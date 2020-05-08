@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -63,14 +63,14 @@ namespace AFLOW_PTHREADS {
     if(VERBOSE) {;} // dummy load
     AFLOW_PTHREADS::FLAG=FALSE;
     AFLOW_PTHREADS::MAX_PTHREADS=1;
-    bool fnp1=aurostd::args2attachedutype<bool>(argv,"--np=",FALSE);
-    bool fnp=aurostd::args2attachedflag(argv,"--np=");
+    bool fnp=XHOST.vflag_control.flag("XPLUG_NUM_THREADS"); // aurostd::args2attachedflag(argv,"--np=");
+    
     bool fnpmax=aurostd::args2flag(argv,"--npmax");
     bool multi_sh=aurostd::args2flag(argv,"--multi=sh|--multi=sh");
     if(!fnp && !fnpmax) {AFLOW_PTHREADS::MAX_PTHREADS=1;}
-    if(fnp && !fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::args2attachedutype<int>(argv,"--np=",0);};
+    if(fnp && !fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; //SC20200319
     if(!fnp && fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();}
-    if(fnp && fnpmax)   {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::args2attachedutype<int>(argv,"--np=",0);};
+    if(fnp && fnpmax)   {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; //SC20200319
     if(multi_sh && !fnp && !fnpmax) {AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();}
 
     if(AFLOW_PTHREADS::MAX_PTHREADS>1) {
@@ -85,7 +85,6 @@ namespace AFLOW_PTHREADS {
     }
     //  AFLOW_PTHREADS::FLAG=TRUE;
     if(LDEBUG) cerr << "AFLOW_PTHREADS::Check_Threads: fnp=" << fnp << endl;
-    if(LDEBUG) cerr << "AFLOW_PTHREADS::Check_Threads: fnp1=" << fnp1 << endl;
     if(LDEBUG) cerr << "AFLOW_PTHREADS::Check_Threads: fnpmax=" << fnpmax << endl;
     if(LDEBUG) cerr << "AFLOW_PTHREADS::Check_Threads: multi_sh=" << multi_sh << endl;
     if(LDEBUG) cerr << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
@@ -566,7 +565,7 @@ namespace AFLOW_PTHREADS {
     // cerr << numzips << endl; exit(0);
     // cerr << sysconf(_SC_ARG_MAX)  << endl;//exit(0);
     for(i=0;i<(uint) numzips;i++) {
-      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
+      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303
       // command="zip -9rv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
       for(uint j=0;j<(uint) size;j++) {
 	if(i*size+j < vdirs.size()) {
@@ -936,7 +935,7 @@ namespace sflow {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// getThreadDistribution - ME 180801
+// getThreadDistribution - ME20180801
 // Calculates the start and end indices for each thread for multi-thread
 // calculations. Note that the end index is not included in each thread.
 vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads) {
@@ -979,6 +978,6 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

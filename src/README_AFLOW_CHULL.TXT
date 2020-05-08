@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -125,7 +125,7 @@ For additional information contact: Corey Oses (corey.oses@duke.edu)
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

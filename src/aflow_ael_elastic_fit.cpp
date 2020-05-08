@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -2473,7 +2473,7 @@ namespace AEL_functions {
     AEL_data.pughs_modulus_ratio = AEL_data.shearmodulus_vrh / AEL_data.bulkmodulus_vrh;
     // Calculates Debye temperature based on speed of sound: see J.-P. Poirer, Introduction to the Physics of the Earth's Interior
     // OBSOLETE double hbar = PLANKSCONSTANT_h / (2 * PI);
-    double hbar = PLANCKSCONSTANT_hbar;  // ME 181020
+    double hbar = PLANCKSCONSTANT_hbar;  //ME20181020
     double sqrtvol = pow(AEL_data.cellvolumem3, 0.5);
     aurostd::StringstreamClean(aus);
     aus << _AELSTR_MESSAGE_ + "hbar = " << hbar << endl;
@@ -2492,3 +2492,9 @@ namespace AEL_functions {
 // ***************************************************************************************
 
 #endif // _AFLOW_AEL_ELASTIC_FIT_CPP
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *                                                                         *
+// ***************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // this file contains the routines to prepare AIMS input files
@@ -292,7 +292,7 @@ namespace KBIN {
         if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=WIGNERSEITZ - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=CARTESIAN - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=FRACTIONAL - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=PRESERVE - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=PRESERVE - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //CO
       }
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -383,7 +383,7 @@ namespace KBIN {
         if(atomABC.size()==2 && volumeABC.size()==0) {
           done=TRUE;
           deque<string> atomX;deque<double> volumeX;
-          for(uint isp=0;isp<=1;isp++) {atomX.push_back(atomABC[isp]);volumeX.push_back(GetAtomVolume(atomABC[isp]));} //KBIN::AIMS_PseudoPotential_CleanName(atomABC[isp]))); //CO200106 - patching for auto-indenting
+          for(uint isp=0;isp<=1;isp++) {atomX.push_back(atomABC[isp]);volumeX.push_back(GetAtomVolume(atomABC[isp]));} //KBIN::AIMS_PseudoPotential_CleanName(atomABC[isp]))); //CO20200106 - patching for auto-indenting
           xaims.str=aflowlib::PrototypeLibraries(FileMESSAGE,label,parameters,atomX,volumeX,-1.0,LIBRARY_MODE_HTQC);
         }
         if(atomABC.size()==2 && volumeABC.size()==1) {
@@ -648,26 +648,26 @@ namespace KBIN {
       aus << "00000  MESSAGE GEOM  STANDARD_PRIMITIVE Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.Standard_Primitive_UnitCellForm();
-      // CO - START
-      //corey, fix issue with iatoms tag becoming atom names
+      //CO START
+      //CO, fix issue with iatoms tag becoming atom names
       bool write_inequivalent_flag=xaims.str.write_inequivalent_flag;
-      // CO - END
+      //CO END
       string bravais_lattice_type=xaims.str.bravais_lattice_type,bravais_lattice_variation_type=xaims.str.bravais_lattice_variation_type,pearson_symbol=xaims.str.pearson_symbol;
       xaims.str.title=xaims.str.title+" [Standard_Primitive Unit Cell Form]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
-      // CO - START
-      //corey, fix if write_inequivalent_flag is present
+      //CO START
+      //CO, fix if write_inequivalent_flag is present
       xaims.str.write_inequivalent_flag=FALSE;
-      //corey, fix if write_inequivalent_flag is present
+      //CO, fix if write_inequivalent_flag is present
       xaims.GEOM << xaims.str;
-      xaims.str.clear();xaims.GEOM >> xaims.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed //DX 20191220 - uppercase to lowercase clear
-      //corey add these flags to prevent recalculation and wasted effort
+      xaims.str.clear();xaims.GEOM >> xaims.str;  //CO, this is important, clear all symmetry stuff as the whole lattice has changed //DX20191220 - uppercase to lowercase clear
+      //CO add these flags to prevent recalculation and wasted effort
       xaims.str.Standard_Lattice_calculated=TRUE;
       xaims.str.Standard_Lattice_primitive=TRUE;
-      //corey add these flags to prevent recalculation and wasted effort
-      //corey, fix issue with iatoms tag becoming atom names
+      //CO add these flags to prevent recalculation and wasted effort
+      //CO, fix issue with iatoms tag becoming atom names
       xaims.str.write_inequivalent_flag=write_inequivalent_flag;
-      // CO - END
+      //CO END
       xaims.str.bravais_lattice_type=bravais_lattice_type;xaims.str.bravais_lattice_variation_type=bravais_lattice_variation_type;xaims.str.pearson_symbol=pearson_symbol;
       xaims.aopts.flag("FLAG::XAIMS_GEOM_generated",TRUE);
       xaims.aopts.flag("FLAG::XAIMS_GEOM_changed",TRUE);
@@ -681,33 +681,33 @@ namespace KBIN {
       aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.Standard_Conventional_UnitCellForm();
-      // CO - START
-      //corey, fix issue with iatoms tag becoming atom names
+      //CO START
+      //CO, fix issue with iatoms tag becoming atom names
       bool write_inequivalent_flag=xaims.str.write_inequivalent_flag;
-      // CO - END
+      //CO END
       string bravais_lattice_type=xaims.str.bravais_lattice_type,bravais_lattice_variation_type=xaims.str.bravais_lattice_variation_type,pearson_symbol=xaims.str.pearson_symbol;
       xaims.str.title=xaims.str.title+" [Standard_Conventional Unit Cell Form]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
-      // CO - START
-      //corey, fix if write_inequivalent_flag is present
+      //CO START
+      //CO, fix if write_inequivalent_flag is present
       xaims.str.write_inequivalent_flag=FALSE;
-      //corey, fix if write_inequivalent_flag is present
+      //CO, fix if write_inequivalent_flag is present
       xaims.GEOM << xaims.str;
-      xaims.str.clear();xaims.GEOM >> xaims.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change //DX 20191220 - uppercase to lowercase clear
-      //corey add these flags to prevent recalculation and wasted effort
+      xaims.str.clear();xaims.GEOM >> xaims.str;  //CO, this is important, clear all symmetry stuff as the whole lattice has change //DX20191220 - uppercase to lowercase clear
+      //CO add these flags to prevent recalculation and wasted effort
       xaims.str.Standard_Lattice_calculated=TRUE;
       xaims.str.Standard_Lattice_conventional=TRUE;
-      //corey add these flags to prevent recalculation and wasted effort
-      //corey, fix issue with iatoms tag becoming atom names
+      //CO add these flags to prevent recalculation and wasted effort
+      //CO, fix issue with iatoms tag becoming atom names
       xaims.str.write_inequivalent_flag=write_inequivalent_flag;
-      // CO - END
+      //CO END
       xaims.str.bravais_lattice_type=bravais_lattice_type;xaims.str.bravais_lattice_variation_type=bravais_lattice_variation_type;xaims.str.pearson_symbol=pearson_symbol;
-      // xaims.str.clear();xaims.GEOM >> xaims.str; //DX 20191220 - uppercase to lowercase clear
+      // xaims.str.clear();xaims.GEOM >> xaims.str; //DX20191220 - uppercase to lowercase clear
       // cout << xaims.str << endl;
       xaims.aopts.flag("FLAG::XAIMS_GEOM_generated",TRUE);
       xaims.aopts.flag("FLAG::XAIMS_GEOM_changed",TRUE);
-      aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell Lattice = ["+xaims.str.bravais_lattice_type << "," << xaims.str.bravais_lattice_variation_type << "," << xaims.str.pearson_symbol << "]" << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); // CO
+      aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell Lattice = ["+xaims.str.bravais_lattice_type << "," << xaims.str.bravais_lattice_variation_type << "," << xaims.str.pearson_symbol << "]" << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //CO
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //CO
       // cerr << det(xaims.str.lattice) << endl;
     }
 
@@ -1055,6 +1055,6 @@ namespace KBIN {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

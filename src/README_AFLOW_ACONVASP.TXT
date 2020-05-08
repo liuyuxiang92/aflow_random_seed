@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -726,6 +726,29 @@ LATTICES = (the ones with "")
   aflow --cart [-c] < POSCAR
         Outputs to standard out a new POSCAR file with atom
         positions in cartesian coordinates.
+
+  aflow --cce[=STRUCT_FILE --usage]
+        Prints user instructions for CCE.
+  aflow --cce=STRUCT_FILE
+        options:
+            [ --usage ]
+            [ --functionals=PBE|LDA|SCAN]
+            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --oxidation_numbers=ox_num_1,ox_num_2,...]
+            [ --print=json|out] (default is out)
+
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
+        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
+        Precalculated DFT formation energies can be provided as a comma separated list using the option
+        --dft_formation_energies= in eV/cell.
+        Functionals for which corrections should be returned can be provided as a comma separated list 
+        using the option --functionals=. If used together with --dft_formation energies, the functionals
+        must be in the same sequence as the DFT formation energies they correspond to. 
+        Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
+        It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
+        same sequence as the corresponding atoms in the provided structure file.
+        Output in json format can be obtained using the option --print=json
+
   aflow --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]
                               |CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]
                               |CHGCAR,CUTOFF[,DOWNSAMPLE]
@@ -855,6 +878,8 @@ LATTICES = (the ones with "")
             (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
           [--geometry_file=POSCAR.relax1] : Compare geometries from a particular step in the DFT relaxation 
             (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
+          [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation.
+            Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
       [GENERAL_COMPARISON_OPTIONS] :
         [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
         [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
@@ -1167,6 +1192,9 @@ LATTICES = (the ones with "")
         See --edos. Outputs total DOS and DOS of orbital s and d. The sDOS or dDOS is per species
         as given in POSCAR. Output format:
         Energy DOSup DOSdown s_up_spec1 s_down_spec1...s_up_specN s_down_specN d_up_spec1 d_down_spec1...d_up_specN d_down_specN
+  aflow --elk
+        Transforms an input geometry file to the ELK format.
+        The output follows the ELK conventions discussed in http://elk.sourceforge.net/elk.pdf.
   aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculate point/factor/space group and use them to label equivalent
         and inequivalent atoms. On the output, each structure atom has
@@ -2106,7 +2134,7 @@ LATTICES = (the ones with "")
   aflow --platonSG_number[=EQUAL | EXACT][,ang,d1,d2,d3] < POSCAR
         Same as above but prints ONLY the space group number.	  
 
-  aflow --plotband | --plotbands[=directory[,Emin[,Emax]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--title=]
+  aflow --plotband|--plotbands[=directory[,Emin[,Emax]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
         Generate bandstructure plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory:
          DOSCAR.static
@@ -2122,6 +2150,7 @@ LATTICES = (the ones with "")
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
          --title: the title of the plot in LaTeX format (default: title in EIGENVAL file)
+         --outfile: the name of the output image file.
         Examples:
          aflow --plotband=/common/DATA/ZnO,-8,6
          aflow --plotband=./ --print=gpl --print=png --title=ZnO
@@ -2150,7 +2179,7 @@ LATTICES = (the ones with "")
          Emax: The maximum value of the DOS plot. Default value 10
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
 
-  aflow --plotbanddos [=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
+  aflow --plotbanddos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=] [--outfile=]
         Generate combined bandstructure and DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	 DOSCAR.static
@@ -2171,11 +2200,12 @@ LATTICES = (the ones with "")
          --print: specify the format of the output image (default: pdf)
          --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
+         --outfile: the name of the output image file.
         Examples:
           aflow --plotbanddos=/common/DATA/ZnO,-8,6,1.5
           aflow --plotbanddos=./ --print=png --projection=atoms
 
-  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
+  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=] [--outfile=]
         Generate DOS plot using GNUPLOT and pdfLaTeX
         The following file must reside in the directory:
          DOSCAR.static
@@ -2194,6 +2224,7 @@ LATTICES = (the ones with "")
          --print: specify the format of the output image (default: pdf)
          --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
+         --outfile: the name of the output image file.
         Examples:
          aflow --plotdos=/common/DATA/ZnO,-8,6
          aflow --plotdos=./ --print=png --projection=atoms
@@ -2208,7 +2239,7 @@ LATTICES = (the ones with "")
          Emax: The maximum value of the DOS plot. Default value: 10
          DOSSCALE: The scale value of the DOS plot. Default value: 1.2
  
-  aflow --plotpdos | --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+  aflow --plotpdos|--plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=] [--outfile=]
         Generate atom-projected DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	  	DOSCAR.static
@@ -2228,11 +2259,12 @@ LATTICES = (the ones with "")
          --print: specify the format of the output image (default: pdf)
          --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
+         --outfile: the name of the output image file.
         Examples:
          aflow --plotpdos=/common/DATA/ZnO,-1,-8,6,1.2
          aflow --plotpdos=./,2 --print=png
 
-  aflow --plotpdosall | --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+  aflow --plotpdosall|--plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=] [--outfile=]
         Generate atom-projected DOS plots of all inequivalent atoms using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	  	DOSCAR.static
@@ -2251,6 +2283,7 @@ LATTICES = (the ones with "")
          --print: specify the format of the output image (default: pdf)
          --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
+         --outfile: the name of the output image file.
         Examples:
          aflow --plotpdosall=/common/DATA/ZnO,-1,-8,6,1.2
          aflow --plotpdosall=./ --print=png
@@ -2269,7 +2302,7 @@ LATTICES = (the ones with "")
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
         Use --keep=gnuplot (--keep=GPL) to keep the GNU plot code.
 
-  aflow --plotphdisp | --plotphonondispersion | --pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+  aflow --plotphdisp|--plotphonondispersion|--pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
         Plot the phonon dispersion using GNUPLOT and pdfLaTex
         The following files must reside in the directory
                 PHDOSCAR
@@ -2286,7 +2319,7 @@ LATTICES = (the ones with "")
          --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
          --unit: the unit of the phonon frequencies/energies (default: THz)
         Example:
-         aflow --plotphdisp=./  --print=png --unit=cm-1
+         aflow --plotphdisp=./ --print=png --unit=cm-1
         
   aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
         Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
@@ -2305,10 +2338,11 @@ LATTICES = (the ones with "")
          --print: specify the format of the output image (default: pdf)
          --title: the title of the plot in LaTeX format (default: title in PHDOSCAR file)
          --unit: the unit of the phonon frequencies/energies (default: THz)
+         --outfile: the name of the output image file.
         Example:
          aflow --plotphdispdos=./  --print=png --unit=cm-1
  	  
-  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+  aflow --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
         Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
         The following files must reside in the directory
                 PHDOSCAR
@@ -2322,10 +2356,11 @@ LATTICES = (the ones with "")
          --print: specify the format of the output image (default: pdf)
          --title: the title of the plot in LaTeX format (default: title in PHDOSCAR file)
          --unit: the unit of the phonon frequencies/energies (default: THz)
+         --outfile: the name of the output image file.
         Example:
          aflow --plotphdos=./  --print=png --unit=cm-1
 
-  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
         Plots the APL thermal properties such as vibrational free energy, entropy, and heat capacity
         using GNUPLOT and pdfLaTeX.
         The following file must reside in the directory:
@@ -2338,10 +2373,11 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --print: specify the format of the output image (default: pdf)
          --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+         --outfile: the name of the output image file.
         Example:
          aflow --plotthermo=./,100,300
 
-  aflow --plotcond | --plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+  aflow --plotcond|--plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
         Plots the AAPL thermal conductivity using GNUPLOT and pdfLaTeX.
         The following file must reside in the directory:
                 aflow.aapl.thermal_conductivity.out
@@ -2353,6 +2389,7 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --print: specify the format of the output image (default: pdf)
          --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+         --outfile: the name of the output image file.
         Example:
          aflow --plottcond=./,100,300
 
@@ -2488,6 +2525,32 @@ LATTICES = (the ones with "")
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
+  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+        Calculates the dual of the crystal point group symmetry operations and writes
+        it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
+        This routine consists of symmetry consistency checks. If symmetry rules are broken,
+        the code automatically changes tolerance and recalculates from the beginning.
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must not be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Magnetic analysis:
+          The magnetic tag specifies the magnetic moment on each of the atoms.  The
+          two input formats are a comma separated string of the magnetic moments -
+          in the same order as the input file, the location of the INCAR, or the location
+          of the OUTCAR, which is then read and the magnetic moment for each atom is found
+          (must be a static calculation, otherwise this information isn't specified).
+          Works for both collinear and non-collinear systems (AFLOW autodetects
+          collinear/non-collinear based on the input).
+        Options:
+          [--no_scan] : Will not perform tolerance scan.
+          [--print=txt | --print=json] : Specify output format.
+          [--screen_only] : Prints symmetry elements to string and does not write to a file.
+          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+        Check aflow --readme=symmetry
   aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
         Calculates the point group symmetry of the klattice {K} and writes
         it in the aflow.pgroupk.out file. See documentation of aflow.
@@ -2505,9 +2568,9 @@ LATTICES = (the ones with "")
           [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
-        Calculates the dual of the crystal point group symmetry operations and writes
-        it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
+  aflow --pointgroupk_Patterson | --pgroupk_Patterson[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+        Calculates the Patterson point group symmetry operations and writes
+        it in the aflow.pgroupk_Patterson.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
         the code automatically changes tolerance and recalculates from the beginning.
         Tolerance:
@@ -2578,6 +2641,25 @@ LATTICES = (the ones with "")
   aflow --poscar2aflowin < POSCAR
         Makes an "almost standard" aflow.in starting from the poscar.
         Useful for scripting (SC100630).
+
+  aflow --poscar2cce < STRUCT_FILE
+        options:
+            [ --functionals=PBE|LDA|SCAN]
+            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --oxidation_numbers=ox_num_1,ox_num_2,...]
+            [ --print=json|out] (default is out)
+
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
+        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
+        Precalculated DFT formation energies can be provided as a comma separated list using the option
+        --dft_formation_energies= in eV/cell.
+        Functionals for which corrections should be returned can be provided as a comma separated list 
+        using the option --functionals=. If used together with --dft_formation energies, the functionals
+        must be in the same sequence as the DFT formation energies they correspond to. 
+        Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
+        It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
+        same sequence as the corresponding atoms in the provided structure file.
+        Output in json format can be obtained using the option --print=json
 
   aflow --poscar2enum < POSCAR
         Convert a POSCAR into an input format for MULTIENUM (partial occupation).
@@ -2680,6 +2762,10 @@ LATTICES = (the ones with "")
         Give the list of prototypes (file LIST.txt) from the DMQC-HTQC
         project (SC oct 08)
 
+  aflow --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=
+       Returns unique identification information about the
+       pseudopotentials used for the calculations.   
+ 
   aflow [--server=XXXXXXXX] --prototypes_icsd[=N] | --protos_icsd[=N]                                  
         Give the list of prototypes from the ICSD database included in the code.   
         If N is passed, then it returns ONLY the N-ary compounds.
@@ -3290,6 +3376,40 @@ LATTICES = (the ones with "")
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
         VASP format.                                          
 
+  aflow --visualize_phonons --qpoint=|--qpoints=|--q= [--format=XCRYSDEN|V_SIM] [--amplitude=] [--branches=] [--periods=] [--steps=] [--scell=] -D DIRECTORY
+        Outputs a phonon visualization file. Currently supported formats: xcrysden and v_sim.
+        A phonon calculator state file (aflow.apl.fccalc_state.out) and a force constant
+        file (aflow.apl.harmonicIFCs.xml) must reside in the directory.
+
+        Options for all formats:
+          --qpoint:    q-points for the phonons to be visualized as a comma-separated list.
+                       Multiple points can be specified.
+
+          --format:    The output file format.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+
+          --amplitude: The amplitude of the displacements.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+
+
+        Options for XCRYSDEN:
+          --branches:  The branches of the phonon modes as a comma-separated list (1-based).
+                       Default: all.
+
+          --periods:   The number of periods displayed in the output file.
+                       Default: DEFAULT_APL_ADISP_NPERIODS in .aflow.rc
+
+          --steps:     The number of steps per period in the output file.
+                       Default: DEFAULT_APL_ADISP_NSTEPS in .aflow.rc
+
+          --scell:     The supercell to be displayed in the output file.
+                       Default: unit cell.
+
+        Examples:
+          aflow --visualize_phonons --qpoint=0.5,0,0 --steps=40 --amplitude=0.3 --scell=3x3x3 -D ./
+          aflow --visualize_phonons --q=0,0,0,0.5,0.5,0.5 --branches=4,5,6 --format=XCRYSDEN --scell=4x4x2
+          aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
+
   aflow --volume v < POSCAR
         Outputs POSCAR file giving having volume equal to v.
   aflow --volume*= x < POSCAR
@@ -3509,7 +3629,7 @@ AFLOWLIB MODE
 	
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

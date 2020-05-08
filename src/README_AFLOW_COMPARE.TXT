@@ -1,6 +1,6 @@
 ********************************************************************************
 *                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2020              *
 *                High-Throughput ab-initio Materials Discovery                 *
 *                                                                              *
 ********************************************************************************
@@ -52,6 +52,17 @@ Compounds are compared until each structure is matched or all possible compariso
 See AFLOW COMMANDS USAGE for more details.
 
 ----------------------------------------------------------------------
+INPUT FILE TYPES
+AFLOW-XtalMatch automatically detects the input geometry file type. 
+The supported formats are:
+  - VASP (POSCAR or CONTCAR)
+  - QuantumESPRESSO
+  - FHI-AIMS
+  - ABINIT
+  - CIF
+  - ELK
+
+----------------------------------------------------------------------
 COMPARE TO ESTABLISHED STRUCTURES 
 Users can compare input structures to the AFLOW.org repository and the AFLOW Library of Crystallographic Prototypes.
 The functionality is useful for identifying equivalent compounds within repositories and relating their properties. 
@@ -82,6 +93,7 @@ LIST OF AFLOW-XtalMatch COMMANDS:
   aflow --compare_structures      : Compares structures (ignore species in mapping) and returns their level 
                                     of similarity
   aflow --prototype               : Returns ANRL label/parameters/parameter values of the structure
+  aflow --isopointal_prototypes   : Returns all isopointal (i.e., same symmetry) to input structure
   aflow --unique_atom_decorations : Returns the unique atom decorations for the structure
   
 For details on usage, see the "AFLOW COMMANDS USAGE" section below.
@@ -162,12 +174,12 @@ General options - applicable to all commands - is listed at the bottom of this s
         
         [COMPARE2DATABASE_OPTIONS] : Options specific to this command:
 
-            [--properties=enthalpy_atom,natoms,...]        : Specify the properties via their API keyword to print the corresponding 
-                                                             values with the comparison results.
-            [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] : Restrict the entries to compare with to a specific catalog/library 
-                                                             (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
-            [--geometry_file=POSCAR.relax1]                : Compare geometries from a particular step in the DFT relaxation 
-                                                             (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
+            [--properties=enthalpy_atom,natoms,...]          : Specify the properties via their API keyword to print the corresponding 
+                                                               values with the comparison results.
+            [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd]   : Restrict the entries to compare with to a specific catalog/library 
+                                                               (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
+            [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation. 
+                                                               Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
 
 
     aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
@@ -219,6 +231,19 @@ General options - applicable to all commands - is listed at the bottom of this s
                   - rhombohedral setting for rhombohedral space groups, and 
                   - origin centered on the inversion for centrosymmetric space groups 
               (default: anrl).
+    
+
+    aflow --isopointal_prototype [ISOPOINTAL_OPTIONS] < file             
+        Returns the prototype labels that are isopointal (i.e., same symmetry) as the input structure.
+        In this case, the same symmetry means that the structures have commensurate:
+          1) space groups (equivalent or enantiomorphic pairs) and
+          2) Wyckoff positions (same multiplicity and site symmetry)
+        Can be used to quickly determine if structures cannot be generated with AFLOW
+        (i.e., reveals if structures have similar AFLOW prototype designations).
+            
+        [ISOPOINTAL_OPTIONS] : Options specific to this command:
+        
+          [--catalog=anrl|htqc|all] : Restrict the entries to compare with to a specific catalog/library (e.g., `anrl' or `htqc').
 
 
     aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file
@@ -262,7 +287,7 @@ For additional information contact: David Hicks (david.hicks@duke.edu)
 
 ********************************************************************************
 *                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2020              *
 *                High-Throughput ab-initio Materials Discovery                 *
 *                                                                              *
 ********************************************************************************

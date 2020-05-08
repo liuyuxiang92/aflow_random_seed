@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -31,7 +31,7 @@
 //   * Check if the database needs to be rebuild. This can be triggered either
 //     by the user, by new entries in the schema, or by new/updated dat files.
 //     The dat files are collections of aflowlib.json files for a set of
-//     AUIDs (i.e. aflow:00.dat, aflow:01.dat, etc.).
+//     AUIDs (i.e. aflow:00.jsonl, aflow:01.jsonl, etc.).
 //   * Create a temporary database file and populate with data from these JSONs.
 //     Rebuilding from scratch instead of incrementally adding into the existing
 //     database protects the database from corruption and injection attacks.
@@ -56,7 +56,7 @@
 #include <mutex>
 std::mutex m;
 #else
-#warning "The multithread parts of AflowDB will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#warning "The multithread parts of AflowDB will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 #define _AFLOW_DB_DEBUG_ true  // switched on for logging
@@ -65,7 +65,7 @@ using std::string;
 using std::vector;
 
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
-static const int _DEFAULT_SET_LIMIT_ = 16;
+static const uint _DEFAULT_SET_LIMIT_ = 16; //DX20200317 - int -> uint
 static const int _N_AUID_TABLES_ = 256;
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
@@ -139,7 +139,7 @@ namespace aflowlib {
   void AflowDB::open(int open_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "open(): Opening " << database_file << std::endl;
-    int sql_code = sqlite3_open_v2(database_file.c_str(), &db, open_flags, nullptr);
+    int sql_code = sqlite3_open_v2(database_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
       string message = "Could not open database file " + database_file;
@@ -162,13 +162,13 @@ namespace aflowlib {
     }
   }
 
-} // namespace aflowlib
+}  // namespace aflowlib
 
 /********************************* TMP FILE **********************************/
 
 namespace aflowlib {
 
-  //openTmpFile/////////////////////////////////////////////////////////////////
+  //openTmpFile///////////////////////////////////////////////////////////////
   // Opens a temporary database file 
   void AflowDB::openTmpFile(int open_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
@@ -194,7 +194,7 @@ namespace aflowlib {
     // progress or failed.
     if (aurostd::FileExist(tmp_file)) {
       long int tm_tmp = aurostd::FileModificationTime(tmp_file);
-      time_t t = std::time(nullptr);
+      time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
       long int tm_curr = (long int) t;
       int pid = -1;
       bool del_tmp = false;
@@ -252,22 +252,23 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
-    sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, nullptr);
+    sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
       string message = "Could not open tmp database file " + tmp_file;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
+
     is_tmp = true;
     aurostd::RemoveFile(lock_link);
   }
 
-  //closeTmpFile////////////////////////////////////////////////////////////////
-  // Closes a temporary database file and overwrites the original if the build
-  // was successful. Unless --rebuild_database was selected by the user, this
-  // function tests whether the new database has less entries than the old one.
-  // To avoid data loss, the original file should not be overwritten.
+  //closeTmpFile//////////////////////////////////////////////////////////////
+  // Closes a temporary database file and overwrites the original if the
+  // build was successful. Unless --rebuild_database was selected by the user,
+  // this function tests whether the new database has less entries than the
+  // old one. To avoid data loss, the original file should not be overwritten.
   bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string tmp_file = database_file + ".tmp";
@@ -321,7 +322,7 @@ namespace aflowlib {
     } else {
       if (!aurostd::FileEmpty(database_file)) {
         if (LDEBUG) std::cerr << "Old database file found. "
-          << " Determining number of entries and " << std::endl;
+          << " Determining number of entries and properties." << std::endl;
         open();
         vector<string> props, tables;
         tables = getTables();
@@ -385,7 +386,7 @@ namespace aflowlib {
     return copied;
   }
 
-  //isTMP///////////////////////////////////////////////////////////////////////
+  //isTMP/////////////////////////////////////////////////////////////////////
   // Returns whether or not the cursor points to a temporary file or not
   bool AflowDB::isTMP() {
     return is_tmp;
@@ -397,7 +398,7 @@ namespace aflowlib {
 
 namespace aflowlib {
 
-  //rebuildDatabase/////////////////////////////////////////////////////////////
+  //rebuildDatabase///////////////////////////////////////////////////////////
   // This function first checks if a rebuild is necessary and then initiates
   // the rebuilding functions. Returns true if the database has been
   // successfully rebuilt.
@@ -447,7 +448,7 @@ namespace aflowlib {
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
           key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
-          if (!aurostd::withinList(columns, key, index)) break;
+          if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
         rebuild_db = (k != nkeys);
@@ -461,8 +462,8 @@ namespace aflowlib {
       for (int i = 0; i < _N_AUID_TABLES_; i++) {
         stringstream t;
         t << std::setfill('0') << std::setw(2) << std::hex << i;
-        json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
-        if (!aurostd::EFileExist(json_files[i])) {
+        json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+        if (!aurostd::EFileExist(json_files[i]) && !aurostd::FileExist(json_files[i])) {
           string message = data_path + " is not a valid data path. Missing file for aflow:" + t.str() + ".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
         }
@@ -490,9 +491,9 @@ namespace aflowlib {
     }
   }
 
-  // Rebuild -------------------------------------------------------------------
+  // Rebuild -----------------------------------------------------------------
 
-  //rebuildDB///////////////////////////////////////////////////////////////////
+  //rebuildDB/////////////////////////////////////////////////////////////////
   // Rebuilds the database from scratch.
   void AflowDB::rebuildDB() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
@@ -531,8 +532,8 @@ namespace aflowlib {
     if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Finished rebuild." << std::endl;
   }
 
-  //buildTables/////////////////////////////////////////////////////////////////
-  // Reads the .dat files and processes the JSONs for the database writer.
+  //buildTables///////////////////////////////////////////////////////////////
+  // Reads the .jsonl files and processes the JSONs for the database writer.
   void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
     for (int i = startIndex; i < endIndex; i++) {
       stringstream t;
@@ -540,7 +541,7 @@ namespace aflowlib {
       string table = "auid_" + t.str();
       createTable(table, columns, types);
 
-      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
+      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
       vector<string> data;
       aurostd::efile2vectorstring(jsonfile, data);
       uint ndata = data.size();
@@ -552,7 +553,7 @@ namespace aflowlib {
     }
   }
 
-  //populateTable///////////////////////////////////////////////////////////////
+  //populateTable/////////////////////////////////////////////////////////////
   // Populates the database tables and creates indexes. This function uses a
   // mutex to make the writing thread-safe. While SQLITE does not allow
   // concurrent writing anyway, multiple threads may open a transaction, which
@@ -593,27 +594,28 @@ namespace aflowlib {
     if (LDEBUG) std::cerr << "Finished building table " << table << std::endl;
   }
 
-  // Schema --------------------------------------------------------------------
+  // Schema ------------------------------------------------------------------
 
-  //getSchemaKeys///////////////////////////////////////////////////////////////
+  //getSchemaKeys/////////////////////////////////////////////////////////////
   // Returns the keys from the AFLOW schema.
   vector<string> AflowDB::getSchemaKeys() {
     vector<string> keys;
     string key = "";
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
       if(aurostd::substring2bool(XHOST.vschema.vxsghost[i], "::NAME:")) {
-        key = aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
         keys.push_back(key);
       }
     }
     return keys;
   }
 
-  // Data ----------------------------------------------------------------------
+  // Data --------------------------------------------------------------------
 
-  //getDataTypes////////////////////////////////////////////////////////////////
-  // Gets the data types of the schema keys and converts them into SQLite types.
-  // Note that SQLite does not recognize arrays, so they will be stored as text.
+  //getDataTypes//////////////////////////////////////////////////////////////
+  // Gets the data types of the schema keys and converts them into SQLite
+  // types. Note that SQLite does not recognize arrays, so they will be stored
+  // as text.
   vector<string> AflowDB::getDataTypes(const vector<string>& keys, bool unique) {
     uint nkeys = keys.size();
     vector<string> types(nkeys);
@@ -632,7 +634,7 @@ namespace aflowlib {
     return types;
   }
 
-  //getDataValues///////////////////////////////////////////////////////////////
+  //getDataValues/////////////////////////////////////////////////////////////
   // Retrieves the values of each property from the aflowlib.json file.
   vector<string> AflowDB::getDataValues(const string& entry, const vector<string>& cols, const vector<string>& types) {
     string value = "", id = "";
@@ -648,10 +650,10 @@ namespace aflowlib {
     return values;
   }
 
-  //extractJsonValueAflow///////////////////////////////////////////////////////
-  // This function extracts values from an aflowlib.json file. It is much faster
-  // than using SQLite's JSON extension, but has was designed to only work for
-  // the aflowlib.json. It cannot handle nested JSONs!
+  //extractJsonValueAflow/////////////////////////////////////////////////////
+  // This function extracts values from an aflowlib.json file. It is much
+  // faster than using SQLite's JSON extension, but has was designed to only
+  // work for the aflowlib.json. It cannot handle nested JSONs!
   string AflowDB::extractJsonValueAflow(const string& json, string key) {
     string value = "";
     key = "\"" + key + "\":";
@@ -661,10 +663,10 @@ namespace aflowlib {
       start += key.length();
       end = json.find("\":", start);
       if (end != string::npos) {
+        // In case there is any white space between key and value
         value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
         // If we have a nested object, "value" should only be '{' + white space by now.
         if (value[0] == '{') {
-          // In case there is any white space between key and value
           string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
           string message = "JSON parser cannot read nested objects.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
@@ -688,13 +690,13 @@ namespace aflowlib {
     return value;
   }
 
-} // namespace aflowlib
+}  // namespace aflowlib
 
 /**************************** DATABASE ANALYSIS *****************************/
 
 namespace aflowlib {
 
-  //analyzeDatabase/////////////////////////////////////////////////////////////
+  //analyzeDatabase///////////////////////////////////////////////////////////
   // Provides analytics for the database in JSON format.
   void AflowDB::analyzeDatabase(const string& outfile) {
 
@@ -731,7 +733,7 @@ namespace aflowlib {
     aurostd::stringstream2file(json, outfile);
   }
 
-  //getCatalogStats/////////////////////////////////////////////////////////////
+  //getCatalogStats///////////////////////////////////////////////////////////
   // Gets the statistics for all properties in the catalog.
   DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& tables,
       const vector<string>& cols, const vector<string>& loops) {
@@ -829,7 +831,7 @@ namespace aflowlib {
                   nset = n;
                 } else {
                   for (uint i = 0; i < n; i++) {
-                    if (!aurostd::withinList(set, sets[t][c][i])) {
+                    if (!aurostd::WithinList(set, sets[t][c][i])) {
                       set.push_back(sets[t][c][i]);
                       nset++;
                     }
@@ -868,16 +870,16 @@ namespace aflowlib {
     return stats;
   }
 
-  //getColStats/////////////////////////////////////////////////////////////////
+  //getColStats///////////////////////////////////////////////////////////////
   // Retrieves the statistics for each database property and the loops.
   void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
       const vector<string>& tables, const vector<string>& cols, const vector<string>& loops,
       vector<vector<int> >& counts, vector<vector<int> >& loop_counts,
       vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
     sqlite3* cursor;
-    int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, nullptr);
+    int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
       string message = "Could not open cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -902,13 +904,13 @@ namespace aflowlib {
 
     sql_code = sqlite3_close(cursor);
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
       string message = "Could not close cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
   }
 
-  //getUniqueFromJsonrrays/////////////////////////////////////////////////////
+  //getUniqueFromJsonArrays///////////////////////////////////////////////////
   // Determines the unique array elements in a set of 1D-array strings.
   vector<string> AflowDB::getUniqueFromJsonArrays(const vector<string>& arrays) {
     vector<string> unique, tokens;
@@ -917,9 +919,9 @@ namespace aflowlib {
     for (uint a = 0; a < arrays.size(); a++) {
       vector<string> tokens;
       arr = arrays[a];
-      arr = aurostd::RemoveSubString(arr, "[");
-      arr = aurostd::RemoveSubString(arr, "]");
-      arr = aurostd::RemoveSubString(arr, "\"");
+      arr=aurostd::RemoveSubString(arr, "[");
+      arr=aurostd::RemoveSubString(arr, "]");
+      arr=aurostd::RemoveSubString(arr, "\"");
       aurostd::string2tokens(arr, tokens, ", ");
       for (uint t = 0; t < tokens.size(); t++) {
         if (nunique == 0) {
@@ -939,7 +941,7 @@ namespace aflowlib {
     return unique;
   }
 
-  //writeStatsToJson////////////////////////////////////////////////////////////
+  //writeStatsToJson//////////////////////////////////////////////////////////
   // Writes the database statistics into a JSON-formatted string(stream).
   void AflowDB::writeStatsToJson(std::stringstream& json, const DBStats& db_stats) {
     string tab = "    ";
@@ -959,7 +961,7 @@ namespace aflowlib {
       json << indent << tab << tab << tab << "\"count\": ";
       json << aurostd::utype2string<int>(db_stats.count[c]) << "," << std::endl;
       str_formatted = db_stats.min[c];
-      if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+      if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
         str_formatted = "\"" + str_formatted + "\"";
@@ -969,7 +971,7 @@ namespace aflowlib {
       json << indent << tab << tab << tab << "\"min\": "
         << (db_stats.min[c].empty()?"null":str_formatted) << "," << std::endl;
       str_formatted = db_stats.max[c];
-      if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+      if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
         str_formatted = "\"" + str_formatted + "\"";
@@ -990,7 +992,7 @@ namespace aflowlib {
         json << "[" << std::endl;
         for (uint s = 0; s < nset; s++) {
           str_formatted = db_stats.set[c][s];
-          if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+          if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
             str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
             str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
             str_formatted = "\"" + str_formatted + "\"";
@@ -1035,41 +1037,41 @@ namespace aflowlib {
 
 namespace aflowlib {
 
-  // INDEX ---------------------------------------------------------------------
+  // INDEX -------------------------------------------------------------------
 
-  //createIndex/////////////////////////////////////////////////////////////////
+  //createIndex///////////////////////////////////////////////////////////////
   // Creates an index.
   void AflowDB::createIndex(const string& index, const string& table, const string& column) {
     string command = "CREATE INDEX " + index + " ON " + table + "(" + column +  ")";
     sql::SQLexecuteCommand(db, command);
   }
 
-  //dropIndex///////////////////////////////////////////////////////////////////
+  //dropIndex/////////////////////////////////////////////////////////////////
   // Removes an index.
   void AflowDB::dropIndex(const string& index) {
     string command = "DROP INDEX " + index;
     sql::SQLexecuteCommand(db, command);
   }
 
-  // TRANSACTION ---------------------------------------------------------------
+  // TRANSACTION -------------------------------------------------------------
 
-  //transaction/////////////////////////////////////////////////////////////////
+  //transaction///////////////////////////////////////////////////////////////
   // Begings (begin == true) or ends a database transaction.
   void AflowDB::transaction(bool begin) {
     string command = string(begin?"BEGIN":"END") + " TRANSACTION";
     sql::SQLexecuteCommand(db, command);
   }
 
-  // TABLE ---------------------------------------------------------------------
+  // TABLE -------------------------------------------------------------------
 
-  //dropTable///////////////////////////////////////////////////////////////////
+  //dropTable/////////////////////////////////////////////////////////////////
   // Deletes a table from the database.
   void AflowDB::dropTable(const string& table) {
     string command = "DROP TABLE IF EXISTS " + table;
     sql::SQLexecuteCommand(db, command);
   }
 
-  //getTables///////////////////////////////////////////////////////////////////
+  //getTables/////////////////////////////////////////////////////////////////
   // Retrieves a set of tables. If where is empty, all tables in the database
   // will be returned.
   vector<string> AflowDB::getTables(string where) {
@@ -1082,7 +1084,7 @@ namespace aflowlib {
     return sql::SQLexecuteCommandVECTOR(cursor, command);
   }
 
-  //createTable/////////////////////////////////////////////////////////////////
+  //createTable///////////////////////////////////////////////////////////////
   // Creates a table where all columns have the same type.
   void AflowDB::createTable(const string& table, const vector<string>& cols, const string& type) {
     vector<string> types(cols.size(), type);
@@ -1108,9 +1110,9 @@ namespace aflowlib {
     }
   }
 
-  // INSERT --------------------------------------------------------------------
+  // INSERT ------------------------------------------------------------------
 
-  //insertValues////////////////////////////////////////////////////////////////
+  //insertValues//////////////////////////////////////////////////////////////
   // Inserts a set of values into a table.
   void AflowDB::insertValues(const string& table, const vector<string>& vals) {
     vector<string> cols;
@@ -1136,9 +1138,9 @@ namespace aflowlib {
     }
   }
 
-  // GET -----------------------------------------------------------------------
+  // GET ---------------------------------------------------------------------
 
-  //getColumnNames//////////////////////////////////////////////////////////////
+  //getColumnNames////////////////////////////////////////////////////////////
   // Returns the names of all columns in a specific table.
   vector<string> AflowDB::getColumnNames(const string& table) {
     return getColumnNames(db, table);
@@ -1155,7 +1157,7 @@ namespace aflowlib {
     return columns;
   }
 
-  //getColumnTypes//////////////////////////////////////////////////////////////
+  //getColumnTypes////////////////////////////////////////////////////////////
   // Returns the data types of all columns in a specific table.
   vector<string> AflowDB::getColumnTypes(const string& table) {
     return getColumnTypes(db, table);
@@ -1172,9 +1174,9 @@ namespace aflowlib {
     return columns;
   }
 
-  //getValue////////////////////////////////////////////////////////////////////
-  // Gets a value from a specific column. The row must be specified in the where
-  // condition, or else it just takes the first value.
+  //getValue//////////////////////////////////////////////////////////////////
+  // Gets a value from a specific column. The row must be specified in the
+  // where condition, or else it just takes the first value.
   string AflowDB::getValue(const string& table, const string& col, string where) {
     return getValue(db, table, col, where);
   }
@@ -1184,7 +1186,7 @@ namespace aflowlib {
     return sql::SQLexecuteCommandSCALAR(cursor, command);
   }
 
-  //getProperty/////////////////////////////////////////////////////////////////
+  //getProperty///////////////////////////////////////////////////////////////
   // Gets a database property for a specific column.
   string AflowDB::getProperty(const string& property, const string& table,
       const string& col, string where) {
@@ -1196,7 +1198,7 @@ namespace aflowlib {
     return sql::SQLexecuteCommandSCALAR(cursor, command);
   }
 
-  //getPropertyMultiTables//////////////////////////////////////////////////////
+  //getPropertyMultiTables////////////////////////////////////////////////////
   // Gets a database property for a specific column across multiple tables.
   vector<string> AflowDB::getPropertyMultiTables(const string& property, const vector<string>& tables,
       const string& col, string where) {
@@ -1211,7 +1213,7 @@ namespace aflowlib {
     return sql::SQLexecuteCommandVECTOR(cursor, aurostd::joinWDelimiter(commands, " UNION ALL "));
   }
 
-  //getSet//////////////////////////////////////////////////////////////////////
+  //getSet////////////////////////////////////////////////////////////////////
   // Retrieves a (distinct) set from a single column.
   vector<string> AflowDB::getSet(const string& table, const string& col, bool distinct,
       string where, int limit, string order_by) {
@@ -1225,7 +1227,7 @@ namespace aflowlib {
     return sql::SQLexecuteCommandVECTOR(cursor, command);
   }
 
-  //getSetMulitTables///////////////////////////////////////////////////////////
+  //getSetMulitTables/////////////////////////////////////////////////////////
   // Retrieves a (distinct) set from a single column across multiple tables.
   // The result is sorted already, so there is not need for order_by.
   vector<string> AflowDB::getSetMultiTables(const vector<string>& tables, const string& col,
@@ -1245,7 +1247,7 @@ namespace aflowlib {
     return sql::SQLexecuteCommandVECTOR(cursor, command);
   }
 
-  //prepateSELECT///////////////////////////////////////////////////////////////
+  //prepateSELECT/////////////////////////////////////////////////////////////
   // Lower level function to prepare a SELECT statement for all GET functions.
   string AflowDB::prepareSELECT(const string& table, const string& property, const string& cols,
       string where, int limit, string order_by) {
@@ -1271,7 +1273,7 @@ namespace aflowlib {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

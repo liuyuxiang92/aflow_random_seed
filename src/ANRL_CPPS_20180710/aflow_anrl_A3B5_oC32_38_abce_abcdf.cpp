@@ -1,9 +1,9 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
-// Written by Stefano Curtarolo - David Hicks - 2019
+// Written by Stefano Curtarolo - David Hicks - 2020
 // FILE "ANRL/aflow_anrl_A3B5_oC32_38_abce_abcdf.cpp"
 
 #ifndef _AFLOW_ANRL_A3B5_oC32_38_abce_abcdf_CPP
@@ -15,7 +15,7 @@ namespace anrl {
 }
 
 namespace anrl {
-  uint PrototypeANRL_A3B5_oC32_38_abce_abcdf(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
+  uint PrototypeANRL_A3B5_oC32_38_abce_abcdf(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
     // system A3B5_oC32_38_abce_abcdf
 
     if(XHOST.vflag_control.flag("WWW")) {
@@ -36,8 +36,8 @@ namespace anrl {
 
     anrl::vproto2tokens(proto_line,label,nspecies,natoms,spacegroup,nunderscores,nparameters,Pearson_symbol,params,Strukturbericht,prototype,dialect);
 
-    if(!anrl::PrototypeANRL_Consistency(oss,vparameters.size(),nparameters,prototype,label,
-                 Strukturbericht,Pearson_symbol,spacegroup, params, print_mode) && print_mode!=1) { exit(0);}    
+    anrl::PrototypeANRL_Consistency(vparameters.size(),nparameters,prototype,label,
+        Strukturbericht,Pearson_symbol,spacegroup,params,print_mode);    
 
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_A3B5_oC32_38_abce_abcdf: FOUND" << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_A3B5_oC32_38_abce_abcdf: label=" << label << endl;}
@@ -57,8 +57,6 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-
-    _atom atom;
 
     if(print_mode==1 && vparameters.size()==0){
       for(uint n=0;n<nparameters;n++){
@@ -88,7 +86,7 @@ namespace anrl {
     double z9=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A3B5_oC32_38_abce_abcdf: z9=" << z9 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
     str.scale=1.0;
 
     a1=a*xn;
@@ -118,6 +116,8 @@ namespace anrl {
     if(print_mode!=1){
       str.FixLattices(); // Reciprocal/f2c/c2f
     }
+
+    _atom atom;
     
     atom.name="A"; atom.type=0;                                       // atom B1
     atom.fpos(1)=0.0;atom.fpos(2)=-z1;atom.fpos(3)=z1;                     // atom B1
@@ -235,6 +235,6 @@ namespace anrl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

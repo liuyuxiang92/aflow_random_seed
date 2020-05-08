@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -12,7 +12,7 @@
 #include <cmath>
 //#include <ctime>
 #include <sys/time.h>
-#include <cstdlib>  //CO 180515 - system()
+#include <cstdlib>  //CO20180515 - system()
 //#include <time.h>
 
 using std::string;
@@ -38,9 +38,8 @@ typedef unsigned uint;
 extern std::string Library_HTQC;
 
 // LINKED #include "aflow_data_calculated.cpp"  // created automatically
-extern std::string vAUID;
-extern std::string vAURL;
-extern std::string vLOOP;
+extern std::string vLIBS;
+extern std::string vAURL,vAUID,vLOOP;
 
 // [OBSOLETE] #include "aflow_data_binary.cpp"  // created automatically
 // LINKED #include "aflow_data_libraries.cpp"  // created automatically
@@ -91,11 +90,11 @@ extern std::string README_AFLOW_AGL_TXT;
 extern std::string README_AFLOW_AEL_TXT;
 extern std::string README_AFLOW_ANRL_TXT;
 extern std::string README_AFLOW_COMPARE_TXT;
-extern std::string README_AFLOW_GFA_TXT;  //CO190401
+extern std::string README_AFLOW_GFA_TXT;  //CO20190401
 extern std::string README_AFLOW_SYM_TXT;
-extern std::string README_AFLOW_CCE_TXT;  //CO190620
-extern std::string README_AFLOW_CHULL_TXT;  //CO190620
-extern std::string README_AFLOW_EXCEPTIONS_TXT; //ME180705
+extern std::string README_AFLOW_CCE_TXT;  //CO20190620
+extern std::string README_AFLOW_CHULL_TXT;  //CO20190620
+extern std::string README_AFLOW_EXCEPTIONS_TXT; //ME20180705
 extern std::string README_PROTO_TXT;
 extern std::string README_AFLOW_XAFLOW_TXT;
 extern std::string README_AFLOW_AFLOWRC_TXT;
@@ -198,22 +197,6 @@ namespace aflow {
   }
 } // namespace aflow
 
-string vAURL_cutout(string cutout) {
-  vector<string> vvAURL;
-  stringstream sss;
-  aurostd::string2vectorstring(vAURL,vvAURL);
-  for(uint i=0;i<vvAURL.size();i++) {
-    if(aurostd::substring2bool(vvAURL.at(i),cutout)) {
-      aurostd::StringSubst(vvAURL.at(i),cutout,"");
-      aurostd::StringSubst(vvAURL.at(i),"aflowlib.duke.edu:","");
-      aurostd::StringSubst(vvAURL.at(i),"materials.duke.edu:","");
-      aurostd::StringSubst(vvAURL.at(i),"rostrum.egr.duke.edu:","");
-      sss << vvAURL.at(i) << endl;
-    }
-  }
-  return sss.str();
-}
-
 #define AFLOW_LIBRARY_DIRECTORIES          string("/common/AFLOW/LIBS/,/common/VASP,/home/aflow/common/AFLOW/LIBS/,/fslhome/glh43/src/,/usr/local/bin/,/fslhome/fslcollab8/group/bin/,/home/auro/work/AFLOW3/,~/common/AFLOW/LIBS/,./,/nics/a/proj/aflow/common/AFLOW/LIBS/,/home/users/aflow/common/AFLOW/LIBS,/share/apps/AFLOW3/VASP,/home/junkai/PROTO_DATABASE/,/projects/kyang-group/common/LIBS,/somewhere/")  // first is default, tokenized with ","
 
 int main(int _argc,char **_argv) {
@@ -223,7 +206,6 @@ int main(int _argc,char **_argv) {
   vector<string> vAFLOW_LIBRARY_DIRECTORIES;
   aurostd::string2tokens(string(AFLOW_LIBRARY_DIRECTORIES),vAFLOW_LIBRARY_DIRECTORIES,",");// vAFLOW_LIBRARY_DIRECTORIES;
 
-  
   if(_argc==1) {
     cout << aflow::Banner("BANNER_BIG");
   }
@@ -255,11 +237,11 @@ int main(int _argc,char **_argv) {
       cout << aurostd::PaddedPOST("README_AFLOW_AEL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_AEL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_AEL_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_ANRL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_ANRL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_ANRL_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_COMPARE_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_COMPARE_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_COMPARE_TXT,vtemp) << endl;
-      cout << aurostd::PaddedPOST("README_AFLOW_GFA_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_GFA_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_GFA_TXT,vtemp) << endl; //CO190401
+      cout << aurostd::PaddedPOST("README_AFLOW_GFA_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_GFA_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_GFA_TXT,vtemp) << endl; //CO20190401
       cout << aurostd::PaddedPOST("README_AFLOW_SYM_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_SYM_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_SYM_TXT,vtemp) << endl;
-      cout << aurostd::PaddedPOST("README_AFLOW_CCE_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_CCE_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_CCE_TXT,vtemp) << endl; //CO190620
-      cout << aurostd::PaddedPOST("README_AFLOW_CHULL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_CHULL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_CHULL_TXT,vtemp) << endl; //CO190620
-      cout << aurostd::PaddedPOST("README_AFLOW_EXCEPTIONS_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_EXCEPTIONS_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_EXCEPTIONS_TXT,vtemp) << endl; //ME180705
+      cout << aurostd::PaddedPOST("README_AFLOW_CCE_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_CCE_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_CCE_TXT,vtemp) << endl; //CO20190620
+      cout << aurostd::PaddedPOST("README_AFLOW_CHULL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_CHULL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_CHULL_TXT,vtemp) << endl; //CO20190620
+      cout << aurostd::PaddedPOST("README_AFLOW_EXCEPTIONS_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_EXCEPTIONS_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_EXCEPTIONS_TXT,vtemp) << endl; //ME20180705
       cout << aurostd::PaddedPOST("README_PROTO_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_PROTO_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_PROTO_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_XAFLOW_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_XAFLOW_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_XAFLOW_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_AFLOWRC_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_AFLOWRC_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_AFLOWRC_TXT,vtemp) << endl;
@@ -276,9 +258,11 @@ int main(int _argc,char **_argv) {
       cout << aurostd::PaddedPOST("aflowlib_lib8",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(aflowlib_lib8.size()),10) << "lines=" << aurostd::string2vectorstring(aflowlib_lib8,vtemp) << endl;
       cout << aurostd::PaddedPOST("aflowlib_lib9",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(aflowlib_lib9.size()),10) << "lines=" << aurostd::string2vectorstring(aflowlib_lib9,vtemp) << endl;
       cout << aurostd::PaddedPOST("aflowlib_icsd",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(aflowlib_icsd.size()),10) << "lines=" << aurostd::string2vectorstring(aflowlib_icsd,vtemp) << endl;
-      cout << aurostd::PaddedPOST("vAUID",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vAUID.size()),10) << "lines=" << aurostd::string2vectorstring(vAUID,vtemp) << endl;
-      cout << aurostd::PaddedPOST("vAURL",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vAURL.size()),10) << "lines=" << aurostd::string2vectorstring(vAURL,vtemp) << endl;
-      cout << aurostd::PaddedPOST("vLOOP",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vLOOP.size()),10) << "lines=" << aurostd::string2vectorstring(vLOOP,vtemp) << endl;
+      uint vLIBS_size=vLIBS.size(),vLIBS_lines=aurostd::string2vectorstring(vLIBS,vtemp);
+      cout << aurostd::PaddedPOST("vLIBS",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vLIBS_size),10) << "lines=" << vLIBS_lines << endl;
+      cout << aurostd::PaddedPOST("vAUID",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vLIBS_size/3),10) << "lines=" << vLIBS_lines/3 << endl;
+      cout << aurostd::PaddedPOST("vAURL",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vLIBS_size/3),10) << "lines=" << vLIBS_lines/3 << endl;
+      cout << aurostd::PaddedPOST("vLOOP",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(vLIBS_size/3),10) << "lines=" << vLIBS_lines/3 << endl;
       cout << aurostd::PaddedPOST("FINDSYM_data_space_txt",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(FINDSYM_data_space_txt.size()),10) << "lines=" << aurostd::string2vectorstring(FINDSYM_data_space_txt,vtemp) << endl;
       cout << aurostd::PaddedPOST("FINDSYM_data_wyckoff_txt",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(FINDSYM_data_wyckoff_txt.size()),10) << "lines=" << aurostd::string2vectorstring(FINDSYM_data_wyckoff_txt,vtemp) << endl;
       cout << aurostd::PaddedPOST("FROZSL_data_space_txt",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(FROZSL_data_space_txt.size()),10) << "lines=" << aurostd::string2vectorstring(FROZSL_data_space_txt,vtemp) << endl;
@@ -369,11 +353,11 @@ int main(int _argc,char **_argv) {
     if(!found && argvi=="README_AFLOW_AEL_TXT") {found=TRUE;pstr=&README_AFLOW_AEL_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_ANRL_TXT") {found=TRUE;pstr=&README_AFLOW_ANRL_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_COMPARE_TXT") {found=TRUE;pstr=&README_AFLOW_COMPARE_TXT;} // << endl;
-    if(!found && argvi=="README_AFLOW_GFA_TXT") {found=TRUE;pstr=&README_AFLOW_GFA_TXT;} // << endl;  //CO190401
+    if(!found && argvi=="README_AFLOW_GFA_TXT") {found=TRUE;pstr=&README_AFLOW_GFA_TXT;} // << endl;  //CO20190401
     if(!found && argvi=="README_AFLOW_SYM_TXT") {found=TRUE;pstr=&README_AFLOW_SYM_TXT;} // << endl;
-    if(!found && argvi=="README_AFLOW_CCE_TXT") {found=TRUE;pstr=&README_AFLOW_CCE_TXT;} // << endl;  //CO190620
-    if(!found && argvi=="README_AFLOW_CHULL_TXT") {found=TRUE;pstr=&README_AFLOW_CHULL_TXT;} // << endl;  //CO190620
-    if(!found && argvi=="README_AFLOW_EXCEPTIONS_TXT") {found=TRUE;pstr=&README_AFLOW_EXCEPTIONS_TXT;} //ME180705
+    if(!found && argvi=="README_AFLOW_CCE_TXT") {found=TRUE;pstr=&README_AFLOW_CCE_TXT;} // << endl;  //CO20190620
+    if(!found && argvi=="README_AFLOW_CHULL_TXT") {found=TRUE;pstr=&README_AFLOW_CHULL_TXT;} // << endl;  //CO20190620
+    if(!found && argvi=="README_AFLOW_EXCEPTIONS_TXT") {found=TRUE;pstr=&README_AFLOW_EXCEPTIONS_TXT;} //ME20180705
     if(!found && argvi=="README_PROTO_TXT") {found=TRUE;pstr=&README_PROTO_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_XAFLOW_TXT") {found=TRUE;pstr=&README_AFLOW_XAFLOW_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_AFLOWRC_TXT") {found=TRUE;pstr=&README_AFLOW_AFLOWRC_TXT;} // << endl;
@@ -402,10 +386,24 @@ int main(int _argc,char **_argv) {
       pstr=&conststring;
     }
 
-    // vAUID vAURL vLOOP
-    if(!found && argvi=="vAUID") {found=TRUE;pstr=&vAUID;}//  << endl;
-    if(!found && argvi=="vAURL") {found=TRUE;pstr=&vAURL;}
-    if(!found && argvi=="vLOOP") {found=TRUE;pstr=&vLOOP;}
+    // vAUID vAURL vLOOP vLIBS
+    // [OBSOLETE] if(!found && argvi=="vAUID") {found=TRUE;pstr=&vAUID;}//  << endl;
+    // [OBSOLETE] if(!found && argvi=="vAURL") {found=TRUE;pstr=&vAURL;}
+    // [OBSOLETE] if(!found && argvi=="vLOOP") {found=TRUE;pstr=&vLOOP;}
+    if(!found && argvi=="vLIBS") {found=TRUE;pstr=&vLIBS;}
+    if(!found && (argvi=="vAURL" || argvi=="vAUID" || argvi=="vLOOP")) {
+      found=TRUE;
+      vector<string> vtemp;
+      aurostd::string2vectorstring(vLIBS,vtemp);
+      for(uint i=0;i<vtemp.size();) {
+	vAURL+=vtemp.at(i++)+"\n";
+	vAUID+=vtemp.at(i++)+"\n";
+	vLOOP+=vtemp.at(i++)+"\n";
+      }
+      if(argvi=="vAURL") pstr=&vAURL;
+      if(argvi=="vAUID") pstr=&vAUID;
+      if(argvi=="vLOOP") pstr=&vLOOP;
+    } 
 
     // AFLOW_PSEUDOPOTENTIALS_TXT
     if(!BASE64) { //  no BASE64
@@ -873,6 +871,6 @@ namespace aurostd {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

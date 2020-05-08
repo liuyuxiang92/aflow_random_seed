@@ -22,9 +22,9 @@ namespace bader_functions {
 string BaderCalc(aurostd::xoption vpflow);
 bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, string& directory, ostream& oss);
 bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, const string& prototype,
-               const deque<string>& vspecies, const deque<int>& num_each_species, const vector<double>& vZVAL,
+               const vector<string>& vspecies, const deque<int>& num_each_species, const vector<double>& vZVAL,
                const vector<double>& cutoffs, const vector<int>& downsample_ratios, string& directory, ostream& oss);
-bool BaderCalc(const string& bader_options, const string& prototype, const deque<string>& vspecies,
+bool BaderCalc(const string& bader_options, const string& prototype, const vector<string>& vspecies,
                const deque<int>& num_each_species, const vector<double>& vZVAL, const vector<double>& cutoffs,
                const vector<int>& downsample_ratios, string& directory, ostream& oss);
 void FixDirectory(string& directory);
@@ -39,7 +39,7 @@ bool get_species_string(string& outcar_file, string& species_string, const strin
 bool prepare_CHGCAR_4_Jmol(const string& _chgcar_file, string& species_header, bool zip_file, ostream& oss);
 bool prepare_CHGCAR_4_Jmol(string& _chgcar_file, string& species_header, ostream& oss);
 bool prepare_CHGCAR_4_Jmol(string& _chgcar_file, string& species_header);
-//[CO 180220 - moved to aurostd]bool efile2tempfile(string _FileNameIn, string& FileNameOut);
+//[CO20180220 - moved to aurostd]bool efile2tempfile(string _FileNameIn, string& FileNameOut);
 }
 
 //CHGCAR2JVXL function

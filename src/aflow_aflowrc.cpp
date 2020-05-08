@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by SC 2017-2018
@@ -22,7 +22,7 @@
 #define AFLOWRC_DEFAULT_KZIP_EXT                        string(".xz") 
 #define         DEFAULT_KZIP_EXT                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_EXT")
 
-// ME 191001 - START
+//ME20191001 START
 // DEFAULTS AFLOW DATABASE
 #define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/common/AFLOWCACHE/aflowlib.db")
 #define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
@@ -34,7 +34,7 @@
 #define         DEFAULT_AFLOW_DB_LOCK_FILE              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_LOCK_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD        3*3600
 #define         DEFAULT_AFLOW_DB_STALE_THRESHOLD        XHOST.adefault.getattachedutype<long int>("DEFAULT_AFLOW_DB_STALE_THRESHOLD")
-// ME191001 - STOP
+//ME20191001 STOP
 
 // FILENAMES FOR AFLOW.ORG ANALYSIS
 #define AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT         string("aflowlib.out")
@@ -77,6 +77,8 @@
 #define         DEFAULT_FILE_VOLDISTEVOLUTION_OUT       XHOST.adefault.getattachedscheme("DEFAULT_FILE_VOLDISTEVOLUTION_OUT")
 
 // FILENAMES FOR AFLOW OPERATION
+#define AFLOWRC_DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT  string("aflow.pseudopotential_auid.out") 
+#define         DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT  XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_OUT             string("aflow.prescript.out") 
 #define         DEFAULT_AFLOW_PRESCRIPT_OUT             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PRESCRIPT_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_COMMAND         string("aflow.prescript.command") 
@@ -87,35 +89,39 @@
 #define         DEFAULT_AFLOW_POSTSCRIPT_COMMAND        XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_POSTSCRIPT_COMMAND")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUP_OUT                string("aflow.pgroup.out")
 #define         DEFAULT_AFLOW_PGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON               string("aflow.pgroup.json")      // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON               string("aflow.pgroup.json")      //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_PGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_OUT           string("aflow.pgroup_xtal.out")
 #define         DEFAULT_AFLOW_PGROUP_XTAL_OUT           XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_XTAL_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON          string("aflow.pgroup_xtal.json") // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON          string("aflow.pgroup_xtal.json") //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_PGROUP_XTAL_JSON          XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_XTAL_JSON")
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT     string("aflow.pgroupk_Patterson.out") //DX20200129
+#define         DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT     XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT") //DX20200129
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON    string("aflow.pgroupk_Patterson.json") //DX20200129
+#define         DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON    XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON") //DX20200129
 #define AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT               string("aflow.pgroupk.out")
 #define         DEFAULT_AFLOW_PGROUPK_OUT               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON              string("aflow.pgroupk.json")     // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON              string("aflow.pgroupk.json")     //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_PGROUPK_JSON              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_JSON")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT          string("aflow.pgroupk_xtal.out") // DX 12/5/17 - Added pgroupk_xtal
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT          string("aflow.pgroupk_xtal.out") //DX20171205 - Added pgroupk_xtal
 #define         DEFAULT_AFLOW_PGROUPK_XTAL_OUT          XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_XTAL_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_JSON         string("aflow.pgroupk_xtal.json")// DX 8/2/17 - Add JSON // DX 12/5/17 - Added pgroupk_xtal
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_JSON         string("aflow.pgroupk_xtal.json")//DX20170802 - Add JSON //DX20171205 - Added pgroupk_xtal
 #define         DEFAULT_AFLOW_PGROUPK_XTAL_JSON         XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_XTAL_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_FGROUP_OUT                string("aflow.fgroup.out")
 #define         DEFAULT_AFLOW_FGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_FGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_FGROUP_JSON               string("aflow.fgroup.json")      // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_FGROUP_JSON               string("aflow.fgroup.json")      //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_FGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_FGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_SGROUP_OUT                string("aflow.sgroup.out")
 #define         DEFAULT_AFLOW_SGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_SGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_SGROUP_JSON               string("aflow.sgroup.json")      // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_SGROUP_JSON               string("aflow.sgroup.json")      //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_SGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_SGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_AGROUP_OUT                string("aflow.agroup.out")
 #define         DEFAULT_AFLOW_AGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_AGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_AGROUP_JSON               string("aflow.agroup.json")      // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_AGROUP_JSON               string("aflow.agroup.json")      //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_AGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_AGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_IATOMS_OUT                string("aflow.iatoms.out")
 #define         DEFAULT_AFLOW_IATOMS_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_IATOMS_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_IATOMS_JSON               string("aflow.iatoms.json")      // DX 8/2/17 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_IATOMS_JSON               string("aflow.iatoms.json")      //DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_IATOMS_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_IATOMS_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_ICAGES_OUT                string("aflow.icages.out")
 #define         DEFAULT_AFLOW_ICAGES_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_ICAGES_OUT")
@@ -149,7 +155,7 @@
 #define         MPI_COMMAND_DEFAULT                     XHOST.adefault.getattachedscheme("MPI_COMMAND_DEFAULT")
 #define AFLOWRC_MPI_NCPUS_DEFAULT                       4
 #define         MPI_NCPUS_DEFAULT                       XHOST.adefault.getattachedutype<int>("MPI_NCPUS_DEFAULT")
-#define AFLOWRC_MPI_NCPUS_MAX                           init::GetCPUCores() //16  // CO 180124
+#define AFLOWRC_MPI_NCPUS_MAX                           init::GetCPUCores() //16  //CO20180124
 #define         MPI_NCPUS_MAX                           XHOST.adefault.getattachedutype<int>("MPI_NCPUS_MAX")
 
 // BINARY    // DONE
@@ -170,7 +176,7 @@
 #define         DEFAULT_AIMS_BIN                        XHOST.adefault.getattachedscheme("DEFAULT_AIMS_BIN")
 
 // POTCARS // DONE
-#define AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES               string("/common/VASP,/common/AFLOW/VASP,/home/aflow/common/AFLOW/VASP,/fslhome/fslcollab8/group/VASP,/fslhome/glh43/src/,/share/home/00470/tg457283/common/AFLOW/VASP/,/share/home/00457/tg457357/common/AFLOW/VASP/,/home/mehl/bin/AFLOW/VASP/,~/common/VASP/,~/common/AFLOW/VASP/,/nics/a/proj/aflow/common/AFLOW/VASP/,/home/users/aflow/common/VASP,/share/apps/AFLOW3/VASP,/projects/kyang-group/common/VASP,/home/Tools/src/vasp/,/somewhere/")  // first is default, tokenized with "," //DX 20190107 - added CMU path
+#define AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES               string("/common/VASP,/common/AFLOW/VASP,/home/aflow/common/AFLOW/VASP,/fslhome/fslcollab8/group/VASP,/fslhome/glh43/src/,/share/home/00470/tg457283/common/AFLOW/VASP/,/share/home/00457/tg457357/common/AFLOW/VASP/,/home/mehl/bin/AFLOW/VASP/,~/common/VASP/,~/common/AFLOW/VASP/,/nics/a/proj/aflow/common/AFLOW/VASP/,/home/users/aflow/common/VASP,/share/apps/AFLOW3/VASP,/projects/kyang-group/common/VASP,/home/Tools/src/vasp/,/somewhere/")  // first is default, tokenized with "," //DX20190107 - added CMU path
 #define         DEFAULT_VASP_POTCAR_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_VASP_POTCAR_DIRECTORIES")
 #define AFLOWRC_DEFAULT_VASP_POTCAR_DATE                      string("current")
 #define         DEFAULT_VASP_POTCAR_DATE                      XHOST.adefault.getattachedscheme("DEFAULT_VASP_POTCAR_DATE")
@@ -202,13 +208,13 @@
 #define         DEFAULT_BANDS_GRID                            XHOST.adefault.getattachedutype<int>("DEFAULT_BANDS_GRID") 
 #define AFLOWRC_DEFAULT_BANDS_LATTICE                         string("AUTO")
 #define         DEFAULT_BANDS_LATTICE                         XHOST.adefault.getattachedscheme("DEFAULT_BANDS_LATTICE")
-#define AFLOWRC_DEFAULT_KSCHEME                               string("M")
+#define AFLOWRC_DEFAULT_KSCHEME                               string("AUTO")  //WSETYAWAN DEFAULT  //CO20200329  // WAS M but ivasp fixes
 #define         DEFAULT_KSCHEME                               XHOST.adefault.getattachedscheme("DEFAULT_KSCHEME")
 #define AFLOWRC_DEFAULT_KPPRA                                 6000
 #define         DEFAULT_KPPRA                                 XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA")
 #define AFLOWRC_DEFAULT_KPPRA_STATIC                          10000
 #define         DEFAULT_KPPRA_STATIC                          XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA_STATIC")
-#define AFLOWRC_DEFAULT_STATIC_KSCHEME                        string("M") // WAHYU DEFAULT
+#define AFLOWRC_DEFAULT_STATIC_KSCHEME                        string("AUTO")  //WSETYAWAN DEFAULT  //CO20200329  // WAS M but ivasp fixes
 #define         DEFAULT_STATIC_KSCHEME                        XHOST.adefault.getattachedscheme("DEFAULT_STATIC_KSCHEME")
 #define AFLOWRC_DEFAULT_KPPRA_ICSD                            8000
 #define         DEFAULT_KPPRA_ICSD                            XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA_ICSD")
@@ -220,8 +226,8 @@
 #define         DEFAULT_UNARY_KPPRA_STATIC                    XHOST.adefault.getattachedutype<int>("DEFAULT_UNARY_KPPRA_STATIC")
 #define AFLOWRC_DEFAULT_PHONONS_KSCHEME                       string("G")
 #define         DEFAULT_PHONONS_KSCHEME                       XHOST.adefault.getattachedscheme("DEFAULT_PHONONS_KSCHEME")
-#define AFLOWRC_DEFAULT_PHONONS_KPPRA                         2000  //CO181226  //ME190205 - 8000 uses too much memory e.g. for NaF - 2000 appears sufficient
-#define         DEFAULT_PHONONS_KPPRA                         XHOST.adefault.getattachedutype<int>("DEFAULT_PHONONS_KPPRA") //CO181226 //ME190112
+#define AFLOWRC_DEFAULT_PHONONS_KPPRA                         3000  //CO20181226  //ME20190205 - 8000 uses too much memory e.g. for NaF - 2000 appears sufficient; ME20200108 - 3000 minimum for metals
+#define         DEFAULT_PHONONS_KPPRA                         XHOST.adefault.getattachedutype<int>("DEFAULT_PHONONS_KPPRA") //CO20181226 //ME20190112
 #define AFLOWRC_DEFAULT_DOS_EMIN                              -10.0
 #define         DEFAULT_DOS_EMIN                              XHOST.adefault.getattachedutype<double>("DEFAULT_DOS_EMIN")
 #define AFLOWRC_DEFAULT_DOS_EMAX                              10.0
@@ -264,8 +270,8 @@
 #define         DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE             XHOST.adefault.getattachedscheme("DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE")
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME   string("ENERGY")
 #define         DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME   XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         2 //CO181226
-#define         DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT") //CO181226
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         2 //CO20181226
+#define         DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT") //CO20181226
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME         string("ACCURATE")
 #define         DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME")
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME         string("NORMAL")
@@ -284,7 +290,7 @@
 #define         DEFAULT_VASP_FORCE_OPTION_SPIN                XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN") 
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 FALSE
 #define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 TRUE  // ME190308 - remove spin after two relaxations if zero
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 TRUE  //ME20190308 - remove spin after two relaxations if zero
 #define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2") 
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER               FALSE
 #define         DEFAULT_VASP_FORCE_OPTION_BADER               XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_BADER") 
@@ -362,7 +368,7 @@
 #define         DEFAULT_CHULL_OUTLIER_MULTIPLIER                          XHOST.adefault.getattachedutype<double>("DEFAULT_CHULL_OUTLIER_MULTIPLIER")
 #define AFLOWRC_DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED                  TRUE
 #define         DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED                  XHOST.adefault.getattachedutype<bool>("DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED")
-#define AFLOWRC_DEFAULT_CHULL_LATEX_BANNER                                2 // CO 20180827
+#define AFLOWRC_DEFAULT_CHULL_LATEX_BANNER                                2 //CO20180827
 #define         DEFAULT_CHULL_LATEX_BANNER                                XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_LATEX_BANNER")
 #define AFLOWRC_DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN                      FALSE
 #define         DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN                      XHOST.adefault.getattachedutype<bool>("DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN")
@@ -414,14 +420,14 @@
 #define         DEFAULT_CHULL_PNG_RESOLUTION                              XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_PNG_RESOLUTION")
 
 // DEFAULT GFA
-#define AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     0.05  //CO190628
-#define         DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     XHOST.adefault.getattachedutype<double>("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF")  //CO190628
+#define AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     0.05  //CO20190628
+#define         DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     XHOST.adefault.getattachedutype<double>("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF")  //CO20190628
 
 // DEFAULT ARUN
 #define AFLOWRC_ARUN_DIRECTORY_PREFIX                         string("ARUN.")
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
 
-//DEFAULT POCC //CO181226
+//DEFAULT POCC //CO20181226
 #define AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING                   string("0:2400:300")
 #define         DEFAULT_POCC_TEMPERATURE_STRING                   XHOST.adefault.getattachedscheme("DEFAULT_POCC_TEMPERATURE_STRING")
 #define AFLOWRC_DEFAULT_POCC_SITE_TOL                             0.001
@@ -440,6 +446,8 @@
 #define         DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS             XHOST.adefault.getattachedutype<bool>("DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS")
 #define AFLOWRC_POCC_FILE_PREFIX                                  string("aflow.pocc.")
 #define         POCC_FILE_PREFIX                                  XHOST.adefault.getattachedscheme("POCC_FILE_PREFIX")
+#define AFLOWRC_POCC_OUT_FILE                                     string("out")
+#define         POCC_OUT_FILE                                     XHOST.adefault.getattachedscheme("POCC_OUT_FILE")
 #define AFLOWRC_POCC_ALL_SUPERCELLS_FILE                          string("structures_all.out")
 #define         POCC_ALL_SUPERCELLS_FILE                          XHOST.adefault.getattachedscheme("POCC_ALL_SUPERCELLS_FILE")
 #define AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE                       string("structures_unique.out")
@@ -448,8 +456,6 @@
 #define         POCC_ALL_HNF_MATRICES_FILE                        XHOST.adefault.getattachedscheme("POCC_ALL_HNF_MATRICES_FILE")
 #define AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE                 string("site_configurations.out")
 #define         POCC_ALL_SITE_CONFIGURATIONS_FILE                 XHOST.adefault.getattachedscheme("POCC_ALL_SITE_CONFIGURATIONS_FILE")
-#define AFLOWRC_POCC_OUT_FILE                                     string("out")
-#define         POCC_OUT_FILE                                     XHOST.adefault.getattachedscheme("POCC_OUT_FILE")
 #define AFLOWRC_POCC_DOSCAR_FILE                                  string("DOSCAR.pocc")
 #define         POCC_DOSCAR_FILE                                  XHOST.adefault.getattachedscheme("POCC_DOSCAR_FILE")
 
@@ -463,9 +469,9 @@
 #define         DEFAULT_APL_HIBERNATE                         XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_HIBERNATE")
 #define AFLOWRC_DEFAULT_APL_MINSHELL                          6
 #define         DEFAULT_APL_MINSHELL                          XHOST.adefault.getattachedutype<int>("DEFAULT_APL_MINSHELL")
-#define AFLOWRC_DEFAULT_APL_MINATOMS                          175  // ME190301
+#define AFLOWRC_DEFAULT_APL_MINATOMS                          175  //ME20190301
 #define         DEFAULT_APL_MINATOMS                          XHOST.adefault.getattachedutype<int>("DEFAULT_APL_MINATOMS")
-#define AFLOWRC_DEFAULT_APL_POLAR                             TRUE  //CO181226
+#define AFLOWRC_DEFAULT_APL_POLAR                             TRUE  //CO20181226
 #define         DEFAULT_APL_POLAR                             XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_POLAR")
 #define AFLOWRC_DEFAULT_APL_DMAG                              0.015
 #define         DEFAULT_APL_DMAG                              XHOST.adefault.getattachedutype<double>("DEFAULT_APL_DMAG")
@@ -479,15 +485,17 @@
 #define         DEFAULT_APL_DPM                               XHOST.adefault.getattachedscheme("DEFAULT_APL_DPM")
 #define AFLOWRC_DEFAULT_APL_RELAX                             TRUE
 #define         DEFAULT_APL_RELAX                             XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX")
-#define AFLOWRC_DEFAULT_APL_ZEROSTATE                         TRUE  //CO181216
+#define AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE                TRUE  // ME20200427
+#define         DEFAULT_APL_RELAX_COMMENSURATE                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX_COMMENSURATE")  // ME20200427
+#define AFLOWRC_DEFAULT_APL_ZEROSTATE                         TRUE  //CO20181216
 #define         DEFAULT_APL_ZEROSTATE                         XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE")
-#define AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR                  FALSE  // ME191029
-#define         DEFAULT_APL_ZEROSTATE_CHGCAR                  XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE_CHGCAR")  // ME191029
+#define AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR                  FALSE  //ME20191029
+#define         DEFAULT_APL_ZEROSTATE_CHGCAR                  XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE_CHGCAR")  //ME20191029
 #define AFLOWRC_DEFAULT_APL_USE_LEPSILON                      TRUE
 #define         DEFAULT_APL_USE_LEPSILON                      XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_USE_LEPSILON")
 
 //// DEFAULT APL PHONON PROPERTIES
-#define AFLOWRC_DEFAULT_APL_FREQFORMAT                        string("THZ|ALLOW_NEGATIVE")  //CO181226 - no spaces!
+#define AFLOWRC_DEFAULT_APL_FREQFORMAT                        string("THZ|ALLOW_NEGATIVE")  //CO20181226 - no spaces!
 #define         DEFAULT_APL_FREQFORMAT                        XHOST.adefault.getattachedscheme("DEFAULT_APL_FREQFORMAT")
 #define AFLOWRC_DEFAULT_APL_DC                                TRUE
 #define         DEFAULT_APL_DC                                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DC")
@@ -505,8 +513,12 @@
 #define         DEFAULT_APL_DOSPOINTS                         XHOST.adefault.getattachedutype<int>("DEFAULT_APL_DOSPOINTS")
 #define AFLOWRC_DEFAULT_APL_DOSSMEAR                          0.0
 #define         DEFAULT_APL_DOSSMEAR                          XHOST.adefault.getattachedutype<double>("DEFAULT_APL_DOSSMEAR")
+#define AFLOWRC_DEFAULT_APL_DOS_PROJECT                       FALSE  // ME20200213
+#define         DEFAULT_APL_DOS_PROJECT                       XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DOS_PROJECT")  // ME20200213
 #define AFLOWRC_DEFAULT_APL_TP                                TRUE
 #define         DEFAULT_APL_TP                                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_TP")
+#define AFLOWRC_DEFAULT_APL_DISPLACEMENTS                     TRUE  // ME20200421
+#define         DEFAULT_APL_DISPLACEMENTS                     XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DISPLACEMENTS")  // ME20200421
 #define AFLOWRC_DEFAULT_APL_TPT                               string("0:2000:10")
 #define         DEFAULT_APL_TPT                               XHOST.adefault.getattachedscheme("DEFAULT_APL_TPT")
 
@@ -523,9 +535,14 @@
 #define         DEFAULT_APL_DYNMAT_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_DYNMAT_FILE")
 #define AFLOWRC_DEFAULT_APL_HARMIFC_FILE                      string("harmonicIFCs.xml")
 #define         DEFAULT_APL_HARMIFC_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_APL_HARMIFC_FILE")
+// ME20200415
+#define AFLOWRC_DEFAULT_APL_POLAR_FILE                        string("polar.xml")
+#define         DEFAULT_APL_POLAR_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_POLAR_FILE")
 #define AFLOWRC_DEFAULT_APL_HSKPTS_FILE                       string("hskpoints.out")
 #define         DEFAULT_APL_HSKPTS_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_HSKPTS_FILE")
-// ME190614 - START
+#define AFLOWRC_DEFAULT_APL_MSQRDISP_FILE                     string("displacements.out")  // ME20200329
+#define         DEFAULT_APL_MSQRDISP_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_MSQRDISP_FILE")  // ME20200329
+//ME20190614 BEGIN
 #define AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE                     string("PHDOSCAR")
 #define         DEFAULT_APL_PHDOSCAR_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_PHDOSCAR_FILE")
 #define AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE                     string("PHPOSCAR")
@@ -534,21 +551,49 @@
 #define         DEFAULT_APL_PHKPOINTS_FILE                    XHOST.adefault.getattachedscheme("DEFAULT_APL_PHKPOINTS_FILE")
 #define AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE                   string("PHEIGENVAL")
 #define         DEFAULT_APL_PHEIGENVAL_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_APL_PHEIGENVAL_FILE")
-// ME190614 - END
+// ME20190614 END
+#define AFLOWRC_DEFAULT_APL_STATE_FILE                        string("fccalc_state.out")
+#define         DEFAULT_APL_STATE_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_STATE_FILE")  // ME20200224
+
+// ME20200329 BEGIN
+#define AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT                string("XCRYSDEN")
+#define         DEFAULT_APL_ADISP_SCENE_FORMAT                XHOST.adefault.getattachedscheme("DEFAULT_APL_ADISP_SCENE_FORMAT")
+#define AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE                   0.25
+#define         DEFAULT_APL_ADISP_AMPLITUDE                   XHOST.adefault.getattachedutype<double>("DEFAULT_APL_ADISP_AMPLITUDE")
+#define AFLOWRC_DEFAULT_APL_ADISP_NSTEPS                      20
+#define         DEFAULT_APL_ADISP_NSTEPS                      XHOST.adefault.getattachedutype<int>("DEFAULT_APL_ADISP_NSTEPS")
+#define AFLOWRC_DEFAULT_APL_ADISP_NPERIODS                    1
+#define         DEFAULT_APL_ADISP_NPERIODS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APL_ADISP_NPERIODS")
+//ME20190614 END
+
+// DEFAULT QHA
+//// DEFAULT QHA VALUES
+#define AFLOWRC_DEFAULT_QHA_MODE                              string("QHA")
+#define         DEFAULT_QHA_MODE                              XHOST.adefault.getattachedscheme("DEFAULT_QHA_MODE")
+#define AFLOWRC_DEFAULT_QHA_EOS                               TRUE
+#define         DEFAULT_QHA_EOS                               XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_EOS")
+#define AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE              string("-12:16:3")
+#define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
+#define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
+#define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
+#define AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              FALSE
+#define         DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB")
+#define AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T                      string("50,100,600")
+#define         DEFAULT_QHA_SCQHA_PDIS_T                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_SCQHA_PDIS_T")
 
 // DEFAULT AAPL
 //// DEFAULT AAPL VALUES
 #define AFLOWRC_DEFAULT_AAPL_BTE                              string("FULL")
 #define         DEFAULT_AAPL_BTE                              XHOST.adefault.getattachedscheme("DEFAULT_AAPL_BTE")
-//[ME181226]#define AFLOWRC_DEFAULT_AAPL_BZMETHOD                         string("LT")
-//[ME181226]#define         DEFAULT_AAPL_BZMETHOD                         XHOST.adefault.getattachedscheme("DEFAULT_AAPL_BZMETHOD")
+//[ME20181226]#define AFLOWRC_DEFAULT_AAPL_BZMETHOD                         string("LT")
+//[ME20181226]#define         DEFAULT_AAPL_BZMETHOD                         XHOST.adefault.getattachedscheme("DEFAULT_AAPL_BZMETHOD")
 #define AFLOWRC_DEFAULT_AAPL_FOURTH_ORDER                     FALSE
 #define         DEFAULT_AAPL_FOURTH_ORDER                     XHOST.adefault.getattachedutype<bool>("DEFAULT_AAPL_FOURTH_ORDER")
-#define AFLOWRC_DEFAULT_AAPL_CUT_RAD                          string("0.0") // ME190308 - use CUT_SHELL by default // ME191029
+#define AFLOWRC_DEFAULT_AAPL_CUT_RAD                          string("0.0") //ME20190308 - use CUT_SHELL by default //ME20191029
 #define         DEFAULT_AAPL_CUT_RAD                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_RAD")
-#define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6")  // ME190301  // ME190408  // ME191029
+#define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6")  //ME20190301  //ME20190408  //ME20191029
 #define         DEFAULT_AAPL_CUT_SHELL                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_SHELL")
-#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("26x26x26")
+#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  // ME20200110 - 21x21x21 more than enough for tetrahedron method; odd is preferred (Gamma-centered by construction)
 #define         DEFAULT_AAPL_THERMALGRID                      XHOST.adefault.getattachedscheme("DEFAULT_AAPL_THERMALGRID")
 #define AFLOWRC_DEFAULT_AAPL_TCT                              string("50:550:50")
 #define         DEFAULT_AAPL_TCT                              XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCT")
@@ -578,10 +623,10 @@
 #define         DEFAULT_AAPL_FREQ_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_FREQ_FILE")
 #define AFLOWRC_DEFAULT_AAPL_GVEL_FILE                        string("group_velocities.out")
 #define         DEFAULT_AAPL_GVEL_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_GVEL_FILE")
-#define AFLOWRC_DEFAULT_AAPL_PS_FILE                          string("phase_space.out")  // ME191104
-#define         DEFAULT_AAPL_PS_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_PS_FILE")  // ME191104
-#define AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE                  string("grueneisen.out")  // ME191104
-#define         DEFAULT_AAPL_GRUENEISEN_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_GRUENEISEN_FILE")  // ME191104
+#define AFLOWRC_DEFAULT_AAPL_PS_FILE                          string("phase_space.out")  //ME20191104
+#define         DEFAULT_AAPL_PS_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_PS_FILE")  //ME20191104
+#define AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE                  string("grueneisen.out")  //ME20191104
+#define         DEFAULT_AAPL_GRUENEISEN_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_GRUENEISEN_FILE")  //ME20191104
 #define AFLOWRC_DEFAULT_AAPL_RATES_FILE                       string("scattering_rates_total.out")
 #define         DEFAULT_AAPL_RATES_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_AAPL_RATES_FILE")
 #define AFLOWRC_DEFAULT_AAPL_RATES_3RD_FILE                   string("scattering_rates_anharmonic_3rd.out")
@@ -594,7 +639,7 @@
 #define         DEFAULT_AAPL_BOUNDARY_FILE                    XHOST.adefault.getattachedscheme("DEFAULT_AAPL_BOUNDARY_FILE")
 #define AFLOWRC_DEFAULT_AAPL_TCOND_FILE                       string("thermal_conductivity.out")
 #define         DEFAULT_AAPL_TCOND_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCOND_FILE")
-//OBSOLETE ME191104
+//OBSOLETE ME20191104
 //#define AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE                  string("thermal_conductivity.plt")
 //#define         DEFAULT_AAPL_TCOND_PLOT_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCOND_PLOT_FILE")
 
@@ -699,6 +744,12 @@
 #define AFLOWRC_DEFAULT_AGL_PLOT_RESULTS                      FALSE
 #define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
 
+// RF20200413 - START
+// DEFAULT CCE
+#define AFLOWRC_DEFAULT_CCE_OX_METHOD                         string("ELECTRONEGATIVITY_ALLEN")
+#define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedscheme("DEFAULT_CCE_OX_METHOD")
+// RF20200413 - END
+
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
 #define         AFLOW_CORE_TEMPERATURE_BEEP                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_BEEP") 
@@ -757,23 +808,23 @@
 #define AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             string("/home/bin/") // DUKE_QFLOW_MPICH
 #define         MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI")
 
-//DX 20190509 - MACHINE001 - START
+//DX20190509 - MACHINE001 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE001                        string("") // MACHINE001
 #define         MPI_OPTIONS_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE001")
 #define AFLOWRC_MPI_COMMAND_MACHINE001                        string("aprun -n") // MACHINE001
 #define         MPI_COMMAND_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE001")
 #define AFLOWRC_MPI_BINARY_DIR_MACHINE001                     string("~/bin/") // MACHINE001
 #define         MPI_BINARY_DIR_MACHINE001                     XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE001")
-//DX 20190509 - MACHINE001 - END
+//DX20190509 - MACHINE001 - END
 
-//DX 20190509 - MACHINE002 - START
+//DX20190509 - MACHINE002 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE002                       string("") // MACHINE002
 #define         MPI_OPTIONS_MACHINE002                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE002")
 #define AFLOWRC_MPI_COMMAND_MACHINE002                       string("/p/app/intel/parallel_studio_xe_2017_update4/impi/2017.3.196/intel64/bin/mpirun -np") // MACHINE002
 #define         MPI_COMMAND_MACHINE002                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE002")
 #define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("~/bin/") // MACHINE002
 #define         MPI_BINARY_DIR_MACHINE002                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE002")
-//DX 20190509 - MACHINE002 - END
+//DX20190509 - MACHINE002 - END
 
 #define AFLOWRC_MPI_OPTIONS_MPCDF_EOS                         string("ulimit -s unlimited ") // MPCDF_EOS_MPICH
 #define         MPI_OPTIONS_MPCDF_EOS                         XHOST.adefault.getattachedscheme("MPI_OPTIONS_MPCDF_EOS")
@@ -837,7 +888,7 @@
 #define         MPI_COMMAND_CMU_EULER                         XHOST.adefault.getattachedscheme("MPI_COMMAND_CMU_EULER")
 #define AFLOWRC_MPI_BINARY_DIR_CMU_EULER                      string("/home/Tools/bin/") // CMU_EULER
 #define         MPI_BINARY_DIR_CMU_EULER                      XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_CMU_EULER")
-//DX - CMU EULEr - END
+//DX - CMU EULER - END
 
 #define AFLOWRC_MPI_OPTIONS_MACHINE1                          string("") // future expansions
 #define         MPI_OPTIONS_MACHINE1                          XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE1")
@@ -880,10 +931,10 @@ namespace aflowrc {
       aurostd::string2tokens(XHOST.vaflowrc.at(i),tokens,"=");
       if(tokens.size()>0&&!found) {
         if(aurostd::RemoveWhiteSpaces(tokens.at(0))==schema&&!found) {
-          //CO181226 - it is possible to have '=' inside value: MPI_START_DEFAULT="export OMP_NUM_THREADS=1"
+          //CO20181226 - it is possible to have '=' inside value: MPI_START_DEFAULT="export OMP_NUM_THREADS=1"
           //treat tokens[0] as special
           tokens.erase(tokens.begin()); //remove key
-          found=TRUE; aus=aurostd::RemoveWhiteSpacesFromTheBack(aurostd::joinWDelimiter(tokens,"="));  //CO 180705 - if there are spaces between ="" and //, then the value is set to the spaces (not an empty string!)  //CO181226 - join again by '='
+          found=TRUE; aus=aurostd::RemoveWhiteSpacesFromTheBack(aurostd::joinWDelimiter(tokens,"="));  //CO20180705 - if there are spaces between ="" and //, then the value is set to the spaces (not an empty string!)  //CO20181226 - join again by '='
           aurostd::string2tokens(aus,tokens,"\""); //	    if(tokens.size()>0) cerr << tokens.at(0) << endl;
           if(tokens.size()>0) string_to_add=tokens.at(0);
         }
@@ -983,14 +1034,14 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
 
-    // ME191001 - START
+    //ME20191001 START
     // AFLOW database files
     aflowrc::load_default("DEFAULT_AFLOW_DB_FILE", AFLOWRC_DEFAULT_AFLOW_DB_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_STATS_FILE", AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_DATA_PATH", AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH);
     aflowrc::load_default("DEFAULT_AFLOW_DB_LOCK_FILE", AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_STALE_THRESHOLD", AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD);
-    // ME191001 - END
+    //ME20191001 END
     // FILENAMES FOR AFLOW.ORG ANALYSIS
     aflowrc::load_default("DEFAULT_FILE_AFLOWLIB_ENTRY_OUT",AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
     aflowrc::load_default("DEFAULT_FILE_AFLOWLIB_ENTRY_JSON",AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_JSON);
@@ -1013,6 +1064,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_FILE_VOLDISTEVOLUTION_OUT",AFLOWRC_DEFAULT_FILE_VOLDISTEVOLUTION_OUT);
 
     // FILENAMES FOR AFLOW OPERATION
+    aflowrc::load_default("DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT",AFLOWRC_DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PRESCRIPT_OUT",AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PRESCRIPT_COMMAND",AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_COMMAND);
     aflowrc::load_default("DEFAULT_AFLOW_POSTSCRIPT_OUT",AFLOWRC_DEFAULT_AFLOW_POSTSCRIPT_OUT);
@@ -1021,6 +1073,8 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AFLOW_PGROUP_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUP_XTAL_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUP_XTAL_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON);
+    aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT); //DX20200129
+    aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON); //DX20200129
     aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_XTAL_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT);
@@ -1192,8 +1246,8 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_CHULL_LATEX_BOLD_LABELS",AFLOWRC_DEFAULT_CHULL_LATEX_BOLD_LABELS); 
     aflowrc::load_default("DEFAULT_CHULL_PNG_RESOLUTION",AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION); 
 
-    // DEFAULT GFA  //CO190628
-    aflowrc::load_default("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF",AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF); //CO190628
+    // DEFAULT GFA  //CO20190628
+    aflowrc::load_default("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF",AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF); //CO20190628
 
     // DEFAULT ARUN
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
@@ -1208,11 +1262,11 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON",AFLOWRC_DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON);
     aflowrc::load_default("DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS",AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS);
     aflowrc::load_default("POCC_FILE_PREFIX",AFLOWRC_POCC_FILE_PREFIX);
+    aflowrc::load_default("POCC_OUT_FILE",AFLOWRC_POCC_OUT_FILE);
     aflowrc::load_default("POCC_ALL_SUPERCELLS_FILE",AFLOWRC_POCC_ALL_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_UNIQUE_SUPERCELLS_FILE",AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_ALL_HNF_MATRICES_FILE",AFLOWRC_POCC_ALL_HNF_MATRICES_FILE);
     aflowrc::load_default("POCC_ALL_SITE_CONFIGURATIONS_FILE",AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE);
-    aflowrc::load_default("POCC_OUT_FILE",AFLOWRC_POCC_OUT_FILE);
     aflowrc::load_default("POCC_DOSCAR_FILE",AFLOWRC_POCC_DOSCAR_FILE);
 
     // DEFAULT APL
@@ -1225,12 +1279,13 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_POLAR",AFLOWRC_DEFAULT_APL_POLAR);
     aflowrc::load_default("DEFAULT_APL_DMAG",AFLOWRC_DEFAULT_APL_DMAG);
     aflowrc::load_default("DEFAULT_APL_DXYZONLY",AFLOWRC_DEFAULT_APL_DXYZONLY);
-    aflowrc::load_default("DEFAULT_APL_DSYMMETRIZE",AFLOWRC_DEFAULT_APL_DSYMMETRIZE); //CO181226
-    aflowrc::load_default("DEFAULT_APL_DINEQUIV_ONLY",AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY); //CO181226
+    aflowrc::load_default("DEFAULT_APL_DSYMMETRIZE",AFLOWRC_DEFAULT_APL_DSYMMETRIZE); //CO20181226
+    aflowrc::load_default("DEFAULT_APL_DINEQUIV_ONLY",AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY); //CO20181226
     aflowrc::load_default("DEFAULT_APL_DPM",AFLOWRC_DEFAULT_APL_DPM);
     aflowrc::load_default("DEFAULT_APL_RELAX",AFLOWRC_DEFAULT_APL_RELAX);
+    aflowrc::load_default("DEFAULT_APL_RELAX_COMMENSURATE",AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE);  // ME20200427
     aflowrc::load_default("DEFAULT_APL_ZEROSTATE",AFLOWRC_DEFAULT_APL_ZEROSTATE);
-    aflowrc::load_default("DEFAULT_APL_ZEROSTATE_CHGCAR",AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR);  // ME191029
+    aflowrc::load_default("DEFAULT_APL_ZEROSTATE_CHGCAR",AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR);  //ME20191029
     aflowrc::load_default("DEFAULT_APL_USE_LEPSILON",AFLOWRC_DEFAULT_APL_USE_LEPSILON);
 
     //// DEFAULT APL PHONON PROPERTIES
@@ -1243,7 +1298,9 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DOSMESH",AFLOWRC_DEFAULT_APL_DOSMESH);
     aflowrc::load_default("DEFAULT_APL_DOSPOINTS",AFLOWRC_DEFAULT_APL_DOSPOINTS);
     aflowrc::load_default("DEFAULT_APL_DOSSMEAR",AFLOWRC_DEFAULT_APL_DOSSMEAR);
+    aflowrc::load_default("DEFAULT_APL_DOS_PROJECT",AFLOWRC_DEFAULT_APL_DOS_PROJECT);  // ME20200213
     aflowrc::load_default("DEFAULT_APL_TP",AFLOWRC_DEFAULT_APL_TP);
+    aflowrc::load_default("DEFAULT_APL_DISPLACEMENTS",AFLOWRC_DEFAULT_APL_DISPLACEMENTS);  // ME20200421
     aflowrc::load_default("DEFAULT_APL_TPT",AFLOWRC_DEFAULT_APL_TPT);
 
     //// DEFAULT APL FILES
@@ -1253,17 +1310,36 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_THERMO_FILE",AFLOWRC_DEFAULT_APL_THERMO_FILE);
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
+    aflowrc::load_default("DEFAULT_APL_POLAR_FILE",AFLOWRC_DEFAULT_APL_POLAR_FILE);  // ME20200415
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
-    // ME190614 - START
+    aflowrc::load_default("DEFAULT_APL_MSQRDISP_FILE", AFLOWRC_DEFAULT_APL_MSQRDISP_FILE);  // ME20200329
+    //ME20190614 BEGIN
     aflowrc::load_default("DEFAULT_APL_PHDOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE);
     aflowrc::load_default("DEFAULT_APL_PHPOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE);
     aflowrc::load_default("DEFAULT_APL_PHKPOINTS_FILE",AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE);
     aflowrc::load_default("DEFAULT_APL_PHEIGENVAL_FILE",AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE);
-    // ME190614 - END
+    //ME20190614 END
+    aflowrc::load_default("DEFAULT_APL_STATE_FILE",AFLOWRC_DEFAULT_APL_STATE_FILE);  // ME20200224
+    //ME20200329 BEGIN
+    aflowrc::load_default("DEFAULT_APL_ADISP_SCENE_FORMAT",AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT);
+    aflowrc::load_default("DEFAULT_APL_ADISP_AMPLITUDE",AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE);
+    aflowrc::load_default("DEFAULT_APL_ADISP_NSTEPS",AFLOWRC_DEFAULT_APL_ADISP_NSTEPS);
+    aflowrc::load_default("DEFAULT_APL_ADISP_NPERIODS",AFLOWRC_DEFAULT_APL_ADISP_NPERIODS);
+    //ME20200329 END
+
+    // DEFAULT QHA
+    //// DEFAULT QHA VALUES
+    aflowrc::load_default("DEFAULT_QHA_MODE", AFLOWRC_DEFAULT_QHA_MODE);
+    aflowrc::load_default("DEFAULT_QHA_EOS", AFLOWRC_DEFAULT_QHA_EOS);
+    aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
+    aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
+    aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
+    aflowrc::load_default("DEFAULT_QHA_SCQHA_PDIS_T", AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T);
+
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
     aflowrc::load_default("DEFAULT_AAPL_BTE",AFLOWRC_DEFAULT_AAPL_BTE);
-    //[ME181226]aflowrc::load_default("DEFAULT_AAPL_BZMETHOD",AFLOWRC_DEFAULT_AAPL_BZMETHOD);
+    //[ME20181226]aflowrc::load_default("DEFAULT_AAPL_BZMETHOD",AFLOWRC_DEFAULT_AAPL_BZMETHOD);
     aflowrc::load_default("DEFAULT_AAPL_FOURTH_ORDER",AFLOWRC_DEFAULT_AAPL_FOURTH_ORDER);
     aflowrc::load_default("DEFAULT_AAPL_CUT_RAD",AFLOWRC_DEFAULT_AAPL_CUT_RAD);
     aflowrc::load_default("DEFAULT_AAPL_CUT_SHELL",AFLOWRC_DEFAULT_AAPL_CUT_SHELL);
@@ -1282,15 +1358,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AAPL_IRRQPTS_FILE",AFLOWRC_DEFAULT_AAPL_IRRQPTS_FILE);
     aflowrc::load_default("DEFAULT_AAPL_FREQ_FILE",AFLOWRC_DEFAULT_AAPL_FREQ_FILE);
     aflowrc::load_default("DEFAULT_AAPL_GVEL_FILE",AFLOWRC_DEFAULT_AAPL_GVEL_FILE);
-    aflowrc::load_default("DEFAULT_AAPL_PS_FILE",AFLOWRC_DEFAULT_AAPL_PS_FILE);  // ME191104
-    aflowrc::load_default("DEFAULT_AAPL_GRUENEISEN_FILE",AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE);  // ME191104
+    aflowrc::load_default("DEFAULT_AAPL_PS_FILE",AFLOWRC_DEFAULT_AAPL_PS_FILE);  //ME20191104
+    aflowrc::load_default("DEFAULT_AAPL_GRUENEISEN_FILE",AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE);  //ME20191104
     aflowrc::load_default("DEFAULT_AAPL_RATES_FILE",AFLOWRC_DEFAULT_AAPL_RATES_FILE);
     aflowrc::load_default("DEFAULT_AAPL_RATES_3RD_FILE",AFLOWRC_DEFAULT_AAPL_RATES_3RD_FILE);
     aflowrc::load_default("DEFAULT_AAPL_RATES_4TH_FILE",AFLOWRC_DEFAULT_AAPL_RATES_4TH_FILE);
     aflowrc::load_default("DEFAULT_AAPL_ISOTOPE_FILE",AFLOWRC_DEFAULT_AAPL_ISOTOPE_FILE);
     aflowrc::load_default("DEFAULT_AAPL_BOUNDARY_FILE",AFLOWRC_DEFAULT_AAPL_BOUNDARY_FILE);
     aflowrc::load_default("DEFAULT_AAPL_TCOND_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_FILE);
-    //aflowrc::load_default("DEFAULT_AAPL_TCOND_PLOT_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE);  OBSOLETE ME191104
+    //aflowrc::load_default("DEFAULT_AAPL_TCOND_PLOT_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE);  OBSOLETE ME20191104
 
     // DEFAULT AEL
     //// DEFAULT AEL STRAIN CALCS
@@ -1349,6 +1425,11 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AGL_WRITE_GIBBS_INPUT",AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT);
     aflowrc::load_default("DEFAULT_AGL_PLOT_RESULTS",AFLOWRC_DEFAULT_AGL_PLOT_RESULTS);    
 
+    // RF20200413 - START
+    // DEFAULT CCE
+    aflowrc::load_default("DEFAULT_CCE_OX_METHOD",AFLOWRC_DEFAULT_CCE_OX_METHOD);
+    // RF20200413 - END
+
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_HALT",AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT);
@@ -1383,23 +1464,23 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI); 
 
-    //DX 20190509 - MACHINE001 - START
+    //DX20190509 - MACHINE001 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE001",AFLOWRC_MPI_OPTIONS_MACHINE001); 
     aflowrc::load_default("MPI_COMMAND_MACHINE001",AFLOWRC_MPI_COMMAND_MACHINE001); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE001",AFLOWRC_MPI_BINARY_DIR_MACHINE001); 
-    //DX 20190509 - MACHINE001 - END
+    //DX20190509 - MACHINE001 - END
 
-    //DX 20190509 - MACHINE002 - START
+    //DX20190509 - MACHINE002 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE002",AFLOWRC_MPI_OPTIONS_MACHINE002);
     aflowrc::load_default("MPI_COMMAND_MACHINE002",AFLOWRC_MPI_COMMAND_MACHINE002);
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE002",AFLOWRC_MPI_BINARY_DIR_MACHINE002);
-    //DX 20190509 - MACHINE002 - END
+    //DX20190509 - MACHINE002 - END
 
-    //DX 20190107 - CMU EULER - START
+    //DX20190107 - CMU EULER - START
     aflowrc::load_default("MPI_OPTIONS_CMU_EULER",AFLOWRC_MPI_OPTIONS_CMU_EULER); 
     aflowrc::load_default("MPI_COMMAND_CMU_EULER",AFLOWRC_MPI_COMMAND_CMU_EULER); 
     aflowrc::load_default("MPI_BINARY_DIR_CMU_EULER",AFLOWRC_MPI_BINARY_DIR_CMU_EULER); 
-    //DX 20190107 - CMU EULER - END
+    //DX20190107 - CMU EULER - END
 
     aflowrc::load_default("MPI_OPTIONS_MPCDF_EOS",AFLOWRC_MPI_OPTIONS_MPCDF_EOS); 
     aflowrc::load_default("MPI_COMMAND_MPCDF_EOS",AFLOWRC_MPI_COMMAND_MPCDF_EOS); 
@@ -1436,7 +1517,6 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_MACHINE2",AFLOWRC_MPI_OPTIONS_MACHINE2); 
     aflowrc::load_default("MPI_COMMAND_MACHINE2",AFLOWRC_MPI_COMMAND_MACHINE2); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE2",AFLOWRC_MPI_BINARY_DIR_MACHINE2); 
-
     if(LDEBUG) oss << "aflowrc::read: END" << endl;
 
     return TRUE;
@@ -1475,7 +1555,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_KZIP_EXT=\"" << AFLOWRC_DEFAULT_KZIP_EXT << "\"" << endl;
 
     aflowrc << " " << endl;
-    // ME191001 - START
+    //ME20191001 START
     aflowrc << "// DEFAULT AFLOW DATABASE" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_STATS_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE << "\"" << endl;
@@ -1483,7 +1563,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AFLOW_DB_LOCK_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_STALE_THRESHOLD=" << AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD << endl;
     aflowrc << " " << endl;
-    // ME191001 - STOP
+    //ME20191001 STOP
     aflowrc << "// FILENAMES FOR AFLOW.ORG ANALYSIS" << endl;
     aflowrc << "DEFAULT_FILE_AFLOWLIB_ENTRY_OUT=\"" << AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << endl;
     aflowrc << "DEFAULT_FILE_AFLOWLIB_ENTRY_JSON=\"" << AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "\"" << endl;
@@ -1507,6 +1587,7 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// FILENAMES FOR AFLOW OPERATION" << endl;
+    aflowrc << "DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PRESCRIPT_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PRESCRIPT_COMMAND=\"" << AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_COMMAND << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_POSTSCRIPT_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_POSTSCRIPT_OUT << "\"" << endl;
@@ -1515,6 +1596,8 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AFLOW_PGROUP_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUP_XTAL_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUP_XTAL_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT << "\"" << endl; //DX20200129
+    aflowrc << "DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON << "\"" << endl; //DX20200129
     aflowrc << "DEFAULT_AFLOW_PGROUPK_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUPK_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUPK_XTAL_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT << "\"" << endl;
@@ -1696,9 +1779,9 @@ namespace aflowrc {
     aflowrc << "DEFAULT_CHULL_LATEX_BOLD_LABELS=" << AFLOWRC_DEFAULT_CHULL_LATEX_BOLD_LABELS << " // -1 - default: no bold unless the compound is a ternary, 0 - FALSE, 1 - TRUE" << endl;
     aflowrc << "DEFAULT_CHULL_PNG_RESOLUTION=" << AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION << " // INT" << endl;
 
-    aflowrc << " " << endl; //CO190628
-    aflowrc << "// DEFAULTS GFA" << endl; //CO190628
-    aflowrc << "DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF=" << AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << " // DOUBLE in eV" << endl; //CO190628
+    aflowrc << " " << endl; //CO20190628
+    aflowrc << "// DEFAULTS GFA" << endl; //CO20190628
+    aflowrc << "DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF=" << AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << " // DOUBLE in eV" << endl; //CO20190628
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS ARUN" << endl;
@@ -1715,11 +1798,11 @@ namespace aflowrc {
     aflowrc << "DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON=" << AFLOWRC_DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON << endl;
     aflowrc << "DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS=" << AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     aflowrc << "POCC_FILE_PREFIX=\"" << AFLOWRC_POCC_FILE_PREFIX << "\"" << endl;
+    aflowrc << "POCC_OUT_FILE=\"" << AFLOWRC_POCC_OUT_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_ALL_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_UNIQUE_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_HNF_MATRICES_FILE=\"" << AFLOWRC_POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_SITE_CONFIGURATIONS_FILE=\"" << AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
-    aflowrc << "POCC_OUT_FILE=\"" << AFLOWRC_POCC_OUT_FILE << "\"" << endl;
     aflowrc << "POCC_DOSCAR_FILE=\"" << AFLOWRC_POCC_DOSCAR_FILE << "\"" << endl;
 
     aflowrc << " " << endl;
@@ -1736,19 +1819,22 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DINEQUIV_ONLY=" << AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY << endl;
     aflowrc << "DEFAULT_APL_DPM=\"" << AFLOWRC_DEFAULT_APL_DPM << "\"" << endl;
     aflowrc << "DEFAULT_APL_RELAX=" << AFLOWRC_DEFAULT_APL_RELAX << endl;
+    aflowrc << "DEFAULT_APL_RELAX_COMMENSURATE=" << AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE << endl;  // ME20200427
     aflowrc << "DEFAULT_APL_ZEROSTATE=" << AFLOWRC_DEFAULT_APL_ZEROSTATE << endl;
-    aflowrc << "DEFAULT_APL_ZEROSTATE_CHGCAR=" << AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  // ME191029
+    aflowrc << "DEFAULT_APL_ZEROSTATE_CHGCAR=" << AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  //ME20191029
     aflowrc << "DEFAULT_APL_USE_LEPSILON=" << AFLOWRC_DEFAULT_APL_USE_LEPSILON << endl;
     aflowrc << "DEFAULT_APL_FREQFORMAT=\"" << AFLOWRC_DEFAULT_APL_FREQFORMAT << "\"" << endl;
     aflowrc << "DEFAULT_APL_DC=" << AFLOWRC_DEFAULT_APL_DC << endl;
     aflowrc << "DEFAULT_APL_DCPATH=\"" << AFLOWRC_DEFAULT_APL_DCPATH << "\"" << endl;
-    aflowrc << "DEFAULT_APL_DCPOINTS=" << AFLOWRC_DEFAULT_APL_DCPOINTS << endl; //CO181226
+    aflowrc << "DEFAULT_APL_DCPOINTS=" << AFLOWRC_DEFAULT_APL_DCPOINTS << endl; //CO20181226
     aflowrc << "DEFAULT_APL_DOS=" << AFLOWRC_DEFAULT_APL_DOS << endl;
     aflowrc << "DEFAULT_APL_DOSMETHOD=\"" << AFLOWRC_DEFAULT_APL_DOSMETHOD << "\"" << endl;
     aflowrc << "DEFAULT_APL_DOSMESH=\"" << AFLOWRC_DEFAULT_APL_DOSMESH << "\"" << endl;
     aflowrc << "DEFAULT_APL_DOSPOINTS=" << AFLOWRC_DEFAULT_APL_DOSPOINTS << endl;
     aflowrc << "DEFAULT_APL_DOSSMEAR=" << AFLOWRC_DEFAULT_APL_DOSSMEAR << endl;
+    aflowrc << "DEFAULT_APL_DOS_PROJECT=" << AFLOWRC_DEFAULT_APL_DOS_PROJECT << endl;
     aflowrc << "DEFAULT_APL_TP=" << AFLOWRC_DEFAULT_APL_TP << endl;
+    aflowrc << "DEFAULT_APL_DISPLACEMENTS=" << AFLOWRC_DEFAULT_APL_DISPLACEMENTS << endl;  // ME20200421
     aflowrc << "DEFAULT_APL_TPT=\"" << AFLOWRC_DEFAULT_APL_TPT << "\"" << endl;
     aflowrc << "DEFAULT_APL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_APL_FILE_PREFIX << "\"" << endl;
     aflowrc << "DEFAULT_APL_PDIS_FILE=\"" << AFLOWRC_DEFAULT_APL_PDIS_FILE << "\"" << endl;
@@ -1756,18 +1842,36 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_THERMO_FILE=\"" << AFLOWRC_DEFAULT_APL_THERMO_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_POLAR_FILE=\"" << AFLOWRC_DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
-    // ME190614 - START
+    aflowrc << "DEFAULT_APL_MSQRDISP_FILE=\"" << AFLOWRC_DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
+    //ME20190614 BEGIN
     aflowrc << "DEFAULT_APL_PHDOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHPOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHKPOINTS_FILE=\"" << AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHEIGENVAL_FILE=\"" << AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
-    // ME190614 - END
+    //ME20190614 END
+    aflowrc << "DEFAULT_APL_STATE_FILE=\"" << AFLOWRC_DEFAULT_APL_STATE_FILE << "\"" << endl;  // ME20200224
+    //ME20200329 BEGIN
+    aflowrc << "DEFAULT_APL_ADISP_SCENE_FORMAT=\"" << AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT << "\"" << endl;
+    aflowrc << "DEFAULT_APL_ADISP_AMPLITUDE=" << AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE << endl;
+    aflowrc << "DEFAULT_APL_ADISP_NSTEPS=" << AFLOWRC_DEFAULT_APL_ADISP_NSTEPS << endl;
+    aflowrc << "DEFAULT_APL_ADISP_NPERIODS=" << AFLOWRC_DEFAULT_APL_ADISP_NPERIODS << endl;
+    //ME20200329 END
+
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS QHA" << endl;
+    aflowrc << "DEFAULT_QHA_MODE=\"" << AFLOWRC_DEFAULT_QHA_MODE << "\"" << endl;
+    aflowrc << "DEFAULT_QHA_EOS=" << AFLOWRC_DEFAULT_QHA_EOS  << endl;
+    aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
+    aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
+    aflowrc << "DEFAULT_QHA_SCQHA_PDIS_T=\"" << AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T << "\"" << endl;
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
     aflowrc << "DEFAULT_AAPL_BTE=\"" << AFLOWRC_DEFAULT_AAPL_BTE << "\"" << endl;
-    //[ME181226]aflowrc << "DEFAULT_AAPL_BZMETHOD=\"" << AFLOWRC_DEFAULT_AAPL_BZMETHOD << "\"" << endl;
+    //[ME20181226]aflowrc << "DEFAULT_AAPL_BZMETHOD=\"" << AFLOWRC_DEFAULT_AAPL_BZMETHOD << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_FOURTH_ORDER=" << AFLOWRC_DEFAULT_AAPL_FOURTH_ORDER << endl;
     aflowrc << "DEFAULT_AAPL_CUT_RAD=\"" << AFLOWRC_DEFAULT_AAPL_CUT_RAD << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_CUT_SHELL=\"" << AFLOWRC_DEFAULT_AAPL_CUT_SHELL << "\"" << endl;
@@ -1785,15 +1889,15 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AAPL_IRRQPTS_FILE=\"" << AFLOWRC_DEFAULT_AAPL_IRRQPTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_FREQ_FILE=\"" << AFLOWRC_DEFAULT_AAPL_FREQ_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_GVEL_FILE=\"" << AFLOWRC_DEFAULT_AAPL_GVEL_FILE << "\"" << endl;
-    aflowrc << "DEFAULT_AAPL_PS_FILE=\"" << AFLOWRC_DEFAULT_AAPL_PS_FILE << "\"" << endl;  // ME191104
-    aflowrc << "DEFAULT_AAPL_GRUENEISEN_FILE=\"" << AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE << "\"" << endl;  // ME191104
+    aflowrc << "DEFAULT_AAPL_PS_FILE=\"" << AFLOWRC_DEFAULT_AAPL_PS_FILE << "\"" << endl;  //ME20191104
+    aflowrc << "DEFAULT_AAPL_GRUENEISEN_FILE=\"" << AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE << "\"" << endl;  //ME20191104
     aflowrc << "DEFAULT_AAPL_RATES_FILE=\"" << AFLOWRC_DEFAULT_AAPL_RATES_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_RATES_3RD_FILE=\"" << AFLOWRC_DEFAULT_AAPL_RATES_3RD_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_RATES_4TH_FILE=\"" << AFLOWRC_DEFAULT_AAPL_RATES_4TH_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_ISOTOPE_FILE=\"" << AFLOWRC_DEFAULT_AAPL_ISOTOPE_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_BOUNDARY_FILE=\"" << AFLOWRC_DEFAULT_AAPL_BOUNDARY_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_TCOND_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_FILE << "\"" << endl;
-    //aflowrc << "DEFAULT_AAPL_TCOND_PLOT_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME191104
+    //aflowrc << "DEFAULT_AAPL_TCOND_PLOT_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME20191104
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AEL" << endl;
@@ -1844,6 +1948,12 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AGL_WRITE_GIBBS_INPUT=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     aflowrc << "DEFAULT_AGL_PLOT_RESULTS=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
+    // RF20200413 - START
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS CCE" << endl;
+    aflowrc << "DEFAULT_CCE_OX_METHOD=\"" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "\"" << "  // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    // RF20200413 - END
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
@@ -1880,23 +1990,23 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl; 
 
-    //DX 20190509 - MACHINE001 - START
+    //DX20190509 - MACHINE001 - START
     aflowrc << "MPI_OPTIONS_MACHINE001=\"" << AFLOWRC_MPI_OPTIONS_MACHINE001 << "\"" << "// MACHINE001" << endl;
     aflowrc << "MPI_COMMAND_MACHINE001=\"" << AFLOWRC_MPI_COMMAND_MACHINE001 << "\"" << "// MACHINE001" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE001=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE001 << "\"" << "// MACHINE001" << endl; 
-    //DX 20190509 - MACHINE001 - END
+    //DX20190509 - MACHINE001 - END
 
-    //DX 20190509 - MACHINE002 - START
+    //DX20190509 - MACHINE002 - START
     aflowrc << "MPI_OPTIONS_MACHINE002=\"" << AFLOWRC_MPI_OPTIONS_MACHINE002 << "\"" << "// MACHINE002" << endl;
     aflowrc << "MPI_COMMAND_MACHINE002=\"" << AFLOWRC_MPI_COMMAND_MACHINE002 << "\"" << "// MACHINE002" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE002=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE002 << "\"" << "// MACHINE002" << endl;
-    //DX 20190509 - MACHINE002 - START
+    //DX20190509 - MACHINE002 - START
 
-    //DX 20190107 - CMU EULER - START
+    //DX20190107 - CMU EULER - START
     aflowrc << "MPI_OPTIONS_CMU_EULER=\"" << AFLOWRC_MPI_OPTIONS_CMU_EULER << "\"" << "// CMU_EULER" << endl;
     aflowrc << "MPI_COMMAND_CMU_EULER=\"" << AFLOWRC_MPI_COMMAND_CMU_EULER << "\"" << "// CMU_EULER" << endl;
     aflowrc << "MPI_BINARY_DIR_CMU_EULER=\"" << AFLOWRC_MPI_BINARY_DIR_CMU_EULER << "\"" << "// CMU_EULER" << endl; 
-    //DX 20190107 - CMU EULER - END
+    //DX20190107 - CMU EULER - END
 
     aflowrc << "MPI_OPTIONS_MPCDF_EOS=\"" << AFLOWRC_MPI_OPTIONS_MPCDF_EOS << "\"" << "  // MPCDF_EOS_MPI" << endl;
     aflowrc << "MPI_COMMAND_MPCDF_EOS=\"" << AFLOWRC_MPI_COMMAND_MPCDF_EOS << "\"" << "  // MPCDF_EOS_MPI" << endl;
@@ -1934,14 +2044,13 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_MACHINE2=\"" << AFLOWRC_MPI_COMMAND_MACHINE2 << "\"" << "  // MACHINE2" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE2=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE2 << "\"" << "  // MACHINE2" << endl; 
 
-
     aflowrc << " " << endl;
     aflowrc << "// ****************************************************************************************************" << endl;
 
     //   XHOST.DEBUG=TRUE;
-    //[CO190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
+    //[CO20190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
-      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO190808 - issue this ONLY if it was written, should fix www-data
+      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
     }
     if(LDEBUG) oss << "aflowrc::write_default: END" << endl;
     //    exit(0);
@@ -1959,14 +2068,14 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.home=" << XHOST.home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
-    // ME191001 - START
+    //ME20191001 START
     if(LDEBUG) oss << "// DEFAULT AFLOW DATABASE" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_STATS_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_LOCK_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_STALE_THRESHOLD=" << AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD << endl;
-    // ME191001 - STOP
+    //ME20191001 STOP
     if(LDEBUG) oss << "// DEFAULT DEFINITIONS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_BIN\")=\"" << DEFAULT_KZIP_BIN << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_EXT\")=\"" << DEFAULT_KZIP_EXT << "\"" << endl;
@@ -1993,6 +2102,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_FILE_VOLDISTEVOLUTION_OUT\")=\"" << DEFAULT_FILE_VOLDISTEVOLUTION_OUT << "\"" << endl;
 
     if(LDEBUG) oss << "// FILENAMES FOR AFLOW OPERATION" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT\")=\"" << DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PRESCRIPT_OUT\")=\"" << DEFAULT_AFLOW_PRESCRIPT_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PRESCRIPT_COMMAND\")=\"" << DEFAULT_AFLOW_PRESCRIPT_COMMAND << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_POSTSCRIPT_OUT\")=\"" << DEFAULT_AFLOW_POSTSCRIPT_OUT << "\"" << endl;
@@ -2001,6 +2111,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUP_JSON\")=\"" << DEFAULT_AFLOW_PGROUP_JSON << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUP_XTAL_OUT\")=\"" << DEFAULT_AFLOW_PGROUP_XTAL_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUP_XTAL_JSON\")=\"" << DEFAULT_AFLOW_PGROUP_XTAL_JSON << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT\")=\"" << DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT << "\"" << endl; //DX20200129
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON\")=\"" << DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON << "\"" << endl; //DX20200129
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_OUT\")=\"" << DEFAULT_AFLOW_PGROUPK_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_JSON\")=\"" << DEFAULT_AFLOW_PGROUPK_JSON << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_XTAL_OUT\")=\"" << DEFAULT_AFLOW_PGROUPK_XTAL_OUT << "\"" << endl;
@@ -2171,8 +2283,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_LATEX_BOLD_LABELS\")=" << DEFAULT_CHULL_LATEX_BOLD_LABELS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_PNG_RESOLUTION\")=" << DEFAULT_CHULL_PNG_RESOLUTION << endl;
 
-    if(LDEBUG) oss << "// DEFAULTS GFA" << endl;  //CO190628
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF\")=" << DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << endl;  //CO190628
+    if(LDEBUG) oss << "// DEFAULTS GFA" << endl;  //CO20190628
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF\")=" << DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << endl;  //CO20190628
 
     if(LDEBUG) oss << "// DEFAULTS ARUN" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
@@ -2187,39 +2299,42 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON\")=" << DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS\")=" << DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_FILE_PREFIX\")=\"" << POCC_FILE_PREFIX << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_OUT_FILE\")=\"" << POCC_OUT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SUPERCELLS_FILE\")=\"" << POCC_ALL_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_UNIQUE_SUPERCELLS_FILE\")=\"" << POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_HNF_MATRICES_FILE\")=\"" << POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SITE_CONFIGURATIONS_FILE\")=\"" << POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_OUT_FILE\")=\"" << POCC_OUT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_DOSCAR_FILE\")=\"" << POCC_DOSCAR_FILE << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS APL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PREC\")=\"" << DEFAULT_APL_PREC << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ENGINE\")=\"" << DEFAULT_APL_ENGINE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HIBERNATE\")=" << DEFAULT_APL_HIBERNATE << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MINSHELL\")=" << DEFAULT_APL_MINSHELL << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MINATOMS\")=" << DEFAULT_APL_MINATOMS << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR\")=" << DEFAULT_APL_POLAR << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DMAG\")=" << DEFAULT_APL_DMAG << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DXYZONLY\")=" << DEFAULT_APL_DXYZONLY << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HIBERNATE\")=" << DEFAULT_APL_HIBERNATE << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MINSHELL\")=" << DEFAULT_APL_MINSHELL << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MINATOMS\")=" << DEFAULT_APL_MINATOMS << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR\")=" << DEFAULT_APL_POLAR << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DMAG\")=" << DEFAULT_APL_DMAG << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DXYZONLY\")=" << DEFAULT_APL_DXYZONLY << endl;  //ME20190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DSYMMETRIZE\")=" << DEFAULT_APL_DSYMMETRIZE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DINEQUIV_ONLY\")=" << DEFAULT_APL_DINEQUIV_ONLY << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DPM\")=\"" << DEFAULT_APL_DPM << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_RELAX\")=" << DEFAULT_APL_RELAX << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ZEROSTATE\")=" << DEFAULT_APL_ZEROSTATE << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ZEROSTATE_CHGCAR\")=" << DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  // ME191029
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_USE_LEPSILON\")=" << DEFAULT_APL_USE_LEPSILON << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_RELAX\")=" << DEFAULT_APL_RELAX << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_RELAX_COMMENSURATE\")=" << DEFAULT_APL_RELAX_COMMENSURATE << endl;  //ME20200427
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ZEROSTATE\")=" << DEFAULT_APL_ZEROSTATE << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ZEROSTATE_CHGCAR\")=" << DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  //ME20191029
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_USE_LEPSILON\")=" << DEFAULT_APL_USE_LEPSILON << endl;  //ME20190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_FREQFORMAT\")=\"" << DEFAULT_APL_FREQFORMAT << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DC\")=" << DEFAULT_APL_DC << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DC\")=" << DEFAULT_APL_DC << endl;  //ME20190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DCPATH\")=\"" << DEFAULT_APL_DCPATH << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DCPOINTS\")=" << DEFAULT_APL_DCPOINTS << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOS\")=" << DEFAULT_APL_DOS << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DCPOINTS\")=" << DEFAULT_APL_DCPOINTS << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOS\")=" << DEFAULT_APL_DOS << endl;  //ME20190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSMETHOD\")=\"" << DEFAULT_APL_DOSMETHOD << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSMESH\")=\"" << DEFAULT_APL_DOSMESH << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSPOINTS\")=" << DEFAULT_APL_DOSPOINTS << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSSMEAR\")=" << DEFAULT_APL_DOSSMEAR << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TP\")=" << DEFAULT_APL_TP << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSPOINTS\")=" << DEFAULT_APL_DOSPOINTS << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSSMEAR\")=" << DEFAULT_APL_DOSSMEAR << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOS_PROJECT\")=" << DEFAULT_APL_DOS_PROJECT << endl;  //ME20200213
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TP\")=" << DEFAULT_APL_TP << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DISPLACEMENTS\")=" << DEFAULT_APL_DISPLACEMENTS << endl;  //ME20200421
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TPT\")=\"" << DEFAULT_APL_TPT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_FILE_PREFIX\")=\"" << DEFAULT_APL_FILE_PREFIX << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PDIS_FILE\")=\"" << DEFAULT_APL_PDIS_FILE << "\"" << endl;
@@ -2227,43 +2342,60 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_THERMO_FILE\")=\"" << DEFAULT_APL_THERMO_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR_FILE\")=\"" << DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
-    // ME190614 - START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MSQRDISP_FILE\")=\"" << DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
+    //ME20190614 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHDOSCAR_FILE\")=\"" << DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHPOSCAR_FILE\")=\"" << DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHKPOINTS_FILE\")=\"" << DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHEIGENVAL_FILE\")=\"" << DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
-    // ME190614 - END
+    //ME20190614 END
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_STATE_FILE\")=\"" << DEFAULT_APL_STATE_FILE << "\"" << endl;  //ME20200224
+    //ME20200329 BEGIN
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_SCENE_FORMAT\")=\"" << DEFAULT_APL_ADISP_SCENE_FORMAT << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_AMPLITUDE\")=" << DEFAULT_APL_ADISP_AMPLITUDE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_NSTEPS\")=" << DEFAULT_APL_ADISP_NSTEPS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_NPERIODS\")=" << DEFAULT_APL_ADISP_NPERIODS << endl;
+    //ME20200329 END
+
+    if(LDEBUG) oss << "// DEFAULTS QHA" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_MODE\")=\"" << DEFAULT_QHA_MODE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS\")=" << DEFAULT_QHA_EOS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_SCQHA_PDIS_T\")=\"" << DEFAULT_QHA_SCQHA_PDIS_T << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
-    //[ME181226]if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BZMETHOD\")=\"" << DEFAULT_AAPL_BZMETHOD << "\"" << endl;
+    //[ME20181226]if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BZMETHOD\")=\"" << DEFAULT_AAPL_BZMETHOD << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_FOURTH_ORDER\")=" << DEFAULT_AAPL_FOURTH_ORDER << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_CUT_RAD\")=\"" << DEFAULT_AAPL_CUT_RAD << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_CUT_SHELL\")=\"" << DEFAULT_AAPL_CUT_SHELL << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_THERMALGRID\")=\"" << DEFAULT_AAPL_THERMALGRID << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCT\")=\"" << DEFAULT_AAPL_TCT << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_SUMRULE\")=" << DEFAULT_AAPL_SUMRULE << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_SUMRULE_MAX_ITER\")=" << DEFAULT_AAPL_SUMRULE_MAX_ITER << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_MIXING_COEFFICIENT\")=" << DEFAULT_AAPL_MIXING_COEFFICIENT << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_ISOTOPE\")=" << DEFAULT_AAPL_ISOTOPE << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BOUNDARY\")=" << DEFAULT_AAPL_BOUNDARY << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_CUMULATIVEK\")=" << DEFAULT_AAPL_CUMULATIVEK << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_NANO_SIZE\")=" << DEFAULT_AAPL_NANO_SIZE << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_SUMRULE\")=" << DEFAULT_AAPL_SUMRULE << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_SUMRULE_MAX_ITER\")=" << DEFAULT_AAPL_SUMRULE_MAX_ITER << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_MIXING_COEFFICIENT\")=" << DEFAULT_AAPL_MIXING_COEFFICIENT << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_ISOTOPE\")=" << DEFAULT_AAPL_ISOTOPE << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BOUNDARY\")=" << DEFAULT_AAPL_BOUNDARY << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_CUMULATIVEK\")=" << DEFAULT_AAPL_CUMULATIVEK << endl;  //ME20190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_NANO_SIZE\")=" << DEFAULT_AAPL_NANO_SIZE << endl;  //ME20190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_FILE_PREFIX\")=\"" << DEFAULT_AAPL_FILE_PREFIX << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_QPOINTS_FILE\")=\"" << DEFAULT_AAPL_QPOINTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_IRRQPTS_FILE\")=\"" << DEFAULT_AAPL_IRRQPTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_FREQ_FILE\")=\"" << DEFAULT_AAPL_FREQ_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_GVEL_FILE\")=\"" << DEFAULT_AAPL_GVEL_FILE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_PS_FILE\")=\"" << DEFAULT_AAPL_PS_FILE << "\"" << endl;  // ME191104
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_GRUENEISEN_FILE\")=\"" << DEFAULT_AAPL_GRUENEISEN_FILE << "\"" << endl;  // ME191104
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_PS_FILE\")=\"" << DEFAULT_AAPL_PS_FILE << "\"" << endl;  //ME20191104
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_GRUENEISEN_FILE\")=\"" << DEFAULT_AAPL_GRUENEISEN_FILE << "\"" << endl;  //ME20191104
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_RATES_FILE\")=\"" << DEFAULT_AAPL_RATES_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_RATES_3RD_FILE\")=\"" << DEFAULT_AAPL_RATES_3RD_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_RATES_4TH_FILE\")=\"" << DEFAULT_AAPL_RATES_4TH_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_ISOTOPE_FILE\")=\"" << DEFAULT_AAPL_ISOTOPE_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BOUNDARY_FILE\")=\"" << DEFAULT_AAPL_BOUNDARY_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_FILE\")=\"" << DEFAULT_AAPL_TCOND_FILE << "\"" << endl;
-    //if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_PLOT_FILE\")=\"" << DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME190411
+    //if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_PLOT_FILE\")=\"" << DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME20190411
 
     if(LDEBUG) oss << "// DEFAULTS AEL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_STRAIN_SYMMETRY\")=" << AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY << endl;
@@ -2312,6 +2444,11 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_GIBBS_INPUT\")=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_PLOT_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
+    // RF20200413 - START
+    if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    // RF20200413 - END
+
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
@@ -2346,23 +2483,23 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_QFLOW_OPENMPI\")=\"" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI\")=\"" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
 
-    //DX 20190509 - MACHINE001 - START
+    //DX20190509 - MACHINE001 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE001\")=\"" << MPI_OPTIONS_MACHINE001 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE001\")=\"" << MPI_COMMAND_MACHINE001 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE001\")=\"" << MPI_BINARY_DIR_MACHINE001 << "\"" << endl;
-    //DX 20190509 - MACHINE001 - END
+    //DX20190509 - MACHINE001 - END
 
-    //DX 20190509 - MACHINE002 - START
+    //DX20190509 - MACHINE002 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE002\")=\"" << MPI_OPTIONS_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE002\")=\"" << MPI_COMMAND_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE002\")=\"" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
-    //DX 20190509 - MACHINE002 - END
+    //DX20190509 - MACHINE002 - END
 
-    //DX 20190107 - CMU EULER - START
+    //DX20190107 - CMU EULER - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_CMU_EULER\")=\"" << MPI_OPTIONS_CMU_EULER << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_CMU_EULER\")=\"" << MPI_COMMAND_CMU_EULER << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_CMU_EULER\")=\"" << MPI_BINARY_DIR_CMU_EULER << "\"" << endl;
-    //DX 20190107 - CMU EULER - END
+    //DX20190107 - CMU EULER - END
 
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MPCDF_EOS\")=\"" << MPI_OPTIONS_MPCDF_EOS << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MPCDF_EOS\")=\"" << MPI_COMMAND_MPCDF_EOS << "\"" << endl;
@@ -2417,6 +2554,6 @@ namespace aflowrc {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

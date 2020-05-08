@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2018           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -511,7 +511,7 @@ namespace AGL_functions {
     // OBSOLETE kth = kboltz * acousticthetaD / hbar;
 
     // OBSOLETE double hbar = PLANKSCONSTANT_h / (2 * pi);
-    double hbar = PLANCKSCONSTANT_hbar;  // ME 181020
+    double hbar = PLANCKSCONSTANT_hbar;  //ME20181020
 
     kth = KBOLTZ * acousticthetaD / hbar;
     kths = kth * kth;
@@ -537,3 +537,9 @@ namespace AGL_functions {
 
 #endif // _AFLOW_AGL_THERMAL_CPP
 
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *                                                                         *
+// ***************************************************************************

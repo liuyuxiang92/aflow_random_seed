@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -34,6 +34,7 @@ Table of Contents:
 2.1.2.    Supercell Parameters
 2.1.3.    k-Point Parameters
 2.1.4.    Polar Corrections
+2.1.5.    Number of Bands
 2.2.    Direct Method Parameters
 2.3.    Linear Response Method Parameters
 
@@ -41,6 +42,10 @@ Table of Contents:
 3.1.    Phonon Dispersion Curves
 3.2.    Phonon Density of States
 3.3.    Thermodynamic Properties
+3.4.    Plotting Phonon Properties
+3.5.    Atomic Displacements
+3.5.1.    Mean Square Displacements
+3.5.2.    Visualizing Phonon Displacements
 
 4.    Saving and Loading APL Results (Hibernation)
 
@@ -55,7 +60,8 @@ Table of Contents:
 7.2.2.    Sum Rule Parameters
 7.2.3.    k-Point Parameters
 7.3.    Lattice Thermal Conductivity Calculations
-7.4.    Example AAPL Input File
+7.4.    Plotting Thermal Conductivity
+7.5.    Example AAPL Input File
 
 ----------------------------------------------------------------------------------------------------
 
@@ -79,8 +85,20 @@ forces. This can be achieved in one of two ways:
 
     These are also the default values. Setting RELAX=ON makes APL run two relaxation calculations
     with the precision given in PREC. This method is especially useful when a relaxed structure
-    already exists. The input and output files are saved in XXXCAR.relax_phononsN with N = 1,2.
+    already exists. The input and output files are saved in XXXCAR.relax_aplN with N = 1,2.
     For more information on the PREC option, see Section 2.1.1.
+
+    APL can automatically choose the k-point grid for the relaxation to be commensurate with the
+    k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point grid,
+    the unit cell will be relaxed using a 6x4x3 k-point grid. This minimizes the risk of ghost
+    forces in the supercell calculations. This feature can be turned on by using:
+
+      [AFLOW_APL]RELAX_COMMENSURATE=ON
+
+    The default is ON. If this option is OFF, APL will use the k-point settings for AFLOW RELAX
+    runs. See README_AFLOW.TXT for more information.
+
+    NOTE: Relaxations will be skipped when a PHPOSCAR file is present (see below).
 
   * By relaxing the structure in a normal AFLOW relaxation calculation using the flag:
 
@@ -88,6 +106,8 @@ forces. This can be achieved in one of two ways:
 
     APL can be run afterwards with the resulting structure. [AFLOW_APL]RELAX should be set to OFF.
 
+APL saves the structure that is used to create the supercell in a VASP-5-formatted POSCAR file
+named PHPOSCAR. This structure will be loaded first, no matter what is found in the aflow.in file.
 
 2. Choosing a Phonon Calculation Method
 
@@ -190,6 +210,12 @@ general AFLOW k-point parameters:
       entry. The "[AFLOW_APL]KPPRA" flag overrides this for APL calculations. See README_AFLOW.TXT
       for more information on KPPRA.
 
+    * The k-point grid can also be set directly using:
+
+        [AFLOW_APL]KPOINTS_GRID=k1xk2xk3
+
+      This takes precedence over KPPRA. KPPRA is used as default.
+
     * The k-point scheme can be set using:
 
         [AFLOW_APL]KSCHEME=scheme
@@ -197,6 +223,12 @@ general AFLOW k-point parameters:
       By default, AFLOW takes the KPOINTS scheme from the "[VASP_KPOINTS_FILE]KSCHEME" entry. The
       "[AFLOW_APL]KSCHEME" overrides this setting. See README_AFLOW.TXT for more information on
       KSCHEME.
+
+    * The k-point shift vector can be set using the following format:
+
+        [AFLOW_APL]KPOINTS_SHIFT=X,Y,Z
+
+      Where X, Y, and Z are the comma-separated components of the shift vector.
 
     * The k-point parity can be set using:
 
@@ -230,6 +262,12 @@ unlimited, the following line needs to be written either in the .bashrc file or 
 The dielectric constant tensor and the Born effective charge tensor is by default calculated using
 the tag LEPSILON in the VASP INCAR file, but can be calculated using LCALCEPS as well. To switch to
 LCALCEPS, the value DEFAULT_APL_USE_LEPSILON in the aflow.rc file needs to be set to false (0).
+
+2.1.5. Number of Bands
+
+If NBANDS is set in the parent aflow.in file, APL will scale the number of bands automatically in
+the supercell file. For example, if NBANDS = 20 and a 2x2x2 supercell is used, NBANDS will be set
+to 160 in the supercell calculations.
 
 2.2. Direct Method Parameters
 
@@ -295,15 +333,12 @@ from all distorted states. This can be done using the keyword:
 If activated, APL will generate a calculation of the undistorted supercell and the obtained forces
 will be subtracted from all other strained calculations. The default is ZEROSTATE=OFF.
 WARNING: This method is not well tested yet and should be used with caution.
-
-The ZEROSTATE calculation can also be used to accelerate the DFT calculations of the distorted
-cells by using its charge density. To do this, the following keyword needs to be activated:
-
-    [AFLOW_APL]ZEROSTATE_CHGCAR=ON
-
-The default is OFF.
+NOTE: Using DPM=ON cancels out zerostate forces, so DPM=ON and ZEROSTATE=ON is redundant. However,
+      the zerostate calculation can still be used to test for the presence of ghost forces.
 
 2.3.  Linear Response Method Parameters
+
+NOTE: the linear response method is currently untested!
 
 The use of the linear response method as implemented in VASP requires VASP version 5.2 or higher.
 APL will check if the appropriate binary file is present upon start-up, and will refuse to continue
@@ -317,11 +352,8 @@ size to unlimited, the following line needs to be written either in the .bashrc 
 
 In contrast to the DM method, APL is not responsible for finding the appropriate set of distortion
 vectors for LR calculations as it is all done by VASP. Hence, long run DFT calculations are to be
-expected. Please note, the VASP is using the mode XYZONLY so that more distortions are generated
+expected. Please note that VASP is using the mode XYZONLY so that more distortions are generated
 than in the DM method.
-
-APL will use the file DYNMAT, which is generated by VASP, as the basis for post-processing.
-
 
 3. Calculating Phonon Properties
 
@@ -357,6 +389,9 @@ the point density, and the frequency unit.
              [AFLOW_APL]DCUSERPATH=G-X|X-U|K-G|G-L
 
       The labels must correspond to the labels for the lattice as set by the AFLOW standard.
+
+      NOTE: DCPATH=LATTICE will project the phonon dispersions to the primitive cell, so the
+      labels must correspond to a high-symmetry point in the primitive lattice.
       
       MANUAL lets the user specify which path and points to use. Three parameters need
       to be set to use MANUAL.
@@ -453,7 +488,11 @@ mesh, the number of energy points, and the smearing width.
       This is especially important for the RS method. The default is 0.05 for the RS method and
       0.0 for the LT method (i.e. no smearing).
 
-Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
+Projected DOS can be calculated using the keyword DOS_PROJECT:
+
+         [AFLOW_APL]DOS_PROJECT=ON
+
+The default is OFF. Projections along specific directions can be added using DOSPROJECTIONS:
 
         [AFLOW_APL]DOSPROJECTIONS_CART=1,0,0;0,1,0;0,0,1
                                  or
@@ -461,7 +500,7 @@ Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
 
 Where DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC give the projection directions in Cartesian and
 fractional coordinates, respectively. It is not possible to choose both options. If neither option
-is populated, projected DOS will not be calculated.
+is populated, atom-projected DOS will be calculated.
 
 Each projection vector triplet needs to be separated by a semicolon, and the coordinates inside the
 triplets must be separated by commas. The projection vectors have to be given in Cartesian
@@ -484,17 +523,147 @@ Where TSTART and TEND are the initial and final temperature, respectively, and T
 temperature step size. The default setting is 0:2000:10, i.e. it calculates the properties from 0 K
 to 2000 K in 10 K steps.
 
+APL will also output mean square displacements for each atom inside that temperature range.
+
+3.4. Plotting Phonon Properties
+
+AFLOW can plot phonon dispersions, phonon DOS, and thermodynamic properties using the command line.
+This feature requires gnuplot version 5 and pdflatex.
+
+To plot phonon dispersions, use:
+
+  aflow --plotphdisp|--plotphonondispersion|--pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
+    Defaults.
+     Directory: default = ./
+     Emin: The minimum value of the plot. Default value: minimum frequency
+     Emax: The maximum value of the plot. Default value: maximum frequency
+    Optional arguments:
+     --keep=gpl: keep the gnuplot script
+     --print: specify the format of the output image (default: pdf)
+     --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
+     --unit: the unit of the phonon frequencies/energies (default: THz)
+     --outfile: the name of the output image file.
+    Example:
+     aflow --plotphdisp=./ --print=png --unit=cm-1
+
+The files PHEIGENVAL, PHKPOINTS, and PHPOSCAR must reside in the directory.
+
+Phonon DOS can be plotted in a similar fashion:
+
+  aflow --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
+    Defaults.
+     DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
+    Other options: same as plotphdisp
+
+The file PHDOSCAR must be present in the directory. To plot projected DOS, --projection=atom needs
+to be added to the command and PHPOSCAR needs to be in the directory.
+
+A combined dispersion-DOS plot can be created using:
+
+  aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
+
+Thermodynamic properties can be plotted using:
+
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+    Defaults.
+     Directory: default = ./
+     Tmin: The minimum temperature of the plot. Default value: 0 K
+     Tmax: The maximum temperature of the plot. Default value: maximum temperature
+    Optional arguments:
+     --keep=gpl: keep the gnuplot script
+     --print: specify the format of the output image (default: pdf)
+     --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+     --outfile: the name of the output image file.
+    Example:
+     aflow --plotthermo=./,100,300
+
+This command outputs four separate files for the internal energy, vibrational free energy,
+vibrational entropy, and isochoral heat capacity. The file aflow.apl.thermal_properties.out must be
+present in the directory.
+
+
+3.5. Atomic Displacements
+
+3.5.1. Mean Square Displacements
+
+AFLOW can calculate the mean square displacement vectors for each atom in the unit cell by adding
+the following to the aflow.in file:
+
+    [AFLOW_APL]DISPLACEMENTS=ON
+
+This is also the default option.
+
+The temperature range is taken from the parameter TPT (see section 3.3.) and the mesh density from
+DOS_MESH (see section 3.2.).
+
+3.5.2. Visualizing Phonon Displacements
+
+APL provides an interface to the following output formats that can be used to visualize atomic
+displacements:
+
+  * XCRYSDEN
+  * V_sim
+
+The commands to create these output files are shown below:
+
+  aflow --visualize_phonons --qpoint=|--qpoints=|--q= [--format=XCRYSDEN|V_SIM] [--amplitude=] [--branches=] [--periods=] [--steps=] [--scell=] -D DIRECTORY
+        Outputs a phonon visualization file. Currently supported formats: xcrysden and v_sim.
+
+        Options for all formats:
+          --qpoint:    q-points for the phonons to be visualized as a comma-separated list.
+                       Multiple points can be specified.
+
+          --format:    The output file format.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+
+          --amplitude: The amplitude of the displacements.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+
+
+        Options for XCRYSDEN:
+          --branches:  The branches of the phonon modes as a comma-separated list (1-based).
+                       Default: all.
+
+          --periods:   The number of periods displayed in the output file.
+                       Default: DEFAULT_APL_ADISP_NPERIODS in .aflow.rc
+
+          --steps:     The number of steps per period in the output file.
+                       Default: DEFAULT_APL_ADISP_NSTEPS in .aflow.rc
+
+          --scell:     The supercell to be displayed in the output file.
+                       Default: unit cell.
+
+        Examples:
+          aflow --visualize_phonons --qpoint=0.5,0,0 --steps=40 --amplitude=0.3 --scell=3x3x3 -D ./
+          aflow --visualize_phonons --q=0,0,0,0.5,0.5,0.5 --branches=4,5,6 --format=XCRYSDEN --scell=4x4x2
+          aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
+
+For XCRYSDEN, APL creates an animated structure (axsf) file for each phonon mode. These files
+contain animations that show the motions of the atoms for each of the modes. These animations can
+be used by XCRYSDEN to create mpeg movies or gif images. The parameter "steps" determines the
+number of steps for each period, and "periods" determines how many periods are output into the
+file. For gifs, one period is sufficient. The parameter "scell" can be used to show the
+displacements in a supercell instead of the unit cell, which is important for modes off the Gamma
+point.
+
+V_sim files will be output as aflow.apl.displacements.ascii, which contains all modes for the
+desired q-points. The file can be opened using V_sim or ASCII-phonons. These programs are capable
+of doing supercells and animations on their own and do not require steps, periods, or supercell
+parameters.
+
+
 4. Saving and Loading APL Results APL Calculations (Hibernation)
 
 In order to avoid recalculating the force constant matrix with every run, APL has implemented a
-hibernation system which saves the forces, the force constants, the Born effective charge tensor,
-and the dielectric constant tensor into an output file (aflow.apl.harmonicIFCs.xml).
+hibernation system which saves the force constants into the file aflow.apl.harmonicIFCs.xml.
+Born effective charges and the dielectric tensor are stored in aflow.apl.polar.xml.
 
 This behavior can be switched on(off) using the HIBERNATE keyword: 
 
     [AFLOW_APL]HIBERNATE=ON(OFF)
 
-It is turned on by default.
+It is turned on by default. If settings in the aflow.in file change the calculation of the force
+constants, these files must be deleted for the changes to take effect.
 
 
 5. Inheritance from AFLOW
@@ -609,7 +778,8 @@ then proceed with a subsequent analysis (QHA/AAPL) without the need to change th
 The Automatic Anharmonic Phonon Library (AAPL) is the anharmonic extension to APL and calculates
 anharmonic interatomic force constants (IFCs). These can then be used to calculate the lattice
 thermal conductivity by solving the Boltzmann Transport Equation (BTE). AAPL can use three-phonon
-processes to calculate thermal conductivities.
+processes to calculate thermal conductivities, Grueneisen parameters, and the scattering phase
+space of a material.
 
 To use AAPL, the following needs to be added to the aflow.in file:
 
@@ -769,7 +939,29 @@ scattering.
 
         Which corresponds to the grain size/mean free path threshold in nm. The default is 100 nm.
 
-7.4. Example AAPL Input File
+7.4. Plotting Thermal Conductivity
+
+Thermal conductivity can be plotted using the command line:
+
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
+
+  Defaults.
+   Directory: default = ./
+   Tmin: The minimum temperature of the plot. Default value: 0 K
+   Tmax: The maximum temperature of the plot. Default value: maximum temperature
+  Optional arguments:
+   --keep=gpl: keep the gnuplot script
+   --print: specify the format of the output image (default: pdf)
+   --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+   --outfile: the name of the output image file.
+  Example:
+   aflow --plottcond=./,100,300
+
+aflow.apl.thermal_properties.out must be present in the directory.
+
+This feature requires gnuplot version 5 and pdflatex.
+
+7.5. Example AAPL Input File
 
 The following is an example AAPL input file for NaF. Four-phonon processes are included.
 
@@ -847,7 +1039,7 @@ Direct(2) [A1B1]
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

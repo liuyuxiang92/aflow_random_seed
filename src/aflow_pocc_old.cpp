@@ -14,7 +14,7 @@
 
 //#include "aflow_contrib_kesong.h"
 #include "aflow_pocc_old.h"
-#include "aflow_pocc.h" //CO 180409
+#include "aflow_pocc.h" //CO20180409
 
 //ipocc.cpp
 using aurostd::StringSubst;
@@ -37,7 +37,7 @@ const double KCAL_TO_EV =4.336443203200000E-002; // 1(kcal/mol) = 4.33644E-2 eV
 //const double KJ_TO_EV =1.0357416650425146E-002 ; // 1 (KJ/mol) = 0.010357 eV
 //const double KCAL_TO_KJ = 4.1868; // 1 Kilocalories (Kcal) = 4.1868 Kilojoules (Kj)
 
-bool PRINT_AVG_IDOS=false; //CO190808 - quick patch for IDOS, keep this off in general
+bool PRINT_AVG_IDOS=false; //CO20190808 - quick patch for IDOS, keep this off in general
 
 // ***************************************************************************
 // pflow::POCC_INPUT(void)
@@ -99,8 +99,8 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     unsigned long long int Num_calculated;
     unsigned long long int Num_xstr;
 
-    if(1){  //OLD KESONG
-      vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //170721 CO - KESONG OLD code
+    if(1){  //OLD KY
+      vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //CO20170721 - KY OLD code
       Num_xstr=vecgroupxstr_sorted.size();
 
       if(Num_xstr<MaxNumberPOSCAR) {
@@ -119,12 +119,12 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
         ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
       }
-    } else {  //START COREY
+    } else {  //START CO
       aurostd::xoption pflags;
       _kflags kflags;
       pocc::POccCalculator pcalc(xstr_pocc,aflags,kflags,FileMESSAGE,cout);
       if(!pcalc.m_initialized){exit(1);}
-      //[CO190131 - OBSOLETE]if(!pcalc.calculate()){exit(1);}
+      //[CO20190131 - OBSOLETE]if(!pcalc.calculate()){exit(1);}
       pcalc.calculate();
 
       //vector<xstructure> vecgroupxstr_sorted = pcalc.getUniqueDerivativeStructures(); //too much memory
@@ -258,13 +258,13 @@ void UpdateXstr(xstructure &xstr_orig, ofstream &FileMESSAGE, _aflags &aflags) {
   //Update paritial occupation value
   if(xstr_orig.partial_occupation_flag) {
     ostringstream aus;
-    aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO 180409
-    if(xstr_orig.partial_occupation_site_tol>1E-6) { //CO 180409
-      epsilon = xstr_orig.partial_occupation_site_tol; //CO 180409
+    aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO20180409
+    if(xstr_orig.partial_occupation_site_tol>1E-6) { //CO20180409
+      epsilon = xstr_orig.partial_occupation_site_tol; //CO20180409
     }
     else {
-      aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO 180409
-      aus << "0000 MESSAGE    Default value (1E-2) of \"partial_occupation_site_tol\" is set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO 180409
+      aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO20180409
+      aus << "0000 MESSAGE    Default value (1E-2) of \"partial_occupation_site_tol\" is set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO20180409
     }
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     double partial_value_tmp;
@@ -747,7 +747,7 @@ str_num_data double2str_num_data(double a) {
 namespace pocc {
   void POSCAR2GULP(istream& input) {
     xstructure xstr; 
-    xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr.clear(); //DX20191220 - uppercase to lowercase clear
     xstr=xstructure(input, IOVASP_POSCAR);
     xstr.ReScale(1.0);
     string GulpInput;
@@ -1105,30 +1105,30 @@ vector<xmatrix<double> > CalculateHNF(xstructure str, int n) {
   }
 
   for(i=0;i<(int) vHNF.size();i++) {
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "HNF MAT " << endl;
       cerr << vHNF.at(i) << endl;
     }
     Bi=A*vHNF.at(i);
     found=FALSE;
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "SUPERLATTICE " << endl;
       cerr << Bi << endl;
     }
     for(uint istr=0;istr<vB.size()&&found==FALSE;istr++)  {                              // cycle through the unique vBs
       Bj=vB.at(istr);
-      if(LDEBUG) { //CO 180409
+      if(LDEBUG) { //CO20180409
         cerr << "SUPERLATTICE OLD " << endl;
         cerr << Bj << endl;
       }
       for(uint pgroup=0;pgroup<non_pocc_xstr.pgroup.size()&&found==FALSE;pgroup++) {                  // cycle through the pgroup of str
         R=trasp(non_pocc_xstr.pgroup.at(pgroup).Uc); 
-        if(LDEBUG) { //CO 180409
+        if(LDEBUG) { //CO20180409
           cerr << "POINT GROUP " << endl;
           cerr << R << endl;
         }
         H=aurostd::inverse(Bj)*aurostd::inverse(R)*Bi;
-        if(LDEBUG) { //CO 180409
+        if(LDEBUG) { //CO20180409
           cerr << "H" << endl;
           cerr << H << endl;
         }
@@ -1136,7 +1136,7 @@ vector<xmatrix<double> > CalculateHNF(xstructure str, int n) {
       }
     }
     if(found==FALSE) { // not found, then plug
-      if(LDEBUG) { //CO 180409
+      if(LDEBUG) { //CO20180409
         cerr << "----------------------" << endl;
         cerr << "FOUND " << endl;
         cerr << vHNF.at(i) << endl;
@@ -1429,7 +1429,7 @@ void CombineAll(const vector<vector<vector<int> > > &allVecs, size_t vecIndex, v
 // ***************************************************************************
 vector<string> CalculateSecondAtomicNameSupercell(xstructure xstr_orig, int n) {
   vector<string> AtomicNameSupercell;
-  //    if(CheckDoubleOccupied(xstr_orig)) {  //[CO200106 - close bracket for indenting]}
+  //    if(CheckDoubleOccupied(xstr_orig)) {  //[CO20200106 - close bracket for indenting]}
   xstructure xstr_norm = NormalizeXstructure(xstr_orig); //Format POSCAR
   vector<vector<int> > num_norm_xstr = NormalisedNumberXstructure(xstr_orig); //Format normalized POSCAR's number using 2D vector
   vector<vector<int> > vec_num_supercell=CalculateXstrNumberSupercell(xstr_norm,n); //Produce supercell's number using 2D vector
@@ -1478,7 +1478,7 @@ vector<vector<int> > GenerateSupercellAtomNumber(xstructure xstr_orig, int n) {
   //    vector<vector<int> > atom_num_supercell = CalculateXstrNumberSupercell(xstr_orig, n); //format like 0 1 2 3; 4 5 6 7
   //    We just need to store the atoms' number using normalized xstructure
 
-  //if(CheckDoubleOccupied(xstr_orig)) {  //[CO200106 - close bracket for indenting]}
+  //if(CheckDoubleOccupied(xstr_orig)) {  //[CO20200106 - close bracket for indenting]}
   for (uint i=0; i<xstr_norm.atoms.size();i++) {
     if(xstr_norm.atoms.at(i).partial_occupation_flag) {
       int num_vacancy= hnf_double2int((1-xstr_norm.atoms.at(i).partial_occupation_value)*n);
@@ -1788,7 +1788,7 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
 
   if(xstr.partial_occupation_HNF) {return xstr.partial_occupation_HNF;} //if HNF exists, no need to optimize pocc values
   double tolerance=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;
-  if(LDEBUG) { //CO 180409
+  if(LDEBUG) { //CO20180409
     cerr << "default " << DEFAULT_POCC_SITE_TOL << endl; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE << endl;
     cerr << xstr.partial_occupation_site_tol << endl;
   }
@@ -1813,11 +1813,11 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
   oss << aurostd::PaddedPRE(aurostd::utype2string(0),digits1) << "  " << "--------" << " ";
   for(uint iatom=0;iatom<xstr.atoms.size();iatom++) {
     if(xstr.atoms.at(iatom).partial_occupation_value<1.0) {
-      oss << "| "+aurostd::PaddedPOST("iatom="+aurostd::utype2string(iatom+1)+"/"+aurostd::utype2string(xstr.atoms.size()),digits2) << " " ;  //CO 170629
+      oss << "| "+aurostd::PaddedPOST("iatom="+aurostd::utype2string(iatom+1)+"/"+aurostd::utype2string(xstr.atoms.size()),digits2) << " " ;  //CO20170629
     }
   }
   oss << " | " << "error" << endl;
-  if(LDEBUG) { //CO 180409
+  if(LDEBUG) { //CO20180409
     cerr << "ERROR " << error << endl;
     cerr << "TOL " << tolerance << endl;
   }
@@ -2405,7 +2405,7 @@ vector<xstructure> RemoveEquivalentXstr(vector<xstructure> vec_xstr, ofstream &F
     }
   }
 
-  //cerr << "KESONG TEST" << endl;
+  //cerr << "KY TEST" << endl;
   vector<int> vecDG; vecDG.clear(); //Degenracy
   for (uint i=0;i<vec_xstr_energy_final.size();i++) {
     int DGi =0;
@@ -2469,10 +2469,10 @@ namespace pocc {
     bool RUN_FLAG = false;
     xstr1.SpeciesPutAlphabetic();
     xstr2.SpeciesPutAlphabetic();
-    xstr1.ShifOriginToAtom(0);
+    xstr1.ShiftOriginToAtom(0);
     pflow::Sort_atom_cpos(xstr1);
     for (int i=0; i<xstr2.num_each_type.at(0);i++) {
-      xstr2.ShifOriginToAtom(i);
+      xstr2.ShiftOriginToAtom(i);
       xstr2.BringInCell();
       pflow::Sort_atom_cpos(xstr2);
       if(CoordCompare(xstr1, xstr2)) {
@@ -2495,7 +2495,7 @@ namespace pocc {
     xstructure xstr1_sp, xstr2_sp;
     xstr1_sp = GetStandardPrimitive(xstr1);
     xstr2_sp = GetStandardPrimitive(xstr2);
-    xstr1_sp.ShifOriginToAtom(0);
+    xstr1_sp.ShiftOriginToAtom(0);
     xstr1_sp.BringInCell();
     pflow::Sort_atom_cpos(xstr1_sp);
 
@@ -2503,7 +2503,7 @@ namespace pocc {
     for (uint i=0; i<vec_rot.size();i++) {
       xstructure xstr2_sp_rot_tmp = vec_rot.at(i);
       for (uint j=0; j<xstr2_sp_rot_tmp.atoms.size();j++) {
-        xstr2_sp_rot_tmp.ShifOriginToAtom(j);
+        xstr2_sp_rot_tmp.ShiftOriginToAtom(j);
         xstr2_sp.BringInCell();
         pflow::Sort_atom_cpos(xstr2_sp_rot_tmp);
         if(CoordCompare(xstr1_sp, xstr2_sp_rot_tmp)) {
@@ -2685,7 +2685,7 @@ namespace pocc {
   void POSCAR2ENUM(istream& input) {
 
     xstructure xstr_in; //, xstr_out;
-    xstr_in.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_in.clear(); //DX20191220 - uppercase to lowercase clear
     xstr_in=xstructure(input, IOVASP_POSCAR);
     xstr_in.ReScale(1.00000);
 
@@ -3017,13 +3017,13 @@ namespace pocc {
     int NumCell=cRangeFrac.at(0).at(2)/nDFull;
     if(NumCell>nMax) {nMax=NumCell;}
     if(!CheckPartialOccupation(xstr)) {nMax=1;}
-    //[CO191112 - OBSOLETE]char *cur_dir_name = getcwd(NULL, 0);
+    //[CO20191112 - OBSOLETE]char *cur_dir_name = getcwd(NULL, 0);
     string cur_dir_name=aurostd::getPWD();
     string tmpdir=aurostd::TmpDirectoryCreate("PartialOccupation");
-    //[CO191112 - OBSOLETE]char new_dir_name[1024];
-    //[CO191112 - OBSOLETE]strcpy(new_dir_name, tmpdir.c_str());
-    //[CO191112 - OBSOLETE]chdir(new_dir_name);
-    chdir(tmpdir.c_str());  //CO191112
+    //[CO20191112 - OBSOLETE]char new_dir_name[1024];
+    //[CO20191112 - OBSOLETE]strcpy(new_dir_name, tmpdir.c_str());
+    //[CO20191112 - OBSOLETE]chdir(new_dir_name);
+    chdir(tmpdir.c_str());  //CO20191112
 
     __aflow_call_enum_MOD_aflow_pass_parameter(parLV, &nDFull,dFull,&rdFull,&cdFull,&k, &nMin, &nMax, pLatTyp,&eps, &full, labelFull,&rlabelFull,&clabelFull,digitFull,&ndigitFull,equivalencies,&nequivalencies,&conc_check,cRange,&rcRange,&ccRange);
 
@@ -3096,7 +3096,7 @@ namespace pocc {
     ss_cmd << "rm -rf " << tmpdir << endl;
     aurostd::execute(ss_cmd);
 
-    chdir(cur_dir_name.c_str());  //CO191112
+    chdir(cur_dir_name.c_str());  //CO20191112
     return groupxstr;
   }
 }
@@ -3109,7 +3109,7 @@ namespace pocc {
 namespace pocc {
   bool MultienumPrintSortedXstr(istream& input) {
     xstructure xstr; 
-    xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr.clear(); //DX20191220 - uppercase to lowercase clear
     xstr=xstructure(input, IOVASP_POSCAR);
 
     vector<string> AtomSpecies;
@@ -3420,7 +3420,7 @@ void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE)
       cerr << "Error!!! There are no degeneracy data! Please regenerate your " << _AFLOWIN_ << " file!" << endl;
       exit(1);
     }
-    //CO 180220 - multiply occupied sites will yield titles with more than one DG= value
+    //CO20180220 - multiply occupied sites will yield titles with more than one DG= value
     vtitle.clear();
     aurostd::string2tokensAdd(title,vtitle," ");
     DEI=1;
@@ -3436,11 +3436,11 @@ void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE)
       DEI*=aurostd::string2utype<int>(vtitle2[1]);
     }
     if(LDEBUG){cerr << " DEI[i=" << i << "]=" << DEI << endl;}
-    //[OBSOLETE CO 180220]string last_part_title = vtitle.at(vtitle.size()-1);
-    //[OBSOLETE CO 180220]vector<string> vtitle2;
-    //[OBSOLETE CO 180220]aurostd::string2tokensAdd(last_part_title,vtitle2,"=");
-    //[OBSOLETE CO 180220]int DEI;
-    //[OBSOLETE CO 180220]DEI=aurostd::string2utype<int>(vtitle2.at(vtitle2.size()-1));
+    //[OBSOLETE CO20180220]string last_part_title = vtitle.at(vtitle.size()-1);
+    //[OBSOLETE CO20180220]vector<string> vtitle2;
+    //[OBSOLETE CO20180220]aurostd::string2tokensAdd(last_part_title,vtitle2,"=");
+    //[OBSOLETE CO20180220]int DEI;
+    //[OBSOLETE CO20180220]DEI=aurostd::string2utype<int>(vtitle2.at(vtitle2.size()-1));
     vDE.push_back(DEI);
   }
 }
@@ -3550,17 +3550,18 @@ namespace pocc {
         if(LDEBUG) {
           cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << endl;
         }
-        //xstructure xstr=vxstr[i]; //CO 171002 - grab xstr's too
-        //CO 171002 - using tolerance from symmetry calc - START
+        //xstructure xstr=vxstr[i]; //CO20171002 - grab xstr's too
+        //CO20171002 - using tolerance from symmetry calc - START
         //if(xstr.CalculateSymmetry()){kpt_tol=xstr.sym_eps;}
         //else {kpt_tol=SYM::defaultTolerance(xstr);}
-        //CO 171002 - using tolerance from symmetry calc - STOP
+        //CO20171002 - using tolerance from symmetry calc - STOP
 
         xOUTCAR outcar_aus;
         if(!outcar_aus.GetPropertiesFile(voutcar_files.at(i))){
-          aus << "ERROR" << ": OUTCAR.static reading error " << outcar_aus.ERROR << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          exit(1);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, "xOUTCAR::GetPropertiesFile() failed", _RUNTIME_ERROR_); //CO20200404
+          //[CO20200404 - OBSOLETE]aus << "ERROR" << ": OUTCAR.static reading error " << outcar_aus.ERROR << endl;
+          //[CO20200404 - OBSOLETE]aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          //[CO20200404 - OBSOLETE]exit(1);
         }
         double EFERMI=outcar_aus.Efermi;
         outcar_aus.GetBandGap();
@@ -3580,11 +3581,11 @@ namespace pocc {
         vEgap.push_back(outcar_aus.Egap);
 
         if(LDEBUG||1) {
-          cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; DE=" << vDE[i] << "; NIONS=" << vions.at(i) << "; enthalpy_atom=" << vtoten_per_atom.at(i) << "; mag_cell=" << vmag.at(i) << "; Egap_net=" << vEgap_net.at(i) << endl;    // corey - should read out enthalpy/atom from STATIC, not BANDS
+          cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; DE=" << vDE[i] << "; NIONS=" << vions.at(i) << "; enthalpy_atom=" << vtoten_per_atom.at(i) << "; mag_cell=" << vmag.at(i) << "; Egap_net=" << vEgap_net.at(i) << endl;    //CO - should read out enthalpy/atom from STATIC, not BANDS
         }
 
         //	if(LDEBUG||1) {
-        //	cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; NIONS=" << outcar_aus.NIONS << "; enthalpy_atom=" << outcar_aus.enthalpy_atom << "; mag_cell=" << outcar_aus.mag_cell << "; Egap_net=" << outcar_aus.Egap_net << endl;   //corey
+        //	cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; NIONS=" << outcar_aus.NIONS << "; enthalpy_atom=" << outcar_aus.enthalpy_atom << "; mag_cell=" << outcar_aus.mag_cell << "; Egap_net=" << outcar_aus.Egap_net << endl;   //CO
         //	}
       }
 
@@ -3632,8 +3633,8 @@ namespace pocc {
         Egap.push_back(0);
         for (uint i=0;i<vEgap.size();i++) {
           //Calculate average Egap
-          Egap.at(j)+=vEgap.at(0).at(j)*vprob.at(i);    //corey - otherwise, it crashes if you have Egap up AND Egap down (magnetized system)
-          //Egap.at(j)+=vEgap.at(i).at(j)*vprob.at(i);  //corey
+          Egap.at(j)+=vEgap.at(0).at(j)*vprob.at(i);    //CO - otherwise, it crashes if you have Egap up AND Egap down (magnetized system)
+          //Egap.at(j)+=vEgap.at(i).at(j)*vprob.at(i);  //CO
         }
       }
 
@@ -3643,7 +3644,7 @@ namespace pocc {
         string doscar_file = vdoscar_files.at(i); stringstream ss_doscar; aurostd::efile2stringstream(doscar_file, ss_doscar); 
         string outcar_file = voutcar_files.at(i); stringstream ss_outcar; aurostd::efile2stringstream(outcar_file, ss_outcar);
         double Efermi; vector<vector<double> > TDOS, TOTALPDOS;
-        //CO 180218 - let's not mess around with kesong's functions too much
+        //CO20180218 - let's not mess around with KY's functions too much
         //for now, assume POCC runs have standard DOSCAR.static (PDOS in it)
         //if no PDOS, exit
         //I will fix later
@@ -3684,7 +3685,7 @@ namespace pocc {
 // void pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS)
 // ***************************************************************************
 namespace pocc {
-  void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO190808 - one without IDOS and one with
+  void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO20190808 - one without IDOS and one with
     string soliloquy="pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
     if(TDOS.size()!=PDOS.size()) {cerr << " TDOS and PDOS have different size! Aborting! " << endl; exit(1);}
     vector<double> vtmp;
@@ -3697,8 +3698,8 @@ namespace pocc {
         }
         vtmp.push_back(TDOS.at(i).at(1)); //TDOS
         DOS.push_back(vtmp);
-        vtmp.push_back(TDOS.at(i).at(2));   //CO190808 - IDOS
-        DOS_IDOS.push_back(vtmp); //CO190808 - IDOS
+        vtmp.push_back(TDOS.at(i).at(2));   //CO20190808 - IDOS
+        DOS_IDOS.push_back(vtmp); //CO20190808 - IDOS
       }
     }
     else if(TDOS.at(0).size()==5) { //spin
@@ -3711,8 +3712,8 @@ namespace pocc {
         vtmp.push_back(TDOS.at(i).at(1)); //TDOS up
         vtmp.push_back(TDOS.at(i).at(2)); //TDOS dn
         DOS.push_back(vtmp);
-        vtmp.push_back(TDOS.at(i).at(3));vtmp.push_back(TDOS.at(i).at(4));   //CO190808 - IDOS up/down
-        DOS_IDOS.push_back(vtmp);  //CO190808 - IDOS up/down
+        vtmp.push_back(TDOS.at(i).at(3));vtmp.push_back(TDOS.at(i).at(4));   //CO20190808 - IDOS up/down
+        DOS_IDOS.push_back(vtmp);  //CO20190808 - IDOS up/down
       }
     }
     else {
@@ -3810,7 +3811,7 @@ namespace pocc {
     //produce DOS data
     if(!XHOST.is_command("gnuplot")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR gnuplot is necessary." << endl;exit(1);}; 
     if(!XHOST.is_command("convert")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR convert is necessary." << endl;exit(1);}; 
-    vector<vector<double> > TDOS_ONLY, PDOS_ONLY, DOS, DOS_IDOS;  vector<double> vEfermi,Egap,vprob; double mag,Egap_net; //CO190808 - DOS_IDOS
+    vector<vector<double> > TDOS_ONLY, PDOS_ONLY, DOS, DOS_IDOS;  vector<double> vEfermi,Egap,vprob; double mag,Egap_net; //CO20190808 - DOS_IDOS
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     POCC_GENERATE_DOSDATA(directory,T,TDOS_ONLY,PDOS_ONLY,vEfermi,mag,Egap_net,Egap,vprob);
     if(LDEBUG) {cerr << soliloquy << " POCC_GENERATE_DOSDATA done" << endl;}
@@ -3835,10 +3836,10 @@ namespace pocc {
     double DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(DOS, DOS_Emin, DOS_Emax);
 
     //write 2D vector into files
-    vector<vector<double> >* p_DOS2FILE=&DOS;             //CO190808 - write out DOS_IDOS if desired
-    if(PRINT_AVG_IDOS){p_DOS2FILE=&DOS_IDOS;}             //CO190808 - write out DOS_IDOS if desired
-    const vector<vector<double> >& DOS2FILE=*p_DOS2FILE;  //CO190808 - write out DOS_IDOS if desired
-    string str_dos = aurostd::vector2string(DOS2FILE);    //CO190808 - write out DOS_IDOS if desired
+    vector<vector<double> >* p_DOS2FILE=&DOS;             //CO20190808 - write out DOS_IDOS if desired
+    if(PRINT_AVG_IDOS){p_DOS2FILE=&DOS_IDOS;}             //CO20190808 - write out DOS_IDOS if desired
+    const vector<vector<double> >& DOS2FILE=*p_DOS2FILE;  //CO20190808 - write out DOS_IDOS if desired
+    string str_dos = aurostd::vector2string(DOS2FILE);    //CO20190808 - write out DOS_IDOS if desired
     string dosdatafile = "DOSDATA_" + aurostd::utype2string(T) + "K";
     aurostd::string2file(str_dos, dosdatafile);
 
@@ -3982,7 +3983,7 @@ namespace pocc {
 // Set UFF parameters
 namespace pocc {
   void SetUFFPara(_atom atomi, _atom atomj, double& R0, double& Kij, double& Xij, double& Dij) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180409
     //double bondorder = 1.0; //single bond
     string atomi_name = atomi.name;
     string atomj_name = atomj.name;
@@ -4005,7 +4006,7 @@ namespace pocc {
     Kij = 664.12*Zi*Zj/(R0*R0*R0); //From Equation 6
     Xij = sqrt(Xi*Xj); //From Equation 21b
     Dij = sqrt(Di*Dj); //From Equation 22
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "uffb.ren " << ren << endl;
       cerr << "uffb.R0 " << R0 << endl;
     }
@@ -4017,18 +4018,18 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   double CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180409
     double r0, kij, xij_tmp, dij_tmp;
     pocc::SetUFFPara(atomi, atomj, r0, kij, xij_tmp, dij_tmp);
 
     xstr.ReScale(1.0); //Safety
     double rij = AtomDist(atomi, atomj); //Notice here rij is r, while r0 is rij in paper
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "distij " << rij << endl;
     }
     double delta = rij - r0;
     double delta2 = delta*delta;
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "uffb.Kij " << kij << endl;
       cerr << "uffb.delta " << delta << endl;
     }
@@ -4044,7 +4045,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   double CalculateNonBondEnergy(xstructure xstr, _atom atomi, _atom atomj) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180409
     //van der Waals (Nonbonded interaction)
     double r0_tmp, kij_tmp, Xij, Dij;
     pocc::SetUFFPara(atomi, atomj, r0_tmp, kij_tmp, Xij, Dij);
@@ -4054,7 +4055,7 @@ namespace pocc {
     double X6 = pow((Xij/x), 6); 
     double X12 = pow((Xij/x), 12);
 
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       pocc::UFFPara uffparai; uffparai.GetUFFParameters(atomi.name);
       pocc::UFFPara uffparaj; uffparaj.GetUFFParameters(atomj.name);
       cerr << "Xi " << uffparai.Xi << endl;
@@ -4069,7 +4070,7 @@ namespace pocc {
 
     //From Equation 20
     double energy = Dij*(X12-2*X6);
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "atomi " << atomi << endl;
       cerr << "atomj " << atomj << endl;
       cerr << "distij " << x << endl;
@@ -4085,8 +4086,8 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   double CalculateUFFEnergy(xstructure xstr) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
-    if(LDEBUG) { //CO 180409
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180409
+    if(LDEBUG) { //CO20180409
       cerr << xstr << endl;
     }
     vector<Bond>  Bonds;
@@ -4096,24 +4097,24 @@ namespace pocc {
 
     //bond interaction
     double bondenergy=0.0;
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "BONDING LENGTH " << Bonds.size() << endl;
     }
     for (uint i=0; i<Bonds.size();i++) {
       Bond bondi = Bonds.at(i);
       _atom atomi = bondi.bgn;
       _atom atomj = bondi.end;
-      if(LDEBUG) { //CO 180409
+      if(LDEBUG) { //CO20180409
         cerr << "atom1 " << atomi << endl;
         cerr << "atom2 " << atomj << endl;
       }
       bondenergy += pocc::CalculateBondEnergy(xstr, atomi, atomj);
-      if(LDEBUG) { //CO 180409
+      if(LDEBUG) { //CO20180409
         cerr << "energy " << pocc::CalculateBondEnergy(xstr, atomi, atomj) << endl;
       }
     }
 
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "BONDING ENERGY " << bondenergy << endl;
     }
 
@@ -4136,9 +4137,9 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void ExtractBonds(const xstructure& xstr, deque<deque<_atom> >& neigh_mat_bonded, deque<deque<_atom> >& neigh_mat_nonbonded) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180409
     //Extract bonded and nonbonded atoms
-    const double radius = 10.00; //12;//8.05323*1.5;//10.00; //COREY TEST, this number is very important, and not well explained...
+    const double radius = 10.00; //12;//8.05323*1.5;//10.00; //CO TEST, this number is very important, and not well explained...
     deque<deque<_atom> > neigh_mat;
     xstructure xstr_tmp = xstr;
     xstr_tmp.GetStrNeighData(radius, neigh_mat); // radius 12 angstrom
@@ -4146,7 +4147,7 @@ namespace pocc {
     deque<_atom>  atom_tmp_bonded;
     deque<_atom>  atom_tmp_nonbonded;
 
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "FULL " << endl;
       for(uint i=0;i<neigh_mat.size();i++){
         cerr << "i=" << i << " " << neigh_mat[i].size() << endl;
@@ -4174,7 +4175,7 @@ namespace pocc {
       neigh_mat_nonbonded.push_back(atom_tmp_nonbonded);
     }
 
-    if(LDEBUG) { //CO 180409
+    if(LDEBUG) { //CO20180409
       cerr << "BOND " << endl;
       for(uint i=0;i<neigh_mat_bonded.size();i++){
         cerr << "i=" << i << " " << neigh_mat_bonded[i].size() << endl;
@@ -4244,7 +4245,7 @@ namespace pocc {
 namespace pocc {
   void UFFENERGY(istream& input) {
     xstructure xstr; 
-    xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr.clear(); //DX20191220 - uppercase to lowercase clear
     xstr=xstructure(input, IOVASP_POSCAR);
     cout << "total energy: " <<  pocc::CalculateUFFEnergy(xstr) << endl;
   }
