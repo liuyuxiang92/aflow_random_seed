@@ -216,7 +216,7 @@ typedef unsigned uint;
 
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
-#include "../aflow.h"
+#include "../aflow.h"     //needed for XHOST
 //#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
