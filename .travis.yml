@@ -1,19 +1,171 @@
 sudo: false
 language: cpp
-os:
-  - linux
-  - osx
-compiler:
-  - gcc
-  - clang
+#os:
+#  - linux
+#  - osx
+#compiler:
+#  - gcc
+#  - clang
 matrix:
-  exclude:
-    - os: linux
-      compiler: clang
+  #exclude:
+  #  - os: linux
+  #    compiler: clang
+  #  - os: osx
+  #    compiler: gcc
+  #https://docs.travis-ci.com/user/languages/cpp/
+  include:
+    #GCC on macOS
     - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install xz && CC=gcc-4.9 && CXX=g++-4.9"
+      #[doesn't trigger anything]addons:
+      #[doesn't trigger anything]  homebrew:
+      #[doesn't trigger anything]    packages:
+      #[doesn't trigger anything]      - xz
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+      addons:
+        homebrew:
+          update: true
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc6 && CC=gcc-6 && CXX=g++-6"
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
+    #STANDARD SETTINGS (vs. legacy)
+    - os: linux
       compiler: gcc
+    - os: osx
+      compiler: clang
+    #GCC on Linux
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      env:
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+      env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+    #Clang on Linux
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+      env:
+        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env:
+        - MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+      env:
+        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+    #Clang on macOS
+    - os: osx
+      osx_image: xcode10.1
+    - os: osx
+      osx_image: xcode9.4
+before_install:
+  - if [ -n "${MATRIX_EVAL}" ]; then eval "${MATRIX_EVAL}"; fi
 script:
   - cd src
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ];   then make -j 4 ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then make mac  ; fi
-  - make check_full
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make realclean && make CC=$CC CPP=$CXX -j 4 && make check_full ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then make realclean && make CC=$CC CPP=$CXX -e ARCH=-D_MACOSX_ -j 4 && make check_full ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CC" = "clang" ] && [ "$CXX" = "clang++" ]; then make realclean && make mac && make check_full ; fi
+  - ./aflow
