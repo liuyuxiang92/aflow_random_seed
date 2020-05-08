@@ -1824,7 +1824,7 @@ namespace apl {
 }
 // ***************************************************************************
 #define QHA_ARUN_MODE "QHA" // used in filename
-#define N_GP_FIT_PARAMETERS  3 ///< number of parameters to fit w=w(V) relation
+#define N_GP_FIT_PARAMETERS  3 ///< number of parameters to fit frequency-volume relation
 #define N_EOS_FIT_PARAMETERS 5 ///< number of parameters for polynomial EOS fit
 #define DEFAULT_QHA_GP_PATH_FILE string("aflow.qha.gp.disp.out")
 #define DEFAULT_QHA_THERMO_FILE  string("aflow.qha.thermo.out")

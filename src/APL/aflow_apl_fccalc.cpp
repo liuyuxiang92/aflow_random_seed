@@ -889,12 +889,14 @@ namespace apl {
 
   DirectMethodPC::DirectMethodPC(ostream& oss) : ForceConstantCalculator(oss) {
     free();
+    _directory = ".";
   }
 
   DirectMethodPC::DirectMethodPC(Supercell& sc, ofstream& mf, ostream& oss)
     : ForceConstantCalculator(sc, mf, oss) {
       free();
-    }
+    _directory = ".";
+  }
 
   DirectMethodPC::DirectMethodPC(const DirectMethodPC& that)
     : ForceConstantCalculator(*that._supercell, *that.getOFStream(), *that.getOSS()) {
@@ -949,7 +951,7 @@ namespace apl {
     xInputs.clear();
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
-    _directory = ".";
+    _directory = "";
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
   }
