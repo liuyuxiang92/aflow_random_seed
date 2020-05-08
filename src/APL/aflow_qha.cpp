@@ -1290,7 +1290,7 @@ namespace apl
   double QHAN::electronicFreeEnergy(double T, int id)
   {
     double EelecT = 0; double SelecT = 0; double FelecT = 0; double Eelec0K = 0;
-    double f, f0;
+    double f = 0.0, f0 = 0.0;
 
     double dE = (max(energies_V[id])-min(energies_V[id]))/(energies_V[id].size()-1);
     for (uint i=0; i<edos_V[id].size(); i++){
