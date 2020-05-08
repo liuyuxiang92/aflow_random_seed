@@ -1083,7 +1083,7 @@ namespace apl
 
     xDOSCAR doscar;
     xOUTCAR outcar;
-    string  outcarfile, dosfile;
+    string outcarfile = "", dosfile = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
       msg = "Reading static data from " + subdirectories_static[i];
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
