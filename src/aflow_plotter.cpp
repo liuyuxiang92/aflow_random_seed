@@ -32,6 +32,7 @@ static const string BANDDOS_SIZE = "8, 4.5";
 static const string POCC_TAG=":POCC_";
 static const string ARUN_TAG=":ARUN.";
 static const string POCC_ARUN_TAG=ARUN_TAG+"POCC_";
+static const string DEFAULT_IMAGE_FORMAT = "pdf";
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -84,6 +85,24 @@ namespace plotter {
     // Get image format
     scheme = xopt.getattachedscheme("PLOTTER::PRINT");
     if (!scheme.empty()) plotoptions.push_attached("IMAGE_FORMAT", aurostd::tolower(scheme));
+
+    // ME20200313 - Get user-defined output file name
+    string outfile = xopt.getattachedscheme("PLOTTER::OUTFILE");
+    // Remove extension from user-defined file name (extensions will be handled later)
+    if (!outfile.empty()) {
+      if (scheme.empty()) scheme = "." + DEFAULT_IMAGE_FORMAT;
+      else scheme = "." + aurostd::tolower(scheme);
+      uint nchar_scheme = scheme.size();
+      uint nchar_outfile = outfile.size();
+      if (nchar_outfile > nchar_scheme) {
+        uint i = 0;
+        for (i = 0; i < nchar_scheme; i++) {
+          if (scheme[i] != aurostd::tolower(outfile)[nchar_outfile - nchar_scheme + i]) break;
+        }
+        if (i == nchar_scheme) outfile = outfile.substr(0, nchar_outfile - nchar_scheme);
+      }
+      plotoptions.push_attached("FILE_NAME_USER", outfile);
+    }
 
     // Set standard background color
     plotoptions.push_attached("BACKGROUND_COLOR", "#FFFFFF");
@@ -171,7 +190,7 @@ namespace plotter {
         << " size " << plotoptions.getattachedscheme("PLOT_SIZE") << " linewidth 2" << std::endl;
       out << "set output " << "'" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << ".tex'" << std::endl;
       if (!plottitle.empty())
-        out << "set " << (multiplot?"multiplot ":"")
+        out << "set " << (multiplot?"multiplot layout 1,2 ":"")  // ME20200313 - some machines require layout
           << "title '" << plottitle << "' offset 0, -0.5" << std::endl;
       if (plotoptions.flag("NOBORDER")) out << "unset border" << std::endl;
       out << "set object 1 rectangle from graph 0,0 to graph 1,1 fc"
@@ -263,31 +282,36 @@ namespace plotter {
     string soliloquy="plotter::setFileName():";
     if(LDEBUG){cerr << soliloquy << " filename_in=" << filename << endl;}
     if (filename.empty()) {
-      string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-      if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
-      //ME20200228 - Remove ANRL parameters
-      string::size_type t = default_title.find(":ANRL=");
-      if (t != string::npos) {
-        default_title = default_title.substr(0, t);
-        if(LDEBUG){std::cerr << soliloquy << " default_title (post ANRL)=" << default_title << std::endl;}
-      }
-      filename = default_title;
-      // Get filename
-      string ext = plotoptions.getattachedscheme("EXTENSION");
-      if (!ext.empty()) {
-        if (filename.empty()) filename = ext;
-        else filename += "_" + ext;
-      }
-      filename = aurostd::StringSubst(filename, " ", "_");
-      string set = plotoptions.getattachedscheme("DATASET");
-      if (aurostd::string2utype<int>(set) > 0) {
-        filename += "_" + plotoptions.getattachedscheme("DATALABEL");
-        filename += "_" + set;
+      filename = plotoptions.getattachedscheme("FILE_NAME_USER");  // ME20200313 - user-defined output file
+      if (filename.empty()) {
+        string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
+        if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+        // ME20200228 - Remove ANRL parameters
+        string::size_type t = default_title.find(":ANRL=");
+        if (t != string::npos) {
+          default_title = default_title.substr(0, t);
+          if(LDEBUG){std::cerr << soliloquy << " default_title (post ANRL)=" << default_title << std::endl;}
+        }
+        filename = default_title;
+        // Get filename
+        string ext = plotoptions.getattachedscheme("EXTENSION");
+        if (!ext.empty()) {
+          if (filename.empty()) filename = ext;
+          else filename += "_" + ext;
+        }
+        filename = aurostd::StringSubst(filename, " ", "_");
+        string set = plotoptions.getattachedscheme("DATASET");
+        if (aurostd::string2utype<int>(set) > 0) {
+          filename += "_" + plotoptions.getattachedscheme("DATALABEL");
+          filename += "_" + set;
+        }
       }
     }
     plotoptions.push_attached("FILE_NAME", filename);
     // The .tex file created by gnuplot cannot have . or includegraphics will break
     plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ".", "_"));
+    // ME20200409 - Some terminals do not handle : well, which can break convert
+    plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ":", "_"));
     if(LDEBUG){
       cerr << soliloquy << " filename=" << plotoptions.getattachedscheme("FILE_NAME") << endl;
       cerr << soliloquy << " filename_latex=" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << endl;
@@ -1956,7 +1980,7 @@ namespace plotter {
   void PLOT_THERMO(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     stringstream out;
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
-    plotoptions.push_attached("COLOR", "$000000");
+    plotoptions.push_attached("COLOR", "#000000");
     plotoptions.push_attached("LINETYPES", "-1");
     PLOT_THERMO(plotoptions, out,FileMESSAGE,oss); //CO20200404
   }
@@ -1972,11 +1996,16 @@ namespace plotter {
 
     // Get data
     string thermo_file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
+    // ME20200413 - Since multiple data files are plotted, the user file
+    // name functions as base file name.
+    string user_file_name = plotoptions.getattachedscheme("FILE_NAME_USER");
+    plotoptions.pop_attached("FILE_NAME_USER");
     if (aurostd::EFileExist(thermo_file)) {
       string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
       plotoptions.push_attached("DATA_FILE", thermo_file);
       plotoptions.push_attached("KEYWORD", "APL_THERMO");
       vector<vector<double> > data = readAflowDataFile(plotoptions);
+      if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  // ME20200413
       for (int i = 0; i < nprops; i++) {
         plotoptions.pop_attached("YMIN");
         if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);

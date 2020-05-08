@@ -7142,7 +7142,7 @@ namespace SYM {
         //now bring in cell
         b_atoms[ii]=BringInCell(b_atoms[ii],a.lattice);
       }
-      //b.ShifOriginToAtom(iat);
+      //b.ShiftOriginToAtom(iat);
       //b.BringInCell();
 
       //DX+CO, we should use PGROUP_XTAL instead of PGROUP to reduce the number of checks
@@ -7278,7 +7278,7 @@ namespace SYM {
       aus << "ineq atom #=" << iiat << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       if(0) {if(iat<10) oss << "0"; oss << iat << "["; if(a.atoms.at(iat).equivalent<10) oss << "0";  oss << a.atoms.at(iat).equivalent << "]";}
-      a.ShifOriginToAtom(iat);
+      a.ShiftOriginToAtom(iat);
       //    a.BringInWignerSeitz();
       a.BringInCell();
 
@@ -7441,7 +7441,7 @@ namespace SYM {
                 //now bring in cell
                 b_atoms[ii]=BringInCell(b_atoms[ii],a.lattice);
               }
-              //b.ShifOriginToAtom(eat);
+              //b.ShiftOriginToAtom(eat);
               //b.BringInCell();
               if(!getFullSymBasis(b_atoms,a.lattice,a.c2f,a.f2c,aSymOp,TRUE,skew,_eps_,aSymOp.basis_atoms_map,aSymOp.basis_types_map)){
                 //if(derivative_structure){
@@ -7513,7 +7513,7 @@ namespace SYM {
     //b.atoms.at(ii).cpos=a.atoms.at(ii).cpos;
     //b.atoms.at(ii).fpos=a.atoms.at(ii).fpos;
     //}
-    //b.ShifOriginToAtom(eat);
+    //b.ShiftOriginToAtom(eat);
     //b.BringInCell();
     //if(!getFullSymBasis(b.atoms,a.lattice,a.c2f,a.f2c,aSymOp,TRUE,skew,_eps_,aSymOp.basis_atoms_map,aSymOp.basis_types_map)){
     ////if(derivative_structure){

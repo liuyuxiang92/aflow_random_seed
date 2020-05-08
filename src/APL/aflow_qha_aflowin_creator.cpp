@@ -13,13 +13,8 @@
 
 namespace apl {
   // ***************************************************************************************
-  QHA_AFLOWIN_CREATOR::QHA_AFLOWIN_CREATOR(Supercell& sc, vector<ClusterSet>& clst,
-      _xinput& xinput, //_xvasp& xvasp,
-      _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, //_vflags& vflags,
-      string& AflowIn,
-      Logger& l) : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) //xvasp, aflags, kflags, vflags, l)
-  {  //CO20200106 - patching for auto-indenting
+  QHA_AFLOWIN_CREATOR::QHA_AFLOWIN_CREATOR(Supercell& sc, ofstream& mf, ostream& oss)
+    : ForceConstantCalculator(sc, mf, oss) {
     clear();
     _log.open(_logfile.c_str());
     if (!_log.is_open()) {
@@ -32,7 +27,7 @@ namespace apl {
     _log << std::setprecision(8) << std::fixed;
   }
   // ***************************************************************************************
-  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); }
+  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); xStream::free();}
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::clear()
   {
@@ -81,11 +76,13 @@ namespace apl {
     _EOS_VOL_END=0.0;
     _EOS_VOL_INC=0.0;
     _lattice_index=-1;
+    _PSTRESS = ""; // ME20200220
+    _directory = "";
   }
   // ***************************************************************************************
-  void QHA_AFLOWIN_CREATOR::run_qha()
+  void QHA_AFLOWIN_CREATOR::run_qha(const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
-    _logger<<"Arranging all qha-options "<<apl::endl;
+    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", _directory, *p_FileMESSAGE, *p_oss);
 
     //options are mutually exclusive
     if((_is_gp_on) && (_is_eos)){
@@ -173,45 +170,50 @@ namespace apl {
     //[phonon_option] 4->gp_X || 5->sc-gp_X || 6-> eos-phonon_X || 7->eos-static-X
 
     if(_is_gp_on){
-      create_aflowin_phonon(_gp_vol_distortion, 0);
+      create_aflowin_phonon(_gp_vol_distortion, 0, xInput, _kbinFlags, _xFlags);
     } else if(_is_gp_A_on || _is_gp_B_on || _is_gp_C_on){
-      create_aflowin_phonon_X(_gp_vol_distortion, 4);
+      create_aflowin_phonon_X(_gp_vol_distortion, 4, xInput, _kbinFlags, _xFlags);
     }
 
 
     if(_is_sc_gp_on){
-      create_aflowin_phonon(_scqha_vol_distortion, 1);
+      create_aflowin_phonon(_scqha_vol_distortion, 1, xInput, _kbinFlags, _xFlags);
     } else if(_is_sc_gp_A_on || _is_sc_gp_B_on || _is_sc_gp_C_on){
-      create_aflowin_phonon_X(_scqha_vol_distortion, 5);
+      create_aflowin_phonon_X(_scqha_vol_distortion, 5, xInput, _kbinFlags, _xFlags);
     }
 
     if(_is_eos){
       if(_is_gp_on || _is_gp_A_on || _is_gp_B_on || _is_gp_C_on){
-        create_aflowin_phonon(0, 2);
+        create_aflowin_phonon(0, 2, xInput, _kbinFlags, _xFlags);
       }
-      create_aflowin_phonon(0, 3);
+      create_aflowin_phonon(0, 3, xInput, _kbinFlags, _xFlags);
       _log<<"Equilibrium directory index "<< _zero_index << '\n';
     } else if(_is_eos_A || _is_eos_B || _is_eos_C){
       if(_is_gp_on || _is_gp_A_on || _is_gp_B_on || _is_gp_C_on){
-        create_aflowin_phonon_X(0, 6);
+        create_aflowin_phonon_X(0, 6, xInput, _kbinFlags, _xFlags);
       }
-      create_aflowin_phonon_X(0, 7);
+      create_aflowin_phonon_X(0, 7, xInput, _kbinFlags, _xFlags);
       _log<<"Equilibrium directory index "<< _zero_index << '\n';
     }
   }
   // ***************************************************************************************
   //[phonon_option] 0->gp   || 1->sc-gp   || 2-> eos-phonon   || 3->eos-static 
   //[phonon_option] 4->gp_X || 5->sc-gp_X || 6-> eos-phonon_X || 7->eos-static-X
-  void QHA_AFLOWIN_CREATOR::create_aflowin_phonon(const double distortion, const int phonon_option)
+  void QHA_AFLOWIN_CREATOR::create_aflowin_phonon(const double distortion, const int phonon_option, const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
+    string message = "";
     if(phonon_option==0){
-      _logger<<"Creating distorted configurations to calculate QHA properties "<<apl::endl;
+      message = "Creating distorted configurations to calculate QHA properties ";
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==1){
-      _logger<<"Creating distorted configurations to calculate SCQHA/QHA3P properties "<<apl::endl;
+      message = "Creating distorted configurations to calculate SCQHA/QHA3P properties ";
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==2){
-      _logger<<"Creating distorted configurations to calculate QHA EOS "<<apl::endl;
+      message = "Creating distorted configurations to calculate QHA EOS ";
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==3){
-      _logger<<"Creating distorted configurations to calculate QHA static energies "<<apl::endl;
+      message = "Creating distorted configurations to calculate QHA static energies ";
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     if(phonon_option==0){
@@ -248,14 +250,14 @@ namespace apl {
     }
 
     int idxRun=0;
-    string APL_DIR=PhononCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::getDirectory();
     vector<_xinput> vaspRuns; 
     for(double i=Start; i<=End; i+=Inc){
 
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(xInput);
       idxRun = vaspRuns.size()-1;
       double scale=0.00;
-      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m(3,3,1,1);
       scale=vaspRuns[idxRun].getXStr().scale;
       m= vaspRuns[idxRun].getXStr().lattice;
@@ -273,7 +275,7 @@ namespace apl {
       //include equilibrium configuration
       if(phonon_option==3){
         if((std::abs(i)==smallest_distortion) && (!smallest_distortion_found)){
-          create_aflowin_static_zero();
+          create_aflowin_static_zero(xInput, _kbinFlags, _xFlags);
           smallest_distortion_found=true;
           _zero_index=idxRun;
         }
@@ -317,7 +319,7 @@ namespace apl {
       // new scale factor calulation end
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<newscale<<setw(15)<<newvolume<<'\n';
 
-      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
@@ -326,11 +328,12 @@ namespace apl {
         if (( (_is_sc_gp_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_A_on) && std::abs(i)==_scqha_vol_distortion) ||
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
-      _logger<<"Creating "<< runname <<apl::endl;
+      message = "Creating " + runname;
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       if(phonon_option<3){ 
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==3){ 
-        write_static_OUTPUT(vaspRuns[idxRun]);
+        write_static_OUTPUT(vaspRuns[idxRun], _kbinFlags, _xFlags);
       }
 
     }//for loop end
@@ -339,40 +342,53 @@ namespace apl {
   // ***************************************************************************************
   //[phonon_option] 0->gp   || 1->sc-gp   || 2-> eos-phonon   || 3->eos-static 
   //[phonon_option] 4->gp_X || 5->sc-gp_X || 6-> eos-phonon_X || 7->eos-static-X
-  void QHA_AFLOWIN_CREATOR::create_aflowin_phonon_X(const double distortion, const int phonon_option)
+  void QHA_AFLOWIN_CREATOR::create_aflowin_phonon_X(const double distortion, const int phonon_option, const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
 
+    string message = "";
     if(phonon_option==4){
       if(_is_gp_A_on){ 
-        _logger<<"Creating distorted configurations to calculate Gruneisen-A Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate Gruneisen-A Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_gp_B_on){ 
-        _logger<<"Creating distorted configurations to calculate Gruneisen-B Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate Gruneisen-B Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_gp_C_on){ 
-        _logger<<"Creating distorted configurations to calculate Gruneisen-C Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate Gruneisen-C Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==5){
       if(_is_sc_gp_A_on){ 
-        _logger<<"Creating distorted configurations to calculate SC-Gruneisen-A Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate SC-Gruneisen-A Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_sc_gp_B_on){ 
-        _logger<<"Creating distorted configurations to calculate SC-Gruneisen-B Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate SC-Gruneisen-B Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_sc_gp_C_on){ 
-        _logger<<"Creating distorted configurations to calculate SC-Gruneisen-C Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate SC-Gruneisen-C Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==6){
       if(_is_eos_A){ 
-        _logger<<"Creating distorted configurations to calculate EOS-phonon-A Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate EOS-phonon-A Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_B){ 
-        _logger<<"Creating distorted configurations to calculate EOS-phonon-B Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate EOS-phonon-B Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_C){ 
-        _logger<<"Creating distorted configurations to calculate EOS-phonon-C Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate EOS-phonon-C Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==7){
       if(_is_eos_A){ 
-        _logger<<"Creating distorted configurations to calculate EOS-static-A Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate EOS-static-A Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_B){ 
-        _logger<<"Creating distorted configurations to calculate EOS-static-B Parameter "<<apl::endl;
+        message ="Creating distorted configurations to calculate EOS-static-B Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_C){ 
-        _logger<<"Creating distorted configurations to calculate EOS-static-C Parameter "<<apl::endl;
+        message = "Creating distorted configurations to calculate EOS-static-C Parameter ";
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       }
     }
 
@@ -407,18 +423,18 @@ namespace apl {
     }
 
     int idxRun=0;
-    string APL_DIR=PhononCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::getDirectory();
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=Start; i<=End; i+=Inc)
     { 
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(xInput);
       idxRun = vaspRuns.size()-1;
-      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
       xvector<double> lattice_X(3,1);
       for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
-      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       double mod_X=aurostd::modulus(lattice_X);
 
 
@@ -433,7 +449,7 @@ namespace apl {
       //include equilibrium configuration
       if(phonon_option==7){
         if((std::abs(i)==smallest_distortion) && (!smallest_distortion_found)){
-          create_aflowin_static_zero_X();
+          create_aflowin_static_zero_X(xInput, _kbinFlags, _xFlags);
           smallest_distortion_found=true;
           _zero_index=idxRun;
         }
@@ -478,7 +494,7 @@ namespace apl {
       }
 
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
-      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
 
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
@@ -487,11 +503,12 @@ namespace apl {
         if (( (_is_sc_gp_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_A_on) && std::abs(i)==_scqha_vol_distortion) ||
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
-      _logger<<"Creating "<< runname <<apl::endl;
+      message = "Creating " + runname;
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
       if(phonon_option<7){
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==7){
-        write_static_OUTPUT(vaspRuns[idxRun]);
+        write_static_OUTPUT(vaspRuns[idxRun], _kbinFlags, _xFlags);
       }
     }//for loop end
     vaspRuns.clear();
@@ -511,8 +528,8 @@ namespace apl {
     }
   }
   // ***************************************************************************************
-  void QHA_AFLOWIN_CREATOR::write_static_OUTPUT(const _xinput& xinput) {
-    if(xinput.AFLOW_MODE_VASP){return write_static_AFLOWIN(xinput.xvasp);}
+  void QHA_AFLOWIN_CREATOR::write_static_OUTPUT(const _xinput& xinput, const _kflags& _kbinFlags, const _xflags& _xFlags) {
+    if(xinput.AFLOW_MODE_VASP){return write_static_AFLOWIN(xinput.xvasp, _kbinFlags, _xFlags);}
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
       //ME20191031 - use xerror
@@ -657,8 +674,8 @@ namespace apl {
       }
     } else {
       //ME20191031 - use xerror
-      //throw apl::APLRuntimeError("apl::PhononCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
-      string function = "apl::PhononCalculator::createGPAFLOWIN()";
+      //throw apl::APLRuntimeError("apl::ForceConstantCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
+      string function = "apl::ForceConstantCalculator::createGPAFLOWIN()";
       string message = "Cannot open [" + _AFLOWIN_ + "] file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -792,17 +809,17 @@ namespace apl {
     _EOS_STATIC_KSCHEME=s;
   }
   // ***************************************************************************************
-  void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero()
+  void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero(const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
     int idxRun=0;
-    string APL_DIR=PhononCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::getDirectory();
     vector<_xinput> vaspRuns; 
     for(double i=0; i<=0; i++)
     {
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(xInput);
       idxRun = vaspRuns.size()-1;
       double scale=0.00;
-      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m(3,3,1,1);
       scale=vaspRuns[idxRun].getXStr().scale;
       m= vaspRuns[idxRun].getXStr().lattice;
@@ -817,31 +834,32 @@ namespace apl {
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<scale<<setw(15)<<volume<<'\n';
       // new scale factor calulation end
 
-      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
-      _logger<<"Creating "<< runname <<apl::endl;
-      write_static_OUTPUT(vaspRuns[idxRun]);
+      string message = "Creating " + runname;
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
+      write_static_OUTPUT(vaspRuns[idxRun], _kbinFlags, _xFlags);
     }
     vaspRuns.clear();
   }
   // ***************************************************************************************
-  void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero_X()
+  void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero_X(const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
     int idxRun=0;
-    string APL_DIR=PhononCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::getDirectory();
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=0; i<=0; i++)
     { 
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(xInput);
       idxRun = vaspRuns.size()-1;
-      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
       xvector<double> lattice_X(3,1);
       for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
-      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       double mod_X=aurostd::modulus(lattice_X);
 
       string runname=get_static_runname(i);
@@ -851,20 +869,21 @@ namespace apl {
       _eos_volumes.push_back(mod_X);
 
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
-      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
 
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
 
-      _logger<<"Creating "<< runname <<apl::endl;
-      write_static_OUTPUT(vaspRuns[idxRun]);
+      string message = "Creating " + runname;
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _directory, *p_FileMESSAGE, *p_oss);
+      write_static_OUTPUT(vaspRuns[idxRun], _kbinFlags, _xFlags);
     }
     vaspRuns.clear();
   }
   // ***************************************************************************************
   //create aflow.in for EOS calculations
-  void  QHA_AFLOWIN_CREATOR::write_static_AFLOWIN(const _xvasp& xvasp_input) 
+  void  QHA_AFLOWIN_CREATOR::write_static_AFLOWIN(const _xvasp& xvasp_input, const _kflags& _kbinFlags, const _xflags& _xFlags) 
   {
     _xvasp xvasp(xvasp_input);
     _vflags vflags(_xFlags.vflags);
@@ -1047,8 +1066,8 @@ namespace apl {
     aurostd::stringstream2file(aflowin, filename);
     if (!aurostd::FileExist(filename)) {
       //ME20191031 - use xerror
-      //throw apl::APLRuntimeError("apl::PhononCalculator::createEOSAFLOWIN(); Cannot create [aflow.in] file.");
-      string function = "apl::PhononCalculator::createEOSAFLOWIN()";
+      //throw apl::APLRuntimeError("apl::ForceConstantCalculator::createEOSAFLOWIN(); Cannot create [aflow.in] file.");
+      string function = "apl::ForceConstantCalculator::createEOSAFLOWIN()";
       string message = "Cannot create [" + filename + "] file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -1065,8 +1084,8 @@ namespace apl {
     if (!vlines.size())  //CO
     {
       //ME20191031 - usexerror
-      //throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
-      string function = "apl::PhononCalculator::get_special_inputs()";
+      //throw apl::APLRuntimeError("apl::ForceConstantCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
+      string function = "apl::ForceConstantCalculator::get_special_inputs()";
       string message = "Cannot read ["+_AFLOWIN_+"] file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
