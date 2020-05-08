@@ -4387,10 +4387,10 @@ namespace pflow {
   _atom SetName(const _atom& a,const string& in_name);
   _atom SetType(const _atom& a,const int in_type);
   _atom SetNum(const _atom& a,const int in_num);
-  vector<int> GetTypes(const xstructure& a);
-  vector<string> GetNames(const xstructure& a);
-  vector<string> GetCleanNames(const xstructure& a);
-  vector<double> GetSpins(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<int> GetTypes(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<string> GetNames(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<string> GetCleanNames(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<double> GetSpins(const xstructure& a);
   aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);

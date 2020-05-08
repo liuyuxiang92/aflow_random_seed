@@ -381,7 +381,6 @@ namespace pflow {
   // [OBSOLETE] string PLATON(vector<string>,istream& input);
   string PLATON(string options,istream& input);
   //DX20170926 [OBSOLETE] string SG(string options,istream& input,string mode,string print);
-  void CCE(aurostd::xoption& flags);	//RF20190603
   string SG(aurostd::xoption& vpflow,istream& input,string mode,string print);
   // [OBSOLETE]  string SG(string mode,string print,vector<string>,istream& input);
   void STATDIEL(vector<string>& argv); // CAMILO
