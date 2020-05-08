@@ -1924,7 +1924,7 @@ namespace apl
       vector<double> Temperatures;
       vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
       vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
-      vector<double> coefGPVolumes; ///< multiplication coeffitient w.r.t inital volume
+      vector<double> coefGPVolumes; ///< multiplication coefficient w.r.t initial volume
       vector<double> coefEOSVolumes;
       xvector<double> DOS_Ef;
       // data necessary to calculate thermodynamic properties
