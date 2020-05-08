@@ -1134,7 +1134,7 @@ namespace apl
    */
   double QHAN::calcGamma(double V, xvector<double> &xomega, double &w)
   {
-    bool LDEBUG = false | XHOST.DEBUG;
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
     // no weights in fit
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
     aurostd::cematrix lsfit(gp_fit_matrix);
