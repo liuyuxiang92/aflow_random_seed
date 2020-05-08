@@ -15,9 +15,6 @@
 #define _TMPDIR_ string("ARUN.APL.QH.TMP")  //[PN]
 #define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
-//CO20181226
-#define COMPILE_SLIM
-
 //AS20200427
 #define NEW_QHA true
 
