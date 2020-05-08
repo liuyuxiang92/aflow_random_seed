@@ -876,7 +876,7 @@ namespace apl
    */
   int QHAN::check_static()
   {
-    string function = "QHAN::check_static()";
+    string function = "QHAN::check_static():";
     int count = 0;
     bool all_calculations_done = true;
     string dosfile = "", outcarfile = "";
