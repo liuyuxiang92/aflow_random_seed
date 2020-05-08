@@ -879,7 +879,7 @@ namespace apl
     string function = "QHAN::check_static()";
     int count = 0;
     bool all_calculations_done = true;
-    string dosfile, outcarfile;
+    string dosfile = "", outcarfile = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
       if (aurostd::IsDirectory(subdirectories_static[i])){
         count++;
