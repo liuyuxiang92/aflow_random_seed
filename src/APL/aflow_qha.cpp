@@ -1481,7 +1481,7 @@ namespace apl
     xvector<double> ET(4); // energy eigenvalues at corners of tetrahedra
     double VOLWGT = 0; // weighted volume of tetrahedron
     double DEf = 0.0; // DOS at Fermi level
-    double Ef;  // Fermi energy
+    double Ef = 0.0;  // Fermi energy
     double E21, E31, E41, E32, E42, E43; // Eij = ET[i] - ET[j]
 
     DOS_Ef =  xvector<double>(N_EOSvolumes);
