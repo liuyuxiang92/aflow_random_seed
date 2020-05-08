@@ -439,6 +439,20 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+// ME20200327
+namespace aurostd {
+  template<class utype> xmatrix<utype>
+    outer_product(const xvector<utype>& a, const xvector<utype>& b) {
+      xmatrix<utype> M(a.urows, b.urows, a.lrows, b.lrows);
+      for (int i = a.lrows; i <= a.urows; i++) {
+        for (int j = b.lrows; j <= b.urows; j++) {
+          M[i][j] = a[i] * b[j];
+        }
+      }
+      return M;
+    }
+}
+
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>                 // operator xvector+xvector
     operator+(const xvector<utype>& a,const xvector<utype>& b) {
@@ -599,6 +613,29 @@ namespace aurostd {  // namespace aurostd
       xvector<utype> c(a.lrows,a.urows);
       for(int i=c.lrows;i<=c.urows;i++) c[i]=a[i]/((utype) s);
       return c;
+    }
+}
+
+//ME20200329 real * complex vector
+namespace aurostd {
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(utype s, const xvector<xcomplex<utype> >& a) {
+      xvector<xcomplex<utype> > c(a.lrows, a.urows);
+      for (int i = c.lrows; i <= c.urows; i++) {
+        c[i].re = s * a[i].re;
+        c[i].im = s * a[i].im;
+      }
+      return c;
+    }
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(const xvector<xcomplex<utype> >& a, utype s) {
+      return s * a;
+    }
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator/(const xvector<xcomplex<utype> >& a, utype s) {
+      return ((utype) 1/s) * a;
     }
 }
 

@@ -2565,6 +2565,24 @@ void xstructure::copy(const xstructure& bstr) {
   // ----------------------------------
 }
 
+// ME20200220 - from CO's function in apl::Supercell
+void LightCopy(const xstructure& a, xstructure& b) {
+  b.clear();
+  stringstream POSCAR;
+  POSCAR.str("");
+  POSCAR << a;
+  POSCAR >> b;
+  //enable inequivalent flag to work
+  for (uint i = 0; i < b.atoms.size(); i++) {
+    b.atoms[i].equivalent = a.atoms[i].equivalent;
+    b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
+    b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
+  }
+  //enable inequivalent flag to work
+  b.write_inequivalent_flag = a.write_inequivalent_flag;
+  b.info = a.info;
+}
+
 // copy
 xstructure::xstructure(const xstructure& b) {
   //  free();
@@ -6768,13 +6786,13 @@ void xstructure::AddCorners(void) {
 }
 
 // **************************************************************************
-// xstructure::ShifOriginToAtom
+// xstructure::ShiftOriginToAtom
 // **************************************************************************
 // // Shift the origin to atom(iat)
-void xstructure::ShifOriginToAtom(const int& iat) {
+void xstructure::ShiftOriginToAtom(const int& iat) {
   //DX+CO START
   if(iat<0 || iat>=(int)atoms.size()) {
-    cerr << "ERROR void xstructure::ShifOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
+    cerr << "ERROR void xstructure::ShiftOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
     exit(0);
   }
   xvector<double> frigin(3);
@@ -10005,7 +10023,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
     //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
     //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
-    //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKlattice(FALSE);
+    //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
     //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
@@ -10472,7 +10490,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Initialize a, b, c, ksi, eta, zeta
   xvector<double> indat(6);
-  indat=Getabc_angles(in_lat,RADIANTS);
+  indat=Getabc_angles(in_lat,RADIANS);
   double a=indat(1)*indat(1);
   double b=indat(2)*indat(2);
   double c=indat(3)*indat(3);
@@ -10685,7 +10703,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
   // Make sure that a,b,c,alpha,beta,gamma are the same from
   // direct calculation and from using P to get niggli_lat.
   xvector<double> poutdat(6);
-  poutdat=Getabc_angles(niggli_lat,RADIANTS);
+  poutdat=Getabc_angles(niggli_lat,RADIANS);
   int flag=0;
   for(int i=1;i<=6;i++) {
     if(abs(poutdat(i)-outdat(i))>2*TOL) {flag=1;}
@@ -10742,7 +10760,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Initialize a, b, c, ksi, eta, zeta
   xvector<double> indat(6);
-  indat=Getabc_angles(in_lat,RADIANTS);
+  indat=Getabc_angles(in_lat,RADIANS);
   double a=indat(1)*indat(1);
   double b=indat(2)*indat(2);
   double c=indat(3)*indat(3);
@@ -10931,7 +10949,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
   // Make sure that a,b,c,alpha,beta,gamma are the same from
   // direct calculation and from using P to get niggli_lat.
   xvector<double> poutdat(6);
-  poutdat=Getabc_angles(niggli_lat,RADIANTS);
+  poutdat=Getabc_angles(niggli_lat,RADIANS);
   int flag=0;
   for(int i=1;i<=6;i++) {
     if(abs(poutdat(i)-outdat(i))>2*TOL) {flag=1;}
@@ -11275,7 +11293,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
     cerr << "-----------------------------------------------------------------------" << endl;
     cerr << "ORIG STRUCTURE " << endl;
     cerr << a;
-    b.ReScale(1.0); b.ShifOriginToAtom(0); b.BringInCell(); //fast clean for comparison
+    b.ReScale(1.0); b.ShiftOriginToAtom(0); b.BringInCell(); //fast clean for comparison
     cerr << "NEW STRUCTURE " << endl;
     cerr << b;
     cerr << "STRUCTURES IDENTICAL = " << (compare::aflowCompareStructure(a,b,true) ? "TRUE" : "FALSE") << endl;
@@ -13840,7 +13858,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //now bring in cell
               b_atoms[ii]=BringInCell(b_atoms[ii],b.lattice);
             }
-            //bb.ShifOriginToAtom(iat);
+            //bb.ShiftOriginToAtom(iat);
             //bb.BringInCell();
 
             //IATOMS ONLY

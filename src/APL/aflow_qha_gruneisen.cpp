@@ -26,7 +26,7 @@
 namespace apl
 {
   // ***************************************************************************************
-  QHA::QHA( IPhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
+  QHA::QHA( PhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
   {
     //clear all memories before using
     clear();

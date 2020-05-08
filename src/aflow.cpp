@@ -5,7 +5,7 @@
 // *                                                                         *
 // ***************************************************************************
 //
-//  Copyright 2003-2019 - Stefano Curtarolo - AFLOW.ORG consortium
+//  Copyright 2003-2020 - Stefano Curtarolo - AFLOW.ORG consortium
 //
 //  This file is part of AFLOW software.
 //
@@ -813,7 +813,7 @@ int AFLOW_main(vector<string> &argv) {
 // ***************************************************************************
 namespace aflow {
   string License_Preamble_aflow(void) {
-    //( C) 2003-2019 Stefano Curtarolo, MIT-Duke University SC@duke.edu
+    //( C) 2003-2020 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
     strstream << endl;
     strstream << "***************************************************************************" << endl;
@@ -821,7 +821,7 @@ namespace aflow {
     strstream << "*           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
     strstream << "*                                                                         *" << endl;
     strstream << "***************************************************************************" << endl;
-    strstream << "Copyright 2003-2019 - Stefano Curtarolo - AFLOW.ORG consortium" << endl;
+    strstream << "Copyright 2003-2020 - Stefano Curtarolo - AFLOW.ORG consortium" << endl;
     strstream << endl;
     strstream << "This file is part of AFLOW software." << endl;
     strstream << endl;
@@ -851,7 +851,7 @@ namespace aflow {
 // patched by CO20200106 to avoid long string construction (patching for indents)
 namespace aflow {
   string Intro_aflow(string x) {
-    //( C) 2003-2019 Stefano Curtarolo, MIT-Duke University SC@duke.edu
+    //( C) 2003-2020 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
     string tab="  ";
     string xspaces="";for(uint i=0;i<x.size();i++){xspaces+=" ";} //spaces size of x
@@ -1112,7 +1112,7 @@ namespace aflow {
     }
     if(type=="BANNER_TINY") {
       // called 63 times
-      oss << "AFLOW VERSION "<<AFLOW_VERSION<<":  [aflow.org consortium - 2003-2019] ";
+      oss << "AFLOW VERSION "<<AFLOW_VERSION<<":  [aflow.org consortium - 2003-2020] ";
       return oss.str();
     }
     if(type == "EXCEPTIONS") {

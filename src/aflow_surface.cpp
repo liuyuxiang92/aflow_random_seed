@@ -655,7 +655,7 @@ namespace surface {
       xstructure str(_str);
       // str=BringInCell(_str);
       str=ReScale(BringInCell(_str),1.0);
-      // NO ORIGIN if(1) str.ShifOriginToAtom(0);
+      // NO ORIGIN if(1) str.ShiftOriginToAtom(0);
       double bbfrac=_BBFRAC_;
       // double rrfrac=_RRFRAC_;
       double roughness=_eps_/2.0;
@@ -765,7 +765,7 @@ namespace surface {
         // str=BringInCell(_str);
         str=ReScale(BringInCell(_str),1.0);
         // str.MinkowskiBasisReduction();
-        //  if(1) str.ShifOriginToAtom(0);
+        //  if(1) str.ShiftOriginToAtom(0);
         double bbfrac=_BBFRAC_;
         double rrfrac=_RRFRAC_;
         double area,determinant,a,b,c,d;
@@ -3139,7 +3139,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //clean up structure
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ReScale(1.0);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.BringInCell();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -3211,7 +3211,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //clean up structure
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ReScale(1.0);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.BringInCell();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -3269,7 +3269,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //clean up structure
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ReScale(1.0);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.BringInCell();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
@@ -3842,7 +3842,7 @@ namespace slab {
 
     //clean up structure
     xstr_slab_origbasis.ReScale(1.0);
-    xstr_slab_origbasis.ShifOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
     xstr_slab_origbasis.BringInCell();
     xstr_slab_origbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3862,7 +3862,7 @@ namespace slab {
 
     //clean up structure
     xstr_slab_newbasis.ReScale(1.0);
-    xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
     xstr_slab_newbasis.BringInCell();
     xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3929,7 +3929,7 @@ namespace slab {
 
     //clean up structure
     xstr_slab.ReScale(1.0);
-    xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
     xstr_slab.BringInCell();
     //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
 
