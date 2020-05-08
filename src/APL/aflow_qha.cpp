@@ -1922,7 +1922,7 @@ namespace apl
     // the name of the output file depends on the used EOS fit method and on type of
     // QHA calculation
     ofstream file;
-    string filename;
+    string filename = "";
     switch(eos_method){
       case(EOS_POLYNOMIAL):
         filename = "aflow." + qha + ".polynomial.thermo.out";
