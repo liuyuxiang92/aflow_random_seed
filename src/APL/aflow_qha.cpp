@@ -2043,7 +2043,7 @@ namespace apl
    */
   void QHAN::writeFVT()
   {
-    string function = "QHA::writeFVT()";
+    string function = "QHA::writeFVT():";
     string msg = "Writing F(V,T) relations to file.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
