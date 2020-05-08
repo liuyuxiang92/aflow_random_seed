@@ -1908,7 +1908,7 @@ namespace apl
     eos.method = eos_method;
 
     // type of qha calculation
-    string qha;
+    string qha = "";
     switch(qha_method){
       case (QHA3P_CALC):
         qha = "qha3p";
