@@ -1936,7 +1936,7 @@ namespace apl
         break;
     }
 
-    string function = "QHAN::writeThermalProperties()";
+    string function = "QHAN::writeThermalProperties():";
     string msg = "Writing T-dependent properties to "+filename;
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
