@@ -1482,7 +1482,7 @@ namespace apl
     double VOLWGT = 0; // weighted volume of tetrahedron
     double DEf = 0.0; // DOS at Fermi level
     double Ef = 0.0;  // Fermi energy
-    double E21, E31, E41, E32, E42, E43; // Eij = ET[i] - ET[j]
+    double E21 = 0.0, E31 = 0.0, E41 = 0.0, E32 = 0.0, E42 = 0.0, E43 = 0.0; // Eij = ET[i] - ET[j]
 
     DOS_Ef =  xvector<double>(N_EOSvolumes);
 
