@@ -764,7 +764,7 @@ namespace apl
   {
     bool LDEBUG = false | XHOST.DEBUG;
 
-    string function = "QHAN::run()";
+    string function = "QHAN::run():";
     string msg = "Performing QHA calculation.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
