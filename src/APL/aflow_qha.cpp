@@ -2138,7 +2138,7 @@ namespace apl
             setw(TW) << "CV"               << setw(SW) << ' ' <<
             '\n';
 
-    double T, CV, GP;
+    double T = 0.0, CV =0.0, GP = 0.0;
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
 
