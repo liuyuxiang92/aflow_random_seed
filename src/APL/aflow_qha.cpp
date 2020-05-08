@@ -1977,7 +1977,7 @@ namespace apl
     double V0K = eos.Veq; // equilibrium volume at 0K
 
     double T = 0.0, Veq = 0.0, Feq = 0.0, B = 0.0, Bp = 0.0, beta = 0.0, CV = 0.0, CP = 0.0, GP = 0.0;
-    double CV_mesh, GP_mesh, CP_mesh, beta_mesh; // these properties are calculated 
+    double CV_mesh = 0.0, GP_mesh = 0.0, CP_mesh = 0.0, beta_mesh = 0.0; // these properties are calculated 
     // by weighted sum over q-points mesh
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
