@@ -613,7 +613,7 @@ namespace apl
 
     // parse QHA-related aflow.in options
     string dirname;
-    double gp_distortion;
+    double gp_distortion = 0.0;
     vector<double> eosrange(3);
     vector<string> tokens;
     vector<xoption>::iterator option;
