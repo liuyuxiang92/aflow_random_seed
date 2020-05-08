@@ -1686,7 +1686,7 @@ namespace apl
     double dV = 1e-3;
     double Vtol = 1e-5;
 
-    string function = "QHAN::run_scqha()";
+    string function = "QHAN::run_scqha():";
     pflow::logger(QHA_ARUN_MODE, function, "", currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
