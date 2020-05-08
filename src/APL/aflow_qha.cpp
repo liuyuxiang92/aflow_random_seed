@@ -53,7 +53,7 @@ using std::auto_ptr;
  *  http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
  *
  *  Caution: the default value for the parameter tau (a scaling factor for the initial step size)
- *  was picked to yield a correct fit to Murnaghan equation of state. 
+ *  was picked to yield a correct fit to the Murnaghan equation of state. 
  *  If you observe that this is not a good choice for your function,
  *  try 1e-6 if initial guess is believed to be a good approximation to a true
  *  parameters. Otherwise 1e-3 or even 1 might be a better choice.
