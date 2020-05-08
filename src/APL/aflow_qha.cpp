@@ -132,7 +132,7 @@ void NonlinearFit::Jacobian(xvector<double> &guess)
 void NonlinearFit::fit()
 {
   bool LDEBUG = false;
-  if (LDEBUG) cout << "NonlinearFit::fit()\n";
+  if (LDEBUG) cout << "NonlinearFit::fit()" << endl;
 
   xvector<double> pnew(Nparams);
   xmatrix<double> G(Nparams, 1), M(Nparams, Nparams);
@@ -589,7 +589,7 @@ namespace apl
   {
     xStream::initialize(messageFile, oss);
 
-    string function = "QHAN::initialize()";
+    string function = "QHAN::initialize():";
     string msg  = "Initializing QHA.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
@@ -612,7 +612,7 @@ namespace apl
     double Volume = origStructure.GetVolume();
 
     // parse QHA-related aflow.in options
-    string dirname;
+    string dirname = "";
     double gp_distortion = 0.0;
     vector<double> eosrange(3);
     vector<string> tokens;
@@ -2053,7 +2053,7 @@ namespace apl
     file.precision(10);
 
     xvector<double> Felec(N_EOSvolumes);
-    double T;
+    double T = 0.0;
 
     for (int Tid = 0; Tid < Ntemperatures; Tid++){
       for (int Vid = 0; Vid < N_EOSvolumes; Vid++){
@@ -2074,7 +2074,7 @@ namespace apl
    */
   void QHAN::writeGPpath(double V, const string &directory)
   {
-    string function = "QHAN::writeGPpath()";
+    string function = "QHAN::writeGPpath():";
     string msg = "Calculate and save Grueneisen parameters along a path.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
