@@ -1695,7 +1695,7 @@ namespace apl
     eos.method = method;
     eos.E = aurostd::vector2xvector<double>(E0_V);
     eos.fit();
-    double Pe, VPg; // electronic pressure and volume multiplied by phononic pressure
+    double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
     double V = 1.1*eos.Veq; // to avoid division by zero in self-consistent loop
     // initial volume is taken to be 10% bigger
     double Vnew = 0;
