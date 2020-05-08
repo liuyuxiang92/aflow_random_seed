@@ -861,7 +861,7 @@ namespace apl
       xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
       xinput.xvasp.AVASP_arun_runname = arun_runnames_static[i];
 
-      if (xinput.xvasp.AVASP_path_BANDS.empty()) xinput.xvasp.AVASP_path_BANDS = "AUTO";
+      if (xinput.xvasp.AVASP_path_BANDS.empty()) xinput.xvasp.AVASP_path_BANDS = AFLOWRC_DEFAULT_BANDS_LATTICE;
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
       AVASP_populateXVASP(aflags,kflags,xflags.vflags, xinput.xvasp);
