@@ -2157,7 +2157,7 @@ namespace apl
    */
   void QHAN::writeGPmeshFD()
   {
-    string function = "QHAN::writeGPmeshFD()";
+    string function = "QHAN::writeGPmeshFD():";
     string msg = "Writing Grueneisen parameter calculated on mesh of q-points.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
