@@ -85,7 +85,7 @@ class NonlinearFit{
 };
 
 
-/** Calculates residual sum of squares of a model function w.r.t given data
+/** Calculates the residual sum of squares of a model function w.r.t the given data
  */
 double NonlinearFit::err(xvector<double> &params)
 {
