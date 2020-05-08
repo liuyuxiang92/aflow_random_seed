@@ -27,6 +27,7 @@ matrix:
       osx_image: xcode8
       env:
         - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+      #upgrade is critical, otherwise brew install fails
       addons:
         homebrew:
           update: true
@@ -168,4 +169,5 @@ script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make realclean && make CC=$CC CPP=$CXX -j 4 && make check_full ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then make realclean && make CC=$CC CPP=$CXX -e ARCH=-D_MACOSX_ -j 4 && make check_full ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CC" = "clang" ] && [ "$CXX" = "clang++" ]; then make realclean && make mac && make check_full ; fi
+  #test that scripts generated an aflow binary
   - ./aflow

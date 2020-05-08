@@ -31,10 +31,10 @@ VERSNUMBER=3.1.227
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
 
 #system variables
+# https://stackoverflow.com/questions/714100/os-detecting-makefile
 UNAME=$(shell uname)
 
 # for aflow
-# https://stackoverflow.com/questions/714100/os-detecting-makefile
 CPP=g++
 #-O2 -frepo
 # for sqllite
@@ -45,6 +45,7 @@ CPP=clang++
 CC=clang
 ARCH=-e -D_MACOSX_
 endif
+
 
 #CPP=g++-fsf-7 
 #CPP=g++-fsf-4.9 -std=gnu++11
@@ -265,7 +266,7 @@ extra_clean:
 .PHONY: mac
 mac:
 	$(MAKE) aflow_data
-	$(MAKE) -e -D_MACOSX_ -j 4
+	$(MAKE) $(ARCH) -j 4
 	$(MAKE) check
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
 #	[CO191217 - fix above for the OS]$(MAKE) CC=clang CPP=clang++ aflow_data
@@ -328,6 +329,9 @@ aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js
 	echo "std::string AFLOW_WEBAPP_BANDS_JS=\"\\" >> $@
 	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
+aflow_chull.o: aflow_chull.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP) $(CHULL_JUPYTER_CPP)
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c -o $@
+	touch $@
 #CO 180305 - END
 aflow_chull.o: aflow_chull.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP) aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_jupyter_requirements.cpp aflow_chull_python.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c -o $@
