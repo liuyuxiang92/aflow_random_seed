@@ -126,7 +126,7 @@ void NonlinearFit::Jacobian(xvector<double> &guess)
 
 /** Nonlinear fit using Levenberg-Marquardt algorithm.
  *  The implementation here is based on the ideas from Numerical Recipes and
- *  K.Madsen et. al. Methods For Non-linear Least Squares Problems
+ *  K.Madsen et al. Methods For Non-linear Least Squares Problems
  *  http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
  */
 void NonlinearFit::fit()
