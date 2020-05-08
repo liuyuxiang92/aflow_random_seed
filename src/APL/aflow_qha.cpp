@@ -52,7 +52,7 @@ using std::auto_ptr;
  *  K.Madsen et. al. Methods For Non-linear Least Squares Problems
  *  http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
  *
- *  Caution: default value for parameter tau (a scaling factor for initial step size)
+ *  Caution: the default value for the parameter tau (a scaling factor for the initial step size)
  *  was picked to yield a correct fit to Murnaghan equation of state. 
  *  If you observe that this is not a good choice for your function,
  *  try 1e-6 if initial guess is believed to be a good approximation to a true
