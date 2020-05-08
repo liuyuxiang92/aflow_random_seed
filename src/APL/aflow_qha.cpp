@@ -1711,7 +1711,7 @@ namespace apl
 
     // output file name depends on the used EOS fit method
     ofstream file;
-    string filename;
+    string filename = "";
     string sc = all_iterations_self_consistent ? "sc." : "";
     switch(method){
       case(EOS_POLYNOMIAL):
