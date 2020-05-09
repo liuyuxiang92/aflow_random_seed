@@ -340,7 +340,7 @@ namespace makefile {
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
     vmt_required.push_back(mt_required);
 
-    vector<string> vaflow_deps; //CO populate me with missing skipped files
+    vector<string> vaflow_deps; //populate me with missing skipped files
 
     bool skip_file=false; //these files do NOT get .o
     for(i=0;i<vsubdirectories.size();i++){
@@ -387,6 +387,11 @@ namespace makefile {
             //[didn't compile for some reason]vmt_required.push_back(false);
             mt_required=false;
             getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
+            //unfortunate hack that's needed
+            if(file=="aflowlib_libraries.cpp"){
+              if(!aurostd::WithinList(vvdependencies.back(),"aflow_matlab_funcs.cpp")){vvdependencies.back().push_back("aflow_matlab_funcs.cpp");}  //safety
+              if(!aurostd::WithinList(vvdependencies.back(),"aflow_gnuplot_funcs.cpp")){vvdependencies.back().push_back("aflow_gnuplot_funcs.cpp");}  //safety
+            }
             vmt_required.push_back(mt_required);
             //get rid of any dependencies with AUROSTD and replace with $(AUROSTD_OBJ)
             updateDependenciesAUROSTD(vvdependencies.back());
@@ -394,6 +399,7 @@ namespace makefile {
         }
       }
     }
+    //unfortunate hack that's needed
     if(!aurostd::WithinList(vaflow_deps,"aflow_matlab_funcs.cpp")){vaflow_deps.push_back("aflow_matlab_funcs.cpp");}  //safety
     if(!aurostd::WithinList(vaflow_deps,"aflow_gnuplot_funcs.cpp")){vaflow_deps.push_back("aflow_gnuplot_funcs.cpp");}  //safety
     stringstream makefile_rules_ss;
@@ -408,6 +414,10 @@ namespace makefile {
       makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS) $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")
     }
+    //unfortunate hack that's needed
+    if(!aurostd::WithinList(vobj_files,"aflow_matlab_funcs.cpp")){vobj_files.push_back("aflow_matlab_funcs.cpp");}  //safety
+    if(!aurostd::WithinList(vobj_files,"aflow_gnuplot_funcs.cpp")){vobj_files.push_back("aflow_gnuplot_funcs.cpp");}  //safety
+    
     stringstream makefile_definitions_ss;
     if(vaflow_deps.size()){makefile_definitions_ss << "DEPS_ALL = " << aurostd::joinWDelimiter(vaflow_deps," ") << endl;}
     if(vobj_files.size()){makefile_definitions_ss << "OBJS_ALL = " << aurostd::joinWDelimiter(vobj_files," ") << endl;}

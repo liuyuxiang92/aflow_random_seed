@@ -145,12 +145,12 @@ aflow: $(SQLITE_OBJ) $(DEPS_ALL) Makefile
 #	cp sqlite3.o ./SQLITE/
 #	$(CPP) $(LIBS_AFLOW) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW)
 #	$(CPP) $(LIBS_AFLOW) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW)
-	$(CPP) $(LIBS_AFLOW) -o aflow aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW)
+	$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW)
 	ln -sf aflow aflowd
 	ln -sf aflow apennsy
 static_no_pdf: aflow aflow_data
 	rm -rf $(SQLITE_OBJ)
-	#$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 	$(CC) $(SQLITE_OPTS) -c $(SQLITE_C) $(LIBS_STATIC)
 #	cp sqlite3.o ./SQLITE/
 	rm -f aflow
