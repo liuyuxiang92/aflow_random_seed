@@ -574,53 +574,53 @@ namespace pflow {
   }
 }
 
-// **************************************************************************
-// GetTypes
-// **************************************************************************
-namespace pflow {
-  vector<int> GetTypes(const xstructure& a) {
-    vector<int> out_type;
-    for(uint iat=0;iat<a.atoms.size();iat++)
-      out_type.push_back(a.atoms.at(iat).type);
-    return out_type;
-  }
-}
-
-// **************************************************************************
-// GetNames
-// **************************************************************************
-namespace pflow {
-  vector<string> GetNames(const xstructure& a) {
-    vector<string> out_name;
-    for(uint iat=0;iat<a.atoms.size();iat++)
-      out_name.push_back(a.atoms.at(iat).name);
-    return out_name;
-  }
-}
-
-// **************************************************************************
-// GetCleanNames
-// **************************************************************************
-namespace pflow {
-  vector<string> GetCleanNames(const xstructure& a) {
-    vector<string> out_cleanname;
-    for(uint iat=0;iat<a.atoms.size();iat++)
-      out_cleanname.push_back(a.atoms.at(iat).cleanname);
-    return out_cleanname;
-  }
-}
-
-// **************************************************************************
-// GetSpins
-// **************************************************************************
-namespace pflow {
-  vector<double> GetSpins(const xstructure& a) {
-    vector<double> out_spin;
-    for(uint iat=0;iat<a.atoms.size();iat++)
-      out_spin.push_back(a.atoms.at(iat).spin);
-    return out_spin;
-  }
-}
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]// GetTypes
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]namespace pflow {
+//[RF20200415 - duplicate from xatom]  vector<int> GetTypes(const xstructure& a) {
+//[RF20200415 - duplicate from xatom]    vector<int> out_type;
+//[RF20200415 - duplicate from xatom]    for(uint iat=0;iat<a.atoms.size();iat++)
+//[RF20200415 - duplicate from xatom]      out_type.push_back(a.atoms.at(iat).type);
+//[RF20200415 - duplicate from xatom]    return out_type;
+//[RF20200415 - duplicate from xatom]  }
+//[RF20200415 - duplicate from xatom]}
+//[RF20200415 - duplicate from xatom]
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]// GetNames
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]namespace pflow {
+//[RF20200415 - duplicate from xatom]  vector<string> GetNames(const xstructure& a) {
+//[RF20200415 - duplicate from xatom]    vector<string> out_name;
+//[RF20200415 - duplicate from xatom]    for(uint iat=0;iat<a.atoms.size();iat++)
+//[RF20200415 - duplicate from xatom]      out_name.push_back(a.atoms.at(iat).name);
+//[RF20200415 - duplicate from xatom]    return out_name;
+//[RF20200415 - duplicate from xatom]  }
+//[RF20200415 - duplicate from xatom]}
+//[RF20200415 - duplicate from xatom]
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]// GetCleanNames
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]namespace pflow {
+//[RF20200415 - duplicate from xatom]  vector<string> GetCleanNames(const xstructure& a) {
+//[RF20200415 - duplicate from xatom]    vector<string> out_cleanname;
+//[RF20200415 - duplicate from xatom]    for(uint iat=0;iat<a.atoms.size();iat++)
+//[RF20200415 - duplicate from xatom]      out_cleanname.push_back(a.atoms.at(iat).cleanname);
+//[RF20200415 - duplicate from xatom]    return out_cleanname;
+//[RF20200415 - duplicate from xatom]  }
+//[RF20200415 - duplicate from xatom]}
+//[RF20200415 - duplicate from xatom]
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]// GetSpins
+//[RF20200415 - duplicate from xatom]// **************************************************************************
+//[RF20200415 - duplicate from xatom]namespace pflow {
+//[RF20200415 - duplicate from xatom]  vector<double> GetSpins(const xstructure& a) {
+//[RF20200415 - duplicate from xatom]    vector<double> out_spin;
+//[RF20200415 - duplicate from xatom]    for(uint iat=0;iat<a.atoms.size();iat++)
+//[RF20200415 - duplicate from xatom]      out_spin.push_back(a.atoms.at(iat).spin);
+//[RF20200415 - duplicate from xatom]    return out_spin;
+//[RF20200415 - duplicate from xatom]  }
+//[RF20200415 - duplicate from xatom]}
 
 // ***************************************************************************
 // Function GetFpos

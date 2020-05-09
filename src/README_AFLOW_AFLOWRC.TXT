@@ -528,6 +528,11 @@ DEFAULT_PHONONS_KSCHEME
   choices: "M", "G"
   default: "G"
 
+DEFAULT_PHONONS_KPPRA
+  description: Number of k-points per reciprocal atom for phonon calculations.
+  type: integer
+  default: 3000
+
 DEFAULT_DOS_EMIN
   description: Minimum of the energy range over which the DOS is plotted.
   type: integer
@@ -989,6 +994,15 @@ DEFAULT_CHULL_PNG_RESOLUTION
   default: 300
 
 ####################################################################################################
+DEFAULTS CCE
+
+DEFAULT_CCE_OX_METHOD
+  description: Default method to determine oxidation numbers.
+  type: string
+  choices: "ELECTRONEGATIVITY_ALLEN", "BADER"
+  default: "ELECTRONEGATIVITY_ALLEN"
+
+####################################################################################################
 DEFAULTS GFA
 
 DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF
@@ -1231,6 +1245,11 @@ DEFAULT_APL_HARMIFC_FILE
   type: string
   default: "harmonicIFCs.xml"
 
+DEFAULT_APL_POLAR_FILE
+  description: Output file for the Born effective charge tensors and the dielectric tensor.
+  type: string
+  default: "polar.xml"
+
 DEFAULT_APL_HSKPTS_FILE
   description: Output file for the high-symmetry k-points in APL.
   type: string
@@ -1255,6 +1274,31 @@ DEFAULT_APL_PHEIGENVAL_FILE
   description: Output file for the phonon dispersion in VASP EIGENVAL format.
   type: string
   default: "PHEIGENVAL"
+
+DEFAULT_APL_STATE_FILE
+  description: Output file to save the state of the force constant calculators.
+  type: string
+  default: "fccalc_state.out"
+
+DEFAULT_APL_ADISP_SCENE_FORMAT
+  description: Default format to visualize atomic displacements for phonon modes.
+  type: string
+  default: "XCRYSDEN"
+
+DEFAULT_APL_ADISP_AMPLITUDE
+  description: Default amplitude for atomic displacements.
+  type: double
+  default: 0.25
+
+DEFAULT_APL_ADISP_NSTEPS
+  description: The number of steps per period in an XCRYSDEN animated structure file.
+  type: integer
+  default: 20
+
+DEFAULT_APL_ADISP_NPERIODS
+  description: The number of periods in an XCRYSDEN animated structure file.
+  type: integer
+  default: 1
 
 ####################################################################################################
 DEFAULTS QHA
@@ -1320,7 +1364,7 @@ DEFAULT_AAPL_THERMALGRID
   description: q-point grid for thermal conductivity calculations.
   type: string
   format: "N1xN2xN3"
-  default: "26x26x26"
+  default: "21x21x21"
 
 DEFAULT_AAPL_TCT
   description: Temperature range (Tstart, Tend) and step size (Tstep) for the thermal conductivity calculations.

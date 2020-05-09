@@ -146,6 +146,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   aurostd::xvector<xcomplex<utype> > vxfirst,vx(2),vy(2),vbb=vxfirst,vcc(vxfirst),vxvx,vxvxvxvx(1,2),vb=vxfirst,vc(vxfirst); //DX20180115 - equal operator was missing		//CO20190329 - clang doesn't like x=x, changing to x=y
   aurostd::xvector<utype> vr;
   vx=vy;vx+vx;vx+=vy;vx-vx;vx-=vy;vx*vx; //DX20180117 - added vx=vx		//CO20190329 - clang doesn't like x=x, changing to x=y
+  vx=r*vy;vx=vy*r;vx=vy/r;vx=x*vy;vx=vy*x;vx=vy/r;  //ME20200329
   //xvector<xcomplex<utype> > va,vb=va,vc(va); //DX20180115 - equal operator was missing
   sin(vx);sinh(vx);cos(vx);cosh(vx);exp(vx);log(vx);//sqrt(vx);
   vx.clear(); //DX20180115 - clear was missing
@@ -169,10 +170,12 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; //DX20180115 - operator and equal operator initialized for xcomplex		//CO20190329 - clang doesn't like x=x, changing to x=y
   exp(m); //DX20180115 - add exponential or complex matrices
   m=x*m;m=m/x; //DX20180117 - allow for xcomplex * xmatrix<xcomplex>
+  m=r*n;m=n*r;m=n/r;m+=n;m-=n;vx=mx*vy;  //ME20200329
   cout << m << endl; //DX20180115 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  //ME20180904
   bool tf=false;  //CO20200106 - set the result or clang complains
   m=mx*m;tf=bool(m==n);tf=bool(m!=n);jacobiHermitian(m);vx=m(1); //ME20190814  //CO20200106 - set the result or clang complains
+  m = aurostd::outer_product(vx, vy); //ME20200327
   if(tf){;} //CO20200106 - keep tf busy
 
   //  jacobi(m,vx,m);
@@ -271,6 +274,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<uint> vii; //CO20190622
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
+  aurostd::xmatrix<utype> mprod = aurostd::outer_product(v, w);  // ME20200327
   
   //CO20200404 START - aurostd->pflow
   utype ut=(utype)3;std::vector<utype> vec;std::complex<utype> utcomp;vector<std::complex<utype> > veccomp;

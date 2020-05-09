@@ -253,7 +253,7 @@ namespace pflow {
       }
     }
     xstr_bulk.ReScale(1.0);
-    xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
+    xstr_bulk.ShiftOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
     xstr_bulk.BringInCell();
     xstr_bulk.clean();  //clear origin! //DX20191220 - uppercase to lowercase clean
     if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
@@ -1175,7 +1175,7 @@ namespace pflow {
       }
     }
     xstr_bulk.ReScale(1.0);
-    xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
+    xstr_bulk.ShiftOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
     xstr_bulk.BringInCell();
     xstr_bulk.clean();  //clear origin! //DX20191220 - uppercase to lowercase clean
     if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
@@ -1310,7 +1310,7 @@ namespace pflow {
       if(convert_sprim){
         xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
         xvasp.str.ReScale(1.0);
-        xvasp.str.ShifOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
+        xvasp.str.ShiftOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
         xvasp.str.BringInCell();
         xvasp.str.clean();  //clear origin! //DX20191220 - uppercase to lowercase clean
       }
@@ -6925,8 +6925,8 @@ namespace pflow {
     int natoms=pflow::GetNumAtoms(str);
     double vol=pflow::GetVol(lat);
     aurostd::matrix<double> atfpos=pflow::GetFpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    vector<int> attyp=pflow::GetTypes(str);
-    vector<string> names=pflow::GetNames(str);
+    vector<int> attyp=GetTypes(str);
+    vector<string> names=GetNames(str);
     // Charges should be stored in names - turn into vector of doubles.
     vector<double> atchg(natoms);
     double totchg=0;
@@ -7161,8 +7161,8 @@ namespace pflow {
     int natoms=pflow::GetNumAtoms(str);
     // double vol=pflow::GetVol(lat);  //DM not used
     aurostd::matrix<double> atfpos=pflow::GetFpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    vector<int> attyp=pflow::GetTypes(str);
-    vector<string> names=pflow::GetNames(str);
+    vector<int> attyp=GetTypes(str);
+    vector<string> names=GetNames(str);
     // Charges should be stored in names - turn into vector of doubles.
     vector<double> atchg(natoms);
     double totchg=0;

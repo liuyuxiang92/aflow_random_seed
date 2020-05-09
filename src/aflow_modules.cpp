@@ -84,6 +84,7 @@ namespace KBIN {
     vector<aurostd::xoption> aplflags;
     aurostd::xoption opt;
     opt.keyword="RELAX"; opt.option = DEFAULT_APL_RELAX; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
+    opt.keyword="RELAX_COMMENSURATE"; opt.option = DEFAULT_APL_RELAX_COMMENSURATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200427
     opt.keyword="HIBERNATE"; opt.option = DEFAULT_APL_HIBERNATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="ENGINE"; opt.xscheme = DEFAULT_APL_ENGINE; aplflags.push_back(opt); opt.clear();
     opt.keyword="SUPERCELL"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
@@ -101,6 +102,8 @@ namespace KBIN {
     opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 //ME20190112
     opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  //ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
     opt.keyword="KPOINTS"; aplflags.push_back(opt); opt.clear();
+    opt.keyword="KPOINTS_GRID"; aplflags.push_back(opt); opt.clear();  // ME20200427
+    opt.keyword="KPOINTS_SHIFT"; aplflags.push_back(opt); opt.clear();  // ME20200427
     opt.keyword="PREC"; opt.xscheme = DEFAULT_APL_PREC; aplflags.push_back(opt); opt.clear();
     opt.keyword="ZEROSTATE"; opt.option = DEFAULT_APL_ZEROSTATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="FREQFORMAT"; opt.xscheme = DEFAULT_APL_FREQFORMAT; aplflags.push_back(opt); opt.clear();
@@ -120,8 +123,9 @@ namespace KBIN {
     opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
+    opt.keyword="DISPLACEMENTS"; opt.option = DEFAULT_APL_DISPLACEMENTS; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="TPT"; opt.xscheme = DEFAULT_APL_TPT; aplflags.push_back(opt); opt.clear();
-    opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
+    //opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // OBSOLETE ME20200507
     if (LDEBUG) {
       for (uint i = 0; i < aplflags.size(); i++) {
         std::cerr << soliloquy << " key: " << aplflags[i].keyword << ", xscheme: " << aplflags[i].xscheme << ", option: " << aplflags[i].option << std::endl;
