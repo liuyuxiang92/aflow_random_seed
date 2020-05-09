@@ -1283,6 +1283,8 @@ namespace compare {
     ofstream FileMESSAGE;
     vector<string> tokens;
 
+    if(relaxation_step){} //CO20200508 - keep it busy
+
     if(LDEBUG){
       cerr << function_name << " generating structure: " << structure_name << " from " << structure_source << endl;
     }
@@ -1359,6 +1361,7 @@ namespace compare {
       tokens.clear(); aurostd::string2tokens(structure_designation,tokens,"/");
       structure_number=aurostd::string2utype<uint>(tokens[0]);
       number_of_structures=aurostd::string2utype<uint>(tokens[1]);
+      if(number_of_structures){} //CO20200508 - keep it busy
 
       // ---------------------------------------------------------------------------
       // tokenize stringstream by newline
@@ -6631,7 +6634,7 @@ namespace compare{
     string function_name = "compare::compatibleEnvironments():";
 
     double _TOL_EXACT_MATCH_ = 0.01; // hundredth of an Angstrom, perhaps put in header?
-    double _TOL_RELATIVE_MATCH_ = 0.10; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1
+    //[CO20200508 - OBSOLETE]double _TOL_RELATIVE_MATCH_ = 0.10; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1
     //DX 20200416 [OBSOLETE] double _TOL_LOOSE_MATCH_ = aurostd::min(env_1.distances_neighbor)/2.0; // ten percent, perhaps put in header? //DX 20190724 - changed from 0.25 to 0.1
     double max_distance_env1 = aurostd::max(env_1.distances_neighbor); // normalize distances for relative comparisons (needed for volume scaling) //DX20200421
     double max_distance_env2 = aurostd::max(env_2.distances_neighbor); // normalize distances for relative comparisons (needed for volume scaling) //DX20200421
@@ -7263,6 +7266,8 @@ namespace compare{
     // in the supercell. Helpful analogy: Lattice periodicty vs crystal periodicity. 
     // The quadruplets form the lattice and in this function we check for lattice
     // periodicity. The misfit criteria checks the crystal periodicity.
+
+    if(i&&j){}  //CO20200508 - keep busy
 
     double tolerance = 0.5; // half an Angstrom (Ex As1_ICSD_158474 == As1_ICSD_162840 with 0.1, but not 0.01)
     //DX20200416 [ORIG] double tolerance = 0.01; // Hundredth of an Angstrom
