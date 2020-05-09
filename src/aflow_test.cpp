@@ -4,6 +4,9 @@
 // *                                                                         *
 // ***************************************************************************
 
+#ifndef _AFLOW_TEST_CPP_
+#define _AFLOW_TEST_CPP_
+
 #include "aflow.h"
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -531,6 +534,7 @@ int pinku_main(void) {
 }
 
 
+#endif  // _AFLOW_TEST_CPP_
 
 // **************************************************************************
 // *                                                                        *

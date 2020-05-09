@@ -5,6 +5,9 @@
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2008
 
+#ifndef _AFLOW_XPROTO_GUS_LIB_CPP_
+#define _AFLOW_XPROTO_GUS_LIB_CPP_
+
 #include"aflow.h"
 namespace aflowlib { string PrototypeBinaryGUS_Cache_LibraryS[]= {
 "[gusfcc] fcc1 1 1 48 1 1 1 1 0 1 0 0 1 1 0 0 0 1 0 0 0 1 0 ???",
@@ -4005,3 +4008,5 @@ namespace aflowlib { string PrototypeBinaryGUS_Cache_LibraryS[]= {
 "[gushcp] hcp999 15 6 24 1 1 6 1 0 1 0 0 6 1 0 0 0 1 0 0 0 1 000000011111 ???",
 "XXX"};
 }
+
+#endif  // _AFLOW_XPROTO_GUS_LIB_CPP_
