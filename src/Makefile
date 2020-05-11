@@ -134,6 +134,7 @@ SQLITE_OBJ=$(SQLITE_C:.c=.o)
 MFS=Makefile Makefile.aflow
 
 #CO20200508 - all MUST come first
+#CO20200508 - .PHONY rules do NOT get 'Makefile' as dependence
 .PHONY: all
 all: aflow aflow_data 
 	$(MAKE) check
