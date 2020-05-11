@@ -50,7 +50,7 @@ namespace apl {
     if (ncpus < 1) ncpus = 1;
 
     if (ncpus > 1) {
-      message += " (" + stringify(ncpus) + " threads)";
+      message += " (" + aurostd::utype2string<int>(ncpus) + " threads)";
     }
     log.initProgressBar(message);
 

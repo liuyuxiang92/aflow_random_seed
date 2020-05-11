@@ -1664,7 +1664,7 @@ namespace apl {
     }
 
     t = line.find_first_of(">") + 1;
-    tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+    aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
     if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
@@ -1679,7 +1679,7 @@ namespace apl {
         line = vlines[line_count++];
         if (line.find("order") != string::npos) {
           t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
           int ord = aurostd::string2utype<int>(tokens[0]);
           tokens.clear();
           if (ord != order) {
@@ -1699,7 +1699,7 @@ namespace apl {
         line = vlines[line_count++];
         if (line.find("cutoff") != string::npos) {
           t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
           double cut = aurostd::string2utype<double>(tokens[0]);
           tokens.clear();
           if (abs(cut - cutoff) > _ZERO_TOL_) {
@@ -1737,7 +1737,7 @@ namespace apl {
               message << "pcell lattice tag is corrupt. ";
             }
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (int j = 1; j < 3; j++) {
               latt(i, j) = aurostd::string2utype<double>(tokens[j - 1]);
             }
@@ -1777,12 +1777,12 @@ namespace apl {
             if (line.find("species=\"") != string::npos) {
               // Extract species
               t = line.find_first_of("\"") + 1;
-              tokenize(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
+              aurostd::string2tokens(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
               species.push_back(tokens[0]);
               tokens.clear();
               // Extract positions
               t = line.find_first_of(">") + 1;
-              tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+              aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
               xvector<double> fpos(3);
               for (int i = 1; i < 4; i++) {
                 fpos(i) = aurostd::string2utype<double>(tokens[i-1]);
@@ -1834,7 +1834,7 @@ namespace apl {
         if (line.find("varray name=\"supercell\"") != string::npos) {
           line = vlines[line_count++];
           t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
           xvector<int> sc(3);
           for (int i = 1; i < 4; i++) {
             sc(i) = aurostd::string2utype<double>(tokens[i-1]);
@@ -1940,19 +1940,19 @@ namespace apl {
           if (line.find("atoms") != string::npos) {
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint at = 0; at < tokens.size(); at++) {
               clst.atoms.push_back(aurostd::string2utype<int>(tokens[at]));
             }
           } else if (line.find("fgroup") != string::npos) {
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             clst.fgroup = aurostd::string2utype<int>(tokens[0]);
           } else if (line.find("permutation") != string::npos) {
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             clst.permutation = aurostd::string2utype<int>(tokens[0]);
           }
         }
@@ -1983,14 +1983,14 @@ namespace apl {
       if (line.find("independent") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           lcombs.independent.push_back(aurostd::string2utype<int>(tokens[i]));
         }
       } else if (line.find("dependent") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           lcombs.dependent.push_back(aurostd::string2utype<int>(tokens[i]));
         }
@@ -2007,7 +2007,7 @@ namespace apl {
             vector<int> indices;
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint i = 0; i < tokens.size(); i++) {
               indices.push_back(aurostd::string2utype<int>(tokens[i]));
             }
@@ -2027,7 +2027,7 @@ namespace apl {
             vector<double> coefficients;
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint i = 0; i < tokens.size(); i++) {
               coefficients.push_back(aurostd::string2utype<double>(tokens[i]));
             }
@@ -2047,7 +2047,7 @@ namespace apl {
             vector<int> indep2depMap;
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint i = 0; i < tokens.size(); i++) {
               indep2depMap.push_back(aurostd::string2utype<int>(tokens[i]));
             }
@@ -2098,14 +2098,14 @@ namespace apl {
       if (line.find("atoms") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           idist.atoms.push_back(aurostd::string2utype<int>(tokens[i]));
         }
       } else if (line.find("clusters") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           idist.clusters.push_back(aurostd::string2utype<int>(tokens[i]));
         }
@@ -2130,7 +2130,7 @@ namespace apl {
                 vector<int> dist;
                 tokens.clear();
                 t = line.find_first_of(">") + 1;
-                tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+                aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
                 for (uint i = 0; i < tokens.size(); i++) {
                   dist.push_back(aurostd::string2utype<int>(tokens[i]));
                 }
@@ -2160,7 +2160,7 @@ namespace apl {
                 vector<int> rot;
                 tokens.clear();
                 t = line.find_first_of(">") + 1;
-                tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+                aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
                 for (uint i = 0; i < tokens.size(); i++) {
                   rot.push_back(aurostd::string2utype<int>(tokens[i]));
                 }
@@ -2190,7 +2190,7 @@ namespace apl {
                 vector<int> map;
                 tokens.clear();
                 t = line.find_first_of(">") + 1;
-                tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+                aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
                 for (uint i = 0; i < tokens.size(); i++) {
                   map.push_back(aurostd::string2utype<int>(tokens[i]));
                 }

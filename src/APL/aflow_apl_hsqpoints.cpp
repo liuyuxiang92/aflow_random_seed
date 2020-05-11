@@ -69,7 +69,7 @@ namespace apl
       if(line==""){
       } else if(line[0]=='#'){
         vector<string> vsr;
-        apl::tokenize(line, vsr, string(" "));
+        aurostd::string2tokens(line, vsr, string(" "));
         xvector<double> tmp(3,1);
         tmp[1]=atof(vsr[vsr.size()-3].c_str());
         tmp[2]=atof(vsr[vsr.size()-2].c_str());
@@ -77,7 +77,7 @@ namespace apl
         _hs_kpoints.push_back(tmp);
       } else {
         vector<string> vsr;
-        apl::tokenize(line, vsr, string(" "));
+        aurostd::string2tokens(line, vsr, string(" "));
         if(vsr.size()!=5)
         {
           //ME20190726 - exit clean-up

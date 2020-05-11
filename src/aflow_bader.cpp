@@ -3126,10 +3126,10 @@ namespace pflow {
         if(line.find("<system>") != string::npos)  // was "<system>" in the line?
         {
           string temp;
-          tokenize(line, tokens, string("\""));
+          aurostd::string2tokens(line, tokens, string("\""));
           temp = tokens[1].c_str();  // temp is all strings in between " 's
           tokens.clear();
-          tokenize(temp, tokens, " ");  // divide by whitespace
+          aurostd::string2tokens(temp, tokens, " ");  // divide by whitespace
           chemName = tokens[0].c_str();
           aurostd::StringSubst(chemName, "/", ".");  //ME20190328 - forward slash breaks image conversion
           temp = tokens[0] + " " + tokens[1];  // join chemical and crystal strings
@@ -3140,7 +3140,7 @@ namespace pflow {
         // Read the units
         if(line.find("<units>") != string::npos)  // was "<units>" in the line?
         {
-          tokenize(line, tokens, string(" "));
+          aurostd::string2tokens(line, tokens, string(" "));
           freqUnits = (IPCFreqFlags)atoi(tokens[2].c_str());
           tokens.clear();
           continue;
@@ -3149,7 +3149,7 @@ namespace pflow {
         if(line.find("<nbranches>") != string::npos)  // was "<nbranches>" in the line?
         {
           // Get value
-          tokenize(line, tokens, string(" "));
+          aurostd::string2tokens(line, tokens, string(" "));
           nbranches = atoi(tokens[2].c_str());
           tokens.clear();
           continue;
@@ -3157,7 +3157,7 @@ namespace pflow {
         // Read the labels
         if(line.find("<label>") != string::npos)  // was "<label>" in the line?
         {
-          tokenize(line, tokens, string(" "));
+          aurostd::string2tokens(line, tokens, string(" "));
           specialTickPositions.push_back(atof(tokens[2].c_str()));
           string label = tokens[3];
           if(label == string("G") || label == string("Gamma") ||
@@ -3170,7 +3170,7 @@ namespace pflow {
         //// Read positions of exact qpoints
         //if( line.find("<exact>") != string::npos ) // was "<exact>" in the line?
         //{
-        //tokenize(line, tokens, string(" "));
+        //aurostd::string2tokens(line, tokens, string(" "));
         //exactQPointPositions.push_back( atof( tokens[2].c_str() ) );
         //tokens.clear();
         //continue;

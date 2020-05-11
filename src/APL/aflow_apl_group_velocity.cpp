@@ -274,10 +274,10 @@ namespace apl
     }
     else
     {
-      if(ktype==1)_logger.initProgressBar("Calculating eigenvalues for k-zero (" + stringify(ncpus) + " threads)");
-      else if(ktype==2)_logger.initProgressBar("Calculating eigenvalues for kx-dir (" + stringify(ncpus) + " threads)");
-      else if(ktype==3)_logger.initProgressBar("Calculating eigenvalues for ky-dir (" + stringify(ncpus) + " threads)");
-      else if(ktype==4)_logger.initProgressBar("Calculating eigenvalues for kz-dir (" + stringify(ncpus) + " threads)");
+      if(ktype==1)_logger.initProgressBar("Calculating eigenvalues for k-zero (" + aurostd::utype2string<int>(ncpus) + " threads)");
+      else if(ktype==2)_logger.initProgressBar("Calculating eigenvalues for kx-dir (" + aurostd::utype2string<int>(ncpus) + " threads)");
+      else if(ktype==3)_logger.initProgressBar("Calculating eigenvalues for ky-dir (" + aurostd::utype2string<int>(ncpus) + " threads)");
+      else if(ktype==4)_logger.initProgressBar("Calculating eigenvalues for kz-dir (" + aurostd::utype2string<int>(ncpus) + " threads)");
     }
 
     // Distribute the calculation

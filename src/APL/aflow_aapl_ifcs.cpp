@@ -318,8 +318,7 @@ namespace apl {
       }
       dist_cart *= distortion_magnitude;
       // ME20190109 - Add to title
-      xstr.title += " atom=" + stringify(atoms[at]);
-      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME20190112
+      xstr.title += " atom=" + aurostd::utype2string<int>(atoms[at]);
       std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
       distortion << " distortion=["
         << std::setprecision(3) << dist_cart[1] << ","

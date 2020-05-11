@@ -215,7 +215,7 @@ namespace apl
     if( ncpus == 1 )
       _logger.initProgressBar("Calculating taylor coefficients for QHA3POINTS");
     else
-      _logger.initProgressBar("Calculating taylor coefficients for QHA3POINTS  (" + stringify(ncpus) + " threads)");
+      _logger.initProgressBar("Calculating taylor coefficients for QHA3POINTS  (" + aurostd::utype2string<int>(ncpus) + " threads)");
 
     // Distribute the calculation
     int startIndex, endIndex;

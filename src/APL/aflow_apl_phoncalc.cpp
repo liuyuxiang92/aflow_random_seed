@@ -301,7 +301,7 @@ namespace apl {
       for (int k = 1; k <= 3; k++) {
         line = vlines[line_count++];  //CO
         int t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
         m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
         m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
@@ -362,7 +362,7 @@ namespace apl {
       for (int k = 1; k <= 3; k++) {
         line = vlines[line_count++];  //CO
         int t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
         m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
         m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
@@ -386,7 +386,7 @@ namespace apl {
     for (int k = 1; k <= 3; k++) {
       line = vlines[line_count++];  //CO
       int t = line.find_first_of(">") + 1;
-      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+      aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
       _dielectricTensor(k, 1) = aurostd::string2utype<double>(tokens.at(0));
       _dielectricTensor(k, 2) = aurostd::string2utype<double>(tokens.at(1));
       _dielectricTensor(k, 3) = aurostd::string2utype<double>(tokens.at(2));

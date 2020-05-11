@@ -995,7 +995,7 @@ namespace apl {
     vector<string> tokens;
 
     // Generate users path by points
-    tokenize(userPath,tokens,"|-");
+    aurostd::string2tokens(userPath,tokens,"|-");
     for(uint i = 0; i < tokens.size(); i++) {
       uint j = 0;
       for( ; j < _labels.size(); j++) {
@@ -1060,30 +1060,6 @@ namespace apl {
       if(LDEBUG){cerr << soliloquy << " OUT: " << _labels[i] << ": " << _points[i] << std::endl;}
     }
   }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  //ME20190219 - OBSOLETE duplicate
-  //void PathBuilder::tokenize(const string& str,vector<string>& tokens, string del) {
-  //  string delimiters = del;
-
-  // Skip delimiters at beginning.
-  //  string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-
-  // Find first "non-delimiter".
-  //  string::size_type pos = str.find_first_of(delimiters, lastPos);
-
-  //  while (string::npos != pos || string::npos != lastPos) {
-  // Found a token, add it to the vector.
-  //    tokens.push_back(str.substr(lastPos, pos - lastPos));
-
-  // Skip delimiters. Note the "not_of"
-  //    lastPos = str.find_first_not_of(delimiters, pos);
-
-  // Find next "non-delimiter"
-  //    pos = str.find_first_of(delimiters, lastPos);
-  //  }
-  //}
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -1211,7 +1187,7 @@ namespace apl {
       if( line.empty() ) continue;
       if( line.size() == 1 ) continue;
       //cout << line << std::endl;
-      tokenize(line,tokens,string(" !"));
+      aurostd::string2tokens(line,tokens,string(" !"));
       addPoint(tokens[3],3,atof(tokens[0].c_str()),atof(tokens[1].c_str()),atof(tokens[2].c_str()));
       tokens.clear();
       line.clear();

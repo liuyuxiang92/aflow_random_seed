@@ -29,14 +29,6 @@ static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anha
 static const int _NUM_RELAX_ = 2; //ME20181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  //ME20190125
 
-namespace apl {
-  //ME20190119
-  // Old apl::tokenize is essentially just aurostd::string2tokens
-  void tokenize(const string& strin, vector<string>& tokens, const string& del) {
-    aurostd::string2tokens(strin, tokens, del);
-  }
-}
-
 namespace KBIN {
   // ME20181107 - Relax structure with PREC=PHONONS before running APL
   // ME20200102 - Make k-point grid commensurate with supercell size
@@ -425,6 +417,7 @@ namespace KBIN {
 
     /***************************** READ PARAMETERS *****************************/
 
+    aurostd::xoption aplopts;
     string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO20190114 - initialize everything
     string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; //ME20190625
     string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO20190114 - initialize everything
@@ -438,6 +431,8 @@ namespace KBIN {
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
       const string& key = kflags.KBIN_MODULE_OPTIONS.aplflags[i].keyword;
       logger << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme << apl::endl;
+      aplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].option);
+      aplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme);
       if (key == "RELAX") {USER_RELAX = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "RELAX_COMMENSURATE") {USER_RELAX_COMMENSURATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "HIBERNATE") {USER_HIBERNATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
@@ -547,7 +542,7 @@ namespace KBIN {
     // Check supercell settings
     if (!USER_SUPERCELL.empty()) {
       tokens.clear();
-      apl::tokenize(USER_SUPERCELL, tokens, string(" xX"));
+      aurostd::string2tokens(USER_SUPERCELL, tokens, string(" xX"));
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
@@ -590,13 +585,13 @@ namespace KBIN {
         // Make sure that the number of coordinates and labels agree
         tokens.clear();
         if (!USER_DC_INITCOORDS_FRAC.empty()) {
-          apl::tokenize(USER_DC_INITCOORDS_FRAC, tokens, string(" ;"));
+          aurostd::string2tokens(USER_DC_INITCOORDS_FRAC, tokens, string(" ;"));
         } else {
-          apl::tokenize(USER_DC_INITCOORDS_CART, tokens, string(" ;"));
+          aurostd::string2tokens(USER_DC_INITCOORDS_CART, tokens, string(" ;"));
         }
         uint ncoords = tokens.size();
         tokens.clear();
-        apl::tokenize(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  //ME20190427 - also break along semicolon
+        aurostd::string2tokens(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  //ME20190427 - also break along semicolon
         if (tokens.size() != ncoords) {
           message = "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
           message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
@@ -626,7 +621,7 @@ namespace KBIN {
         logger << "APL will overwrite the smearing value to 0.05 eV." << apl::endl;
         USER_DOS_SMEAR = 0.05;
       }
-      apl::tokenize(DOS_MESH_SCHEME, tokens, string(" xX"));
+      aurostd::string2tokens(DOS_MESH_SCHEME, tokens, string(" xX"));
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "DOSMESH. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
@@ -672,7 +667,7 @@ namespace KBIN {
     // TPT
     if (USER_TP) {
       tokens.clear();
-      apl::tokenize(USER_TPT, tokens, string(" :"));
+      aurostd::string2tokens(USER_TPT, tokens, string(" :"));
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "TPT. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
@@ -830,7 +825,7 @@ namespace KBIN {
       bool defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
       if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) {
         tokens.clear();
-        apl::tokenize(CUTOFF_SCHEME, tokens, string(" ,"));
+        aurostd::string2tokens(CUTOFF_SCHEME, tokens, string(" ,"));
         if (tokens.size() < 1) {
           message = "Not enought entries in " + _ASTROPT_ + "CUT_RAD. ";
           message += "See README_AFLOW_APL.TXT for more information.";
@@ -854,7 +849,7 @@ namespace KBIN {
 
       if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
         tokens.clear();
-        apl::tokenize(SHELL_SCHEME, tokens, string(" ,"));
+        aurostd::string2tokens(SHELL_SCHEME, tokens, string(" ,"));
         if (tokens.size() < 1) {
           message = "Not enought entries in " + _ASTROPT_ + "CUT_SHELL. ";
           message += "See README_AFLOW_APL.TXT for more information.";
@@ -883,7 +878,7 @@ namespace KBIN {
 
       // THERMALGRID
       tokens.clear();
-      apl::tokenize(THERMALGRID_SCHEME, tokens, string(" xX"));
+      aurostd::string2tokens(THERMALGRID_SCHEME, tokens, string(" xX"));
       if (tokens.size() == 3) {
         USER_THERMALGRID[0] = aurostd::string2utype<int>(tokens[0]);
         USER_THERMALGRID[1] = aurostd::string2utype<int>(tokens[1]);
@@ -897,7 +892,7 @@ namespace KBIN {
 
       // TCT
       tokens.clear();
-      apl::tokenize(TCT_SCHEME, tokens, string(" :"));
+      aurostd::string2tokens(TCT_SCHEME, tokens, string(" :"));
       if (tokens.size() == 3) {
         USER_TCT_TSTART = aurostd::string2utype<double>(tokens[0]);
         USER_TCT_TEND = aurostd::string2utype<double>(tokens[1]);
@@ -1102,7 +1097,7 @@ namespace KBIN {
       if(kflags.KBIN_PHONONS_CALCULATION_SCQHA|| kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C){
         SCQHA_PDIS_T_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "SCQHA_PDIS_T=" + "|" + _ASTROPT_APL_OLD_ + "SCQHA_PDIS_T="), SCQHA_PDIS_T_OPTION.option, SCQHA_PDIS_T_OPTION.xscheme);
         tokens.clear(); scqha_pdis_T.clear();
-        apl::tokenize(SCQHA_PDIS_T_OPTION.content_string, tokens, string(" ,"));
+        aurostd::string2tokens(SCQHA_PDIS_T_OPTION.content_string, tokens, string(" ,"));
         if (tokens.size() == 0) {
           //ME20191031 - use xerror
           //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0");
@@ -1160,7 +1155,7 @@ namespace KBIN {
         SCQHA_DISTORTION=SCQHA_DISTORTION_OPTION.content_double;
         if (SCQHA_DISTORTION_OPTION.isentry) {
           tokens.clear();
-          apl::tokenize(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
+          aurostd::string2tokens(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
           if (tokens.size() != 1) {
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION_OPTION=3.0.", _INPUT_ILLEGAL_);
           }
@@ -1176,7 +1171,7 @@ namespace KBIN {
         CUTOFF_FREQ = CUTOFF_FREQ_OPTION.content_double;
         if (CUTOFF_FREQ_OPTION.isentry) {
           tokens.clear();
-          apl::tokenize(CUTOFF_FREQ_OPTION.content_string, tokens, string(" "));
+          aurostd::string2tokens(CUTOFF_FREQ_OPTION.content_string, tokens, string(" "));
           if (tokens.size() != 1) {
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"CUTOFF_FREQ. Specify as CUTOFF_FREQ=0.01.", _INPUT_ILLEGAL_);
           }
@@ -1195,7 +1190,7 @@ namespace KBIN {
         {
           EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme);
           tokens.clear();
-          apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
+          aurostd::string2tokens(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
           if (tokens.size() != 3) {
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1.", _INPUT_ILLEGAL_);
           }
@@ -1209,7 +1204,7 @@ namespace KBIN {
           FITTING_TYPE = FITTING_TYPE_OPTION.content_string;
           if (FITTING_TYPE_OPTION.isentry) {
             tokens.clear();
-            apl::tokenize(FITTING_TYPE_OPTION.content_string, tokens, string(" "));
+            aurostd::string2tokens(FITTING_TYPE_OPTION.content_string, tokens, string(" "));
             if (tokens.size() != 1) {
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"FITTING_TYPE. Specify as FITTING_TYPE=BM2.", _INPUT_ILLEGAL_);
             }
@@ -1222,7 +1217,7 @@ namespace KBIN {
           if(CALCULATE_GRUNEISEN_OPTION.option){
             if (EOS_STATIC_KPPRA_OPTION.isentry) {
               tokens.clear();
-              apl::tokenize(EOS_STATIC_KPPRA_OPTION.content_string, tokens, string(" "));
+              aurostd::string2tokens(EOS_STATIC_KPPRA_OPTION.content_string, tokens, string(" "));
               if (tokens.size() != 1) {
                 throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"EOS_STATIC_KPPRA. Specify as EOS_STATIC_KPPRA=10000.", _INPUT_ILLEGAL_);
               }
@@ -1233,7 +1228,7 @@ namespace KBIN {
           NEDOS = NEDOS_OPTION.content_int;
           if (NEDOS_OPTION.isentry) {
             tokens.clear();
-            apl::tokenize(NEDOS_OPTION.content_string, tokens, string(" "));
+            aurostd::string2tokens(NEDOS_OPTION.content_string, tokens, string(" "));
             if (tokens.size() != 1) {
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"NEDOS. Specify as NEDOS=5000.", _INPUT_ILLEGAL_);
             }
@@ -1270,7 +1265,7 @@ namespace KBIN {
       GP_DISTORTION=GP_DISTORTION_OPTION.content_double;
       if (GP_DISTORTION_OPTION.isentry) {
         tokens.clear();
-        apl::tokenize(GP_DISTORTION_OPTION.content_string, tokens, string(" "));
+        aurostd::string2tokens(GP_DISTORTION_OPTION.content_string, tokens, string(" "));
         if (tokens.size() != 1) {
           //ME20191031 - use xerror
           //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.");
@@ -1285,7 +1280,7 @@ namespace KBIN {
       logger << (CALCULATE_EOS_SUBDIRECTORIES_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "EOS_SD=" << (CALCULATE_EOS_SUBDIRECTORIES_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
       EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme); //CO20170601
       tokens.clear();
-      apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
+      aurostd::string2tokens(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
       if (tokens.size() != 3) {
         //ME20191031 - use xerror
         //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1");
@@ -1326,7 +1321,7 @@ namespace KBIN {
       SCQHA_DISTORTION=SCQHA_DISTORTION_OPTION.content_double;
       if (SCQHA_DISTORTION_OPTION.isentry) {
         tokens.clear();
-        apl::tokenize(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
+        aurostd::string2tokens(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
         if (tokens.size() != 1) {
           //ME20190131 - use xerror
           //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.");
@@ -1531,43 +1526,14 @@ namespace KBIN {
     // Reading failed - calculate
     if (!awakeHarmIFCs) {
       // Set up calculator
-      auto_ptr<apl::ForceConstantCalculator> fccalc;
-      if (USER_ENGINE == string("DM")) {
-        apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, messageFile, oss);
-        fccalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
-        fccalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
-        fccalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
-        fccalcdm->setDistortionINEQUIVONLY(USER_DISTORTIONS_INEQUIVONLY); //CO20190131
-        fccalcdm->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
-        fccalcdm->setCalculateZeroStateForces(USER_ZEROSTATE);
-        fccalc.reset(fccalcdm);
-        fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
-      } //CO20200106 - patching for auto-indenting
-      //CO generally redirects to DM, the distinction between DM and GSA is obsolete
-      //else if (USER_ENGINE == string("GSA")) {
-      //  apl::GeneralizedSupercellApproach* gsa = new apl::GeneralizedSupercellApproach(supercell, strPair, xinput, aflags, kflags, xflags, logger);//xvasp, aflags, kflags, vflags, logger);  //Modified JJPR
-      //  //gsa->setGeneratePlusMinus(USER_DISTORTIONS_PLUS_MINUS_OPTION.option); //CO auto
-      //  gsa->setGeneratePlusMinus(AUTO_DISTORTIONS_PLUS_MINUS_OPTION.option, USER_DISTORTIONS_PLUS_MINUS_OPTION.option);  //CO auto
-      //  gsa->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY_OPTION.option);
-      //  gsa->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
-      //  gsa->setTensor(CALCULATE_TCOND_OPTION.option);  // TCOND JJPR
-      //  gsa->setSumRule(USER_EPS_SUM);           // TCOND JJPR
-      //  //phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE_OPTION.option);
-      //  phcalc.reset(gsa);
-      //  } //CO20200106 - patching for auto-indenting
-      else {
-        fccalc.reset(new apl::LinearResponsePC(supercell, messageFile, oss));
-        fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
-      }
-      // Run calculations
-      fccalc->setDirectory(aflags.Directory);
-      apl_stagebreak = fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, AflowIn);
-      fccalc->saveState(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
+      apl::ForceConstantCalculator fccalc(supercell, aplopts, messageFile, oss);
+      apl_stagebreak = fccalc.runVASPCalculations(xinput, aflags, kflags, xflags, AflowIn);
+      fccalc.saveState(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!apl_stagebreak) {
-        apl_stagebreak = !(fccalc->run());
+        apl_stagebreak = !(fccalc.run());
         if (!apl_stagebreak) {
-          if (USER_HIBERNATE) fccalc->hibernate();
-          phcalc.setHarmonicForceConstants(*fccalc);
+          if (USER_HIBERNATE) fccalc.hibernate();
+          phcalc.setHarmonicForceConstants(fccalc);
         }
       }
     }
@@ -1585,7 +1551,6 @@ namespace KBIN {
         CALCULATE_QHA3P_OPTION.option || CALCULATE_QHA3P_A_OPTION.option || CALCULATE_QHA3P_B_OPTION.option || CALCULATE_QHA3P_C_OPTION.option)
     {
       pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, messageFile, oss));
-      pheos->setDirectory(aflags.Directory);
 
       pheos->setGP(CALCULATE_GRUNEISEN_OPTION.option, CALCULATE_GRUNEISEN_A_OPTION.option, CALCULATE_GRUNEISEN_B_OPTION.option, CALCULATE_GRUNEISEN_C_OPTION.option);
       if( CALCULATE_SCQHA_OPTION.option || CALCULATE_SCQHA_A_OPTION.option || CALCULATE_SCQHA_B_OPTION.option || CALCULATE_SCQHA_C_OPTION.option )
@@ -1840,7 +1805,7 @@ namespace KBIN {
       //     try {
       // Convert format to machine representation
       tokens.clear();
-      apl::tokenize(USER_FREQFORMAT, tokens, string(" |:;,"));
+      aurostd::string2tokens(USER_FREQFORMAT, tokens, string(" |:;,"));
       for (uint i = 0; i < tokens.size(); i++) {
         if (tokens.at(i) == string("OMEGA")) {
           frequencyFormat |= apl::OMEGA;

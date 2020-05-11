@@ -27,39 +27,8 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 //#define _AFLOW_APL_REGISTER_ register   // register ?
 #define _AFLOW_APL_REGISTER_
 
-// Create the version of GCC, we will uset it for multithread parts of code,
-// to check if the current compiling version of gcc is able to compile the
-// std::thead features
-#ifndef GCC_VERSION
-#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
-
 //ME20190219 - Define the checksum algorithm used for APL hibernate files
 #define APL_CHECKSUM_ALGO  string("Fletcher32")
-
-// Basic objects ...
-// ***************************************************************************
-// "aplexcept.h"
-// in aurostd.h // [OBSOLETE]
-// ME20200222 - APLStageBreak obsolete
-//[OBSOLETE] #include <stdexcept>
-//[OBSOLETE] namespace apl {
-//[OBSOLETE]   //
-//[OBSOLETE]   // OBSOLETE ME20191031 - use xerror
-//[OBSOLETE]   //class APLRuntimeError : public std::runtime_error {
-//[OBSOLETE]   // public:
-//[OBSOLETE]   //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
-//[OBSOLETE]   //};
-//[OBSOLETE]   //class APLLogicError : public std::logic_error {
-//[OBSOLETE]   // public:
-//[OBSOLETE]   //  APLLogicError(const std::string& s) : std::logic_error(s) {}
-//[OBSOLETE]   //};
-//[OBSOLETE]   //
-//[OBSOLETE]   class APLStageBreak : public std::exception {
-//[OBSOLETE]     public:
-//[OBSOLETE]       APLStageBreak() {}
-//[OBSOLETE]   };
-//[OBSOLETE] }
 
 // ***************************************************************************
 // "logger.h"
@@ -156,35 +125,6 @@ namespace apl {
   Logger& setformat(Logger&, const char*);
   LMANIP<const char*> sf(const char*);
 }  // namespace APL
-
-// ***************************************************************************
-// "hroutines.h"
-// in aurostd.h // [OBSOLETE]
-#include <typeinfo>
-
-namespace apl {
-  template <typename T>
-    inline std::string stringify(const T& x) {
-      std::ostringstream o;
-      if (!(o << x)) {
-        //ME20191031 - use xerror
-        //throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
-      }
-      return o.str();
-    }
-  //ME20190219 BEGIN
-  //[OBSOLETE] vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20180801
-  void tokenize(const string& strin, vector<string>& tokens, const string& del);
-  //[OBSOLETE] string getVASPVersionString(const string&);
-  //[OBSOLETE] unsigned int getFileCheckSum(const string&);
-  //[OBSOLETE] void printXVector(const xvector<double>&, bool = true);
-  //[OBSOLETE] void printXVector(const xvector<xcomplex<double> >&);
-  //[OBSOLETE] void printXMatrix(const xmatrix<double>&);
-  //[OBSOLETE] void printXMatrix(const xmatrix<xcomplex<double> >&);
-  //[OBSOLETE] void printXMatrix2(const xmatrix<xcomplex<double> >&);
-  //ME20190219 END
-}  // namespace apl
 
 // ***************************************************************************
 // ***************************************************************************
@@ -749,11 +689,13 @@ namespace apl {
 namespace apl {
   class ForceConstantCalculator : public xStream {
     protected:
-      // Aflow's stuff required for running some routines
       Supercell* _supercell;
+    private:
       bool _sc_set;
+      bool _initialized;
 
       vector<_xinput> xInputs;
+      string _method;
 
       // Calculate forces at no distortion - since for some structure
       // (not well relaxed, or with other problems) these forces have to be
@@ -768,79 +710,35 @@ namespace apl {
       vector<xmatrix<double> > _bornEffectiveChargeTensor;
       // Dielectric tensor
       xmatrix<double> _dielectricTensor;
-      string _directory;
 
-      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
-      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
-
-    private:
       void free();
       void copy(const ForceConstantCalculator&);
 
-      virtual bool calculateForceConstants() {return false;} // ME20200211
-
+      // Force constants
+      bool runVASPCalculationsDM(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+      bool runVASPCalculationsLR(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+      bool calculateForceConstants(); // ME20200211
+      bool calculateForceConstantsDM();
+      bool readForceConstantsFromVasprun(_xinput&);
       void symmetrizeForceConstantMatrices();
       void correctSumRules();
-
-      void writeHarmonicIFCs(const string&);
-      void writeBornChargesDielectricTensor(const string&);
-
-      // Born charges + dielectric tensor
-      void readBornEffectiveChargesFromAIMSOUT(void);
-      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
-      void symmetrizeBornEffectiveChargeTensors(void);
-      void readDielectricTensorFromAIMSOUT(void);
-      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
 
       //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
       //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
 
-    public:
-      ForceConstantCalculator(ostream& oss=std::cout);
-      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
-      ForceConstantCalculator(const ForceConstantCalculator&);
-      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
-      virtual ~ForceConstantCalculator() {};
-      void clear(Supercell&);
-
-      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&) {return false;};  // ME20191029
-      void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
-
-      bool run();  // ME20191029
-      void hibernate();
-
-      const vector<vector<xmatrix<double> > >& getForceConstants() const;
-      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
-      const xmatrix<double>& getDielectricTensor() const;
-      bool isPolarMaterial() const;
-      const string& getDirectory() const;
-      void setDirectory(const string&);
-
-      virtual void saveState(const string&) {}  // ME20200112
-      virtual void readFromStateFile(const string&) {};  // ME20200112
-  };
-}
-
-// ***************************************************************************
-// "dirphoncalc.h"
-namespace apl {
-  class DirectMethodPC : public ForceConstantCalculator {
-    private:
-      //bool GENERATE_PLUS_MINUS;  //JAHNATEK ORIGINAL
-      //CO START
+      // Direct method
       bool AUTO_GENERATE_PLUS_MINUS;
       bool USER_GENERATE_PLUS_MINUS;
-      //CO END
       bool GENERATE_ONLY_XYZ;
       bool DISTORTION_SYMMETRIZE; //CO20190108
       double DISTORTION_MAGNITUDE;
       bool DISTORTION_INEQUIVONLY; //CO20190108
-      string zerostate_dir;  // ME20191030
       // For each inequivalent atom, there is a set of unique distortions
       vector<vector<xvector<double> > > _uniqueDistortions;
       // For each inequivalent atom and unique distortion, there is a field
       // of forces (for each atom of the supercell)
       vector<vector<vector<xvector<double> > > > _uniqueForces;
+      vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
 
       void estimateUniqueDistortions(const xstructure&,
           vector<vector<xvector<double> > >&);
@@ -849,46 +747,49 @@ namespace apl {
           vector<xvector<double> >&,
           bool integrate_equivalent_distortions=true);  //CO20190114
       bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
-
-    public:
-      DirectMethodPC(ostream& oss=std::cout);
-      DirectMethodPC(Supercell&, ofstream&, ostream& os=std::cout);
-      DirectMethodPC(const DirectMethodPC&);
-      DirectMethodPC& operator=(const DirectMethodPC&);
-      ~DirectMethodPC();
-      void clear(Supercell&);
-
-      // Easy access to global parameters
-      //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
-      void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
-      void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO20190108
-      void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
-      void setGeneratePlusMinus(bool _auto_, bool _user_) {
-        AUTO_GENERATE_PLUS_MINUS = _auto_;
-        USER_GENERATE_PLUS_MINUS = _user_;
-      }  //CO
-      void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
-      void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
-
-      //void writeFORCES();  // OBSOLETE ME20200504 - not used
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-      //void writeXCrysDenForces();  // OBSOLETE ME20200504 - not used
-      void saveState(const string&);  // ME20200212
-      void readFromStateFile(const string&);  // ME20200212
-
-    private:
-      void copy(const DirectMethodPC&);
-      void free();
-      vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
-      bool calculateForceConstants();  // ME20200211
       bool calculateForceFields();  // ME20190412  //ME20191029
       void completeForceFields();
       void projectToCartesianDirections();
       void buildForceConstantMatrices();
 
-      void writeDYNMAT();
+      // Born charges + dielectric tensor
+      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
+      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
+      void readBornEffectiveChargesFromAIMSOUT(void);
+      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
+      void symmetrizeBornEffectiveChargeTensors(void);
+      void readDielectricTensorFromAIMSOUT(void);
+      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
+
+    public:
+      ForceConstantCalculator(ostream& oss=std::cout);
+      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(Supercell&, const aurostd::xoption&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(const ForceConstantCalculator&);
+      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
+      ~ForceConstantCalculator();
+      void clear(Supercell&);
+      void initialize(const aurostd::xoption&);
+
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+
+      bool run();  // ME20191029
+      void hibernate();
+
+      const vector<vector<xmatrix<double> > >& getForceConstants() const;
+      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
+      const xmatrix<double>& getDielectricTensor() const;
+      bool isPolarMaterial() const;
+
+      string _directory;
+
+      void writeHarmonicIFCs(const string&);
+      void writeBornChargesDielectricTensor(const string&);
+      void writeDYNMAT(const string&);
+      void saveState(const string&);  // ME20200112
+      void readFromStateFile(const string&);  // ME20200112
   };
-}  // namespace apl
+}
 
 //PN START
 // ***************************************************************************
@@ -1004,44 +905,6 @@ namespace apl {
   };
 }
 // ***************************************************************************
-
-// ***************************************************************************
-// "lrphoncalc.h"
-namespace apl {
-  class LinearResponsePC : public ForceConstantCalculator {
-    private:
-      void free();
-      void copy(const LinearResponsePC&);
-      bool runVASPCalculationsDFPT(_xinput&, _aflags&, _kflags&, _xflags&, string&);  //ME20190113  // ME20200213 - changed name
-      bool readForceConstantsFromVasprun(_xinput&);  //ME20200211
-      bool calculateForceConstants();  //ME20200211
-
-    public:
-      LinearResponsePC(ostream& oss=std::cout);
-      LinearResponsePC(Supercell&, ofstream&, ostream& os=std::cout);
-      LinearResponsePC(const LinearResponsePC&);
-      LinearResponsePC& operator=(const LinearResponsePC&);
-      ~LinearResponsePC();
-      void clear(Supercell&);
-
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-      void saveState(const string&);  //ME20200212
-      void readFromStateFile(const string&); //ME20200212
-  };
-}  // namespace apl
-
-// ***************************************************************************
-// "gsa.h"
-
-//CO generally redirects to DM, the distinction between DM and GSA is obsolete
-namespace apl {
-  class GeneralizedSupercellApproach : public DirectMethodPC {
-    public:
-      GeneralizedSupercellApproach(Supercell&, ofstream&, ostream& os=std::cout);
-      ~GeneralizedSupercellApproach();
-      void clear();
-  };
-}  // namespace apl
 
 // QMesh definition has to come before PhononCalculator
 namespace apl {
