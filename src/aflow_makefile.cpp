@@ -14,6 +14,7 @@
 #include "aflow_makefile.h"
 
 #define _DEBUG_MAKEFILE_ true
+#define EXCLUDE_DATA true
 
 namespace makefile {
   void trimPath(string& filename){
@@ -384,7 +385,7 @@ namespace makefile {
             if(file.find("_LOCAL_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;}  //continue, we don't want these in vaflow_deps
             if(file.find("_BACKUP_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vaflow_deps
             //remove anything with aflow_data
-            if(file.find("aflow_data")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;} //continue, we don't want these in vaflow_deps
+            if(EXCLUDE_DATA){if(file.find("aflow_data")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;}} //continue, we don't want these in vaflow_deps
             //skip misc cpp files
             if(file=="aflow_nomix.2014-01-15.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;} //continue, we don't want these in vaflow_deps  //no reason why we have this file in the build
             if(file=="aflow_xproto_gus_lib.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
@@ -423,8 +424,10 @@ namespace makefile {
     for(i=0;i<vfiles.size();i++){
       if(vvdependencies[i].empty()){continue;} //we will define generic one at the end
       obj_file=vfiles[i];aurostd::StringSubst(obj_file,".cpp",".o");
-      vobj_files.push_back(obj_file);
-      vaflow_deps.push_back(obj_file);
+      if(vfiles[i].find("aflow_data")==string::npos){ //CO20200508 - do not include anything for aflow_data in aflow dependencies
+        vobj_files.push_back(obj_file);
+        vaflow_deps.push_back(obj_file);
+      }
       //[not a good idea, circular flow of information]if(!aurostd::FileExist(obj_file)){continue;}  //since we can only run this code once aflow is compiled, we can check that the obj_file is a real target or not
       makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS) $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")
@@ -434,11 +437,11 @@ namespace makefile {
     if(!aurostd::WithinList(vobj_files,"aflow_gnuplot_funcs.cpp")){vobj_files.push_back("aflow_gnuplot_funcs.cpp");}  //safety
     
     stringstream makefile_definitions_ss;
-    if(vaflow_deps.size()){makefile_definitions_ss << "DEPS_ALL=" << aurostd::joinWDelimiter(vaflow_deps," ") << endl;}  //SC variables - hack
-    if(vobj_files.size()){makefile_definitions_ss << "OBJS_ALL=" << aurostd::joinWDelimiter(vobj_files," ") << endl;}  //SC variables - hack
-    if(vcpp_aurostd.size()){makefile_definitions_ss << "AUROSTD_CPP=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
-    if(vhpp_aurostd.size()){makefile_definitions_ss << "AUROSTD_HPP=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
-    if(vhpp_aflow.size()){makefile_definitions_ss << "AFLOW_HPP=" << aurostd::joinWDelimiter(vhpp_aflow," ") << endl;} //SC variables - hack
+    if(vaflow_deps.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vaflow_deps," ") << endl;}  //SC variables - hack
+    if(vobj_files.size()){makefile_definitions_ss << "AFLOW_OBJS=" << aurostd::joinWDelimiter(vobj_files," ") << endl;}  //SC variables - hack
+    if(vhpp_aflow.size()){makefile_definitions_ss << "AFLOW_HPPS=" << aurostd::joinWDelimiter(vhpp_aflow," ") << endl;} //SC variables - hack
+    if(vcpp_aurostd.size()){makefile_definitions_ss << "AUROSTD_CPPS=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
+    if(vhpp_aurostd.size()){makefile_definitions_ss << "AUROSTD_HPPS=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
 
     //join together
     stringstream makefile_aflow;

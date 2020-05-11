@@ -117,9 +117,9 @@ SQLITE_OPTS=-DSQLITE_THREADSAFE=1
 # /opt/intel/mkl100/lib/32/libguide.a
 
 #CO20200508 START - FIGURE OUT HOW TO GET RID OF THESE
-#AUROSTD_CPP = ./AUROSTD/aurostd.cpp ./AUROSTD/aurostd_main.cpp ./AUROSTD/aurostd_argv.cpp ./AUROSTD/aurostd_xoption.cpp ./AUROSTD/aurostd_boot.cpp ./AUROSTD/aurostd_crc64.cpp ./AUROSTD/aurostd_xscalar.cpp ./AUROSTD/aurostd_xcomplex.cpp ./AUROSTD/aurostd_xvector.cpp ./AUROSTD/aurostd_xmatrix.cpp ./AUROSTD/aurostd_xtensor.cpp ./AUROSTD/aurostd_xcombos.cpp ./AUROSTD/aurostd_xerror.cpp
-#AUROSTD_HPP = ./AUROSTD/aurostd.h ./AUROSTD/aurostd_argv.h ./AUROSTD/aurostd_xcomplex.h ./AUROSTD/aurostd_xmatrix.h ./AUROSTD/aurostd_xoption.h ./AUROSTD/aurostd_xrandom.h ./AUROSTD/aurostd_xscalar.h ./AUROSTD/aurostd_xtensor.h ./AUROSTD/aurostd_xvector.h ./AUROSTD/aurostd_xcombos.h AUROSTD/aurostd_xerror.h
-#AFLOW_HPP = aflow.h aflow_pflow.h aflow_agl_debye.h aflow_apennsy.h aflow_chull.h aflow_pocc.h aflow_pocc_old.h aflow_cce.h aflow_xgndstate.h aflow_xphases.h aflow_xvaspin.h APL/aflow_apl.h APL/aflow_qha_operations.h
+#AUROSTD_CPPS = ./AUROSTD/aurostd.cpp ./AUROSTD/aurostd_main.cpp ./AUROSTD/aurostd_argv.cpp ./AUROSTD/aurostd_xoption.cpp ./AUROSTD/aurostd_boot.cpp ./AUROSTD/aurostd_crc64.cpp ./AUROSTD/aurostd_xscalar.cpp ./AUROSTD/aurostd_xcomplex.cpp ./AUROSTD/aurostd_xvector.cpp ./AUROSTD/aurostd_xmatrix.cpp ./AUROSTD/aurostd_xtensor.cpp ./AUROSTD/aurostd_xcombos.cpp ./AUROSTD/aurostd_xerror.cpp
+#AUROSTD_HPPS = ./AUROSTD/aurostd.h ./AUROSTD/aurostd_argv.h ./AUROSTD/aurostd_xcomplex.h ./AUROSTD/aurostd_xmatrix.h ./AUROSTD/aurostd_xoption.h ./AUROSTD/aurostd_xrandom.h ./AUROSTD/aurostd_xscalar.h ./AUROSTD/aurostd_xtensor.h ./AUROSTD/aurostd_xvector.h ./AUROSTD/aurostd_xcombos.h AUROSTD/aurostd_xerror.h
+#AFLOW_HPPS = aflow.h aflow_pflow.h aflow_agl_debye.h aflow_apennsy.h aflow_chull.h aflow_pocc.h aflow_pocc_old.h aflow_cce.h aflow_xgndstate.h aflow_xphases.h aflow_xvaspin.h APL/aflow_apl.h APL/aflow_qha_operations.h
 #AFLOWLIB_HPP = aflowlib.h
 #CO20200508 STOP - FIGURE OUT HOW TO GET RID OF THESE
 
@@ -139,7 +139,7 @@ MFS=Makefile Makefile.aflow
 all: aflow aflow_data 
 	$(MAKE) check
 include Makefile.aflow
-aflow: $(SQLITE_OBJ) $(DEPS_ALL) $(MFS) 
+aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS) 
 #	$(MAKE) -C ../AFLOW2_FREE/EXTRA/APL2AGR/ && cd ../../
 #	cp -f aflow_apl*.o  aflow_aapl*.o  aflow_qha*.o ./APL/
 #	cp -f aflow_anrl*.o ./ANRL/
@@ -147,7 +147,7 @@ aflow: $(SQLITE_OBJ) $(DEPS_ALL) $(MFS)
 #	$(CPP) $(LIBS_AFLOW) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW)
 #	$(CPP) $(LIBS_AFLOW) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW)
 	@echo "linking aflow*.o"
-	@$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW)
+	@$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(AFLOW_OBJS) $(LIB_MKL) $(LIBS_AFLOW)
 	ln -sf aflow aflowd
 	ln -sf aflow apennsy
 .PHONY: static_no_pdf
@@ -159,7 +159,7 @@ static_no_pdf: aflow aflow_data
 	rm -f aflow
 #	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW_STATIC)
 #	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW_STATIC)
+	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow $(SQLITE_OBJ) $(AFLOW_OBJS) $(LIB_MKL) $(LIBS_AFLOW_STATIC)
 	rm -f aflow_data
 #	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.cpp $(LIBS_STATIC)
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(LIBS_STATIC)
@@ -189,7 +189,7 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 #	$(CC) $(SQLITE_OPTS) -c $<
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
-.cpp.o: .cpp .h $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
+.cpp.o: .cpp .h $(MFS) $(AFLOW_HPPS) $(AUROSTD_HPPS) $(AUROSTD_CPPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
@@ -648,13 +648,14 @@ aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_dat
 	if [ -f ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz ]; then xzcat  ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp; fi
 	if [ -f ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz ]; then echo "\";" >> aflow_data_extra.cpp; fi
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -c $<
+	$(MAKE) aflow_data.o
+#	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""aflow_data.cpp"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_data.cpp -c -o aflow_data.o
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o
 .PHONY: data
 data: aflow_data
 .PHONY: amir
-amir:	aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp aflow_data_extra.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -DICSD -o aflow_data aflow_data.cpp
+amir:	aflow_data.cpp aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data_extra.cpp
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -DICSD -o aflow_data $<
 ###################################################################################################
 
 ###################################################################################################
@@ -696,17 +697,17 @@ aflow_gnuplot_funcs.cpp: Makefile
 ###################################################################################################
 
 ###################################################################################################
-aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
-aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
 ###################################################################################################
 
 ###################################################################################################
 #HTRESOURCES
-aflow_contrib_stefano_htcurriculum.o: aflowlib.h $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+aflow_contrib_stefano_htcurriculum.o: aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
-aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp aflowlib.h $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
 ###################################################################################################
 
@@ -777,7 +778,7 @@ aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_CHULL_PYTHON_CPP_" >> $@
 #MB 190301 - END
-aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
+aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
 	rm -rf $@
