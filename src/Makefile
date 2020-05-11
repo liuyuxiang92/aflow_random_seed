@@ -134,6 +134,7 @@ SQLITE_OBJ=$(SQLITE_C:.c=.o)
 MFS=Makefile Makefile.aflow
 
 #CO20200508 - all MUST come first
+.PHONY: all
 all: aflow aflow_data 
 	$(MAKE) check
 include Makefile.aflow
@@ -179,7 +180,7 @@ mac:
 
 ###################################################################################################
 #CO201706147
-$(SQLITE_OBJ): $(SQLITE_C)
+$(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CC) $(SQLITE_OPTS) -c $< -o $@
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
@@ -187,40 +188,40 @@ $(SQLITE_OBJ): $(SQLITE_C)
 #	$(CC) $(SQLITE_OPTS) -c $<
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
-.cpp.o: .cpp $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(@:.o=.cpp) -c
+.cpp.o: .cpp .h $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
 
 ###################################################################################################
 .PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
-apl2agr:
+apl2agr: Makefile
 	@echo "MAKING APL2AGR"
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/apl2agr ] && [ -d ../AFLOW3_NONFREE/BIN ]; then cp $(EXTRA_FREE)/APL2AGR/apl2agr ../AFLOW3_NONFREE/BIN; fi
-subst:
+subst: Makefile
 	@echo "MAKING SUBST"
 	if [ -f $(EXTRA_FREE)/SUBST/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/SUBST clean; fi
 	if [ -f $(EXTRA_FREE)/SUBST/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/SUBST; fi
 	if [ -f $(EXTRA_FREE)/SUBST/subst ] && [ -d ../AFLOW3_NONFREE/BIN ]; then cp $(EXTRA_FREE)/SUBST/subst ../AFLOW3_NONFREE/BIN; fi
-findsym:
+findsym: Makefile
 	@echo "MAKING FINDSYM"
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/findsym ]; then cp ../AFLOW3_NONFREE/EXTRA/FINDSYM/findsym ../AFLOW3_NONFREE/BIN; fi
-frozsl:
+frozsl: Makefile
 	@echo "MAKING FROZSL"
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/frozsl ]; then cp ../AFLOW3_NONFREE/EXTRA/FROZSL/frozsl ../AFLOW3_NONFREE/BIN; fi
-platon:
+platon: Makefile
 	@echo "MAKING PLATON"
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/PLATON/51108 clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/PLATON/51108; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/platon ]; then cp ../AFLOW3_NONFREE/EXTRA/PLATON/51108/platon ../AFLOW3_NONFREE/BIN; fi
-enum:
+enum: Makefile
 	@echo "MAKING ENUM"
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS; fi
 .PHONY: extra_clean
@@ -233,7 +234,7 @@ extra_clean:
 ###################################################################################################
 
 ###################################################################################################
-aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
+aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT Makefile
 	$(MAKE) aflow -j 16
 	rm -rf aflow_library_icsd.dat
 	echo "[AFLOW] aflow_library_icsd.dat  " >> aflow_library_icsd.dat
@@ -275,7 +276,7 @@ aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/READ
 	./aflow --protos_icsd > $(EXTRA_FREE)/NIST/ICSD_List_2014.txt
 	rm -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz
 	xz -9vf $(EXTRA_FREE)/NIST/ICSD_List_2014.txt
-$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD1.TXT.xz >>$@
@@ -283,7 +284,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD2.TXT.xz >>$@
@@ -291,7 +292,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD3.TXT.xz >>$@
@@ -299,7 +300,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD4.TXT.xz >>$@
@@ -307,7 +308,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD5.TXT.xz >>$@
@@ -315,7 +316,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD6.TXT.xz >>$@
@@ -323,7 +324,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD7.TXT.xz >>$@
@@ -331,7 +332,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD8.TXT.xz >>$@
@@ -339,7 +340,7 @@ $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT:
 	echo " STRUCTURE ___PROTO_END___">>$@
 	echo " END">>$@
 	echo "// ***************************************************************************">>$@
-$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT:
+$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
 	xzcat $(NIST_LIB)/README_LIBRARY_ICSD9.TXT.xz >>$@
@@ -596,7 +597,7 @@ aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT R
 	cat README_AFLOW_AFLOWRC.TXT | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_README_CPP_" >> $@
-aflow_data_extra.cpp: Makefile aflow_library_icsd.dat.xz
+aflow_data_extra.cpp: aflow_library_icsd.dat.xz Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_DATA_EXTRA_CPP_" >> $@
 	echo "#define _AFLOW_DATA_EXTRA_CPP_" >> $@
@@ -617,7 +618,7 @@ aflow_data_extra.cpp: Makefile aflow_library_icsd.dat.xz
 	echo "std::string icsd_14_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/14-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
 	echo "std::string icsd_15_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/15-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> $@
-#	echo "std::string Library_ICSD=\"\\" >> $@ && xzcat  ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+#	echo "std::string Library_ICSD=\"\\" >> $@ && xzcat  ../AFLOW3_NONFREE/LIBS/$< | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
 #	MAKE aflow_data_libraries.cpp, do not make another rule, aflow_data_libraries.cpp is already a rule
 	rm -rf aflow_data_libraries.cpp
 	echo "#ifndef _AFLOW_DATA_LIBRARIES_CPP_" >> aflow_data_libraries.cpp
@@ -636,7 +637,7 @@ aflow_data_extra.cpp: Makefile aflow_library_icsd.dat.xz
 	echo "std::string aflowlib_icsd=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_icsd.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp
 	echo "#endif  //  _AFLOW_DATA_LIBRARIES_CPP_" >> aflow_data_libraries.cpp
 #aflow_data: aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
-aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_data_libraries.o aflow_data_stokes.o aflow_data_nist.o aflow_data_latex.o aflow_data_aflow_potcars.o
+aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_data_libraries.o aflow_data_stokes.o aflow_data_nist.o aflow_data_latex.o aflow_data_aflow_potcars.o Makefile
 	rm -f aflow_data_extra.cpp
 	echo "#ifndef _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	echo "#define _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
@@ -1053,7 +1054,7 @@ send_version_updates_email:
 	rm -f version_updates_email.txt
 #CO190131 - STOP
 #CO190218 - START
-version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT
+version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	rm -f $(@:.txt=_tmp.txt)
 	@file_content=""; \
 	found_content=false; \
