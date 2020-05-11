@@ -20,7 +20,7 @@ namespace makefile {
   void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
   void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
   void updateDependenciesAUROSTD(vector<string>& vdependencies);
-  void buildDependencies(const string& directory=".");
+  void createMakefileAFLOW(const string& directory=".");
 }
 
 #endif  // _AFLOW_MAKEFILE_CPP_

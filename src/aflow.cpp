@@ -331,6 +331,7 @@ int main(int _argc,char **_argv) {
 
     bool Arun=FALSE;
     if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--generate_makefile|--makefile"))  {Arun=TRUE;makefile::createMakefileAFLOW(".");}  //CO20200508 - if calling from command-line, you should be sitting inside aflow directory (will write out Makefile.aflow)
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {
       if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
       return 1;
@@ -409,12 +410,6 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
     
-      //vector<string> files_already_explored,dfiles;
-      //makefile::getDependencies("aflow.h",files_already_explored,dfiles);
-      makefile::buildDependencies(".");
-
-      exit(1);
-
       if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - aflow.cpp:main: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
