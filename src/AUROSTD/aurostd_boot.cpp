@@ -261,6 +261,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
   vv=pointLineIntersection(v,v,v); //CO20190520
   double dist;vv=linePlaneIntersect(v,v,v,v,dist,w); //CO20190520
+  vv=getVectorProjection(v,w);vvvv=getModeratedVectorProjection(vv,v,w);vv=getVectorConvolution(v,w); //ME20200511
   getGeneralNormal(vxv);
   v=aurostd::args2xvectorutype<utype>(vstring,c,v);v=aurostd::args2xvectorutype<utype>(vstring,c,i);
   aurostd::args2vectorutype<utype>(vstring,c);aurostd::args2dequeutype<utype>(dstring,c);

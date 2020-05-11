@@ -127,19 +127,10 @@ namespace apl {
 }  // namespace APL
 
 // ***************************************************************************
-// ***************************************************************************
 // BEGIN ME: Anharmonic Force Constants (AAPL)
 // ***************************************************************************
 
 namespace apl {
-  // Options for anharmonic IFC calculations
-  // OBSOLETE ME20190501 - Replaced with xoption
-  //struct _anharmonicIFCOptions {
-  //  int max_iter;
-  //  double sumrule_threshold;
-  //  double mixing_coefficient;
-  //};
-
   // _cluster holds a single cluster
   struct _cluster {
     vector<int> atoms;  // List of atoms inside the cluster
@@ -1146,18 +1137,7 @@ namespace apl {
 
 
 // ***************************************************************************
-
-//PN START
-// OBSOLETE, moved to .aflow.rc - ME20181024
-//#define AFLOW_APL_VASP_USE_LEPSILON
-//#undef AFLOW_APL_VASP_USE_LCALCEPS  // HAS some problem [PN]
-//PN END
-
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
 // Supplementary classes for calculation of dispersion curves and density of states
-
 // ***************************************************************************
 // "pathbuilder.h"
 namespace apl {
@@ -1287,9 +1267,6 @@ namespace apl { //PN20180705
 } // namespace apl
 
 // ***************************************************************************
-//ME20190417 END
-// ***************************************************************************
-// ***************************************************************************
 // "doscalc.h"
 namespace apl {
 #define MIN_FREQ_TRESHOLD -0.1  //in AMU
@@ -1351,39 +1328,6 @@ namespace apl {
       void free();
   };
 }  // namespace apl
-
-// ***************************************************************************
-// OBSOLETE ME20190423 - RootSamplingMethod and LinearTetrahedronMethod have
-// been integrated into DOSCalculator
-// "rsmdos.h"
-//namespace apl {
-//class RootSamplingMethod : public DOSCalculator {
-// public:
-//  RootSamplingMethod(IPhononCalculator&, IReciprocalPointGrid&, Logger&);
-//  ~RootSamplingMethod();
-//  void rawCalc(int);
-//};
-//}  // namespace apl
-//
-//// ***************************************************************************
-//// "ltetdos.h"
-//namespace apl {
-//class LinearTetrahedronMethod : public DOSCalculator {
-// private:
-//  double _weightVolumeOfEachTetrahedron;
-//  std::vector<std::vector<int> > _irrTetrahedraList;
-//  std::vector<int> _irrTetrahedraWeightList;
-//
-// private:
-//  void generateTetrahedras();
-//
-// public:
-//  LinearTetrahedronMethod(IPhononCalculator&, IReciprocalPointGrid&, Logger&);
-//  ~LinearTetrahedronMethod();
-//  void clear();
-//  void rawCalc(int);
-//};
-//}  // end namespace apl
 
 // ***************************************************************************
 // thermalpc.h
@@ -1454,19 +1398,6 @@ namespace apl {
 // ***************************************************************************
 
 namespace apl {
-  //[ME20190520 - MOVED UP]struct _qpoint {
-  //[ME20190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
-  //[ME20190520 - MOVED UP]  xvector<double> fpos;  // Fractional coordinates of the q-point
-  //[ME20190520 - MOVED UP]  xvector<int> indices;  // Indices of the q-point grid for this q-point
-  //[ME20190520 - MOVED UP]  int symop;  // Symmetry operation to transform into an irreducible q-point
-  //[ME20190520 - MOVED UP]};
-
-  //[ME20190520 - MOVED UP]struct _kcell {
-  //[ME20190520 - MOVED UP]  xmatrix<double> lattice;  // The reciprocal lattice vectors
-  //[ME20190520 - MOVED UP]  xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
-  //[ME20190520 - MOVED UP]  xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
-  //[ME20190520 - MOVED UP]  bool skewed;  // Is the lattice skewed?
-  //[ME20190520 - MOVED UP]};
 
   class TCONDCalculator {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
@@ -1553,34 +1484,6 @@ namespace apl {
 // END ME: Lattice Thermal Conductivity (AAPL)
 // ***************************************************************************
 
-// OBSOLETE - ME20190428 - all q-point grids are now described using the QMesh class
-//namespace apl
-//{
-//  class UniformMesh
-//  { //PN20180705
-//  private:
-//    Logger& _logger;
-//    vector<aurostd::xvector<double> > _kpoints;
-//    vector<double> _weights;
-//    vector<int> _sc_size;
-//    xmatrix<double> _rlattice;
-//    aurostd::xmatrix<double> _klattice;
-//    int _k_index;//k index at gamma ponit
-//    public:
-//     UniformMesh(Logger&);
-//    ~UniformMesh();
-//    void clear();
-//
-//    public:
-//        void create_uniform_mesh(int na, int nb, int nc, const xstructure& xs);
-//        vector<int> get_sc_size();
-//        vector<double> get_weights();
-//        vector<aurostd::xvector<double> > get_kpoints();
-//        xmatrix<double> get_rlattice();
-//        xmatrix<double> get_klattice();
-//        int get_k_index();
-//  };
-//}
 // ***************************************************************************
 //Functions in this class are used to calculate group velocities and related properties//
 namespace apl
@@ -2557,41 +2460,6 @@ namespace apl {
 }  // end namespace apl
 
 // ***************************************************************************
-// aplmath.h
-
-namespace aurostd {
-  // Calculate vector projection b on a
-  template <class utype>
-    xvector<utype> getVectorProjection(const xvector<utype>& b, const xvector<utype>& a) {
-      return (a * (utype)(scalar_product(a, b) / scalar_product(a, a)));
-    }
-  // Calculate vector projection c on a like b on a
-  template <class utype>
-    xvector<utype> getModeratedVectorProjection(const xvector<utype>& c, const xvector<utype>& b, const xvector<utype>& a) {
-      return (c * (utype)(scalar_product(a, b) / scalar_product(a, a)));
-    }
-  // Calculate vector convolution
-  template <class utype>
-    xvector<utype> getVectorConvolution(const xvector<utype>& a, const xvector<utype>& b) {
-      xvector<utype> v(a.rows);
-      for (int i = v.lrows; i <= v.urows; i++) {
-        v(i) = a(i) * b(i);
-      }
-      return (v);
-    }
-}
-
-
-//OBSOLETE - ME20190815 - moved to aurostd::xmatrix
-//[OBSOLETE] namespace apl {
-//[OBSOLETE]   //void tred2(xmatrix<xcomplex<double> >&);
-//[OBSOLETE]   void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
-//[OBSOLETE] #ifdef USE_MKL
-//[OBSOLETE]   void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
-//[OBSOLETE] #endif
-//[OBSOLETE] }
-
-// ***************************************************************************
 // cursor.h
 
 #define cursor_moveyx(y, x) printf("\033[%d;%dH", y, x) /*Move cursor to position y,x (rows, columns) with (1,1) as origin*/
@@ -2625,136 +2493,6 @@ namespace aurostd {
 #define cursor_attr_underline() printf("\033[4m") /*Underline text*/
 #define cursor_attr_blink() printf("\033[5m")     /*Supposed to make text blink, usually bolds it instead*/
 #define cursor_attr_reverse() printf("\033[7m")   /*Swap background and foreground colors*/
-
-// OBSOLETE ME20191031 - not used
-// ***************************************************************************
-// xtensor.hpp
-//
-//namespace apl {
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//class xtensor {
-//  T* _data;
-//  int _lindex;
-//  int _hindex;
-//  unsigned int _indexSize;
-//  unsigned long long _arraySize;
-//  std::vector<unsigned long long> _precomputedOffsets;
-//
-// private:
-//  unsigned long long getOffset(const std::vector<unsigned int>&);
-//
-// public:
-//  xtensor(int, int);
-//  ~xtensor();
-//  void zero();
-//  void fill(const T&);
-//  T& operator()(int, ...);
-//};
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//xtensor<T, TENSOR_ORDER>::xtensor(int index1, int index2) {
-//  _hindex = index1 > index2 ? index1 : index2;
-//  _lindex = index1 < index2 ? index1 : index2;
-//
-//  _indexSize = _hindex - _lindex + 1;
-//
-//  // Allocate data
-//  unsigned long long arraySizeBefore;
-//  _arraySize = 1ULL;
-//  _precomputedOffsets.push_back(_arraySize);
-//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER; i++) {
-//    arraySizeBefore = _arraySize;
-//    _arraySize *= _indexSize;
-//    // Detect overflow
-//    if (arraySizeBefore > _arraySize)
-//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); The setting is producing an array which can not by handled by this implementation.");
-//    _precomputedOffsets.push_back(_arraySize);
-//  }
-//
-//  try {
-//    // FIX: Problem; new(std::size_t), where size_t is hardware/platform specific,
-//    // for 32 bit systems it is uint = 2^32, if our array is bigger than this,
-//    // there is a overflow -> use more pages of the same block _data[PAGE][2^32]???,
-//    // or go to the 64 bits systems -> 2^64 (unsigned long long)
-//    if (_arraySize > (1ULL << (8 * sizeof(std::size_t) - 1)))  // dont go overboard  SC (-1)
-//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); Problem to allocate a required array. Hardware specific problem.");
-//    _data = new T[(std::size_t)_arraySize];
-//  } catch (std::bad_alloc& e) {
-//    throw APLRuntimeError("apl::xtensor<T>::xtensor(); Bad allocation.");
-//  }
-//
-//  // Reverse precomputed for better manipulation and shift by 1
-//  std::vector<unsigned long long> temp(_precomputedOffsets.rbegin() + 1, _precomputedOffsets.rend());
-//  _precomputedOffsets = temp;
-//  temp.clear();
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//xtensor<T, TENSOR_ORDER>::~xtensor() {
-//  _precomputedOffsets.clear();
-//  delete[] _data;
-//  _data = NULL;
-//  _arraySize = 0ULL;
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//void xtensor<T, TENSOR_ORDER>::zero() {
-//  // Take care! The last argument is of std::size_t, hence platform specific
-//  memset(_data, 0, _arraySize * sizeof(T));
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//void xtensor<T, TENSOR_ORDER>::fill(const T& val) {
-//  for (unsigned long long i = 0ULL; i < _arraySize; i++)
-//    _data[i] = val;
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//unsigned long long xtensor<T, TENSOR_ORDER>::getOffset(const std::vector<unsigned int>& idxs) {
-//  unsigned long long offset = idxs.back();
-//  for (_AFLOW_APL_REGISTER_ int i = idxs.size() - 2; i >= 0; i--)
-//    offset += (unsigned long long)(idxs[i] * _precomputedOffsets[i]);
-//  return offset;
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//T& xtensor<T, TENSOR_ORDER>::operator()(int idx1, ...) {
-//  // Get indices and transform to form 0...max
-//  va_list arguments;
-//  std::vector<unsigned int> idxs;
-//
-//  // The 1st index
-//  idxs.push_back((unsigned int)(idx1 - _lindex));
-//  //    if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-//  if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-//
-//  // The rest of indices
-//  va_start(arguments, idx1);
-//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER - 1; i++) {
-//    idxs.push_back((unsigned int)(va_arg(arguments, int) - _lindex));
-//    //   if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-//    if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-//  }
-//  va_end(arguments);
-//
-//  // Calculate offset
-//  unsigned long long offset = getOffset(idxs);
-//  idxs.clear();
-//
-//  // Return value
-//  return _data[offset];
-//}
-////////////////////////////////////////////////////////////////////////////////
-//}
-// ***************************************************************************
 
 #endif  // _AFLOW_APL_H_
 

@@ -1640,7 +1640,7 @@ namespace apl {
     // is non zero length -> is unique
     xvector<double> testDistortion = distortionVector;
     for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
-      testDistortion = testDistortion - getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
+      testDistortion = testDistortion - aurostd::getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
     }
     if (aurostd::modulus(testDistortion) > _AFLOW_APL_EPS_) {
       // Normalize vector
@@ -1658,7 +1658,7 @@ namespace apl {
         testDistortion = symPool[iSymOp].Uc * distortionVector;
 
         for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
-          testDistortion = testDistortion - getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
+          testDistortion = testDistortion - aurostd::getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
         }
         if (aurostd::modulus(testDistortion) > _AFLOW_APL_EPS_) {
           testDistortion = testDistortion / aurostd::modulus(testDistortion);
@@ -1861,9 +1861,9 @@ namespace apl {
             // Orthogonalize new rotated distortion vector on all accepted distortion vectors
             for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
               for (uint l = 0; l < _supercell->getNumberOfAtoms(); l++) {
-                testForce[l] = testForce[l] - getModeratedVectorProjection(forcePool[k][l], testVec, allDistortionsOfAtom[k]);
+                testForce[l] = testForce[l] - aurostd::getModeratedVectorProjection(forcePool[k][l], testVec, allDistortionsOfAtom[k]);
               }
-              testVec = testVec - getVectorProjection(testVec, allDistortionsOfAtom[k]);
+              testVec = testVec - aurostd::getVectorProjection(testVec, allDistortionsOfAtom[k]);
             }
 
             // If the remaining vector is non-zero length, it is new independent direction, hence store it...

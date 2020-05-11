@@ -2187,6 +2187,34 @@ namespace aurostd {
     }
 }
 
+//ME20200511 - vector projections (taken from old APL/aflow_apl.j)
+namespace aurostd {
+
+  // Calculate the vector projection of b on a
+  template<class utype> xvector<utype>
+    getVectorProjection(const xvector<utype>& b, const xvector<utype>& a) {
+      return (a * (utype)(scalar_product(a, b)/scalar_product(a, a)));
+    }
+
+  // Project vector c on a using the projection of b on a
+  template<class utype> xvector<utype>
+    getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a) {
+      return (c * (utype) (scalar_product(a, b)/scalar_product(a, a)));
+    }
+
+  template<class utype> xvector<utype>
+    getVectorConvolution(const xvector<utype>& a, const xvector<utype>& b) {
+      if (a.rows != b.rows) {
+        string function = "aurostd::getVectorConvolution():";
+        string message = "Vectors must have the same number of rows.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      xvector<utype> v(a.rows);
+      for (int i = 0; i < v.rows; i++) v[i + v.lrows] = a[i + a.lrows] * b[i + b.lrows];
+      return v;
+    }
+}
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------- simple sort routines
 
