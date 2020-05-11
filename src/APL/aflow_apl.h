@@ -14,7 +14,6 @@
 // Almost generally used precision in the whole apl, however, somewhere it is
 // hard coded based on the tests and it work much better...
 #define _AFLOW_APL_EPS_ 1E-6
-extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 
 // Aflow core libraries
 #include "../aflow.h"

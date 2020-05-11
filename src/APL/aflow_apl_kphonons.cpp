@@ -15,8 +15,6 @@
 #define _TMPDIR_ string("ARUN.APL.QH.TMP")  //[PN]
 #define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
-bool _WITHIN_DUKE_ = false;
-
 //CO fixing cpp version issues with auto_ptr (depreciated)
 #if __cplusplus >= 201103L
 template <typename T>
@@ -290,12 +288,6 @@ namespace KBIN {
           kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
           kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C || //PN20180717
           kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN20180705
-
-    //we make certain automatic fixes if we're within our domain, otherwise issue warning/error
-    //ME20190109 - OBSOLETE because this doesn't make any sense. The automatic fix that is applied is
-    // the VASP version, which can be done anywhere. Moreover, the hostname becomes the name of the node
-    //  whenever a job is sent to the queue.
-    //  ::_WITHIN_DUKE_ = (aurostd::substring2bool(XHOST.hostname, "nietzsche") || aurostd::substring2bool(XHOST.hostname, "aflowlib") || aurostd::substring2bool(XHOST.hostname, "qrats") || aurostd::substring2bool(XHOST.hostname, "habana") || aurostd::substring2bool(XHOST.hostname, "quser"));
 
     //determine if we have a consistent mode defined between input and flags
     if(xinput.AFLOW_MODE_VASP){
@@ -2137,9 +2129,6 @@ namespace KBIN {
             << "calculation of thermodynamic properties." << apl::endl;
         }
       }
-
-      // Clear old stuff
-      //delete dosc; //auto_ptr will do
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -2477,21 +2466,6 @@ namespace apl {
   }
 
 }  // namespace apl
-
-//////////////////////////////////////////////////////////////////////////////
-
-bool PHON_RunPhonons(const xstructure& _str,
-    _aflags& aflags,
-    const double& _radius,
-    const bool& osswrite, ostream& oss) {
-  bool Krun = FALSE;
-  oss << "not implemented" << endl;
-  if (0) {  // to avoid warnings
-    oss << _str << endl
-      << aflags.QUIET << _radius << osswrite << endl;
-  }
-  return Krun;
-}
 
 // ***************************************************************************
 // *                                                                         *

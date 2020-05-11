@@ -27,7 +27,7 @@ namespace apl {
     _log << std::setprecision(8) << std::fixed;
   }
   // ***************************************************************************************
-  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); xStream::free();}
+  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear();}
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::clear()
   {
