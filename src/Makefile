@@ -144,7 +144,8 @@ aflow: $(SQLITE_OBJ) $(DEPS_ALL) $(MFS)
 #	cp sqlite3.o ./SQLITE/
 #	$(CPP) $(LIBS_AFLOW) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW)
 #	$(CPP) $(LIBS_AFLOW) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW)
-	$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW)
+	@echo "linking aflow*.o"
+	@$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW)
 	ln -sf aflow aflowd
 	ln -sf aflow apennsy
 .PHONY: static_no_pdf
@@ -177,12 +178,13 @@ mac:
 
 
 ###################################################################################################
-$(SQLITE_OBJ): $(SQLITE_C)	#CO201706147
-	$(CC) $(SQLITE_OPTS) -c $^ -o $@
-#	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
-#	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $^ $(LIBS)
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-#	$(CC) $(SQLITE_OPTS) -c $^
+#CO201706147
+$(SQLITE_OBJ): $(SQLITE_C)
+	$(CC) $(SQLITE_OPTS) -c $< -o $@
+#	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
+#	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(CC) $(SQLITE_OPTS) -c $<
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
 .cpp.o: .cpp $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
@@ -194,32 +196,32 @@ $(SQLITE_OBJ): $(SQLITE_C)	#CO201706147
 .PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
 apl2agr:
-	echo "MAKING APL2AGR"
+	@echo "MAKING APL2AGR"
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/apl2agr ] && [ -d ../AFLOW3_NONFREE/BIN ]; then cp $(EXTRA_FREE)/APL2AGR/apl2agr ../AFLOW3_NONFREE/BIN; fi
 subst:
-	echo "MAKING SUBST"
+	@echo "MAKING SUBST"
 	if [ -f $(EXTRA_FREE)/SUBST/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/SUBST clean; fi
 	if [ -f $(EXTRA_FREE)/SUBST/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/SUBST; fi
 	if [ -f $(EXTRA_FREE)/SUBST/subst ] && [ -d ../AFLOW3_NONFREE/BIN ]; then cp $(EXTRA_FREE)/SUBST/subst ../AFLOW3_NONFREE/BIN; fi
 findsym:
-	echo "MAKING FINDSYM"
+	@echo "MAKING FINDSYM"
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/findsym ]; then cp ../AFLOW3_NONFREE/EXTRA/FINDSYM/findsym ../AFLOW3_NONFREE/BIN; fi
 frozsl:
-	echo "MAKING FROZSL"
+	@echo "MAKING FROZSL"
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/frozsl ]; then cp ../AFLOW3_NONFREE/EXTRA/FROZSL/frozsl ../AFLOW3_NONFREE/BIN; fi
 platon:
-	echo "MAKING PLATON"
+	@echo "MAKING PLATON"
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/PLATON/51108 clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/PLATON/51108; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/platon ]; then cp ../AFLOW3_NONFREE/EXTRA/PLATON/51108/platon ../AFLOW3_NONFREE/BIN; fi
 enum:
-	echo "MAKING ENUM"
+	@echo "MAKING ENUM"
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS; fi
 .PHONY: extra_clean
 extra_clean:
@@ -360,6 +362,7 @@ aflow_data_calculated.cpp: Makefile
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
+	touch $@
 aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT README_LIBRARY_HTQC_BORIDES.TXT README_LIBRARY_HTQC_CARBIDES.TXT Makefile
 	rm -f $@
 	echo "#ifndef _AFLOW_DATA_HTQC_CPP_" >> $@
@@ -391,34 +394,34 @@ aflow_data_libraries.cpp: Makefile
 	echo "#include <string>" >> $@
 #	echo "std::string aflowlib_icsd=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_icsd.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_icsd=\"\";" >> $@
-	echo "LIB0"
+	@echo "LIB0"
 #	echo "std::string aflowlib_lib0=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib0.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@	
 	echo "std::string aflowlib_lib0=\"\";" >> $@
-	echo "LIB1"
+	@echo "LIB1"
 #	echo "std::string aflowlib_lib1=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib1.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@	
 	echo "std::string aflowlib_lib1=\"\";" >> $@
-	echo "LIB2"
+	@echo "LIB2"
 #	echo "std::string aflowlib_lib2=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib2.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@	
 	echo "std::string aflowlib_lib2=\"\";" >> $@
-	echo "LIB3"
+	@echo "LIB3"
 #	echo "std::string aflowlib_lib3=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib3.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib3=\"\";" >> $@
-	echo "LIB4"
+	@echo "LIB4"
 #	echo "std::string aflowlib_lib4=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib4.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib4=\"\";" >> $@
-	echo "LIB5"
+	@echo "LIB5"
 #	echo "std::string aflowlib_lib5=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib5.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib5=\"\";" >> $@
-	echo "LIB6"
+	@echo "LIB6"
 #	echo "std::string aflowlib_lib6=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib6.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib6=\"\";" >> $@
-	echo "LIB7"
+	@echo "LIB7"
 #	echo "std::string aflowlib_lib7=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib7.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib7=\"\";" >> $@
-	echo "LIB8"
+	@echo "LIB8"
 #	echo "std::string aflowlib_lib8=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib8.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib8=\"\";" >> $@
-	echo "LIB9"
+	@echo "LIB9"
 #	echo "std::string aflowlib_lib9=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib9.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib9=\"\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_LIBRARIES_CPP_" >> $@
@@ -466,6 +469,7 @@ aflow_data_stokes.cpp: Makefile
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
+	touch $@
 aflow_data_nist.cpp: Makefile 
 	rm -rf $@
 	if [ -f $(EXTRA_FREE)/NIST/ElectronStoppingPower.txt.xz ]; then echo "// $@ automatic generated from NIST" >> $@ ; fi
@@ -486,6 +490,7 @@ aflow_data_nist.cpp: Makefile
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
+	touch $@
 aflow_data_aflow_potcars.cpp: Makefile 
 	rm -rf $@
 	echo "#ifndef _AFLOW_DATA_AFLOW_POTCARS_CPP_" >> $@
@@ -631,7 +636,7 @@ aflow_data_extra.cpp: Makefile aflow_library_icsd.dat.xz
 	echo "std::string aflowlib_icsd=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_icsd.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp
 	echo "#endif  //  _AFLOW_DATA_LIBRARIES_CPP_" >> aflow_data_libraries.cpp
 #aflow_data: aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
-aflow_data: aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_data_libraries.o aflow_data_stokes.o aflow_data_nist.o aflow_data_latex.o aflow_data_aflow_potcars.o aflow_data.cpp
+aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_data_libraries.o aflow_data_stokes.o aflow_data_nist.o aflow_data_latex.o aflow_data_aflow_potcars.o
 	rm -f aflow_data_extra.cpp
 	echo "#ifndef _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	echo "#define _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
@@ -641,7 +646,7 @@ aflow_data: aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_
 	if [ -f ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz ]; then xzcat  ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp; fi
 	if [ -f ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz ]; then echo "\";" >> aflow_data_extra.cpp; fi
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -c aflow_data.cpp
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -c $<
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o
 .PHONY: data
 data: aflow_data
@@ -670,6 +675,7 @@ aflow_matlab_funcs.cpp: Makefile
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
+	touch $@
 aflow_gnuplot_funcs.cpp: Makefile
 	rm -rf $@
 	if [ -f $(EXTRA_FREE)/GNUPLOT/plotbz.sh ]; then echo "// $@ automatic generated from GNUPLOT/*" >> $@ ; fi
@@ -684,6 +690,7 @@ aflow_gnuplot_funcs.cpp: Makefile
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
+	touch $@
 ###################################################################################################
 
 ###################################################################################################
@@ -693,7 +700,8 @@ aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefil
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
 ###################################################################################################
 
-###### HTRESOURCES #################################################
+###################################################################################################
+#HTRESOURCES
 aflow_contrib_stefano_htcurriculum.o: $(AFLOWLIB_HPP) $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
 aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp $(AFLOWLIB_HPP) $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
@@ -702,68 +710,68 @@ aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp $(AFLOW
 
 ###################################################################################################
 #CO20170622 - START
-aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js
+aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
 	echo "#define _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_WEBAPP_ENTRY_JS=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\u/\\\\u/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\u/\\\\u/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
 #CO20170622 - END
 #CO20180305 - START
-aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js
+aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
 	echo "#define _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_WEBAPP_BANDS_JS=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
 #CO20180305 - END
 #MB 190301 - START
-aflow_chull_jupyter.cpp: aflow_chull_jupyter.json
+aflow_chull_jupyter.cpp: aflow_chull_jupyter.json Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_CPP_" >> $@
 	echo "#define _AFLOW_CHULL_JUPYTER_CPP_" >> $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_CHULL_JUPYTER_JSON=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_CHULL_JUPYTER_CPP_" >> $@
 #MB 190301 - END
 #MB 190301 - START
-aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py
+aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
 	echo "#define _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_CHULL_JUPYTER_PLOTTER_PY=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
 #MB 190301 - END
 #MB 190301 - START
-aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt
+aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
 	echo "#define _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
 #MB 190301 - END
 #MB 190301 - START
-aflow_chull_python.cpp: aflow_chull_python.py
+aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_PYTHON_CPP_" >> $@
 	echo "#define _AFLOW_CHULL_PYTHON_CPP_" >> $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_CHULL_PYTHON_PY=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_CHULL_PYTHON_CPP_" >> $@
 #MB 190301 - END
