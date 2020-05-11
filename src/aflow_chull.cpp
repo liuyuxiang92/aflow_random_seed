@@ -6070,7 +6070,7 @@ namespace chull {
   }
 
   double ConvexHull::getStabilityCriterion(const string& cauid) const {
-    string soliloquy="ConvexHull::getStabilityCriterion):";
+    string soliloquy="ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     vector<string> vcauid; vcauid.push_back(cauid);
     vector<double> vsc=getStabilityCriterion(vcauid);
@@ -6078,7 +6078,7 @@ namespace chull {
   }
 
   double ConvexHull::getStabilityCriterion(uint cpoint) const {
-    string soliloquy="ConvexHull::getStabilityCriterion):";
+    string soliloquy="ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     if(cpoint>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     vector<uint> vcpoint; vcpoint.push_back(cpoint);
@@ -6087,7 +6087,7 @@ namespace chull {
   }
 
   vector<double> ConvexHull::getStabilityCriterion(const vector<string>& vcauid) const {
-    string soliloquy="ConvexHull::getStabilityCriterion):";
+    string soliloquy="ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
 

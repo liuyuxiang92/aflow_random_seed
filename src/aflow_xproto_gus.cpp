@@ -6,8 +6,8 @@
 // Written by Stefano Curtarolo - 2008 - 2009
 // fixed for xz - SC 2018
 
-#ifndef _AFLOW_XPROTO_GUS_CPP
-#define _AFLOW_XPROTO_GUS_CPP
+#ifndef _AFLOW_XPROTO_GUS_CPP_
+#define _AFLOW_XPROTO_GUS_CPP_
 #include "aflow.h"
 #include "aflow_xproto_gus_lib.cpp"
 
@@ -396,7 +396,7 @@ namespace aflowlib {
   }
 } // namespace aflowlib
 
-#endif  // _AFLOW_XPROTO_GUS_CPP
+#endif  // _AFLOW_XPROTO_GUS_CPP_
 // **************************************************************************
 // *                                                                        *
 // *             STEFANO CURTAROLO - Duke University 2003-2020              *

@@ -322,12 +322,14 @@ namespace compare {
 
     // This function compares multiple structures (i.e., more than two).
 
-    string function_name = "compare::compareMultipleStructures():";
     bool LDEBUG=(false || XHOST.DEBUG);
+    string function_name = "compare::compareMultipleStructures():";
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
+    
+    if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
 
     // ---------------------------------------------------------------------------
     // create xoptions to contain all comparison options
@@ -446,6 +448,7 @@ namespace compare {
       message << "OPTIONS: Including magnetic moment information in comparisons. Magnetic input detected for " << magmoms_for_systems.size() << " systems.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
+    if(magnetic_comparison){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
     // FLAG: ICSD comparison - structure with minimum ICSD number as representative prototype
@@ -1783,6 +1786,8 @@ namespace compare {
     string function_name = "compare::printCompare2Database():";
     stringstream message;
     ostringstream oss;
+    
+    if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
   
     // ---------------------------------------------------------------------------
     // main compare2database() function
@@ -2040,6 +2045,7 @@ namespace compare {
       message << "OPTIONS: Including magnetic moment information in comparisons.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
+    if(magnetic_comparison){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
     // FLAG: do not calculate unique permutations 
@@ -2092,6 +2098,7 @@ namespace compare {
       message << "OPTIONS: Relaxation step (0=original, 1=relax1, 2=most_relaxed): " << relaxation_step << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
+    if(load_most_relaxed_structure_only){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
@@ -2565,7 +2572,7 @@ namespace compare {
       comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",TRUE);
     }
 
-    return compareMultipleStructures(all_structures, oss, FileMESSAGE, num_proc, same_species, directory, comparison_options); 
+    return compareMultipleStructures(all_structures, oss, FileMESSAGE, num_proc, same_species, directory, comparison_options, logstream);   //CO20200508
 
   }
 }
@@ -2573,12 +2580,14 @@ namespace compare {
 namespace compare {
   vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options, ostream& logstream){ //DX20200103 - condensed booleans to xoptions //DX20200226 - added logstream
 
-    string function_name = "compare::compareMultipleStructures():";
     bool LDEBUG=(false || XHOST.DEBUG);
+    string function_name = "compare::compareMultipleStructures():";
     //DX20200226 ostream& logstream = cout;
     stringstream message;
     bool quiet = false;
     //DX20190319 [OBSOLETE] ofstream FileMESSAGE;
+    
+    if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
 
     message << "Total number of structures to compare: " << all_structures.size();
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -3068,7 +3077,7 @@ namespace compare {
 
       // ---------------------------------------------------------------------------
       // variables
-      uint i=0;
+      //[CO20200508 - OBSOLETE]uint i=0;
       xvector<double> origin;
       xstructure proto;           
       vector<xstructure> vprotos,vprotos_tmp;
