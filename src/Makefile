@@ -86,9 +86,9 @@ PROJECT_DIRECTORY_GNDSTATE=/common/LIB2
 # -static
 OPTSA=-O3
 # -static
-DAY=$(shell date +%y)$(shell date +%m)$(shell date +%d)
-#TIME="20$(shell date +%y)-$(shell date +%m)-$(shell date +%d) $(shell date +%H):$(shell date +%M):$(shell date +%S)"
-TIME="20$(shell date +%y)-$(shell date +%m)-$(shell date +%d)"
+DAY=$(shell date +%Y%m%d)
+#TIME="$(shell date +%Y-%m-%d %H:%M:%S)
+TIME="$(shell date +%Y-%m-%d)"
 LIBS=-lpthread
 # -static
 #CO START 170614 easy integration
@@ -126,25 +126,17 @@ AFLOWLIB_HPP = aflowlib.h
 #CO20170614
 #ME191125 -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip)
 SQLITE_C = ./SQLITE/sqlite3.c
+SQLITE_OBJ=$(SQLITE_C:.c=.o)
 
 #README_SRC= aflow_readme.cpp
-
-DATA_SRC=aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
-DATA_OBJ                = $(DATA_FUNCS_SRC:.cpp=.o)
-
-SQLITE_OBJ             = $(SQLITE_C:.c=.o)	#CO20170614
 
 #MAKEFILES=Makefile Makefile.aflow	#CO20200508 - special makefile variable, DO NOT USE
 MFS=Makefile Makefile.aflow
 
-.PHONY: check send_version_updates_email
-
 #CO20200508 - all MUST come first
 all: aflow aflow_data 
 	$(MAKE) check
-
 include Makefile.aflow
-
 aflow: $(SQLITE_OBJ) $(DEPS_ALL) $(MFS) 
 #	$(MAKE) -C ../AFLOW2_FREE/EXTRA/APL2AGR/ && cd ../../
 #	cp -f aflow_apl*.o  aflow_aapl*.o  aflow_qha*.o ./APL/
@@ -155,6 +147,7 @@ aflow: $(SQLITE_OBJ) $(DEPS_ALL) $(MFS)
 	$(CPP) $(LIBS_AFLOW) -o aflow $(SQLITE_OBJ) $(OBJS_ALL) $(LIB_MKL) $(LIBS_AFLOW)
 	ln -sf aflow aflowd
 	ln -sf aflow apennsy
+.PHONY: static_no_pdf
 static_no_pdf: aflow aflow_data
 	rm -rf $(SQLITE_OBJ)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
@@ -167,8 +160,23 @@ static_no_pdf: aflow aflow_data
 	rm -f aflow_data
 #	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.cpp $(LIBS_STATIC)
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(LIBS_STATIC)
+#.PHONY: static
 #static: static_no_pdf
 #	tar Jcfvp /www/AFLOW/CURRENT/aflow_$(VERSNUMBER)_amd64_debian_static.tar.xz aflow aflow_data	
+#ME190313 - Change compiler to clang because g++ fails to compile on some Macs
+.PHONY: mac
+mac:
+	$(MAKE) CC=clang CPP=clang++ aflow_data
+	$(MAKE) CC=clang CPP=clang++ -e ARCH=-D_MACOSX_ -j 4
+	ln -sf aflow aflowd
+	ln -sf aflow apennsy
+	$(MAKE) check
+#.PHONY: mac_static
+#mac_static: mac
+#	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
+
+
+###################################################################################################
 $(SQLITE_OBJ): $(SQLITE_C)	#CO201706147
 	$(CC) $(SQLITE_OPTS) -c $^ -o $@
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
@@ -176,6 +184,14 @@ $(SQLITE_OBJ): $(SQLITE_C)	#CO201706147
 #	$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 #	$(CC) $(SQLITE_OPTS) -c $^
 #	cp sqlite3.o ./SQLITE/
+#CO20200508 - catch all rule
+.cpp.o: .cpp $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(@:.o=.cpp) -c
+#	touch $@
+###################################################################################################
+
+###################################################################################################
+.PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
 apl2agr:
 	echo "MAKING APL2AGR"
@@ -205,105 +221,16 @@ platon:
 enum:
 	echo "MAKING ENUM"
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS; fi
+.PHONY: extra_clean
 extra_clean:
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/PLATON/51108/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/PLATON/51108 clean; fi
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
-#ME190313 - Change compiler to clang because g++ fails to compile on some Macs
-mac:
-	$(MAKE) CC=clang CPP=clang++ aflow_data
-	$(MAKE) CC=clang CPP=clang++ -e ARCH=-D_MACOSX_ -j 4
-	ln -sf aflow aflowd
-	ln -sf aflow apennsy
-	$(MAKE) check
-#mac_static: mac
-#	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
+###################################################################################################
 
-.cpp.o: .cpp $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(@:.o=.cpp) -c
-#	touch $@
-#CO20170622 - START
-aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js
-	rm -rf $@
-	echo "#ifndef _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
-	echo "#define _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_WEBAPP_ENTRY_JS=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\u/\\\\u/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
-#CO20170622 - END
-#CO20180305 - START
-aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js
-	rm -rf $@
-	echo "#ifndef _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
-	echo "#define _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_WEBAPP_BANDS_JS=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
-#CO20180305 - END
-#MB 190301 - START
-aflow_chull_jupyter.cpp: aflow_chull_jupyter.json
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_JUPYTER_JSON=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
-aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_JUPYTER_PLOTTER_PY=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
-aflow_chull_python.cpp: aflow_chull_python.py
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_PYTHON_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_PYTHON_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_PYTHON_PY=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOW_CHULL_PYTHON_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
-aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt
-	rm -rf $@
-	echo "#ifndef _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-	echo "#define _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
-	echo "std::string AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT=\"\\" >> $@
-	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-#MB 190301 - END
-aflow_mix_nomix_table.cpp: $(MFS) $(AFLOW_HPP) $(AUROSTD_HPP)
-	rm -rf nomix.tmp
-	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
-	rm -rf $@
-	echo "#ifndef _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
-	echo "#define _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
-	echo "// $@ automatic generated " >> $@
-	echo "#include <string>" >> $@
-	echo "std::string NomixTable=\"\\" >> $@
-	cat nomix.tmp | sort | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> $@
-	echo "\";" >> $@
-	echo "#endif  //  _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
-	chmod 755 $@
-	rm -rf nomix.tmp
+###################################################################################################
 aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
 	$(MAKE) aflow -j 16
 	rm -rf aflow_library_icsd.dat
@@ -347,79 +274,79 @@ aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/READ
 	rm -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz
 	xz -9vf $(EXTRA_FREE)/NIST/ICSD_List_2014.txt
 $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD1.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD1.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD2.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD2.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD2.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD3.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD3.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD3.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD4.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD4.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD4.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD5.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD5.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD5.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD6.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD6.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD6.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD7.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD7.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD7.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD8.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD8.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT:
-	rm -rf $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
-	xzcat $(NIST_LIB)/README_LIBRARY_ICSD9.TXT.xz >>$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
-	echo " STRUCTURE ___PROTO_END___">>$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
-	echo " END">>$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
-	echo "// ***************************************************************************">>$(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
+	rm -rf $@
+	echo "// ***************************************************************************">>$@
+	xzcat $(NIST_LIB)/README_LIBRARY_ICSD9.TXT.xz >>$@
+	echo "// ***************************************************************************">>$@
+	echo " STRUCTURE ___PROTO_END___">>$@
+	echo " END">>$@
+	echo "// ***************************************************************************">>$@
 ############################################################################################################
-aflow_data_calculated.cpp: $(MFS)
+aflow_data_calculated.cpp: Makefile
 	rm -rf $@
 	# vLIBS	
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "// $@ automatic generated from CALCULATED/vLIBS.dat" >> $@ ; fi
@@ -433,7 +360,7 @@ aflow_data_calculated.cpp: $(MFS)
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
-aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT $(MFS)
+aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT README_LIBRARY_HTQC_BORIDES.TXT README_LIBRARY_HTQC_CARBIDES.TXT Makefile
 	rm -f $@
 	echo "#ifndef _AFLOW_DATA_HTQC_CPP_" >> $@
 	echo "#define _AFLOW_DATA_HTQC_CPP_" >> $@
@@ -447,7 +374,7 @@ aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT $(MFS)
 	echo " END"  | perl -p -e 's/\n/ \\n\\\n/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_HTQC_CPP_" >> $@
-#aflow_data_binary.cpp: $(MFS)
+#aflow_data_binary.cpp: Makefile
 #	rm -rf aflow_data_binary.cpp
 #	echo "// aflow_data_binary.cpp automatic generated from PROTO/Binary.exp" >> aflow_data_binary.cpp
 #	echo "std::string AFLOW_BinaryRead=\"\\" >> aflow_data_binary.cpp
@@ -456,7 +383,7 @@ aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT $(MFS)
 #	echo "std::string AFLOW_Binary_Angle_Read=\"\\" >> aflow_data_binary.cpp
 #	cat $(EXTRA_FREE)/PROTO/Binary_angle.exp | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> aflow_data_binary.cpp
 #	echo "\";" >> aflow_data_binary.cpp
-aflow_data_libraries.cpp: $(MFS)
+aflow_data_libraries.cpp: Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_DATA_LIBRARIES_CPP_" >> $@
 	echo "#define _AFLOW_DATA_LIBRARIES_CPP_" >> $@
@@ -495,7 +422,7 @@ aflow_data_libraries.cpp: $(MFS)
 #	echo "std::string aflowlib_lib9=\"\\" >> $@ && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib9.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\\Gamma/\\\\Gamma/g' | perl -p -e 's/\\Sigma/\\\\Sigma/g' >> $@ && echo "\";" >> $@
 	echo "std::string aflowlib_lib9=\"\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_LIBRARIES_CPP_" >> $@
-aflow_data_stokes.cpp: $(MFS) 
+aflow_data_stokes.cpp: Makefile 
 	rm -rf $@
 	if [ -f $(EXTRA_FREE)/DATA_FINDSYM/data_space.txt.xz ]; then echo "// $@ automatic generated " >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/DATA_FINDSYM/data_space.txt.xz ]; then echo "#include <string>" >> $@ ; fi
@@ -539,7 +466,7 @@ aflow_data_stokes.cpp: $(MFS)
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
-aflow_data_nist.cpp: $(MFS) 
+aflow_data_nist.cpp: Makefile 
 	rm -rf $@
 	if [ -f $(EXTRA_FREE)/NIST/ElectronStoppingPower.txt.xz ]; then echo "// $@ automatic generated from NIST" >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/NIST/ElectronStoppingPower.txt.xz ]; then echo "#include <string>" >> $@ ; fi
@@ -559,7 +486,7 @@ aflow_data_nist.cpp: $(MFS)
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
-aflow_data_aflow_potcars.cpp: $(MFS) 
+aflow_data_aflow_potcars.cpp: Makefile 
 	rm -rf $@
 	echo "#ifndef _AFLOW_DATA_AFLOW_POTCARS_CPP_" >> $@
 	echo "#define _AFLOW_DATA_AFLOW_POTCARS_CPP_" >> $@
@@ -575,7 +502,7 @@ aflow_data_aflow_potcars.cpp: $(MFS)
 	if [ -f ../AFLOW3_NONFREE/EXTRA/NONE_AFLOW_PSEUDOPOTENTIALS/AFLOW_PSEUDOPOTENTIALS_LIST.TXT.xz ]; then xzcat ../AFLOW3_NONFREE/EXTRA/NONE_AFLOW_PSEUDOPOTENTIALS/AFLOW_PSEUDOPOTENTIALS_LIST.TXT.xz | grep "POTCAR=" | perl -p -e 's/\n/\\n\\\n/g' >> $@ ; fi
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_AFLOW_POTCARS_CPP_" >> $@
-aflow_data_latex.cpp: $(MFS)
+aflow_data_latex.cpp: Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_DATA_LATEX_CPP_" >> $@
 	echo "#define _AFLOW_DATA_LATEX_CPP_" >> $@
@@ -591,7 +518,7 @@ aflow_data_latex.cpp: $(MFS)
 	if [ -f ../AFLOW3_NONFREE/EXTRA/LATEX/decf00ca3ad2fe494eea8e543e929068 ]; then cat ../AFLOW3_NONFREE/EXTRA/LATEX/decf00ca3ad2fe494eea8e543e929068 | perl -p -e 's/\\/\\\\/g' | perl -p -e 's/\"/\\\"/g'  | perl -p -e 's/\n/ \\n\\\n/g' >> $@ ; fi
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_LATEX_CPP_" >> $@
-aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT README_AFLOW_APL.TXT README_AFLOW_QHA_SCQHA_QHA3P.TXT README_AFLOW_AGL.TXT README_AFLOW_AEL.TXT README_AFLOW_POCC.TXT README_AFLOW_ANRL.TXT README_AFLOW_COMPARE.TXT README_AFLOW_GFA.TXT README_AFLOW.TXT README_PROTO.TXT README_AFLOW_APENNSY.TXT README_AFLOW_FROZSL.TXT README_AFLOW_SCRIPTING.TXT README_AFLOW_SYM.TXT README_AFLOW_CCE.TXT README_AFLOW_CHULL.TXT README_AFLOW_XAFLOW.TXT README_AFLOW_AFLOWRC.TXT README_AFLOW_EXCEPTIONS.TXT README_CONTRIBS.TXT README_AFLOW_VERSIONS_HISTORY.TXT $(MFS)
+aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT README_AFLOW_APL.TXT README_AFLOW_QHA_SCQHA_QHA3P.TXT README_AFLOW_AGL.TXT README_AFLOW_AEL.TXT README_AFLOW_POCC.TXT README_AFLOW_ANRL.TXT README_AFLOW_COMPARE.TXT README_AFLOW_GFA.TXT README_AFLOW.TXT README_PROTO.TXT README_AFLOW_APENNSY.TXT README_AFLOW_FROZSL.TXT README_AFLOW_SCRIPTING.TXT README_AFLOW_SYM.TXT README_AFLOW_CCE.TXT README_AFLOW_CHULL.TXT README_AFLOW_XAFLOW.TXT README_AFLOW_AFLOWRC.TXT README_AFLOW_EXCEPTIONS.TXT README_CONTRIBS.TXT README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_DATA_README_CPP_" >> $@
 	echo "#define _AFLOW_DATA_README_CPP_" >> $@
@@ -664,25 +591,33 @@ aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT R
 	cat README_AFLOW_AFLOWRC.TXT | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif  //  _AFLOW_DATA_README_CPP_" >> $@
-aflow_data_extra.cpp: $(MFS) aflow_library_icsd.dat.xz
-	rm -rf aflow_data_extra.cpp aflow_data_libraries.cpp
+aflow_data_extra.cpp: Makefile aflow_library_icsd.dat.xz
+	rm -rf $@
+	echo "#ifndef _AFLOW_DATA_EXTRA_CPP_" >> $@
+	echo "#define _AFLOW_DATA_EXTRA_CPP_" >> $@
+	echo "#include <string>" >> $@
+	echo "std::string icsd_1_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/1-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_2_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/2-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_3_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/3-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_4_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/4-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_5_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/5-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_6_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/6-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_7_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/7-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_8_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/8-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_9_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/9-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@	
+	echo "std::string icsd_10_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/10-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+	echo "std::string icsd_11_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/11-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+	echo "std::string icsd_12_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/12-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+	echo "std::string icsd_13_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/13-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+	echo "std::string icsd_14_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/14-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+	echo "std::string icsd_15_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/15-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> $@
+#	echo "std::string Library_ICSD=\"\\" >> $@ && xzcat  ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
+#	MAKE aflow_data_libraries.cpp, do not make another rule, aflow_data_libraries.cpp is already a rule
+	rm -rf aflow_data_libraries.cpp
+	echo "#ifndef _AFLOW_DATA_LIBRARIES_CPP_" >> aflow_data_libraries.cpp
+	echo "#define _AFLOW_DATA_LIBRARIES_CPP_" >> aflow_data_libraries.cpp
 	echo "#include <string>" >> aflow_data_libraries.cpp
-	echo "std::string icsd_1_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/1-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_2_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/2-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_3_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/3-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_4_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/4-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_5_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/5-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_6_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/6-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_7_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/7-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_8_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/8-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_9_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/9-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp	
-	echo "std::string icsd_10_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/10-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
-	echo "std::string icsd_11_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/11-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
-	echo "std::string icsd_12_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/12-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
-	echo "std::string icsd_13_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/13-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
-	echo "std::string icsd_14_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/14-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
-	echo "std::string icsd_15_ary=\"\\" >> aflow_data_extra.cpp && xzcat $(NIST_LIB)/15-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
-#	echo "std::string Library_ICSD=\"\\" >> aflow_data_extra.cpp && xzcat  ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_extra.cpp && echo "\";" >> aflow_data_extra.cpp
 	echo "std::string aflowlib_lib0=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib0.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp	
 	echo "std::string aflowlib_lib1=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib1.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp	
 	echo "std::string aflowlib_lib2=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib2.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp	
@@ -694,6 +629,7 @@ aflow_data_extra.cpp: $(MFS) aflow_library_icsd.dat.xz
 	echo "std::string aflowlib_lib8=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib8.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp
 	echo "std::string aflowlib_lib9=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib9.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp
 	echo "std::string aflowlib_icsd=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_icsd.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp
+	echo "#endif  //  _AFLOW_DATA_LIBRARIES_CPP_" >> aflow_data_libraries.cpp
 #aflow_data: aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
 aflow_data: aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_data_libraries.o aflow_data_stokes.o aflow_data_nist.o aflow_data_latex.o aflow_data_aflow_potcars.o aflow_data.cpp
 	rm -f aflow_data_extra.cpp
@@ -706,13 +642,16 @@ aflow_data: aflow_data_readme.o aflow_data_calculated.o aflow_data_htqc.o aflow_
 	if [ -f ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz ]; then echo "\";" >> aflow_data_extra.cpp; fi
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -c aflow_data.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o 
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o
+.PHONY: data
+data: aflow_data
+.PHONY: amir
 amir:	aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp aflow_data_extra.cpp
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -DICSD -o aflow_data aflow_data.cpp
-############################################################################################################
-aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPP) $(AUROSTD_HPP) $(MFS)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
-aflow_matlab_funcs.cpp: $(MFS)
+###################################################################################################
+
+###################################################################################################
+aflow_matlab_funcs.cpp: Makefile
 	rm -rf $@
 	if [ -f $(EXTRA_FREE)/MATLAB/param.m ]; then echo "// $@ automatic generated from MATLAB/*" >>  $@ ; fi
 	if [ -f $(EXTRA_FREE)/MATLAB/param.m ]; then echo "#include <sstream>" >> $@ ; fi
@@ -731,7 +670,7 @@ aflow_matlab_funcs.cpp: $(MFS)
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
-aflow_gnuplot_funcs.cpp: $(MFS)
+aflow_gnuplot_funcs.cpp: Makefile
 	rm -rf $@
 	if [ -f $(EXTRA_FREE)/GNUPLOT/plotbz.sh ]; then echo "// $@ automatic generated from GNUPLOT/*" >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/GNUPLOT/plotbz.sh ]; then echo "#include <sstream>" >> $@ ; fi
@@ -745,21 +684,114 @@ aflow_gnuplot_funcs.cpp: $(MFS)
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
-aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPP) $(AUROSTD_HPP) $(MFS)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aurostd_xtemplates.cpp -c
-#
-###### HTRESOURCES #################################################
-aflow_contrib_stefano_htcurriculum.o: $(AFLOWLIB_HPP) $(AFLOW_HPP) $(AUROSTD_HPP) $(MFS)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
-aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp $(AFLOWLIB_HPP) $(AFLOW_HPP) $(AUROSTD_HPP) $(MFS)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_contrib_stefano_htsecurity.cpp -c
+###################################################################################################
 
+###################################################################################################
+aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
+aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
+###################################################################################################
+
+###### HTRESOURCES #################################################
+aflow_contrib_stefano_htcurriculum.o: $(AFLOWLIB_HPP) $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
+aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp $(AFLOWLIB_HPP) $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
+###################################################################################################
+
+###################################################################################################
+#CO20170622 - START
+aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js
+	rm -rf $@
+	echo "#ifndef _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
+	echo "#define _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_WEBAPP_ENTRY_JS=\"\\" >> $@
+	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\u/\\\\u/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOWLIB_WEBAPP_ENTRY_CPP_" >> $@
+#CO20170622 - END
+#CO20180305 - START
+aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js
+	rm -rf $@
+	echo "#ifndef _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
+	echo "#define _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_WEBAPP_BANDS_JS=\"\\" >> $@
+	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
+#CO20180305 - END
+#MB 190301 - START
+aflow_chull_jupyter.cpp: aflow_chull_jupyter.json
+	rm -rf $@
+	echo "#ifndef _AFLOW_CHULL_JUPYTER_CPP_" >> $@
+	echo "#define _AFLOW_CHULL_JUPYTER_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_CHULL_JUPYTER_JSON=\"\\" >> $@
+	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOW_CHULL_JUPYTER_CPP_" >> $@
+#MB 190301 - END
+#MB 190301 - START
+aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py
+	rm -rf $@
+	echo "#ifndef _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
+	echo "#define _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_CHULL_JUPYTER_PLOTTER_PY=\"\\" >> $@
+	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
+#MB 190301 - END
+#MB 190301 - START
+aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt
+	rm -rf $@
+	echo "#ifndef _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
+	echo "#define _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT=\"\\" >> $@
+	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
+#MB 190301 - END
+#MB 190301 - START
+aflow_chull_python.cpp: aflow_chull_python.py
+	rm -rf $@
+	echo "#ifndef _AFLOW_CHULL_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_CHULL_PYTHON_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_CHULL_PYTHON_PY=\"\\" >> $@
+	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOW_CHULL_PYTHON_CPP_" >> $@
+#MB 190301 - END
+aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
+	rm -rf nomix.tmp
+	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
+	rm -rf $@
+	echo "#ifndef _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
+	echo "#define _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
+	echo "// $@ automatic generated " >> $@
+	echo "#include <string>" >> $@
+	echo "std::string NomixTable=\"\\" >> $@
+	cat nomix.tmp | sort | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> $@
+	echo "\";" >> $@
+	echo "#endif  //  _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
+	chmod 755 $@
+	rm -rf nomix.tmp
+###################################################################################################
+
+###################################################################################################
+.PHONY: install
 install: all
 	cp -f aflow $(BIN)/aflow.$(VERSNUMBER)
 	cp -f aflow_data $(BIN)/
 	cp -f $(BIN)/aflow.$(VERSNUMBER) $(BIN)/aflow
 	ls -las $(BIN)/aflow*
 	$(MAKE) check
+.PHONY: install_auro
 install_auro: install_user
 	./aflow --version | grep AFLOW >> $(BIN)/etc_aflow_status.txt
 	chmod 644 $(BIN)/etc_aflow_status.txt
@@ -767,20 +799,14 @@ install_auro: install_user
 	chmod 644 $(BIN)/etc_aflowlib_status.txt
 	./aflow --apool > $(BIN)/etc_aflowlib_apool.txt
 	chmod 644 $(BIN)/etc_aflowlib_apool.txt
+.PHONY: install_root
 install_root: all
 	cp -f aflow /usr/local/bin/aflow.$(VERSNUMBER)
 	cp -f aflow_data /usr/local/bin/aflow_data
 	cp -f /usr/local/bin/aflow.$(VERSNUMBER) /usr/local/bin/aflow
 	ls -las /usr/local/bin/aflow*
 	$(MAKE) check
-send_version_updates_email:
-	#CO190131 - START
-	rm -f version_updates_email.txt
-	$(MAKE) version_updates_email.txt
-	[ -s version_updates_email.txt ]
-	cat version_updates_email.txt | mail -r aflow@materials.duke.edu -s "AFLOW Code Update: v$(VERSNUMBER)" aflow+int+737+2740356048620877160@groups.io
-	rm -f version_updates_email.txt
-	#CO190131 - STOP
+.PHONY: niet
 niet:	
 	dropbox stop
 	$(MAKE) clean
@@ -805,6 +831,7 @@ niet:
 	rm -fv aflow_matlab_funcs.cpp* && $(MAKE) aflow_matlab_funcs.cpp && cp -f aflow_matlab_funcs.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_matlab_funcs.cpp
 	rm -fv aflow_gnuplot_funcs.cpp* && $(MAKE) aflow_gnuplot_funcs.cpp && cp -f aflow_gnuplot_funcs.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_gnuplot_funcs.cpp
 	dropbox start
+.PHONY: backup
 backup: realclean clean icsdclean 
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean ; fi
 	mkdir -p aflow.$(VERSNUMBER)
@@ -817,6 +844,9 @@ backup: realclean clean icsdclean
 	if [ -d /www/AFLOW ]; then cp -f aflow.$(VERSNUMBER).tar.xz /www/AFLOW ; fi
 	mv aflow.$(VERSNUMBER).tar.xz $(BACKUP)
 	rm -rfv aflow.$(VERSNUMBER)
+.PHONY: www
+www:	web
+.PHONY: web
 web:	realclean
 	rm -rvf aflow3.tar.xz aflow_test.tar.xz aflow3 ~/aflow3.tar.xz ~/aflow_test.tar.xz ~/aflow3
 	tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE
@@ -851,6 +881,169 @@ web:	realclean
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/findsym ]; then cp ../AFLOW3_NONFREE/EXTRA/FINDSYM/findsym /www/AFLOW ; fi
 	if [ -d /www/auro ]; then mv -f  ~/aflow3.tar.xz /www/auro ; fi
+.PHONY: wget
+wget:	realclean
+	rm -rf aflow3.tar.xz* aflow_test.tar.xz*
+	-if [ ! -f aflow3.tar.xz ]; then wget http://materials.duke.edu/auro/aflow3.tar.xz; fi
+	-if [ ! -f aflow3.tar.xz ]; then wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow3.tar.xz; fi
+	if [ ! -f aflow3.tar.xz ]; then exit 1; fi
+	tar xfvp aflow3.tar.xz
+	rm -rf aflow3.tar.xz 
+.PHONY: distroget
+distroget: wget
+	rm -rf TESTS PLATON* FINDSYM* FROZSL*
+	cat Makefile | sed "s/Makefile /Makefile /g" | sed "s/\*\.a//g" > M
+	mv M Makefile
+.PHONY: patch_makefile1
+patch_makefile1: Makefile
+	cat Makefile | sed "s/ \-Wno\-unused\-but\-set\-variable//g" > M	
+	mv M Makefile
+.PHONY: patch_makefile2
+patch_makefile2: Makefile
+	cat Makefile | sed "s/\-O1//g" | sed "s/\-O2//g" | sed "s/\-O3//g" > M	
+	mv M Makefile
+###################################################################################################
+
+###################################################################################################
+.PHONY: clean
+clean:
+	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`
+	rm -rfv `find . -name "LOCK*" | grep -v TESTS | grep -v SOURCES` *.out aflow.rasmol.xyz* aflow_potcar.cpp aflow_xpotcar.cpp aflow3.tar.xz ./AFLOWDATA ./LIBRARY* *html *toc *m *.jpg *.gif *.png
+	rm -rfv ./APL/*~ ./ANRL/*~ ./ANRL*/*~ ./SQLITE/*~ ../AFLOW3_NONFREE/BIN/* ./EXTRA/GUS/*~ ./EXTRA/GUS/*.o 
+.PHONY: realclean
+realclean: clean
+	$(MAKE) clean_autogen
+	rm -rf aurostd.cpp aurostd.h *conflic* 
+	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean; fi
+	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM realclean; fi
+	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
+	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then rm -fv ../AFLOW3_NONFREE/EXTRA/FROZSL/*conflic*; fi
+	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
+.PHONY: dataclean
+dataclean:
+	rm -f aflow_data aflow_data_*
+.PHONY: clean_autogen
+clean_autogen:
+	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+###################################################################################################
+
+###################################################################################################
+# icsd
+.PHONY: icsdclean
+icsdclean: clean realclean
+	echo "dummy" > $(ICSD_LIB)//dummy.txt
+	rm $(ICSD_LIB)//*
+.PHONY: icsd
+icsd:	$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
+.PHONY: icsd_test
+icsd_test: aflow
+	cat $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT | grep PROTOTYPE | sed "s/\[/\n/g" | grep PROTOTYPE | sed "s/PROTOTYPE/\.\/aflow --proto_icsd /g" > xgo
+	sh ./xgo > /dev/null
+###################################################################################################
+
+###################################################################################################
+# PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY
+.PHONY: energy
+energy:	all
+	./aflow --energy > apennsy.tex
+	latex apennsy.tex | grep -v Overfull | grep -v cmtt | grep -v type | grep -v "\[\]" | grep "\["
+.PHONY: psenergy
+psenergy: all
+	./aflow --psenergy > psapennsy.tex
+	latex psapennsy.tex
+	dvips psapennsy.dvi -o psapennsy.eps
+	ps2pdf psapennsy.eps
+	cp psapennsy*ps EPS
+	cp psapennsy*pdf EPS
+.PHONY: MIX
+MIX:	aflow
+	./aflow --libraryX --mix > aflow_nomix.$(TIME).cpp
+	chmod 755 aflow_nomix.$(TIME).cpp
+	rm -rf aflow_nomix.cpp
+	ln -sf aflow_nomix.$(TIME).cpp aflow_nomix.cpp
+	grep -c UNKNOWN aflow_nomix.2*
+.PHONY: mix
+mix:	MIX
+.PHONY: NOMIX
+NOMIX:	aflow
+	cat aflow_nomix.cpp | grep NOMIX | sed "s/\/\//\n/g" | grep calcs | sed "s/\=/\n/g" | grep calcs | sed "s/ calcs/xxxx/g" | sed "s/ /cd \.\//g" | sed "s/xxxx/ \&\& aflow --multi \&\& cd \.\.\//g" > xnomix
+	scp xnomix fslcollab8@mary:LIBS/LIB2/LIB
+	rm -rf xnomix
+.PHONY: nomix
+nomix: NOMIX
+.PHONY: EXPERIMENTS
+EXPERIMENTS: aflow
+	./aflow --libraryX --experiments > aflow_mix_experiments.$(TIME).cpp
+.PHONY: experiments
+experiments: EXPERIMENTS
+.PHONY: TABLE
+TABLE:aflow
+	./aflow --libraryX --table > aflow_table.$(TIME).tex
+.PHONY: table
+table: TABLE
+.PHONY: xaflowauto
+xaflowauto: aflow
+	./aflow --libraryX --xaflowauto > xaflowauto
+	scp xaflowauto fslcollab8@marylou5.byu.edu:LIBS
+.PHONY: boo
+boo: aflow
+	rm -rf boo
+	./aflow --calculated=icsd --remove | sed "s/\.\//\.\/ICSD\//g" >> boo
+	./aflow --calculated=lib0 --remove | sed "s/\.\//\.\/LIB0\/LIB\//g" >> boo
+	./aflow --calculated=lib1 --remove | sed "s/\.\//\.\/LIB1\/LIB\//g" >> boo
+	./aflow --calculated=lib2 --remove | sed "s/\.\//\.\/LIB2\/LIB\//g" >> boo
+	./aflow --calculated=lib3 --remove | sed "s/\.\//\.\/LIB3\/LIB\//g" >> boo
+	./aflow --calculated=lib4 --remove | sed "s/\.\//\.\/LIB4\/LIB\//g" >> boo
+	./aflow --calculated=lib5 --remove | sed "s/\.\//\.\/LIB5\/LIB\//g" >> boo
+	./aflow --calculated=lib6 --remove | sed "s/\.\//\.\/LIB6\/LIB\//g" >> boo
+	./aflow --calculated=lib7 --remove | sed "s/\.\//\.\/LIB7\/LIB\//g" >> boo
+	./aflow --calculated=lib8 --remove | sed "s/\.\//\.\/LIB8\/LIB\//g" >> boo
+	./aflow --calculated=lib9 --remove | sed "s/\.\//\.\/LIB9\/LIB\//g" >> boo
+#	scp boo aflow@lonsdale.tchpc.tcd.ie:LIB3/
+	scp boo fslcollab8@mary:LIBS/
+.PHONY: WEB
+WEB:	aflow
+	rm -rf *eps *pdf apennsy.m *html
+	#	./aflow --libraryX --QUIET --print=pdf --hull > apennsy.m
+	./aflow --libraryX --QUIET --print=gif --print=jpg --hull --oss=cout > apennsy.m
+	./aflow --libraryX --QUIET --print=html > apennsy.html
+	/usr/local/bin/matlab -nodesktop -r apennsy
+	mv *jpg *gif /www/AFLOW
+	rm -rf *eps
+.PHONY: AFLOW_OLD
+APOOL_OLD: aflow aflow_apennsy_main.cpp .cpp
+	rm -rf /www/php/apool.html
+	cat /www/php/apool_pre.html >> /www/php/apool.html
+#	./aflow --apool_test >> /www/php/apool.html
+	./aflow --apool >> /www/php/apool.html
+	cat /www/php/apool_post.html >> /www/php/apool.html	
+	./aflow --apool | grep available | sed "s/ checked//g" | sed "s/></XXXX\n/g" | grep radio | sed "s/<input type=\"radio\" name=\"alloy\" value=//g" | sed "s/XXXX/,/g" > /home/auro/work/AWRAPPER/awrapper_tables_public.cpp
+#
+#
+#	rm -rf /www/php/apool2.html
+#	cat /www/php/apool_pre.html >> /www/php/apool2.html
+#	./aflow --apool_private >> /www/php/apool2.html
+#	cat /www/php/apool_post.html >> /www/php/apool2.html	
+#	#
+.PHONY: shull
+shull:	all
+	./aflow --library2 --shull --oss=cout > apennsys.m
+.PHONY: vasp
+vasp:	all
+	./aflow --VASPIN | sed "s/\t/ /g" | sed "s/  / /g" | sed "s/  / /g" > structures.tex
+###################################################################################################
+
+###################################################################################################
+#EMAIL VERSION UPDATES
+#CO190131 - START
+.PHONY: send_version_updates_email
+send_version_updates_email:
+	rm -f version_updates_email.txt
+	$(MAKE) version_updates_email.txt
+	[ -s version_updates_email.txt ]
+	cat version_updates_email.txt | mail -r aflow@materials.duke.edu -s "AFLOW Code Update: v$(VERSNUMBER)" aflow+int+737+2740356048620877160@groups.io
+	rm -f version_updates_email.txt
+#CO190131 - STOP
 #CO190218 - START
 version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT
 	rm -f $(@:.txt=_tmp.txt)
@@ -884,25 +1077,14 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT
 	echo "Thanks," >> $@
 	echo "AFLOW Dev" >> $@
 #CO190218 - STOP
-wget:	realclean
-	rm -rf aflow3.tar.xz* aflow_test.tar.xz*
-	-if [ ! -f aflow3.tar.xz ]; then wget http://materials.duke.edu/auro/aflow3.tar.xz; fi
-	-if [ ! -f aflow3.tar.xz ]; then wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow3.tar.xz; fi
-	if [ ! -f aflow3.tar.xz ]; then exit 1; fi
-	tar xfvp aflow3.tar.xz
-	rm -rf aflow3.tar.xz 
-distroget: wget
-	rm -rf TESTS PLATON* FINDSYM* FROZSL*
-	cat Makefile | sed "s/Makefile /Makefile /g" | sed "s/\*\.a//g" > M
-	mv M Makefile
-patch_makefile1: Makefile
-	cat Makefile | sed "s/ \-Wno\-unused\-but\-set\-variable//g" > M	
-	mv M Makefile
-patch_makefile2: Makefile
-	cat Makefile | sed "s/\-O1//g" | sed "s/\-O2//g" | sed "s/\-O3//g" > M	
-	mv M Makefile
+###################################################################################################
+
+###################################################################################################
+#UNIT TESTS
+.PHONY: check
 check:
 	$(MAKE) check_proto
+.PHONY: check_full
 check_full:
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
 	$(MAKE) check_gcd
@@ -916,6 +1098,7 @@ check_full:
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_pocc
 	$(MAKE) check_cce
+.PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
@@ -929,18 +1112,24 @@ check_proto:
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
+.PHONY: check_Egap
 check_Egap:
 	./aflow --Egap_test
+.PHONY: check_gcd
 check_gcd:
 	./aflow --gcd_test
+.PHONY: check_smith
 check_smith:
 	./aflow --smith_test
+.PHONY: check_slab
 check_slab:
 	./aflow --slab_test
+.PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
+	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only | cut -d' ' -f2) && \
 		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$ANSWER meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
 	@echo "CHULL tests passed"
+.PHONY: check_pocc
 check_pocc:
 	@echo "Running POCC test 1 - unique structures count of C5HfMoNbTaTi" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Ti --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
 		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
@@ -1067,19 +1256,23 @@ check_pocc:
 	@echo "Running POCC test 62 - unique structures count of C5CrMoTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
 		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
 	@echo "POCC tests passed"
+.PHONY: check_aflowSG
 check_aflowSG:
 	@echo "Running aflowSG test 1" && ANSWER="Pm-3m #221" && RESULT=$$(./aflow --proto=AB_cP2_221_b_a:Cl:Cs | ./aflow --aflowSG) && \
 		if [ "$$RESULT" != "$$ANSWER" ]; then "aflowSG did not return $$ANSWER for './aflow --proto=AB_cP2_221_b_a:Cl:Cs | ./aflow --aflowSG', found $$RESULT instead" && exit 1; fi
 	@echo "aflowSG test 1 passed!"
+.PHONY: check_AFLOWSYM
 check_AFLOWSYM:
 	@echo "Running aflowSYM test 1" && ANSWER_PGROUPS=8 && ANSWER_PGROUPKS=8 && ANSWER_FGROUPS=4 && ANSWER_PGROUP_XTALS=4 && ANSWER_PGROUPK_XTALS=4 && ANSWER_AGROUPS=24 && ANSWER_SGROUPS=108 && RESULT=$$(./aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only) && COUNT_PGROUPS=$$(echo $$RESULT | awk -F'pgroup ' '{print NF-1}') && COUNT_PGROUPKS=$$(echo $$RESULT | awk -F'pgroupk ' '{print NF-1}') && COUNT_FGROUPS=$$(echo $$RESULT | awk -F'fgroup ' '{print NF-1}') && COUNT_PGROUP_XTALS=$$(echo $$RESULT | awk -F'pgroup_xtal ' '{print NF-1}') && COUNT_PGROUPK_XTALS=$$(echo $$RESULT | awk -F'pgroupk_xtal ' '{print NF-1}') && COUNT_AGROUPS=$$(echo $$RESULT | awk -F'agroup ' '{print NF-1}') && COUNT_SGROUPS=$$(echo $$RESULT | awk -F'sgroup ' '{print NF-1}') && \
 		if [ "$$ANSWER_PGROUPS" -ne "$$COUNT_PGROUPS" ] || [ "$$ANSWER_PGROUPKS" -ne "$$COUNT_PGROUPKS" ] || [ "$$ANSWER_FGROUPS" -ne "$$COUNT_FGROUPS" ] || [ "$$ANSWER_PGROUP_XTALS" -ne "$$COUNT_PGROUP_XTALS" ] || [ "$$ANSWER_PGROUPK_XTALS" -ne "$$COUNT_PGROUPK_XTALS" ] || [ "$$ANSWER_AGROUPS" -ne "$$COUNT_AGROUPS" ] || [ "$$ANSWER_SGROUPS" -ne "$$COUNT_SGROUPS" ]; then "aflowSYM did not return one of the correct group cardinalities for './aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only'; (ANSWER==FOUND) $$ANSWER_PGROUPS==$$COUNT_PGROUPS, $$ANSWER_PGROUPKS==$$COUNT_PGROUPKS, $$ANSWER_FGROUPS==$$COUNT_FGROUPS, $$ANSWER_PGROUP_XTALS==$$COUNT_PGROUP_XTALS, $$ANSWER_PGROUPK_XTALS==$$COUNT_PGROUPK_XTALS, $$ANSWER_AGROUPS==$$COUNT_AGROUPS, $$ANSWER_SGROUPS==$$COUNT_SGROUPS"  && exit 1; fi
 	@echo "aflowSYM test 1 passed!"
+.PHONY: check_aflow_xtal_match
 check_aflow_xtal_match:
 	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
 		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
 	@echo "aflow_xtal_match test 1 passed!"
 #RF20200302 - START
+.PHONY: check_cce
 check_cce:
 	@echo "Performing 'aflow --cce' test"
 	@echo "Running CCE test 1: MgO"
@@ -1123,108 +1316,9 @@ check_cce:
 	@echo "Running CCE test 20: LiCaN"
 	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304"; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
 #RF20200302 - STOP
+.PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
 	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' *.cpp | wc -l) && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
 	@echo "aflow_gcc_compatibility test 1 passed!"
-www:	web
-clean:
-	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`
-	rm -rfv `find . -name "LOCK*" | grep -v TESTS | grep -v SOURCES` *.out aflow.rasmol.xyz* aflow_potcar.cpp aflow_xpotcar.cpp aflow3.tar.xz ./AFLOWDATA ./LIBRARY* *html *toc *m *.jpg *.gif *.png
-	rm -rfv ./APL/*~ ./ANRL/*~ ./ANRL*/*~ ./SQLITE/*~ ../AFLOW3_NONFREE/BIN/* ./EXTRA/GUS/*~ ./EXTRA/GUS/*.o 
-realclean: clean
-	$(MAKE) clean_autogen
-	rm -rf aurostd.cpp aurostd.h *conflic* 
-	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean; fi
-	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM realclean; fi
-	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
-	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then rm -fv ../AFLOW3_NONFREE/EXTRA/FROZSL/*conflic*; fi
-	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
-dataclean:
-	rm -f aflow_data aflow_data_*
-data: aflow_data
-clean_autogen:
-	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
-# ****************************************************************************
-# icsd
-icsdclean: clean realclean
-	echo "dummy" > $(ICSD_LIB)//dummy.txt
-	rm $(ICSD_LIB)//*
-icsd:	$(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT
-icsd_test: aflow
-	cat $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT | grep PROTOTYPE | sed "s/\[/\n/g" | grep PROTOTYPE | sed "s/PROTOTYPE/\.\/aflow --proto_icsd /g" > xgo
-	sh ./xgo > /dev/null
-# ****************************************************************************
-# PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY PENNSY
-energy:	all
-	./aflow --energy > apennsy.tex
-	latex apennsy.tex | grep -v Overfull | grep -v cmtt | grep -v type | grep -v "\[\]" | grep "\["
-psenergy: all
-	./aflow --psenergy > psapennsy.tex
-	latex psapennsy.tex
-	dvips psapennsy.dvi -o psapennsy.eps
-	ps2pdf psapennsy.eps
-	cp psapennsy*ps EPS
-	cp psapennsy*pdf EPS
-MIX:	aflow
-	./aflow --libraryX --mix > aflow_nomix.$(TIME).cpp
-	chmod 755 aflow_nomix.$(TIME).cpp
-	rm -rf aflow_nomix.cpp
-	ln -sf aflow_nomix.$(TIME).cpp aflow_nomix.cpp
-	grep -c UNKNOWN aflow_nomix.2*
-mix:	MIX
-NOMIX:	aflow
-	cat aflow_nomix.cpp | grep NOMIX | sed "s/\/\//\n/g" | grep calcs | sed "s/\=/\n/g" | grep calcs | sed "s/ calcs/xxxx/g" | sed "s/ /cd \.\//g" | sed "s/xxxx/ \&\& aflow --multi \&\& cd \.\.\//g" > xnomix
-	scp xnomix fslcollab8@mary:LIBS/LIB2/LIB
-	rm -rf xnomix
-nomix: NOMIX
-EXPERIMENTS:aflow
-	./aflow --libraryX --experiments > aflow_mix_experiments.$(TIME).cpp
-experiments:EXPERIMENTS
-TABLE:aflow
-	./aflow --libraryX --table > aflow_table.$(TIME).tex
-table:TABLE
-xaflowauto: aflow
-	./aflow --libraryX --xaflowauto > xaflowauto
-	scp xaflowauto fslcollab8@marylou5.byu.edu:LIBS
-boo: aflow
-	rm -rf boo
-	./aflow --calculated=icsd --remove | sed "s/\.\//\.\/ICSD\//g" >> boo
-	./aflow --calculated=lib0 --remove | sed "s/\.\//\.\/LIB0\/LIB\//g" >> boo
-	./aflow --calculated=lib1 --remove | sed "s/\.\//\.\/LIB1\/LIB\//g" >> boo
-	./aflow --calculated=lib2 --remove | sed "s/\.\//\.\/LIB2\/LIB\//g" >> boo
-	./aflow --calculated=lib3 --remove | sed "s/\.\//\.\/LIB3\/LIB\//g" >> boo
-	./aflow --calculated=lib4 --remove | sed "s/\.\//\.\/LIB4\/LIB\//g" >> boo
-	./aflow --calculated=lib5 --remove | sed "s/\.\//\.\/LIB5\/LIB\//g" >> boo
-	./aflow --calculated=lib6 --remove | sed "s/\.\//\.\/LIB6\/LIB\//g" >> boo
-	./aflow --calculated=lib7 --remove | sed "s/\.\//\.\/LIB7\/LIB\//g" >> boo
-	./aflow --calculated=lib8 --remove | sed "s/\.\//\.\/LIB8\/LIB\//g" >> boo
-	./aflow --calculated=lib9 --remove | sed "s/\.\//\.\/LIB9\/LIB\//g" >> boo
-	#scp boo aflow@lonsdale.tchpc.tcd.ie:LIB3/
-	scp boo fslcollab8@mary:LIBS/
-WEB:	aflow
-	rm -rf *eps *pdf apennsy.m *html
-	#	./aflow --libraryX --QUIET --print=pdf --hull > apennsy.m
-	./aflow --libraryX --QUIET --print=gif --print=jpg --hull --oss=cout > apennsy.m
-	./aflow --libraryX --QUIET --print=html > apennsy.html
-	/usr/local/bin/matlab -nodesktop -r apennsy
-	mv *jpg *gif /www/AFLOW
-	rm -rf *eps
-APOOL_OLD: aflow aflow_apennsy_main.cpp .cpp
-	rm -rf /www/php/apool.html
-	cat /www/php/apool_pre.html >> /www/php/apool.html
-#	./aflow --apool_test >> /www/php/apool.html
-	./aflow --apool >> /www/php/apool.html
-	cat /www/php/apool_post.html >> /www/php/apool.html	
-	./aflow --apool | grep available | sed "s/ checked//g" | sed "s/></XXXX\n/g" | grep radio | sed "s/<input type=\"radio\" name=\"alloy\" value=//g" | sed "s/XXXX/,/g" > /home/auro/work/AWRAPPER/awrapper_tables_public.cpp
-	#
-	#
-#	rm -rf /www/php/apool2.html
-#	cat /www/php/apool_pre.html >> /www/php/apool2.html
-#	./aflow --apool_private >> /www/php/apool2.html
-#	cat /www/php/apool_post.html >> /www/php/apool2.html	
-#	#
-shull:	all
-	./aflow --library2 --shull --oss=cout > apennsys.m
-vasp:	all
-	./aflow --VASPIN | sed "s/\t/ /g" | sed "s/  / /g" | sed "s/  / /g" > structures.tex
+###################################################################################################
