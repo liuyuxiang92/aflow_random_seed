@@ -135,12 +135,9 @@ bool NonlinearFit::fitLevenbergMarquardt()
   xvector<double> g = -trasp(J)*yvec;
 
   bool found = false;
-
-  // find maximum diagonal element
-  double maxA = A[1][1];
-  for (int i=2; i<=Nparams; i++) if (A[i][i] > maxA) maxA = A[i][i];
   
-  double lambda = tau*maxA; // determine initial step
+  // determine initial step
+  double lambda = tau*maxDiagonalElement(A);
   if (LDEBUG) cerr << function << "lambda = " << lambda << std::endl;
 
   while (!found && iter<max_iter){
@@ -235,7 +232,7 @@ double BirchMurnaghan(const double x, const xvector<double> &p, xvector<double> 
 }
 
 
-/// Check if minimum exists within a given data set 
+/// Checks if minimum exists within a given data set 
 /// (at least one internal point should be lower than edge points)
 bool isMinimumWithinBounds(const xvector<double> &y){
   for (int i=y.lrows+1; i<y.urows; i++){
@@ -392,6 +389,7 @@ apl::EOSfit::EOSfit()
 ///
 void apl::EOSfit::fit()
 {
+  string function = "EOSfit::fit():", msg = "";
   switch(method){
     case(EOS_POLYNOMIAL):
       p   = fitEOSpoly(V, E);
@@ -417,7 +415,7 @@ void apl::EOSfit::fit()
       }
       break;
     case(EOS_MURNAGHAN):
-    default: // TODO : error here
+      {
       guess[1] = min(E);
       guess[2] = (max(V)+min(V))/2;
       guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
@@ -431,7 +429,11 @@ void apl::EOSfit::fit()
       Veq = p[2];
       B   = p[3]*eV2GPa;
       Bp  = p[4];
-
+      }
+      break;
+    default:
+      msg = "Undefined EOS method input to " + function;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
       break;
   }
 }
