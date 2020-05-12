@@ -318,7 +318,7 @@ namespace makefile {
     vector<string> vsubdirectories;
     vsubdirectories.push_back(directory);
     vsubdirectories.push_back(directory+"/APL");
-    vsubdirectories.push_back(directory+"/ANRL");
+    //DX20200512 vsubdirectories.push_back(directory+"/ANRL");
     vsubdirectories.push_back(directory+"/SQLITE");
     std::sort(vsubdirectories.begin(),vsubdirectories.end()); //sort before adding AUROSTD, which must come first
     
@@ -447,7 +447,8 @@ namespace makefile {
     stringstream makefile_aflow;
     makefile_aflow << makefile_definitions_ss.str() << endl;
     makefile_aflow << makefile_rules_ss.str() << endl;
-    aurostd::stringstream2file(makefile_aflow,"Makefile.aflow");
+    if(aurostd::FileExist(directory+"/"+"Makefile.aflow")){aurostd::file2file(directory+"/"+"Makefile.aflow",directory+"/"+"Makefile.aflow.OLD");}  //saving
+    aurostd::stringstream2file(makefile_aflow,directory+"/"+"Makefile.aflow");
   }
 }
 
