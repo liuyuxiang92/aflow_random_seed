@@ -774,197 +774,85 @@ namespace KBIN {
 
     /***************************** READ PARAMETERS *****************************/
 
+    bool USER_TCOND = false;
     aurostd::xoption aaplopts;
-    string USER_BTE;
-    bool USER_TCOND, USER_ISOTOPE, USER_BOUNDARY, USER_CUMULATIVEK, USER_AAPL_FOURTH_ORDER;
-    double USER_NANO_SIZE, USER_EPS_SUM, USER_AAPL_MIX, USER_TCT_TSTART, USER_TCT_TEND, USER_TCT_TSTEP;
-    int USER_AAPL_MAX_ITER, USER_KPPRA_AAPL = -1;  //ME20190408 - Added KPPRA_AAPL
-    vector<double> USER_CUTOFF_DISTANCE(2);
-    vector<int> USER_CUTOFF_SHELL(2), USER_THERMALGRID(3);
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       USER_TCOND = true;
-      string CUTOFF_SCHEME, SHELL_SCHEME, THERMALGRID_SCHEME, TCT_SCHEME;
       for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aaplflags.size(); i++) {
         const string& key = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].keyword;
         logger << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme << apl::endl;
         aaplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option);
         aaplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme);
-        if (key == "BTE") {USER_BTE = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
-        if (key == "FOURTH_ORDER") {USER_AAPL_FOURTH_ORDER = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
-        if (key == "CUT_RAD") {CUTOFF_SCHEME = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
-        if (key == "CUT_SHELL") {SHELL_SCHEME = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
-        if (key == "THERMALGRID") {THERMALGRID_SCHEME = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
-        if (key == "TCT") {TCT_SCHEME = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
-        if (key == "SUMRULE") {USER_EPS_SUM = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_double; continue;}
-        if (key == "SUMRULE_MAX_ITER") {USER_AAPL_MAX_ITER = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_int; continue;}
-        if (key == "MIXING_COEFFICIENT") {USER_AAPL_MIX = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_double; continue;}
-        if (key == "ISOTOPE") {USER_ISOTOPE = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
-        if (key == "BOUNDARY") {USER_BOUNDARY = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
-        if (key == "CUMULATIVEK") {USER_CUMULATIVEK = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
-        if (key == "NANO_SIZE") {USER_NANO_SIZE = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_double; continue;}
-        if (key == "KPPRA_AAPL") {USER_KPPRA_AAPL = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_int; continue;}  //ME20190408
       }
-
-      /***************************** CHECK PARAMETERS *****************************/
-
-      // Correct BTE
-      if (USER_BTE != "RTA" && USER_BTE != "FULL") {
-        message = "Wrong setting in " + _ASTROPT_ + "BTE. Use either RTA or FULL.";
-        message += "See README_AFLOW_APL.TXT for more information.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
-      }
-
+      apl::validateParametersAAPL(aaplopts, aflags, messageFile, oss);
+      // Additional parameters from APL
+      aaplopts.push_attached("DMAG", aplopts.getattachedscheme("DMAG"));
+      aaplopts.flag("ZEROSTATE", aplopts.flag("ZEROSTATE"));
       vector<string> tokens;
-      // CUT_SHELL and CUT_RAD
-      bool defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
-      if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) {
-        tokens.clear();
-        aurostd::string2tokens(CUTOFF_SCHEME, tokens, string(" ,"));
-        if (tokens.size() < 1) {
-          message = "Not enough entries in " + _ASTROPT_ + "CUT_RAD. ";
-          message += "See README_AFLOW_APL.TXT for more information.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-        } else if (tokens.size() > 2) {
-          logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_RAD. ";
-          logger << "Excess entries will be ignored." << apl::endl;
-        }
-        USER_CUTOFF_DISTANCE[0] = aurostd::string2utype<double>(tokens[0]);
-        if (USER_AAPL_FOURTH_ORDER) {
-          if (tokens.size() == 1) {
-            logger << apl::warning << "Only one entry found for the cutoff radius. ";
-            logger << "3rd and 4th order anharmonic IFCs will use the same value." << apl::endl;
-            USER_CUTOFF_DISTANCE[1] = USER_CUTOFF_DISTANCE[0];
-          } else {
-            USER_CUTOFF_DISTANCE[1] = aurostd::string2utype<double>(tokens[1]);
-          }
-        }
-      }
-
-      if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
-        tokens.clear();
-        aurostd::string2tokens(SHELL_SCHEME, tokens, string(" ,"));
-        if (tokens.size() < 1) {
-          message = "Not enought entries in " + _ASTROPT_ + "CUT_SHELL. ";
-          message += "See README_AFLOW_APL.TXT for more information.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-        } else if (tokens.size() > 2) {
-          logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_SHELL. ";
-          logger << "Excess entries will be ignored." << apl::endl;
-        }
-        USER_CUTOFF_SHELL[0] = aurostd::string2utype<int>(tokens[0]);
-        if (USER_AAPL_FOURTH_ORDER) {
-          if (tokens.size() == 1) {
-            logger << apl::warning << "Only one entry found for the number of coordination shells. ";
-            logger << "3rd and 4th order anharmonic IFCs will use the same value." << apl::endl;
-            USER_CUTOFF_SHELL[1] = USER_CUTOFF_SHELL[0];
-          } else {
-            USER_CUTOFF_SHELL[1] = aurostd::string2utype<int>(tokens[1]);
-          }
-        }
-      }
-      // If only one parameter is set in the aflow.in file, unset the other
-      if (kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] != kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
-        if (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) USER_CUTOFF_DISTANCE.assign(2, 0.0);
-        if (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) USER_CUTOFF_SHELL.assign(2, 0);
-      }
-
-      // THERMALGRID
-      tokens.clear();
-      aurostd::string2tokens(THERMALGRID_SCHEME, tokens, string(" xX"));
-      if (tokens.size() == 3) {
-        USER_THERMALGRID[0] = aurostd::string2utype<int>(tokens[0]);
-        USER_THERMALGRID[1] = aurostd::string2utype<int>(tokens[1]);
-        USER_THERMALGRID[2] = aurostd::string2utype<int>(tokens[2]);
-      } else {
-        message = "Wrong setting in " + _ASTROPT_ + "THERMALGRID. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-      }
-
-      // TCT
-      tokens.clear();
-      aurostd::string2tokens(TCT_SCHEME, tokens, string(" :"));
-      if (tokens.size() == 3) {
-        USER_TCT_TSTART = aurostd::string2utype<double>(tokens[0]);
-        USER_TCT_TEND = aurostd::string2utype<double>(tokens[1]);
-        USER_TCT_TSTEP = aurostd::string2utype<double>(tokens[2]);
-        if (USER_TCT_TSTART == 0) {
-          logger << apl::warning << "Thermal conductivity is infinite at 0 K and will be skipped." << apl::endl;
-          USER_TCT_TSTART += USER_TCT_TSTEP;
-        }
-      } else {
-        message = "Wrong setting in " + _ASTROPT_ + "TCT. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-      }
-      // BOUNDARY and CUMULATIVEK
-      if (USER_BOUNDARY && USER_CUMULATIVEK) {
-        USER_CUMULATIVEK = false;
-        logger << apl::warning << "Both boundary effects and cumulative thermal conductivity cannot be ";
-        logger << "set at the same time. Cumulative thermal conductivity has been switched off." << apl::endl;
-      }
 
       /****************************** OUTPUT SUMMARY ******************************/
 
-      logger << "Parameters for the Automatic Anharmonic Phonon Library successfully read." << apl::endl;
-      logger << "Four-phonon processes will " << (USER_AAPL_FOURTH_ORDER?"":"NOT ") << "be included in the calculations." << apl::endl;
+      stringstream aaplout;
+      aaplout << "Parameters for the Automatic Anharmonic Phonon Library successfully read." << std::endl;
+      aaplout << "Four-phonon processes will " << (aaplopts.flag("FOURTH_ORDER")?"":"NOT ") << "be included in the calculations.";
 
-      defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
-      if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) {
-        logger << "The cutoff to compute the 3rd order anharmonic IFCs will be ";
-        logger << USER_CUTOFF_DISTANCE[0] << " Angstrom." << apl::endl;
-        if (USER_AAPL_FOURTH_ORDER) {
-          logger << "The cutoff to compute the 4th order anharmonic IFCs will be ";
-          logger << USER_CUTOFF_DISTANCE[1] << " Angstrom." << apl::endl;
+      bool defaults = (!aaplopts.flag("CUT_RAD") && !aaplopts.flag("CUT_SHELL"));
+      if (defaults || aaplopts.flag("CUT_RAD")) {
+        aurostd::string2tokens(aaplopts.getattachedscheme("CUT_RAD"), tokens, ",");
+        aaplout << "The cutoff to compute the 3rd order anharmonic IFCs will be ";
+        aaplout << tokens[0] << " Angstrom." << std::endl;
+        if (aaplopts.flag("FOUTH_ORDER")) {
+          aaplout << "The cutoff to compute the 4th order anharmonic IFCs will be ";
+          aaplout << tokens[1] << " Angstrom." << std::endl;
         }
       }
-      if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
-        logger << "The calculation of 3rd order anharmonic IFCs will consider up to ";
-        logger << USER_CUTOFF_SHELL[0] << " coordination shells." << apl::endl;
-        if (USER_AAPL_FOURTH_ORDER) {
-          logger << "The calculation of 4th order anharmonic IFCs will consider up to ";
-          logger << USER_CUTOFF_SHELL[1] << " coordination shells." << apl::endl;
+      if (defaults || aaplopts.flag("CUT_RAD")) {
+        aurostd::string2tokens(aaplopts.getattachedscheme("CUT_SHELL"), tokens, ",");
+        aaplout << "The calculation of 3rd order anharmonic IFCs will consider up to ";
+        aaplout << tokens[0] << " coordination shells." << std::endl;
+        if (aaplopts.flag("FOURTH_ORDER")) {
+          aaplout << "The calculation of 4th order anharmonic IFCs will consider up to ";
+          aaplout << tokens[1] << " coordination shells." << std::endl;
         }
       }
 
-      if (USER_KPPRA_AAPL > 0) logger << "AAPL will use a KPPRA of " << USER_KPPRA_AAPL << " for static calculations." << apl::endl;  //ME20190408
+      if (aaplopts.flag("KPPRA")) aaplout << "AAPL will use a KPPRA of " << aaplopts.getattachedscheme("KPPRA") << " for static calculations." << std::endl;
 
-      logger << "Anharmonic IFCs will be calculated with a convergence criterion of " << USER_EPS_SUM << "." << apl::endl;
-      logger << "A mixing coefficient of " << USER_AAPL_MIX << " will be used." << apl::endl;
-      logger << "Anharmonic IFCs need to be converged within " << USER_AAPL_MAX_ITER << " iterations." << apl::endl;
+      aaplout << "Anharmonic IFCs will be calculated with a convergence criterion of " << aaplopts.getattachedscheme("SUMRULE") << "." << std::endl;;
+      aaplout << "A mixing coefficient of " << aaplopts.getattachedscheme("MIXING_COEFFICIENT")<< " will be used." << std::endl;
+      aaplout << "Anharmonic IFCs need to be converged within " << aaplopts.getattachedscheme("SUMRULE_MAX_ITER") << " iterations." << std::endl;
 
-      logger << "Thermal conductivity will be calculated between ";
-      logger << USER_TCT_TSTART << " K and " << USER_TCT_TEND << "K ";
-      logger << "in " << USER_TCT_TSTEP << " K steps." << apl::endl;
+      aaplout << "Thermal conductivity will be calculated between ";
+      aaplout << aaplopts.getattachedscheme("TSTART") << " K";
+      aaplout << " and " << aaplopts.getattachedscheme("TEND") << "K";
+      aaplout << " in " << aaplopts.getattachedscheme("TSTEP") << " K steps." << std::endl;
 
-      logger << "The Boltzmann Transport Equation will be solved using ";
-      if (USER_BTE == "RTA") {
-        logger << "the Relaxation Time Approximation Approximation (RTA)." << apl::endl;
+      aaplout << "The Boltzmann Transport Equation will be solved using ";
+      if (aaplopts.getattachedscheme("BTE") == "RTA") {
+        aaplout << "the Relaxation Time Approximation Approximation (RTA)." << std::endl;
       } else {
-        logger << "an iterative scheme." << apl::endl;
+        aaplout << "an iterative scheme." << std::endl;
       }
-      logger << "The equation will be solved using the tetrahedron method along a ";
-      logger << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << " q-point mesh." << apl::endl;
-      logger << "Isotope effects will " << (USER_ISOTOPE?"":"NOT ") << "be included." << apl::endl;
-      if (USER_BOUNDARY || USER_CUMULATIVEK) {
-        logger << "Boundary effects will be included via ";
-        if (USER_BOUNDARY) {
-          logger << "boundary scattering with a grain size of ";
+      aaplout << "The equation will be solved using the tetrahedron method along a ";
+      aaplout << aaplopts.getattachedscheme("THERMALGRID") << " q-point mesh." << std::endl;
+      aaplout << "Isotope effects will " << (aaplopts.flag("ISOTOPE")?"":"NOT ") << "be included." << std::endl;
+      if (aaplopts.flag("BOUNDARY") || aaplopts.flag("CUMULATIVEK")) {
+        aaplout << "Boundary effects will be included via ";
+        if (aaplopts.flag("BOUNDARY")) {
+          aaplout << "boundary scattering with a grain size of ";
         } else {
-          logger << "cumulative thermal conductivity and a mean free path of at most ";
+          aaplout << "cumulative thermal conductivity and a mean free path of at most ";
         }
-        logger << USER_NANO_SIZE << " nm." << apl::endl;
+        aaplout << aaplopts.getattachedscheme("NANO_SIZE") << " nm." << std::endl;
       } else {
-        logger << "Boundary effects will NOT be included." << apl::endl;
+        aaplout << "Boundary effects will NOT be included." << std::endl;
       }
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, aaplout, aflags, messageFile, oss);
     } else {
       USER_TCOND = false;
-      logger << "Anharmonic force constants and thermal conductivity will NOT be calculated." << apl::endl;
+      stringstream aaplout;
+      aaplout << "Anharmonic force constants and thermal conductivity will NOT be calculated.";
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, aaplout, aflags, messageFile, oss);
     }
     //ME20181027 STOP
 
@@ -1579,7 +1467,7 @@ namespace KBIN {
     // Anharmonic force constants
     bool aapl_stagebreak = false;
     if (USER_TCOND) {
-      int max_order = (USER_AAPL_FOURTH_ORDER ? 4 : 3);
+      int max_order = (aaplopts.flag("FOURTH_ORDER") ? 4 : 3);
       for (int o = 3; o <= max_order; o++) {
         // Try and load IFCs from file
         string ifcs_hib_file = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[o-3]);
@@ -1604,8 +1492,7 @@ namespace KBIN {
           // Setup calculations
           apl::AnharmonicIFCs anharm(messageFile, oss);
           anharm.setDirectory(aflags.Directory);
-          anharm.initialize(phcalc.getSupercell(), o, USER_CUTOFF_SHELL[o - 3], USER_CUTOFF_DISTANCE[o - 3]);
-          anharm.setOptions(USER_DISTORTION_MAGNITUDE, USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM, USER_ZEROSTATE);
+          anharm.initialize(phcalc.getSupercell(), o, aaplopts);
           aapl_stagebreak = (anharm.runVASPCalculations(xinput, aflags, kflags, xflags) || aapl_stagebreak);
           // Calculate IFCs
           if (!aapl_stagebreak) {
@@ -2151,6 +2038,192 @@ namespace KBIN {
       tcond.calculateGrueneisenParameters();
       tcond.calculateThermalConductivity();
       tcond.writeOutputFiles(phcalc.getDirectory());
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                                 VALIDATORS                               //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  // ME200224
+  void validateParametersDosAPL(aurostd::xoption& aplopts, const _aflags& aflags, ofstream& messageFile, ostream& oss) {
+    string function = "apl::validateParametersDosAPL()";
+    string message = "";
+    vector<string> tokens;
+
+    // DOS Method
+    string dos_method = aplopts.getattachedscheme("DOSMETHOD");
+    if ((dos_method != "LT") && (dos_method != "RS")) {
+      message = "Wrong setting in DOSMETHOD. Use either LT or RS.";
+      message += " See README_AFLOW_APL.TXT for more information.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
+    double dos_smear = aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR"));
+    if ((dos_method == "RS") && (dos_smear < _ZERO_TOL_)) {
+      message = "Smearing value for DOS not set or set to zero.";
+      message += " APL will overwrite the smearing value to 0.05 eV.";
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
+      aplopts.pop_attached("DOSSMEAR");
+      aplopts.push_attached("DOSSMEAR", "0.05");
+    }
+
+    // q-point mesh
+    aurostd::string2tokens(aplopts.getattachedscheme("DOSMESH"), tokens, " xX");
+    if (tokens.size() != 3) {
+      message = "Wrong setting in DOSMESH.";
+      message += " See README_AFLOW_APL.TXT for the correct format.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+    }
+
+    // DOS projections
+    if (aplopts.flag("DOS_PROJECT")) {
+      string dos_proj_cart = aplopts.getattachedscheme("DOSPROJECTIONS_CART");
+      string dos_proj_frac = aplopts.getattachedscheme("DOSPROJECTIONS_FRAC");
+      if (!dos_proj_frac.empty() || !dos_proj_cart.empty()) {
+        if (!dos_proj_cart.empty() && !dos_proj_frac.empty()) {
+          message = "Ambiguous input in APL DOS projections.";
+          message += " Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
+        } else {
+          string projscheme;
+          if (!dos_proj_cart.empty()) projscheme = dos_proj_cart;
+          else projscheme = dos_proj_frac;
+          tokens.clear();
+          aurostd::string2tokens(projscheme, tokens, "; ");
+          for (uint i = 0; i < tokens.size(); i++) {
+            vector<string> proj;
+            aurostd::string2tokens(tokens[i], proj, ", ");
+            if (proj.size() != 3) {
+              message = "Wrong setting in DOSPROJECTIONS_";
+              message += string(dos_proj_cart.empty()?"FRAC":"CART") + ".";
+              message += " See README_AFLOW_APL.TXT for the correct format.";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Checks that the AAPL parameters are valid and recasts them to be usable
+  // by all AAPL classes.
+  void validateParametersAAPL(xoption& aaplopts, const _aflags& aflags, ofstream& messageFile, ostream& oss) {
+    string function = "apl::validateParametersAAPL()";
+    string _ASTROPT_ = "[AFLOW_AAPL]";
+    string module = "AAPL";
+    string scheme = "", message = "";
+    vector<string> tokens;
+
+    // BTE
+    scheme = aaplopts.getattachedscheme("BTE");
+    if ((scheme != "RTA") && (scheme != "FULL")) {
+      message = "Wrong setting in " + _ASTROPT_ + "BTE. Use either RTA or FULL.";
+      message += " See README_AFLOW_APL.TXT for more information.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
+
+    // CUT_SHELL and CUT_RAD
+    bool defaults = (!aaplopts.flag("CUT_SHELL") && !aaplopts.flag("CUT_RAD"));  // flag is false when isentry was false
+    bool fourth_order = aaplopts.flag("FOURTH_ORDER");
+    if (defaults || aaplopts.flag("CUT_RAD")) {
+      aurostd::string2tokens(aaplopts.getattachedscheme("CUT_RAD"), tokens, " ,");
+      if (tokens.size() < 1) {
+        message = "Not enough entries in " + _ASTROPT_ + "CUT_RAD. ";
+        message += "See README_AFLOW_APL.TXT for more information.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      } else if (tokens.size() > 2) {
+        message = "Too many entries for " + _ASTROPT_ + "CUT_RAD. Excess entries will be ignored.";
+        pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, messageFile, oss, _LOGGER_WARNING_);
+      } 
+      if (aaplopts.flag("FOURTH_ORDER")) {
+        if (tokens.size() == 1) {
+          message = "Only one entry found for the cutoff radius. 3rd and 4th order anharmonic IFCs will use the same value.";
+          pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, messageFile, oss, _LOGGER_WARNING_);
+          aaplopts.push_attached("CUT_RAD", tokens[0] + "," + tokens[0]);
+        } else {
+          aaplopts.push_attached("CUT_RAD", tokens[0] + "," + tokens[1]);
+        }
+      } else {
+        aaplopts.push_attached("CUT_RAD", tokens[0]);
+      }
+    }
+    if (defaults || aaplopts.flag("CUT_SHELL")) {
+      aurostd::string2tokens(aaplopts.getattachedscheme("CUT_SHELL"), tokens, " ,");
+      if (tokens.size() < 1) {
+        message = "Not enough entries in " + _ASTROPT_ + "CUT_SHELL. ";
+        message += "See README_AFLOW_APL.TXT for more information.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      } else if (tokens.size() > 2) {
+        message = "Too many entries for " + _ASTROPT_ + "CUT_SHELL. Excess entries will be ignored.";
+        pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, messageFile, oss, _LOGGER_WARNING_);
+      } 
+      if (aaplopts.flag("FOURTH_ORDER")) {
+        if (tokens.size() == 1) {
+          message = "Only one entry found for the cutoff shells. 3rd and 4th order anharmonic IFCs will use the same value.";
+          pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, messageFile, oss, _LOGGER_WARNING_);
+          aaplopts.push_attached("CUT_SHELL", tokens[0] + "," + tokens[0]);
+        } else {
+          aaplopts.push_attached("CUT_SHELL", tokens[0] + "," + tokens[1]);
+        }
+      } else {
+        aaplopts.push_attached("CUT_SHELL", tokens[0]);
+      }
+    }
+    // if only one parameter is set in the aflow.in file, unset the other
+    if (aaplopts.flag("CUT_RAD") != aaplopts.flag("CUT_SHELL")) {
+      if (!aaplopts.flag("CUT_RAD")) aaplopts.push_attached("CUT_RAD", (fourth_order?"0.0,0.0":"0.0"));
+      if (!aaplopts.flag("CUT_SHELL")) aaplopts.push_attached("CUT_RAD", (fourth_order?"0,0":"0"));
+    }
+
+    // THERMALGRID
+    scheme = aaplopts.getattachedscheme("THERMALGRID");
+    aurostd::string2tokens(scheme, tokens, string(" xX"));
+    if (tokens.size() != 3) {
+      message = "Wrong setting in " + _ASTROPT_ + "THERMALGRID. ";
+      message += "See README_AFLOW_APL.TXT for the correct format.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+    }
+
+    // TCT
+    scheme = aaplopts.getattachedscheme("TCT");
+    aurostd::string2tokens(scheme, tokens, string(" :"));
+    if (tokens.size() == 3) {
+      double USER_TCT_TSTART = aurostd::string2utype<double>(tokens[0]);
+      double USER_TCT_TEND = aurostd::string2utype<double>(tokens[1]);
+      double USER_TCT_TSTEP = aurostd::string2utype<double>(tokens[2]);
+      if (USER_TCT_TSTEP < _ZERO_TOL_) {
+        message = "Temperature step cannot be zero.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      }
+      if (USER_TCT_TSTART == 0) {
+        message = "Thermal conductivity is infinite at 0 K and will be skipped.";
+        pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, messageFile, oss);
+        USER_TCT_TSTART += USER_TCT_TSTEP;
+      }
+      if (USER_TCT_TSTART > USER_TCT_TEND) {
+        message = "Start temperature cannot be larger than final temperature.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      }
+      aaplopts.push_attached("TSTART", aurostd::utype2string<double>(USER_TCT_TSTART));
+      aaplopts.push_attached("TEND", aurostd::utype2string<double>(USER_TCT_TEND));
+      aaplopts.push_attached("TSTEP", aurostd::utype2string<double>(USER_TCT_TSTEP));
+    } else {
+      message = "Wrong setting in " + _ASTROPT_ + "TCT. ";
+      message += "See README_AFLOW_APL.TXT for the correct format.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+    }
+
+    // BOUNDARY and CUMULATIVEK
+    if (aaplopts.flag("BOUNDARY") && aaplopts.flag("CUMULATIVEK")) {
+      aaplopts.flag("CUMULATIVEK", false);
+      message = "Both boundary effects and cumulative thermal conductivity cannot be set at the same time.";
+      message += " Cumulative thermal conductivity has been switched off.";
+      pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, messageFile, oss, _LOGGER_WARNING_);
     }
   }
 }

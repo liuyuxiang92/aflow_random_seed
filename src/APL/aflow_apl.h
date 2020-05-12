@@ -269,7 +269,7 @@ namespace apl {
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
       void clear();
-      void initialize(const Supercell&, int, int, double);
+      void initialize(const Supercell&, int, const aurostd::xoption&);
 
       void setOptions(double, int, double, double, bool);
       const string& getDirectory() const;
@@ -665,6 +665,8 @@ namespace apl {
 // Interface
 namespace apl {
 
+  void validateParametersDosAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersAAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
   bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
   bool filesExistPhonons(_xinput&);
@@ -1409,7 +1411,11 @@ namespace apl {
       void clear(PhononCalculator&, const _aflags&);
       void initialize(const aurostd::xoption&);
 
-      aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
+      double boundary_grain_size;
+      bool calc_boundary;
+      bool calc_cumulative;
+      bool calc_isotope;
+      bool calc_rta_only;
       vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
       vector<vector<double> > freq;  // The frequencies at each q-point
       vector<vector<xvector<double> > > gvel;  // The group velocities

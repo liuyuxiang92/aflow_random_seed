@@ -192,16 +192,13 @@ namespace apl {
   }
 
   void PhononCalculator::initialize_qmesh(const xvector<int>& grid, bool include_inversions, bool gamma_centered) {
-    _qm.clear();
     _qm.initialize(grid, _supercell.getInputStructure(), include_inversions, gamma_centered);
   }
 
   void PhononCalculator::initialize_supercell(const xstructure& xstr) {
-    _supercell.clear();
     _supercell.initialize(xstr);
   }
   void PhononCalculator::initialize_supercell(const string& filename) {
-    _supercell.clear();
     _supercell.readFromStateFile(filename);
   }
 }

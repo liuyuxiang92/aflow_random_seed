@@ -243,9 +243,13 @@ namespace apl {
     // Read Born effective charges and dielectric tensor
     if (_isPolarMaterial && !calculateBornChargesDielectricTensor(xInputs.back())) return false;
 
-    if ((_method == "DM") && !calculateForceConstantsDM()) return false;
-    if ((_method == "LR") && !readForceConstantsFromVasprun(xInputs[0])) return false;
-    else return false;
+    if (_method == "DM") {
+      if (!calculateForceConstantsDM()) return false;
+    } else if (_method == "LR") {
+      if (!readForceConstantsFromVasprun(xInputs[0])) return false;
+    } else {
+      return false;
+    }
 
     // ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
@@ -1428,16 +1432,7 @@ namespace apl {
       }
     }
 
-    // BEGIN SC
-    // Do an additional calculation for polar materials
-    if (_isPolarMaterial) {
-      // Calc. Born effective charge tensors and dielectric constant matrix
-      _xinput xinpBE(xInput);  //ME20190113
-      stagebreak = (runVASPCalculationsBE(xinpBE, _aflowFlags, _kbinFlags, _xFlags, _AflowIn, ncalcs) || stagebreak);  //ME20190113
-      xInputs.push_back(xinpBE);
-    }
     return stagebreak;
-    // END SC
   }
 
   void ForceConstantCalculator::estimateUniqueDistortions(const xstructure& xstr,

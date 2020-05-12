@@ -143,8 +143,31 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the anharmonic IFC calculator by building the ClusterSet.
-  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, int cut_shell, double cut_rad) {
+  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts) {
+    string function = "apl::AnharmonicIFCs::initialize()";
+    string message = "";
+    // Initialize IFC parameters
     order = _order;
+    distortion_magnitude = aurostd::string2utype<double>(opts.getattachedscheme("DMAG"));
+    max_iter = aurostd::string2utype<int>(opts.getattachedscheme("SUMRULE_MAX_ITER"));
+    mixing_coefficient = aurostd::string2utype<double>(opts.getattachedscheme("MIXING_COEFFICIENT"));
+    sumrule_threshold = aurostd::string2utype<double>(opts.getattachedscheme("SUMRULE"));
+    _useZeroStateForces = opts.flag("ZEROSTATE");
+
+    // Initialize cluster
+    vector<string> tokens;
+    aurostd::string2tokens(opts.getattachedscheme("CUT_RAD"), tokens, ",");
+    if (tokens.size() < (uint) order - 2) {
+      message = "Not enough parameters for CUT_RAD";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
+    double cut_rad = aurostd::string2utype<double>(tokens[order - 3]);
+    aurostd::string2tokens(opts.getattachedscheme("CUT_SHELL"), tokens, ",");
+    if (tokens.size() < (uint) order - 2) {
+      message = "Not enough parameters for CUT_SHELL";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
+    int cut_shell = aurostd::string2utype<int>(tokens[order - 3]);
     clst.initialize(scell, _order, cut_shell, cut_rad);
     string clust_hib_file = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[_order-3];
     bool awakeClusterSet = aurostd::EFileExist(clust_hib_file);

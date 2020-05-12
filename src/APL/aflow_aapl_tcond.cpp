@@ -103,7 +103,11 @@ namespace apl {
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
     aflags = that.aflags;
-    calc_options = that.calc_options;
+    boundary_grain_size = that.boundary_grain_size;
+    calc_boundary = that.boundary_grain_size;
+    calc_cumulative = that.calc_cumulative;
+    calc_isotope = that.calc_isotope;
+    calc_rta_only = that.calc_rta_only;
     eigenvectors = that.eigenvectors;
     freq = that.freq;
     grueneisen_avg = that.grueneisen_avg;
@@ -136,7 +140,11 @@ namespace apl {
 
   //free//////////////////////////////////////////////////////////////////////
   void TCONDCalculator::free() {
-    calc_options.clear();
+    boundary_grain_size = 0.0;
+    calc_boundary = false;
+    calc_cumulative = false;
+    calc_isotope = false;
+    calc_rta_only = false;
     eigenvectors.clear();
     freq.clear();
     grueneisen_avg.clear();
@@ -180,7 +188,7 @@ namespace apl {
     }
     _logger.initialize(*_pc->getOFStream(), aflags);
     _logger.setModuleName(_AAPL_TCOND_MODULE_);
-    calc_options = opts;
+    // Set up phonon parameters
     nBranches = _pc->getNumberOfBranches();
     vector<int> grid;
     aurostd::string2tokens(opts.getattachedscheme("THERMALGRID"), grid, " xX");
@@ -194,15 +202,26 @@ namespace apl {
     nIQPs = _qm->getnIQPs();
 
     // Set up temperatures
-    double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
-    double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
-    double tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
+    double tstart = aurostd::string2utype<double>(opts.getattachedscheme("TSTART"));
+    double tend = aurostd::string2utype<double>(opts.getattachedscheme("TEND"));
+    double tstep = aurostd::string2utype<double>(opts.getattachedscheme("TSTEP"));
 
     if (tstart > tend) {
       message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
+    if (aurostd::isequal(tstep, 0.0)) {
+      message = "Tstep cannot be zero.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
     for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
+
+    // Set up calculation options
+    calc_boundary = opts.flag("BOUNDARY");
+    if (calc_boundary) boundary_grain_size = aurostd::string2utype<double>(opts.getattachedscheme("NANO_SIZE"));
+    calc_cumulative = opts.flag("CUMULATIVEK");
+    calc_isotope = opts.flag("ISOTOPE");
+    calc_rta_only = (opts.getattachedscheme("BTE") == "RTA");
 
     // Frequencies and group velocities
     calculateFrequenciesGroupVelocities();
@@ -237,7 +256,7 @@ namespace apl {
     scattering_rates_total.clear();
     scattering_rates_total.resize(ntemps, vector<vector<double> >(nIQPs, vector<double> (nBranches)));
     // Only need little groups for full BTE
-    if (!calc_options.flag("RTA") && !_qm->littleGroupsCalculated()) _qm->calculateLittleGroups();
+    if (!calc_rta_only && !_qm->littleGroupsCalculated()) _qm->calculateLittleGroups();
 
     for (uint t = 0; t < temperatures.size(); t++) {
       thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], scattering_rates_total[t], scattering_rates_anharm[t]);
@@ -271,11 +290,11 @@ namespace apl {
     writeTempDepOutput(filename, "SCATTERING_RATES", "1/ps", temperatures, scattering_rates_total);
     filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
     writeTempDepOutput(filename, "SCATTERING_RATES_ANHARMONIC", "1/ps", temperatures, scattering_rates_anharm);
-    if (calc_options.flag("ISOTOPE")) {
+    if (calc_isotope) {
       filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
       writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", scattering_rates_isotope);
     }
-    if (calc_options.flag("BOUNDARY")) {
+    if (calc_boundary) {
       string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
       writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", scattering_rates_boundary);
     }
@@ -297,8 +316,8 @@ namespace apl {
   // This function is mostly overhead, the actual calculation happens in
   // calculateFreqGvel.
   void TCONDCalculator::calculateFrequenciesGroupVelocities() {
-    _logger << "Calculating frequencies and group velocities." << apl::endl;
-    string message = "Frequencies and group velocities";
+    string message = "Calculating frequencies and group velocities.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
     // Prepare storage
     xmatrix<xcomplex<double> > eigen(nBranches, nBranches, 1, 1);
@@ -310,18 +329,19 @@ namespace apl {
     // Calculate frequencies and group velocities
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
-    vector<vector<int> > thread_dist = setupMPI(message, _logger, nQPs, ncpus);
+    vector<vector<int> > thread_dist = getThreadDistribution(nQPs, ncpus);
     vector<std::thread*> threads;
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateFreqGvel, this,
             thread_dist[icpu][0], thread_dist[icpu][1]));
     }
-    finishMPI(threads, _logger);
+    for (uint t = 0; t < threads.size(); t++) {
+      threads[t]->join();
+      delete threads[t];
+    }
 #else
-    _logger.initProgressBar(message);
     calculateFreqGvel(0, nQPs);
-    _logger.finishProgressBar();
 #endif
   }
 
@@ -351,7 +371,6 @@ namespace apl {
           }
         }
       }
-      _logger.updateProgressBar(1.0/(nQPs - 1));
     }
   }
 
@@ -370,7 +389,9 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Grueneisen parameters
-    _logger << "Calculating Grueneisen parameters." << apl::endl;
+    string message = "Calculating Grueneisen parameters.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
     grueneisen_mode = calculateModeGrueneisen(phases);
     phases.clear();
@@ -468,9 +489,9 @@ namespace apl {
           }
           g_mode *= -10.0 * au2nmTHz/(6.0 * std::pow(freq[q][br], 2));
           if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
-            _logger << apl::warning << " Grueneisen parameter at mode "
-              << iq << ", " << br << " is not real ("
-              << g_mode.re << ", " << g_mode.im << ")." << apl::endl;
+            stringstream message;
+            message << "Grueneisen parameter at mode " << iq << ", " << br << " is not real (" << g_mode.re << ", " << g_mode.im << ").";
+            pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS(), _LOGGER_WARNING_);
           }
           grueneisen[iq][br] = g_mode.re;
         } else {
@@ -514,21 +535,22 @@ namespace apl {
   // Calculates the transition probabilities for three-phonon, isotope, and
   // boundary scattering. Also calculates the scattering phase space.
   void TCONDCalculator::calculateTransitionProbabilities() {
-    _logger << "Calculating transition probabilities." << apl::endl;
+    string message = "Calculating transition probabilities.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist;
 #endif
-    string message = "";
     _qm->generateTetrahedra();
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);  // true: conjugate
 
     // Three-phonon transition probabilities
+    message = "Calculating transition probabilities for 3-phonon scattering processes.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     message = "Transition Probabilities";
-    _logger << "Calculating transition probabilities for 3-phonon scattering processes." << apl::endl;
     processes.clear();
     processes.resize(nIQPs);
     intr_trans_probs.clear();
@@ -550,8 +572,9 @@ namespace apl {
     _logger.finishProgressBar();
 #endif
 
-    if (calc_options.flag("ISOTOPE")) {
-      _logger << "Calculating isotope transition probabilities." << apl::endl;
+    if (calc_isotope) {
+      message = "Calculating isotope transition probabilities.";
+      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
       // Test if isotope scattering is possible
       const xstructure& pcell = _pc->getInputCellStructure();
@@ -562,9 +585,9 @@ namespace apl {
       }
 
       if (at == natoms) {
-        calc_options.flag("ISOTOPE", false);
-        _logger << "There are no atoms with isotopes of different masses."
-          << " Isotope scattering will be turned off." << apl::endl;
+        calc_isotope = false;
+        message = "There are no atoms with isotopes of different masses. Isotope scattering will be turned off.";
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       } else {
         message = "Isotope Transition Probabilities";
         processes_iso.resize(nIQPs);
@@ -579,16 +602,17 @@ namespace apl {
           threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
                 thread_dist[icpu][0], thread_dist[icpu][1]));
         }
-        finishMPI(threads, _logger);
+        for (uint t = 0; t < threads.size(); t++) {
+          threads[t]->join();
+          delete threads[t];
+        }
 #else
-        _logger.initProgressBar(message);
         calculateTransitionProbabilitiesIsotope(0, nIQPs);
-        _logger.finishProgressBar();
 #endif
       }
     }
 
-    if (calc_options.flag("BOUNDARY")) {
+    if (calc_boundary) {
       scattering_rates_boundary.clear();
       scattering_rates_boundary = calculateTransitionProbabilitiesBoundary();
     }
@@ -892,7 +916,6 @@ namespace apl {
           }
         }
       }
-      _logger.updateProgressBar(1.0/nIQPs);
     }
   }
 
@@ -902,13 +925,14 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateTransitionProbabilitiesBoundary() {
     int br = 0, iq = 0, q = 0;
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches));
-    double grain_size = aurostd::string2utype<double>(calc_options.getattachedscheme("GRAIN_SIZE"));
 
-    _logger << "Calculating grain boundary transition probabilities with a grain size of " << grain_size << " nm." << apl::endl;
+    stringstream message;
+    message << "Calculating grain boundary transition probabilities with a grain size of " << boundary_grain_size << " nm.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     for (iq = 0; iq < nIQPs; iq++) {
       for (br = 0; br < nBranches; br++) {
         q = _qm->getIbzqpts()[iq];
-        rates[iq][br] = aurostd::modulus(gvel[q][br])/grain_size;
+        rates[iq][br] = aurostd::modulus(gvel[q][br])/boundary_grain_size;
       }
     }
     return rates;
@@ -1056,23 +1080,28 @@ namespace apl {
   xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
       vector<vector<double> >& rates_total,
       vector<vector<double> >& rates_anharm) {
-    _logger << "Calculating thermal conductivity for " << T << " K." << apl::endl;
+    stringstream message;
+    message << "Calculating thermal conductivity for " << T << " K.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     // Bose-Einstein distribution
     vector<vector<double> > occ = getOccupationNumbers(T);
 
-    _logger << "Calculating scattering rates." << apl::endl;
+    message << "Calculating scattering rates.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     rates_total = calculateTotalRates(occ, rates_anharm);
 
-    _logger << "Calculating RTA" << apl::endl;
+    message << "Calculating RTA";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates_total);
     xmatrix<double> tcond = calcTCOND(T, occ, mfd); // RTA solution
 
     // Iteration for the full BTE.
-    if (!calc_options.flag("RTA")) {
+    if (!calc_rta_only) {
       xmatrix<double> tcond_prev(3, 3), diff(3, 3);
       int num_iter = 1;
       double norm = 0.0;
-      _logger << "Begin SCF for the Boltzmann transport equation." << apl::endl;
+      message << "Begin SCF for the Boltzmann transport equation.";
+      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       ostream& oss = *_pc->getOSS();
       oss << std::setiosflags(std::ios::fixed | std::ios::right);
       oss << std::setw(15) << "Iteration";
@@ -1095,7 +1124,6 @@ namespace apl {
       } while ((std::abs(norm) > TCOND_ITER_THRESHOLD) && (num_iter <= max_iter));
       if (num_iter > max_iter) {
         string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor()";
-        stringstream message;
         message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
         message << "at " << T << " K.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -1138,7 +1166,7 @@ namespace apl {
     vector<vector<double> > rates = calculateAnharmonicRates(occ);
     rates_anharm = rates;
 
-    if (calc_options.flag("ISOTOPE")) {
+    if (calc_isotope) {
       for (int iq = 0; iq < nIQPs; iq++) {
         for (int br = 0; br < nBranches; br++) {
           rates[iq][br] += scattering_rates_isotope[iq][br];
@@ -1146,7 +1174,7 @@ namespace apl {
       }
     }
 
-    if (calc_options.flag("BOUNDARY")) {
+    if (calc_boundary) {
       for (int iq = 0; iq < nIQPs; iq++) {
         for (int br = 0; br < nBranches; br++) {
           rates[iq][br] += scattering_rates_boundary[iq][br];
@@ -1220,8 +1248,7 @@ namespace apl {
   xmatrix<double> TCONDCalculator::calcTCOND(double T, const vector<vector<double> >& occ,
       const vector<vector<xvector<double> > >& mfd) {
     xmatrix<double> tcond(3, 3);
-    bool cumulative = calc_options.flag("CUMULATIVEK");
-    double grain_size = aurostd::string2utype<double>(calc_options.getattachedscheme("GRAIN_SIZE"));
+    bool cumulative = calc_cumulative;
     double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc->getInputCellStructure()));
     for (int q = 0; q < nQPs; q++) {
       for (int br = 0; br < nBranches; br++) {
@@ -1230,7 +1257,7 @@ namespace apl {
           include = false;
         } else if (cumulative) {  // Only include processes below a certain mean free path if cumulative
           double mfpath = scalar_product(mfd[q][br], gvel[q][br])/aurostd::modulus(gvel[q][br]);
-          include = !(mfpath > grain_size);
+          include = !(mfpath > boundary_grain_size);
         }
         if (include) {
           double x = occ[q][br] * (occ[q][br] + 1) * freq[q][br];
@@ -1303,7 +1330,7 @@ namespace apl {
         delta[i][branches[0]] += intr_trans_probs[i][p] * correction;
       }
 
-      if (calc_options.flag("ISOTOPE")) {
+      if (calc_isotope) {
         int q2 = 0, br1 = 0, br2 = 0;
         for (uint p = 0, nprocs = processes_iso[i].size(); p < nprocs; p++) {
           q2 = processes_iso[i][p][0];
