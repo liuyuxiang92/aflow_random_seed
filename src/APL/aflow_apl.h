@@ -1402,12 +1402,12 @@ namespace apl {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
       TCONDCalculator();
-      TCONDCalculator(PhononCalculator&, const _aflags&);
+      TCONDCalculator(PhononCalculator&, const aurostd::xoption&, const _aflags&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
       void clear(PhononCalculator&, const _aflags&);
-      void initialize();
+      void initialize(const aurostd::xoption&);
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
       vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
@@ -1420,12 +1420,23 @@ namespace apl {
       vector<vector<double> > intr_trans_probs;  // The intrinsic transition probabilities
       vector<vector<vector<int> > > processes_iso;  // The q-point and branch indices of the isotope scattering processes
       vector<vector<double> > intr_trans_probs_iso;  // The intrinsic transition probabilities for isotope processes
-      vector<vector<double> > rates_boundary;
-      vector<vector<double> > rates_isotope;
-      vector<double> temperatures;  // The mperatures for the thermal conductivity calculations
+      // Scattering rates
+      vector<vector<vector<double> > > scattering_rates_total;  // total
+      vector<vector<vector<double> > > scattering_rates_anharm;  // anharmonic scattering
+      vector<vector<double> > scattering_rates_boundary;  // boundary scattering
+      vector<vector<double> > scattering_rates_isotope;  // isotope scattering
+
+      vector<vector<vector<vector<double> > > > phase_space;  // Scattering phase space
+
+      vector<vector<double> > grueneisen_mode;  // Mode Grueneisen parameter
+      vector<double>  grueneisen_avg;  // Averaged Grueneisen parameter for each temperature
+
+      vector<double> temperatures;  // The temperatures for the thermal conductivity calculations
       vector<xmatrix<double> > thermal_conductivity;  // The thermal conductivity values
 
       void calculateThermalConductivity();
+      void calculateGrueneisenParameters();
+      void writeOutputFiles(const string&);
 
     private:
       PhononCalculator* _pc;  // Reference to the phonon calculator
@@ -1433,6 +1444,7 @@ namespace apl {
       Logger _logger;  // The APL logger
       _aflags aflags;
       bool _pc_set;
+      bool _initialized;
 
       void free();
       void copy(const TCONDCalculator&);
@@ -1451,12 +1463,10 @@ namespace apl {
       void calculateTransitionProbabilitiesIsotope(int, int);
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();
       void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
-      xmatrix<double> calculateThermalConductivityTensor(double,
-          vector<vector<vector<double> > >&,
-          vector<vector<vector<double> > >&);
+      xmatrix<double> calculateThermalConductivityTensor(double, vector<vector<double> >&, vector<vector<double> >&);
       vector<vector<double> > getOccupationNumbers(double);
       vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
-      vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<vector<double> > >&);
+      vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<double> >&);
       double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
       void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
       vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
@@ -1472,8 +1482,8 @@ namespace apl {
       void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
       void writeDataBlock(stringstream&, const vector<vector<double> >&);
       void writeGroupVelocities(const string&);
-      void writePhaseSpace(const string&, const vector<vector<vector<vector<double> > > >&);
-      void writeGrueneisen(const string&, const vector<double>&, const vector<vector<double> >&);
+      void writePhaseSpace(const string&);
+      void writeGrueneisen(const string&);
       void writeThermalConductivity(const string&);
   };
 

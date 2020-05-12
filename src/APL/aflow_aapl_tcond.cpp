@@ -79,12 +79,12 @@ namespace apl {
     free();
   }
 
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, const _aflags& a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, const aurostd::xoption& opts, const _aflags& a) {
     _pc = &pc;
     _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more readable
     _pc_set = true;
     aflags = a;
-    initialize();
+    initialize(opts);
   }
 
   //Copy Constructor//////////////////////////////////////////////////////////
@@ -105,8 +105,11 @@ namespace apl {
     aflags = that.aflags;
     calc_options = that.calc_options;
     eigenvectors = that.eigenvectors;
-    freq = that.freq;;
+    freq = that.freq;
+    grueneisen_avg = that.grueneisen_avg;
+    grueneisen_mode = that.grueneisen_mode;
     gvel = that.gvel;
+    _initialized = that._initialized;
     intr_trans_probs = that.intr_trans_probs;
     intr_trans_probs_iso = that.intr_trans_probs_iso;
     nBranches = that.nBranches;
@@ -114,12 +117,16 @@ namespace apl {
     nQPs = that.nQPs;
     _pc = that._pc;
     _pc_set = that._pc_set;
+    phase_space = that.phase_space;
     processes = that.processes;
     processes_iso = that.processes_iso;
     _qm = that._qm;
-    rates_boundary = that.rates_boundary;
-    rates_isotope = that.rates_isotope;
+    scattering_rates_anharm = that.scattering_rates_anharm;
+    scattering_rates_boundary = that.scattering_rates_boundary;
+    scattering_rates_isotope = that.scattering_rates_isotope;
+    scattering_rates_total = that.scattering_rates_total;
     temperatures = that.temperatures;
+    thermal_conductivity = that.thermal_conductivity;
   }
 
   //Destructor////////////////////////////////////////////////////////////////
@@ -132,7 +139,10 @@ namespace apl {
     calc_options.clear();
     eigenvectors.clear();
     freq.clear();
+    grueneisen_avg.clear();
+    grueneisen_mode.clear();
     gvel.clear();
+    _initialized = false;
     intr_trans_probs.clear();
     intr_trans_probs_iso.clear();
     nBranches = 0;
@@ -140,11 +150,14 @@ namespace apl {
     nQPs = 0;
     _pc = NULL;
     _pc_set = false;
+    phase_space.clear();
     processes.clear();
     processes_iso.clear();
     _qm = NULL;
-    rates_boundary.clear();
-    rates_isotope.clear();
+    scattering_rates_anharm.clear();
+    scattering_rates_boundary.clear();
+    scattering_rates_isotope.clear();
+    scattering_rates_total.clear();
     temperatures.clear();
     thermal_conductivity.clear();
   }
@@ -156,15 +169,44 @@ namespace apl {
     _qm = &_pc->getQMesh();
     _pc_set = true;
     aflags = a;
-    initialize();
   }
 
-  void TCONDCalculator::initialize() {
+  void TCONDCalculator::initialize(const aurostd::xoption& opts) {
+    string function = "apl::TCONDCalculator::initialize():";
+    string message = "";
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     _logger.initialize(*_pc->getOFStream(), aflags);
     _logger.setModuleName(_AAPL_TCOND_MODULE_);
+    calc_options = opts;
     nBranches = _pc->getNumberOfBranches();
+    vector<int> grid;
+    aurostd::string2tokens(opts.getattachedscheme("THERMALGRID"), grid, " xX");
+    if (grid.size() != 3) {
+      message = "Wrong format for the q-point grid for thermal conductivity calculations.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
+    _pc->initialize_qmesh(grid, true, true);
+    _qm->makeIrreducible();
     nQPs = _qm->getnQPs();
     nIQPs = _qm->getnIQPs();
+
+    // Set up temperatures
+    double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
+    double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
+    double tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
+
+    if (tstart > tend) {
+      message = "Tstart cannot be higher than Tend.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
+    for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
+
+    // Frequencies and group velocities
+    calculateFrequenciesGroupVelocities();
+    _initialized = true;
   }
 
 }  // namespace apl
@@ -177,72 +219,72 @@ namespace apl {
   // The main function that calculates the thermal conductivity tensor, the
   // Grueneisen parameters, and the scattering phase space.
   void TCONDCalculator::calculateThermalConductivity() {
-    string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
-    string message = "";
-
-    if (!_pc_set) {
-      message = "PhononCalculator pointer not set.";
+    if (!_initialized) {
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
+      string message = "Not initialized.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
-
-    // Setup temperatures
-    double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
-    double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
-    double tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
-
-    if (!_qm->initialized()) {
-      message = "q-point mesh is not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
-    }
-
-    if (tstart > tend) {
-      message = "Tstart cannot be higher than Tend.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
-    }
-    for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
-
-    // Frequencies and group velocities
-    calculateFrequenciesGroupVelocities();
-
-    string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
-    writeTempIndepOutput(filename, "Frequency", "THz", freq);
-
-    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
-    writeGroupVelocities(filename);
-
-    // Grueneisen parameters
-    _logger << "Calculating Grueneisen parameters." << apl::endl;
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
-    vector<vector<double> > grueneisen_modes = calculateModeGrueneisen(phases);
-    phases.clear();
-    vector<double> grueneisen_avg(temperatures.size());
-    for (uint t = 0; t < temperatures.size(); t++) {
-      grueneisen_avg[t] = calculateAverageGrueneisen(temperatures[t], grueneisen_modes);
-    }
-    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
-    writeGrueneisen(filename, grueneisen_avg, grueneisen_modes);
 
     // Transition probabilities
     calculateTransitionProbabilities();
 
     // Thermal conductivity tensor and scattering rates
-    thermal_conductivity.assign(temperatures.size(), xmatrix<double>(3, 3));
-    vector<vector<vector<double> > > rates_total, rates_anharm;
+    uint ntemps = temperatures.size();
+    thermal_conductivity.clear();
+    thermal_conductivity.assign(ntemps, xmatrix<double>(3, 3));
+    scattering_rates_anharm.clear();
+    scattering_rates_anharm.resize(ntemps, vector<vector<double> >(nIQPs, vector<double> (nBranches)));
+    scattering_rates_total.clear();
+    scattering_rates_total.resize(ntemps, vector<vector<double> >(nIQPs, vector<double> (nBranches)));
     // Only need little groups for full BTE
     if (!calc_options.flag("RTA") && !_qm->littleGroupsCalculated()) _qm->calculateLittleGroups();
 
     for (uint t = 0; t < temperatures.size(); t++) {
-      thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], rates_total, rates_anharm);
+      thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], scattering_rates_total[t], scattering_rates_anharm[t]);
     }
 
-    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
-    writeTempDepOutput(filename, "SCATTERING_RATES", "1/ps", temperatures, rates_total);
-    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
-    writeTempDepOutput(filename, "SCATTERING_RATES_ANHARMONIC", "1/ps", temperatures, rates_anharm);
+  }
 
-    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
+  void TCONDCalculator::writeOutputFiles(const string& directory) {
+    // q-points
+    string filename = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE;
+    _qm->writeQpoints(filename);
+    filename = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE;
+    _qm->writeIrredQpoints(filename);
+
+    // Frequencies and group velocities
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
+    writeTempIndepOutput(filename, "Frequency", "THz", freq);
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
+    writeGroupVelocities(filename);
+
+    // Grueneisen parameters
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
+    writeGrueneisen(filename);
+
+    // Phase space
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
+    writePhaseSpace(filename);
+
+    // Scattering rates
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
+    writeTempDepOutput(filename, "SCATTERING_RATES", "1/ps", temperatures, scattering_rates_total);
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
+    writeTempDepOutput(filename, "SCATTERING_RATES_ANHARMONIC", "1/ps", temperatures, scattering_rates_anharm);
+    if (calc_options.flag("ISOTOPE")) {
+      filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
+      writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", scattering_rates_isotope);
+    }
+    if (calc_options.flag("BOUNDARY")) {
+      string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
+      writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", scattering_rates_boundary);
+    }
+
+    // Thermal conductivity
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
     writeThermalConductivity(filename);
   }
+
 
 } // namespace apl
 
@@ -318,6 +360,26 @@ namespace apl {
 /******************************** GRUENEISEN ********************************/
 
 namespace apl {
+
+  //calculateGrueneisenParameters/////////////////////////////////////////////
+  // Calculates the mode and average Grueneisen parameters.
+  void TCONDCalculator::calculateGrueneisenParameters() {
+    if (!_initialized) {
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateGrueneisenParameters()";
+      string message = "Not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    // Grueneisen parameters
+    _logger << "Calculating Grueneisen parameters." << apl::endl;
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
+    grueneisen_mode = calculateModeGrueneisen(phases);
+    phases.clear();
+    grueneisen_avg.clear();
+    grueneisen_avg.resize(temperatures.size());
+    for (uint t = 0; t < temperatures.size(); t++) {
+      grueneisen_avg[t] = calculateAverageGrueneisen(temperatures[t], grueneisen_mode);
+    }
+  }
 
   //calculateModeGrueneisen///////////////////////////////////////////////////
   // Calculates the Grueneisen parameters for each mode.
@@ -423,7 +485,7 @@ namespace apl {
   //calculateAverageGrueneisen////////////////////////////////////////////////
   // Calculates the average Grueneisen parameter for a specific temperature.
   double TCONDCalculator::calculateAverageGrueneisen(double T,
-      const vector<vector<double> >& grueneisen_modes) {
+      const vector<vector<double> >& grueneisen_mode) {
     vector<vector<double> > occ = getOccupationNumbers(T);
     int iq = 0;
     double c, c_tot = 0, g_tot = 0;
@@ -434,7 +496,7 @@ namespace apl {
         if (freq[q][br] > _AFLOW_APL_EPS_) {
           c = prefactor * occ[q][br] * (1.0 + occ[q][br]) * std::pow(freq[q][br], 2);
           c_tot += c;
-          g_tot += grueneisen_modes[iq][br] * c;
+          g_tot += grueneisen_mode[iq][br] * c;
         }
       }
     }
@@ -467,10 +529,13 @@ namespace apl {
     // Three-phonon transition probabilities
     message = "Transition Probabilities";
     _logger << "Calculating transition probabilities for 3-phonon scattering processes." << apl::endl;
+    processes.clear();
     processes.resize(nIQPs);
+    intr_trans_probs.clear();
     intr_trans_probs.resize(nIQPs);
     // Phase space for each (1) q-point, (2) branch, (3) type (AAA, AAO, etc.), and (4) sign (normal, umklapp)
-    vector<vector<vector<vector<double> > > > phase_space(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
+    phase_space.clear();
+    phase_space.resize(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
     threads.clear();
@@ -484,10 +549,6 @@ namespace apl {
     calculateTransitionProbabilitiesPhonon(0, nIQPs, phase_space, phases);
     _logger.finishProgressBar();
 #endif
-
-    // Output phase space
-    string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
-    writePhaseSpace(filename, phase_space);
 
     if (calc_options.flag("ISOTOPE")) {
       _logger << "Calculating isotope transition probabilities." << apl::endl;
@@ -508,7 +569,8 @@ namespace apl {
         message = "Isotope Transition Probabilities";
         processes_iso.resize(nIQPs);
         intr_trans_probs_iso.resize(nIQPs);
-        rates_isotope.resize(nIQPs, vector<double>(nBranches));
+        scattering_rates_isotope.clear();
+        scattering_rates_isotope.resize(nIQPs, vector<double>(nBranches));
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
         thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
@@ -524,14 +586,11 @@ namespace apl {
         _logger.finishProgressBar();
 #endif
       }
-      string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
-      writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
     }
 
     if (calc_options.flag("BOUNDARY")) {
-      rates_boundary = calculateTransitionProbabilitiesBoundary();
-      string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
-      writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
+      scattering_rates_boundary.clear();
+      scattering_rates_boundary = calculateTransitionProbabilitiesBoundary();
     }
   }
 
@@ -828,7 +887,7 @@ namespace apl {
               proc[1] = b;
               intr_trans_probs_iso[i].push_back(rate);
               processes_iso[i].push_back(proc);
-              rates_isotope[i][br1] += rate;
+              scattering_rates_isotope[i][br1] += rate;
             }
           }
         }
@@ -995,18 +1054,17 @@ namespace apl {
   // scattering rates for a specific temperature. The rates are passed by
   // reference so that they can be written into output files later.
   xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
-      vector<vector<vector<double> > >& rates_total,
-      vector<vector<vector<double> > >& rates_anharm) {
+      vector<vector<double> >& rates_total,
+      vector<vector<double> >& rates_anharm) {
     _logger << "Calculating thermal conductivity for " << T << " K." << apl::endl;
     // Bose-Einstein distribution
     vector<vector<double> > occ = getOccupationNumbers(T);
 
     _logger << "Calculating scattering rates." << apl::endl;
-    vector<vector<double> > rates = calculateTotalRates(occ, rates_anharm);
-    rates_total.push_back(rates);
+    rates_total = calculateTotalRates(occ, rates_anharm);
 
     _logger << "Calculating RTA" << apl::endl;
-    vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates);
+    vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates_total);
     xmatrix<double> tcond = calcTCOND(T, occ, mfd); // RTA solution
 
     // Iteration for the full BTE.
@@ -1022,7 +1080,7 @@ namespace apl {
       oss << std::setw(25) << "Rel. Change in Norm" << std::endl;
       do {
         tcond_prev = tcond;
-        getMeanFreeDispFull(rates, occ, mfd);
+        getMeanFreeDispFull(rates_total, occ, mfd);
 
         tcond = calcTCOND(T, occ, mfd);
         // Calculate relative changes to the Frobenius norm instead of just
@@ -1076,14 +1134,14 @@ namespace apl {
   // Calculates the total scattering rates based on three-phonon, isotope,
   // and boundary scattering.
   vector<vector<double> > TCONDCalculator::calculateTotalRates(const vector<vector<double> >& occ,
-      vector<vector<vector<double> > >& rates_anharm) {
+      vector<vector<double> >& rates_anharm) {
     vector<vector<double> > rates = calculateAnharmonicRates(occ);
-    rates_anharm.push_back(rates);
+    rates_anharm = rates;
 
     if (calc_options.flag("ISOTOPE")) {
       for (int iq = 0; iq < nIQPs; iq++) {
         for (int br = 0; br < nBranches; br++) {
-          rates[iq][br] += rates_isotope[iq][br];
+          rates[iq][br] += scattering_rates_isotope[iq][br];
         }
       }
     }
@@ -1091,7 +1149,7 @@ namespace apl {
     if (calc_options.flag("BOUNDARY")) {
       for (int iq = 0; iq < nIQPs; iq++) {
         for (int br = 0; br < nBranches; br++) {
-          rates[iq][br] += rates_boundary[iq][br];
+          rates[iq][br] += scattering_rates_boundary[iq][br];
         }
       }
     }
@@ -1300,7 +1358,7 @@ namespace apl {
   // Writes temperature-independent output files.
   void TCONDCalculator::writeTempIndepOutput(const string& filename, string keyword,
       const string& unit, const vector<vector<double> >& data) {
-    string path = aurostd::CleanFileName(_pc->getDirectory() + "/" + filename);
+    if (data.size() == 0) return;  // Nothing to write
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
@@ -1315,11 +1373,11 @@ namespace apl {
     writeDataBlock(output, data);
     output << key << "STOP" << std::endl;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    aurostd::stringstream2file(output, path);
-    if (!aurostd::FileExist(path)) {
+    aurostd::stringstream2file(output, filename);
+    if (!aurostd::FileExist(filename)) {
       string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput()";
       stringstream message;
-      message << "Could not write file " << path << ".";
+      message << "Could not write file " << filename << ".";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
   }
@@ -1328,6 +1386,7 @@ namespace apl {
   // Writes temperature-dependent output files.
   void TCONDCalculator::writeTempDepOutput(const string& filename, string keyword, const string& unit,
       const vector<double>& temps, const vector<vector<vector<double> > >& data) {
+    if (data.size() == 0) return; // Nothing to write
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
@@ -1373,6 +1432,7 @@ namespace apl {
   // Writes the group velocities into a file. Each row belongs to a q-point,
   // and each column triplet belongs to a phonon branch.
   void TCONDCalculator::writeGroupVelocities(const string& filename) {
+    if (gvel.size() == 0) return;  // Nothing to write
     stringstream output;
 
     // Header
@@ -1416,8 +1476,8 @@ namespace apl {
   // Writes the scattering phase space into an output file. Numbers are
   // converted into fs to get "nicer" numbers. OOO should be zero, but it is
   // output regardless in case there is a problem.
-  void TCONDCalculator::writePhaseSpace(const string& filename,
-      const vector<vector<vector<vector<double> > > >& phase_space) {
+  void TCONDCalculator::writePhaseSpace(const string& filename) {
+    if (phase_space.size() == 0) return;  // Nothing to write
     // Calculate totals
     vector<double> ps_procs(4), ps_nu(2);
     vector<vector<double> > ps_modes(nIQPs, vector<double>(nBranches));
@@ -1465,9 +1525,8 @@ namespace apl {
   //writeGrueneisen///////////////////////////////////////////////////////////
   // Outputs the temperature-dependent average Grueneisen parameters and the
   // mode Grueneisen parameters into a file.
-  void TCONDCalculator::writeGrueneisen(const string& filename,
-      const vector<double>& grueneisen_avg,
-      const vector<vector<double> >& grueneisen_modes) {
+  void TCONDCalculator::writeGrueneisen(const string& filename) {
+    if (grueneisen_mode.size() == 0) return;  // Nothing to write
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc->getSystemName() << std::endl;
@@ -1483,7 +1542,7 @@ namespace apl {
     output << "[AAPL_GRUENEISEN_MODE]START" << std::endl;
     for (int i = 0; i < nIQPs; i++) {
       for (int b = 0; b < nBranches; b++) {
-        output << std::setw(17) << std::setprecision(10) << std::dec << grueneisen_modes[i][b];
+        output << std::setw(17) << std::setprecision(10) << std::dec << grueneisen_mode[i][b];
       }
       output << std::endl;
     }
@@ -1495,6 +1554,7 @@ namespace apl {
   //writeThermalConductivity////////////////////////////////////////////////////
   // Outputs the thermal conductivity tensor into a file.
   void TCONDCalculator::writeThermalConductivity(const string& filename) {
+    if (thermal_conductivity.size() == 0) return;  // Nothing to write
     stringstream output;
 
     // Header

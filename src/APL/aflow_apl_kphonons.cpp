@@ -774,6 +774,7 @@ namespace KBIN {
 
     /***************************** READ PARAMETERS *****************************/
 
+    aurostd::xoption aaplopts;
     string USER_BTE;
     bool USER_TCOND, USER_ISOTOPE, USER_BOUNDARY, USER_CUMULATIVEK, USER_AAPL_FOURTH_ORDER;
     double USER_NANO_SIZE, USER_EPS_SUM, USER_AAPL_MIX, USER_TCT_TSTART, USER_TCT_TEND, USER_TCT_TSTEP;
@@ -786,6 +787,8 @@ namespace KBIN {
       for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aaplflags.size(); i++) {
         const string& key = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].keyword;
         logger << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme << apl::endl;
+        aaplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option);
+        aaplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme);
         if (key == "BTE") {USER_BTE = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
         if (key == "FOURTH_ORDER") {USER_AAPL_FOURTH_ORDER = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
         if (key == "CUT_RAD") {CUTOFF_SCHEME = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme; continue;}
@@ -819,7 +822,7 @@ namespace KBIN {
         tokens.clear();
         aurostd::string2tokens(CUTOFF_SCHEME, tokens, string(" ,"));
         if (tokens.size() < 1) {
-          message = "Not enought entries in " + _ASTROPT_ + "CUT_RAD. ";
+          message = "Not enough entries in " + _ASTROPT_ + "CUT_RAD. ";
           message += "See README_AFLOW_APL.TXT for more information.";
           //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
@@ -1794,7 +1797,6 @@ namespace KBIN {
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
     if (!USER_FREQFORMAT.empty()) {
-      //     try {
       // Convert format to machine representation
       tokens.clear();
       aurostd::string2tokens(USER_FREQFORMAT, tokens, string(" |:;,"));
@@ -2120,13 +2122,15 @@ namespace KBIN {
           for (i = 0; i < freqs.size(); i++) {
             if (freqs[i] > -_AFLOW_APL_EPS_) break;
           }
-          double idos_percent = 100.0 * idos[i]/idos.back();
-          // Cannot use std::setprecision with apl:logger, so use this workaround.
-          stringstream percent;
-          percent << std::fixed << std::setprecision(1) << idos_percent;
-          logger << apl::warning << "There are imaginary frequencies in the phonon DOS, covering "
-            << percent.str() << "\% of the integrated DOS. These frequencies were omitted in the "
-            << "calculation of thermodynamic properties." << apl::endl;
+          if (i > 0) {
+            double idos_percent = 100.0 * idos[i - 1]/idos.back();
+            // Cannot use std::setprecision with apl:logger, so use this workaround.
+            stringstream percent;
+            percent << std::fixed << std::setprecision(1) << idos_percent;
+            logger << apl::warning << "There are imaginary frequencies in the phonon DOS, covering "
+              << percent.str() << "\% of the integrated DOS. These frequencies were omitted in the "
+              << "calculation of thermodynamic properties." << apl::endl;
+          }
         }
       }
     }
@@ -2140,35 +2144,14 @@ namespace KBIN {
     if (LDEBUG) std::cerr << function << " DEBUG [6]" << std::endl;
 
     if (USER_TCOND) {
-      // Get q-points
       message = "Starting thermal conductivity calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-      std::cout << aurostd::joinWDelimiter(USER_THERMALGRID, "x") << std::endl;
-      phcalc.initialize_qmesh(USER_THERMALGRID, true, true);
-      apl::QMesh& qmtcond = phcalc.getQMesh();
-      qmtcond.makeIrreducible();
-      qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
-      qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);
 
-      // Do the thermal conductivity calculation
-      apl::TCONDCalculator tcond(phcalc, aflags);
-
-      // Set calculation options
-      tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));
-      tcond.calc_options.flag("ISOTOPE", USER_ISOTOPE);
-      tcond.calc_options.flag("BOUNDARY", USER_BOUNDARY);
-      tcond.calc_options.flag("CUMULATIVE", USER_CUMULATIVEK);
-      tcond.calc_options.flag("FOURTH_ORDER", USER_AAPL_FOURTH_ORDER);
-      tcond.calc_options.push_attached("GRAIN_SIZE", aurostd::utype2string<double>(USER_NANO_SIZE));
-      tcond.calc_options.push_attached("TSTART", aurostd::utype2string<double>(USER_TCT_TSTART));
-      tcond.calc_options.push_attached("TEND", aurostd::utype2string<double>(USER_TCT_TEND));
-      tcond.calc_options.push_attached("TSTEP", aurostd::utype2string<double>(USER_TCT_TSTEP));
-      tcond.calc_options.push_attached("KZIP_BIN", kflags.KZIP_BIN);
-
+      apl::TCONDCalculator tcond(phcalc, aaplopts, aflags);
+      tcond.calculateGrueneisenParameters();
       tcond.calculateThermalConductivity();
+      tcond.writeOutputFiles(phcalc.getDirectory());
     }
-    /*************** End Thermal Conductivity Calculations ****************/
-
   }
 }
 
