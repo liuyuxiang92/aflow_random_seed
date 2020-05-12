@@ -122,7 +122,7 @@ bool NonlinearFit::fitLevenbergMarquardt()
   bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
   if (LDEBUG) cerr << function << "begin"  << std::endl;
 
-  const double step_scaling_factor = 10.0;
+  static const double step_scaling_factor = 10.0;
 
   xvector<double> pnew(Nparams);
   xmatrix<double> G(Nparams, 1), M(Nparams, Nparams);
