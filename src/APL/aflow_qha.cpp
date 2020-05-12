@@ -799,6 +799,7 @@ namespace apl
       msg = "QHA is not initialized properly and QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
+      return;
     }
 
     try{
@@ -907,7 +908,15 @@ namespace apl
   /// 
   int QHAN::checkStaticCalculations()
   {
-    string function = "QHAN::checkStaticCalculations():";
+    string function = "QHAN::checkStaticCalculations():", msg = "";
+
+    if (!isInitialized){
+      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_ERROR_);
+      return;
+    }
+
     int count = 0;
     string dosfile = "", outcarfile = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
@@ -918,7 +927,7 @@ namespace apl
         count++;
       }
       else{
-        string msg = "QHA is not able to proceed: ";
+        msg = "QHA is not able to proceed: ";
         msg += subdirectories_static[i] + " is missing.\n";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_WARNING_);
@@ -939,6 +948,13 @@ namespace apl
     string msg = "Reading phonon DOS and dispersion relations.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
+
+    if (!isInitialized){
+      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_ERROR_);
+      return;
+    }
 
     int Nqpoints = 0;
     bool apl_data_calculated = true;
@@ -1127,6 +1143,13 @@ namespace apl
     string msg = "";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
+
+    if (!isInitialized){
+      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_ERROR_);
+      return;
+    }
 
     xDOSCAR doscar;
     xOUTCAR outcar;
