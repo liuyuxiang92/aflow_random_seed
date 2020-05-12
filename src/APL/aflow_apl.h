@@ -1404,11 +1404,11 @@ namespace apl {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
       TCONDCalculator();
-      TCONDCalculator(PhononCalculator&, const aurostd::xoption&, const _aflags&);
+      TCONDCalculator(PhononCalculator&, const aurostd::xoption&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
-      void clear(PhononCalculator&, const _aflags&);
+      void clear(PhononCalculator&);
       void initialize(const aurostd::xoption&);
 
       double boundary_grain_size;
@@ -1447,8 +1447,6 @@ namespace apl {
     private:
       PhononCalculator* _pc;  // Reference to the phonon calculator
       QMesh* _qm;
-      Logger _logger;  // The APL logger
-      _aflags aflags;
       bool _pc_set;
       bool _initialized;
 

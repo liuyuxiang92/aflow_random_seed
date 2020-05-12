@@ -342,7 +342,7 @@ namespace KBIN {
       _ASTROPT_ = _ASTROPT_APL_;    //CO20170601
     }
 
-    logger << "RUNNING..." << apl::endl;
+    pflow::logger(_AFLOW_FILE_NAME_, modulename, "RUNNING...", aflags, messageFile, oss);
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -778,9 +778,11 @@ namespace KBIN {
     aurostd::xoption aaplopts;
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       USER_TCOND = true;
+      stringstream aaplout;
       for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aaplflags.size(); i++) {
         const string& key = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].keyword;
-        logger << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme << apl::endl;
+        aaplout << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme;
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, aaplout, aflags, messageFile, oss);
         aaplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option);
         aaplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme);
       }
@@ -792,7 +794,6 @@ namespace KBIN {
 
       /****************************** OUTPUT SUMMARY ******************************/
 
-      stringstream aaplout;
       aaplout << "Parameters for the Automatic Anharmonic Phonon Library successfully read." << std::endl;
       aaplout << "Four-phonon processes will " << (aaplopts.flag("FOURTH_ORDER")?"":"NOT ") << "be included in the calculations.";
 
@@ -2034,7 +2035,7 @@ namespace KBIN {
       message = "Starting thermal conductivity calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
 
-      apl::TCONDCalculator tcond(phcalc, aaplopts, aflags);
+      apl::TCONDCalculator tcond(phcalc, aaplopts);
       tcond.calculateGrueneisenParameters();
       tcond.calculateThermalConductivity();
       tcond.writeOutputFiles(phcalc.getDirectory());

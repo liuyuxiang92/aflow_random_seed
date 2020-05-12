@@ -17,6 +17,7 @@
 #if GCC_VERSION >= 40400
 #define AFLOW_APL_MULTITHREADS_ENABLE
 #include <thread>
+#include <mutex>
 #else
 #warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
@@ -30,45 +31,13 @@ static const string _AAPL_TCOND_MODULE_ = "AAPL";
 static const int max_iter = 250;  // Maximum number of iterations for the iterative BTE solution
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
 static const double TCOND_ITER_THRESHOLD = 1e-4;  // Convergence criterion for thermal conductivity
+static unsigned long long int progress_bar_counter = 0;
 
 using aurostd::xcomplex;
 using aurostd::xmatrix;
 using aurostd::xvector;
 using aurostd::xerror;
 using std::vector;
-
-/************************************ MPI ***********************************/
-
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-
-namespace apl {
-
-  //setupMPI//////////////////////////////////////////////////////////////////
-  // Sets up an MPI calculation.
-  vector<vector<int> > setupMPI(string message, Logger& log,
-      int nproc, int& ncpus) {
-    if (ncpus < 1) ncpus = 1;
-
-    if (ncpus > 1) {
-      message += " (" + aurostd::utype2string<int>(ncpus) + " threads)";
-    }
-    log.initProgressBar(message);
-
-    return getThreadDistribution(nproc, ncpus);
-  }
-
-  //finishMPI/////////////////////////////////////////////////////////////////
-  // Finishes the MPI progress bar and deletes the threads.
-  void finishMPI(vector<std::thread*>& threads, Logger& log) {
-    for (uint t = 0; t < threads.size(); t++) {
-      threads[t]->join();
-      delete threads[t];
-    }
-    log.finishProgressBar();
-  }
-
-}  // namespace apl
-#endif
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
 
@@ -79,11 +48,10 @@ namespace apl {
     free();
   }
 
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, const aurostd::xoption& opts, const _aflags& a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, const aurostd::xoption& opts) {
     _pc = &pc;
     _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more readable
     _pc_set = true;
-    aflags = a;
     initialize(opts);
   }
 
@@ -102,7 +70,6 @@ namespace apl {
   }
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
-    aflags = that.aflags;
     boundary_grain_size = that.boundary_grain_size;
     calc_boundary = that.boundary_grain_size;
     calc_cumulative = that.calc_cumulative;
@@ -171,12 +138,11 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, const _aflags& a) {
+  void TCONDCalculator::clear(PhononCalculator& pc) {
     free();
     _pc = &pc;
     _qm = &_pc->getQMesh();
     _pc_set = true;
-    aflags = a;
   }
 
   void TCONDCalculator::initialize(const aurostd::xoption& opts) {
@@ -186,8 +152,6 @@ namespace apl {
       message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
-    _logger.initialize(*_pc->getOFStream(), aflags);
-    _logger.setModuleName(_AAPL_TCOND_MODULE_);
     // Set up phonon parameters
     nBranches = _pc->getNumberOfBranches();
     vector<int> grid;
@@ -558,18 +522,21 @@ namespace apl {
     // Phase space for each (1) q-point, (2) branch, (3) type (AAA, AAO, etc.), and (4) sign (normal, umklapp)
     phase_space.clear();
     phase_space.resize(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
+    progress_bar_counter = 0;
+    pflow::updateProgressBar(progress_bar_counter, nIQPs, *_pc->getOSS());
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
+    thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
             thread_dist[icpu][0], thread_dist[icpu][1], std::ref(phase_space), std::ref(phases)));
     }
-    finishMPI(threads, _logger);
+    for (uint t = 0; t < threads.size(); t++) {
+      threads[t]->join();
+      delete threads[t];
+    }
 #else
-    _logger.initProgressBar(message);
     calculateTransitionProbabilitiesPhonon(0, nIQPs, phase_space, phases);
-    _logger.finishProgressBar();
 #endif
 
     if (calc_isotope) {
@@ -589,14 +556,13 @@ namespace apl {
         message = "There are no atoms with isotopes of different masses. Isotope scattering will be turned off.";
         pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       } else {
-        message = "Isotope Transition Probabilities";
         processes_iso.resize(nIQPs);
         intr_trans_probs_iso.resize(nIQPs);
         scattering_rates_isotope.clear();
         scattering_rates_isotope.resize(nIQPs, vector<double>(nBranches));
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-        thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
+        thread_dist = getThreadDistribution(nIQPs, ncpus);
         threads.clear();
         for (int icpu = 0; icpu < ncpus; icpu++) {
           threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
@@ -856,7 +822,11 @@ namespace apl {
           }
         }
       }
-      _logger.updateProgressBar(1.0/nIQPs);
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe progress bar writing
+#endif
+      progress_bar_counter += 1;;
+      pflow::updateProgressBar(progress_bar_counter, nIQPs, *_pc->getOSS());
     }
   }
 

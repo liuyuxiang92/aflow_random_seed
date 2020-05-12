@@ -10402,6 +10402,25 @@ namespace pflow {
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace pflow {
+
+  // ME20200512 - Created by CO for POCC.
+  const int BAR_WIDTH = 70;
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
+    if(XHOST.WEB_MODE){return;} //CO20190520 - no progress bar for web stuff
+    double progress = (double)current/(double)end;
+    int pos = BAR_WIDTH * progress;
+
+    oss << "[";
+    for (int i = 0; i < BAR_WIDTH; ++i) {
+      if (i < pos) oss << "=";
+      else if (i == pos) oss << ">";
+      else oss << " ";
+    }
+    oss << "] " << int(progress * 100.0) << " %\r";
+    oss.flush();
+    if(current==end){ oss << endl; }
+  }
+
   //***************************************************************************//
   // pflow::logger(const char& type,const string& function_name,string
   // _message,bool silent,ostream& oss,ofstream& FileMESSAGE)

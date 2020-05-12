@@ -332,6 +332,7 @@ namespace pflow {
   ////////////////////////////////////////////////////////////////////////////////
   // START - added by Corey Oses - May 2017
   // effectively logs EVERYTHING, deals with cout and logger
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=std::cout);
   void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
