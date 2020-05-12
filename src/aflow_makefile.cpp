@@ -318,7 +318,7 @@ namespace makefile {
     vector<string> vsubdirectories;
     vsubdirectories.push_back(directory);
     vsubdirectories.push_back(directory+"/APL");
-    vsubdirectories.push_back(directory+"/ANRL");
+    //DX20200512 vsubdirectories.push_back(directory+"/ANRL");
     vsubdirectories.push_back(directory+"/SQLITE");
     std::sort(vsubdirectories.begin(),vsubdirectories.end()); //sort before adding AUROSTD, which must come first
     
