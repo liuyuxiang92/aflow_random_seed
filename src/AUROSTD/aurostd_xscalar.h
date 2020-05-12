@@ -81,7 +81,7 @@
 #define BEfactor_h_THz                PLANCKSCONSTANTEV_h/(KBOLTZEV*Hz2THz)  // h/kB in K/THz
 
 //AS20200427 - QHA-related conversion factors
-#define eV2GPa 160.2176621    // [eV/A^3] --> [GPa]
+#define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants

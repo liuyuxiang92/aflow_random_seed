@@ -1824,18 +1824,18 @@ namespace apl {
 }
 // ***************************************************************************
 #define QHA_ARUN_MODE "QHA" // used in filename
-#define N_GP_FIT_PARAMETERS  3 ///< number of parameters to fit frequency-volume relation
-#define N_EOS_FIT_PARAMETERS 5 ///< number of parameters for polynomial EOS fit
 
 namespace apl
 {
-  /** Performs fit of energy-volume relation to a given equation of state.
-   *  The choises are: Murnaghan, Birch-Murnaghan or polynomial EOS models.
-   */
+  enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
+
+  /// Performs fit of energy-volume relation to a given equation of state.
+  /// The choices are: Murnaghan, Birch-Murnaghan or polynomial EOS models.
+  ///
   class EOSfit{
     public:
       EOSfit();
-      int method;
+      EOSmethod method;
       xvector<double> E;
       xvector<double> V;
       xvector<double> guess;
@@ -1851,64 +1851,66 @@ namespace apl
 
 namespace apl
 {
-  /** Calculates QHA-related properties
-   *
-   * This class will substitute old QHA class.
-   * The old QHA class will be kept until the new one is finished.
-   */
+  enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC};
+
+  // Calculates QHA-related properties
+  // 
+  // This class will substitute old QHA class.
+  // The old QHA class will be kept until the new one is finished.
+  // 
   class QHAN : public xStream {
     public:
-      QHAN();
+      QHAN(ostream& oss=std::cout);
       QHAN(const QHAN& qha);
-      QHAN(string &tpt,_xinput &xinput, _aflags &aflags, _kflags &kflags,
-          _xflags &xflags, string *aflowin, xoption &supercellopts,
+      QHAN(string &tpt,_xinput &xinput, _kflags &kflags, xoption &supercellopts,
           ofstream &messageFile, ostream &oss=std::cout);
-      void initialize(string &tpt,_xinput &xinput, _aflags &aflags, _kflags &kflags,
-          _xflags &xflags, string *aflowin, xoption &supercellopts,
-          ofstream &messageFile, ostream &oss);
+      void initialize(string &tpt,_xinput &xinput, _kflags &kflags,
+          xoption &supercellopts, ofstream &messageFile, ostream &oss);
       ~QHAN();
       const QHAN& operator=(const QHAN &qha);
-      void run();
+      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
       void clear();
-      double calcGamma(double V, xvector<double> &xomega, double &w);
-      double calcGammaFD(xvector<double> &xomega);
-      void   calcCV_GP(double T, double &CV, double &GP);
-      void   calcCV_GP_fit(double T, double V, double &CV, double &GP);
+      double calcGrueneiesen(double V, xvector<double> &xomega, double &w);
+      double calcGrueneiesenFD(const xvector<double> &xomega);
+      void   calcCVandGP(double T, double &CV, double &GP);
+      void   calcCVandGPfit(double T, double V, double &CV, double &GP);
       double FreeEnergy(double T, int id);
-      double FreeEnergyFit(double T, double V, int method);
+      double FreeEnergyFit(double T, double V, QHAmethod method);
       double electronicFreeEnergy(double T, int id);
       xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
       double InternalEnergyFit(double T, double V);
-      double Entropy(double T, double V, int method);
-      double getEqVolumeT(double T, int method);
-      double ThermalExpansion(double T, int method);
-      double IsochoricSpecificHeat(double T, double V, int method);
+      double Entropy(double T, double V, QHAmethod method);
+      double getEqVolumeT(double T, QHAmethod method);
+      double ThermalExpansion(double T, QHAmethod method);
+      double IsochoricSpecificHeat(double T, double V, QHAmethod method);
       // QHA3P and SCQHA
-      double extrapolateFrequency(double V, xvector<double> &xomega);
-      double extrapolateGamma(double V, xvector<double> &xomega);
+      double extrapolateFrequency(double V, const xvector<double> &xomega);
+      double extrapolateGamma(double V, const xvector<double> &xomega);
       // QHA3P
-      double FreeEnergyTE(double T, int Vid);
-      double InternalEnergyTE(double T, double V);
+      double FreeEnergyTaylorExpansion(double T, int Vid);
+      double InternalEnergyTaylorExpansion(double T, double V);
       // SCQHA
       double VPgamma(double T, double V);
-      void   run_scqha(int method, bool all_iterations_self_consistent=true);
+      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
       // output
-      void   writeThermalProperties(int eos_method, int qha_method);
+      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
       void   writeFVT();
       void   writeGPpath(double V, const string &directory=".");
-      void   writeAverageGP_FD();
+      void   writeAverageGPfiniteDifferences();
       void   writeGPmeshFD();
       void   writeFrequencies();
       // members
       xoption apl_options;
       EOSfit eos;
+      string system_title;
     private:
       xoption supercellopts;
       bool isEOS;
       bool isGP_FD;
       bool ignore_imaginary;
       bool runQHA, runQHA3P, runSCQHA;
+      bool isInitialized;
       bool includeElectronicContribution;
       int Ntemperatures;
       int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
@@ -1944,24 +1946,19 @@ namespace apl
       vector<string> subdirectories_apl_eos;
       vector<string> subdirectories_apl_gp;
       vector<string> subdirectories_static;
-      vector<string> arun_runnames_apl_eos;
-      vector<string> arun_runnames_apl_gp;
       vector<string> arun_runnames_static;
       _xinput xinput;
-      _xflags xflags;
-      _aflags aflags;
-      _kflags kflags;
-      string *aflowin;
       string currentDirectory;
       // methods
-      int  check_static();
+      int  checkStaticCalculations();
       void read();
-      double run_apl(vector<string> &subdirectories,
-                     vector<string> &arun_subdirectories,
-                     vector<double> &coefVolumes, bool gp=true);
-      void read_static();
+      double runAPLcalculations(const vector<string> &subdirectories,
+          const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
+          _kflags &kflags, string &aflowin, bool gp=true);
+      void readStaticCalculationsData();
       void calculate();
-      void createSubdirectoriesStaticRun();
+      void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
+          const _kflags &kflags);
       void free();
       void copy(const QHAN &qha);
   };
