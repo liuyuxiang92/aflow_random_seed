@@ -38,7 +38,6 @@ const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000
 const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY
 
 //some constants
-//const int BAR_WIDTH = 70;  // OBSOLETE ME20200512 - moved to pflow
 const int A_START = 1, C_START = 1, F_START = 1;
 const int B_START = 0, D_START = 0, E_START = 0;
 
@@ -3128,23 +3127,6 @@ namespace pocc {
     }
     return add2DerivativeStructuresList(psc,l_supercell_sets.begin(),l_supercell_sets.end());
   }
-
-  //OBSOLETE ME20200512 - Moved to pflow
-  //[OBSOLETE] void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-  //[OBSOLETE]   if(XHOST.WEB_MODE){return;} //CO20190520 - no progress bar for web stuff
-  //[OBSOLETE]   double progress = (double)current/(double)end;
-  //[OBSOLETE]   int pos = BAR_WIDTH * progress;
-
-  //[OBSOLETE]   oss << "[";
-  //[OBSOLETE]   for (int i = 0; i < BAR_WIDTH; ++i) {
-  //[OBSOLETE]     if (i < pos) oss << "=";
-  //[OBSOLETE]     else if (i == pos) oss << ">";
-  //[OBSOLETE]     else oss << " ";
-  //[OBSOLETE]   }
-  //[OBSOLETE]   oss << "] " << int(progress * 100.0) << " %\r";
-  //[OBSOLETE]   oss.flush();
-  //[OBSOLETE]   if(current==end){ oss << endl; }
-  //[OBSOLETE] }
 
   void POccCalculator::getHNFMatSiteConfig(const POccSuperCell& psc,
       xmatrix<double>& _hnf_mat,
