@@ -441,6 +441,7 @@ void apl::EOSfit::fit()
 /// Returns energy at a given volume for a chosen EOS model
 double apl::EOSfit::eval(double Vin)
 {
+  string function = "EOSfit::eval():", msg = "";
   double energy = 0;
 
   static xvector<double> dydp(4);
@@ -452,8 +453,11 @@ double apl::EOSfit::eval(double Vin)
       energy = BirchMurnaghan(Vin, p, dydp);
       break;
     case(EOS_MURNAGHAN):
-    default: // TODO error here
       energy = Murnaghan(Vin, p, dydp);
+      break;
+    default:
+      msg = "Undefined EOS method input to " + function;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
       break;
   }
 
