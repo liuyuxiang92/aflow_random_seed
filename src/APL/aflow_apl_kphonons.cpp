@@ -1837,7 +1837,7 @@ namespace KBIN {
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
     if (!USER_FREQFORMAT.empty()) {
-      //     try {
+      //     try
       // Convert format to machine representation
       tokens.clear();
       apl::tokenize(USER_FREQFORMAT, tokens, string(" |:;,"));

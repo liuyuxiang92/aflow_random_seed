@@ -169,11 +169,11 @@ static_no_pdf: aflow aflow_data
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
 .PHONY: mac
 mac:
-	$(MAKE) CC=clang CPP=clang++ aflow_data
+#	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data
 	$(MAKE) CC=clang CPP=clang++ -e ARCH=-D_MACOSX_ -j 4
-	ln -sf aflow aflowd
-	ln -sf aflow apennsy
-	$(MAKE) check
+#	[CO20200508 - OBSOLETE]ln -sf aflow aflowd
+#	[CO20200508 - OBSOLETE]ln -sf aflow apennsy
+#	[CO20200508 - OBSOLETE]$(MAKE) check
 #.PHONY: mac_static
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
