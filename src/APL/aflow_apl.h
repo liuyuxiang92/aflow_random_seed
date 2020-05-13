@@ -1952,7 +1952,7 @@ namespace apl
       // methods
       int  checkStaticCalculations();
       void read();
-      double runAPLcalculations(const vector<string> &subdirectories,
+      bool runAPLcalculations(const vector<string> &subdirectories,
           const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
           _kflags &kflags, string &aflowin, bool gp=true);
       void readStaticCalculationsData();

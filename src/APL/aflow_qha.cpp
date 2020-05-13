@@ -914,7 +914,7 @@ namespace apl
       msg = "QHA is not initialized properly and QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
-      return;
+      return 0;
     }
 
     int count = 0;
@@ -940,7 +940,7 @@ namespace apl
 
   /// Create APL subdirectory or gather and process data from finished calculation.
   /// 
-  double QHAN::runAPLcalculations(const vector<string> &subdirectories,
+  bool QHAN::runAPLcalculations(const vector<string> &subdirectories,
           const vector<double> &coefVolumes, _xflags &xflags,
           _aflags &aflags, _kflags &kflags, string &aflowin, bool gp)
   {
@@ -953,7 +953,7 @@ namespace apl
       msg = "QHA is not initialized properly and QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
-      return;
+      return false;
     }
 
     int Nqpoints = 0;
