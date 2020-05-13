@@ -375,96 +375,6 @@ double Bprime(double V0, const xvector<double> &fit_parameters){
   return -(V0*d3EOSpoly(V0, fit_parameters)/d2EOSpoly(V0, fit_parameters) + 1);
 }
 
-apl::EOSfit::EOSfit()
-{
-  guess = xvector<double>(4);
-  p     = xvector<double>(4);
-}
-
-/// Fit equation of state to one of the following models:
-/// polynomial: (eq (5.2) page 106)  https://doi.org/10.1017/CBO9781139018265
-/// Murnaghan: Proceedings of the National Academy of Sciences of the United States of 
-/// America, 30 (9): 244–247
-/// Birch-Murnaghan: Physical Review. 71 (11): 809–824
-///
-void apl::EOSfit::fit()
-{
-  string function = "EOSfit::fit():", msg = "";
-  switch(method){
-    case(EOS_POLYNOMIAL):
-      p   = fitEOSpoly(V, E);
-      Veq = EOSpolyGetEqVolume(p, min(V), max(V));
-      Eeq = EOSpoly(Veq, p);
-      B   = BulkModulus(Veq, p);
-      Bp  = Bprime(Veq, p);
-      break;
-    case(EOS_BIRCH_MURNAGHAN):
-      {
-      guess[1] = min(E);
-      guess[2] = (max(V)+min(V))/2;
-      guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences
-      guess[4] = 3.5; // a reasonable initial value for most materials
-
-      NonlinearFit bmfit(V,E,guess,BirchMurnaghan);
-      bmfit.fitLevenbergMarquardt();
-      p   = bmfit.p;
-      Eeq = p[1];
-      Veq = p[2];
-      B   = p[3]*eV2GPa;
-      Bp  = p[4];
-      }
-      break;
-    case(EOS_MURNAGHAN):
-      {
-      guess[1] = min(E);
-      guess[2] = (max(V)+min(V))/2;
-      guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
-      guess[4] = 3.5; // a reasonable intial value for most materials
-
-      NonlinearFit nlfit(V,E,guess,Murnaghan);
-      nlfit.fitLevenbergMarquardt();
-      p = nlfit.p;
-
-      Eeq = p[1];
-      Veq = p[2];
-      B   = p[3]*eV2GPa;
-      Bp  = p[4];
-      }
-      break;
-    default:
-      msg = "Undefined EOS method input to " + function;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
-      break;
-  }
-}
-
-/// Returns energy at a given volume for a chosen EOS model
-double apl::EOSfit::eval(double Vin)
-{
-  string function = "EOSfit::eval():", msg = "";
-  double energy = 0;
-
-  static xvector<double> dydp(4);
-  switch(method){
-    case(EOS_POLYNOMIAL):
-      energy = EOSpoly(Vin, p);
-      break;
-    case(EOS_BIRCH_MURNAGHAN):
-      energy = BirchMurnaghan(Vin, p, dydp);
-      break;
-    case(EOS_MURNAGHAN):
-      energy = Murnaghan(Vin, p, dydp);
-      break;
-    default:
-      msg = "Undefined EOS method input to " + function;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
-      break;
-  }
-
-  return energy;
-}
-
-
 //=============================================================================
 //                         Definitions of QHA class members
 namespace apl
@@ -536,7 +446,6 @@ namespace apl
     if (this==&qha) return;
 
     apl_options       = qha.apl_options;
-    eos               = qha.eos;
     system_title      = qha.system_title;
     supercellopts     = qha.supercellopts;
     isEOS             = qha.isEOS;
@@ -730,8 +639,6 @@ namespace apl
         coefEOSVolumes.push_back(i);
         EOSvolumes.push_back(i*Volume/NatomsOrigCell);
       }
-      eos.V = aurostd::vector2xvector(EOSvolumes);
-      eos.E = xvector<double>(N_EOSvolumes);
     }
 
     tokens.clear();
@@ -739,7 +646,7 @@ namespace apl
     if (tokens.size() != 3){
       msg = "Wrong setting in ";
       msg += "[AFLOW_APL]TPT.\n";
-      msg += "Specify as TPT="+AFLOWRC_DEFAULT_APL_TPT"+.\n";
+      msg += "Specify as TPT="+AFLOWRC_DEFAULT_APL_TPT+".\n";
       msg += "See README_AFLOW_APL.TXT for the details.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
           _INPUT_NUMBER_);
@@ -1293,20 +1200,22 @@ namespace apl
   /// Volume dependency is obtained via fit to QHA model.
   /// @param qha_method defines what type of QHA calculation is performed.
   ///
-  double QHAN::FreeEnergyFit(double T, double V, QHAmethod qha_method)
+  double QHAN::FreeEnergyFit(double T, double V, EOSmethod eos_method,
+      QHAmethod qha_method)
   {
     string function = "FreeEnergyFit():", msg = "";
-    if (T<0) return 0;
+    if (T<_ZERO_TOL_) return 0;
 
+    xvector<double> E(N_EOSvolumes);
     switch(qha_method){
       case (QHA3P_CALC):
-        for (int i=eos.E.lrows; i<=eos.E.urows; i++){
-          eos.E[i] = FreeEnergyTaylorExpansion(T, i-1);
+        for (int i=E.lrows; i<=E.urows; i++){
+          E[i] = FreeEnergyTaylorExpansion(T, i-1);
         }
         break;
       case(QHA_CALC):
-        for (int i=eos.E.lrows; i<=eos.E.urows; i++){
-          eos.E[i] = FreeEnergy(T, i-1);
+        for (int i=E.lrows; i<=E.urows; i++){
+          E[i] = FreeEnergy(T, i-1);
         }
         break;
       default:
@@ -1314,9 +1223,9 @@ namespace apl
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-    if (includeElectronicContribution) eos.E += electronicFreeEnergySommerfeld(T);
-    eos.fit();
-    return eos.eval(V);
+    if (includeElectronicContribution) E += electronicFreeEnergySommerfeld(T);
+    xvector<double> p = fitToEOSmodel(E, eos_method);
+    return evalEOSmodel(V, p, eos_method);
   }
 
   /// Calculates internal energy as a function of volume and temperature.
@@ -1343,6 +1252,95 @@ namespace apl
   {
     return eos_vib_thermal_properties[id].getVibrationalFreeEnergy(T, apl::eV)
            /NatomsOrigCell + E0_V[id];
+  }
+
+  /// Fit equation of state to one of the following models:
+  /// polynomial: (eq (5.2) page 106)  https://doi.org/10.1017/CBO9781139018265
+  /// Murnaghan: Proceedings of the National Academy of Sciences of the United States of 
+  /// America, 30 (9): 244–247
+  /// Birch-Murnaghan: Physical Review. 71 (11): 809–824
+  ///
+  xvector<double> QHAN::fitToEOSmodel(xvector<double> &E, EOSmethod method)
+  {
+    string function = "EOSfit::fit():", msg = "";
+    xvector<double> V = aurostd::vector2xvector(EOSvolumes);
+    xvector<double> fit_params;
+    xvector<double> guess(4);
+    switch(method){
+      case(EOS_POLYNOMIAL):
+        fit_params = fitEOSpoly(V, E);
+        EOS_volume_at_equilibrium = EOSpolyGetEqVolume(fit_params, min(V), max(V));
+        EOS_energy_at_equilibrium = EOSpoly(EOS_volume_at_equilibrium, fit_params);
+        EOS_bulk_modulus_at_equilibrium = BulkModulus(EOS_volume_at_equilibrium,fit_params);
+        EOS_Bprime_at_equilibrium  = Bprime(EOS_volume_at_equilibrium, fit_params);
+        break;
+      case(EOS_BIRCH_MURNAGHAN):
+        {
+        guess[1] = min(E);
+        guess[2] = (max(V)+min(V))/2;
+        guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences
+        guess[4] = 3.5; // a reasonable initial value for most materials
+  
+        NonlinearFit bmfit(V,E,guess,BirchMurnaghan);
+        bmfit.fitLevenbergMarquardt();
+
+        fit_params = bmfit.p;
+        EOS_energy_at_equilibrium = bmfit.p[1];
+        EOS_volume_at_equilibrium = bmfit.p[2];
+        EOS_bulk_modulus_at_equilibrium   = bmfit.p[3]*eV2GPa;
+        EOS_Bprime_at_equilibrium  = bmfit.p[4];
+        }
+        break;
+      case(EOS_MURNAGHAN):
+        {
+        guess[1] = min(E);
+        guess[2] = (max(V)+min(V))/2;
+        guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
+        guess[4] = 3.5; // a reasonable intial value for most materials
+  
+        NonlinearFit nlfit(V,E,guess,Murnaghan);
+        nlfit.fitLevenbergMarquardt();
+
+        fit_params = nlfit.p;
+        EOS_energy_at_equilibrium = nlfit.p[1];
+        EOS_volume_at_equilibrium = nlfit.p[2];
+        EOS_bulk_modulus_at_equilibrium   = nlfit.p[3]*eV2GPa;
+        EOS_Bprime_at_equilibrium  = nlfit.p[4];
+        }
+        break;
+      default:
+        msg = "Undefined EOS method input to " + function;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
+        break;
+    }
+
+    return fit_params;
+  }
+
+  /// Returns energy at a given volume for a chosen EOS model
+  double QHAN::evalEOSmodel(double V, const xvector<double> &p, EOSmethod method)
+  {
+    string function = "EOSfit::eval():", msg = "";
+    double energy = 0;
+  
+    static xvector<double> dydp(4);
+    switch(method){
+      case(EOS_POLYNOMIAL):
+        energy = EOSpoly(V, p);
+        break;
+      case(EOS_BIRCH_MURNAGHAN):
+        energy = BirchMurnaghan(V, p, dydp);
+        break;
+      case(EOS_MURNAGHAN):
+        energy = Murnaghan(V, p, dydp);
+        break;
+      default:
+        msg = "Undefined EOS method input to " + function;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
+        break;
+    }
+  
+    return energy;
   }
 
   double FermiDirac(double E, double mu, double T){
@@ -1395,18 +1393,19 @@ namespace apl
   /// Calculate equilibrium volume for a given temperature.
   /// @param qha_method defines what type of QHA calculation is performed.
   /// 
-  double QHAN::getEqVolumeT(double T, QHAmethod qha_method)
+  double QHAN::getEqVolumeT(double T, EOSmethod eos_method, QHAmethod qha_method)
   {
     string function = "getEqVolumeT():", msg = "";
+    xvector<double> E(N_EOSvolumes);
     switch(qha_method){
       case (QHA3P_CALC):
-        for (int i=eos.E.lrows; i<=eos.E.urows; i++){
-          eos.E[i] = FreeEnergyTaylorExpansion(T, i-1);
+        for (int i=E.lrows; i<=E.urows; i++){
+          E[i] = FreeEnergyTaylorExpansion(T, i-1);
         }
         break;
       case(QHA_CALC):
-        for (int i=eos.E.lrows; i<=eos.E.urows; i++){
-          eos.E[i] = FreeEnergy(T, i-1);
+        for (int i=E.lrows; i<=E.urows; i++){
+          E[i] = FreeEnergy(T, i-1);
         }
         break;
       default:
@@ -1415,10 +1414,10 @@ namespace apl
         break;
     }
 
-    if (includeElectronicContribution) eos.E += electronicFreeEnergySommerfeld(T);
-    eos.fit();
+    if (includeElectronicContribution) E += electronicFreeEnergySommerfeld(T);
+    fitToEOSmodel(E, eos_method);
 
-    return eos.Veq;
+    return EOS_volume_at_equilibrium;
   }
 
 
@@ -1521,13 +1520,14 @@ namespace apl
   /// @param eos_method defines which model is used for EOS fit
   /// @return volumetric thermal expansion coefficient.
   /// 
-  double QHAN::ThermalExpansion(double T, QHAmethod qha_method)
+  double QHAN::ThermalExpansion(double T, EOSmethod eos_method, QHAmethod qha_method)
   {
     if (!(T>0)) return 0;
 
     double dT = DCOEFF*T;
-    return 0.5*(getEqVolumeT(T+dT,qha_method)-getEqVolumeT(T-dT,qha_method))/dT/
-           getEqVolumeT(T,qha_method);
+    return 0.5*(getEqVolumeT(T+dT,eos_method,qha_method)
+               -getEqVolumeT(T-dT,eos_method,qha_method))/
+                dT/getEqVolumeT(T,eos_method,qha_method);
   }
 
   /// Calculates isochoric specific heat as a temperature derivative of free
@@ -1535,13 +1535,15 @@ namespace apl
   /// 
   /// @param eos_method defines which model is used for EOS fit
   /// 
-  double QHAN::IsochoricSpecificHeat(double T, double V, QHAmethod qha_method)
+  double QHAN::IsochoricSpecificHeat(double T, double V, EOSmethod eos_method,
+      QHAmethod qha_method)
   {
     double dT = DCOEFF*T;
     double CV = 0;
     if (T>0){
-      CV = -(FreeEnergyFit(T+dT,V,qha_method)-2*FreeEnergyFit(T,V,qha_method)
-             +FreeEnergyFit(T-dT,V,qha_method));
+      CV = -(FreeEnergyFit(T+dT, V, eos_method, qha_method)
+           -2*FreeEnergyFit(T, V, eos_method, qha_method)
+           +FreeEnergyFit(T-dT ,V, eos_method, qha_method));
       CV *= T/pow(dT,2);
     }
 
@@ -1553,10 +1555,11 @@ namespace apl
   /// 
   /// @param eos_method defines which model is used for EOS fit
   /// 
-  double QHAN::Entropy(double T, double V, QHAmethod qha_method)
+  double QHAN::Entropy(double T, double V, EOSmethod eos_method, QHAmethod qha_method)
   {
     double dT = DCOEFF*T;
-    return -0.5*(FreeEnergyFit(T+dT,V,qha_method)-FreeEnergyFit(T-dT,V,qha_method))/dT;
+    return -0.5*(FreeEnergyFit(T+dT,V,eos_method,qha_method)
+        -FreeEnergyFit(T-dT,V,eos_method,qha_method))/dT;
   }
 
   /// Calculates DOS value at Fermi level using linear tetrahedron method. 
@@ -1785,18 +1788,18 @@ namespace apl
 
     // get equilibrium volume from the fit to EOS based on energies from static
     // calculations
-    eos.method = method;
-    eos.E = aurostd::vector2xvector<double>(E0_V);
-    eos.fit();
+    xvector<double> E = aurostd::vector2xvector<double>(E0_V);
+    xvector<double> fit_params = fitToEOSmodel(E, method);
     double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
-    double V = 1.1*eos.Veq; // to avoid division by zero in self-consistent loop
+    // to avoid division by zero in self-consistent loop
     // initial volume is taken to be 10% bigger
-    double Vnew = 0;
+    double V = 1.1*EOS_volume_at_equilibrium;
+    double Vnew = 0.0;
 
     // self-consistent loop for 0K temperature
-    double V0K = 1.1*eos.Veq;
+    double V0K = 1.1*EOS_volume_at_equilibrium;
     for (int i=0; i<max_scqha_iteration; i++){
-      Pe   = dEOSpoly(V, eos.p);
+      Pe   = dEOSpoly(V, fit_params);
       VPg  = VPgamma(0.0,V);
       Vnew = VPg/Pe;
       if (abs(V0K - Vnew)/V > Vtol) V0K += (Vnew - V0K) * dV; else break;
@@ -1804,7 +1807,7 @@ namespace apl
 
     // output file name depends on the used EOS fit method
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX;
+    string filename = DEFAULT_QHA_FILE_PREFIX + "scqha.";
     string sc = all_iterations_self_consistent ? "sc." : "";
     switch(method){
       case(EOS_POLYNOMIAL):
@@ -1844,7 +1847,7 @@ namespace apl
     // self-consistent loop for initial temperature (defined by user)
     int iter=1;
     while (iter <= max_scqha_iteration){
-      Pe   = dEOSpoly(V, eos.p);
+      Pe   = dEOSpoly(V, fit_params);
       VPg  = VPgamma(T, V);
       Vnew = VPg/Pe;
       if (abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
@@ -1893,7 +1896,7 @@ namespace apl
       if (all_iterations_self_consistent || !(abs(beta)>0)){
         iter=1;
         while (iter <= max_scqha_iteration){
-          Pe   = dEOSpoly(V, eos.p);
+          Pe   = dEOSpoly(V, fit_params);
           VPg  = VPgamma(T, V);
           Vnew = VPg/Pe;
           if (abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
@@ -1961,13 +1964,13 @@ namespace apl
 
       Feq /= NQpoints;
       Feq /= NatomsOrigCell;
-      Feq += eos.eval(V);
+      Feq += evalEOSmodel(V, fit_params, method);
 
       Bgamma /= NQpoints; Bdgamma /= NQpoints;
       Bgamma /= NatomsOrigCell; Bdgamma /= NatomsOrigCell;
       Bgamma /= V; Bdgamma /= V;
 
-      Belec  = BulkModulus(V, eos.p);
+      Belec  = BulkModulus(V, fit_params);
       Pgamma = VPgamma(T, V)/V;
 
       B = Belec + (Bgamma + Bdgamma + Pgamma)*eV2GPa;
@@ -2013,8 +2016,6 @@ namespace apl
   {
     string function = "QHAN::writeThermalProperties():";
     string msg = "";
-
-    eos.method = eos_method;
 
     // type of qha calculation
     string qha = "";
@@ -2081,10 +2082,10 @@ namespace apl
 
     switch(qha_method){
       case(QHA3P_CALC):
-        for (int Vid=0; Vid<N_EOSvolumes; Vid++) eos.E[Vid+1] = FreeEnergyTaylorExpansion(0, Vid);
+        for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergyTaylorExpansion(0, Vid);
         break;
       case(QHA_CALC):
-        for (int Vid=0; Vid<N_EOSvolumes; Vid++) eos.E[Vid+1] = FreeEnergy(0, Vid);
+        for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(0, Vid);
         break;
       default:
         msg = "Undefined QHA method input to " + function;
@@ -2092,8 +2093,8 @@ namespace apl
         break;
     }
 
-    eos.fit();
-    double V0K = eos.Veq; // equilibrium volume at 0K
+    fitToEOSmodel(F, eos_method);
+    double V0K = EOS_volume_at_equilibrium; // equilibrium volume at 0K
 
     double T = 0.0, Veq = 0.0, Feq = 0.0, B = 0.0, Bp = 0.0, beta = 0.0, CV = 0.0, CP = 0.0, GP = 0.0;
     double CV_mesh = 0.0, GP_mesh = 0.0, CP_mesh = 0.0, beta_mesh = 0.0; // these properties are calculated 
@@ -2103,10 +2104,10 @@ namespace apl
 
       switch(qha_method){
         case(QHA3P_CALC):
-          for (int Vid=0; Vid<N_EOSvolumes; Vid++) eos.E[Vid+1] = FreeEnergyTaylorExpansion(T, Vid);
+          for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergyTaylorExpansion(T, Vid);
           break;
         case(QHA_CALC):
-          for (int Vid=0; Vid<N_EOSvolumes; Vid++) eos.E[Vid+1] = FreeEnergy(T, Vid);
+          for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(T, Vid);
           break;
         default:
           msg = "Undefined QHA method input to " + function;
@@ -2114,10 +2115,10 @@ namespace apl
           break;
       }
 
-      if (includeElectronicContribution) eos.E += electronicFreeEnergySommerfeld(T);
+      if (includeElectronicContribution) F += electronicFreeEnergySommerfeld(T);
 
       // stop if energy minimum is no longer within a given set of volumes
-      if (!isMinimumWithinBounds(eos.E)){
+      if (!isMinimumWithinBounds(F)){
         msg = "Stopping at T=" + aurostd::utype2string<double>(T) + " [K]";
         msg+= "since there is no free energy minimum within a given volume range.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -2125,15 +2126,15 @@ namespace apl
         break;
       }
 
-      eos.fit();
+      fitToEOSmodel(F, eos_method);
       // note that state of EOSfit is changed by ThermalExpansion and/or
       // IsochoricSpecificHeat functions, so save Veq, Feq and B for future use
-      Veq = eos.Veq;
-      Feq = eos.Eeq;
-      B   = eos.B;  // [GPa]
-      Bp  = eos.Bp;
-      beta = ThermalExpansion(T, qha_method); // [K^-1]
-      CV   = IsochoricSpecificHeat(T, V0K, qha_method)/KBOLTZEV; // [kB/atom]
+      Veq = EOS_volume_at_equilibrium;
+      Feq = EOS_energy_at_equilibrium;
+      B   = EOS_bulk_modulus_at_equilibrium;  // [GPa]
+      Bp  = EOS_Bprime_at_equilibrium;
+      beta = ThermalExpansion(T, eos_method, qha_method); // [K^-1]
+      CV   = IsochoricSpecificHeat(T, V0K, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
       CP   = CV + Veq*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
       GP   = (beta/CV)*B*Veq/eV2GPa/KBOLTZEV;
 

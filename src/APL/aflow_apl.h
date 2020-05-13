@@ -1823,34 +1823,12 @@ namespace apl {
   void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
 }
 // ***************************************************************************
+//AS20200513 BEGIN
 #define QHA_ARUN_MODE "QHA" // used in filename
 
 namespace apl
 {
   enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
-
-  /// Performs fit of energy-volume relation to a given equation of state.
-  /// The choices are: Murnaghan, Birch-Murnaghan or polynomial EOS models.
-  ///
-  class EOSfit{
-    public:
-      EOSfit();
-      EOSmethod method;
-      xvector<double> E;
-      xvector<double> V;
-      xvector<double> guess;
-      xvector<double> p;
-      double Eeq;
-      double Veq;
-      double B;
-      double Bp;
-      void fit();
-      double eval(double Vin);
-  };
-}
-
-namespace apl
-{
   enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC};
 
   // Calculates QHA-related properties
@@ -1875,15 +1853,18 @@ namespace apl
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
       double FreeEnergy(double T, int id);
-      double FreeEnergyFit(double T, double V, QHAmethod method);
+      double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
       double electronicFreeEnergy(double T, int id);
       xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
       double InternalEnergyFit(double T, double V);
-      double Entropy(double T, double V, QHAmethod method);
-      double getEqVolumeT(double T, QHAmethod method);
-      double ThermalExpansion(double T, QHAmethod method);
-      double IsochoricSpecificHeat(double T, double V, QHAmethod method);
+      xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
+      double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
+      double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
+      double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
+          QHAmethod qha_method);
       // QHA3P and SCQHA
       double extrapolateFrequency(double V, const xvector<double> &xomega);
       double extrapolateGamma(double V, const xvector<double> &xomega);
@@ -1902,8 +1883,11 @@ namespace apl
       void   writeFrequencies();
       // members
       xoption apl_options;
-      EOSfit eos;
       string system_title;
+      double EOS_volume_at_equilibrium;
+      double EOS_energy_at_equilibrium;
+      double EOS_bulk_modulus_at_equilibrium;
+      double EOS_Bprime_at_equilibrium;
     private:
       xoption supercellopts;
       bool isEOS;
@@ -1963,6 +1947,7 @@ namespace apl
       void copy(const QHAN &qha);
   };
 }
+//AS20200513 END
 // ***************************************************************************
 namespace apl
 {

@@ -1512,6 +1512,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    //AS20200513 BEGIN
     bool run_any_qha =
           kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
           kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
@@ -1544,6 +1545,7 @@ namespace KBIN {
       qha.run(xflags, aflags, kflags, AflowIn);
       return;
     }
+    //AS20200513 END
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
