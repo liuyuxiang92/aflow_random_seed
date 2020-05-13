@@ -36,151 +36,193 @@ using std::auto_ptr;
 
 #define DEBUG_QHA false
 
-//================================================================================
+//=============================================================================
+//              Definitions of NonlinearFit class members
 
-// [TODO:] move this class to aurostd_xmatrix?
-
-/// Fit to a nonlinear model using Levenberg-Marquardt algorithm.
-///
-/// The implementation here is based on the ideas from Numerical Recipes and
-/// K. Madsen et al. Methods For Non-linear Least Squares Problems
-/// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
-///
-/// Caution: the default value for the parameter tau (a scaling factor for the initial step size)
-/// was picked to yield a correct fit to the Murnaghan equation of state. 
-/// If you observe that this is not a good choice for your function,
-/// try 1e-6 if the initial guess is believed to be a good approximation to the true
-/// parameters. Otherwise 1e-3 or even 1 might be a better choice.
-class NonlinearFit{
-  public:
-    int Npoints, Nparams;
-    double tol; /// convergence tolerance criterion
-    double tau; /// scaling parameter for initial step size
-    int max_iter; /// maximum number of allowed iterations
-    xvector<double> x,y;   // data points
-    xvector<double> yvec;  // residuals of a given model function
-    xvector<double> guess; // initial guess for fit parameters
-    xvector<double> p;     // parameters obtained by fit
-    xmatrix<double> A;     // J^T.J matrix
-    xmatrix<double> J;     // Jacobian of a model function w.r.t parameters
-    double (*f)(const double x, const xvector<double> &p, xvector<double> &dydp);
-    NonlinearFit(xvector<double> &x, xvector<double> &y, xvector<double> &guess,
-        double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
-        double tol=1e-6, double tau=1e-12, int max_iter=1000)
-        : Npoints(x.rows), Nparams(guess.rows), tol(tol), tau(tau), max_iter(max_iter),
-        x(x), y(y), yvec(Npoints), guess(guess), p(Nparams), A(Nparams, Nparams),
-        J(Npoints, Nparams), f(foo) {}
-    bool fitLevenbergMarquardt();
-    void Jacobian(const xvector<double> &guess);
-    void calculateResiduals(const xvector<double> &params);
-    double calculateResidualSquareSum(const xvector<double> &params);
-};
-
-
-/// Calculates the residual sum of squares of a model function w.r.t the given data
-///
-double NonlinearFit::calculateResidualSquareSum(const xvector<double> &params)
+namespace apl
 {
-  double chi_sqr = 0.0;
-
-  calculateResiduals(params); // calculate residuals and save them to yvec
-  for (int i=1; i<= Npoints; i++) chi_sqr += pow(yvec[i], 2);
-
-  return chi_sqr;
-}
-
-/// Calculates residuals of a given model function and stores the result in 
-/// "yvec" array
-///
-void NonlinearFit::calculateResiduals(const xvector<double> &params)
-{
-  static xvector<double> dydp(Nparams);
-  for (int i=1; i<=Npoints; i++) yvec[i] = y[i] - f(x[i], params, dydp);
-}
-
-/// Calculates Jacobian of a given model function for "guess" parameters
-///
-void NonlinearFit::Jacobian(const xvector<double> &guess)
-{
-  xvector<double> dydp(Nparams);
-  for (int i=1; i<=Npoints; i++){
-    f(x[i], guess, dydp); 
-    for (int j=1; j<=Nparams; j++){
-      J[i][j] = -dydp[j];
-    }
+  NonlinearFit::NonlinearFit()
+  {
+    free();
   }
-}
 
-/// Nonlinear fit using Levenberg-Marquardt algorithm.
-/// The implementation here is based on the ideas from Numerical Recipes and
-/// K.Madsen et al. Methods For Non-linear Least Squares Problems
-/// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
-///
-bool NonlinearFit::fitLevenbergMarquardt()
-{
-  string function = "NonlinearFit::fit(): ";
-  bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
-  if (LDEBUG) cerr << function << "begin"  << std::endl;
+  NonlinearFit::NonlinearFit(const NonlinearFit &nlf)
+  {
+    free(); copy(nlf);
+  }
 
-  static const double step_scaling_factor = 10.0;
+  NonlinearFit::NonlinearFit(xvector<double> &x, xvector<double> &y,
+      xvector<double> &guess,
+      double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
+      double tol, double tau, int max_iter)
+  {
+    free();
+    Npoints = x.rows;
+    Nparams = guess.rows;
+    this->tol = tol;
+    this->tau = tau;
+    this->max_iter = max_iter;
+    this->x = x;
+    this->y = y;
+    residuals = xvector<double> (Npoints);
+    this->guess = guess;
+    p = xvector<double> (Nparams);
+    dydp = xvector<double> (Nparams);
+    A = xmatrix<double> (Nparams, Nparams);
+    J = xmatrix<double> (Npoints, Nparams);
+    f = foo;
+  }
 
-  xvector<double> pnew(Nparams);
-  xmatrix<double> G(Nparams, 1), M(Nparams, Nparams);
+  NonlinearFit::~NonlinearFit() { free(); }
 
-  int iter = 0;
-  double chi_sqr = 0.0, new_chi_sqr =0.0; // old and new residual square sums
+  const NonlinearFit& NonlinearFit::operator=(const NonlinearFit &nlf)
+  {
+    copy(nlf);
+    return *this;
+  }
 
-  p = guess; Jacobian(p); calculateResiduals(p);
-  xmatrix<double> A = trasp(J)*J;
-  xvector<double> g = -trasp(J)*yvec;
+  void NonlinearFit::clear() { free(); }
+  void NonlinearFit::free()
+  {
+    Npoints = 0;
+    Nparams = 0;
+    tol = 0.0;
+    tau = 0.0;
+    max_iter = 0;
+    x.clear();
+    y.clear();
+    residuals.clear();
+    guess.clear();
+    p.clear();
+    dydp.clear();
+    A.clear();
+    J.clear();
+    f = NULL;
+  }
 
-  bool found = false;
+  void NonlinearFit::copy(const NonlinearFit &nlf)
+  {
+    if (this==&nlf) return;
+
+    Npoints = nlf.Npoints;
+    Nparams = nlf.Nparams;
+    tol = nlf.tol;
+    tau = nlf.tau;
+    max_iter = nlf.max_iter;
+    x = nlf.x;
+    y = nlf.y;
+    residuals = nlf.residuals;
+    guess = nlf.guess;
+    p = nlf.p;
+    dydp = nlf.dydp;
+    A = nlf.A;
+    J = nlf.J;
+    f = nlf.f;
+  }
   
-  // determine initial step
-  double lambda = tau*maxDiagonalElement(A);
-  if (LDEBUG) cerr << function << "lambda = " << lambda << std::endl;
-
-  while (!found && iter<max_iter){
-    iter++;
-    if (LDEBUG) cerr << function << "iteration: " << iter << std::endl;
-
-    // M = A + lambda*diag(A)
-    M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
-
-    if (LDEBUG) cerr << function << " M:" << std::endl << M << std::endl;
-
-    // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
-    for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
-    aurostd::GaussJordan(M,G);
-
-    pnew = p + M*g;
-
-    chi_sqr = calculateResidualSquareSum(p);
-    new_chi_sqr = calculateResidualSquareSum(pnew);
-
-    if (abs(new_chi_sqr - chi_sqr) < tol){
-      found = true;
-      p = pnew;
-      break;
-    }
-
-    // update only if step leads to a smaller residual sum of squares
-    if (new_chi_sqr < chi_sqr){
-      p = pnew; Jacobian(p); calculateResiduals(p);
-
-      A = trasp(J)*J;
-      g = -trasp(J)*yvec;
-
-      lambda /= step_scaling_factor;
-    }
-    else{
-      lambda *= step_scaling_factor;
-    }
-    if (LDEBUG) cerr << function << "pnew = " << p << std::endl;
+  /// Calculates the residual sum of squares of a model function w.r.t the given data
+  ///
+  double NonlinearFit::calculateResidualSquareSum(const xvector<double> &params)
+  {
+    double chi_sqr = 0.0;
+  
+    calculateResiduals(params); // calculate residuals and save them to residuals
+    for (int i=1; i<= Npoints; i++) chi_sqr += pow(residuals[i], 2);
+  
+    return chi_sqr;
   }
+  
+  /// Calculates residuals of a given model function and stores the result in 
+  /// "residuals" array
+  ///
+  void NonlinearFit::calculateResiduals(const xvector<double> &params)
+  {
+    static xvector<double> dydp(Nparams);
+    for (int i=1; i<=Npoints; i++) residuals[i] = y[i] - f(x[i], params, dydp);
+  }
+  
+  /// Calculates Jacobian of a given model function for "guess" parameters
+  ///
+  void NonlinearFit::Jacobian(const xvector<double> &guess)
+  {
+    xvector<double> dydp(Nparams);
+    for (int i=1; i<=Npoints; i++){
+      f(x[i], guess, dydp); 
+      for (int j=1; j<=Nparams; j++){
+        J[i][j] = -dydp[j];
+      }
+    }
+  }
+  
+  /// Nonlinear fit using Levenberg-Marquardt algorithm.
+  /// The implementation here is based on the ideas from Numerical Recipes and
+  /// K.Madsen et al. Methods For Non-linear Least Squares Problems
+  /// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
+  ///
+  bool NonlinearFit::fitLevenbergMarquardt()
+  {
+    string function = "NonlinearFit::fit(): ";
+    bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
+    if (LDEBUG) cerr << function << "begin"  << std::endl;
+  
+    static const double step_scaling_factor = 10.0;
+  
+    xvector<double> pnew(Nparams);
+    xmatrix<double> G(Nparams, 1), M(Nparams, Nparams);
+  
+    int iter = 0;
+    double chi_sqr = 0.0, new_chi_sqr =0.0; // old and new residual square sums
+  
+    p = guess; Jacobian(p); calculateResiduals(p);
 
-  if (LDEBUG) cerr << function << "end"  << std::endl;
-  return iter < max_iter;
+    xmatrix<double> A = trasp(J)*J;
+    xvector<double> g = -trasp(J)*residuals;
+    
+    // determine initial step
+    double lambda = tau*maxDiagonalElement(A);
+    if (LDEBUG) cerr << function << "lambda = " << lambda << std::endl;
+  
+    while (iter<max_iter){
+      iter++;
+      if (LDEBUG) cerr << function << "iteration: " << iter << std::endl;
+  
+      // M = A + lambda*diag(A)
+      M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
+  
+      if (LDEBUG) cerr << function << " M:" << std::endl << M << std::endl;
+  
+      // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
+      for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
+      aurostd::GaussJordan(M,G);
+  
+      pnew = p + M*g;
+  
+      chi_sqr = calculateResidualSquareSum(p);
+      new_chi_sqr = calculateResidualSquareSum(pnew);
+  
+      if (abs(new_chi_sqr - chi_sqr) < tol){
+        p = pnew;
+        break;
+      }
+  
+      // update only if step leads to a smaller residual sum of squares
+      if (new_chi_sqr < chi_sqr){
+        p = pnew; Jacobian(p); calculateResiduals(p);
+  
+        A = trasp(J)*J;
+        g = -trasp(J)*residuals;
+  
+        lambda /= step_scaling_factor;
+      }
+      else{
+        lambda *= step_scaling_factor;
+      }
+      if (LDEBUG) cerr << function << "pnew = " << p << std::endl;
+    }
+  
+    if (LDEBUG) cerr << function << "end"  << std::endl;
+    return iter < max_iter;
+  }
 }
 
 //================================================================================
