@@ -41,7 +41,7 @@ ARCH=
 ifeq ($(UNAME),Darwin)
 CPP=clang++
 CC=clang
-ARCH=-e -D_MACOSX_
+ARCH=-D_MACOSX_
 endif
 
 
@@ -170,7 +170,7 @@ static_no_pdf: aflow aflow_data
 .PHONY: mac
 mac:
 #	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data
-	$(MAKE) CC=clang CPP=clang++ -e ARCH=-D_MACOSX_ -j 4
+	$(MAKE) CC=clang CPP=clang++ ARCH=-D_MACOSX_ -j 4
 #	[CO20200508 - OBSOLETE]ln -sf aflow aflowd
 #	[CO20200508 - OBSOLETE]ln -sf aflow apennsy
 #	[CO20200508 - OBSOLETE]$(MAKE) check
