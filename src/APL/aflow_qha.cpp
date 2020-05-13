@@ -1383,23 +1383,6 @@ namespace apl
     return energy;
   }
 
-  double FermiDirac(double E, double mu, double T){
-    if (T<0) return 0;
-
-    if (T>_ZERO_TOL_){
-      return 1/(1+exp((E-mu)/(KBOLTZEV*T)));
-    }
-    else
-      // At T=0 FD transforms to Heaviside step function
-      if (E<mu){
-        return 1;
-      }
-      else if (E>mu){
-        return 0;
-      }
-      else return 0.5;
-  }
-
   /// Calculates electronic free energy using integration over DOS.
   /// Currently this function does not work (to be fixed in the future)
   ///
@@ -1412,8 +1395,8 @@ namespace apl
 
     double dE = (max(energies_V[id])-min(energies_V[id]))/(energies_V[id].size()-1);
     for (uint i=0; i<edos_V[id].size(); i++){
-      f0 = FermiDirac(energies_V[id][i], Efermi_V[id], 0);
-      f  = FermiDirac(energies_V[id][i], Efermi_V[id], T);
+      f0 = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], 0);
+      f  = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], T);
 
       Eelec0K += energies_V[id][i] * edos_V[id][i] * f0;
       EelecT  += energies_V[id][i] * edos_V[id][i] * f;
@@ -2254,7 +2237,7 @@ namespace apl
   {
     string function = "QHAN::writeGPpath():";
     string msg = "Calculating and saving Grueneisen parameters along a path in";
-    msg += " reciprocal space, which was used to calculate phonon dispersion.\n";
+    msg += " reciprocal space which was used to calculate phonon dispersion.\n";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
     // we will save bands-projected Grueneisen parameter in xEIGENVAL

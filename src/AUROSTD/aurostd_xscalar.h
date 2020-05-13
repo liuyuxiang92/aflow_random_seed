@@ -542,6 +542,12 @@ namespace aurostd {
   unsigned long long int powint(unsigned long long int x,uint exp); //CO20191201
 }
 
+//AS20200513 BEGIN
+namespace aurostd{
+  double FermiDirac(double E, double mu, double T);
+}
+//AS20200513 END
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
