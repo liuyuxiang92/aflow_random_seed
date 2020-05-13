@@ -1102,7 +1102,7 @@ check_full:
 	$(MAKE) check_smith
 	$(MAKE) check_proto
 	$(MAKE) check_slab
-	$(MAKE) check_chull
+	-$(MAKE) check_chull
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
@@ -1138,7 +1138,7 @@ check_slab:
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only | cut -d' ' -f2) && \
+	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
 		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$ANSWER meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
 	@echo "CHULL tests passed"
 .PHONY: check_pocc
