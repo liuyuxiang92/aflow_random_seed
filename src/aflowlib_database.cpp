@@ -98,16 +98,19 @@ namespace aflowlib {
 
   // Copy constructors
   AflowDB::AflowDB(const AflowDB& that) {
+    if (this != &that) free();
     copy(that);
   }
 
   AflowDB& AflowDB::operator=(const AflowDB& that) {
-    if (this != &that) copy(that);
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
 
   void AflowDB::copy(const AflowDB& that) {
+    if (this == &that) return;
     data_path = that.data_path;
     database_file = that.database_file;
     lock_file = that.lock_file;
