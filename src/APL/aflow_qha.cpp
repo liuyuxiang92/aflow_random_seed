@@ -137,7 +137,6 @@ namespace apl
   ///
   void NonlinearFit::calculateResiduals(const xvector<double> &params)
   {
-    static xvector<double> dydp(Nparams);
     for (int i=1; i<=Npoints; i++) residuals[i] = y[i] - f(x[i], params, dydp);
   }
   
@@ -145,7 +144,6 @@ namespace apl
   ///
   void NonlinearFit::Jacobian(const xvector<double> &guess)
   {
-    xvector<double> dydp(Nparams);
     for (int i=1; i<=Npoints; i++){
       f(x[i], guess, dydp); 
       for (int j=1; j<=Nparams; j++){
