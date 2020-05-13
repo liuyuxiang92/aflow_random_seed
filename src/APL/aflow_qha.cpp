@@ -1911,11 +1911,11 @@ namespace apl
       }
 
       // calculate thermodynamic properties
-      Cvi = 0.0; CP = 0; CV = 0.0; 
-      GP  = 0.0; gamma   = 0.0;
-      w       = 0.0; w0K     = 0.0; expx    = 0.0; expx0   = 0.0;
-      ui      = 0.0;
-      Bgamma  = 0.0; Bdgamma = 0.0; Belec   = 0.0; Pgamma  = 0.0; B = 0.0;
+      Cvi = 0.0; CP = 0.0; CV = 0.0; 
+      GP = 0.0; gamma = 0.0;
+      w = 0.0; w0K = 0.0; expx = 0.0; expx0 = 0.0;
+      ui = 0.0;
+      Bgamma = 0.0; Bdgamma = 0.0; Belec = 0.0; Pgamma = 0.0; B = 0.0;
       fi = 0.0; Feq = 0.0;
 
       for (uint q=0; q<NIrQpoints; q++){
