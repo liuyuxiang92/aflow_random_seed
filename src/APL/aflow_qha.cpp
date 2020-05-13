@@ -424,7 +424,6 @@ namespace apl
   QHAN::QHAN(ostream& oss) { free(); xStream::initialize(oss); }
   QHAN::QHAN(const QHAN &qha){
     free(); copy(qha);
-    xStream::free(); xStream::copy(qha);
   }
   QHAN::~QHAN() { xStream::free(); free(); }
   const QHAN& QHAN::operator=(const QHAN &qha){
@@ -701,12 +700,7 @@ namespace apl
     // define a set of temperatures for thermodynamic calculations
     Ntemperatures = floor((tp_end - tp_start)/tp_step) + 1;
 
-    Temperatures = vector<double> (Ntemperatures);
-    uint Tcount = 0;
-    for (int T=tp_start; T<=tp_end; T+=tp_step){
-      Temperatures[Tcount] = T;
-      Tcount++;
-    }
+    for (int T=tp_start; T<=tp_end; T+=tp_step) Temperatures.push_back(T);
 
     // this matrix will be used in the fit of frequency-volume dependency
     // w(V) = a + b*V + c*V^2 + d*V^3
@@ -924,11 +918,10 @@ namespace apl
       phcalc.setNCPUs(kflags);
 
       auto_ptr<apl::ForceConstantCalculator> fccalc;
-      apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
-          *p_FileMESSAGE, *p_oss);
 
       if (apl_options.getattachedscheme("ENGINE") == string("DM")){
-
+        apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
+          *p_FileMESSAGE, *p_oss);
         fccalc.reset(dmPC);
 
         // set options for direct method phonon calculations
@@ -1005,7 +998,13 @@ namespace apl
         }
       }
 
-      if (!phcalc.getSupercell().projectToPrimitive()){
+      if (phcalc.getSupercell().projectToPrimitive()){
+        // if projection to primitive was successful update origStructure
+        double Volume = origStructure.GetVolume();
+        origStructure = phcalc.getSupercell().getInputStructure();
+        origStructure.InflateVolume(Volume/origStructure.GetVolume());
+      }
+      else{
         msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
         msg += "Phonon dispersions will be calculated using the original structure instead.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
