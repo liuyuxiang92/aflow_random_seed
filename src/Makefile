@@ -93,8 +93,10 @@ LIBS=-lpthread
 # -static
 #CO START 170614 easy integration
 LIBS_AFLOW=-ldl $(LIBS)
-LIBS_STATIC=-static
-LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(LIBS_STATIC)
+FLAGS_STATIC=-static
+LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(FLAGS_STATIC)
+FLAGS_STATIC_PRE=
+FLAGS_STATIC_POST=
 #CO END 170614 easy integration
 # -lglut -lGLU -lGL -D_HOST_=\"`hostname`\"
 #AFLOW_VERSION := $(shell cat aflow.cpp | /home/auro/bin/getvalue AFLOW_VERSION)-$(TIME)
@@ -152,19 +154,17 @@ aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS)
 	ln -sf aflow apennsy
 .PHONY: static_no_pdf
 static_no_pdf: aflow aflow_data
-	rm -rf $(SQLITE_OBJ)
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-	$(CC) $(SQLITE_OPTS) -c $(SQLITE_C) $(LIBS_STATIC)
-#	cp sqlite3.o ./SQLITE/
-	rm -f aflow
-#	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-#	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow $(SQLITE_OBJ) $(AFLOW_OBJS) $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-	rm -f aflow_data
-#	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.cpp $(LIBS_STATIC)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(LIBS_STATIC)
-#.PHONY: static
-#static: static_no_pdf
+#	[CO20200513 - KEEP rm command in case we do 'make -j' first]
+	rm -rf $(SQLITE_OBJ) aflow aflow_data
+	$(MAKE) LIBS_AFLOW="$(LIBS_AFLOW_STATIC)" FLAGS_STATIC_POST="$(FLAGS_STATIC)"
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(FLAGS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(MAKE) $(SQLITE_OBJ) FLAGS_STATIC_POST="$(FLAGS_STATIC)"
+#	rm -f aflow
+#	$(MAKE) aflow LIBS_AFLOW="$(LIBS_AFLOW_STATIC)"
+#	rm -f aflow_data
+#	$(MAKE) aflow_data FLAGS_STATIC_POST="$(FLAGS_STATIC)"
+.PHONY: static
+static: static_no_pdf
 #	tar Jcfvp /www/AFLOW/CURRENT/aflow_$(VERSNUMBER)_amd64_debian_static.tar.xz aflow aflow_data	
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
 .PHONY: mac
@@ -182,7 +182,7 @@ mac:
 ###################################################################################################
 #CO201706147
 $(SQLITE_OBJ): $(SQLITE_C) Makefile
-	$(CC) $(SQLITE_OPTS) -c $< -o $@
+	$(CC) $(SQLITE_OPTS) -c $< -o $@ $(FLAGS_STATIC_POST)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
@@ -650,7 +650,7 @@ aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_dat
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	$(MAKE) aflow_data.o
 #	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""aflow_data.cpp"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_data.cpp -c -o aflow_data.o
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(FLAGS_STATIC_POST)
 .PHONY: data
 data: aflow_data
 .PHONY: amir
@@ -1102,14 +1102,14 @@ check_full:
 	$(MAKE) check_smith
 	$(MAKE) check_proto
 	$(MAKE) check_slab
-	-$(MAKE) check_chull
+	$(MAKE) check_chull
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_match
 	$(MAKE) check_aflow_gcc_compatibility
-	$(MAKE) check_pocc
 	$(MAKE) check_cce
+	$(MAKE) check_pocc
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1139,6 +1139,7 @@ check_slab:
 .PHONY: check_chull
 check_chull:
 	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
+		if [ -z "$$SC" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check  './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t'" && exit 0; fi && \
 		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$ANSWER meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
 	@echo "CHULL tests passed"
 .PHONY: check_pocc
