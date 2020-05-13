@@ -1848,8 +1848,8 @@ namespace apl
       const QHAN& operator=(const QHAN &qha);
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
       void clear();
-      double calcGrueneiesen(double V, xvector<double> &xomega, double &w);
-      double calcGrueneiesenFD(const xvector<double> &xomega);
+      double calcGrueneisen(double V, xvector<double> &xomega, double &w);
+      double calcGrueneisenFD(const xvector<double> &xomega);
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
       double FreeEnergy(double T, int id);

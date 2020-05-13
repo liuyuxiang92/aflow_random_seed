@@ -1109,9 +1109,10 @@ namespace apl
   /// @param xomega is an array of frequency-volume dependence for a given
   /// phonon branch.
   /// 
-  double QHAN::calcGrueneiesen(double V, xvector<double> &xomega, double &w)
+  double QHAN::calcGrueneisen(double V, xvector<double> &xomega, double &w)
   {
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
+    string function = "calcGrueneisen():";
     // no weights in fit
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
     aurostd::cematrix lsfit(gp_fit_matrix);
@@ -1154,7 +1155,7 @@ namespace apl
             msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
             msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid])+'\n';
 
-            pflow::logger(QHA_ARUN_MODE, "calcGrueneiesen()", msg, currentDirectory,
+            pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory,
                 *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
             cerr << xomega << std::endl;
             cerr << gp_fit_matrix * tmp << std::endl;
@@ -1175,11 +1176,11 @@ namespace apl
   /// 
   /// gamma = -V0/w0*dw/dV |V->V0 ~ -V0/w0*(w(V0+dV)-w(V0-dV))/(2*dV)
   /// 
-  double QHAN::calcGrueneiesenFD(const xvector<double> &xomega)
+  double QHAN::calcGrueneisenFD(const xvector<double> &xomega)
   {
-    string function = "calcGrueneiesenFD(): ", msg = "";
+    string function = "calcGrueneisenFD(): ", msg = "";
     if (xomega.rows != 3){
-      msg = "Wrong size of xomega array passed to calcGrueneiesenFD function.";
+      msg = "Wrong size of xomega array passed to calcGrueneisenFD function.";
       msg += "Expected size: 3. Actual size: ";
       msg += aurostd::utype2string<int>(xomega.rows);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INDEX_BOUNDS_);
@@ -1451,7 +1452,7 @@ namespace apl
 
             Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
 
-            GP += calcGrueneiesenFD(xomega) * Cvi;
+            GP += calcGrueneisenFD(xomega) * Cvi;
             CV += Cvi;
           }
         }
@@ -1489,7 +1490,7 @@ namespace apl
       for (int branch=0; branch<Nbranches; branch++){
           xomega = aurostd::vector2xvector(omegaV_mesh_EOS[q][branch]);
 
-          gamma = calcGrueneiesen(V, xomega, w);
+          gamma = calcGrueneisen(V, xomega, w);
           w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
           if (w > _mm_epsilon){
             expx = exp(w*beta);
@@ -2213,7 +2214,8 @@ namespace apl
   void QHAN::writeGPpath(double V, const string &directory)
   {
     string function = "QHAN::writeGPpath():";
-    string msg = "Calculating and saving Grueneisen parameters along a path.";
+    string msg = "Calculating and saving Grueneisen parameters along a path in";
+    msg += " reciprocal space, which was used to calculate phonon dispersion.\n";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
     // we will save bands-projected Grueneisen parameter in xEIGENVAL
@@ -2238,8 +2240,8 @@ namespace apl
           xomega[Vid+1] = gp_ph_dispersions[Vid].venergy.at(q).at(branch).at(0);
         }
 
-        //GPpath.venergy.at(q).at(branch).at(0) = calcGrueneiesen(V, xomega);
-        GPpath.venergy.at(q).at(branch).at(0) = calcGrueneiesenFD(xomega);
+        //GPpath.venergy.at(q).at(branch).at(0) = calcGrueneisen(V, xomega);
+        GPpath.venergy.at(q).at(branch).at(0) = calcGrueneisenFD(xomega);
       }
     }
 
@@ -2344,7 +2346,7 @@ namespace apl
       for (int branch=0; branch<Nbranches; branch++){
         xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
         xeigen.venergy[q][branch][0] = xomega[2];
-        xeigen.venergy[q][branch][1] = calcGrueneiesenFD(xomega);
+        xeigen.venergy[q][branch][1] = calcGrueneisenFD(xomega);
       }
     }
 
