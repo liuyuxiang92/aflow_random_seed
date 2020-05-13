@@ -739,7 +739,7 @@ namespace apl
     if (tokens.size() != 3){
       msg = "Wrong setting in ";
       msg += "[AFLOW_APL]TPT.\n";
-      msg += "Specify as TPT=0:2000:10.\n";
+      msg += "Specify as TPT="+AFLOWRC_DEFAULT_APL_TPT"+.\n";
       msg += "See README_AFLOW_APL.TXT for the details.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
           _INPUT_NUMBER_);
