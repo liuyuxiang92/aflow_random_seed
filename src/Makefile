@@ -697,21 +697,6 @@ aflow_gnuplot_funcs.cpp: Makefile
 ###################################################################################################
 
 ###################################################################################################
-aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
-aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
-###################################################################################################
-
-###################################################################################################
-#HTRESOURCES
-aflow_contrib_stefano_htcurriculum.o: aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
-aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
-###################################################################################################
-
-###################################################################################################
 #CO20170622 - START
 aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js Makefile
 	rm -rf $@
@@ -792,6 +777,21 @@ aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	echo "#endif  //  _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
 	chmod 755 $@
 	rm -rf nomix.tmp
+###################################################################################################
+
+###################################################################################################
+aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
+aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
+###################################################################################################
+
+###################################################################################################
+#HTRESOURCES
+aflow_contrib_stefano_htcurriculum.o: aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
+aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
 ###################################################################################################
 
 ###################################################################################################
