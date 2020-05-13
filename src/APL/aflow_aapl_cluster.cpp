@@ -63,19 +63,18 @@ namespace apl {
 
   //Copy Constructors/////////////////////////////////////////////////////////
   ClusterSet::ClusterSet(const ClusterSet& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void ClusterSet::copy(const ClusterSet& that) {
+    if (this == &that) return;
     xStream::copy(that);
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;

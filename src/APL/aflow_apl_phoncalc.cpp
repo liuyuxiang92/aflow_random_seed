@@ -42,20 +42,19 @@ namespace apl {
 
 
   PhononCalculator::PhononCalculator(const PhononCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   // Copy constructors
   PhononCalculator& PhononCalculator::operator=(const PhononCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void PhononCalculator::copy(const PhononCalculator& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;

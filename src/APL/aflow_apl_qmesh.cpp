@@ -55,19 +55,18 @@ namespace apl {
 
   // Copy constructors
   QMesh::QMesh(const QMesh& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   QMesh& QMesh::operator=(const QMesh& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void QMesh::copy(const QMesh& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _ibzqpts = that._ibzqpts;
     _initialized = that._initialized;

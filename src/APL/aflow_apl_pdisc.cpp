@@ -41,19 +41,18 @@ namespace apl {
   }
 
   PhononDispersionCalculator::PhononDispersionCalculator(const PhononDispersionCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   PhononDispersionCalculator& PhononDispersionCalculator::operator=(const PhononDispersionCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void PhononDispersionCalculator::copy(const PhononDispersionCalculator& that) {
+    if (this == &that) return;
     _frequencyFormat = that._frequencyFormat;
     _freqs = that._freqs;
     _pc = that._pc;
@@ -601,19 +600,18 @@ namespace apl {
   }
 
   PathBuilder::PathBuilder(const PathBuilder& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   PathBuilder& PathBuilder::operator=(const PathBuilder& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void PathBuilder::copy(const PathBuilder& that) {
+    if (this == &that) return;
     _mode = that._mode;
     _store = that._store;
     _path = that._path;

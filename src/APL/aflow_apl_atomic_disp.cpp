@@ -41,15 +41,13 @@ namespace apl {
   }
 
   AtomicDisplacements::AtomicDisplacements(const AtomicDisplacements& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   AtomicDisplacements& AtomicDisplacements::operator=(const AtomicDisplacements& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
@@ -58,6 +56,7 @@ namespace apl {
   }
 
   void AtomicDisplacements::copy(const AtomicDisplacements& that) {
+    if (this == &that) return;
     _eigenvectors = that._eigenvectors;
     _frequencies = that._frequencies;
     _displacement_matrices = that._displacement_matrices;

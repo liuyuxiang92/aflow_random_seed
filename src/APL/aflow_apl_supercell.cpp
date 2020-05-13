@@ -52,14 +52,13 @@ namespace apl {
   }
 
   Supercell& Supercell::operator=(const Supercell& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    free();
+    copy(that);
     return *this;
   }
 
   void Supercell::copy(const Supercell& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _directory = that._directory;
     _inStructure = that._inStructure;

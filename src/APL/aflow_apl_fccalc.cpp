@@ -47,15 +47,13 @@ namespace apl {
   }
 
   ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   ForceConstantCalculator& ForceConstantCalculator::operator=(const ForceConstantCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
@@ -70,6 +68,7 @@ namespace apl {
   }
 
   void ForceConstantCalculator::copy(const ForceConstantCalculator& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;

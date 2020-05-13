@@ -2015,6 +2015,7 @@ namespace plotter {
         if (outformat == "GNUPLOT") {
           savePlotGNUPLOT(plotoptions, out);
         }
+        out.str("");  //ME20200513 - reset stringstream
       }
     } else {
       string function = "plotter::PLOT_THERMO()";

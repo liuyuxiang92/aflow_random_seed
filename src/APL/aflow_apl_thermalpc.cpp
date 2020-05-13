@@ -67,15 +67,13 @@ namespace apl {
 
   // Copy constructors
   ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   ThermalPropertiesCalculator& ThermalPropertiesCalculator::operator=(const ThermalPropertiesCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
@@ -86,6 +84,7 @@ namespace apl {
   }
 
   void ThermalPropertiesCalculator::copy(const ThermalPropertiesCalculator& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _freqs_0K = that._freqs_0K;
     _dos_0K = that._dos_0K;

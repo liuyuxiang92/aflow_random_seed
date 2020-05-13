@@ -57,19 +57,18 @@ namespace apl {
 
   //Copy Constructor//////////////////////////////////////////////////////////
   TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   TCONDCalculator& TCONDCalculator::operator=(const TCONDCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
+    if (this == &that) return;
     boundary_grain_size = that.boundary_grain_size;
     calc_boundary = that.boundary_grain_size;
     calc_cumulative = that.calc_cumulative;

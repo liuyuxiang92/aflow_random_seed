@@ -41,14 +41,13 @@ namespace apl {
   }
 
   DOSCalculator& DOSCalculator::operator=(const DOSCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    free();
+    copy(that);
     return *this;
   }
 
   void DOSCalculator::copy(const DOSCalculator& that) {
+    if (this == &that) return;
     _pc = that._pc;
     _pc_set = that._pc_set;
     _bzmethod = that._bzmethod;

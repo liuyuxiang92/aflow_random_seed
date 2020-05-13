@@ -64,20 +64,19 @@ namespace apl {
 
   //Copy constructors
   AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   //copy//////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
+    if (this == &that) return;
     xStream::copy(that);
     cart_indices = that.cart_indices;
     clst = that.clst;
