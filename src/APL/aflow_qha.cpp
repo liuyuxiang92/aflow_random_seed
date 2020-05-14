@@ -2238,8 +2238,8 @@ namespace apl
   void QHAN::writeGPpath(double V, const string &directory)
   {
     string function = "QHAN::writeGPpath():";
-    string msg = "Calculating and saving Grueneisen parameters along a path in";
-    msg += " reciprocal space which was used to calculate phonon dispersion.";
+    string msg = "Calculating Grueneisen parameters along the path in";
+    msg += " that was used to for the phonon dispersion.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
     // we will save bands-projected Grueneisen parameter in xEIGENVAL
