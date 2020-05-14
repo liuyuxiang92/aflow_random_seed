@@ -22,6 +22,7 @@ static const char _LOGGER_COMPLETE_ = 'C';
 static const char _LOGGER_OPTION_ = 'O';
 static const char _LOGGER_RAW_ = 'R';
 static const char _LOGGER_MESSAGE_ = 'M';
+static const char _LOGGER_NOTICE_ = 'N';
 
 #define XRAY_THETA_TOL 1e-5;                                  //CO20190409
 

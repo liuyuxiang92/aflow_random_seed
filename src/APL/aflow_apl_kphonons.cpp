@@ -280,6 +280,8 @@ namespace KBIN {
 
     xinput.xvasp.AVASP_arun = true;
     string function = "KBIN::RunPhonons_APL():";  //ME20191029
+    stringstream message;
+
     if (LDEBUG) std::cerr << function << " DEBUG [0]" << std::endl;
     // Test
     //if (!(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN20180705
@@ -359,25 +361,29 @@ namespace KBIN {
       xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.options2entry(AflowIn,_STROPT_+"BADER=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_BADER",xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry && DEFAULT_VASP_FORCE_OPTION_BADER) {
-        logger << "Switching OFF BADER for APL calculations (default: OFF)." << apl::endl; //CO20181226 - default OFF
+        message << "Switching OFF BADER for APL calculations (default: OFF)."; //CO20181226 - default OFF
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.options2entry(AflowIn,_STROPT_+"CHGCAR=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_CHGCAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.isentry && DEFAULT_VASP_FORCE_OPTION_CHGCAR) {
-        logger << "Switching OFF CHGCAR for APL calculations (default: OFF)." << apl::endl;  //CO20181226 - default OFF
+        message << "Switching OFF CHGCAR for APL calculations (default: OFF).";  //CO20181226 - default OFF
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.options2entry(AflowIn,_STROPT_+"ELF=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_ELF",xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && DEFAULT_VASP_FORCE_OPTION_ELF) {
-        logger << "Switching OFF ELF for APL calculations (default: OFF)." << apl::endl; //CO20181226 - default OFF
+        message << "Switching OFF ELF for APL calculations (default: OFF)."; //CO20181226 - default OFF
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.options2entry(AflowIn,_STROPT_+"WAVECAR=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_WAVECAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.isentry && DEFAULT_VASP_FORCE_OPTION_WAVECAR) {
-        logger << "Switching OFF WAVECAR for APL calculations (default: OFF)." << apl::endl;  //CO20181226 - default OFF
+        message << "Switching OFF WAVECAR for APL calculations (default: OFF).";  //CO20181226 - default OFF
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       }
     }
 
@@ -386,7 +392,7 @@ namespace KBIN {
       vector<int> kpts;
       aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.content_string, kpts, " xX");
       if (kpts.size() != 3) {
-        string message = "Incorrect format for KPOINTS_GRID";
+        message << "Incorrect format for KPOINTS_GRID";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
     }
@@ -396,7 +402,7 @@ namespace KBIN {
       vector<int> kpts;
       aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_SHIFT.content_string, kpts, " ,;");
       if (kpts.size() != 3) {
-        string message = "Incorrect format for KPOINTS_SHIFT";
+        message << "Incorrect format for KPOINTS_SHIFT";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
     }
@@ -422,7 +428,8 @@ namespace KBIN {
     vector<xvector<double> > USER_DOS_PROJECTIONS;
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
       const string& key = kflags.KBIN_MODULE_OPTIONS.aplflags[i].keyword;
-      logger << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme << apl::endl;
+      message << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme;
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       aplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].option);
       aplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme);
       if (key == "RELAX") {USER_RELAX = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
@@ -469,8 +476,6 @@ namespace KBIN {
 
     /***************************** CHECK PARAMETERS *****************************/
 
-    string message;
-
     //ME20190313 START
     // Do not relax with --generate_aflowin_only option
     if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
@@ -510,9 +515,8 @@ namespace KBIN {
       USER_ENGINE = "DM";
     }
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
-      message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
-      message += "See README_AFLOW_APL.TXT for more information.";
-      //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+      message << "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
+      message << "See README_AFLOW_APL.TXT for more information.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     //OBSOLETE ME20200507
@@ -536,9 +540,8 @@ namespace KBIN {
       tokens.clear();
       aurostd::string2tokens(USER_SUPERCELL, tokens, string(" xX"));
       if (tokens.size() != 3) {
-        message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+        message << "Wrong setting in " + _ASTROPT_ + "SUPERCELL. ";
+        message << "See README_AFLOW_APL.TXT for the correct format.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       }
     }
@@ -564,7 +567,7 @@ namespace KBIN {
       supercell_opts.push_attached("SUPERCELL::METHOD", "SHELLS");
       supercell_opts.push_attached("SUPERCELL::VALUE", aurostd::utype2string<int>(USER_MINSHELL));
     } else {
-      message = "Could not determine supercell method.";
+      message << "Could not determine supercell method.";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     supercell_opts.flag("SUPERCELL::VERBOSE", true);  // Use verbose output for supercell construction
@@ -585,16 +588,14 @@ namespace KBIN {
         tokens.clear();
         aurostd::string2tokens(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  //ME20190427 - also break along semicolon
         if (tokens.size() != ncoords) {
-          message = "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
-          message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
-          message += "See README_AFLOW_APL.TXT for more information.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+          message << "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
+          message << "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
+          message << "See README_AFLOW_APL.TXT for more information.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
         }
       } else {
-        message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
-        message += "See README_AFLOW_APL.TXT for more information.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+        message << "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
+        message << "See README_AFLOW_APL.TXT for more information.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
     }
@@ -603,21 +604,20 @@ namespace KBIN {
     if (USER_DOS || USER_TP) {  //ME20190423
       tokens.clear();
       if (USER_DOS_METHOD != "LT" && USER_DOS_METHOD != "RS") {
-        message = "Wrong setting in " + _ASTROPT_ + "DOSMETHOD. Use either LT or RS. ";
-        message += "See README_AFLOW_APL.TXT for more information.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+        message << "Wrong setting in " + _ASTROPT_ + "DOSMETHOD. Use either LT or RS. ";
+        message << "See README_AFLOW_APL.TXT for more information.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
       if ((USER_DOS_METHOD == "RS") && (USER_DOS_SMEAR < _ZERO_TOL_)) {
-        logger << apl::warning << "Smearing value for DOS not set or set to zero. ";
-        logger << "APL will overwrite the smearing value to 0.05 eV." << apl::endl;
+        message << "Smearing value for DOS not set or set to zero.";
+        message << " APL will overwrite the smearing value to 0.05 eV.";
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
         USER_DOS_SMEAR = 0.05;
       }
       aurostd::string2tokens(DOS_MESH_SCHEME, tokens, string(" xX"));
       if (tokens.size() != 3) {
-        message = "Wrong setting in " + _ASTROPT_ + "DOSMESH. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+        message << "Wrong setting in " + _ASTROPT_ + "DOSMESH. ";
+        message << "See README_AFLOW_APL.TXT for the correct format.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       } else {
         USER_DOS_MESH[0] = aurostd::string2utype<int>(tokens[0]);
@@ -629,8 +629,8 @@ namespace KBIN {
       if (USER_DOS_PROJECT) {
         if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
           if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
-            message = "Ambiguous input in APL DOS projections. ";
-            message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
+            message << "Ambiguous input in APL DOS projections. ";
+            message << "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
           }
           string projscheme = "";
@@ -643,9 +643,9 @@ namespace KBIN {
             if (proj.size() == 3) {
               USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
             } else {
-              message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
-              message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
-              message += "See README_AFLOW_APL.TXT for the correct format.";
+              message << "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
+              message << string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
+              message << "See README_AFLOW_APL.TXT for the correct format.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
             }
           }
@@ -661,9 +661,8 @@ namespace KBIN {
       tokens.clear();
       aurostd::string2tokens(USER_TPT, tokens, string(" :"));
       if (tokens.size() != 3) {
-        message = "Wrong setting in " + _ASTROPT_ + "TPT. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
+        message << "Wrong setting in " + _ASTROPT_ + "TPT. ";
+        message << "See README_AFLOW_APL.TXT for the correct format.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       }
       USER_TP_TSTART = aurostd::string2utype<double>(tokens[0]);
@@ -673,97 +672,102 @@ namespace KBIN {
 
     /****************************** OUTPUT SUMMARY ******************************/
 
-    logger << "Parameters for the Automatic Phonon Library successfully read." << apl::endl;
-    logger << "The structure will " << (USER_RELAX?"":"NOT ") << "be relaxed before running APL." << apl::endl;
-    logger << "The hibernate feature is switched " << (USER_HIBERNATE?"ON":"OFF") << "." << apl::endl;
-    logger << "Phonons will be calculated using the " << (USER_ENGINE=="DM"?"Direct":"Linear Response") << " Method." << apl::endl;
+    message << "Parameters for the Automatic Phonon Library successfully read." << std::endl;
+    message << "The structure will " << (USER_RELAX?"":"NOT ") << "be relaxed before running APL." << std::endl;
+    message << "The hibernate feature is switched " << (USER_HIBERNATE?"ON":"OFF") << "." << std::endl;
+    message << "Phonons will be calculated using the " << (USER_ENGINE=="DM"?"Direct":"Linear Response") << " Method." << std::endl;
 
     if (USER_ENGINE == "DM") {
-      logger << "The distortion magnitude will be " << USER_DISTORTION_MAGNITUDE << " Angstrom." << apl::endl;
+      message << "The distortion magnitude will be " << USER_DISTORTION_MAGNITUDE << " Angstrom." << std::endl;
       if (USER_DISTORTIONS_XYZ_ONLY) {
-        logger << "Only distortions along the lattice vectors will be used." << apl::endl;
+        message << "Only distortions along the lattice vectors will be used." << std::endl;
       } else {
-        logger << "Atoms will be distorted along the lattice vectors, face diagonals, and body diagonals." << apl::endl;
+        message << "Atoms will be distorted along the lattice vectors, face diagonals, and body diagonals." << std::endl;
       }
       if (USER_DISTORTIONS_SYMMETRIZE) {
-        logger << "Non-symmetric distortion directions will be determined for each site." << apl::endl;
+        message << "Non-symmetric distortion directions will be determined for each site." << std::endl;
       } else {
-        logger << "Distortions will be generated in three independent directions." << apl::endl;
+        message << "Distortions will be generated in three independent directions." << std::endl;
       }
       if (USER_DISTORTIONS_INEQUIVONLY) { //CO20190131
-        logger << "Distortion directions will be determined for inequivalent site only." << apl::endl;
+        message << "Distortion directions will be determined for inequivalent site only." << std::endl;
       } else {
-        logger << "Distortion directions will be determined for ALL site." << apl::endl;
+        message << "Distortion directions will be determined for ALL site." << std::endl;
       }
+      // Output now so that the warning about positive directions are can be displayed properly
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       if (USER_AUTO_DISTORTIONS) {
-        logger << "Positive/negative distortion directions will be determined for each site." << apl::endl; 
+        message << "Positive/negative distortion directions will be determined for each site."; 
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       } else if (USER_DPM) {
-        logger << "Distortions will be generated in both the positive and negative direction." << apl::endl;
+        message << "Distortions will be generated in both the positive and negative direction.";
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       } else {
-        logger << apl::warning << "Distortions will only be generated in the positive direction - this is NOT recommended." << apl::endl;
+        message << "Distortions will only be generated in the positive direction - this is NOT recommended.";
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
       }
-      logger << "Forces from the undistored state will " << (USER_ZEROSTATE?"":"NOT ") << "be used." << apl::endl;
+      message << "Forces from the undistored state will " << (USER_ZEROSTATE?"":"NOT ") << "be used." << std::endl;
       //logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  //OBSOLETE ME20200507
     }
 
-    logger << "Polar corrections will " << (USER_POLAR?"":"NOT ") << "be employed." << apl::endl;
-    logger << "Frequencies will be returned in this format: " << USER_FREQFORMAT << "." << apl::endl;
+    message << "Polar corrections will " << (USER_POLAR?"":"NOT ") << "be employed." << std::endl;
+    message << "Frequencies will be returned in this format: " << USER_FREQFORMAT << "." << std::endl;
 
-    logger << "The supercell will be built using ";
+    message << "The supercell will be built using ";
     if (kflags.KBIN_MODULE_OPTIONS.supercell_method[0]) {
-      logger << "the dimensions " << USER_SUPERCELL << "." << apl::endl;
+      message << "the dimensions " << USER_SUPERCELL << "." << std::endl;
     } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[1]) {
-      logger << "at least " << USER_MINATOMS << " atoms." << apl::endl;
+      message << "at least " << USER_MINATOMS << " atoms." << std::endl;
     } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[2]) {
-      logger << "at most " << USER_MAXSHELL << " shells." << apl::endl;
+      message << "at most " << USER_MAXSHELL << " shells." << std::endl;
     } else {
-      logger << "at least " << USER_MINSHELL << " shells." << apl::endl;
+      message << "at least " << USER_MINSHELL << " shells." << std::endl;
     }
 
     if (USER_DC) {
-      logger << "Phonon dispersion curves will be calculated ";
+      message << "Phonon dispersion curves will be calculated ";
       if (USER_DC_METHOD == "LATTICE") {
-        logger << "using the default path of the lattice (see DOI 10.1016/j.commatsci.2010.05.010). ";
+        message << "using the default path of the lattice (see DOI 10.1016/j.commatsci.2010.05.010). ";
       } else {
-        logger << "along the " << (USER_DC_INITCOORDS_FRAC.empty()?"Cartesian":"fractional") << " coordinates ";
-        logger << "[" << (USER_DC_INITCOORDS_FRAC.empty()?USER_DC_INITCOORDS_CART:USER_DC_INITCOORDS_FRAC) << "].";
+        message << "along the " << (USER_DC_INITCOORDS_FRAC.empty()?"Cartesian":"fractional") << " coordinates ";
+        message << "[" << (USER_DC_INITCOORDS_FRAC.empty()?USER_DC_INITCOORDS_CART:USER_DC_INITCOORDS_FRAC) << "].";
       }
-      logger << " Each subpath will be divided into " << USER_DC_NPOINTS << " points." << apl::endl;
+      message << " Each subpath will be divided into " << USER_DC_NPOINTS << " points." << std::endl;
     } else {
-      logger << "Phonon dispersion curves will NOT be calculated." << apl::endl;
+      message << "Phonon dispersion curves will NOT be calculated." << std::endl;
     }
 
     if (USER_DOS || USER_TP) {  //ME20190423
-      logger << "Phonon DOS will be calculated using the ";
-      logger << (USER_DOS_METHOD == "LT"?"Linear Tetrahedron":"Root Sampling") << " method ";
-      logger << "along a " << USER_DOS_MESH[0] << "x" << USER_DOS_MESH[1] << "x" << USER_DOS_MESH[2];
-      logger << " mesh with " << USER_DOS_NPOINTS << " bins.";
+      message << "Phonon DOS will be calculated using the ";
+      message << (USER_DOS_METHOD == "LT"?"Linear Tetrahedron":"Root Sampling") << " method ";
+      message << "along a " << USER_DOS_MESH[0] << "x" << USER_DOS_MESH[1] << "x" << USER_DOS_MESH[2];
+      message << " mesh with " << USER_DOS_NPOINTS << " bins.";
       if (USER_DOS_METHOD == "RS")
-        logger << " A smearing value of " << USER_DOS_SMEAR << " eV will be used.";
+        message << " A smearing value of " << USER_DOS_SMEAR << " eV will be used.";
       //ME20190626 - projected DOS
       if ((USER_DOS_PROJECTIONS.size() == 0) || (USER_DOS_METHOD == "RS")) {
-        logger << " Projected phonon DOS will NOT be calculated.";
+        message << " Projected phonon DOS will NOT be calculated.";
       } else {
-        logger << " Projected phonon DOS will be calculated along the "
+        message << " Projected phonon DOS will be calculated along the "
           << (USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"fractional":"Cartesian") << " directions ";
         for (uint i = 0; i < USER_DOS_PROJECTIONS.size(); i++) {
-          logger << "[";
-          for (int j = 1; j < 4; j++) logger << USER_DOS_PROJECTIONS[i][j] << ((j < 3)?", ":"");
-          logger << "]" << ((i < USER_DOS_PROJECTIONS.size() - 1)?", ":".");
+          message << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(aurostd::xvector2vector<double>(USER_DOS_PROJECTIONS[i])), ", ") << "]";
+          message << ((i < USER_DOS_PROJECTIONS.size() - 1)?", ":".");
         }
       }
-      logger << apl::endl;
+      message << std::endl;
     } else {
-      logger << "Phonon DOS will NOT be calculated." << apl::endl;
+      message << "Phonon DOS will NOT be calculated." << std::endl;
     }
 
     if (USER_TP) {
-      logger << "Thermodynamic properties will be calculated between ";
-      logger << USER_TP_TSTART << " K and " << USER_TP_TEND << " K ";
-      logger << "in " << USER_TP_TSTEP << " K steps." << apl::endl;
+      message << "Thermodynamic properties will be calculated between ";
+      message << USER_TP_TSTART << " K and " << USER_TP_TEND << " K ";
+      message << "in " << USER_TP_TSTEP << " K steps." << std::endl;
     } else {
-      logger << "Thermodynamic properties will NOT be calculated." << apl::endl;
+      message << "Thermodynamic properties will NOT be calculated." << std::endl;
     }
+    pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
     //ME20181026 END
 
     // AAPL ----------------------------------------------------------------------
@@ -778,11 +782,11 @@ namespace KBIN {
     aurostd::xoption aaplopts;
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       USER_TCOND = true;
-      stringstream aaplout;
+      stringstream message;
       for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aaplflags.size(); i++) {
         const string& key = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].keyword;
-        aaplout << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme;
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, aaplout, aflags, messageFile, oss);
+        message << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme;
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
         aaplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option);
         aaplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme);
       }
@@ -794,67 +798,65 @@ namespace KBIN {
 
       /****************************** OUTPUT SUMMARY ******************************/
 
-      aaplout << "Parameters for the Automatic Anharmonic Phonon Library successfully read." << std::endl;
-      aaplout << "Four-phonon processes will " << (aaplopts.flag("FOURTH_ORDER")?"":"NOT ") << "be included in the calculations.";
+      message << "Parameters for the Automatic Anharmonic Phonon Library successfully read." << std::endl;
+      message << "Four-phonon processes will " << (aaplopts.flag("FOURTH_ORDER")?"":"NOT ") << "be included in the calculations.";
 
       bool defaults = (!aaplopts.flag("CUT_RAD") && !aaplopts.flag("CUT_SHELL"));
       if (defaults || aaplopts.flag("CUT_RAD")) {
         aurostd::string2tokens(aaplopts.getattachedscheme("CUT_RAD"), tokens, ",");
-        aaplout << "The cutoff to compute the 3rd order anharmonic IFCs will be ";
-        aaplout << tokens[0] << " Angstrom." << std::endl;
+        message << "The cutoff to compute the 3rd order anharmonic IFCs will be ";
+        message << tokens[0] << " Angstrom." << std::endl;
         if (aaplopts.flag("FOUTH_ORDER")) {
-          aaplout << "The cutoff to compute the 4th order anharmonic IFCs will be ";
-          aaplout << tokens[1] << " Angstrom." << std::endl;
+          message << "The cutoff to compute the 4th order anharmonic IFCs will be ";
+          message << tokens[1] << " Angstrom." << std::endl;
         }
       }
       if (defaults || aaplopts.flag("CUT_RAD")) {
         aurostd::string2tokens(aaplopts.getattachedscheme("CUT_SHELL"), tokens, ",");
-        aaplout << "The calculation of 3rd order anharmonic IFCs will consider up to ";
-        aaplout << tokens[0] << " coordination shells." << std::endl;
+        message << "The calculation of 3rd order anharmonic IFCs will consider up to ";
+        message << tokens[0] << " coordination shells." << std::endl;
         if (aaplopts.flag("FOURTH_ORDER")) {
-          aaplout << "The calculation of 4th order anharmonic IFCs will consider up to ";
-          aaplout << tokens[1] << " coordination shells." << std::endl;
+          message << "The calculation of 4th order anharmonic IFCs will consider up to ";
+          message << tokens[1] << " coordination shells." << std::endl;
         }
       }
 
-      if (aaplopts.flag("KPPRA")) aaplout << "AAPL will use a KPPRA of " << aaplopts.getattachedscheme("KPPRA") << " for static calculations." << std::endl;
+      if (aaplopts.flag("KPPRA")) message << "AAPL will use a KPPRA of " << aaplopts.getattachedscheme("KPPRA") << " for static calculations." << std::endl;
 
-      aaplout << "Anharmonic IFCs will be calculated with a convergence criterion of " << aaplopts.getattachedscheme("SUMRULE") << "." << std::endl;;
-      aaplout << "A mixing coefficient of " << aaplopts.getattachedscheme("MIXING_COEFFICIENT")<< " will be used." << std::endl;
-      aaplout << "Anharmonic IFCs need to be converged within " << aaplopts.getattachedscheme("SUMRULE_MAX_ITER") << " iterations." << std::endl;
+      message << "Anharmonic IFCs will be calculated with a convergence criterion of " << aaplopts.getattachedscheme("SUMRULE") << "." << std::endl;;
+      message << "A mixing coefficient of " << aaplopts.getattachedscheme("MIXING_COEFFICIENT")<< " will be used." << std::endl;
+      message << "Anharmonic IFCs need to be converged within " << aaplopts.getattachedscheme("SUMRULE_MAX_ITER") << " iterations." << std::endl;
 
-      aaplout << "Thermal conductivity will be calculated between ";
-      aaplout << aaplopts.getattachedscheme("TSTART") << " K";
-      aaplout << " and " << aaplopts.getattachedscheme("TEND") << "K";
-      aaplout << " in " << aaplopts.getattachedscheme("TSTEP") << " K steps." << std::endl;
+      message << "Thermal conductivity will be calculated between ";
+      message << aaplopts.getattachedscheme("TSTART") << " K";
+      message << " and " << aaplopts.getattachedscheme("TEND") << "K";
+      message << " in " << aaplopts.getattachedscheme("TSTEP") << " K steps." << std::endl;
 
-      aaplout << "The Boltzmann Transport Equation will be solved using ";
+      message << "The Boltzmann Transport Equation will be solved using ";
       if (aaplopts.getattachedscheme("BTE") == "RTA") {
-        aaplout << "the Relaxation Time Approximation Approximation (RTA)." << std::endl;
+        message << "the Relaxation Time Approximation Approximation (RTA)." << std::endl;
       } else {
-        aaplout << "an iterative scheme." << std::endl;
+        message << "an iterative scheme." << std::endl;
       }
-      aaplout << "The equation will be solved using the tetrahedron method along a ";
-      aaplout << aaplopts.getattachedscheme("THERMALGRID") << " q-point mesh." << std::endl;
-      aaplout << "Isotope effects will " << (aaplopts.flag("ISOTOPE")?"":"NOT ") << "be included." << std::endl;
+      message << "The equation will be solved using the tetrahedron method along a ";
+      message << aaplopts.getattachedscheme("THERMALGRID") << " q-point mesh." << std::endl;
+      message << "Isotope effects will " << (aaplopts.flag("ISOTOPE")?"":"NOT ") << "be included." << std::endl;
       if (aaplopts.flag("BOUNDARY") || aaplopts.flag("CUMULATIVEK")) {
-        aaplout << "Boundary effects will be included via ";
+        message << "Boundary effects will be included via ";
         if (aaplopts.flag("BOUNDARY")) {
-          aaplout << "boundary scattering with a grain size of ";
+          message << "boundary scattering with a grain size of ";
         } else {
-          aaplout << "cumulative thermal conductivity and a mean free path of at most ";
+          message << "cumulative thermal conductivity and a mean free path of at most ";
         }
-        aaplout << aaplopts.getattachedscheme("NANO_SIZE") << " nm." << std::endl;
+        message << aaplopts.getattachedscheme("NANO_SIZE") << " nm." << std::endl;
       } else {
-        aaplout << "Boundary effects will NOT be included." << std::endl;
+        message << "Boundary effects will NOT be included." << std::endl;
       }
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, aaplout, aflags, messageFile, oss);
     } else {
       USER_TCOND = false;
-      stringstream aaplout;
-      aaplout << "Anharmonic force constants and thermal conductivity will NOT be calculated.";
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, aaplout, aflags, messageFile, oss);
+      message << "Anharmonic force constants and thermal conductivity will NOT be calculated.";
     }
+    pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
     //ME20181027 STOP
 
     if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
@@ -983,8 +985,6 @@ namespace KBIN {
         tokens.clear(); scqha_pdis_T.clear();
         aurostd::string2tokens(SCQHA_PDIS_T_OPTION.content_string, tokens, string(" ,"));
         if (tokens.size() == 0) {
-          //ME20191031 - use xerror
-          //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0");
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the"+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0", _INPUT_ILLEGAL_);
         }
         if(tokens.size()!=0){
@@ -1151,8 +1151,6 @@ namespace KBIN {
         tokens.clear();
         aurostd::string2tokens(GP_DISTORTION_OPTION.content_string, tokens, string(" "));
         if (tokens.size() != 1) {
-          //ME20191031 - use xerror
-          //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.");
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.", _INPUT_ILLEGAL_);
         }
       }
@@ -1166,8 +1164,6 @@ namespace KBIN {
       tokens.clear();
       aurostd::string2tokens(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
       if (tokens.size() != 3) {
-        //ME20191031 - use xerror
-        //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1");
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1", _INPUT_ILLEGAL_);
       }
       EOS_DISTORTION_START = aurostd::string2utype<double>(tokens.at(0));
@@ -1207,8 +1203,6 @@ namespace KBIN {
         tokens.clear();
         aurostd::string2tokens(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
         if (tokens.size() != 1) {
-          //ME20190131 - use xerror
-          //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.");
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.", _INPUT_ILLEGAL_);
         }
       }
@@ -1271,13 +1265,13 @@ namespace KBIN {
       if(xflags.AFLOW_MODE_VASP && !XHOST.GENERATE_AFLOWIN_ONLY){  //ME20190313 - Do not check the VASP binary for generate_aflowin_only
         try {
           // Check the version of VASP binary
-          logger << "Checking VASP version for linear response calculations.";
+          message << "Checking VASP version for linear response calculations.";
           string vaspVersion;
           vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
           if (!vaspVersion.empty()) {
-            logger << "[" << vaspVersion[0] << "]";
+            message << "[" << vaspVersion[0] << "].";
             if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
-              logger << apl::warning << "." << apl::endl;
+              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
               //ME20190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;
               kflags.KBIN_MPI_BIN = DEFAULT_VASP5_MPI_BIN;
@@ -1286,18 +1280,21 @@ namespace KBIN {
               } else {
                 kflags.KBIN_BIN = kflags.KBIN_SERIAL_BIN;
               }
-              logger << apl::warning << "Modifying VASP bin to " << kflags.KBIN_BIN << " (AUTO modification)." << apl::endl;  //ME20190109
+              message << "Modifying VASP bin to " << kflags.KBIN_BIN << " (AUTO modification).";  //ME20190109
+              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
             } else {
-              logger << " OK." << apl::endl;
+              message << " OK.";
+              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
             }
           } else {
-            logger << "Failed." << apl::warning << apl::endl;
+            message << "Failed.";
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Unexpected binary format.", _FILE_WRONG_FORMAT_);
           }
         } catch (aurostd::xerror& excpt) {
-          logger << apl::warning << "Failed to identify the version of the VASP binary." << apl::endl;
-          logger << apl::warning << excpt.error_message << apl::endl;
-          //logger << apl::warning << excpt.what() << apl::endl;
+          message << "Failed to identify the version of the VASP binary." << std::endl;
+          message << excpt.error_message << std::endl;
+          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
         }
       }
     }
@@ -1309,7 +1306,8 @@ namespace KBIN {
     // between AFLOW versions.
     string phposcar_file = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
     if (aurostd::EFileExist(phposcar_file)) {
-      logger << "Reading structure from file " << phposcar_file << "." << apl::endl;
+      message << "Reading structure from file " << phposcar_file << ".";
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
@@ -1341,7 +1339,7 @@ namespace KBIN {
             USER_RELAX_COMMENSURATE, xinput.xvasp, aflags, kflags, xflags.vflags, messageFile);
       }
       if (!Krun) {
-        string message = "Relaxation calculations did not run successfully.";
+        message << "Relaxation calculations did not run successfully.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
 
@@ -1369,7 +1367,7 @@ namespace KBIN {
       poscar << xstr;
       aurostd::stringstream2file(poscar, phposcar_file);
       if (!aurostd::FileExist(phposcar_file)) {
-        string message = "Cannot open output file " + phposcar_file + ".";
+        message << "Cannot open output file " + phposcar_file + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       }
     }
@@ -1401,7 +1399,7 @@ namespace KBIN {
         pflow::logger(_AFLOW_FILE_NAME_, "APL", "Awakening...", aflags, messageFile, oss);
         phcalc.awake();
       } catch (aurostd::xerror& e) {
-        message = e.error_message + " Skipping awakening...";
+        message << e.error_message + " Skipping awakening...";
         pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         awakeHarmIFCs = false;
       }
@@ -1475,14 +1473,14 @@ namespace KBIN {
         bool awakeAnharmIFCs = (USER_HIBERNATE && aurostd::EFileExist(ifcs_hib_file));
         if (awakeAnharmIFCs) {
           try {
-            message = "Reading anharmonic IFCs from " + ifcs_hib_file + ".";
+            message << "Reading anharmonic IFCs from " + ifcs_hib_file + ".";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
             phcalc.readAnharmonicIFCs(ifcs_hib_file);
           } catch (aurostd::xerror& excpt) {
-            message = excpt.error_message + " Skipping awakening of ";
-            if (o == 3) message += "3rd";
-            else message += aurostd::utype2string<int>(o) + "th";
-            message = excpt.error_message + " order anharmonic IFCs.";
+            message<< excpt.error_message + " Skipping awakening of ";
+            if (o == 3) message << "3rd";
+            else message << aurostd::utype2string<int>(o) + "th";
+            message << excpt.error_message + " order anharmonic IFCs.";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
             awakeAnharmIFCs = false;
           }
@@ -1525,7 +1523,7 @@ namespace KBIN {
     //[OBSOLETE]     }
     //[OBSOLETE]   }
     //[OBSOLETE]   if (d == ndir) {
-    //[OBSOLETE]     string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
+    //[OBSOLETE]     message << "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
     //[OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
     //[OBSOLETE]     USER_ZEROSTATE_CHGCAR = false;
     //[OBSOLETE]   } else {
@@ -1545,7 +1543,8 @@ namespace KBIN {
 
     // At least one calculation has not finished - return
     if (stagebreak) {
-      logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO20181226
+      message << "Stopped. Waiting for required calculations...";  //CO20181226
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_NOTICE_);
       return;
     }
     //ME201901029 END
@@ -1735,8 +1734,8 @@ namespace KBIN {
       //ME20181029 - Restructured
       if (USER_DC_METHOD == "LATTICE") {
         if (!supercell.projectToPrimitive()) {  //ME20200117 - project to primitive
-          message = "Could not map the AFLOW standard primitive cell to the supercell.";
-          message += " Phonon dispersions will be calculated using the original structure instead.";
+          message << "Could not map the AFLOW standard primitive cell to the supercell.";
+          message << " Phonon dispersions will be calculated using the original structure instead.";
           pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         }
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
@@ -2015,9 +2014,10 @@ namespace KBIN {
             // Cannot use std::setprecision with apl:logger, so use this workaround.
             stringstream percent;
             percent << std::fixed << std::setprecision(1) << idos_percent;
-            logger << apl::warning << "There are imaginary frequencies in the phonon DOS, covering "
-              << percent.str() << "\% of the integrated DOS. These frequencies were omitted in the "
-              << "calculation of thermodynamic properties." << apl::endl;
+            message << "There are imaginary frequencies in the phonon DOS, covering "
+              << percent.str() << "\% of the integrated DOS. These frequencies were "
+              << " omitted in the calculation of thermodynamic properties.";
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
           }
         }
       }
@@ -2032,7 +2032,7 @@ namespace KBIN {
     if (LDEBUG) std::cerr << function << " DEBUG [6]" << std::endl;
 
     if (USER_TCOND) {
-      message = "Starting thermal conductivity calculations.";
+      message << "Starting thermal conductivity calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
 
       apl::TCONDCalculator tcond(phcalc, aaplopts);
@@ -2268,9 +2268,10 @@ namespace apl {
 
   // ME20181022 - Old method to create aflow.in files for AIMS
   void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& messageFile) {
+    string function = "apl::createAflowInPhononsAIMS():";
+    string message = "";
     if (!xinp.AFLOW_MODE_AIMS) {
-      string function = "apl::createAflowInPhononsAIMS():";
-      string message = "This function only works with AIMS.";
+      message = "This function only works with AIMS.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     xinp.xaims.CONTROL.str(std::string());
@@ -2287,7 +2288,7 @@ namespace apl {
     string directory=xinp.getDirectory();
     if(directory.empty()){
       string function = "apl::createAflowInPhononsAIMS():";
-      string message =  "no output directory found";
+      message =  "no output directory found";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
@@ -2328,8 +2329,7 @@ namespace apl {
       string geom_filename = xaims.Directory + "/" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM;
       aurostd::stringstream2file(xaims.GEOM, geom_filename);
       if(!aurostd::FileExist(geom_filename)){
-      string function = "apl::createAflowInPhononsAIMS():";
-        string message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
+        message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::ChmodFile("a+rw", geom_filename);
@@ -2339,8 +2339,7 @@ namespace apl {
     string filename = directory + string("/") + _AFLOWIN_;
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)){
-      string function = "apl::createAflowInPhononsAIMS():";
-      string message = "Cannot create [" + _AFLOWIN_ + "] file.";
+      message = "Cannot create [" + _AFLOWIN_ + "] file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::ChmodFile("a+rw", filename); // CHMOD a+rw _AFLOWIN_

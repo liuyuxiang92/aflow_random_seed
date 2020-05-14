@@ -10767,6 +10767,56 @@ namespace pflow {
       // END Raw logger
       ////////////////////////////////////////////////////////////////////////////
 
+      // ME20200514
+    } else if (type == _LOGGER_NOTICE_) {
+
+      ////////////////////////////////////////////////////////////////////////////
+      // START Raw logger
+      ////////////////////////////////////////////////////////////////////////////
+
+      if(verbose) {
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[32m");  // green
+        //[CO20181226 OBSOLETE]if(!message.empty())
+        for(uint i=0;i<message_parts.size();i++) //CO20181226
+        { //CO20200106 - patching for auto-indenting
+          oss << "00000";
+          oss << "  ";
+
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
+          oss << "NOTICE";
+
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
+          oss << message_parts[i]; //CO20181226 //message;
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
+      }
+      // write to log
+      //[CO20181226 OBSOLETE]if(!message.empty())
+      for(uint i=0;i<message_parts.size();i++) //CO20181226
+      { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << "00000";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "NOTICE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
+        FileMESSAGE << message_parts[i]; //CO20181226 //message;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
+      }
+      FileMESSAGE.flush();
+
+      ////////////////////////////////////////////////////////////////////////////
+      // END Raw logger
+      ////////////////////////////////////////////////////////////////////////////
+
     } else {
 
       ////////////////////////////////////////////////////////////////////////////
