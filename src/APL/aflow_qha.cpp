@@ -53,21 +53,21 @@ namespace apl
     free(); copy(nlf);
   }
 
-  NonlinearFit::NonlinearFit(xvector<double> &x, xvector<double> &y,
-      xvector<double> &guess,
+  NonlinearFit::NonlinearFit(xvector<double> &x_in, xvector<double> &y_in,
+      xvector<double> &guess_in,
       double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
-      double tol, double tau, int max_iter)
+      double tol_in, double tau_in, int max_iter_in)
   {
     free();
     Npoints = x.rows;
     Nparams = guess.rows;
-    this->tol = tol;
-    this->tau = tau;
-    this->max_iter = max_iter;
-    this->x = x;
-    this->y = y;
+    tol = tol_in;
+    tau = tau_in;
+    max_iter = max_iter_in;
+    x = x_in;
+    y = y_in;
     residuals = xvector<double> (Npoints);
-    this->guess = guess;
+    guess = guess_in;
     p = xvector<double> (Nparams);
     dydp = xvector<double> (Nparams);
     A = xmatrix<double> (Nparams, Nparams);
