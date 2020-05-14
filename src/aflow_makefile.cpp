@@ -332,6 +332,8 @@ namespace makefile {
     bool mt_required=false;
     vector<string> vcpp_aurostd,vhpp_aurostd,vhpp_aflow; //SC variables - hack
 
+    string Makefile_aflow="Makefile.aflow",Makefile_aflow_OLD="Makefile.aflow.OLD";
+    
     //do AUROSTD first - it gets compiled separately
     file=directory+"/AUROSTD/aurostd.cpp";
     trimPath(file);
@@ -447,8 +449,8 @@ namespace makefile {
     stringstream makefile_aflow;
     makefile_aflow << makefile_definitions_ss.str() << endl;
     makefile_aflow << makefile_rules_ss.str() << endl;
-    if(aurostd::FileExist(directory+"/"+"Makefile.aflow")){aurostd::file2file(directory+"/"+"Makefile.aflow",directory+"/"+"Makefile.aflow.OLD");}  //saving
-    aurostd::stringstream2file(makefile_aflow,directory+"/"+"Makefile.aflow");
+    if(aurostd::FileExist(directory+"/"+Makefile_aflow)){aurostd::file2file(directory+"/"+Makefile_aflow,directory+"/"+Makefile_aflow_OLD);}  //saving
+    aurostd::stringstream2file(makefile_aflow,directory+"/"+Makefile_aflow);
   }
 }
 
