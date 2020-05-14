@@ -15,11 +15,11 @@
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Added QHA to modules. (AS)
         -- Fixed xEIGENVAL to work correctly with files created by vasp 5. (AS)
-        -- QHA class was reworked:  (AS)
-            *) QHA module is used to input aflow.in parameters;
-            *) QHA options are now processed inside the QHA class;
-            *) QHA, QHA3P and SCQHA was united into one class;
-            *) QHA_AFLOWIN_CREATOR class is no longer used;
+        -- Introduced a core part of the new QHA class: (AS)
+            *) QHA-related options from aflow.in are parsed into QHA module;
+            *) QHA options are processed and initialized inside the QHA class;
+            *) QHA, QHA3P and SCQHA are united into one class;
+            *) new QHA uses standard aflow infrastructure to create aflow.in files;
             *) new functionality: thermal properties can be derived from the temperature dependence of the free energy;
             *) added the possibility to calculate Grueneisen parameters using fit to frequency-volume relation.
         -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
