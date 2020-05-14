@@ -430,7 +430,7 @@ namespace makefile {
       }
       //[not a good idea, circular flow of information]if(!aurostd::FileExist(obj_file)){continue;}  //since we can only run this code once aflow is compiled, we can check that the obj_file is a real target or not
       makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
-      makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS) $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")
+      makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")
     }
     //unfortunate hack that's needed
     if(!aurostd::WithinList(vobj_files,"aflow_matlab_funcs.cpp")){vobj_files.push_back("aflow_matlab_funcs.cpp");}  //safety

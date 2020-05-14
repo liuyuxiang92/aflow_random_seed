@@ -67,9 +67,9 @@ aflow_cce_data.o: aflow_cce_data.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQL
 aflow_chull.o: aflow_chull.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_chull.h aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_jupyter_requirements.cpp aflow_chull_python.cpp aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_compare_structure.o: aflow_compare_structure.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_symmetry_spacegroup.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_compare_structure_function.o: aflow_compare_structure_function.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_symmetry_spacegroup.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_contrib_cormac.o: aflow_contrib_cormac.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_contrib_shidong.o: aflow_contrib_shidong.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_contrib_shidong.h aflow_contrib_shidong_auxiliary.h aflow_contrib_shidong_cluster_expansion.h aflow_pflow.h aflow_xelement.h aflowlib.h
@@ -167,7 +167,7 @@ aflow_xproto_gus.o: aflow_xproto_gus.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h
 aflow_xpseudopotentials.o: aflow_xpseudopotentials.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflow_xpseudopotentials_data.cpp aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_database.o: aflowlib_database.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflowlib_libraries.o: aflowlib_libraries.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_bader.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_libraries_scrubber.o: aflowlib_libraries_scrubber.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
@@ -181,17 +181,17 @@ APL/aflow_aapl_cluster.o: APL/aflow_aapl_cluster.cpp AUROSTD/aurostd.o APL/aflow
 APL/aflow_aapl_ifcs.o: APL/aflow_aapl_ifcs.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_aapl_tcond.o: APL/aflow_aapl_tcond.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_atomic_disp.o: APL/aflow_apl_atomic_disp.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_doscalc.o: APL/aflow_apl_doscalc.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_fccalc.o: APL/aflow_apl_fccalc.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_function_fitting.o: APL/aflow_apl_function_fitting.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_group_velocity.o: APL/aflow_apl_group_velocity.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_gsa.o: APL/aflow_apl_gsa.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_hsqpoints.o: APL/aflow_apl_hsqpoints.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
@@ -201,7 +201,7 @@ APL/aflow_apl_kphonons.o: APL/aflow_apl_kphonons.cpp AUROSTD/aurostd.o APL/aflow
 APL/aflow_apl_logger.o: APL/aflow_apl_logger.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_pdisc.o: APL/aflow_apl_pdisc.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_phoncalc.o: APL/aflow_apl_phoncalc.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_qmesh.o: APL/aflow_apl_qmesh.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
@@ -213,25 +213,25 @@ APL/aflow_apl_supercell.o: APL/aflow_apl_supercell.cpp AUROSTD/aurostd.o APL/afl
 APL/aflow_apl_thermalpc.o: APL/aflow_apl_thermalpc.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_qha3phonons_eos.o: APL/aflow_qha3phonons_eos.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_qha_aflowin_creator.o: APL/aflow_qha_aflowin_creator.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_qha_dm_pdos_save.o: APL/aflow_qha_dm_pdos_save.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_qha_energies.o: APL/aflow_qha_energies.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_qha_eos.o: APL/aflow_qha_eos.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_qha_gruneisen.o: APL/aflow_qha_gruneisen.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_qha_operations.o: APL/aflow_qha_operations.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_scqha_T_freqs.o: APL/aflow_scqha_T_freqs.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_scqha_eos.o: APL/aflow_scqha_eos.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_scqha_gruneisen.o: APL/aflow_scqha_gruneisen.cpp AUROSTD/aurostd.o APL/aflow_apl.h APL/aflow_qha_operations.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS_MT) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 SQLITE/aflow_sqlite.o: SQLITE/aflow_sqlite.cpp AUROSTD/aurostd.o SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 
