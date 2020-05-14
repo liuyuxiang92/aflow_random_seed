@@ -13031,6 +13031,18 @@ xstructure SetScale(const xstructure& a,const double &in_scale) {
   return b;
 }
 
+//AS20200514 START
+// ***************************************************************************
+// Function UpdateCartesianCoordinates
+// ***************************************************************************
+void xstructure::UpdateCartesianCoordinates()
+{
+  for (uint at=0; at<atoms.size(); at++){
+    atoms[at].cpos = F2C(scale, lattice, atoms[at].fpos);
+  }
+}
+//AS20200514 END
+
 // ***************************************************************************
 // Function SetVolume
 // ***************************************************************************
