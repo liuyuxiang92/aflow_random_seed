@@ -480,7 +480,8 @@ namespace KBIN {
     // Do not relax with --generate_aflowin_only option
     if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
       USER_RELAX = false;
-      logger << apl::warning << "RELAX will be switched OFF for generate_aflowin_only." << apl::endl;
+      message << "RELAX will be switched OFF for generate_aflowin_only.";
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
     }
     //ME20190313 END
     // Relax structure
@@ -497,21 +498,24 @@ namespace KBIN {
           }
         }
         if (START_RELAX == _NUM_RELAX_ + 1) {
-          logger << "Structure has already been relaxed. Relaxation will be skipped." << apl::endl;
+          message << "Structure has already been relaxed. Relaxation will be skipped.";
           USER_RELAX = false;
         } else if (START_RELAX != 1) {
-          logger << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
-          logger << "Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << "." << apl::endl;
+          message << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
+          message << " Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << ".";
         }
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       } else {
         USER_RELAX = false;
-        logger << apl::warning << "RELAX option only supported for VASP. Relaxations will be skipped." << apl::endl;
+        message << "RELAX option only supported for VASP. Relaxations will be skipped.";
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
       }
     }
 
     // Correct user engine
     if (USER_ENGINE == "GSA") {
-      logger << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM)." << apl::endl;
+      message << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM).";
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
       USER_ENGINE = "DM";
     }
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
