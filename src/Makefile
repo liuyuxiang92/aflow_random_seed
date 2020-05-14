@@ -191,7 +191,8 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 #	$(CC) $(SQLITE_OPTS) -c $<
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
-.cpp.o: .cpp .h $(MFS) $(AFLOW_HPPS) $(AUROSTD_HPPS) $(AUROSTD_CPPS)
+#[CO20200508 - do not include AFLOW*.h or AUROSTD*.cpp/AUROSTD*.h].cpp.o: .cpp .h $(MFS) $(AFLOW_HPPS) $(AUROSTD_HPPS) $(AUROSTD_CPPS)
+.cpp.o: .cpp .h Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
