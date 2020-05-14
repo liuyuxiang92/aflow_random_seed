@@ -41,7 +41,7 @@ ARCH=
 ifeq ($(UNAME),Darwin)
 CPP=clang++
 CC=clang
-ARCH=-e -D_MACOSX_
+ARCH=-D_MACOSX_
 endif
 
 
@@ -93,8 +93,10 @@ LIBS=-lpthread
 # -static
 #CO START 170614 easy integration
 LIBS_AFLOW=-ldl $(LIBS)
-LIBS_STATIC=-static
-LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(LIBS_STATIC)
+FLAGS_STATIC=-static
+LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(FLAGS_STATIC)
+FLAGS_STATIC_PRE=
+FLAGS_STATIC_POST=
 #CO END 170614 easy integration
 # -lglut -lGLU -lGL -D_HOST_=\"`hostname`\"
 #AFLOW_VERSION := $(shell cat aflow.cpp | /home/auro/bin/getvalue AFLOW_VERSION)-$(TIME)
@@ -152,28 +154,26 @@ aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS)
 	ln -sf aflow apennsy
 .PHONY: static_no_pdf
 static_no_pdf: aflow aflow_data
-	rm -rf $(SQLITE_OBJ)
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-	$(CC) $(SQLITE_OPTS) -c $(SQLITE_C) $(LIBS_STATIC)
-#	cp sqlite3.o ./SQLITE/
-	rm -f aflow
-#	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-#	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow `ls *.o | grep -v aflow_data` $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow $(SQLITE_OBJ) $(AFLOW_OBJS) $(LIB_MKL) $(LIBS_AFLOW_STATIC)
-	rm -f aflow_data
-#	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.cpp $(LIBS_STATIC)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(LIBS_STATIC)
-#.PHONY: static
-#static: static_no_pdf
+#	[CO20200513 - KEEP rm command in case we do 'make -j' first]
+	rm -rf $(SQLITE_OBJ) aflow aflow_data
+	$(MAKE) LIBS_AFLOW="$(LIBS_AFLOW_STATIC)" FLAGS_STATIC_POST="$(FLAGS_STATIC)"
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(FLAGS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(MAKE) $(SQLITE_OBJ) FLAGS_STATIC_POST="$(FLAGS_STATIC)"
+#	rm -f aflow
+#	$(MAKE) aflow LIBS_AFLOW="$(LIBS_AFLOW_STATIC)"
+#	rm -f aflow_data
+#	$(MAKE) aflow_data FLAGS_STATIC_POST="$(FLAGS_STATIC)"
+.PHONY: static
+static: static_no_pdf
 #	tar Jcfvp /www/AFLOW/CURRENT/aflow_$(VERSNUMBER)_amd64_debian_static.tar.xz aflow aflow_data	
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
 .PHONY: mac
 mac:
-	$(MAKE) CC=clang CPP=clang++ aflow_data
-	$(MAKE) CC=clang CPP=clang++ -e ARCH=-D_MACOSX_ -j 4
-	ln -sf aflow aflowd
-	ln -sf aflow apennsy
-	$(MAKE) check
+#	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data
+	$(MAKE) CC=clang CPP=clang++ ARCH=-D_MACOSX_ -j 4
+#	[CO20200508 - OBSOLETE]ln -sf aflow aflowd
+#	[CO20200508 - OBSOLETE]ln -sf aflow apennsy
+#	[CO20200508 - OBSOLETE]$(MAKE) check
 #.PHONY: mac_static
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
@@ -182,7 +182,7 @@ mac:
 ###################################################################################################
 #CO201706147
 $(SQLITE_OBJ): $(SQLITE_C) Makefile
-	$(CC) $(SQLITE_OPTS) -c $< -o $@
+	$(CC) $(SQLITE_OPTS) -c $< -o $@ $(FLAGS_STATIC_POST)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
@@ -650,7 +650,7 @@ aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_dat
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	$(MAKE) aflow_data.o
 #	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""aflow_data.cpp"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_data.cpp -c -o aflow_data.o
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(FLAGS_STATIC_POST)
 .PHONY: data
 data: aflow_data
 .PHONY: amir
@@ -694,21 +694,6 @@ aflow_gnuplot_funcs.cpp: Makefile
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	if [ ! -f $@ ]; then exit 1; fi
 	touch $@
-###################################################################################################
-
-###################################################################################################
-aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
-aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
-###################################################################################################
-
-###################################################################################################
-#HTRESOURCES
-aflow_contrib_stefano_htcurriculum.o: aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
-aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
 ###################################################################################################
 
 ###################################################################################################
@@ -792,6 +777,21 @@ aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	echo "#endif  //  _AFLOW_MIX_NOMIX_TABLE_CPP_" >> $@
 	chmod 755 $@
 	rm -rf nomix.tmp
+###################################################################################################
+
+###################################################################################################
+aflow_phonons.o: aflow_phonons.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_phonons.cpp -c
+aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
+###################################################################################################
+
+###################################################################################################
+#HTRESOURCES
+aflow_contrib_stefano_htcurriculum.o: aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS)  -c
+aflow_contrib_stefano_htsecurity.o: aflow_contrib_stefano_htsecurity.cpp aflowlib.h $(AFLOW_HPPS) $(AUROSTD_HPPS) Makefile
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c
 ###################################################################################################
 
 ###################################################################################################
@@ -1105,10 +1105,11 @@ check_full:
 	$(MAKE) check_chull
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
+	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_match
 	$(MAKE) check_aflow_gcc_compatibility
-	$(MAKE) check_pocc
 	$(MAKE) check_cce
+	$(MAKE) check_pocc
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1137,7 +1138,8 @@ check_slab:
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only | cut -d' ' -f2) && \
+	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
+		if [ -z "$$SC" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check  './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t'" && exit 0; fi && \
 		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$ANSWER meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
 	@echo "CHULL tests passed"
 .PHONY: check_pocc
@@ -1277,6 +1279,11 @@ check_AFLOWSYM:
 	@echo "Running aflowSYM test 1" && ANSWER_PGROUPS=8 && ANSWER_PGROUPKS=8 && ANSWER_FGROUPS=4 && ANSWER_PGROUP_XTALS=4 && ANSWER_PGROUPK_XTALS=4 && ANSWER_AGROUPS=24 && ANSWER_SGROUPS=108 && RESULT=$$(./aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only) && COUNT_PGROUPS=$$(echo $$RESULT | awk -F'pgroup ' '{print NF-1}') && COUNT_PGROUPKS=$$(echo $$RESULT | awk -F'pgroupk ' '{print NF-1}') && COUNT_FGROUPS=$$(echo $$RESULT | awk -F'fgroup ' '{print NF-1}') && COUNT_PGROUP_XTALS=$$(echo $$RESULT | awk -F'pgroup_xtal ' '{print NF-1}') && COUNT_PGROUPK_XTALS=$$(echo $$RESULT | awk -F'pgroupk_xtal ' '{print NF-1}') && COUNT_AGROUPS=$$(echo $$RESULT | awk -F'agroup ' '{print NF-1}') && COUNT_SGROUPS=$$(echo $$RESULT | awk -F'sgroup ' '{print NF-1}') && \
 		if [ "$$ANSWER_PGROUPS" -ne "$$COUNT_PGROUPS" ] || [ "$$ANSWER_PGROUPKS" -ne "$$COUNT_PGROUPKS" ] || [ "$$ANSWER_FGROUPS" -ne "$$COUNT_FGROUPS" ] || [ "$$ANSWER_PGROUP_XTALS" -ne "$$COUNT_PGROUP_XTALS" ] || [ "$$ANSWER_PGROUPK_XTALS" -ne "$$COUNT_PGROUPK_XTALS" ] || [ "$$ANSWER_AGROUPS" -ne "$$COUNT_AGROUPS" ] || [ "$$ANSWER_SGROUPS" -ne "$$COUNT_SGROUPS" ]; then "aflowSYM did not return one of the correct group cardinalities for './aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only'; (ANSWER==FOUND) $$ANSWER_PGROUPS==$$COUNT_PGROUPS, $$ANSWER_PGROUPKS==$$COUNT_PGROUPKS, $$ANSWER_FGROUPS==$$COUNT_FGROUPS, $$ANSWER_PGROUP_XTALS==$$COUNT_PGROUP_XTALS, $$ANSWER_PGROUPK_XTALS==$$COUNT_PGROUPK_XTALS, $$ANSWER_AGROUPS==$$COUNT_AGROUPS, $$ANSWER_SGROUPS==$$COUNT_SGROUPS"  && exit 1; fi
 	@echo "aflowSYM test 1 passed!"
+.PHONY: check_edata
+check_edata:
+	@echo "Running edata test 1" && ANSWER=1 RESULT=$$(./aflow --proto=AB2_tI6_139_a_e:Os:Rh --params=2.7095,4.27466,0.662829 | ./aflow --edata | grep "BRAVAIS LATTICE OF THE LATTICE (pgroup)" | wc -l) && \
+		if [ "$$ANSWER" -ne "$$RESULT" ]; then "edata did not finish successfully" && exit 1; fi
+	@echo "edata test 1 passed!"
 .PHONY: check_aflow_xtal_match
 check_aflow_xtal_match:
 	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
@@ -1329,7 +1336,7 @@ check_cce:
 #RF20200302 - STOP
 .PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
-	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' *.cpp | wc -l) && \
+	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' |wc -l) && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
 	@echo "aflow_gcc_compatibility test 1 passed!"
 ###################################################################################################

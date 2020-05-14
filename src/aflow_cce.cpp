@@ -2434,10 +2434,10 @@ namespace cce {
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
             }
             int offset=get_offset(functional); // define also local offset variable since offset must correspond to functional detected from aflow.in
-            for (uint i = 0; i < vfunctional_aflow_in.size(); i++) {
+            for (uint j = 0; j < vfunctional_aflow_in.size(); j++) {
               Bader_template = aurostd::string2utype<double>(Bader_tokens[offset/2+2+(CCE_num_functionals_Bader+1)*n]);
               if(LDEBUG){
-                cerr << soliloquy << "Bader_template " << vfunctional_aflow_in[i] << ": " << Bader_template << endl;
+                cerr << soliloquy << "Bader_template " << vfunctional_aflow_in[j] << ": " << Bader_template << endl;
               }
             }
             if ( std::abs(Bader_template-cce_vars.Bader_charges[i]) < Bader_tolerance && std::abs(Bader_template-cce_vars.Bader_charges[i]) < Bader_deviation ){ // must be compared to Bader_deviation to load correction for Bader charge closest to template and not to be overloaded by other corrections for later tested Bader charges (oxidation states)
