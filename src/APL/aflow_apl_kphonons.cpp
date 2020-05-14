@@ -1837,7 +1837,6 @@ namespace KBIN {
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
     if (!USER_FREQFORMAT.empty()) {
-      //     try
       // Convert format to machine representation
       tokens.clear();
       apl::tokenize(USER_FREQFORMAT, tokens, string(" |:;,"));
@@ -2189,7 +2188,6 @@ namespace KBIN {
       // Get q-points
       message = "Starting thermal conductivity calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-      std::cout << aurostd::joinWDelimiter(USER_THERMALGRID, "x") << std::endl;
       phcalc.initialize_qmesh(USER_THERMALGRID, true, true);
       apl::QMesh& qmtcond = phcalc.getQMesh();
       qmtcond.makeIrreducible();
