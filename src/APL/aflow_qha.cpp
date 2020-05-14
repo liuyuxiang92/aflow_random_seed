@@ -35,6 +35,7 @@ using std::auto_ptr;
                     // be too small). Usage dT = DCOEFF*T
 
 #define DEBUG_QHA false
+#define DEBUG_QHA_GP_FIT false
 
 //=============================================================================
 //              Definitions of NonlinearFit class members
@@ -1154,7 +1155,6 @@ namespace apl
   /// 
   double QHAN::calcGrueneisen(double V, xvector<double> &xomega, double &w)
   {
-    bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
     string function = "calcGrueneisen():";
     // no weights in fit
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
@@ -1174,8 +1174,6 @@ namespace apl
       }
     }
 
-    double err = 0;
-
     // calculate gamma_i only if w is nonzero
     if (freqs_are_nonzero){
       lsfit.LeastSquare(xomega,s);
@@ -1184,28 +1182,31 @@ namespace apl
       c = lsfit.AVec()[2];
       d = lsfit.AVec()[3];
 
-      if (LDEBUG){
-        xvector<double> tmp(4);
-        tmp[1] = a; tmp[2] = b; tmp[3] = c; tmp[4] = d;
+#if DEBUG_QHA_GP_FIT
+      double err = 0;
+      xvector<double> tmp(4);
+      tmp[1] = a; tmp[2] = b; tmp[3] = c; tmp[4] = d;
 
-        // check fit error
-        for (int Vid=0; Vid<N_EOSvolumes; Vid++){
-          err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
-                -xomega[Vid+1])/xomega[Vid+1];
-          err *= 100.0;
-          if (err>=10.0){
-            string msg="Relative error of log(w)=f(V) fit (used to ";
-            msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
-            msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid]);
+      // check fit error
+      for (int Vid=0; Vid<N_EOSvolumes; Vid++){
+        err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
+              -xomega[Vid+1])/xomega[Vid+1];
+        err *= 100.0;
+        if (err>=10.0){
+          string msg="Relative error of log(w)=f(V) fit (used to ";
+          msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
+          msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid]);
 
-            pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory,
-                *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-            cerr << xomega << std::endl;
-            cerr << gp_fit_matrix * tmp << std::endl;
-            break;
-          }
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory,
+              *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+          cerr << function << " original frequencies:" << std::endl;
+          cerr << function << xomega << std::endl;
+          cerr << function << " fit to frequencies:" << std::endl;
+          cerr << function << gp_fit_matrix * tmp << std::endl;
+          break;
         }
       }
+#endif
 
       w = a + b*V + c*pow(V,2) + d*pow(V,3);
       gamma = -V/w * (b + 2*c*V + 3*d*pow(V,2));
