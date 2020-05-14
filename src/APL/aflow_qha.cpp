@@ -359,7 +359,7 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
 
   // iterate until the convergence criteria f(middle) is in epsilon-neighbourhood of 
   // zero is reached
-  // Meantime, do a sanity check that function has an opposite sign at interval ends
+  // Meanwhile, do a sanity check that the function has opposite signs at interval ends
   while ((sign(f_at_left_end) != sign(f_at_right_end)) && (abs(f_at_middle)>tol)){
     if (sign(f_at_left_end) == sign(f_at_middle)){
       std::swap(left_end, middle);
@@ -383,7 +383,7 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
     }
   }
 
-  // double-check that convergence criteria was reached
+  // double-check that the convergence criterion was reached
   if (abs(f_at_middle) > tol) return -1;
 
   if (LDEBUG) cerr << function << "end" << std::endl;
@@ -720,7 +720,7 @@ namespace apl
 
   /// Performs QHA calculation.
   /// 
-  /// For a regular QHA calculation there is a choice between two possibilities:
+  /// For a regular QHA calculation, there are two possible choices:
   /// 1) calculate Grueneisen parameter using finite difference method.
   ///    This calculation requires 3 phonon calculations (for volumes V, V-dV and V+dV);
   /// 2) calculate temperature-dependent parameters (such as equilibrium volume,
@@ -763,7 +763,7 @@ namespace apl
         }
       }
 
-      // In QHA calculation EOS flag enables APL calculation for a set of volumes.
+      // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
       if (isEOS){
         eos_data_available = runAPLcalculations(subdirectories_apl_eos,
@@ -782,7 +782,7 @@ namespace apl
 
       // QHA3P and SCQHA require that Grueneisen parameter is calculated via
       // finite difference numerical derivative.
-      // For QHA calculation use GP_FD flag to turn on this type of calculation
+      // For a QHA calculation, use GP_FD flag to turn on this type of calculation
       if (isGP_FD || runQHA3P || runSCQHA){
         gp_data_available = runAPLcalculations(subdirectories_apl_gp, coefGPVolumes,
             xflags, aflags, kflags, aflowin);
@@ -850,7 +850,7 @@ namespace apl
   /// Check if all static calculations needed to proceed with QHA calculation.
   /// exist and returns the number of finished calculations.
   /// 
-  /// If not all calculations are finished returns 0.
+  /// If not all calculations are finished, it returns 0.
   /// 
   int QHAN::checkStaticCalculations()
   {
@@ -1021,7 +1021,7 @@ namespace apl
       pdisc.writePHEIGENVAL(subdirectories[i]);
 
       // save all the data that is necessary for QHA calculations
-      if (i==0){// qmesh data is the same for all volumes: need to save it only once
+      if (i==0){// qmesh data is the same for all volumes: need to store only once
         qpWeights = phcalc.getQMesh().getWeights();
         qPoints   = phcalc.getQMesh().getIrredQPointsFPOS();
         Nqpoints  = qPoints.size();
@@ -1791,8 +1791,8 @@ namespace apl
     return VPgamma;
   }
 
-  /// Performs SCQHA calculation.
-  /// Here there are two implementations:
+  /// Performs SCQHA calculations.
+  /// There are two implementations:
   /// 1) perform self-consistent loop for initial nonzero temperature and extrapolate
   /// the volume at next temperature step using V(T+dT) ~ (1+beta dT)*V.
   /// Expect it to be inaccurate at high temperatures.
