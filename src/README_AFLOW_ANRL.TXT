@@ -16,7 +16,7 @@ Citation Information:
     - M. J. Mehl, D. Hicks, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, and S. Curtarolo, 
       The AFLOW Library of Crystallographic Prototypes: Part 1, Comp. Mat. Sci. 136, S1–S828 (2017).
     - D. Hicks, M. J. Mehl, E. Gossett, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, and S. Curtarolo, 
-      The AFLOW Library of Crystallographic Prototypes: Part 2, in press (2019).
+      The AFLOW Library of Crystallographic Prototypes: Part 2, Comp. Mat. Sci. 161 Supplement, S1-S1011 (2019).
 
 
 The AFLOW/ANRL Library consists of 590 (part 1: 288, part 2: 302) crystallographic prototypes from the papers listed above. 

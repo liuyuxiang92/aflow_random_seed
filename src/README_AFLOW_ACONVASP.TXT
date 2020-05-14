@@ -2719,13 +2719,17 @@ LATTICES = (the ones with "")
       AIMS output                                                                     
         If you specify --aims, aflow will add AIMS code to aflow.in (experimental).  
 
-      ANRL: AFLOW NAVAL RESEARCH LAB PROTOTYPE LIBRARY
-        With respect to the article:
-        Mehl et al., "The AFLOW Library of Crystallographic Prototype", https://arxiv.org/abs/1607.02532
-        the code gives the possibility to define the parameters of the cell --params=...
-        Some rhombohedral cells can be generated in hexagonal configurations (see the article).
-        The choice is performed with the flag --hex.
-        Check aflow --readme=anrl 
+      AFLOW-ANRL: AFLOW NAVAL RESEARCH LAB PROTOTYPE LIBRARY
+        The AFLOW-ANRL Library consists of 590 (part 1: 288, part 2: 302) crystallographic prototypes
+        from the following articles:
+          - M. J. Mehl, D. Hicks, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, and S. Curtarolo,
+            The AFLOW Library of Crystallographic Prototypes: Part 1, Comp. Mat. Sci. 136, S1–S828 (2017).
+          - D. Hicks, M. J. Mehl, E. Gossett, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, and S. Curtarolo,
+            The AFLOW Library of Crystallographic Prototypes: Part 2, Comp. Mat. Sci. 161 Supplement, S1-S1011 (2019).
+        These prototypes must be accompanied by the --params=... flag or label suffix (e.g., <label>-001) specifying
+        the internal degrees of freedom for the prototype.
+        Rhombohedral cells can be generated in the hexagonal setting with the flag --hex.
+        Check aflow --readme=anrl for more information.
    
 
   aflow --prototype [--setting=1|2|anrl] < file             
