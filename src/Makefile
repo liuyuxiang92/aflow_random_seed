@@ -1336,7 +1336,7 @@ check_cce:
 #RF20200302 - STOP
 .PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
-	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' *.cpp | wc -l) && \
+	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' *.cpp *.h | wc -l) && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
 	@echo "aflow_gcc_compatibility test 1 passed!"
 ###################################################################################################
