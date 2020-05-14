@@ -614,7 +614,7 @@ namespace apl
 
         if ((tokens.size()<1) || (tokens.size() > 3)){
           string message = "Wrong setting in ";
-          message += "[AFLOW_QHA]MODE.";
+          message += "[AFLOW_QHA]MODE. ";
           message += "Specify as MODE=QHA,QHA3P,SCQHA";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_NUMBER_);
