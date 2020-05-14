@@ -29,16 +29,18 @@ using auto_ptr = std::unique_ptr<T>;
 using std::auto_ptr;
 #endif
 
-#define SW 5  // width of separator when text is formatted
-#define TW 15 // width of label/number when text is formatted
-#define DCOEFF 1e-2 // coefficient used in numerical differentiation (should not
-                    // be too small). Usage dT = DCOEFF*T
+// Field width modifiers: used to format text during the output via std::setw function
+#define SW 5  // width of columns with blank space separator
+#define TW 15 // width of columns containing label/number
+#define DCOEFF 1e-2 // this coefficient is used in numerical differentiation
+                    // (should not be too small). Usage dT = DCOEFF*T
 
-#define DEBUG_QHA false
-#define DEBUG_QHA_GP_FIT false
+#define DEBUG_QHA false // toggles QHA-related debug output
+#define DEBUG_QHA_GP_FIT false // toggles debug output related to the fit functionality
+                               // in the calcGrueneisen function
 
 //=============================================================================
-//              Definitions of NonlinearFit class members
+//              Definitions of the NonlinearFit class members
 
 namespace apl
 {
@@ -59,8 +61,8 @@ namespace apl
       double tol_in, double tau_in, int max_iter_in)
   {
     free();
-    Npoints = x.rows;
-    Nparams = guess.rows;
+    Npoints = x_in.rows;
+    Nparams = guess_in.rows;
     tol = tol_in;
     tau = tau_in;
     max_iter = max_iter_in;
@@ -142,7 +144,7 @@ namespace apl
     for (int i=1; i<=Npoints; i++) residuals[i] = y[i] - f(x[i], params, dydp);
   }
   
-  /// Calculates Jacobian of a given model function for "guess" parameters
+  /// Calculates Jacobian of a given model function for the given "guess" parameters
   ///
   void NonlinearFit::Jacobian(const xvector<double> &guess)
   {
@@ -274,8 +276,8 @@ double BirchMurnaghan(const double x, const xvector<double> &p, xvector<double> 
 }
 
 
-/// Checks if minimum exists within a given data set 
-/// (at least one internal point should be lower than edge points)
+/// Checks if there is a minimum within a given data set 
+/// (at least one internal point should be lower than the edge points)
 bool isMinimumWithinBounds(const xvector<double> &y){
   for (int i=y.lrows+1; i<y.urows; i++){
     if (y[y.lrows] > y[i] && y[y.urows] > y[i]) return true;
@@ -284,7 +286,7 @@ bool isMinimumWithinBounds(const xvector<double> &y){
   return false;
 }
 
-/// Polynomial model for equation of state fit
+/// The polynomial model that is used for equation of state fitting.
 ///
 /// E = a + b*V^(-2/3) + c*V^(-4/3) + d*V^(-6/3) + e*V^(-8/3)
 /// Ref: (eq (5.2) page 106)  https://doi.org/10.1017/CBO9781139018265
@@ -295,35 +297,34 @@ double EOSpoly(double V, const xvector<double> &p){
               + p[4]*pow(V,-6/3.0) + p[5]*pow(V,-8/3.0);
 }
 
-/// First derivative w.r.t volume of polynomial model
+/// First derivative w.r.t volume of the polynomial model
 double dEOSpoly(double x, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return -2/3.0*p[2]*pow(x,-5/3.0) - 4/3.0*p[3]*pow(x, -7/3.0)
          -6/3.0*p[4]*pow(x,-9/3.0) - 8/3.0*p[5]*pow(x,-11/3.0);
 }
 
-/// Second derivative w.r.t volume of polynomial model
+/// Second derivative w.r.t volume of the polynomial model
 double d2EOSpoly(double x, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return  10/9.0*p[2]*pow(x, -8/3.0) + 28/9.0*p[3]*pow(x,-10/3.0)
          +     6*p[4]*pow(x,-12/3.0) + 88/9.0*p[5]*pow(x,-14/3.0);
 }
 
-/// Third derivative w.r.t volume of polynomial model
+/// Third derivative w.r.t volume of the polynomial model
 double d3EOSpoly(double x, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return -(80.0/27.0*p[2]*pow(x, -11.0/3.0) + 280.0/27.0*p[3]*pow(x, -13.0/3.0) +
                 24.0*p[4]*pow(x, -15.0/3.0) + 88*14/27.0*p[5]*pow(x, -17.0/3.0));
 }
 
-/// Calculate equilibrium volume for polynomial model
+/// Calculates the equilibrium volume for the polynomial model.
 ///
-/// Veq is determined by searching for a solution of dE/dV=0 equation using bisection
-/// method.
+/// Veq is determined as a solution of dE/dV=0 equation using bisection method.
 /// Function returns negative number if an error has occurred.
 ///
 /// It is assumed that only one minimum exists between Vmin and Vmax,
-/// since it is the only physically meaningful situation
+/// since it is the only physically meaningful situation.
 ///
 /// The main idea: if continuous function f(x) has root f(x0)=0 in the interval [a,b], 
 /// than its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
@@ -331,7 +332,9 @@ double d3EOSpoly(double x, const xvector<double> &p){
 /// subintervals and for the next iteration picks a subinterval where f(x) has 
 /// opposite sign on its ends.
 /// This process continues until the length of the interval is less than some negligibly
-/// small number and one picks the interval's middle as x0.
+/// small number and one picks the middle of the interval as x0.
+/// In this situation f(x0)~0 and this condition is used as a criterion to stop the
+/// iteration procedure.
 ///
 double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax, 
     double tol=_mm_epsilon) {
@@ -357,9 +360,9 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
     cerr << f_at_right_end << std::endl;
   }
 
-  // iterate until the convergence criteria f(middle) is in epsilon-neighbourhood of 
-  // zero is reached
-  // Meanwhile, do a sanity check that the function has opposite signs at interval ends
+  // Iterate until the convergence criteria is reached:
+  // f(middle) is sufficiently close to zero.
+  // Meanwhile, do a sanity check that the function has opposite signs at interval ends.
   while ((sign(f_at_left_end) != sign(f_at_right_end)) && (abs(f_at_middle)>tol)){
     if (sign(f_at_left_end) == sign(f_at_middle)){
       std::swap(left_end, middle);
@@ -390,8 +393,8 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
   return middle;
 }
 
-/// Perform a fit for polynomial EOS model for a given set of volumes and energies
-/// using linear least squares method
+/// Perform a fit to the polynomial EOS model for a given set of volumes and energies
+/// using linear least squares method.
 ///
 xvector<double> fitEOSpoly(const xvector<double> &Volumes, xvector<double> &E){
   xmatrix<double> M(Volumes.rows,5);
@@ -407,18 +410,18 @@ xvector<double> fitEOSpoly(const xvector<double> &Volumes, xvector<double> &E){
   return M_ce.GetFitVector();
 }
 
-/// Calculate bulk modulus for polynomial EOS model */
+/// Calculates the bulk modulus for the polynomial EOS model.
 double BulkModulus(double V0, const xvector<double> &fit_parameters){
   return eV2GPa*V0*d2EOSpoly(V0,fit_parameters);
 }
 
-/** Calculate pressure derivative of bulk modulus for polynomial EOS model */
+/// Calculates the pressure derivative of bulk modulus for the polynomial EOS model.
 double Bprime(double V0, const xvector<double> &fit_parameters){
   return -(V0*d3EOSpoly(V0, fit_parameters)/d2EOSpoly(V0, fit_parameters) + 1);
 }
 
 //=============================================================================
-//                         Definitions of QHA class members
+//                         Definitions of the QHA class members
 namespace apl
 {
   QHAN::QHAN(ostream& oss) { free(); xStream::initialize(oss); }
@@ -542,7 +545,7 @@ namespace apl
     initialize(tpt, xinput, kflags, supercellopts, messageFile, oss);
   }
 
-  /// Used to initialize QHAN class with all the necessary data.
+  /// Initializes QHA class with all the necessary data.
   ///
   void QHAN::initialize(string &tpt, _xinput &xinput, _kflags &kflags,
       xoption &supercellopts, ofstream &messageFile, ostream &oss)
@@ -564,9 +567,9 @@ namespace apl
     this->xinput = xinput;
     this->supercellopts = supercellopts;
 
-    currentDirectory = xinput.xvasp.Directory; // remember current directory
+    currentDirectory = xinput.xvasp.Directory; // remember the current directory
 
-    // initialization of data that is derived from the structure info
+    // initialization of the data that is derived from the structure's info
     origStructure = xinput.xvasp.str;
     origStructure.ReScale(1.0);
     NatomsOrigCell = origStructure.atoms.size();
@@ -632,8 +635,8 @@ namespace apl
       }
     }
 
-    // determine names for directories for the calculation of Grueneisen parameter
-    // (calculated using finite differences)
+    // determine names for the directories for the calculation of Grueneisen parameter
+    // (calculated using finite differences method)
     vector<double> gprange(3);
     gprange[0] = 1.0-gp_distortion; gprange[1] = 1.0; gprange[2] = 1.0+gp_distortion;
     N_GPvolumes = 3;
@@ -646,7 +649,7 @@ namespace apl
     }
 
 
-    // determine names for directories for EOS calculation
+    // determine names for the directories used for the EOS calculation
     if (isEOS){
       eosrange[0] = 1.0 + eosrange[0]/100.0;
       eosrange[1] = 1.0 + eosrange[1]/100.0;
@@ -668,7 +671,7 @@ namespace apl
             *p_oss, _LOGGER_ERROR_);
       }
 
-      // get a set of volumes that would be used for QHA-EOS calculation
+      // get a set of volumes that would be used for the QHA-EOS calculation
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
         subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
             "_PHONON_" + aurostd::utype2string(i, precision_format));
@@ -718,7 +721,7 @@ namespace apl
     isInitialized = true;
   }
 
-  /// Performs QHA calculation.
+  /// Performs a QHA calculation.
   /// 
   /// For a regular QHA calculation, there are two possible choices:
   /// 1) calculate Grueneisen parameter using finite difference method.
@@ -727,9 +730,10 @@ namespace apl
   /// free energy, bulk modulus, thermal expansion, isochoric and isobaric specific heat,
   /// average Grueneisen parameter) employing a set of phonon calculations and
   /// making a fit to some model equation of state.
-  /// It requires N static and N phonon calculations.
+  /// It requires N_EOSvolumes static and N_EOSvolumes phonon calculations
+  /// (N_EOSvolumes is determined by the EOS_DISTORTION_RANGE option).
   /// 
-  /// QHA3P and SCQHA calculations require 3 phonon calculations and N static
+  /// QHA3P and SCQHA calculations require 3 phonon calculations and N_EOSvolumes static
   /// calculations.
   /// 
   void QHAN::run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin)
@@ -737,12 +741,12 @@ namespace apl
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
 
     string function = "QHAN::run():";
-    string msg = "Performing QHA calculation.";
+    string msg = "Performing a QHA calculation.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     if (!isInitialized){
-      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return;
@@ -752,8 +756,9 @@ namespace apl
       bool eos_data_available = false;
       bool gp_data_available = false;
 
-      // QHA3P and SCQHA require static EOS calculation
-      // For QHA calculation EOS calculation is to be set with EOS flag
+      // QHA3P and SCQHA require a set of static EOS calculations.
+      // But for a QHA calculation the EOS flag is used to toggle this type of 
+      // calculations.
       if (isEOS || runQHA3P || runSCQHA){
         if (checkStaticCalculations() == N_EOSvolumes){
           readStaticCalculationsData();
@@ -780,9 +785,9 @@ namespace apl
         }
       }
 
-      // QHA3P and SCQHA require that Grueneisen parameter is calculated via
-      // finite difference numerical derivative.
-      // For a QHA calculation, use GP_FD flag to turn on this type of calculation
+      // QHA3P and SCQHA require that mode-dependent Grueneisen parameters are
+      // calculated via finite difference numerical derivative.
+      // For a QHA calculation, use the GP_FD flag to turn on this type of calculation.
       if (isGP_FD || runQHA3P || runSCQHA){
         gp_data_available = runAPLcalculations(subdirectories_apl_gp, coefGPVolumes,
             xflags, aflags, kflags, aflowin);
@@ -815,12 +820,12 @@ namespace apl
     }
   }
 
-  /// Creates subdirectories with aflow.in for static DFT calculations.
+  /// Creates subdirectories with aflow.in for a set of static DFT calculations.
   ///
   void QHAN::createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
       const _kflags &kflags)
   {
-    // prepare static_bands calculations to get reasonable electronic DOS
+    // use static_bands calculations to get a reasonable electronic DOS
     xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = true;
     xinput.xvasp.AVASP_flag_RUN_STATIC             = false;
     xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
@@ -847,8 +852,8 @@ namespace apl
     }
   }
 
-  /// Check if all static calculations needed to proceed with QHA calculation.
-  /// exist and returns the number of finished calculations.
+  /// Checks if all needed static calculations exist and returns the number of 
+  /// finished calculations.
   /// 
   /// If not all calculations are finished, it returns 0.
   /// 
@@ -857,7 +862,7 @@ namespace apl
     string function = "QHAN::checkStaticCalculations():", msg = "";
 
     if (!isInitialized){
-      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return 0;
@@ -873,8 +878,8 @@ namespace apl
         count++;
       }
       else{
-        msg = "QHA is not able to proceed: ";
-        msg += subdirectories_static[i] + " is missing.";
+        msg = "QHA is not able to proceed: the ";
+        msg += subdirectories_static[i] + " directory is missing.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_WARNING_);
         return 0;
@@ -884,19 +889,20 @@ namespace apl
     return count;
   }
 
-  /// Create APL subdirectory or gather and process data from finished calculation.
+  /// Creates a set of EOS APL subdirectories with corresponding aflow.in or gathers
+  /// and processes data from finished APL calculations.
   /// 
   bool QHAN::runAPLcalculations(const vector<string> &subdirectories,
           const vector<double> &coefVolumes, _xflags &xflags,
           _aflags &aflags, _kflags &kflags, string &aflowin, bool gp)
   {
-    string function = "QHAN::runAPLcalculations()";
+    string function = "QHAN::runAPLcalculations():";
     string msg = "Reading phonon DOS and dispersion relations.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     if (!isInitialized){
-      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return false;
@@ -939,17 +945,17 @@ namespace apl
       fccalc->setPolarMaterial(apl_options.flag("POLAR"));
       fccalc->setDirectory(subdirectories[i]);
 
-      // set name of subdirectory
+      // set the name of subdirectory
       xinput.setDirectory(subdirectories[i]);
 
-      // determine APL subdirectories: if it is first run skip to the next
-      // volume calculation
+      // if it is the first run, create APL subdirectories with corresponding aflow.in
+      // files and skip to the next volume calculation
       if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, aflowin)){
         apl_data_calculated = false;
         continue;
       }
 
-      // check if APL calculation is ready and calculate force constants
+      // check if APL calculation is ready and calculate the force constants
       if (!fccalc->run()){
         apl_data_calculated = false;
         continue;
@@ -958,7 +964,7 @@ namespace apl
 
       // calculate all phonon-related data: DOS, frequencies at q-mesh and
       // phonon dispersions
-      vector<xvector<double> > dummy_dos_projections; // do not need in QHA
+      vector<xvector<double> > dummy_dos_projections; // do not need for QHA
       vector<int> dos_mesh(3);
 
       vector<string> tokens;
@@ -979,18 +985,20 @@ namespace apl
 
       if (dosc.hasNegativeFrequencies()){
         stringstream msg;
-        msg << "Imaginary frequencies for APL calculation in ";
-        msg << subdirectories[i] + " folder were detected." << std::endl;
+        msg << "Phonon dispersions of the APL calculation in the " << subdirectories[i];
+        msg << " directory contain imaginary frequencies." << std::endl;
         if (ignore_imaginary){
-          msg << "They will be ignored. Check if results are still meaningful!" << std::endl;
+          msg << "Imaginary part of the phonon dispersions and phonon DOS will be ignored.";
+          msg << " Check if the results are still meaningful!" << std::endl;
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
         }
         else{
           msg << "QHA calculation will be stopped after checking all available APL calculations." << std::endl;
-          msg << "Please check phonon DOS and band structure." << std::endl;
-          msg << "Workaround: adjust EOS_DISTORTION_RANGE to exclude problematic calculations or" << std::endl;
-          msg << "ignore this error by setting IGNORE_IMAGINARY=ON." << std::endl;
+          msg << "Please check the phonon DOS and phonon dispersions." << std::endl;
+          msg << "Workaround: adjust the EOS_DISTORTION_RANGE option to exclude";
+          msg << "the problematic calculations or ignore this error by setting "; 
+          msg << "IGNORE_IMAGINARY=ON." << std::endl;
 
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
@@ -1084,7 +1092,7 @@ namespace apl
     return apl_data_calculated;
   }
 
-  /// Read data from static calculations.
+  /// Reads data from a set of static DFT calculations.
   void QHAN::readStaticCalculationsData()
   {
     string function = "QHAN::readStaticCalculationsData():";
@@ -1093,7 +1101,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     if (!isInitialized){
-      msg = "QHA is not initialized properly and QHA calculation will be aborted.";
+      msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return;
@@ -1103,7 +1111,8 @@ namespace apl
     xOUTCAR outcar;
     string outcarfile = "", dosfile = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
-      msg = "Reading static data from " + subdirectories_static[i];
+      msg = "Reading data from the static DFT calculation in the ";
+      msg += subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
           *p_oss, _LOGGER_MESSAGE_);
 
@@ -1137,13 +1146,13 @@ namespace apl
     }
   }
 
-  /// Calculates Grueneisen parameter of an individual vibrational mode for a
+  /// Calculates the Grueneisen parameter of an individual vibrational mode for a
   /// given volume.
   /// 
   /// gamma_i = -V/w*dw/dV,
-  /// where w is frequency of a given mode a at given volume
+  /// where w is a frequency of a given mode at a given volume
   /// 
-  /// Volume dependence of w is approximated by the polynomial
+  /// Volume dependence of the frequency is approximated by the following polynomial:
   /// w = a + b*V  + c*V**2 + d*V**3
   /// 
   /// @param V is a volume at which Grueneisen parameter is calculated.
@@ -1153,13 +1162,13 @@ namespace apl
   double QHAN::calcGrueneisen(double V, xvector<double> &xomega, double &w)
   {
     string function = "calcGrueneisen():";
-    // no weights in fit
+    // set all weight in fit to 1
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
     aurostd::cematrix lsfit(gp_fit_matrix);
 
-    double a=0.0, b=0.0, c=0.0, d=0.0; //  fit parameters
-    double gamma = 0;
-    w = 0;
+    double a=0.0, b=0.0, c=0.0, d=0.0; // fit parameters
+    double gamma = 0; // mode-dependent Grueneisen parameter
+    w = 0; // frequency of a given branch that corresponds to the input volume V
 
     /** Workaround: for w=0, gamma_i is assumed to be zero, since
     / the actual value depends on the path used to approach w->0. */
@@ -1171,7 +1180,7 @@ namespace apl
       }
     }
 
-    // calculate gamma_i only if w is nonzero
+    // calculate gamma_i only if all frequencies in a given branch are nonzero
     if (freqs_are_nonzero){
       lsfit.LeastSquare(xomega,s);
       a = lsfit.AVec()[0];
@@ -1184,13 +1193,13 @@ namespace apl
       xvector<double> tmp(4);
       tmp[1] = a; tmp[2] = b; tmp[3] = c; tmp[4] = d;
 
-      // check fit error
+      // check the fit error
       for (int Vid=0; Vid<N_EOSvolumes; Vid++){
         err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
               -xomega[Vid+1])/xomega[Vid+1];
         err *= 100.0;
         if (err>=10.0){
-          string msg="Relative error of log(w)=f(V) fit (used to ";
+          string msg="Relative error of the log(w)=f(V) fit (used to ";
           msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
           msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid]);
 
@@ -1212,7 +1221,7 @@ namespace apl
     return gamma;
   }
 
-  /// Calculates Grueneisen parameter of an individual vibrational mode using
+  /// Calculates the Grueneisen parameter of an individual vibrational mode using
   /// central finite difference method.
   /// 
   /// gamma = -V0/w0*dw/dV |V->V0 ~ -V0/w0*(w(V0+dV)-w(V0-dV))/(2*dV)
@@ -1221,7 +1230,7 @@ namespace apl
   {
     string function = "calcGrueneisenFD(): ", msg = "";
     if (xomega.rows != 3){
-      msg = "Wrong size of xomega array passed to calcGrueneisenFD function.";
+      msg = "Wrong size of the xomega array passed to calcGrueneisenFD function.";
       msg += "Expected size: 3. Actual size: ";
       msg += aurostd::utype2string<int>(xomega.rows);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INDEX_BOUNDS_);
@@ -1237,10 +1246,10 @@ namespace apl
   }
 
 
-  /// Calculates free energy (without electronic contribution) as a function of volume
-  /// and temperature.
-  /// Volume dependency is obtained via fit to QHA model.
-  /// @param qha_method defines what type of QHA calculation is performed.
+  /// Calculates the free energy (without electronic contribution) as a function of 
+  /// volume and temperature.
+  /// Volume dependency is obtained via fit to the model equation of state.
+  /// @param qha_method defines what type of a QHA calculation is performed.
   ///
   double QHAN::FreeEnergyFit(double T, double V, EOSmethod eos_method,
       QHAmethod qha_method)
@@ -1261,7 +1270,7 @@ namespace apl
         }
         break;
       default:
-        msg = "Undefined QHA method input to " + function;
+        msg = "Nonexistent QHA method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -1270,7 +1279,7 @@ namespace apl
     return evalEOSmodel(V, p, eos_method);
   }
 
-  /// Calculates internal energy as a function of volume and temperature.
+  /// Calculates the internal energy as a function of volume and temperature.
   ///
   double QHAN::InternalEnergyFit(double T, double V)
   {
@@ -1287,8 +1296,8 @@ namespace apl
     return EOSpoly(V, fitEOSpoly(xvolumes, U));
   }
 
-  /// Free energy (without electronic contribution) for a calculation at specific
-  /// volume (given by id).
+  /// Calculates the free energy (without electronic contribution) for a calculation at
+  /// a specific volume (given by its id in EOSvolumes array).
   ///
   double QHAN::FreeEnergy(double T, int id)
   {
@@ -1296,7 +1305,8 @@ namespace apl
            /NatomsOrigCell + E0_V[id];
   }
 
-  /// Fit equation of state to one of the following models:
+  /// Fits the (free) energy-volume dependency to one of the following equation of state
+  /// models:
   /// polynomial: (eq (5.2) page 106)  https://doi.org/10.1017/CBO9781139018265
   /// Murnaghan: Proceedings of the National Academy of Sciences of the United States of 
   /// America, 30 (9): 244–247
@@ -1338,7 +1348,7 @@ namespace apl
         guess[1] = min(E);
         guess[2] = (max(V)+min(V))/2;
         guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
-        guess[4] = 3.5; // a reasonable intial value for most materials
+        guess[4] = 3.5; // a reasonable initial value for most materials
   
         NonlinearFit nlfit(V,E,guess,Murnaghan);
         nlfit.fitLevenbergMarquardt();
@@ -1351,7 +1361,7 @@ namespace apl
         }
         break;
       default:
-        msg = "Undefined EOS method input to " + function;
+        msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -1359,7 +1369,7 @@ namespace apl
     return fit_params;
   }
 
-  /// Returns energy at a given volume for a chosen EOS model
+  /// Returns the (free) energy at a given volume for a chosen EOS model.
   double QHAN::evalEOSmodel(double V, const xvector<double> &p, EOSmethod method)
   {
     string function = "EOSfit::eval():", msg = "";
@@ -1377,7 +1387,7 @@ namespace apl
         energy = Murnaghan(V, p, dydp);
         break;
       default:
-        msg = "Undefined EOS method input to " + function;
+        msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -1385,7 +1395,7 @@ namespace apl
     return energy;
   }
 
-  /// Calculates electronic free energy using integration over DOS.
+  /// Calculates the electronic free energy using integration over the electronic DOS.
   /// Currently this function does not work (to be fixed in the future)
   ///
   /// @param id selects the volume at which corresponding data was obtained 
@@ -1415,8 +1425,8 @@ namespace apl
     return FelecT;
   }
 
-  /// Calculate equilibrium volume for a given temperature.
-  /// @param qha_method defines what type of QHA calculation is performed.
+  /// Calculates the equilibrium volume at a given temperature.
+  /// @param qha_method defines what type of a QHA calculation is performed.
   /// 
   double QHAN::getEqVolumeT(double T, EOSmethod eos_method, QHAmethod qha_method)
   {
@@ -1434,7 +1444,7 @@ namespace apl
         }
         break;
       default:
-        msg = "Undefined QHA method input to " + function;
+        msg = "Nonexistent QHA method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -1446,8 +1456,8 @@ namespace apl
   }
 
 
-  /// Calculates average Grueneisen parameter (GP) and isochoric specific heat (CV)
-  /// using weighted sum over k-points mesh.
+  /// Calculates the average Grueneisen parameter (GP) and the isochoric specific 
+  /// heat (CV) at a given temperature using weighted sum over k-points mesh.
   /// This function is used when Grueneisen parameter is calculated using finite
   /// difference method.
   ///
@@ -1459,7 +1469,7 @@ namespace apl
     xvector<double> xomega;
 
     uint NIrQpoints = omegaV_mesh.size();
-    int NQpoints = 0; // the total number of q-points
+    int NQpoints = 0; //  total number of q-points
 
     double Cvi  = 0;   // mode-dependent specific heat at V=const
     double w    = 0;   // frequency for a given volume
@@ -1488,11 +1498,10 @@ namespace apl
     CV *= 3*pow(beta,2);
   }
 
-  /// Calculates average Grueneisen parameter (GP) and isochoric specific heat (CV)
-  /// This function requires to input the volume at which those parameters are
-  /// calculated.
+  /// Calculates the average Grueneisen parameter (GP) and the isochoric specific 
+  /// heat (CV) at a given volume and a given temperature.
   /// This function is used when Grueneisen parameter is calculated using fit to
-  /// w(V) relation obtained from EOS calculations.
+  /// w(V) relation, that is obtained from a set of EOS calculations.
   ///
   void QHAN::calcCVandGPfit(double T, double V, double &CV, double &GP)
   {
@@ -1533,7 +1542,7 @@ namespace apl
     CV *= pow(beta,2);
   }
 
-  /// Calculates volumetric thermal expansion coefficient (beta).
+  /// Calculates the volumetric thermal expansion coefficient (beta).
   /// 
   /// Central finite differences are used to calculate beta = 1/V dV/dT.
   /// Values of V(T+dT) and V(T-dT) are taken from the EOS fit to the corresponding
@@ -1542,7 +1551,7 @@ namespace apl
   /// For T=0K function returns 0, negative temperatures are ignored.
   /// 
   /// @param T is the temperature at which the calculation is done.
-  /// @param eos_method defines which model is used for EOS fit
+  /// @param eos_method defines which model is used for the EOS fit
   /// @return volumetric thermal expansion coefficient.
   /// 
   double QHAN::ThermalExpansion(double T, EOSmethod eos_method, QHAmethod qha_method)
@@ -1555,10 +1564,10 @@ namespace apl
                 dT/getEqVolumeT(T,eos_method,qha_method);
   }
 
-  /// Calculates isochoric specific heat as a temperature derivative of free
+  /// Calculates the isochoric specific heat as a temperature derivative of the free
   /// energy using central finite differences method.
   /// 
-  /// @param eos_method defines which model is used for EOS fit
+  /// @param eos_method defines which model is used for the EOS fit
   /// 
   double QHAN::IsochoricSpecificHeat(double T, double V, EOSmethod eos_method,
       QHAmethod qha_method)
@@ -1575,7 +1584,7 @@ namespace apl
     return CV;
   }
 
-  /// Calculates entropy as a temperature derivative of free energy using
+  /// Calculates the entropy as a temperature derivative of the free energy using
   /// central finite differences method.
   /// 
   /// @param eos_method defines which model is used for EOS fit
@@ -1587,12 +1596,12 @@ namespace apl
         -FreeEnergyFit(T-dT,V,eos_method,qha_method))/dT;
   }
 
-  /// Calculates DOS value at Fermi level using linear tetrahedron method. 
+  /// Calculates the DOS value at the Fermi level using linear tetrahedron method. 
   /// For the details check: https://doi.org/10.1103/PhysRevB.49.16223
   ///
   xvector<double> QHAN::DOSatEf()
   {
-    xvector<double> energy_tetrahedron(4);//energy eigenvalues at corners of tetrahedron
+    xvector<double> energy_tetrahedron(4);//energy eigenvalues at the corners of tetrahedron
     double weighted_volume = 0; // weighted volume of tetrahedron
     double DEf = 0.0; // DOS at Fermi level
     double Ef = 0.0;  // Fermi energy
@@ -1648,7 +1657,7 @@ namespace apl
     return DOS_Ef;
   }
 
-  /// Calculates electronic free energy using Sommerfeld expansion.
+  /// Calculates the electronic free energy using Sommerfeld expansion.
   xvector<double> QHAN::electronicFreeEnergySommerfeld(double T)
   {
     xvector<double> F_Som = DOS_Ef;
@@ -1660,7 +1669,7 @@ namespace apl
 
   // QHA3P-related functions
 
-  /// Returns frequency extrapolated by Taylor expansion
+  /// Returns frequency extrapolated by Taylor expansion.
   ///
   double QHAN::extrapolateFrequency(double V, const xvector<double> &xomega)
   {
@@ -1672,7 +1681,7 @@ namespace apl
     return xomega[2] + dwdV*dV + 0.5*d2wdV2*pow(dV,2);
   }
 
-  /// Returns Grueneisen parameter extrapolated by Taylor expansion
+  /// Returns Grueneisen parameter extrapolated by Taylor expansion.
   ///
   double QHAN::extrapolateGamma(double V, const xvector<double> &xomega)
   {
@@ -1693,9 +1702,9 @@ namespace apl
     return gamma;
   }
 
-  /// Free energy (total energy + vibrational contribution) obtained using Taylor 
-  /// expansion of frequencies.
-  /// This function is related to QHA3P and SCQHA methods.
+  /// Calculates the free energy (total energy + vibrational contribution) obtained 
+  /// using Taylor expansion of frequencies.
+  /// This function is used in QHA3P and SCQHA methods.
   /// 
   double QHAN::FreeEnergyTaylorExpansion(double T, int Vid)
   {
@@ -1727,8 +1736,9 @@ namespace apl
     return F + E0_V[Vid];
   }
 
-  /// Vibrational internal energy obtained using Taylor expansion of frequencies.
-  /// This function is related to QHA3P and SCQHA methods.
+  /// Calculates the vibrational internal energy obtained using Taylor expansion of
+  /// frequencies.
+  /// This function is used in QHA3P and SCQHA methods.
   double QHAN::InternalEnergyTaylorExpansion(double T, double V)
   {
     double U = 0.0, ui = 0.0,  w = 0.0; 
@@ -1756,11 +1766,12 @@ namespace apl
     return U;
   }
 
-  // SCQHA-related functions
+  // Definition of the functions used by SCQHA.
   // Implementation is based on http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   // and https://doi.org/10.1016/j.commatsci.2016.04.012
 
-  /// Phononic pressure multiplied by volume.
+  /// Calculates the phononic pressure multiplied by volume for a given temperature and
+  /// a given volume.
   /// Check http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// for more details
   /// 
@@ -1793,10 +1804,10 @@ namespace apl
 
   /// Performs SCQHA calculations.
   /// There are two implementations:
-  /// 1) perform self-consistent loop for initial nonzero temperature and extrapolate
-  /// the volume at next temperature step using V(T+dT) ~ (1+beta dT)*V.
+  /// 1) perform self-consistent loop for the initial nonzero temperature and extrapolate
+  /// the volume at the next temperature step using V(T+dT) ~ (1+beta dT)*V.
   /// Expect it to be inaccurate at high temperatures.
-  /// 2) perform self-consistent loop for each temperature
+  /// 2) perform self-consistent loop for each temperature.
   ///
   /// 1) corresponds to the original implementation as described by the following papers:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
@@ -1811,8 +1822,8 @@ namespace apl
     pflow::logger(QHA_ARUN_MODE, function, "", currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
-    // get equilibrium volume from the fit to EOS based on energies from static
-    // calculations
+    // get equilibrium volume from the fit to the EOS model fitted to the set of 
+    // energies obtained from static DFT calculations
     xvector<double> E = aurostd::vector2xvector<double>(E0_V);
     xvector<double> fit_params = fitToEOSmodel(E, method);
     double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
@@ -1830,7 +1841,7 @@ namespace apl
       if (abs(V0K - Vnew)/V > Vtol) V0K += (Vnew - V0K) * dV; else break;
     }
 
-    // output file name depends on the used EOS fit method
+    // the name of the output file depends on the used EOS fit method
     stringstream file;
     string filename = DEFAULT_QHA_FILE_PREFIX + "scqha.";
     string sc = all_iterations_self_consistent ? "sc." : "";
@@ -1845,7 +1856,7 @@ namespace apl
         filename += sc+"murnaghan.";
         break;
       default:
-        msg = "Undefined QHA method input to " + function;
+        msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -1869,7 +1880,7 @@ namespace apl
 
     double T = Temperatures[0];
 
-    // self-consistent loop for initial temperature (defined by user)
+    // self-consistent loop for the initial temperature (defined by user)
     int iter=1;
     while (iter <= max_scqha_iteration){
       Pe   = dEOSpoly(V, fit_params);
@@ -2052,13 +2063,13 @@ namespace apl
         qha = "qha";
         break;
       default:
-        msg = "Undefined QHA method input to " + function;
+        msg = "Nonexistent QHA method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
 
-    // the name of the output file depends on the used EOS fit method and on type of
-    // QHA calculation
+    // the name of the output file depends on the used EOS fit method and on the type of
+    // a QHA calculation
     stringstream file;
     string filename = DEFAULT_QHA_FILE_PREFIX;
     switch(eos_method){
@@ -2072,7 +2083,7 @@ namespace apl
         filename += qha + ".murnaghan.";
         break;
       default:
-        msg = "Undefined EOS method input to " + function;
+        msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -2113,7 +2124,7 @@ namespace apl
         for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(0, Vid);
         break;
       default:
-        msg = "Undefined QHA method input to " + function;
+        msg = "Nonexistent QHA method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
@@ -2135,7 +2146,7 @@ namespace apl
           for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(T, Vid);
           break;
         default:
-          msg = "Undefined QHA method input to " + function;
+          msg = "Nonexistent QHA method was passed to " + function;
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
           break;
       }
@@ -2144,7 +2155,7 @@ namespace apl
 
       // stop if energy minimum is no longer within a given set of volumes
       if (!isMinimumWithinBounds(F)){
-        msg = "Stopping at T=" + aurostd::utype2string<double>(T) + " [K]";
+        msg = "Calculation is stopped at T=" + aurostd::utype2string<double>(T) + " [K]";
         msg+= "since there is no free energy minimum within a given volume range.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_MESSAGE_);
@@ -2152,8 +2163,8 @@ namespace apl
       }
 
       fitToEOSmodel(F, eos_method);
-      // note that state of EOSfit is changed by ThermalExpansion and/or
-      // IsochoricSpecificHeat functions, so save Veq, Feq and B for future use
+      // note that the state of the EOS fit is changed by the ThermalExpansion and/or
+      // IsochoricSpecificHeat functions, so save Veq, Feq and B for the future use
       Veq = EOS_volume_at_equilibrium;
       Feq = EOS_energy_at_equilibrium;
       B   = EOS_bulk_modulus_at_equilibrium;  // [GPa]
@@ -2282,13 +2293,13 @@ namespace apl
 
 
   /// Writes average Grueneisen parameter, which is calculated using finite
-  /// difference method and isochoric specific heat
+  /// difference method and isochoric specific heat.
   /// Output file: "aflow.qha.gp.avg.out"
   ///
   void QHAN::writeAverageGPfiniteDifferences()
   {
     string function = "QHAN::writeAverageGPfiniteDifferences(): ";
-    string msg = "Writing T-dependence of average Grueneisen parameter.";
+    string msg = "Writing T-dependence of the average Grueneisen parameter.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
@@ -2330,7 +2341,7 @@ namespace apl
   void QHAN::writeGPmeshFD()
   {
     string function = "QHAN::writeGPmeshFD():";
-    string msg = "Writing Grueneisen parameter calculated on mesh of q-points.";
+    string msg = "Writing Grueneisen parameters calculated on the mesh of q-points.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
@@ -2381,7 +2392,7 @@ namespace apl
     }
   }
 
-  /// Writes volume-dependent phonon frequencies obtained from series of EOS APL
+  /// Writes volume-dependent phonon frequencies obtained from the series of EOS APL
   /// calculations.
   ///
   void QHAN::writeFrequencies()
