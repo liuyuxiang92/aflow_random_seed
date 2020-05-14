@@ -17,11 +17,11 @@
         -- Fixed xEIGENVAL to work correctly with files created by vasp 5. (AS)
         -- QHA class was reworked:  (AS)
             *) QHA module is used to input aflow.in parameters;
-            *) QHA options are now processed inside of QHA class;
+            *) QHA options are now processed inside the QHA class;
             *) QHA, QHA3P and SCQHA was united into one class;
             *) QHA_AFLOWIN_CREATOR class is no longer used;
-            *) new functionality: thermal properties can be derived from the temperature dependency of free energy;
-            *) added a possibility to calculate Grueneisen parameter using fit to frequency-volume relation.
+            *) new functionality: thermal properties can be derived from the temperature dependence of the free energy;
+            *) added the possibility to calculate Grueneisen parameters using fit to frequency-volume relation.
         -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
         -- Added check for required binaries to plotter. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
