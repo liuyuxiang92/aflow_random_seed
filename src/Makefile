@@ -55,7 +55,7 @@ endif
 CCFLAGS=-Wall -W -fno-inline
 #ME20200514 - Allow inlining for threaded files (big performance penalty otherwise)
 CCFLAGS_MT=-Wall -W
-#[CO191217 - put in OPTS_MT]CCFLAGS_MT=$(CCFLAGS) -O2
+#[CO20191217 - put in OPTS_MT]CCFLAGS_MT=$(CCFLAGS) -O2
 #CCFLAGS_GSA=$(CCFLAGS) -O1	#CO OBSOLETE 170601
 INCLUDE = -I ./
 #INCLUDE = -I ./  -I /opt/intel/mkl100/include
