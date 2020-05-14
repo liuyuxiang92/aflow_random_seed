@@ -128,7 +128,7 @@ SQLITE_OPTS=-DSQLITE_THREADSAFE=1
 #CO20200508 STOP - FIGURE OUT HOW TO GET RID OF THESE
 
 #CO20170614
-#ME191125 -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip)
+#ME20191125 -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip)
 SQLITE_C = ./SQLITE/sqlite3.c
 SQLITE_OBJ=$(SQLITE_C:.c=.o)
 
