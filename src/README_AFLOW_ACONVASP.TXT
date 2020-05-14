@@ -2728,7 +2728,7 @@ LATTICES = (the ones with "")
             The AFLOW Library of Crystallographic Prototypes: Part 2, Comp. Mat. Sci. 161 Supplement, S1-S1011 (2019).
         These prototypes must be accompanied by the --params=... flag or label suffix (e.g., <label>-001) specifying
         the internal degrees of freedom for the prototype.
-        Rhombohedral cells can be generated in the hexagonal setting with the flag --hex.
+        Rhombohedral systems can be generated in the hexagonal setting with the flag --hex.
         Check aflow --readme=anrl for more information.
    
 
