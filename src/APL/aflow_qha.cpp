@@ -49,6 +49,7 @@ namespace apl
 
   NonlinearFit::NonlinearFit(const NonlinearFit &nlf)
   {
+    if (this==&nlf) return;
     free(); copy(nlf);
   }
 
