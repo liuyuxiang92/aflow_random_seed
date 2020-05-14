@@ -405,11 +405,11 @@ namespace makefile {
             //[didn't compile for some reason]vmt_required.push_back(false);
             mt_required=false;
             getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
-            //unfortunate hack that's needed
-            if(file=="aflowlib_libraries.cpp"){
-              if(!aurostd::WithinList(vvdependencies.back(),"aflow_matlab_funcs.cpp")){vvdependencies.back().push_back("aflow_matlab_funcs.cpp");}  //safety
-              if(!aurostd::WithinList(vvdependencies.back(),"aflow_gnuplot_funcs.cpp")){vvdependencies.back().push_back("aflow_gnuplot_funcs.cpp");}  //safety
-            }
+            //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
+            //[CO20200508 - OBSOLETE]if(file=="aflowlib_libraries.cpp"){
+            //[CO20200508 - OBSOLETE]  if(!aurostd::WithinList(vvdependencies.back(),"aflow_matlab_funcs.cpp")){vvdependencies.back().push_back("aflow_matlab_funcs.cpp");}  //safety
+            //[CO20200508 - OBSOLETE]  if(!aurostd::WithinList(vvdependencies.back(),"aflow_gnuplot_funcs.cpp")){vvdependencies.back().push_back("aflow_gnuplot_funcs.cpp");}  //safety
+            //[CO20200508 - OBSOLETE]}
             vmt_required.push_back(mt_required);
             //get rid of any dependencies with AUROSTD and replace with $(AUROSTD_OBJ)
             updateDependenciesAUROSTD(vvdependencies.back());
@@ -417,9 +417,9 @@ namespace makefile {
         }
       }
     }
-    //unfortunate hack that's needed
-    if(!aurostd::WithinList(vaflow_deps,"aflow_matlab_funcs.cpp")){vaflow_deps.push_back("aflow_matlab_funcs.cpp");}  //safety
-    if(!aurostd::WithinList(vaflow_deps,"aflow_gnuplot_funcs.cpp")){vaflow_deps.push_back("aflow_gnuplot_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vaflow_deps,"aflow_matlab_funcs.cpp")){vaflow_deps.push_back("aflow_matlab_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vaflow_deps,"aflow_gnuplot_funcs.cpp")){vaflow_deps.push_back("aflow_gnuplot_funcs.cpp");}  //safety
     stringstream makefile_rules_ss;
     vector<string> vobj_files;
     string obj_file="";
@@ -434,9 +434,9 @@ namespace makefile {
       makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")  //ME20200514 - Added CCFLAGS_MT
     }
-    //unfortunate hack that's needed
-    if(!aurostd::WithinList(vobj_files,"aflow_matlab_funcs.cpp")){vobj_files.push_back("aflow_matlab_funcs.cpp");}  //safety
-    if(!aurostd::WithinList(vobj_files,"aflow_gnuplot_funcs.cpp")){vobj_files.push_back("aflow_gnuplot_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vobj_files,"aflow_matlab_funcs.cpp")){vobj_files.push_back("aflow_matlab_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vobj_files,"aflow_gnuplot_funcs.cpp")){vobj_files.push_back("aflow_gnuplot_funcs.cpp");}  //safety
     
     stringstream makefile_definitions_ss;
     if(vaflow_deps.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vaflow_deps," ") << endl;}  //SC variables - hack
