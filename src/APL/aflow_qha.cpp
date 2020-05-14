@@ -589,8 +589,9 @@ namespace apl
 
         if (tokens.size() != 3) {
           string message = "Wrong setting in the ";
-          message += "[AFLOW_QHA]EOS_DISTORTION_RANGE.\n";
-          message += "Specify as EOS_DISTORTION_RANGE=-3:6:1.";
+          message += "[AFLOW_QHA]EOS_DISTORTION_RANGE.";
+          message += "Specify as EOS_DISTORTION_RANGE=";
+          message += AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_NUMBER_);
         }
@@ -611,7 +612,7 @@ namespace apl
 
         if ((tokens.size()<1) || (tokens.size() > 3)){
           string message = "Wrong setting in ";
-          message += "[AFLOW_QHA]MODE.\n";
+          message += "[AFLOW_QHA]MODE.";
           message += "Specify as MODE=QHA,QHA3P,SCQHA";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_NUMBER_);
@@ -653,13 +654,14 @@ namespace apl
       if (N_EOSvolumes < REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT){
         isEOS = false;
 
-        msg = "QHA EOS calculation requires at least ";
-        msg += aurostd::utype2string<int>(REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT);
-        msg += " APL calculations.\n";
-        msg += "The current choice of volume range and increment produces ";
-        msg += aurostd::utype2string<int>(N_EOSvolumes);
-        msg += " APL calculations.\n";
-        msg += "QHA EOS calculation will be skipped!";
+        stringstream msg;
+        msg << "QHA EOS calculation requires at least ";
+        msg << aurostd::utype2string<int>(REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT);
+        msg << " APL calculations." << std::endl;
+        msg << "The current choice of volume range and increment produces ";
+        msg << aurostd::utype2string<int>(N_EOSvolumes);
+        msg << " APL calculations." << std::endl;
+        msg << "QHA EOS calculation will be skipped!";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_ERROR_);
       }
@@ -683,10 +685,11 @@ namespace apl
     tokens.clear();
     aurostd::string2tokens(tpt, tokens, string (" :"));
     if (tokens.size() != 3){
-      msg = "Wrong setting in ";
-      msg += "[AFLOW_APL]TPT.\n";
-      msg += "Specify as TPT="+AFLOWRC_DEFAULT_APL_TPT+".\n";
-      msg += "See README_AFLOW_APL.TXT for the details.";
+      stringstream msg;
+      msg << "Wrong setting in ";
+      msg << "[AFLOW_APL]TPT.";
+      msg << "Specify as TPT="+AFLOWRC_DEFAULT_APL_TPT+"." << std::endl;
+      msg << "See README_AFLOW_APL.TXT for the details.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
           _INPUT_NUMBER_);
     }
@@ -869,7 +872,7 @@ namespace apl
       }
       else{
         msg = "QHA is not able to proceed: ";
-        msg += subdirectories_static[i] + " is missing.\n";
+        msg += subdirectories_static[i] + " is missing.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_WARNING_);
         return 0;
@@ -977,18 +980,19 @@ namespace apl
       dosc.writePHDOSCAR(subdirectories[i]);
 
       if (dosc.hasNegativeFrequencies()){
-        msg = "Imaginary frequencies for APL calculation in ";
-        msg += subdirectories[i] + " folder were detected.\n";
+        stringstream msg;
+        msg << "Imaginary frequencies for APL calculation in ";
+        msg << subdirectories[i] + " folder were detected." << std::endl;
         if (ignore_imaginary){
-          msg += "They will be ignored. Check if results are still meaningful!\n";
+          msg << "They will be ignored. Check if results are still meaningful!" << std::endl;
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
         }
         else{
-          msg += "QHA calculation will be stopped after checking all available APL calculations.\n";
-          msg += "Please check phonon DOS and band structure.\n";
-          msg += "Workaround: adjust EOS_DISTORTION_RANGE to exclude problematic calculations or\n";
-          msg += "ignore this error by setting IGNORE_IMAGINARY=ON.\n";
+          msg << "QHA calculation will be stopped after checking all available APL calculations." << std::endl;
+          msg << "Please check phonon DOS and band structure." << std::endl;
+          msg << "Workaround: adjust EOS_DISTORTION_RANGE to exclude problematic calculations or" << std::endl;
+          msg << "ignore this error by setting IGNORE_IMAGINARY=ON." << std::endl;
 
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
@@ -1192,7 +1196,7 @@ namespace apl
           if (err>=10.0){
             string msg="Relative error of log(w)=f(V) fit (used to ";
             msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
-            msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid])+'\n';
+            msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid]);
 
             pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory,
                 *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -2237,7 +2241,7 @@ namespace apl
   {
     string function = "QHAN::writeGPpath():";
     string msg = "Calculating and saving Grueneisen parameters along a path in";
-    msg += " reciprocal space which was used to calculate phonon dispersion.\n";
+    msg += " reciprocal space which was used to calculate phonon dispersion.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
     // we will save bands-projected Grueneisen parameter in xEIGENVAL
