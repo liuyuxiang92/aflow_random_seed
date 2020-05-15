@@ -360,7 +360,7 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
     cerr << f_at_right_end << std::endl;
   }
 
-  // Iterate until the convergence criteria is reached:
+  // Iterate until the convergence criterion is reached:
   // f(middle) is sufficiently close to zero.
   // Meanwhile, do a sanity check that the function has opposite signs at interval ends.
   while ((sign(f_at_left_end) != sign(f_at_right_end)) && (abs(f_at_middle)>tol)){
@@ -852,7 +852,7 @@ namespace apl
     }
   }
 
-  /// Checks if all needed static calculations exist and returns the number of 
+  /// Checks if all required static calculations exist and returns the number of
   /// finished calculations.
   /// 
   /// If not all calculations are finished, it returns 0.
@@ -1051,7 +1051,7 @@ namespace apl
       if (gp){
         gp_ph_dispersions.push_back(pdisc.createEIGENVAL());
 
-        // allocate memory at first run (entire chunk of memory is needed because
+        // allocate memory at the first run (entire chunk of memory is required because
         // data will be reordered)
         if (i==0){
           omegaV_mesh = vector<vector<vector<double> > > (Nqpoints,
@@ -1071,7 +1071,7 @@ namespace apl
         eos_vib_thermal_properties.push_back(ThermalPropertiesCalculator(dosc,
               *p_FileMESSAGE));
 
-        // allocate memory at first run (entire chunk of memory is needed because
+        // allocate memory at the first run (entire chunk of memory is required because
         // data will be reordered)
         if (i==0){
           omegaV_mesh_EOS = vector<vector<vector<double> > > (Nqpoints,
