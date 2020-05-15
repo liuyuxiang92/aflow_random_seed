@@ -1172,7 +1172,7 @@ namespace apl
     / the actual value depends on the path used to approach w->0. */
     bool freqs_are_nonzero = true;
     for (int i=xomega.lrows; i<=xomega.urows; i++){
-      if (!(xomega[i] > _mm_epsilon)){
+      if (!(xomega[i] > AUROSTD_ROUNDOFF_TOL)){
         freqs_are_nonzero = false;
         break;
       }
@@ -1504,7 +1504,7 @@ namespace apl
   void QHAN::calcCVandGPfit(double T, double V, double &CV, double &GP)
   {
     CV = 0; GP = 0;
-    if (!(T>0)) return;
+    if (T<_ZERO_TOL_) return;
 
     xvector<double> xomega;
 
@@ -1523,7 +1523,7 @@ namespace apl
 
           gamma = calcGrueneisen(V, xomega, w);
           w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
-          if (w > _mm_epsilon){
+          if (w > AUROSTD_ROUNDOFF_TOL){
             expx = exp(w*beta);
 
             Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
@@ -1706,6 +1706,8 @@ namespace apl
   /// 
   double QHAN::FreeEnergyTaylorExpansion(double T, int Vid)
   {
+    if (T < _ZERO_TOL_) return E0_V[Vid];
+
     double w = 0.0; // extrapolated frequency at V_id volume
     double F = 0.0; // Free energy
     double fi = 0.0;
@@ -1720,7 +1722,7 @@ namespace apl
             PLANCKSCONSTANTEV_h;
         fi = 0.5*w;
 
-        if (w>_mm_epsilon && T>_mm_epsilon) fi += KBOLTZEV*T*log(1-exp(-w*beta));
+        if (w> AUROSTD_ROUNDOFF_TOL && T>_ZERO_TOL_) fi += KBOLTZEV*T*log(1-exp(-w*beta));
 
         fi *= qpWeights[q];
         F += fi;
@@ -1739,6 +1741,8 @@ namespace apl
   /// This function is used in the QHA3P and SCQHA methods.
   double QHAN::InternalEnergyTaylorExpansion(double T, double V)
   {
+    if (T<_ZERO_TOL_) return 0.0;
+
     double U = 0.0, ui = 0.0,  w = 0.0; 
     double beta = 1.0/KBOLTZEV/T;
     int NQpoints = 0;
@@ -2104,12 +2108,16 @@ namespace apl
             setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
             setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
             setw(TW) << "gamma(beta,B,Cv)"     << setw(SW) << ' ' <<
-            setw(TW) << "Bprime"               << setw(SW) << ' ' <<
+            setw(TW) << "Bprime";
+    // the following properties are calculated only with a regular QHA calculation
+    if (qha_method==QHA_CALC){
+      file  << setw(SW) << ' ' <<
             setw(TW) << "beta_mesh[10^-6/K]"   << setw(SW) << ' ' <<
             setw(TW) << "Cv_mesh[kB/atoms]"    << setw(SW) << ' ' <<
             setw(TW) << "Cp_mesh[kB/atoms]"    << setw(SW) << ' ' <<
-            setw(TW) << "gamma_mesh"           << setw(SW) << ' ' <<
-            std::endl;
+            setw(TW) << "gamma_mesh";
+    }
+    file << std::endl;
 
     xvector<double> F(N_EOSvolumes); // free energy
     xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
@@ -2172,9 +2180,12 @@ namespace apl
       CP   = CV + Veq*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
       GP   = (beta/CV)*B*Veq/eV2GPa/KBOLTZEV;
 
-      calcCVandGPfit(T, Veq, CV_mesh, GP_mesh);
-      beta_mesh = KBOLTZEV*CV_mesh*GP_mesh/Veq/(B/eV2GPa); // [K^-1]
-      CP_mesh   = CV_mesh + Veq*T*B*pow(beta_mesh,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+      // the following properties are calculated only with a regular QHA calculation
+      if (qha_method==QHA_CALC){
+        calcCVandGPfit(T, Veq, CV_mesh, GP_mesh);
+        beta_mesh = KBOLTZEV*CV_mesh*GP_mesh/Veq/(B/eV2GPa); // [K^-1]
+        CP_mesh   = CV_mesh + Veq*T*B*pow(beta_mesh,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+      }
 
       // write values to file
       file << setw(5)  << T                   << setw(SW) << ' ' <<
@@ -2185,12 +2196,16 @@ namespace apl
               setw(TW) << CV                  << setw(SW) << ' ' <<
               setw(TW) << CP                  << setw(SW) << ' ' <<
               setw(TW) << GP                  << setw(SW) << ' ' <<
-              setw(TW) << Bp                  << setw(SW) << ' ' <<
+              setw(TW) << Bp;
+      // the following properties are calculated only with a regular QHA calculation
+      if (qha_method==QHA_CALC){
+        file << setw(SW) << ' ' <<
               setw(TW) << beta_mesh * 1e6     << setw(SW) << ' ' << //[10^-6/K]
               setw(TW) << CV_mesh             << setw(SW) << ' ' <<
               setw(TW) << CP_mesh             << setw(SW) << ' ' <<
-              setw(TW) << GP_mesh             << setw(SW) << ' ' <<
-              std::endl;
+              setw(TW) << GP_mesh             << setw(SW);
+      }
+      file << std::endl;
     }
 
     file << "[QHA_THERMAL_PROPERTIES]STOP" << std::endl;
