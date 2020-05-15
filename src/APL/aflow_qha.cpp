@@ -650,7 +650,7 @@ namespace apl
 
 
     // determine names for the directories used for the EOS calculation
-    if (isEOS){
+    if (isEOS || runQHA3P || runSCQHA){
       eosrange[0] = 1.0 + eosrange[0]/100.0;
       eosrange[1] = 1.0 + eosrange[1]/100.0;
       eosrange[2] = eosrange[2]/100.0;
@@ -770,7 +770,7 @@ namespace apl
 
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
-      if (isEOS){
+      if (isEOS && runQHA){
         eos_data_available = runAPLcalculations(subdirectories_apl_eos,
                 coefEOSVolumes, xflags, aflags, kflags, aflowin, false);
 
