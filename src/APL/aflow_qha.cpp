@@ -914,7 +914,6 @@ namespace apl
     for (uint i=0; i<subdirectories.size(); i++){
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
-      xinput.xvasp.str.UpdateCartesianCoordinates();
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xinput.getXStr());
