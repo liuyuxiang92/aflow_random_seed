@@ -150,7 +150,7 @@ namespace apl
     for (int i=1; i<=Npoints; i++){
       f(x[i], guess, dydp); 
       for (int j=1; j<=Nparams; j++){
-        J[i][j] = -dydp[j];
+        J[i][j] = -dydp[j]; // derivative of a given function w.r.t fit parameters
       }
     }
   }
@@ -174,7 +174,7 @@ namespace apl
     int iter = 0;
     double chi_sqr = 0.0, new_chi_sqr =0.0; // old and new residual square sums
   
-    p = guess; Jacobian(p); calculateResiduals(p);
+    p = guess; Jacobian(p); calculateResiduals(p); // p are the fitted parameters
 
     xmatrix<double> A = trasp(J)*J;
     xvector<double> g = -trasp(J)*residuals;
@@ -634,7 +634,7 @@ namespace apl
       }
     }
 
-    // determine the names for the directories for the calculation ofthe Grueneisen parameter
+    // determine the names for the directories for the calculation of the Grueneisen parameter
     // (calculated using finite differences method)
     vector<double> gprange(3);
     gprange[0] = 1.0-gp_distortion; gprange[1] = 1.0; gprange[2] = 1.0+gp_distortion;
