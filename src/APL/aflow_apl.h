@@ -592,13 +592,6 @@ namespace apl {
       int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO20190218
       int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO20190218
       const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
-      xvector<double> getFPositionItsNearestImage(const xvector<double>&,
-          const xvector<double>&,
-          const xmatrix<double>&);
-      xvector<double> getFPositionItsNearestImage(int, int);
-      xvector<double> getCPositionItsNearestImage(int, int);
-      bool compareFPositions(xvector<double>&, xvector<double>&);          //CO
-      bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
       void calculatePhaseVectors();  // ME20200117
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,

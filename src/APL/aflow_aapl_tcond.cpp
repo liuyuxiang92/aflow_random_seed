@@ -587,7 +587,7 @@ namespace apl {
   // Calculates the phase factors for each atom in the supercell. The
   // conjugate is used for the scattering matrices whereas the non-conjugate
   // is used for the Grueneisen parameters. Calculating the phases ahead of
-  // time decreases runtime considerably.
+  // time decreases runtimes considerably.
   vector<vector<vector<xcomplex<double> > > > TCONDCalculator::calculatePhases(bool conjugate) {
     vector<xvector<double> > qpts = _pc->getQMesh().getQPointsCPOS();
     const xstructure& scell = _pc->getSuperCellStructure();

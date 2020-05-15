@@ -1051,8 +1051,8 @@ namespace apl {
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
         uint ipc2 = _supercell.sc2pcMap(isc2);
 
-        xvector<double> rf = _supercell.getFPositionItsNearestImage(isc2, isc1);
-        xvector<double> rc = F2C(sc.lattice, rf);
+        xvector<double> rc = SYM::minimizeDistanceCartesianMethod(sc.atoms[isc2].cpos, sc.atoms[isc1].cpos, sc.lattice);
+        xvector<double> rf = F2C(sc.lattice, rc);
 
         if (aurostd::modulus(rc) < _AFLOW_APL_EPS_) continue;
 
