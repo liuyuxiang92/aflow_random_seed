@@ -70,14 +70,14 @@ namespace aflowlib {
 	  for(uint k=0;k<tokens.size();k++) {
 	    string digits_ij=tokens.at(j)+tokens.at(k);
 	    acout << soliloquy << " TESTING /common/" << vlib.at(i) << "/RAW/" << "aflow:" << digits_ij << "*.json links" << endl;
-	    //	    acout << soliloquy << " TIME" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	    //	    acout << soliloquy << " TIME" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
 	    aurostd::string2vectorstring(aurostd::execute2string("find /common/AUID/aflow:"+digits_ij+"* -name RAW"),list2found);
-	    //	acout << soliloquy << " TIME" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	    //	acout << soliloquy << " TIME" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
 	    //	acout << soliloquy << " list2found.size()=" << list2found.size() << endl;
 	    //	acout << soliloquy << " ordering " << endl;
 	    sort(list2found.begin(),list2found.end());
 	    acout << soliloquy << " list2found.size()=" << list2found.size() << endl;
-	    //  acout << soliloquy << " TIME" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	    //  acout << soliloquy << " TIME" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
 	    for(uint l=0;l<list2found.size();l++) {
 	      string filename=list2found.at(l);
 	      aurostd::StringSubst(filename,"/common/AUID/","");
