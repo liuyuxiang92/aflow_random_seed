@@ -143,7 +143,7 @@ extern string _AFLOWLOCK_;
 #define AFLOW_WEB_SERVER_DEFAULT              string("nietzsche.mems.duke.edu")
 #define AFLOWLIB_SERVER_DEFAULT               string("aflowlib.duke.edu")
 #define AFLOWLIB_MATERIALS_SERVER             string("aflow.org")
-#define AFLOWLIB_CONSORTIUM_STRING            string("AFLOW - www.aflow.org consortium")
+#define AFLOWLIB_CONSORTIUM_STRING            string("aflow.org")
 #define _XENTRY_ string("index.php")
 
 // [OBSOLETE] #define DEFAULT_KZIP_BIN              string("bzip2")           // moved to aflow_aflowrc.cpp in V3.1.194
@@ -296,9 +296,11 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID;  // aflow.cpp
-    ostringstream ostrPID; // aflow.cpp
-    // machinery
+    int PID;               // aflow_init.cpp  PID number
+    ostringstream ostrPID; // aflow_init.cpp  PID in ostringstream...
+    string sPID;           // aflow_init.cpp  [PID=12345678]
+    bool showPID;          // aflow_init.cpp  check if --showPID
+     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CT20181212
@@ -1034,7 +1036,8 @@ namespace init {
   string InitLibraryObject(string string2load,bool=FALSE);
   string AFLOW_Projects_Directories(string string2load);
   long GetRAM(void);
-  uint GetTEMPs(void);
+  uint GetTEMP(void);
+  double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
 } // namespace init
 
@@ -1045,7 +1048,7 @@ bool CheckMaterialServer(string message);
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
 string aflow_get_time_string_short(void);
-string strPID(void);
+// [OBSOLETE] string strPID(void);
 
 string Message(string="");
 string Message(string str1,string list2print);

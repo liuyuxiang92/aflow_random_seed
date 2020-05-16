@@ -24,7 +24,7 @@
 namespace pflow {
   void AClusterExpansionMethodMain(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::AClusterExpansionMethodMain: BEGIN" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::AClusterExpansionMethodMain: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
@@ -537,14 +537,14 @@ namespace pflow {
     }
 
     CleanUp();
-    if(LDEBUG) cerr << "pflow::AClusterExpansionMethodMain: END" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::AClusterExpansionMethodMain: END" << endl;
   }
 } // namespace pflow
 
 namespace pflow {
   void SQS(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::SQS: BEGIN" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::SQS: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=7 && tokens.size()!=3) {
@@ -567,7 +567,7 @@ namespace pflow {
     }
 
     if((tokens.size() != 3) && (tokens.size() != 7)) {
-      cerr << "pflow::SQSMain: Incorrect argument numbers."<< endl
+      cerr << XHOST.sPID << "pflow::SQSMain: Incorrect argument numbers."<< endl
 	   <<"Please use aflow --help to see the correct arguments \n";
       exit(_EXIT_FAIL);
     }
@@ -622,7 +622,7 @@ namespace pflow {
       //SLtmp = ceSL(str_type);
 
       if(a.species.size() > 2) {
-	cerr << "pflow::SQS: only binary alloy is implemented\n";
+	cerr << XHOST.sPID << "pflow::SQS: only binary alloy is implemented\n";
 	exit(_EXIT_FAIL);
       }
 
@@ -670,14 +670,14 @@ namespace pflow {
       mySLfilein.close();
 
     }
-    if(LDEBUG) cerr << "pflow::SQS: END" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::SQS: END" << endl;
   }
 }
 
 namespace pflow {
   void Superlattice(string options) {
    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::Superlattice: BEGIN" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::Superlattice: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=3 && tokens.size()!=4) {
@@ -780,7 +780,7 @@ namespace pflow {
       ACESLProperties(cerr, structure_type, min_SLcell_nr, max_SLcell_nr, allcluster, ECIcluster);
     }
 
-    if(LDEBUG) cerr << "pflow::Superlattice: END" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::Superlattice: END" << endl;
   }
 }
 
@@ -791,7 +791,7 @@ namespace pflow {
 namespace pflow {
   void Cluster(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::Cluster: BEGIN" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::Cluster: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
@@ -829,7 +829,7 @@ namespace pflow {
     NNNum_up = aurostd::string2utype<int>(tokens.at(4));
     allcluster.SetCluster(site_num_low, site_num_up, NNNum_low, NNNum_up);
     allcluster.WriteFile(filename, open_opt);
-    if(LDEBUG) cerr << "pflow::Cluster: END" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::Cluster: END" << endl;
   }
 }
 
@@ -876,7 +876,7 @@ namespace pflow {
     string jmol_command = XHOST.command("jmol")+" " + cif_tmp + " -s " + jmol_script_tmp + " -x -i -L ";
 
     string gif_command = XHOST.command("convert")+" -delay 20 -loop 0 " + cif_tmp + "_movie00* ";
-    string gif_file = "animation_" + strPID() + ".gif";
+    string gif_file = "animation_" + XHOST.ostrPID.str() + ".gif";
 
     if(argv.size()==3) { // give output file name
       gif_file = argv.at(2);
@@ -886,7 +886,7 @@ namespace pflow {
     ofstream foutAnime;
     foutAnime.open(gif_file.c_str());
     if(!foutAnime.is_open()) { // given file is not writable
-      gif_file = "/tmp/animation_" + strPID() + ".gif";
+      gif_file = "/tmp/animation_" + XHOST.ostrPID.str() + ".gif";
       cerr << "Cannot write to " << argv.at(2) << ". ";
     }
     foutAnime.close();

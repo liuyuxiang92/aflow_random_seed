@@ -139,7 +139,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       //    Num_calculated=MaxNumberPOSCAR;
       //}
 
-      string soliloquy = "iPOcc():";
+      string soliloquy = XHOST.sPID + "iPOcc():";
       stringstream message;
       ostream& oss=cout;
       //ofstream FileMESSAGE;
@@ -2630,8 +2630,8 @@ void xstructure::AddAtom_POCC(const _atom& atom) {
     species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
     species_mass.push_back(GetAtomMass(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
   } else {
-    // cerr <<  num_each_type.size() << " " <<  btom.type << endl;
-    // cerr <<  comp_each_type.size() << " " <<  btom.type << endl;
+    // cerr << num_each_type.size() << " " <<  btom.type << endl;
+    // cerr << comp_each_type.size() << " " <<  btom.type << endl;
     if(LDEBUG) {cerr << "AddAtom increasing species_position " << species_position << endl;}
     num_each_type.at(species_position)++;
     comp_each_type.at(species_position)+=atom.partial_occupation_value;
@@ -3383,7 +3383,7 @@ namespace pocc {
 // ***************************************************************************
 void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_aflowin) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="ExtracAllPOSCARSFromAflowin():";
+  string soliloquy = XHOST.sPID + "ExtracAllPOSCARSFromAflowin():";
   vxstr.clear();
   string POSCAR_START_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]START.";
   string POSCAR_STOP_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]STOP.";
@@ -3409,7 +3409,7 @@ void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_af
 // ***************************************************************************
 void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetDegeneracyFromVPOSCAR():";
+  string soliloquy = XHOST.sPID + "GetDegeneracyFromVPOSCAR():";
   string title="";
   vector<string> vtitle,vtitle2;
   int DEI=1;
@@ -3453,7 +3453,7 @@ namespace pocc {
     //Warnning: DOS is absolute value, no shift, and the output DOS, it is format is Energy, s, p, d, f, TDOS, TDOS_sum
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pocc::POCC_GENERATE_DOSDATA():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_GENERATE_DOSDATA():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     if(LDEBUG) {cerr << soliloquy << " directory=[" << directory << "]" << endl;}
 
@@ -3493,13 +3493,12 @@ namespace pocc {
       //double kpt_tol;
 
       bool found_ext=false;
-      deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
       string outcar_file,doscar_file;
 
       for(uint i=0;i<vrun.size();i++) {
         found_ext=false;
-        for(uint j=0;j<vext.size();j++){
-          outcar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static"+vext[j]);
+        for(uint iext=0;iext<XHOST.vext.size();iext++){
+          outcar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static"+XHOST.vext.at(iext));
           if(aurostd::FileExist(outcar_file)) {
             if(LDEBUG) {
               aus << "00000  MESSAGE POCC OUTCAR file OK: " << outcar_file << " " << endl;
@@ -3520,8 +3519,8 @@ namespace pocc {
       }
       for(uint i=0;i<vrun.size();i++) {
         found_ext=false;
-        for(uint j=0;j<vext.size();j++){
-          doscar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static"+vext[j]);
+        for(uint iext=0;iext<XHOST.vext.size();iext++){
+          doscar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static"+XHOST.vext.at(iext));
           if(aurostd::FileExist(doscar_file)) {
             if(LDEBUG) {
               aus << "00000  MESSAGE POCC DOSCAR file OK: " << doscar_file << " " << endl;
@@ -3686,7 +3685,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO20190808 - one without IDOS and one with
-    string soliloquy="pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
     if(TDOS.size()!=PDOS.size()) {cerr << " TDOS and PDOS have different size! Aborting! " << endl; exit(1);}
     vector<double> vtmp;
     if(TDOS.at(0).size()==3) { //non-spin
@@ -3806,7 +3805,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POCC_GENERATE_OUTPUT(const string& directory, const double& T, const double& DOS_Emin, double& DOS_Emax, const double& DOSSCALE) {
-    string soliloquy="pocc::POCC_GENERATE_OUTPUT():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_GENERATE_OUTPUT():";
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     //produce DOS data
     if(!XHOST.is_command("gnuplot")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR gnuplot is necessary." << endl;exit(1);}; 

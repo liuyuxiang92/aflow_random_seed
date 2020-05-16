@@ -44,17 +44,15 @@ void AConvaspBandgap(vector<string>& argv) {
   
   string file_tmp=aurostd::TmpFileCreate("AConvaspBandgap");
   aurostd::RemoveFile(file_tmp);
-
-  deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-  deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-  if(vext.size()!=vcat.size()) { cerr << "ERROR - AConvaspBandgap: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+  
+  if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - AConvaspBandgap: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
   // OUTCAR.bands
   found=FALSE;
-  for(uint iext=0;iext<vext.size();iext++) {
-    if(!found && aurostd::FileExist(directory+"/OUTCAR.bands"+vext.at(iext))) {
+  for(uint iext=0;iext<XHOST.vext.size();iext++) {
+    if(!found && aurostd::FileExist(directory+"/OUTCAR.bands"+XHOST.vext.at(iext))) {
       found=TRUE;
-      aurostd::execute(vcat.at(iext)+" "+directory+"/OUTCAR.bands"+vext.at(iext)+" | grep E-fermi > "+file_tmp);
+      aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.bands"+XHOST.vext.at(iext)+" | grep E-fermi > "+file_tmp);
     }
   }
   if(!found) { cerr << "ERROR - AConvaspBandgap: OUTCAR.bands[.EXT] not found in the directory, aborting." << endl; exit(0); }
@@ -65,10 +63,10 @@ void AConvaspBandgap(vector<string>& argv) {
   
    // EIGENVAL.bands
   found=FALSE;
-  for(uint iext=0;iext<vext.size();iext++) {
-    if(!found && aurostd::FileExist(directory+"/EIGENVAL.bands"+vext.at(iext))) {
+  for(uint iext=0;iext<XHOST.vext.size();iext++) {
+    if(!found && aurostd::FileExist(directory+"/EIGENVAL.bands"+XHOST.vext.at(iext))) {
       found=TRUE;
-      aurostd::execute(vcat.at(iext)+" "+directory+"/EIGENVAL.bands"+vext.at(iext)+" > "+file_tmp);
+      aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > "+file_tmp);
     }
   }
   if(!found) { cerr << "ERROR - AConvaspBandgap: EIGENVAL.bands[.EXT] not found in the directory, aborting." << endl; exit(0); }
@@ -115,9 +113,7 @@ void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
   stringstream straus;
   bool found=FALSE;
 
-  deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-  deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-  if(vext.size()!=vcat.size()) { cerr << "ERROR - AConvaspBandgaps: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+  if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - AConvaspBandgaps: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
   
   while(bandsdir.good()) {
     bandsdir >> directory; //directory
@@ -129,10 +125,10 @@ void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
     
     // OUTCAR.bands
     found=FALSE;
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found && aurostd::FileExist(directory+"/OUTCAR.bands"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found && aurostd::FileExist(directory+"/OUTCAR.bands"+XHOST.vext.at(iext))) {
 	found=TRUE;
-	aurostd::execute(vcat.at(iext)+" "+directory+"/OUTCAR.bands"+vext.at(iext)+" | grep E-fermi > "+file_tmp);
+	aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.bands"+XHOST.vext.at(iext)+" | grep E-fermi > "+file_tmp);
       }
     }
     if(!found) { cerr << "ERROR - AConvaspBandgaps: OUTCAR.bands[.EXT] not found in the directory, aborting." << endl; exit(0); }
@@ -143,10 +139,10 @@ void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
     
     // EIGENVAL.bands
     found=FALSE;
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found && aurostd::FileExist(directory+"/EIGENVAL.bands"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found && aurostd::FileExist(directory+"/EIGENVAL.bands"+XHOST.vext.at(iext))) {
 	found=TRUE;
-	aurostd::execute(vcat.at(iext)+" "+directory+"/EIGENVAL.bands"+vext.at(iext)+" > "+file_tmp);
+	aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > "+file_tmp);
       }
     }
     if(!found) { cerr << "ERROR - AConvaspBandgap: EIGENVAL.bands[.EXT] not found in the directory, aborting." << endl; exit(0); }
@@ -859,9 +855,7 @@ namespace pflow {
       the MISSING lines mean that the structures are in LIB but not in RAW	
     */
     
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - pflow::ICSD_CheckRaw: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - pflow::ICSD_CheckRaw: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
     
     vector<string> LIBlist,RAWlist,LIBnotRAW,RAWnotLIB,LIBRAW;
     string stmp;
@@ -964,9 +958,9 @@ namespace pflow {
       if(!ifound) { cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "POSCAR.bands[.EXT], KPOINTS.bands[.EXT], DOSCAR.static[.EXT] in directory_LIB=" << directory_LIB << " do not exist " << endl; continue; }
     
       // 2. diff POSCAR.bands
-      for(uint iext=0;iext<vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/POSCAR.bands"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_LIB+"/POSCAR.bands"+vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/POSCAR.bands"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_RAW+"/POSCAR.bands"+vext.at(iext)+" > wRAW.tmp");
+      for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	if(aurostd::FileExist(directory_LIB+"/POSCAR.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/POSCAR.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
+    	if(aurostd::FileExist(directory_RAW+"/POSCAR.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/POSCAR.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
       iftmp.open("wDIFF.tmp");
@@ -976,9 +970,9 @@ namespace pflow {
       if(!ifound) { cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "POSCAR.bands" << endl;continue; }
 
       // 3. diff KPOINTS.bands
-      for(uint iext=0;iext<vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/KPOINTS.bands"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_LIB+"/KPOINTS.bands"+vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/KPOINTS.bands"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_RAW+"/KPOINTS.bands"+vext.at(iext)+" > wRAW.tmp");
+      for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	if(aurostd::FileExist(directory_LIB+"/KPOINTS.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/KPOINTS.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
+    	if(aurostd::FileExist(directory_RAW+"/KPOINTS.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/KPOINTS.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
      iftmp.open("wDIFF.tmp");
@@ -991,9 +985,9 @@ namespace pflow {
       }
       /*
       // 4. diff EIGENVAL.bands
-      for(uint iext=0;iext<vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/EIGENVAL.bands"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_LIB+"/EIGENVAL.bands"+vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_RAW+"/EIGENVAL.bands"+vext.at(iext)+" > wRAW.tmp");
+      for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	if(aurostd::FileExist(directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
+    	if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
       iftmp.open("wDIFF.tmp");
@@ -1007,9 +1001,9 @@ namespace pflow {
       */
 
       // 5. diff DOSCAR.static
-      for(uint iext=0;iext<vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/DOSCAR.static"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_LIB+"/DOSCAR.static"+vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/DOSCAR.static"+vext.at(iext))) aurostd::execute(vcat.at(iext)+" "+directory_RAW+"/DOSCAR.static"+vext.at(iext)+" > wRAW.tmp");
+      for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	if(aurostd::FileExist(directory_LIB+"/DOSCAR.static"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/DOSCAR.static"+XHOST.vext.at(iext)+" > wLIB.tmp");
+    	if(aurostd::FileExist(directory_RAW+"/DOSCAR.static"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/DOSCAR.static"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
 

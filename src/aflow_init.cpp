@@ -92,8 +92,16 @@ namespace init {
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);exit(1);}
 
     // IMMEDIATELY GET PIDS
-    XHOST.PID=getpid();XHOST.ostrPID.clear();XHOST.ostrPID.str(std::string());XHOST.ostrPID<<XHOST.PID;  // initialize PID ??
-    // if(INIT_VERBOSE) oss << aurostd::PaddedPOST("XHOST.ostrPID = ",depth_short) << XHOST.ostrPID.str() << endl;
+    XHOST.PID=getpid();    // PID number
+    XHOST.ostrPID.clear(); // PID as stringstream
+    XHOST.ostrPID.str(std::string()); // PID as stringstream
+    XHOST.ostrPID<<XHOST.PID;  // PID as stringstream
+    XHOST.sPID="";
+    XHOST.showPID=aurostd::args2flag(argv,cmds,"--showPID");
+    if(XHOST.showPID) XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // PID as a comment
+    //   XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // for the time being (LIB4)
+    aurostd::xerror_PID=XHOST.sPID;
+    
     // DO THREADS IMMEDIATELY
     // std::vector<pthread_t> _thread(MAX_ALLOCATABLE_PTHREADS);AFLOW_PTHREADS::vpthread=_thread;
     // std::vector<int>    _iret(MAX_ALLOCATABLE_PTHREADS);AFLOW_PTHREADS::viret=_iret;
@@ -272,13 +280,13 @@ namespace init {
     if(!found&&(XHOST.argv[0]=="aflow"||XHOST.argv[0]=="aflowd"||XHOST.argv[0]=="aconvasp"||XHOST.argv[0]=="apennsy")) {
       string aflow_data_command="aflow_data";
       //CO20180706 - note, IsCommandAvailableModify() simply overwrites aflow_data_command with true path from `which'
-      if(aurostd::IsCommandAvailableModify(aflow_data_command)){XHOST.vcmd.push_back(aflow_data_command);found=TRUE;}  //CO20180703
+      if(aurostd::IsCommandAvailableModify(aflow_data_command)) {XHOST.vcmd.push_back(aflow_data_command);found=TRUE;}  //CO20180703
     }
     if(!found&&(XHOST.argv[0]=="./aflow"||XHOST.argv[0]=="./aflowd"||XHOST.argv[0]=="./aconvasp"||XHOST.argv[0]=="./apennsy")) {
-      if(aurostd::FileExist("./aflow_data")){XHOST.vcmd.push_back("./aflow_data");found=TRUE;}
+      if(aurostd::FileExist("./aflow_data")) {XHOST.vcmd.push_back("./aflow_data");found=TRUE;}
     }
     if(!found&&(XHOST.argv[0]=="/usr/local/bin/aflow"||XHOST.argv[0]=="/usr/local/bin/aflowd"||XHOST.argv[0]=="/usr/local/bin/aconvasp"||XHOST.argv[0]=="/usr/local/bin/apennsy")) {
-      if(aurostd::FileExist("/usr/local/bin/aflow_data")){XHOST.vcmd.push_back("/usr/local/bin/aflow_data");found=TRUE;}
+      if(aurostd::FileExist("/usr/local/bin/aflow_data")) {XHOST.vcmd.push_back("/usr/local/bin/aflow_data");found=TRUE;}
     }
     //[OBSOLETE CO20180706]if(!found&&(XHOST.progname=="aflow"||XHOST.progname=="aflowd"||XHOST.progname=="aconvasp"||XHOST.progname=="apennsy")) {XHOST.vcmd.push_back("aflow_data");found=TRUE;}
     //[OBSOLETE CO20180706]if(!found&&(XHOST.progname=="./aflow"||XHOST.progname=="./aflowd"||XHOST.progname=="./aconvasp"||XHOST.progname=="./apennsy")) {XHOST.vcmd.push_back("./aflow_data");found=TRUE;}
@@ -354,7 +362,7 @@ namespace init {
     // TEMPERATURE
     XHOST.sensors_allowed=TRUE;
     if(0)  if(XHOST.is_command("sensors")) {
-      init::GetTEMPs();
+      init::GetTEMP();
       if(INIT_VERBOSE) oss << "XHOST.vTemperatureCore.size()=" << XHOST.vTemperatureCore.size() << endl;
       if(INIT_VERBOSE && XHOST.vTemperatureCore.size()) {
         oss << "--- TEMPERATURES --------------- " << endl;
@@ -600,11 +608,11 @@ namespace init {
     if(XHOST.vflag_control.flag("DIRECTORY")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"DIR\")=[" << XHOST.vflag_control.getattachedscheme("DIRECTORY") << "]" << endl; 
     //CO20190402 START - cleaning directory, giving us something to print with logger
     string directory_clean="";
-    if(XHOST.vflag_control.flag("DIRECTORY")){directory_clean=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
+    if(XHOST.vflag_control.flag("DIRECTORY")) {directory_clean=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
     aurostd::StringSubst(directory_clean,"//","/");  //clean
     directory_clean=aurostd::RemoveWhiteSpaces(directory_clean);
-    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::getPWD()+"/";}  //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
-    if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
+    if(directory_clean.empty() || directory_clean=="./" || directory_clean==".") {directory_clean=aurostd::getPWD()+"/";}  //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(!directory_clean.empty()) {XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
     //CO20190402 STOP - cleaning directory, giving us something to print with logger
 
@@ -815,14 +823,14 @@ namespace init {
 
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
-      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,32,48,52,64",vshort,",");
+      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
       for(uint ishort=0;ishort<vshort.size();ishort++) {
 	if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
 	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
 	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
 	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
 	  //	  if(INIT_VERBOSE)
-	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	  cerr << XHOST.sPID << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
 	}
       }
     }
@@ -836,12 +844,11 @@ namespace init {
 	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","16");
 	  XHOST.vflag_control.flag("FILE",TRUE);  // if found
 	  XHOST.vflag_control.push_attached("FILE","x.lib"+vshort.at(ishort));
-	  cerr << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
-	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	  cerr << XHOST.sPID << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
+	  cerr << XHOST.sPID << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
 	}
       }
     }
-
    
     //ME20181103 - set MPI when number of threads is larger than 1
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX") || 
@@ -858,7 +865,7 @@ namespace init {
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER") &&
         !(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="aflowlib.duke.edu" || XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="materials.duke.edu")) {
-      cerr << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
+      cerr << XHOST.sPID << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
       exit(0);
     }
     // LOAD options
@@ -873,7 +880,7 @@ namespace init {
     XHOST.AFLOW_MULTIflag=aurostd::args2flag(XHOST.argv,"--run=multi|-run=multi|--multi|-multi");	
     XHOST.AFLOW_RUNXflag=!XHOST.AFLOW_MULTIflag && (aurostd::args2attachedflag(XHOST.argv,"--run=") || aurostd::args2attachedflag(XHOST.argv,"-run="));
 
-    //   cerr << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
+    //   cerr << XHOST.sPID << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
 
     XHOST.AFLOW_RUNXnumber=0;
     XHOST.vflag_pflow.clear(); 
@@ -974,7 +981,7 @@ namespace init {
 namespace init {
   string InitLoadString(string str2load,bool LVERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
-    string soliloquy="init::InitLoadString:";
+    string soliloquy = XHOST.sPID + "init::InitLoadString:";
     if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
 
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again
@@ -1019,65 +1026,79 @@ namespace init {
       bool found=FALSE;
       aurostd::string2vectorstring(out,vout);
       for(uint i=0;i<vout.size();) {
-	aurl=vout.at(i);XHOST_vLIBS.at(0).push_back(vout.at(i++)); // AURL
-	auid=vout.at(i);XHOST_vLIBS.at(1).push_back(vout.at(i++)); // AUID
-	loop=vout.at(i);XHOST_vLIBS.at(2).push_back(vout.at(i++)); // LOOP
+	aurl=vout.at(i++);XHOST_vLIBS.at(0).push_back(aurl); // AURL
+	auid=vout.at(i++);XHOST_vLIBS.at(1).push_back(auid); // AUID
+	loop=vout.at(i++);XHOST_vLIBS.at(2).push_back(loop); // LOOP
 	aurostd::StringSubst(aurl,"aflowlib.duke.edu:","");
 	aurostd::StringSubst(aurl,"materials.duke.edu:","");
 	found=FALSE;
+	// do LIB3 first to accelerate
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB3")) { // XHOST_Library_CALCULATED_LIB3
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB3_RAW/","");
+	    XHOST_Library_CALCULATED_LIB3_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB3_RAW.push_back(aurl);
+	  }
+	// do LIB4 second to accelerate
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB4")) { // XHOST_Library_CALCULATED_LIB4
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB4_RAW/","");
+	    XHOST_Library_CALCULATED_LIB4_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB4_RAW.push_back(aurl);
+	  }
+	// do LIB2 third to accelerate
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB2")) { // XHOST_Library_CALCULATED_LIB2
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","");
+	    XHOST_Library_CALCULATED_LIB2_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB2_RAW.push_back(aurl);
+	  }
 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/ICSD")) { // XHOST_Library_CALCULATED_ICSD
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_RAW/","");
 	    aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_WEB/","");
 	    XHOST_Library_CALCULATED_ICSD_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_ICSD_RAW.push_back(aurl);
 	  }
  	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB0")) { // XHOST_Library_CALCULATED_LIB0
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB0_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB0_RAW/","");
 	    XHOST_Library_CALCULATED_LIB0_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB0_RAW.push_back(aurl);
 	  }
 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB1")) { // XHOST_Library_CALCULATED_LIB1
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB1_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB1_RAW/","");
 	    XHOST_Library_CALCULATED_LIB1_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB1_RAW.push_back(aurl);
 	  }
-	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB2")) { // XHOST_Library_CALCULATED_LIB2
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","");
-	    XHOST_Library_CALCULATED_LIB2_LIB.push_back(aurl);
-	    XHOST_Library_CALCULATED_LIB2_RAW.push_back(aurl);
-	  }
-	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB3")) { // XHOST_Library_CALCULATED_LIB3
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB3_RAW/","");
-	    XHOST_Library_CALCULATED_LIB3_LIB.push_back(aurl);
-	    XHOST_Library_CALCULATED_LIB3_RAW.push_back(aurl);
-	  }
-	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB4")) { // XHOST_Library_CALCULATED_LIB4
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB4_RAW/","");
-	    XHOST_Library_CALCULATED_LIB4_LIB.push_back(aurl);
-	    XHOST_Library_CALCULATED_LIB4_RAW.push_back(aurl);
-	  }
 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB5")) { // XHOST_Library_CALCULATED_LIB5
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB5_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB5_RAW/","");
 	    XHOST_Library_CALCULATED_LIB5_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB5_RAW.push_back(aurl);
 	  }
 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB6")) { // XHOST_Library_CALCULATED_LIB6
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB6_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB6_RAW/","");
 	    XHOST_Library_CALCULATED_LIB6_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB6_RAW.push_back(aurl);
 	  }
 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB7")) { // XHOST_Library_CALCULATED_LIB7
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB7_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB7_RAW/","");
 	    XHOST_Library_CALCULATED_LIB7_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB7_RAW.push_back(aurl);
 	  }
  	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB8")) { // XHOST_Library_CALCULATED_LIB8
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB8_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB8_RAW/","");
 	    XHOST_Library_CALCULATED_LIB8_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB8_RAW.push_back(aurl);
 	  }
 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB9")) { // XHOST_Library_CALCULATED_LIB9
-	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB9_RAW/","");
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB9_RAW/","");
 	    XHOST_Library_CALCULATED_LIB9_LIB.push_back(aurl);
 	    XHOST_Library_CALCULATED_LIB9_RAW.push_back(aurl);
 	  }
@@ -1350,7 +1371,7 @@ namespace init {
 namespace init {
   string AFLOW_Projects_Directories(string lib) {
     bool LDEBUG=FALSE;
-    if(LDEBUG){;} //CO20190906 - keep LDEBUG busy
+    if(LDEBUG) {;} //CO20190906 - keep LDEBUG busy
     string out="";
     if(lib=="AUID" || lib=="auid") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
     if(lib=="ICSD" || lib=="icsd") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
@@ -1383,13 +1404,13 @@ namespace init {
 } // namespace init
 
 // ***************************************************************************
-// uint init::GetTEMPs(void) // need sensors package
+// uint init::GetTEMP(void) // need sensors package
 // ***************************************************************************
 namespace init {
-  pthread_mutex_t mutex_INIT_GetTEMPs=PTHREAD_MUTEX_INITIALIZER;
-  uint GetTEMPs(void) {
-    pthread_mutex_lock(&mutex_INIT_GetTEMPs);
-    // pthread_mutex_unlock(&mutex_INIT_GetTEMPs);
+  pthread_mutex_t mutex_INIT_GetTEMP=PTHREAD_MUTEX_INITIALIZER;
+  uint GetTEMP(void) {
+    pthread_mutex_lock(&mutex_INIT_GetTEMP);
+    // pthread_mutex_unlock(&mutex_INIT_GetTEMP);
 
     // if(aurostd::execute2string("ps aux | grep sensors | grep -v sensorsd | grep -v grep")!="") LOCAL_is_sensor=FALSE; // must postpone
     XHOST.vTemperatureCore.clear();
@@ -1432,10 +1453,42 @@ namespace init {
         XHOST.vTemperatureCore.clear();
       }
     }
-    pthread_mutex_unlock(&mutex_INIT_GetTEMPs);
+    pthread_mutex_unlock(&mutex_INIT_GetTEMP);
     return XHOST.vTemperatureCore.size();
   }
 } // namespace init
+
+// ***************************************************************************
+// uint init::GetTEMP(void) // need sensors package
+// ***************************************************************************
+namespace init {
+  double WaitTEMP(double TRESHOLD,ostream& oss,bool LVERBOSE,vector<string> vmessage) {
+    bool _tmp_=XHOST.sensors_allowed;
+    XHOST.sensors_allowed=TRUE;
+    string message_PRE="",message_POST="";
+    
+    if(vmessage.size()>0) message_PRE=vmessage.at(0);
+    if(vmessage.size()>1) message_POST=vmessage.at(1);
+    
+    stringstream sss;
+    sss.setf(std::ios::fixed,std::ios::floatfield);
+    sss.precision(1);
+    
+    init::GetTEMP();
+    while (aurostd::max(XHOST.vTemperatureCore)>TRESHOLD) {
+      int sleep=20+aurostd::abs(100.0*(TRESHOLD-aurostd::max(XHOST.vTemperatureCore))*aurostd::ran0());
+      sss.clear();sss.str("");sss << aurostd::max(XHOST.vTemperatureCore) << " >  " << TRESHOLD;
+      if(LVERBOSE) { oss << message_PRE << "init::WaitTEMP: max(TEMP) " << sss.str() << "   ... waiting, sleeping secs = " << sleep << message_POST << endl;oss.flush();}
+      aurostd::execute("sleep "+aurostd::utype2string<int>(sleep));
+      init::GetTEMP();
+    }
+    sss.clear();sss.str("");sss << aurostd::max(XHOST.vTemperatureCore) << " <= " << TRESHOLD;
+    if(LVERBOSE) { oss << message_PRE << "init::WaitTEMP: max(TEMP) " << sss.str() << message_POST << endl;oss.flush();}
+    XHOST.sensors_allowed=_tmp_;
+    return aurostd::max(XHOST.vTemperatureCore);
+  }
+}
+
 
 // ***************************************************************************
 // AFLOW_getTEMP
@@ -1459,7 +1512,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
   if(LDEBUG) cerr << "AFLOW_getTEMP: warning_halt=" << warning_halt << "   -   AFLOW_CORE_TEMPERATURE_HALT=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
   if(WRITE!="") aurostd::RemoveFile(WRITE);
 
-  while(init::GetTEMPs()) {
+  while(init::GetTEMP()) {
     stringstream oss;
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
@@ -1608,15 +1661,15 @@ string aflow_get_time_string_short(void) {
   return date;
 }
 
-// ***************************************************************************
-// strPID
-// ***************************************************************************
-string strPID(void) {
-  int PID=getpid();
-  ostringstream oss;
-  oss << PID;
-  return (string) oss.str();
-}
+// [OBSOLETE] // ***************************************************************************
+// [OBSOLETE] // strPID
+// [OBSOLETE] // ***************************************************************************
+// [OBSOLETE] string strPID(void) {
+// [OBSOLETE]   int PID=getpid();
+// [OBSOLETE]   ostringstream oss;
+// [OBSOLETE]   oss << PID;
+// [OBSOLETE]   return (string) oss.str();
+// [OBSOLETE] }
 
 // ***************************************************************************
 // Messages
@@ -1655,7 +1708,7 @@ string Message(string list2print) {
   if(aurostd::substring2bool(list2print,"group") || aurostd::substring2bool(list2print,"GROUP")) oss << " - [group=" << XHOST.group << "]";
   if(aurostd::substring2bool(list2print,"host") || aurostd::substring2bool(list2print,"HOST")) oss << " - [host=" << XHOST.hostname << "]";
   if(aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME")) oss << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMPs()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"- [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
+  if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"- [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
   if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) oss << " - [host=" << XHOST.hostname << "]";
   if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
   if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";

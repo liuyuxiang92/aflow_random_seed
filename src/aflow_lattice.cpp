@@ -16,7 +16,7 @@
 // ***************************************************************************
 namespace LATTICE {
   bool lattice_is_working(string lat) {
-    if(lat.empty()){cerr << "LATTICE::lattice_is_working(): " << "ERROR: input lattice string is empty" << endl;exit(0);} //CO20180622
+    if(lat.empty()){cerr << XHOST.sPID << "LATTICE::lattice_is_working(): " << "ERROR: input lattice string is empty" << endl;exit(0);} //CO20180622
     if(lat=="CUB" || lat=="cP") return TRUE;
     if(lat=="BCC" || lat=="cI") return TRUE;
     if(lat=="FCC" || lat=="cF") return TRUE;
@@ -57,7 +57,7 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
-    string function_name = "LATTICE::lattice2typeAndCentering()";
+    string function_name = XHOST.sPID + "LATTICE::lattice2typeAndCentering()";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
@@ -158,7 +158,7 @@ namespace LATTICE {
     string lattice_type,lattice_system;
     for(uint sg=1;sg<=230;sg++) {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
-      if(lattice_type=="error") {cerr << "LATTICE::Lattice2SpaceGroup error" << endl; exit(0);}
+      if(lattice_type=="error") {cerr << XHOST.sPID << "LATTICE::Lattice2SpaceGroup error" << endl; exit(0);}
       if(lattice_type==lattice) vsgn.push_back(sg);
     }
     return vsgn.size();  // if zero, error
@@ -218,7 +218,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"TRI") || aurostd::substring2bool(lattice,"aP")) return lattice;
         else {
           return "TRI";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of TRI for sg "<<sg<<endl;
+          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of TRI for sg " << sg << endl;
         }
       }
       else return "TRI";
@@ -233,7 +233,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"MCLC") || aurostd::substring2bool(lattice,"mS")) return lattice;
         else {
           return "MCLC";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of MCLC for sg "<<sg<<endl;
+          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of MCLC for sg " << sg << endl;
         }
       }
       else return "MCLC";
@@ -252,7 +252,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"ORCF") || aurostd::substring2bool(lattice,"oF")) return lattice;
         else {
           return "ORCF";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of ORCF for sg "<<sg<<endl;
+          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of ORCF for sg " << sg << endl;
         }
       }
       else return "ORCF";
@@ -269,7 +269,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"BCT") || aurostd::substring2bool(lattice,"tI")) return lattice;
         else {
           return "BCT";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of BCT for sg "<<sg<<endl;
+          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of BCT for sg " << sg << endl;
         }
       }
       else return "BCT";
@@ -283,7 +283,7 @@ namespace LATTICE {
           if(aurostd::substring2bool(lattice,"RHL") || aurostd::substring2bool(lattice,"hR")) return lattice;
           else {
             return "RHL";
-            cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of RHL for sg "<<sg<<endl;
+            cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of RHL for sg " << sg << endl;
           }
         }
         else return "RHL";
@@ -340,7 +340,7 @@ namespace LATTICE {
       //However, this function needs lattice vectors to determine alpha,kgamma,testphi
       //and to return the proper variation, for now it will return "MCLC".
       return "MCLC";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in MCLCC" << endl;
+      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in MCLCC" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -349,7 +349,7 @@ namespace LATTICE {
     // 5. ORCC
     if(sg==20 || sg==21 || (sg>=35 && sg<=41) || (sg>=63 && sg<=68)) {
       return "ORCC";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCC" << endl;
+      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCC" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -360,7 +360,7 @@ namespace LATTICE {
       if(mismatch>1+eps/5.0) return "ORCF1";
       if(mismatch<1-eps/5.0) return "ORCF2";
       if(aurostd::isequal(mismatch,1.0,eps/5.0)) return "ORCF3";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCF" << endl;
+      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCF" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -374,7 +374,7 @@ namespace LATTICE {
       if(a<c)  return "BCT2";
       // test if a=b=c
       if(aurostd::isequal(a,b,eps) && aurostd::isequal(a,c,eps)) return "BCT2";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in BCT" << endl;
+      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in BCT" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -525,7 +525,7 @@ namespace LATTICE {
       return clattice;
     }
     else {
-      cerr<<"ERROR: lattice "<<lattice<<" not found in function LATTICE::sp2sc."<<endl; abort();
+      cerr << XHOST.sPID << "ERROR: lattice " << lattice << " not found in function LATTICE::sp2sc." << endl; abort();
     }
   }
 }
@@ -753,9 +753,9 @@ namespace LATTICE {
     str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
     //DX20190304 - moved above GetPrimitive - END
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     str_sp.GetPrimitive(0.005);
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 
     //DX20190304 - save transformation between orig and get prim (may have rotated) - START
@@ -773,7 +773,7 @@ namespace LATTICE {
     double str_sp_volume=str_sp.Volume();    // backups
     bool str_sp_neg_scale=str_sc.neg_scale;  // backups
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
     //[DX20190307 - moved up]str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
     //[DX20190307 - moved up]str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
@@ -819,7 +819,7 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
-      if(LDEBUG) { cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
+      if(LDEBUG) { cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       //pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
       string format="out";
       if(str_sp.pgroup_xtal_calculated==TRUE) { //DX20170814 - Speed increase, if already calculated just look use look-up table
@@ -854,7 +854,7 @@ namespace LATTICE {
 
     eps = str_sp.sym_eps;
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
     xvector<int> dims(3);    // to scan
     dims=LatticeDimensionSphere(str_sp.lattice,RadiusSphereLattice(str_sp.lattice)/1.0);
@@ -882,10 +882,10 @@ namespace LATTICE {
     //DX [OBSOLETE] - nndist is not used anywhere      if(modulus(aus)>eps && modulus(aus)<=nndist) nndist=modulus(aus);
     //DX [OBSOLETE] - nndist is not used anywhere    }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
 
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
 
     if(LDEBUG) {
       cerr << "str_sp.atoms.size()=" << str_sp.atoms.size() << endl;
@@ -973,10 +973,10 @@ namespace LATTICE {
     //  bool VERBOSE_PROGRESS=TRUE;
     // try different solutions
     for (uint choice=0;choice<=2&&!found;choice++) {
-      if(VERBOSE_PROGRESS) if(choice==0) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
-      if(VERBOSE_PROGRESS) if(choice==1) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
-      if(VERBOSE_PROGRESS) if(choice==2) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
-      if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
+      if(VERBOSE_PROGRESS) if(choice==0) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
+      if(VERBOSE_PROGRESS) if(choice==1) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
+      if(VERBOSE_PROGRESS) if(choice==2) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
+      if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
 
       // ***************************************************************************************************
       // CUBIC CRYSTAL SYSTEM
@@ -1906,7 +1906,7 @@ namespace LATTICE {
     }
     // DONE
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -1940,7 +1940,7 @@ namespace LATTICE {
          }
          */
     }
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
 
     if(found==TRUE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -2001,7 +2001,7 @@ namespace LATTICE {
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
     /* STEFANO OLD VERSION
@@ -2074,7 +2074,7 @@ namespace LATTICE {
     //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //SC OLD VERSION
   { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
     //  LDEBUG=TRUE;
     // starting from a str_in (whatever lattices) this routine returns a standard primitive (str_sp)
@@ -2082,20 +2082,20 @@ namespace LATTICE {
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     str_sp.GetPrimitive(0.005);
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 
     double str_sp_volume=str_sp.Volume();    // backups
     bool str_sp_neg_scale=str_sc.neg_scale;  // backups
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
     str_sp.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sp.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
     //   if(aurostd::isequal(str_sp.a,str_sp.b,eps) && aurostd::isequal(str_sp.b,str_sp.c,eps) && aurostd::isequal(str_sp.c,str_sp.a,eps)) {
-    //     cerr << "LATTICE::Standard_Lattice_Structure: skipping str_sp.MinkowskiBasisReduction()" << endl;
+    //     cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: skipping str_sp.MinkowskiBasisReduction()" << endl;
     //   } else
     {str_sp.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
 
@@ -2104,12 +2104,12 @@ namespace LATTICE {
     str_sc.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sc.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
     //   if(aurostd::isequal(str_sc.a,str_sc.b,eps) && aurostd::isequal(str_sc.b,str_sc.c,eps) && aurostd::isequal(str_sc.c,str_sc.a,eps)) {
-    //     cerr << "LATTICE::Standard_Lattice_Structure: skipping str_sc.MinkowskiBasisReduction()" << endl;
+    //     cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: skipping str_sc.MinkowskiBasisReduction()" << endl;
     //   } else
     {str_sc.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
     str_sc.ClearSymmetry();
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
     xvector<int> dims(3);    // to scan
     dims=LatticeDimensionSphere(str_sp.lattice,RadiusSphereLattice(str_sp.lattice)/1.0);
@@ -2134,7 +2134,7 @@ namespace LATTICE {
           if(modulus(aus)>eps && modulus(aus)<=nndist) nndist=modulus(aus);
         }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
 
     string crystal_system="none";
     bool lattice_found=FALSE;
@@ -2159,7 +2159,7 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
-      if(LDEBUG) { cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
+      if(LDEBUG) { cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
     }
 
@@ -2173,12 +2173,12 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
-    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
+    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
     }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
     //  cerr << "[2]" << endl;
     if(str_sp.fgroup_calculated==FALSE) {
     //  cerr << "str_sp.fgroup_calculated" << endl;
@@ -2186,15 +2186,15 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
-    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
-    //DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
+    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
+    // DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
     }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
     //  cerr << "[3]" << endl;
     if(str_sp.pgroup_xtal_calculated==FALSE) {
     //  cerr << "str_sp.pgroup_xtal_calculated" << endl;
@@ -2203,19 +2203,19 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
-    //DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
-    //DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
-    //DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
+    // DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
+    // DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
+    // DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
     }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
     //  cerr << "[4]" << endl;
     */ //OLD (DX)
     //DX END
@@ -2249,7 +2249,7 @@ namespace LATTICE {
     }
     */
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
 
     if(LDEBUG) {
       cerr << "str_sp.atoms.size()=" << str_sp.atoms.size() << endl;
@@ -2357,10 +2357,10 @@ namespace LATTICE {
     //  bool VERBOSE_PROGRESS=TRUE;
     // try different solutions
     for (uint choice=0;choice<=2&&!found;choice++) {
-      if(VERBOSE_PROGRESS) if(choice==0) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
-      if(VERBOSE_PROGRESS) if(choice==1) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
-      if(VERBOSE_PROGRESS) if(choice==2) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
-      if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
+      if(VERBOSE_PROGRESS) if(choice==0) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
+      if(VERBOSE_PROGRESS) if(choice==1) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
+      if(VERBOSE_PROGRESS) if(choice==2) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
+      if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
 
       // ***************************************************************************************************
       // CUBIC CRYSTAL SYSTEM
@@ -3088,7 +3088,7 @@ namespace LATTICE {
     }
     // DONE
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -3118,7 +3118,7 @@ namespace LATTICE {
       }
     }
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
 
     if(found==TRUE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -3170,7 +3170,7 @@ namespace LATTICE {
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
     //SC OLD VERSION
@@ -3203,8 +3203,8 @@ void CheckLatticeHistogram(xstructure& a) {
   tolerance=PointGroupHistogramCheck(str_in);
   for(uint i=0;i<tolerance.size();i++) {
     LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,ss,tolerance.at(i),true);
-    cout<<"TOLERANCE: "<<tolerance.at(i);
-    cout<<"  LATTICETYPE: "<<str_sp.bravais_lattice_type<<endl;
+    cout << "TOLERANCE: " << tolerance.at(i);
+    cout << "  LATTICETYPE: " << str_sp.bravais_lattice_type << endl;
   }
 }
 
@@ -3292,9 +3292,9 @@ namespace LATTICE {
         same_eps = true; //force single while loop, no check
       }
       if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym)){
-        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} // DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
-          cerr << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
+          cerr << XHOST.sPID << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
           ignore_checks = true;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
@@ -3313,20 +3313,20 @@ namespace LATTICE {
       _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
       _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
-      //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-      //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-      //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
-      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
-      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
-      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
-      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
-      //DX20170814 END
-      //DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
-      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) //DX20180226 - do not need to do full sym on lattice
-      { //CO20200106 - patching for auto-indenting
-        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
+      // DX20170814 - START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+      // DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+      // DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
+      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
+      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
+      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
+      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
+      // DX20170814 - END
+      // DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
+      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) // DX20180226 - do not need to do full sym on lattice
+      { //CO200106 - patching for auto-indenting
+        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} // DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
-          cerr << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
+          cerr << XHOST.sPID << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
         str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
@@ -3502,7 +3502,7 @@ xvector<double> Vrotate(xvector<double> V, xvector<double> Vaxis, double zzeta) 
 }
 
 // ***************************************************************************
-// lattice::BZPLOTDATA
+// LATTICE::BZPLOTDATA
 // ***************************************************************************
 namespace LATTICE {
   void BZPLOTDATA(string options,istream& poscar, int mode) {
@@ -3533,28 +3533,28 @@ namespace LATTICE {
     //analogous to --bzplotdatauseKPOINTS but for --bzplot.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: BEGIN" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
 
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: options=" << options << endl;
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: mode=" << mode << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: options=" << options << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: mode=" << mode << endl;
 
     if(mode==0 && tokens.size()!=0) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
       exit(0);
     }
     if(mode==10 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplotdatauseKPOINTS=KPOINTS < POSCAR > plotbz.dat");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdatauseKPOINTS=KPOINTS < POSCAR > plotbz.dat");
       exit(0);
     }
     if(mode==1 && tokens.size()!=0) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplot < POSCAR");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplot < POSCAR");
       exit(0);
     }
     if(mode==11 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplotuseKPOINTS=KPOINTS < POSCAR");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotuseKPOINTS=KPOINTS < POSCAR");
       exit(0);
     }
 
@@ -3562,7 +3562,7 @@ namespace LATTICE {
     if(mode==10) filename=tokens.at(0);
     if(mode==11) filename=tokens.at(0);
 
-#define bzsetf std::setw(8)<<std::fixed<<setprecision(4)
+#define bzsetf std::setw(8) << std::fixed << setprecision(4)
 
     bool found=false;
     int i,j;
@@ -3577,7 +3577,7 @@ namespace LATTICE {
       if(aurostd::FileExist(filename)) {
         aurostd::efile2vectorstring(filename,tokens);
       } else {
-        cerr<<"ERROR: lattice::BZPLOTDATA: "<<filename<<" can not be opened. aborted.";abort();
+        cerr << XHOST.sPID << "ERROR: LATTICE::BZPLOTDATA: " << filename << " can not be opened. aborted.";abort();
       }
       if(tokens.size()>0) str_sp.bravais_lattice_variation_type=tokens.at(0);
       aurostd::string2tokens(string(tokens.at(0)),tokens," ");
@@ -3587,7 +3587,8 @@ namespace LATTICE {
           str_sp.bravais_lattice_variation_type=tokens.at(1);
       }
     }
-    cerr << "LATTICE TYPE="<<str_sp.bravais_lattice_variation_type<<endl;
+    //    cout << XHOST.sPID << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
+    cerr << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
     xvector<double> data(6),a1(3),a2(3),a3(3),b1(3),b2(3),b3(3),pL(3),
       pLaxis(3),pz(3),ptmp(3),tmpb1(3),tmpb2(3),tmpb3(3);
     xmatrix<double> klattice(3,3);
@@ -6111,341 +6112,341 @@ namespace LATTICE {
 
     //output
     if(mode==0) {
-      cout<<glatt<<endl
-        <<gpath<<endl
-        <<bzsetf<<xrotview<<" "<<bzsetf<<zrotview<<"  xrot and zrot view in degrees (gnuplot)"<<endl
-        <<bzsetf<<azview<<" "<<bzsetf<<elview<<"  azimuth and elevation view in degrees (matlab)"<<endl
-        <<bzsetf<<b1arrow<<" "<<bzsetf<<b2arrow<<" "<<bzsetf<<b3arrow
-        <<"  lenght of recip. vec. arrow in fractions of recip vec norm"<<endl
-        <<bzsetf<<b1text<<" "<<bzsetf<<b2text<<" "<<bzsetf<<b3text
-        <<"  arrow label position in fractions of recip. vec. norm"<<endl
-        <<"Reciprocal lattice vectors:"<<endl
-        <<klattice<<endl;
-      cout<<Nirbz<<" #kpoints in kpath (cartesian coordinates)"<<endl;
+      cout << glatt << endl
+         << gpath << endl
+         << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
+         << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
+         << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
+         << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
+         << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
+         << "  arrow label position in fractions of recip. vec. norm" << endl
+         << "Reciprocal lattice vectors:" << endl
+         << klattice << endl;
+      cout << Nirbz << " #kpoints in kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        cout<<bzsetf<<cirbz(i,1)<<" "
-          <<bzsetf<<cirbz(i,2)<<" "
-          <<bzsetf<<cirbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        cout << bzsetf << cirbz(i,1) << " "
+          << bzsetf << cirbz(i,2) << " "
+          << bzsetf << cirbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      cout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z."<<endl;
-      cout<<Nircon<<" #segments for kpath (cartesian coordinates)"<<endl;
+      cout << "Each line represents a line segment p1 to p2, " << endl
+         << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
+      cout << Nircon << " #segments for kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        cout<<bzsetf<<cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),3)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3)<<endl;
+        cout << bzsetf << cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(1,i),3) << " "
+          << bzsetf << cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3) << endl;
       }
-      cout<<Nirconback<<" #segments for irbz non kpath (cartesian coordinates)"<<endl;
+      cout << Nirconback << " #segments for irbz non kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        cout<<bzsetf<<cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),3)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3)<<endl;
+        cout << bzsetf << cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(1,i),3) << " "
+          << bzsetf << cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3) << endl;
       }
-      cout<<Ncon<<" #segments for front bz (cartesian coordinates)"<<endl;
+      cout << Ncon << " #segments for front bz (cartesian coordinates)" << endl;
       for(i=1;i<Ncon+1;i++) {
-        cout<<bzsetf<<cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(1,i),3)<<" "
-          <<bzsetf<<cbz(con(2,i),1)-cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(2,i),2)-cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(2,i),3)-cbz(con(1,i),3)<<endl;
+        cout << bzsetf << cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(1,i),3) << " "
+          << bzsetf << cbz(con(2,i),1)-cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(2,i),2)-cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(2,i),3)-cbz(con(1,i),3) << endl;
       }
-      cout<<Nconback<<" #segments for back bz (cartesian coordinates)"<<endl;
+      cout << Nconback << " #segments for back bz (cartesian coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        cout<<bzsetf<<cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(1,i),3)<<" "
-          <<bzsetf<<cbz(conback(2,i),1)-cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(2,i),2)-cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(2,i),3)-cbz(conback(1,i),3)<<endl;
+        cout << bzsetf << cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(1,i),3) << " "
+          << bzsetf << cbz(conback(2,i),1)-cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(2,i),2)-cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(2,i),3)-cbz(conback(1,i),3) << endl;
       }
-      cout<<Nirbz<<" #kpoints in kpath (fractional coordinates)"<<endl;
+      cout << Nirbz << " #kpoints in kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        cout<<bzsetf<<irbz(i,1)<<" "
-          <<bzsetf<<irbz(i,2)<<" "
-          <<bzsetf<<irbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        cout << bzsetf << irbz(i,1) << " "
+          << bzsetf << irbz(i,2) << " "
+          << bzsetf << irbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      cout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)."<<endl;
-      cout<<Nircon<<" #segments for kpath (fractional coordinates)"<<endl;
+      cout << "Each line represents a line segment p1 to p2, " << endl
+         << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
+      cout << Nircon << " #segments for kpath (fractional coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        cout<<bzsetf<<irbz(ircon(1,i),1)<<" "
-          <<bzsetf<<irbz(ircon(1,i),2)<<" "
-          <<bzsetf<<irbz(ircon(1,i),3)<<"  to "
-          <<bzsetf<<irbz(ircon(2,i),1)<<" "
-          <<bzsetf<<irbz(ircon(2,i),2)<<" "
-          <<bzsetf<<irbz(ircon(2,i),3)<<endl;
+        cout << bzsetf << irbz(ircon(1,i),1) << " "
+          << bzsetf << irbz(ircon(1,i),2) << " "
+          << bzsetf << irbz(ircon(1,i),3) << "  to "
+          << bzsetf << irbz(ircon(2,i),1) << " "
+          << bzsetf << irbz(ircon(2,i),2) << " "
+          << bzsetf << irbz(ircon(2,i),3) << endl;
       }
-      cout<<Nirconback<<" #segments for irbz non kpath (fractional coordinates)"<<endl;
+      cout << Nirconback << " #segments for irbz non kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        cout<<bzsetf<<irbz(irconback(1,i),1)<<" "
-          <<bzsetf<<irbz(irconback(1,i),2)<<" "
-          <<bzsetf<<irbz(irconback(1,i),3)<<"  to "
-          <<bzsetf<<irbz(irconback(2,i),1)<<" "
-          <<bzsetf<<irbz(irconback(2,i),2)<<" "
-          <<bzsetf<<irbz(irconback(2,i),3)<<endl;
+        cout << bzsetf << irbz(irconback(1,i),1) << " "
+          << bzsetf << irbz(irconback(1,i),2) << " "
+          << bzsetf << irbz(irconback(1,i),3) << "  to "
+          << bzsetf << irbz(irconback(2,i),1) << " "
+          << bzsetf << irbz(irconback(2,i),2) << " "
+          << bzsetf << irbz(irconback(2,i),3) << endl;
       }
-      cout<<Ncon<<" #segments for front bz"<<endl;
+      cout << Ncon << " #segments for front bz" << endl;
       for(i=1;i<Ncon+1;i++) {
-        cout<<bzsetf<<bz(con(1,i),1)<<" "
-          <<bzsetf<<bz(con(1,i),2)<<" "
-          <<bzsetf<<bz(con(1,i),3)<<"  to "
-          <<bzsetf<<bz(con(2,i),1)<<" "
-          <<bzsetf<<bz(con(2,i),2)<<" "
-          <<bzsetf<<bz(con(2,i),3)<<endl;
+        cout << bzsetf << bz(con(1,i),1) << " "
+          << bzsetf << bz(con(1,i),2) << " "
+          << bzsetf << bz(con(1,i),3) << "  to "
+          << bzsetf << bz(con(2,i),1) << " "
+          << bzsetf << bz(con(2,i),2) << " "
+          << bzsetf << bz(con(2,i),3) << endl;
       }
-      cout<<Nconback<<" #segments for back bz (fractional coordinates)"<<endl;
+      cout << Nconback << " #segments for back bz (fractional coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        cout<<bzsetf<<bz(conback(1,i),1)<<" "
-          <<bzsetf<<bz(conback(1,i),2)<<" "
-          <<bzsetf<<bz(conback(1,i),3)<<"  to "
-          <<bzsetf<<bz(conback(2,i),1)<<" "
-          <<bzsetf<<bz(conback(2,i),2)<<" "
-          <<bzsetf<<bz(conback(2,i),3)<<endl;
+        cout << bzsetf << bz(conback(1,i),1) << " "
+          << bzsetf << bz(conback(1,i),2) << " "
+          << bzsetf << bz(conback(1,i),3) << "  to "
+          << bzsetf << bz(conback(2,i),1) << " "
+          << bzsetf << bz(conback(2,i),2) << " "
+          << bzsetf << bz(conback(2,i),3) << endl;
       }
     }
     if(mode==1) {
       ofstream fout;
       fout.open("bzplot.dat");
-      cerr<<"Generating plotbz.dat file"<<endl;
-      fout<<glatt<<endl
-        <<gpath<<endl
-        <<bzsetf<<xrotview<<" "<<bzsetf<<zrotview<<"  xrot and zrot view in degrees (gnuplot)"<<endl
-        <<bzsetf<<azview<<" "<<bzsetf<<elview<<"  azimuth and elevation view in degrees (matlab)"<<endl
-        <<bzsetf<<b1arrow<<" "<<bzsetf<<b2arrow<<" "<<bzsetf<<b3arrow
-        <<"  lenght of recip. vec. arrow in fractions of recip vec norm"<<endl
-        <<bzsetf<<b1text<<" "<<bzsetf<<b2text<<" "<<bzsetf<<b3text
-        <<"  arrow label position in fractions of recip. vec. norm"<<endl
-        <<"Reciprocal lattice vectors:"<<endl
-        <<klattice<<endl;
-      fout<<Nirbz<<" #kpoints in kpath (cartesian coordinates)"<<endl;
+      cerr << "Generating plotbz.dat file" << endl;
+      fout << glatt << endl
+         << gpath << endl
+         << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
+         << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
+         << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
+         << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
+         << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
+         << "  arrow label position in fractions of recip. vec. norm" << endl
+         << "Reciprocal lattice vectors:" << endl
+         << klattice << endl;
+      fout << Nirbz << " #kpoints in kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        fout<<bzsetf<<cirbz(i,1)<<" "
-          <<bzsetf<<cirbz(i,2)<<" "
-          <<bzsetf<<cirbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        fout << bzsetf << cirbz(i,1) << " "
+          << bzsetf << cirbz(i,2) << " "
+          << bzsetf << cirbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      fout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z."<<endl;
-      fout<<Nircon<<" #segments for kpath (cartesian coordinates)"<<endl;
+      fout << "Each line represents a line segment p1 to p2, " << endl
+         << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
+      fout << Nircon << " #segments for kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        fout<<bzsetf<<cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),3)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3)<<endl;
+        fout << bzsetf << cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(1,i),3) << " "
+          << bzsetf << cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3) << endl;
       }
-      fout<<Nirconback<<" #segments for irbz non kpath (cartesian coordinates)"<<endl;
+      fout << Nirconback << " #segments for irbz non kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        fout<<bzsetf<<cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),3)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3)<<endl;
+        fout << bzsetf << cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(1,i),3) << " "
+          << bzsetf << cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3) << endl;
       }
-      fout<<Ncon<<" #segments for front bz (cartesian coordinates)"<<endl;
+      fout << Ncon << " #segments for front bz (cartesian coordinates)" << endl;
       for(i=1;i<Ncon+1;i++) {
-        fout<<bzsetf<<cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(1,i),3)<<" "
-          <<bzsetf<<cbz(con(2,i),1)-cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(2,i),2)-cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(2,i),3)-cbz(con(1,i),3)<<endl;
+        fout << bzsetf << cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(1,i),3) << " "
+          << bzsetf << cbz(con(2,i),1)-cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(2,i),2)-cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(2,i),3)-cbz(con(1,i),3) << endl;
       }
-      fout<<Nconback<<" #segments for back bz (cartesian coordinates)"<<endl;
+      fout << Nconback << " #segments for back bz (cartesian coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        fout<<bzsetf<<cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(1,i),3)<<" "
-          <<bzsetf<<cbz(conback(2,i),1)-cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(2,i),2)-cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(2,i),3)-cbz(conback(1,i),3)<<endl;
+        fout << bzsetf << cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(1,i),3) << " "
+          << bzsetf << cbz(conback(2,i),1)-cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(2,i),2)-cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(2,i),3)-cbz(conback(1,i),3) << endl;
       }
-      fout<<Nirbz<<" #kpoints in kpath (fractional coordinates)"<<endl;
+      fout << Nirbz << " #kpoints in kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        fout<<bzsetf<<irbz(i,1)<<" "
-          <<bzsetf<<irbz(i,2)<<" "
-          <<bzsetf<<irbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        fout << bzsetf << irbz(i,1) << " "
+          << bzsetf << irbz(i,2) << " "
+          << bzsetf << irbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      fout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)."<<endl;
-      fout<<Nircon<<" #segments for kpath (fractional coordinates)"<<endl;
+      fout << "Each line represents a line segment p1 to p2, " << endl
+         << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
+      fout << Nircon << " #segments for kpath (fractional coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        fout<<bzsetf<<irbz(ircon(1,i),1)<<" "
-          <<bzsetf<<irbz(ircon(1,i),2)<<" "
-          <<bzsetf<<irbz(ircon(1,i),3)<<"  to "
-          <<bzsetf<<irbz(ircon(2,i),1)<<" "
-          <<bzsetf<<irbz(ircon(2,i),2)<<" "
-          <<bzsetf<<irbz(ircon(2,i),3)<<endl;
+        fout << bzsetf << irbz(ircon(1,i),1) << " "
+          << bzsetf << irbz(ircon(1,i),2) << " "
+          << bzsetf << irbz(ircon(1,i),3) << "  to "
+          << bzsetf << irbz(ircon(2,i),1) << " "
+          << bzsetf << irbz(ircon(2,i),2) << " "
+          << bzsetf << irbz(ircon(2,i),3) << endl;
       }
-      fout<<Nirconback<<" #segments for irbz non kpath (fractional coordinates)"<<endl;
+      fout << Nirconback << " #segments for irbz non kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        fout<<bzsetf<<irbz(irconback(1,i),1)<<" "
-          <<bzsetf<<irbz(irconback(1,i),2)<<" "
-          <<bzsetf<<irbz(irconback(1,i),3)<<"  to "
-          <<bzsetf<<irbz(irconback(2,i),1)<<" "
-          <<bzsetf<<irbz(irconback(2,i),2)<<" "
-          <<bzsetf<<irbz(irconback(2,i),3)<<endl;
+        fout << bzsetf << irbz(irconback(1,i),1) << " "
+          << bzsetf << irbz(irconback(1,i),2) << " "
+          << bzsetf << irbz(irconback(1,i),3) << "  to "
+          << bzsetf << irbz(irconback(2,i),1) << " "
+          << bzsetf << irbz(irconback(2,i),2) << " "
+          << bzsetf << irbz(irconback(2,i),3) << endl;
       }
-      fout<<Ncon<<" #segments for front bz"<<endl;
+      fout << Ncon << " #segments for front bz" << endl;
       for(i=1;i<Ncon+1;i++) {
-        fout<<bzsetf<<bz(con(1,i),1)<<" "
-          <<bzsetf<<bz(con(1,i),2)<<" "
-          <<bzsetf<<bz(con(1,i),3)<<"  to "
-          <<bzsetf<<bz(con(2,i),1)<<" "
-          <<bzsetf<<bz(con(2,i),2)<<" "
-          <<bzsetf<<bz(con(2,i),3)<<endl;
+        fout << bzsetf << bz(con(1,i),1) << " "
+          << bzsetf << bz(con(1,i),2) << " "
+          << bzsetf << bz(con(1,i),3) << "  to "
+          << bzsetf << bz(con(2,i),1) << " "
+          << bzsetf << bz(con(2,i),2) << " "
+          << bzsetf << bz(con(2,i),3) << endl;
       }
-      fout<<Nconback<<" #segments for back bz (fractional coordinates)"<<endl;
+      fout << Nconback << " #segments for back bz (fractional coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        fout<<bzsetf<<bz(conback(1,i),1)<<" "
-          <<bzsetf<<bz(conback(1,i),2)<<" "
-          <<bzsetf<<bz(conback(1,i),3)<<"  to "
-          <<bzsetf<<bz(conback(2,i),1)<<" "
-          <<bzsetf<<bz(conback(2,i),2)<<" "
-          <<bzsetf<<bz(conback(2,i),3)<<endl;
+        fout << bzsetf << bz(conback(1,i),1) << " "
+          << bzsetf << bz(conback(1,i),2) << " "
+          << bzsetf << bz(conback(1,i),3) << "  to "
+          << bzsetf << bz(conback(2,i),1) << " "
+          << bzsetf << bz(conback(2,i),2) << " "
+          << bzsetf << bz(conback(2,i),3) << endl;
       }
       fout.close();
 
       fout.open("plotbz.sh");
-      cerr<<"Generating gnuplot script plotbz.sh"<<endl;
+      cerr << "Generating gnuplot script plotbz.sh" << endl;
 
-      fout<<"#!/bin/ksh"<<endl
-        <<"# A script to plot brillouin zone and kpath."<<endl
-        <<"# It needs aflow with --bzplotdata option"<<endl
-        <<"# input files: bzplot.dat"<<endl
-        <<"# output files: bzplot.eps bzplot.png"<<endl
-        <<"#"<<endl<<"# written: 2010 wahyu@alumni.duke.edu"<<endl<<endl
-        <<"datfile=bzplot.dat"<<endl
-        <<"recipfile=recip.dat #reciprocal vectors"<<endl
-        <<"kptsfile=kpts.dat #kpts"<<endl
-        <<"kpathfile=kpath.dat #kpath"<<endl
-        <<"nonkpathfile=nonkpath.dat #irbz non kpath"<<endl
-        <<"fbzfile=fbz.dat #front bz"<<endl
-        <<"bbzfile=bbz.dat #back bz"<<endl<<endl
-        <<"#-----reading datfile-----"<<endl
-        <<"#---reciprocal lattice vectors b1 b2 b3---"<<endl
-        <<"exec 0< $datfile"<<endl
-        <<"$IFS read glatt"<<endl
-        <<"$IFS read gpath"<<endl
-        <<"$IFS read xrotview zrotview srest"<<endl
-        <<"read srest"<<endl
-        <<"$IFS read Lb1 Lb2 Lb3 srest"<<endl
-        <<"$IFS read Tb1 Tb2 Tb3 srest"<<endl
-        <<"read srest"<<endl
-        <<"$IFS read b11 b12 b13"<<endl
-        <<"$IFS read b21 b22 b23"<<endl
-        <<"$IFS read b31 b32 b33"<<endl
-        <<"((hb11=b11/2.0)); ((hb12=b12/2.0)); ((hb13=b13/2.0)); "<<endl
-        <<"((hb21=b21/2.0)); ((hb22=b22/2.0)); ((hb23=b23/2.0)); "<<endl
-        <<"((hb31=b31/2.0)); ((hb32=b32/2.0)); ((hb33=b33/2.0)); "<<endl
-        <<"#--length of b1 b2 b3 arrows--"<<endl
-        <<"((db11=b11*Lb1)); ((db12=b12*Lb1)); ((db13=b13*Lb1)); "<<endl
-        <<"((db21=b21*Lb2)); ((db22=b22*Lb2)); ((db23=b23*Lb2)); "<<endl
-        <<"((db31=b31*Lb3)); ((db32=b32*Lb3)); ((db33=b33*Lb3)); "<<endl
-        <<"echo $hb11 $hb12 $hb13 $db11 $db12 $db13 > $recipfile"<<endl
-        <<"echo $hb21 $hb22 $hb23 $db21 $db22 $db23 >> $recipfile"<<endl
-        <<"echo $hb31 $hb32 $hb33 $db31 $db32 $db33 >> $recipfile"<<endl
-        <<"((tb11=hb11+b11*Tb1)); ((tb12=hb12+b12*Tb1)); ((tb13=hb13+b13*Tb1));"<<endl
-        <<"((tb21=hb21+b21*Tb2)); ((tb22=hb22+b22*Tb2)); ((tb23=hb23+b23*Tb2));"<<endl
-        <<"((tb31=hb31+b31*Tb3)); ((tb32=hb32+b32*Tb3)); ((tb33=hb33+b33*Tb3));"<<endl
-        <<""<<endl
-        <<"#---kpts---"<<endl
-        <<"$IFS read Nkpts srest"<<endl
-        <<"rm -f $kptsfile"<<endl
-        <<"for ((i=0;i<Nkpts;i++))"<<endl
-        <<"do"<<endl
-        <<"  read kptsx[$i] kptsy[$i] kptsz[$i] klab[$i]"<<endl
-        <<"  echo ${kptsx[$i]} ${kptsy[$i]} ${kptsz[$i]} ${klab[$i]} >> $kptsfile"<<endl
-        <<"done"<<endl
-        <<""<<endl
-        <<"#---kpath---"<<endl
-        <<"read srest"<<endl
-        <<"read srest"<<endl
-        <<"$IFS read N srest"<<endl
-        <<"rm -f $kpathfile"<<endl
-        <<"for ((i=0;i<N;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $kpathfile"<<endl
-        <<"done"<<endl
-        <<"#---irbz non kpath---"<<endl
-        <<"$IFS read Nnonkpath srest"<<endl
-        <<"rm -f $nonkpathfile"<<endl
-        <<"for ((i=0;i<Nnonkpath;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $nonkpathfile"<<endl
-        <<"done"<<endl
-        <<"#---front bz---"<<endl
-        <<"$IFS read N srest"<<endl
-        <<"rm -f $fbzfile"<<endl
-        <<"for ((i=0;i<N;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $fbzfile"<<endl
-        <<"done"<<endl
-        <<"#---back bz---"<<endl
-        <<"$IFS read N srest"<<endl
-        <<"rm -f $bbzfile"<<endl
-        <<"for ((i=0;i<N;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $bbzfile"<<endl
-        <<"done"<<endl
-        <<""<<endl;
+      fout << "#!/bin/ksh" << endl
+         << "# A script to plot brillouin zone and kpath." << endl
+         << "# It needs aflow with --bzplotdata option" << endl
+         << "# input files: bzplot.dat" << endl
+         << "# output files: bzplot.eps bzplot.png" << endl
+         << "#" << endl << "# written: 2010 wahyu@alumni.duke.edu" << endl << endl
+         << "datfile=bzplot.dat" << endl
+         << "recipfile=recip.dat #reciprocal vectors" << endl
+         << "kptsfile=kpts.dat #kpts" << endl
+         << "kpathfile=kpath.dat #kpath" << endl
+         << "nonkpathfile=nonkpath.dat #irbz non kpath" << endl
+         << "fbzfile=fbz.dat #front bz" << endl
+         << "bbzfile=bbz.dat #back bz" << endl << endl
+         << "#-----reading datfile-----" << endl
+         << "#---reciprocal lattice vectors b1 b2 b3---" << endl
+         << "exec 0< $datfile" << endl
+         << "$IFS read glatt" << endl
+         << "$IFS read gpath" << endl
+         << "$IFS read xrotview zrotview srest" << endl
+         << "read srest" << endl
+         << "$IFS read Lb1 Lb2 Lb3 srest" << endl
+         << "$IFS read Tb1 Tb2 Tb3 srest" << endl
+         << "read srest" << endl
+         << "$IFS read b11 b12 b13" << endl
+         << "$IFS read b21 b22 b23" << endl
+         << "$IFS read b31 b32 b33" << endl
+         << "((hb11=b11/2.0)); ((hb12=b12/2.0)); ((hb13=b13/2.0)); " << endl
+         << "((hb21=b21/2.0)); ((hb22=b22/2.0)); ((hb23=b23/2.0)); " << endl
+         << "((hb31=b31/2.0)); ((hb32=b32/2.0)); ((hb33=b33/2.0)); " << endl
+         << "#--length of b1 b2 b3 arrows--" << endl
+         << "((db11=b11*Lb1)); ((db12=b12*Lb1)); ((db13=b13*Lb1)); " << endl
+         << "((db21=b21*Lb2)); ((db22=b22*Lb2)); ((db23=b23*Lb2)); " << endl
+         << "((db31=b31*Lb3)); ((db32=b32*Lb3)); ((db33=b33*Lb3)); " << endl
+         << "echo $hb11 $hb12 $hb13 $db11 $db12 $db13 > $recipfile" << endl
+         << "echo $hb21 $hb22 $hb23 $db21 $db22 $db23 >> $recipfile" << endl
+         << "echo $hb31 $hb32 $hb33 $db31 $db32 $db33 >> $recipfile" << endl
+         << "((tb11=hb11+b11*Tb1)); ((tb12=hb12+b12*Tb1)); ((tb13=hb13+b13*Tb1));" << endl
+         << "((tb21=hb21+b21*Tb2)); ((tb22=hb22+b22*Tb2)); ((tb23=hb23+b23*Tb2));" << endl
+         << "((tb31=hb31+b31*Tb3)); ((tb32=hb32+b32*Tb3)); ((tb33=hb33+b33*Tb3));" << endl
+         << "" << endl
+         << "#---kpts---" << endl
+         << "$IFS read Nkpts srest" << endl
+         << "rm -f $kptsfile" << endl
+         << "for ((i=0;i<Nkpts;i++))" << endl
+         << "do" << endl
+         << "  read kptsx[$i] kptsy[$i] kptsz[$i] klab[$i]" << endl
+         << "  echo ${kptsx[$i]} ${kptsy[$i]} ${kptsz[$i]} ${klab[$i]} >> $kptsfile" << endl
+         << "done" << endl
+         << "" << endl
+         << "#---kpath---" << endl
+         << "read srest" << endl
+         << "read srest" << endl
+         << "$IFS read N srest" << endl
+         << "rm -f $kpathfile" << endl
+         << "for ((i=0;i<N;i++))" << endl
+         << "do" << endl
+         << "  read srest" << endl
+         << "  echo $srest >> $kpathfile" << endl
+         << "done" << endl
+         << "#---irbz non kpath---" << endl
+         << "$IFS read Nnonkpath srest" << endl
+         << "rm -f $nonkpathfile" << endl
+         << "for ((i=0;i<Nnonkpath;i++))" << endl
+         << "do" << endl
+         << "  read srest" << endl
+         << "  echo $srest >> $nonkpathfile" << endl
+         << "done" << endl
+         << "#---front bz---" << endl
+         << "$IFS read N srest" << endl
+         << "rm -f $fbzfile" << endl
+         << "for ((i=0;i<N;i++))" << endl
+         << "do" << endl
+         << "  read srest" << endl
+         << "  echo $srest >> $fbzfile" << endl
+         << "done" << endl
+         << "#---back bz---" << endl
+         << "$IFS read N srest" << endl
+         << "rm -f $bbzfile" << endl
+         << "for ((i=0;i<N;i++))" << endl
+         << "do" << endl
+         << "  read srest" << endl
+         << "  echo $srest >> $bbzfile" << endl
+         << "done" << endl
+         << "" << endl;
       /*
-         fout<<"#getting the structure name and icsd number"<<endl
-         <<"name=$(pwd)"<<endl
-         <<"echo $name | sed \"s/\//\n/g\" | grep '_ICSD_' > wahyutmp"<<endl
-         <<"exec 0< wahyutmp"<<endl
-         <<"$IFS read name"<<endl
-         <<"rm -f wahyutmp"<<endl
-         <<""<<endl;
+         fout << "#getting the structure name and icsd number" << endl
+          << "name=$(pwd)" << endl
+          << "echo $name | sed \"s/\//\n/g\" | grep '_ICSD_' > wahyutmp" << endl
+          << "exec 0< wahyutmp" << endl
+          << "$IFS read name" << endl
+          << "rm -f wahyutmp" << endl
+          << "" << endl;
          */
-      fout<<"echo \"set terminal postscript eps color enhanced \\\"" << DEFAULT_GNUPLOT_EPS_FONT << "\\\" 18 \"> plotbz.gnu"<<endl;
-      //fout<<"echo \"set output \\\"bz_$name.eps\\\" \">> plotbz.gnu"<<endl
-      fout<<"echo \"set output \\\"bzplot.eps\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"set key off \">> plotbz.gnu"<<endl
-        <<"echo \"unset border \">> plotbz.gnu"<<endl
-        <<"echo \"unset xtics \">> plotbz.gnu"<<endl
-        <<"echo \"unset ytics \">> plotbz.gnu"<<endl
-        <<"echo \"unset ztics \">> plotbz.gnu"<<endl
-        <<"echo \"set view equal xyz \">> plotbz.gnu"<<endl
-        <<"echo \"set view $xrotview,$zrotview \">> plotbz.gnu"<<endl
-        <<"echo \"set title \\\"$glatt  path: $gpath\\\" \">> plotbz.gnu"<<endl
-        <<"for ((i=0;i<Nkpts;i++))"<<endl
-        <<"do"<<endl
-        <<"  echo \"set label \\\"${klab[$i]}\\\" at ${kptsx[i]},${kptsy[i]},${kptsz[i]}\" >> plotbz.gnu"<<endl
-        <<"done"<<endl
-        <<"echo \"set label \\\"b{/Symbol _1}\\\" at $tb11,$tb12,$tb13 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"set label \\\"b{/Symbol _2}\\\" at $tb21,$tb22,$tb23 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"set label \\\"b{/Symbol _3}\\\" at $tb31,$tb32,$tb33 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"splot '$recipfile' using 1:2:3:4:5:6 with vectors head filled lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"echo \"'$fbzfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"echo \"'$bbzfile' using 1:2:3:4:5:6 with vector nohead lt 0 lw 1.5 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"echo \"'$kpathfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"if((Nnonkpath>0))"<<endl
-        <<"then"<<endl
-        <<"  echo \"'$nonkpathfile' using 1:2:3:4:5:6 with vector nohead lt 2 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"fi"<<endl
-        <<"echo \"'$kptsfile' using 1:2:3 with points pt 7 ps 0.8 lc rgb \\\"#FF0000\\\" \" >> plotbz.gnu"<<endl
-        <<""<<endl
-        <<XHOST.command("gnuplot")<< " plotbz.gnu"<<endl;
-      //fout<<XHOST.command("convert")<<" -density 200 bz_$name.eps bz_$name.png"<<endl;
-      fout<<XHOST.command("convert")<<" -density 200 bzplot.eps bzplot.png"<<endl;
-      fout<<"rm -f plotbz.gnu $recipfile $kptsfile $kpathfile $nonkpathfile $fbzfile $bbzfile"<<endl;
+      fout << "echo \"set terminal postscript eps color enhanced \\\"" << DEFAULT_GNUPLOT_EPS_FONT << "\\\" 18 \"> plotbz.gnu" << endl;
+      //fout << "echo \"set output \\\"bz_$name.eps\\\" \">> plotbz.gnu" << endl
+      fout << "echo \"set output \\\"bzplot.eps\\\" \">> plotbz.gnu" << endl
+         << "echo \"set key off \">> plotbz.gnu" << endl
+         << "echo \"unset border \">> plotbz.gnu" << endl
+         << "echo \"unset xtics \">> plotbz.gnu" << endl
+         << "echo \"unset ytics \">> plotbz.gnu" << endl
+         << "echo \"unset ztics \">> plotbz.gnu" << endl
+         << "echo \"set view equal xyz \">> plotbz.gnu" << endl
+         << "echo \"set view $xrotview,$zrotview \">> plotbz.gnu" << endl
+         << "echo \"set title \\\"$glatt  path: $gpath\\\" \">> plotbz.gnu" << endl
+         << "for ((i=0;i<Nkpts;i++))" << endl
+         << "do" << endl
+         << "  echo \"set label \\\"${klab[$i]}\\\" at ${kptsx[i]},${kptsy[i]},${kptsz[i]}\" >> plotbz.gnu" << endl
+         << "done" << endl
+         << "echo \"set label \\\"b{/Symbol _1}\\\" at $tb11,$tb12,$tb13 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+         << "echo \"set label \\\"b{/Symbol _2}\\\" at $tb21,$tb22,$tb23 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+         << "echo \"set label \\\"b{/Symbol _3}\\\" at $tb31,$tb32,$tb33 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+         << "echo \"splot '$recipfile' using 1:2:3:4:5:6 with vectors head filled lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+         << "echo \"'$fbzfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+         << "echo \"'$bbzfile' using 1:2:3:4:5:6 with vector nohead lt 0 lw 1.5 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+         << "echo \"'$kpathfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
+         << "if((Nnonkpath>0))" << endl
+         << "then" << endl
+         << "  echo \"'$nonkpathfile' using 1:2:3:4:5:6 with vector nohead lt 2 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
+         << "fi" << endl
+         << "echo \"'$kptsfile' using 1:2:3 with points pt 7 ps 0.8 lc rgb \\\"#FF0000\\\" \" >> plotbz.gnu" << endl
+         << "" << endl
+         << XHOST.command("gnuplot") << " plotbz.gnu" << endl;
+      //fout << XHOST.command("convert") << " -density 200 bz_$name.eps bz_$name.png" << endl;
+      fout << XHOST.command("convert") << " -density 200 bzplot.eps bzplot.png" << endl;
+      fout << "rm -f plotbz.gnu $recipfile $kptsfile $kpathfile $nonkpathfile $fbzfile $bbzfile" << endl;
       fout.close();
       stringstream command;
       command.clear();command.str(std::string());
@@ -6488,10 +6489,10 @@ namespace LATTICE {
     oss.setf(std::ios::fixed);
     oss.precision(4);
     nkpoint++;
-    oss <<"  " << (Kx[1]>=0.0?" ":"") << Kx[1] 
-      << " " << (Kx[2]>=0.0?" ":"") << Kx[2] 
-      << " " << (Kx[3]>=0.0?" ":"") << Kx[3] 
-      << "   " << double(1.0) << "   ! " << aurostd::PaddedPOST(Ks,20," ") << " // nkpoint=" << nkpoint << endl;
+    oss << "  " << (Kx[1]>=0.0?" ":"") << Kx[1] 
+       << " " << (Kx[2]>=0.0?" ":"") << Kx[2] 
+       << " " << (Kx[3]>=0.0?" ":"") << Kx[3] 
+       << "   " << double(1.0) << "   ! " << aurostd::PaddedPOST(Ks,20," ") << " // nkpoint=" << nkpoint << endl;
     return nkpoint;
   }
   uint kpoint2stream(stringstream& oss, bool isVASP, bool isQE, string A, string B, double grid,uint &nkpoint) {
@@ -6547,10 +6548,10 @@ namespace LATTICE {
     //  if(grid>-1.0 && grid<0.0) grid=-1.0;
     if(grid>=0.0 && grid<1.0) grid=1.0;
 
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions iomode=" << iomode << endl;
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions isQE=" << isQE << endl;
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions isVASP=" << isVASP << endl;
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions grid=" << grid << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions iomode=" << iomode << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions isQE=" << isQE << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions isVASP=" << isVASP << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions grid=" << grid << endl;
 
     xvector<double> cdata(6),kdata(6);
     xmatrix<double> klattice(3,3),sc(3,3);
@@ -6632,12 +6633,12 @@ namespace LATTICE {
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (simple cubic) G-X-M-G-R-X M-R"  << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      oss << lattice_type << " (simple cubic) G-X-M-G-R-X M-R"   << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -6684,29 +6685,29 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (face-centered cubic) G-X-W-K-G-L-U-W-L-K U-X" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),W.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),K.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),U.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),W.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),K.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
 
       //OLD: G-X-W-K-G-L-U-X  U-W-L-K
@@ -6738,22 +6739,22 @@ namespace LATTICE {
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (body-centered cubic) G-H-N-G-P-H P-N"  << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      oss << lattice_type << " (body-centered cubic) G-H-N-G-P-H P-N"   << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
+      if(isVASP && grid>0) oss << " "   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
     }  
     //************************* TETRAGONAL (TET) ****************************
@@ -6790,11 +6791,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (tetragonal) G-X-M-G-Z-R-A-Z  X-R  M-A" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
@@ -6832,7 +6833,7 @@ namespace LATTICE {
       P.fpos(1)=0.250; P.fpos(2)=0.250; P.fpos(3)=0.250; P.label="P";
       X.fpos(1)=0.000; X.fpos(2)=0.000; X.fpos(3)=0.500; X.label="X";
       eta=0.25*(1+c*c/a/a);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
       //DX20181105 [OBSOLETE] stringstream Z,Z1;
       //DX20181105 [OBSOLETE] Z << eta << "  " << eta << "  " << -eta << "  ! Z";
       //DX20181105 [OBSOLETE] Z1 << -eta << "  " << (1-eta) << "  " << eta << "  ! Z_1";
@@ -6854,11 +6855,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (body-centered tetragonal c < a) G-X-M-G-Z-P-N-Z1-M X-P" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -6898,8 +6899,8 @@ namespace LATTICE {
       float eta,zeta;
       eta=0.25*(1+a*a/c/c);
       zeta=0.5*a*a/c/c;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
       //DX20181105 [OBSOLETE] stringstream Sg1,Sg,Y1,Y;
       //DX20181105 [OBSOLETE] Sg << -eta << "  " << eta << "  " << eta << "  ! \\Sigma";
@@ -6929,11 +6930,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (body-centered tetragonal a < c) G-X-Y-Sg-G-Z-Sg1-N-P-Y1-Z X-P" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -6998,11 +6999,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (orthorhombic) G-X-S-Y-G-Z-U-R-T-Z Y-T U-X S-R" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),S.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
@@ -7051,8 +7052,8 @@ namespace LATTICE {
       float zeta,eta;
       zeta = 0.25*(1+a*a/b/b-a*a/c/c);
       eta = 0.25*(1+a*a/b/b+a*a/c/c);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
       //DX20181105 [OBSOLETE] A << "   0.500  " << 0.5+zeta << "  " <<  zeta << "   ! A";
       //DX20181105 [OBSOLETE] A1 << "   0.500  " <<  0.5-zeta << "  " <<  1.0-zeta << "   ! A_1";
@@ -7088,11 +7089,11 @@ namespace LATTICE {
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
         oss << lattice_type << " (face-centered orthorhombic 1/a^2 = 1/b^2+1/c^2) G-Y-T-Z-G-X-A1-Y X-A-Z L-G" << endl; //ME20190520
       }
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7142,11 +7143,11 @@ namespace LATTICE {
       eta = 0.25*(1+a*a/b/b-a*a/c/c);
       phi = 0.25*(1+c*c/b/b-c*c/a/a);
       delta = 0.25*(1+b*b/a/a-b*b/c/c);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
-      //DX20181105 [OBSOLETE] C << "   0.500  " <<  0.5-eta  << "  " << 1.0-eta << "   ! C";
+      //DX20181105 [OBSOLETE] C << "   0.500  " <<  0.5-eta   << "  " << 1.0-eta << "   ! C";
       //DX20181105 [OBSOLETE] C1 << "   0.500   " <<  0.5+eta << "  " <<  eta << "   ! C_1";
       //DX20181105 [OBSOLETE] D <<  0.5-delta << "   0.500  " << 1.0-delta << "   ! D";
       //DX20181105 [OBSOLETE] D1 <<  0.5+delta << "   0.500   " << delta << "   ! D_1";
@@ -7179,11 +7180,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (face-centered orthorhombic 1/a^2 < 1/b^2+1/c^2) G-Y-C-D-X-G-Z-D1-H-C C1-Z X-H1 H-Y L-G" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),C.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7237,10 +7238,10 @@ namespace LATTICE {
       eta = 0.25*(1+b*b/c/c);
       delta = 0.25*(b*b-a*a)/c/c;
       mu = 0.25*(a*a+b*b)/c/c;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
 
       //DX20181105 [OBSOLETE] L <<  -mu << "  " <<  mu << "  " <<  0.5-delta << "   ! L";
       //DX20181105 [OBSOLETE] L1 <<  mu << "  " <<  -mu << "  " <<  0.5+delta << "   ! L_1";    
@@ -7279,11 +7280,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (body-centered orthorhombc a < b < c) G-X-L-T-W-R-X1-Z-G-Y-S-W L1-Y Y1-Z" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7316,7 +7317,7 @@ namespace LATTICE {
     if(lattice_type=="ORCC") {
       foundBZ=TRUE;
       float zeta=(a*a+b*b)/(4.0*b*b);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
       //DX20181105 [OBSOLETE] string G,R,S,T,Y,Z;
       //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
@@ -7362,11 +7363,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (C-centered orthorhombic a < b) G-X-S-R-A-Z-G-Y-X1-A1-T-Y Z-T" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),S.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7427,11 +7428,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (hexagonal) G-M-K-G-A-L-H-A L-M K-H" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),K.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7464,8 +7465,8 @@ namespace LATTICE {
       h=sqrt(h2);
       eta= 5.0/6.0 - ap*ap/h/h/18.0;
       nu=0.5*(1.5-eta);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
       //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
       //DX20181105 [OBSOLETE] F="   0.500   0.500   0.000    ! F";
@@ -7515,11 +7516,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (rhombohedral alpha < 90) G-L-B1 B-Z-G-X Q-F-P1-Z L-P" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),B1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7556,8 +7557,8 @@ namespace LATTICE {
       kh=sqrt(kh2);
       eta=0.5*ka*ka*h/kh;
       nu=(1.5-eta)*0.5;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
       //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
       //DX20181105 [OBSOLETE] F="   0.500  -0.500   0.000    ! F";
@@ -7595,11 +7596,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (rhombohedral alpha > 90) G-P-Z-Q-G-F-P1-Q1-L-Z" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7639,8 +7640,8 @@ namespace LATTICE {
       alpharad=alpha*PI/180.0;
       eta=0.5*(1-b*cos(alpharad)/c)/sin(alpharad)/sin(alpharad);
       nu=0.5-eta*c*cos(alpharad)/b;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
       //DX20181105 [OBSOLETE] H << "   0.000  " << eta << "  " << (1-nu) << "  ! H";
       //DX20181105 [OBSOLETE] H1 << "   0.000  " << (1-eta) << "  " << nu << "  ! H_1";
@@ -7691,12 +7692,12 @@ namespace LATTICE {
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (monoclinic) G-Y-H-C-E-M1-A-X-G-Z-D-M Z-A D-Y X-H1"  << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      oss << lattice_type << " (monoclinic) G-Y-H-C-E-M1-A-X-G-Z-D-M Z-A D-Y X-H1"   << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7749,12 +7750,12 @@ namespace LATTICE {
       phi = psi + 0.25*a*a/b/c/tan(alpharad)/sin(alpharad);
       mu = psi + 0.25*(2-b/c/cos(alpharad))/tan(alpharad)/tan(alpharad);
       delta = 1.0 - 0.5*b/tan(alpharad)*(1/c/sin(alpharad)-2/b/tan(alpharad)) - mu;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
       //DX20181105 [OBSOLETE] F << (1.0-zeta) << "  " << (1.0-zeta) << "  " << (1.0-eta) << "   ! F";
       //DX20181105 [OBSOLETE] F1 << zeta << "  " << zeta << "  " << eta << "   ! F_1";
@@ -7828,11 +7829,11 @@ namespace LATTICE {
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
         oss << lattice_type << " (C-centered monoclinic kgamma = 90) G-Y-F-L-I I1-Z-G-M N-G Z-F1" << endl;
       }
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -7888,15 +7889,15 @@ namespace LATTICE {
       delta = (2*mu-0.5)*c/b*cos(alpharad);
       phi = 0.75 - 0.25*b*b/a/a - 0.25*b/tan(alpharad)*(1/c/sin(alpharad)-1/b/tan(alpharad));
       psi = 0.5 + (2*phi-1)*c/b*cos(alpharad);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
       //DX20181105 [OBSOLETE] F <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! F";
-      //DX20181105 [OBSOLETE] F1 <<  phi << "  " <<  (phi-1.0) << "  "  << psi << "   ! F_1";
+      //DX20181105 [OBSOLETE] F1 <<  phi << "  " <<  (phi-1.0) << "  "   << psi << "   ! F_1";
       //DX20181105 [OBSOLETE] F2 <<  (1.0-phi) << "  " <<  (-phi) << "  " <<  (1.0-psi) << "   ! F_2";
       //DX20181105 [OBSOLETE] H <<  zeta << "  " <<  zeta << "  " <<  eta << "   ! H";
       //DX20181105 [OBSOLETE] H1 <<  (1.0-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_1";
@@ -7959,11 +7960,11 @@ namespace LATTICE {
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
         oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2=1) G-Y-F-H-Z-I-X-G-Z M-G-N X-Y1-H1" << endl; //ME20190520
       }
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -8021,15 +8022,15 @@ namespace LATTICE {
       omega = c*cos(alpharad)/b*(2.0*nu-0.5) + c*sin(alpharad)*tan(alpharad)/b*(2.0*nu-0.5*b*b/a/a-0.5);
       rho = 0.75 + 0.25*a*a/b/b/sin(alpharad)*(b/c/tan(alpharad)-1/sin(alpharad));
       delta = (2.0*mu-nu)*c*cos(alpharad)/b + 0.5*omega - 0.25;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
 
       //DX20181105 [OBSOLETE] F <<  nu << "  " <<  nu << "  " <<  omega << "   ! F";
       //DX20181105 [OBSOLETE] F1 << (1.0-nu) << "  " << (1.0-nu) << "  " << (1.0-omega) << "   ! F_1";
@@ -8037,9 +8038,9 @@ namespace LATTICE {
       //DX20181105 [OBSOLETE] H <<  zeta << "  " <<  zeta << "  " <<  eta << "   ! H";
       //DX20181105 [OBSOLETE] H1 <<  (1.0-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_1";
       //DX20181105 [OBSOLETE] H2 <<  (-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_2";
-      //DX20181105 [OBSOLETE] I <<  rho  << "  " << (1.0-rho) << "   0.500   ! I";
+      //DX20181105 [OBSOLETE] I <<  rho   << "  " << (1.0-rho) << "   0.500   ! I";
       //DX20181105 [OBSOLETE] I1 << (1.0-rho) << "  " <<  (rho-1.0) << "   0.5   ! I_1";
-      //DX20181105 [OBSOLETE] Q <<  phi << "  " <<  (phi-1.0) << "  "  << psi << "   ! Q";
+      //DX20181105 [OBSOLETE] Q <<  phi << "  " <<  (phi-1.0) << "  "   << psi << "   ! Q";
       //DX20181105 [OBSOLETE] S <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! S";
       //DX20181105 [OBSOLETE] S1 <<  (1.0-phi) << "  " <<  (-phi) << "  " <<  (1.0-psi) << "   ! S_1";
       //DX20181105 [OBSOLETE] Y << mu << "  " <<  mu << "  " <<  delta << "   ! Y";
@@ -8103,11 +8104,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2>1) G-Y-F-L-I I1-Z-G-X-Y1-H1 H-F1 F2-X M-G-N H-Z" << endl; //ME20190520
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -8170,18 +8171,18 @@ namespace LATTICE {
         eta=0.5*(zeta-rho);
         mu=0.5+0.5*b2(3)*(b2(3)+b3(3))/b2(2)/b2(2)-eta*b1(2)/b2(2);
         delta=0.5+(eta*b1(3)+mu*b2(3))/b3(3);
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
         // 10 center of faces
         //DX20181105 [OBSOLETE] L << "   0.500   0.500   0.000   ! L";
@@ -8307,18 +8308,18 @@ namespace LATTICE {
         omega=0.5*(b1(3)-b2(3)) - b1(1)*b1(1)*(theta-0.5)/b1(3) + 0.5*b1(2)*b1(2)/b1(3) - 0.5*b2(2)*b2(2)/b2(3);
         omega= -0.5*b2(3)-b2(2)*(omega*aa*b2(3)+0.5*b2(2))/b2(3)+theta*b1(3)+(1.0-lambda)*b2(3);
         omega=omega/b3(3);
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
         //DX20181105 [OBSOLETE] // 10 center of faces
         //DX20181105 [OBSOLETE] L << "   0.500  -0.500   0.000   ! L";
@@ -8420,11 +8421,11 @@ namespace LATTICE {
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (triclinic) X-G-Y L-G-Z N-G-M R-G" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
@@ -8442,7 +8443,7 @@ namespace LATTICE {
     if(foundBZ==FALSE) {
       cerr << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
       cout << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
-      oss  << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
+      oss   << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
     }
     string output(oss.str());
     if(grid<0) aurostd::StringSubst(output,"NKPOINTS",aurostd::utype2string(nkpoint));
