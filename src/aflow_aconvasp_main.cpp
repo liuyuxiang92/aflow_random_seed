@@ -3129,7 +3129,7 @@ namespace pflow {
       tolerance = default_tolerance;
     }
     if(tolerance < 1e-10){
-      cerr << XHOST.sPID << "pflow::SYMMETRY ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
+      cerr << soliloquy << " ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
       return 0;
     }
     //DX20170803 - Add format flag - START
@@ -3179,7 +3179,8 @@ namespace pflow {
     //DX20180221 [OBSOLETE]}
 
     //while(symmetry_commensurate==FALSE)
-    if(print == false) { // DX20170803 - PRINT
+    if(print == false) // DX20170803 - PRINT
+    { //CO200106 - patching for auto-indenting
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
@@ -3245,7 +3246,8 @@ namespace pflow {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT,DEFAULT_KZIP_BIN);
-      } else if(format == "json"){ // DX20170803 - FORMAT
+      }
+      else if(format == "json"){ //DX20170803 - FORMAT
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,DEFAULT_KZIP_BIN); //DX20200129
@@ -5614,30 +5616,28 @@ namespace pflow {
     // 2008 wahyu setyawan    ws26@duke.edu
     // 2008 roman chepulskyy  rc74@duke.edu
 #define _MAXSPECIES_ 10
-    /*
-       cout << " udos -h            : help\n"
-       << " udos 1 s p         : nonspin, includes s and p orbitals\n"
-       << " udos 2 s p d f     : spin-polarized, includes s,p,d,and f orbitals.\n\n"
-       << " OUTPUT format:\n"
-       << " udos 1\n"
-       << "   energy DOS\n"
-       << " udos 2\n"
-       << "   energy DOSup DOSdown\n"
-       << " udos 2 f\n"
-       << "   energy fDOSup_elemnt1 fDOSdown_elemnt1 ... fDOSup_elmntN fDOSdown_elmntN\n"
-       << " udos 2 s d\n"
-       << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dD\
-       OSdown_elmntN"
-       << " udos 2 d s\n"
-       << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dD\
-       OSdown_elmntN"
-       << " udos 2 s p d f\n"
-       << "   energy DOSup DOSdown sDOSup_elmnt1 sDOSdown_elmnt1 ...sDOSup_elmntN sDOSdown_elmntN ... fDOSup_elmntN fDOSdown_elmntN\n\\
-       n"
-       << " "
-       << " note: DOS for spin down is given in (negative) sign.\n"
-       << "       Splitting of the elements(or species) is according to POSCAR.\n";
-       */
+    //   cout << " udos -h            : help\n"
+    //   << " udos 1 s p         : nonspin, includes s and p orbitals\n"
+    //   << " udos 2 s p d f     : spin-polarized, includes s,p,d,and f orbitals.\n\n"
+    //   << " OUTPUT format:\n"
+    //   << " udos 1\n"
+    //   << "   energy DOS\n"
+    //   << " udos 2\n"
+    //   << "   energy DOSup DOSdown\n"
+    //   << " udos 2 f\n"
+    //   << "   energy fDOSup_elemnt1 fDOSdown_elemnt1 ... fDOSup_elmntN fDOSdown_elmntN\n"
+    //   << " udos 2 s d\n"
+    //   << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dD\
+    //   OSdown_elmntN"
+    //   << " udos 2 d s\n"
+    //   << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dD\
+    //   OSdown_elmntN"
+    //   << " udos 2 s p d f\n"
+    //   << "   energy DOSup DOSdown sDOSup_elmnt1 sDOSdown_elmnt1 ...sDOSup_elmntN sDOSdown_elmntN ... fDOSup_elmntN fDOSdown_elmntN\n\\
+    //   n"
+    //   << " "
+    //   << " note: DOS for spin down is given in (negative) sign.\n"
+    //   << "       Splitting of the elements(or species) is according to POSCAR.\n";
 
     int argc=argv.size();
     if(argc==2) return;
@@ -6637,7 +6637,8 @@ namespace pflow {
     } 
 
     //while(symmetry_commensurate==FALSE)
-    if(print == false) { // DX20170803 - PRINT
+    if(print == false) // DX20170803 - PRINT
+    { //CO200106 - patching for auto-indenting
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
@@ -8055,11 +8056,9 @@ namespace pflow {
   void KBAND(vector<string> argv) {
     // 2008 wahyu setyawan    ws26@duke.edu
     // 2008 roman chepulskyy  rc74@duke.edu
-    /*
-       cout << " uband -h     : help\n"
-       << " uband 1      : nonspin\n"
-       << " uband 2      : spin-polarized.\n";
-       */
+    //   cout << " uband -h     : help\n"
+    //   << " uband 1      : nonspin\n"
+    //   << " uband 2      : spin-polarized.\n";
 #define _NSEGMAX_ 50
 
     int argc=argv.size();

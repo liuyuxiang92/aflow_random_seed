@@ -560,7 +560,7 @@ namespace bader_functions {
     string bader_command="";
     //do critical points first, so normal ACF, AVF, etc. get overwritten by the usual bader command (with bader CHGCAR -ref SUM)
     if(vpflow.flag("BADER::CRITICAL_POINTS")) {
-      bader_command= XHOST.command("bader") + " -vac auto -cp REFERENCE";
+      bader_command=XHOST.command("bader") + " -vac auto -cp REFERENCE";
       if(LDEBUG) {cerr << soliloquy << " bader_command=\"" << bader_command << "\"" << endl;}
       BADER_CODE_OUTPUT << endl << aurostd::execute2string(bader_command) << endl;  //local variant, must be SUM_CHARGE file (sum of valence+core charges)
       //not sure if we expect a particular type of error
@@ -605,7 +605,7 @@ namespace bader_functions {
     BADER_CODE_OUTPUT.str("");
 
     //BADER_CODE_OUTPUT << endl << aurostd::execute2string(XHOST.command("bader")+" "+bader_options+" "+required_files.at(0)+" -ref "+ref_file) << endl;
-    bader_command= XHOST.command("bader") + " " + bader_options + " CHGCAR -ref REFERENCE";
+    bader_command=XHOST.command("bader") + " " + bader_options + " CHGCAR -ref REFERENCE";
     if(LDEBUG) {cerr << soliloquy << " bader_command=\"" << bader_command << "\"" << endl;}
     BADER_CODE_OUTPUT << endl << aurostd::execute2string(bader_command) << endl;  //local variant
     //BADER_CODE_OUTPUT << endl << aurostd::execute2string("/home/CO/bin/bader "+bader_options+" "+required_files.at(0)+" -ref "+ref_file) << endl;

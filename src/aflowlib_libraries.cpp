@@ -978,11 +978,11 @@ namespace aflowlib {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XHOST.sPID+"aflowlib::LIB2RAW():";
     long double seconds_begin=aurostd::get_seconds();
-    if(LDEBUG) cerr << "aflowlib::LIB2RAW: BEGIN" << endl;
-    if(LDEBUG) cerr << "aflowlib::LIB2RAW: options=" << options << endl;
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
     // Call to LIB2LIB function to run postprocessing - added by CT20181212
     if(!LIB2LIB(options, flag_FORCE, LOCAL)) {
-      cerr << XHOST.sPID << "aflowlib::LIB2RAW: LIB2LIB failed" << endl;
+      cerr << soliloquy << " LIB2LIB failed" << endl;
       exit(0);
     }
     vector<string> tokens;
@@ -993,7 +993,7 @@ namespace aflowlib {
       tokens.push_back(options);
     }
 
-    if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
       init::ErrorOption(cout,options,"aflowlib::LIB2RAW",aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
       exit(0);
@@ -1025,7 +1025,7 @@ namespace aflowlib {
       directory_WEB=directory+"/WEB";
       PROJECT_LIBRARY=directory_LIB;
     } else {    //normal run
-      //  cout << XHOST.sPID << "aflowlib::LIB2RAW: AFLOW (" << VERSION << ")" << endl;
+      //  cout << soliloquy << " AFLOW (" << VERSION << ")" << endl;
       CheckMaterialServer("aflowlib::LIB2RAW"); // must be in AFLOW_MATERIALS_SERVER
       string directory=aurostd::CleanFileName(options);
       if(directory.at(directory.size()-1)=='/')  directory=directory.substr(0,directory.size()-1);
@@ -1038,35 +1038,35 @@ namespace aflowlib {
       aurostd::StringSubst(directory,"LIB2/RAW","LIB2/LIB");
 
       PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(directory);
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: directory=" << directory << endl;
+      // cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
+      cout << soliloquy << " directory=" << directory << endl;
 
       //  bool flag_LIB=FALSE;
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: scan libraries BEGIN [1]" << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: PROJECT_LIBRARY=" << PROJECT_LIBRARY << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB0=" << XHOST_LIBRARY_LIB0 << endl;
+      if(LDEBUG) cerr << soliloquy << " scan libraries BEGIN [1]" << endl;
+      if(LDEBUG) cerr << soliloquy << " PROJECT_LIBRARY=" << PROJECT_LIBRARY << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB0=" << XHOST_LIBRARY_LIB0 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB0")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB1=" << XHOST_LIBRARY_LIB1 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB1=" << XHOST_LIBRARY_LIB1 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB1")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB2")) { flag_WEB=FALSE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB3=" << XHOST_LIBRARY_LIB3 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB3=" << XHOST_LIBRARY_LIB3 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB3")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB4=" << XHOST_LIBRARY_LIB4 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB4=" << XHOST_LIBRARY_LIB4 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB4")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB5=" << XHOST_LIBRARY_LIB5 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB5=" << XHOST_LIBRARY_LIB5 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB5")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB6=" << XHOST_LIBRARY_LIB6 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB6=" << XHOST_LIBRARY_LIB6 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB6")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB7=" << XHOST_LIBRARY_LIB7 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB7=" << XHOST_LIBRARY_LIB7 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB7")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB8=" << XHOST_LIBRARY_LIB8 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB8=" << XHOST_LIBRARY_LIB8 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB8")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_LIB9=" << XHOST_LIBRARY_LIB9 << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_LIB9=" << XHOST_LIBRARY_LIB9 << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB9")) { flag_WEB=TRUE;flag_files_RAW=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: XHOST_LIBRARY_ICSD=" << XHOST_LIBRARY_ICSD << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_LIBRARY_ICSD=" << XHOST_LIBRARY_ICSD << endl;
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("ICSD")) { flag_WEB=TRUE;flag_files_WEB=TRUE; }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: scan libraries END [2]"   << endl;
+      if(LDEBUG) cerr << soliloquy << " scan libraries END [2]"   << endl;
 
       stringstream aus_exec;
       //   vector<string> tokens;
@@ -1082,8 +1082,8 @@ namespace aflowlib {
             }
           }
         if(directory_LIB.length()==0) {
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: you must specify the directory including the whole lattice type" << endl;
+          cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
+          cout << soliloquy << " you must specify the directory including the whole lattice type" << endl;
           cout << " such as  aflow --lib2raw=FCC/La1Se1_ICSD_27104  " << endl;
           exit(0);
         }
@@ -1104,22 +1104,22 @@ namespace aflowlib {
 	 PROJECT_LIBRARY==init::AFLOW_Projects_Directories("LIB2")) {
         //      directory_WEB=directory_RAW;
       }
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: PROJECT_LIBRARY=" << PROJECT_LIBRARY << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB0")=" << init::AFLOW_Projects_Directories("LIB0") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB1")=" << init::AFLOW_Projects_Directories("LIB1") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB2")=" << init::AFLOW_Projects_Directories("LIB2") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB3")=" << init::AFLOW_Projects_Directories("LIB3") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB4")=" << init::AFLOW_Projects_Directories("LIB4") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB5")=" << init::AFLOW_Projects_Directories("LIB5") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB6")=" << init::AFLOW_Projects_Directories("LIB6") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB7")=" << init::AFLOW_Projects_Directories("LIB7") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB8")=" << init::AFLOW_Projects_Directories("LIB8") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("LIB9")=" << init::AFLOW_Projects_Directories("LIB9") << endl;
-      // cout << XHOST.sPID << "aflowlib::LIB2RAW: init::AFLOW_Projects_Directories("ICSD")=" << init::AFLOW_Projects_Directories("ICSD") << endl;
+      cout << soliloquy << " PROJECT_LIBRARY=" << PROJECT_LIBRARY << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB0")=" << init::AFLOW_Projects_Directories("LIB0") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB1")=" << init::AFLOW_Projects_Directories("LIB1") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB2")=" << init::AFLOW_Projects_Directories("LIB2") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB3")=" << init::AFLOW_Projects_Directories("LIB3") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB4")=" << init::AFLOW_Projects_Directories("LIB4") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB5")=" << init::AFLOW_Projects_Directories("LIB5") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB6")=" << init::AFLOW_Projects_Directories("LIB6") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB7")=" << init::AFLOW_Projects_Directories("LIB7") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB8")=" << init::AFLOW_Projects_Directories("LIB8") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("LIB9")=" << init::AFLOW_Projects_Directories("LIB9") << endl;
+      // cout << soliloquy << " init::AFLOW_Projects_Directories("ICSD")=" << init::AFLOW_Projects_Directories("ICSD") << endl;
     }
-    cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_LIB=" << directory_LIB << endl;
-    cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_RAW=" << directory_RAW << endl;
-    cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_WEB=" << directory_WEB << endl;
+    cout << soliloquy << " directory_LIB=" << directory_LIB << endl;
+    cout << soliloquy << " directory_RAW=" << directory_RAW << endl;
+    cout << soliloquy << " directory_WEB=" << directory_WEB << endl;
 
     bool perform_LOCK=TRUE,perform_BANDS=FALSE,perform_BADER=FALSE,perform_MAGNETIC=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
@@ -1144,8 +1144,8 @@ namespace aflowlib {
 
     // cerr << XHOST.sPID << directory_WEB << endl; cerr << XHOST.sPID << directory_LIB << endl; cerr << XHOST.sPID << directory_RAW << endl; exit(0);
     if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: directory does not exist: " << directory_LIB << endl;
+      cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
+      cout << soliloquy << " directory does not exist: " << directory_LIB << endl;
       return FALSE;
       // exit(0);
     }
@@ -1155,13 +1155,13 @@ namespace aflowlib {
         aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",FALSE,XHOST.sPID); // PATCH FOR REFRESH (to be removed)
         aurostd::ZIP2ZIP(directory_LIB,"gz","xz",FALSE,XHOST.sPID); // PATCH FOR REFRESH (to be removed)
 	
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
+        cout << soliloquy << " ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
         return FALSE;
       }
       if(perform_BANDS) {
         if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands") || aurostd::EFileExist(directory_RAW+"/EIGENVAL.bands")) {
           // return FALSE;
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: directory is skipped because of BANDS: " << directory_RAW << endl;
+          cout << soliloquy << " directory is skipped because of BANDS: " << directory_RAW << endl;
           return FALSE;
           //  exit(0);
         }
@@ -1169,7 +1169,7 @@ namespace aflowlib {
     }
     // directory_LIB exists and directory_RAW does not exist can move on:
     if(aurostd::RemoveWhiteSpaces(directory_RAW).empty()) {  //imagine this empty, then do this: "rm -f /"+directory_RAW+"/*" DEAD
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_RAW is empty" << endl;
+      cout << soliloquy << " directory_RAW is empty" << endl;
       return FALSE;
     }
     //if(LOCAL){aurostd::execute("rm -rf \""+directory_RAW)+"\"";} //CO20190321 - safer NOT to -rf
@@ -1180,12 +1180,12 @@ namespace aflowlib {
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_RAW+"/*\"");
     }
     if(!aurostd::IsDirectory(directory_RAW)) {
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: directory is skipped because directory_RAW cannot be created: " << directory_RAW << endl;
+      cout << soliloquy << " directory is skipped because directory_RAW cannot be created: " << directory_RAW << endl;
       return FALSE;
     }
     if(flag_WEB) {
       if(aurostd::RemoveWhiteSpaces(directory_WEB).empty()) {  //imagine this empty, then do this: "rm -f /"+directory_WEB+"/*" DEAD
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_WEB is empty" << endl;
+        cout << soliloquy << " directory_WEB is empty" << endl;
         return FALSE;
       }
       //if(LOCAL){aurostd::execute("rm -rf \""+directory_WEB+"\"");} //CO20190321 - safer NOT to -rf
@@ -1194,22 +1194,22 @@ namespace aflowlib {
       aurostd::RemoveFile(directory_WEB+"/*");
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_WEB+"/*\"");
       if(!aurostd::IsDirectory(directory_WEB)) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: directory is skipped because directory_WEB cannot be created: " << directory_WEB << endl;
+        cout << soliloquy << " directory is skipped because directory_WEB cannot be created: " << directory_WEB << endl;
         return FALSE;
       }
     }
 
-    cout << XHOST.sPID << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
+    cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
     if((perform_THERMODYNAMICS || perform_BANDS ||  perform_MAGNETIC)) {
       _aflags aflags;
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: dir=" << directory_LIB << " BEGIN_DATE = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      cout << soliloquy << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",TRUE,XHOST.sPID); 
       aurostd::ZIP2ZIP(directory_LIB,"gz","xz",TRUE,XHOST.sPID);
 
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: [1]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [1]" << endl;
       //DX20190516 [OBSOLETE - overwrites file everytime, messes up timestamp] aurostd::RemoveBinaryCharactersFromFile(directory_LIB,_AFLOWIN_); //DX20190211 - Ensure no binary characters in aflow.in
       //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE] if(aurostd::RemoveControlCodeCharactersFromFile(directory_LIB,_AFLOWIN_)) { //DX20190516 - Ensure no control characters in aflow.in; only modifies if control characters are detected 
-      //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE]   cout << XHOST.sPID << "aflowlib::LIB2RAW: Control characters detected in aflow.in. The invalid characters have been removed, and the file has been overwritten (the original file has moved to aflow.in_old)." << endl; // signals file has been cleaned
+      //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE]   cout << soliloquy << " Control characters detected in aflow.in. The invalid characters have been removed, and the file has been overwritten (the original file has moved to aflow.in_old)." << endl; // signals file has been cleaned
       //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE] }
 
       vector<string> vfile;   // the needed files
@@ -1217,14 +1217,14 @@ namespace aflowlib {
       vector<string> vspecies;   // the species
       GetSpeciesDirectory(directory_LIB,vspecies);
 
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: [2]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [2]" << endl;
 
       for(uint i=0;i<vspecies.size();i++) {
         aflowlib_data.species+=vspecies.at(i);
         if(i<vspecies.size()-1)  aflowlib_data.species+=",";
       }    // plug vspecies into aflowlib_data
 
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: [3]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [3]" << endl;
 
       if(LOCAL) {
         aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
@@ -1245,16 +1245,16 @@ namespace aflowlib {
         if(aurostd::substring2bool(aflowlib_data.aurl,"LIB9")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB9/LIB","AFLOWDATA/LIB9_RAW");aflowlib_data.catalog="LIB9"; }
         if(aurostd::substring2bool(aflowlib_data.aurl,"AURO")) { aurostd::StringSubst(aflowlib_data.aurl,"common/AURO/LIB","AFLOWDATA/AURO_RAW");aflowlib_data.catalog="AURO"; }
         aurostd::StringSubst(aflowlib_data.aurl,":/AFLOWDATA",":AFLOWDATA");
-        // cout << "aflowlib::LIB2RAW: AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
+        // cout << soliloquy << " AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
         // build aflowlib_data.auid
-        if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: [AUID=0] directory_LIB=" << directory_LIB << endl;
+        if(LDEBUG) cerr << soliloquy << " [AUID=0] directory_LIB=" << directory_LIB << endl;
         // aflowlib::directory2auid(directory_LIB,aflowlib_data.aurl,aflowlib_data.auid,aflowlib_data.vauid); // OLD STYLE
         aflowlib_data.directory2auid(directory_LIB); // NEW STLYE
         //  if(AFLOWLIB_VERBOSE)
-        if(LDEBUG) cerr << "aflowlib::LIB2RAW: [AUID=0b] directory_LIB=" << directory_LIB << endl;
-        cout << "aflowlib::LIB2RAW: AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl; 
-        cout << "aflowlib::LIB2RAW: AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
-        cout << "aflowlib::LIB2RAW: VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
+        if(LDEBUG) cerr << soliloquy << " [AUID=0b] directory_LIB=" << directory_LIB << endl;
+        cout << soliloquy << " AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl; 
+        cout << soliloquy << " AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
+        cout << soliloquy << " VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
         //ME20200207 - the system name is the canonical title
         aflowlib_data.title = KBIN::ExtractSystemName(directory_LIB);  //ME20200207
 
@@ -1277,28 +1277,28 @@ namespace aflowlib {
         //[OBSOLETE]   aflowlib_data.title = aurostd::joinWDelimiter(vtitle, ".");
         //[OBSOLETE] }
         //[OBSOLETE] //ME20190125 END
-        if(LDEBUG) cerr << "aflowlib::LIB2RAW: [AUID=2]" << endl;
-        cout << "aflowlib::LIB2RAW: CATALOG = " << aurostd::PaddedPOST(aflowlib_data.catalog,60) << endl;//"   " << directory_LIB << endl;
-        if(LDEBUG) cerr << "aflowlib::LIB2RAW: [AUID=3]" << endl;
+        if(LDEBUG) cerr << soliloquy << " [AUID=2]" << endl;
+        cout << soliloquy << " CATALOG = " << aurostd::PaddedPOST(aflowlib_data.catalog,60) << endl;//"   " << directory_LIB << endl;
+        if(LDEBUG) cerr << soliloquy << " [AUID=3]" << endl;
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the THERMNODYNAMYCS
       if(perform_THERMODYNAMICS) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: THERMODYNAMIC LOOP ---------------------------------------------------------------------------------" << endl;//perform_BANDS=FALSE;
-        aflowlib::LIB2RAW_Loop_Thermodynamics(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (thermodynamics):",LOCAL); // identifier inside
+        cout << soliloquy << " THERMODYNAMIC LOOP ---------------------------------------------------------------------------------" << endl;//perform_BANDS=FALSE;
+        aflowlib::LIB2RAW_Loop_Thermodynamics(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (thermodynamics):",LOCAL); // identifier inside
       }
-      if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW: [4]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [4]" << endl;
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the BANDS
       if(perform_BANDS) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: BANDS LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_Bands(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (bands):");
+        cout << soliloquy << " BANDS LOOP ---------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_Bands(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (bands):");
         // MOVE/LINK PICS data
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the MAGNETIC
       if((perform_MAGNETIC || perform_BANDS)) { //JX
-        cout << "aflowlib::LIB2RAW: MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
+        cout << soliloquy << " MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
         aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,"aflowlib::LIB2RAW (magnetic):"); 
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
@@ -1306,8 +1306,8 @@ namespace aflowlib {
       //      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB6")) perform_BADER=FALSE; // hack
       // [OBSOLETE]    if(0) // DEBUG NOW
       if(perform_BADER) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: BADER LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_Bader(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (bader):");
+        cout << soliloquy << " BADER LOOP ---------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_Bader(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (bader):");
         // MOVE/LINK PICS data
         // [OBSOLETE] [MOVED DOWN] if(flag_WEB) {
         // [OBSOLETE] [MOVED DOWN] aurostd::LinkFile(directory_RAW+"/*_abader.out",directory_WEB);      // LINK
@@ -1317,8 +1317,8 @@ namespace aflowlib {
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the AGL
       if(perform_AGL) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: AGL LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_AGL(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (agl):");
+        cout << soliloquy << " AGL LOOP ---------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_AGL(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (agl):");
         if(flag_WEB) {
           aurostd::LinkFile(directory_RAW+"/aflow.agl.out",directory_WEB);    // LINK
           aurostd::LinkFile(directory_RAW+"/AGL.out",directory_WEB);    // LINK
@@ -1336,8 +1336,8 @@ namespace aflowlib {
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the AEL
       if(perform_AEL) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: AEL LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_AEL(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (ael):");
+        cout << soliloquy << " AEL LOOP ---------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_AEL(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (ael):");
         if(flag_WEB) {
           aurostd::LinkFile(directory_RAW+"/aflow.ael.out",directory_WEB);    // LINK
           aurostd::LinkFile(directory_RAW+"/AEL_Elastic_constants.out",directory_WEB);    // LINK
@@ -1349,32 +1349,32 @@ namespace aflowlib {
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the LOCK
       if(perform_LOCK) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: LOCK LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (LOCK):"); 
+        cout << soliloquy << " LOCK LOOP ---------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (LOCK):"); 
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the PATCH
       if(perform_PATCH) {
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: PATCH LOOP --------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+"aflowlib::LIB2RAW: (PATCH):"); 
+        cout << soliloquy << " PATCH LOOP --------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (PATCH):"); 
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // write DOS + BANDS JSON //CO20171025
       string system_name=KBIN::ExtractSystemName(directory_LIB);
       if((aurostd::FileExist(directory_LIB+"/DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/DOSCAR.static")) &&
 	 (aurostd::FileExist(directory_LIB+"/POSCAR.static") || aurostd::EFileExist(directory_LIB+"/POSCAR.static"))) {
-	cout << XHOST.sPID << "aflowlib::LIB2RAW: DOS + BANDS JSON  ---------------------------------------------------------------------------------" << endl;
+	cout << soliloquy << " DOS + BANDS JSON  ---------------------------------------------------------------------------------" << endl;
         stringstream _json_file,json_file;
         aurostd::xoption vpflow;  //dummy
         if(estructure::DOSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
           json_file << _json_file.str() << endl; _json_file.str("");
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: compressing file: " << string(directory_RAW+"/"+system_name+"_dosdata.json") << endl; cout.flush();
+          cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_dosdata.json") << endl; cout.flush();
           aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_dosdata.json");
           json_file.str("");
           if(aurostd::EFileExist(directory_LIB+"/EIGENVAL.bands") && aurostd::EFileExist(directory_LIB+"/KPOINTS.bands")) {
             if(estructure::BANDSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
               json_file << _json_file.str() << endl; _json_file.str("");
-              cout << XHOST.sPID << "aflowlib::LIB2RAW: compressing file: " << string(directory_RAW+"/"+system_name+"_bandsdata.json") << endl; cout.flush();
+              cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_bandsdata.json") << endl; cout.flush();
               aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_bandsdata.json");
               json_file.str("");
             }
@@ -1385,7 +1385,7 @@ namespace aflowlib {
       // ---------------------------------------------------------------------------------------------------------------------------------
       // DO THE COMPRESSING
       //      cout << "COMPRESSING" << endl;
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: COMPRESSING REMOVING LINKING --------------------------------------------------------------" << endl;
+      cout << soliloquy << " COMPRESSING REMOVING LINKING --------------------------------------------------------------" << endl;
       
       // generic for compressing and linking
       deque<string> vtype; aurostd::string2tokens(".orig,.relax,.relax1,.relax2,.relax3,.relax4,.static,.bands",vtype,",");
@@ -1415,7 +1415,7 @@ namespace aflowlib {
       for(uint iremove=0;iremove<vfile2remove.size();iremove++) {
         if(aurostd::FileExist(directory_RAW+"/"+vfile2remove.at(iremove))) { // need to be present
           //if(LDEBUG)
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: removing file: " << string(directory_RAW+"/"+vfile2remove.at(iremove)) << endl;
+          cout << soliloquy << " removing file: " << string(directory_RAW+"/"+vfile2remove.at(iremove)) << endl;
           aurostd::RemoveFile(directory_RAW+"/"+vfile2remove.at(iremove));
         } // FileExist
       } // iremove
@@ -1423,17 +1423,17 @@ namespace aflowlib {
       deque<string> vfile2compress0; aurostd::string2tokens("OUTCAR.relax",vfile2compress0,",");
       for(uint icompress=0;icompress<vfile2compress0.size();icompress++) {
         if(aurostd::FileExist(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN)) { // test if there is one already compressed (possibly linked)
-          if(1||LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: found compressed file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN) << endl;  cout.flush(); }
-          if(1||LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: removing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
+          if(1||LDEBUG) { cout << soliloquy << " found compressed file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN) << endl;  cout.flush(); }
+          if(1||LDEBUG) { cout << soliloquy << " removing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
           aurostd::RemoveFile(directory_RAW+"/"+vfile2compress0.at(icompress));
         }
         if(aurostd::FileExist(directory_RAW+"/"+vfile2compress0.at(icompress))) { // need to be present
-          if(1||LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: compressing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
+          if(1||LDEBUG) { cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
           aurostd::CompressFile(directory_RAW+"/"+vfile2compress0.at(icompress),DEFAULT_KZIP_BIN);
         } // FILES to compress
       } // icompress
       // [OBSOLETE] no compress jvxl     if(perform_BADER) {
-      // [OBSOLETE] no compress jvxl   if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: compressing file: " << string(directory_RAW+"/"+"*.jvxl") << endl;  cout.flush(); }
+      // [OBSOLETE] no compress jvxl   if(LDEBUG) { cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+"*.jvxl") << endl;  cout.flush(); }
       // [OBSOLETE] no compress jvxl   aurostd::CompressFile(directory_RAW+"/"+"*.jvxl",DEFAULT_KZIP_BIN);
       // [OBSOLETE] no compress jvxl     }
       // FILES to compress
@@ -1442,7 +1442,7 @@ namespace aflowlib {
         for(uint iout=0;iout<vout.size();iout++) {
           for(uint itype=0;itype<vtype.size();itype++) {   
             if(aurostd::FileExist(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout))) {
-              if(1||LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: compressing file (" << ilink << "," << iout << "," << itype << "): " << string(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }
+              if(1||LDEBUG) { cout << soliloquy << " compressing file (" << ilink << "," << iout << "," << itype << "): " << string(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }
               aurostd::CompressFile(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout),DEFAULT_KZIP_BIN);
             } // FileExist
           } // itype
@@ -1455,16 +1455,16 @@ namespace aflowlib {
           deque<string> vfile2link0; aurostd::string2tokens("DOSCAR.static,OUTCAR.static,CHGCAR.static,AECCAR0.static,AECCAR2.static,EIGENVAL.bands,OSZICAR.bands",vfile2link0,",");
           for(uint ilink=0;ilink<vfile2link0.size();ilink++) {
             if(vfile.at(ifile)==vfile2link0.at(ilink)) {
-              // cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file RAW->LIB: " << vfile2link0.at(ilink) << endl;       
+              // cout << soliloquy << " linking file RAW->LIB: " << vfile2link0.at(ilink) << endl;       
               if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)) || aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { // need to be present in LIB also  
                 aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); // remove RAW original
                 if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile))) { 
-                  cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)) << endl; cout.flush();   
+                  cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)) << endl; cout.flush();   
                   aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile),directory_RAW); // link LIB to RAW (save space)
                 }
                 for(uint iext=0;iext<XHOST.vext.size();iext++) {
                   if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext))) {
-                    cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext)) << endl;  cout.flush();          
+                    cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext)) << endl;  cout.flush();          
                     aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext),directory_RAW); // link LIB to RAW (save space)
                   }
                 }
@@ -1490,12 +1490,12 @@ namespace aflowlib {
       // DO THE FINISH LINK/COPY FOR WEB
 
       if(perform_BANDS || 1 || TRUE) { // ALWAYS
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: linking stuff flag_WEB=" << flag_WEB << endl;
+        cout << soliloquy << " linking stuff flag_WEB=" << flag_WEB << endl;
         // MOVE/LINK PICS data
 
         if(flag_WEB) {
           string system_name=KBIN::ExtractSystemName(directory_LIB);
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: linking SYSTEM=" << system_name << endl;
+          cout << soliloquy << " linking SYSTEM=" << system_name << endl;
           if(aurostd::FileExist(directory_RAW+"/"+system_name+".png")
               || aurostd::FileExist(directory_RAW + "/" + system_name + "_banddos.png"))  //ME20190621 - new file name convention
             aurostd::LinkFile(directory_RAW+"/*png",directory_WEB);            // LINK
@@ -1514,12 +1514,12 @@ namespace aflowlib {
             for(uint iout=0;iout<vout.size();iout++) {
               for(uint itype=0;itype<vtype.size();itype++) {   
                 if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout))) { // no compression
-                  if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }              
+                  if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }              
                   aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout),directory_WEB);
                 }  // FileExist
                 for(uint iext=0;iext<XHOST.vext.size();iext++) {
                   if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext))) { // with compression
-                    if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+                    if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
                     aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);
                   } // FileExist
                 } // iext
@@ -1529,36 +1529,36 @@ namespace aflowlib {
           // PREVIOUSLY IN NETFLIX // cheat for void string
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout))) {
-              if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
               aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout),directory_WEB);  // CO20171024
             }  // FileExist
           } // iout
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout))) {
-              if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
               aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  // CO20171024
             } // FileExist
           } // iout
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)))  {  // NO EXTENSION
-              if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
               aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout),directory_WEB);       // CO20171024
             }
             for(uint iext=0;iext<XHOST.vext.size();iext++) {
               if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)))  {
-                if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
                 aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       // CO20171024
               } // FileExist
             } // iext
           } // iout
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout))) { // NO EXTENSION
-              if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
               aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout),directory_WEB);     // CO20171024
             } // FileExist
             for(uint iext=0;iext<XHOST.vext.size();iext++) {
               if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext))) {
-                if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
                 aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     // CO20171024
               } // FileExist
             } // iext
@@ -1566,21 +1566,21 @@ namespace aflowlib {
           deque<string> vfile2link2; aurostd::string2tokens("EIGENVAL.bands,DOSCAR.static,OUTCAR.static,CONTCAR.relax,CONTCAR.relax1,POSCAR.bands,CONTCAR.relax.vasp,CONTCAR.relax.qe,CONTCAR.relax.abinit,CONTCAR.relax.aims,KPOINTS.relax,KPOINTS.static,KPOINTS.bands,INCAR.bands,AECCAR0.static,AECCAR2.static,CHGCAR.static",vfile2link2,",");
           for(uint ilink=0;ilink<vfile2link2.size();ilink++) {
             if(aurostd::FileExist(directory_RAW+"/"+vfile2link2.at(ilink))) { // NO EXTENSION
-              if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)) << endl; cout.flush(); }
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)) << endl; cout.flush(); }
               aurostd::LinkFile(directory_RAW+"/"+vfile2link2.at(ilink),directory_WEB);         // LINK
             }
             for(uint iext=0;iext<XHOST.vext.size();iext++) {
               if(aurostd::FileExist(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext))) {
-                if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext)) << endl; cout.flush(); }
                 aurostd::LinkFile(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext),directory_WEB);         // LINK
               }
             } // iext
           } // ilink
 
           if(perform_BADER) {
-            if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+"*jvxl") << endl; cout.flush(); }
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*jvxl") << endl; cout.flush(); }
             aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
-            if(LDEBUG) { cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file WEB->RAW: " << string(directory_RAW+"/"+"*_abader.out") << endl; cout.flush(); }
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*_abader.out") << endl; cout.flush(); }
             aurostd::LinkFile(directory_RAW+"/"+"*_abader.out*",directory_WEB);         // LINK
           }
         } // flag_WEB
@@ -1613,16 +1613,16 @@ namespace aflowlib {
       }
 
       // write aflowlib.out
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl; cout.flush(); 
+      cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl; cout.flush(); 
       cout << XHOST.sPID << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"out");
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".out") << endl; cout.flush(); 
+      cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".out") << endl; cout.flush(); 
       aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_RAW+"/"+aflowlib_data.auid+".out");         // LINK
       // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
 
       // write aflowlib.json
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << endl; cout.flush(); 
+      cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << endl; cout.flush(); 
       cout << XHOST.sPID << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,"json");
-      cout << XHOST.sPID << "aflowlib::LIB2RAW: linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".json") << endl; cout.flush(); 
+      cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".json") << endl; cout.flush(); 
       aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_RAW+"/"+aflowlib_data.auid+".json");         // LINK
       // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON);
 
@@ -1635,12 +1635,12 @@ namespace aflowlib {
       // CHECK FOR AUID-WEB-LINKS
       //      LDEBUG=TRUE;
       if (!LOCAL) {
-        if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: flag_WEB=" << flag_WEB << endl;
-        if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_LIB=" << directory_LIB << endl;
-        if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_RAW=" << directory_RAW << endl;
-        if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: directory_WEB=" << directory_WEB << endl;
+        if(LDEBUG) cout << soliloquy << " flag_WEB=" << flag_WEB << endl;
+        if(LDEBUG) cout << soliloquy << " directory_LIB=" << directory_LIB << endl;
+        if(LDEBUG) cout << soliloquy << " directory_RAW=" << directory_RAW << endl;
+        if(LDEBUG) cout << soliloquy << " directory_WEB=" << directory_WEB << endl;
         //if(LDEBUG)
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: aflowlib_data.auid=" << aflowlib_data.auid << endl;
+        cout << soliloquy << " aflowlib_data.auid=" << aflowlib_data.auid << endl;
         // **----------------------------------------------------------------------------
         // **----------------------------------------------------------------------------
         // NEW BUT STILL DOING
@@ -1656,21 +1656,21 @@ namespace aflowlib {
         aurostd::RemoveFile(directory_AUID_WEB); // to avoid auto-linking SC20181205
 
         // directory_AUID_LIB
-        if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
+        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
+        cout << soliloquy << " (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
         aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK
         // directory_AUID_RAW
-        if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
-        cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
+        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
+        cout << soliloquy << " (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
         aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK
 
         if(flag_WEB) {
-          if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
+          if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
+          cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
           aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK
         } else {
-          if(LDEBUG) cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
-          cout << XHOST.sPID << "aflowlib::LIB2RAW: (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
+          if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
+          cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
           aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK
         }
 
@@ -1681,28 +1681,28 @@ namespace aflowlib {
             if(tokens.at(tokens.size()-2)=="ICSD") {
               string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
               aurostd::DirectoryMake(directory_ICSD2LINK);	      
-              cout << XHOST.sPID << "aflowlib::LIB2RAW: (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
+              cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
               // LIB
               aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
               aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK
-              cout << XHOST.sPID << "aflowlib::LIB2RAW: (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
+              cout << soliloquy << " (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
               // RAW
               aurostd::RemoveFile(directory_ICSD2LINK+"/RAW");  // to avoid auto-linking SC20190830
               aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK
-              cout << XHOST.sPID << "aflowlib::LIB2RAW: (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
+              cout << soliloquy << " (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
               // WEB
               aurostd::RemoveFile(directory_ICSD2LINK+"/WEB");  // to avoid auto-linking SC20190830
               aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK
-              cout << XHOST.sPID << "aflowlib::LIB2RAW: (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
+              cout << soliloquy << " (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
             }
           }
         }
 
 
-        // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << XHOST.sPID << "aflowlib::LIB2RAW: DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
+        // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << soliloquy << " DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
         // DONE
-	//      cout << XHOST.sPID << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
-	cout << XHOST.sPID << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << endl;
+	//      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
+	cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << endl;
         if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
     }
@@ -1722,19 +1722,19 @@ namespace aflowlib {
     LDEBUG=FALSE; //CO20180321
     //CO20180216 - more robust for any type of directory/file setup
     vector<string> Chmod_Files;
-    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: pwd=" << aurostd::getPWD() << endl;}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+    if(LDEBUG) { cerr << soliloquy << " pwd=" << aurostd::getPWD() << endl;}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_RAW+"\" -type d`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type d"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++) {
-      if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
+      if(LDEBUG) { cerr << soliloquy << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("755",Chmod_Files[i]);
     }
 
     //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_RAW+"\" -type f`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type f"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++) {
-      if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
+      if(LDEBUG) { cerr << soliloquy << " \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("644",Chmod_Files[i]);
     }
 
@@ -1742,14 +1742,14 @@ namespace aflowlib {
       //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_WEB+"\" -type d`");
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_WEB+"\" -type d"),Chmod_Files);
       for(uint i=0;i<Chmod_Files.size();i++) {
-        if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
+        if(LDEBUG) { cerr << soliloquy << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
         aurostd::ChmodFile("755",Chmod_Files[i]);
       }
 
       //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_WEB+"\" -type f`");
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_WEB+"\" -type f"),Chmod_Files);
       for(uint i=0;i<Chmod_Files.size();i++) {
-        if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
+        if(LDEBUG) { cerr << soliloquy << " \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
         aurostd::ChmodFile("644",Chmod_Files[i]);
       }
     }
@@ -1757,14 +1757,14 @@ namespace aflowlib {
     //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_LIB+"\" -type d`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_LIB+"\" -type d"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++) {
-      if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
+      if(LDEBUG) { cerr << soliloquy << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("755",Chmod_Files[i]);
     }
 
     //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_LIB+"\" -type f`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_LIB+"\" -type f"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++) {
-      if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::LIB2RAW: \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
+      if(LDEBUG) { cerr << soliloquy << " \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("644",Chmod_Files[i]);
     }
 
@@ -1790,7 +1790,7 @@ namespace aflowlib {
     // NOW WRITE DOWN THE FILE FOR THE LIBRARY
 
     // done
-    //    cout << XHOST.sPID << "aflowlib::LIB2RAW: [1]" << endl;
+    //    cout << soliloquy << " [1]" << endl;
     return TRUE;
   }
 }

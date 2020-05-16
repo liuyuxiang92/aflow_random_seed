@@ -1915,7 +1915,7 @@ namespace aurostd {
   // ***************************************************************************
   // aurostd::ZIP2ZIP aurostd::BZ2XZ aurostd::GZ2XZ
   // ***************************************************************************
-  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE,string message) {  // "" compliant April/2019 SC
+  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE,const string& message) {  // "" compliant April/2019 SC
     string from_cmd="bzip2",from_ext="bz2";
     string to_cmd="xz",to_ext="xz";
     string dir=aurostd::CleanFileName(_dir);
@@ -1985,8 +1985,8 @@ namespace aurostd {
     return TRUE;
   }
 
-  bool BZ2XZ(string dir,bool VERBOSE,string message) { return ZIP2ZIP(dir,"bz2","xz",VERBOSE,message); }
-  bool GZ2XZ(string dir,bool VERBOSE,string message) { return ZIP2ZIP(dir,"gz","xz",VERBOSE,message); }
+  bool BZ2XZ(string dir,bool VERBOSE,const string& message) { return ZIP2ZIP(dir,"bz2","xz",VERBOSE,message); }
+  bool GZ2XZ(string dir,bool VERBOSE,const string& message) { return ZIP2ZIP(dir,"gz","xz",VERBOSE,message); }
 
   // ***************************************************************************
   // Function FileExist

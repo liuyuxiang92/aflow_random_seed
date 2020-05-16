@@ -21,7 +21,7 @@ namespace aurostd {
   // List of error types and errors ////////////////////////////////////////////
 #define _AFLOW_NUM_ERR_TYPES_ 7  // Number of error types
 
-  string xerror_PID;
+  string xerror_PID;  //SC20200508
 
   static const std::string error_types[_AFLOW_NUM_ERR_TYPES_] = 
     {"", "Input Error", "File Error", "Value Error",
@@ -87,12 +87,12 @@ namespace aurostd {
   //buildMessageString/////////////////////////////////////////////////////////
   std::string xerror::buildMessageString() {
     std::stringstream msgstr;
-    msgstr << xerror_PID;
+    msgstr << xerror_PID; //SC20200508
     msgstr << "ERROR " << error_code << " in ";
     msgstr << whereFunction() << ": ";  // function name
     msgstr << error_string() << endl; //<< " - ";  // error type  //CO20181226
     if (error_code == 2) {
-      //   msgstr << xerror_PID;
+      //   msgstr << xerror_PID;  //SC20200508
       msgstr << "There was an error, but the supplied error code is invalid. Please contact the developers. ";
       msgstr << "Supplied error message: ";
     }

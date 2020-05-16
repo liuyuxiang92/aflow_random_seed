@@ -148,10 +148,10 @@
         -- working on SCAN in aflowlib.h added aflowlib_enrty MEGAGGA 2d (SC)
         -- added some pseudopotentials references, fixed HEX/FCC and RHL into autogamma ivasp 2c (SC)
         -- removed EnthalpyReference 2b (SC)
-        -- sum up all the previous updates -- ready to run now 2a (SC)
+        -- sum up all the previous updates - ready to run now 2a (SC)
 3.2.2 - 2020/03/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2.tar.xz
-        -- sum up all the previous updates -- ready to run now (SC)
+        -- sum up all the previous updates - ready to run now (SC)
 3.2.1k - 2020/03/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1*.tar.xz
         -- species_pp_groundstate_energy and species_pp_groundstate_structure 1k (SC)
@@ -365,7 +365,7 @@
         -- Added safeguards for DOSCAR readers for broken DOSCAR files (ME)
         -- Fixed plotter bugs for HTQC prototype names (ME)
         -- Added findInList function to AUROSTD (ME)
-        -- Generalized BringInCell method (ME/DX)
+        -- Generalized BringInCell method (ME+DX)
         -- created overloads for BringInCell method (double/xvector/_atom/xstructure), along with "InPlace" variants, i.e., const input (DX)
         -- replaced all mod_one/mod_one_xvec/mod_one_atom for new BringInCell method (DX)
         -- replaced old BringInCell functions with new version (DX)
@@ -402,13 +402,13 @@
         -- Changed xDOSCAR, xEIGENVAL, and xKPOINTS to be compatible with new plotter (ME)
         -- Added functionality to APL that outputs phonon DOS and dispersion in
         -- VASP format for new plotter functions (ME)
-        -- Fixed bug for the path builder for path with -- and | as separators (ME)
+        -- Fixed bug for the path builder for path with - and | as separators (ME)
         -- Fixed xDOSCAR reader to be more general (ME)
         -- patched change_tolerance() bug for double& tolerance return (DX)
         -- renamed minimum distance functions, more descriptive (minimizeDistanceCartesianMethod() and minimizeDistanceFractionalMethod()) (DX)
         -- reduced number of inputs for minimum distance functions (DX)
         -- added functionality to read VASP5 format in CHGCAR (DX)
-        -- cleaned species/atom names in xstructure2json; remove pseudopotential information, oxidation numbers, etc (DX)
+        -- cleaned species/atom names in xstructure2json; remove pseudopotential information, oxidation numbers, etc. (DX)
         -- added boolean to ignore minimum distance check in foldAtomsInCell() (DX)
         -- added overloads for mapping functions (DX) 
         -- fixed bug in in xstructure2json in LIB2RAW runs; store corresponding structure from relaxations (DX) 
@@ -516,7 +516,7 @@
         -- added force_strict_pc2scMap to GetSuperCell() constraining the map to the true primitive cell and not equivalent atoms (CO)
         -- added general function to fix string for latex output (CO)
         -- added XHOST.vflag_control.flag("DIRECTORY_CLEAN") for accurate logging of current directory (CO)
-        -- major restructuring of pocc code, consolidating classes, renaming variables, etc (CO)
+        -- major restructuring of pocc code, consolidating classes, renaming variables, etc. (CO)
         -- fixed old pocc to run with any compression extension (CO)
         -- eliminating atom.print_RHT (CO)
         -- patches for xStream() (CO)
@@ -595,15 +595,15 @@
         -- added ANRL preset values for prototypes in getANRLParameters() (DX)
         -- added ANRL prototypes to README_PROTO.TXT along with unique permutation information (DX)
         -- updated headers for each AFLOW prototype in README_LIBRARY_HTQC.TXT to include the stoichometry, Pearson symbol, space group, and Wyckoff letters (DX)
-        -- added functionality to search AFLOW prototypes (--proto_labels) via stoichiometry, space group, arity, etc (DX)
+        -- added functionality to search AFLOW prototypes (--proto_labels) via stoichiometry, space group, arity, etc. (DX)
         -- added AFLUX command line functionality (DX+FR)
         -- added AFLUX helper functions to run inside AFLOW and extract properties into vectors of properties (DX)
         -- added functionality to --wyccar, print letters/multiplicities/site symmetries as a string (DX)
         -- added function to perform symmetry on vector of xstructures (DX)
         -- added function to get enantiomophs of space group, if any exist (DX)
-        -- added function to return list of particular element classes, e.g., alkali, transition metals, metals, non-metals, etc (DX) 
+        -- added function to return list of particular element classes, e.g., alkali, transition metals, metals, non-metals, etc. (DX) 
         -- added function to convert compound name into a stoichiometry (DX) 
-        -- updated comparison code; added new functionality to compare compounds to AFLOW database, compare compounds to AFLOW prototypes, identify unique permutations, etc (DX)
+        -- updated comparison code; added new functionality to compare compounds to AFLOW database, compare compounds to AFLOW prototypes, identify unique permutations, etc. (DX)
         -- added options to ignore symmetry during structure comparison (DX)
         -- improved comparison code output, i.e., more information and cleaner (DX)
         -- improved multithreading of comparison code (DX)
@@ -622,7 +622,7 @@
         -- accelerated reading of forces from vasprun.xml files for APL and AAPL (ME)
         -- AFLOW not produces POSCAR in the format required by the VASP binary instead of just taking the format in the aflow.in file (ME)
         -- added functionality to read CHGCAR and WAVECAR files between relaxations (ME + Rico Friedrich)
-        -- removed duplicate APL functions -- apl_hroutines.cpp is now obsolete (ME)
+        -- removed duplicate APL functions - apl_hroutines.cpp is now obsolete (ME)
         -- auto-sort by inequivalent atoms in APL (CO + Xiaoyu Wang from UBuffalo)
         -- added sortAtomsEquivalent() to pre-APL/POCC and CONVERT-sprim, -sconv, -niggli, -minkowski for prospective APL calculations: better to sort before relaxations and not have to sort again in the future (CO)
         -- patched sortAtoms*() to include basis and ensure relative order (CO)
@@ -694,7 +694,7 @@
         -- Added LIB2LIB function to automatically perform AEL and AGL post processing when running LIB2RAW (CT)
         -- Updated LIB2RAW and webpage generation functions to incorporate additional AEL and AGL properties (CT)
         -- Added conversion of pressure extracted from OUTCAR file from kB to GPa in AEL and AGL to keep units consistent (CT)
-        -- added species scaling to volume for ANRL prototypes, if --params=-1.0,.. (DX)
+        -- added species scaling to volume for ANRL prototypes, if --params=-1.0,... (DX)
         -- added ANRL prototype for the kesterite structure (DX)
         -- improved CIF reader, i.e., account for different formats and partial occupation (DX)
         -- fixed bug in kpath determination (primitive vs original lattice) (DX)
@@ -1003,7 +1003,7 @@
         -- fixed static compile settings (CO)
         -- fixed _sym_op.basis_map_calculated issue in ApplyAtom() for AAPL (CO)
         -- added xStream class for logging workflow updates (CO)
-        -- fixed stability criterion vs (Delta H) fonts in chull report (CO)
+        -- fixed stability criterion vs. (Delta H) fonts in chull report (CO)
         -- substantial clean-up of classes in POCC in anticipation for AVASP_MakeSingleAFLOWIN integration (CO)
         -- added avasp function in preparation for AVASP_MakeSingleAFLOWIN integration (CO)
         -- added try/catches for easy debugging (CO)
@@ -1217,7 +1217,7 @@
         -- added grouped Wyckoff position information to the JSON output (DX)
         -- added logger/status for directory comparisons (DX)
         -- added functionality to read .bz2 geometry files (DX)
-        -- added --no_scale option for comparisons (required for chull) (CO/DX)
+        -- added --no_scale option for comparisons (required for chull) (CO+DX)
         (AFLOW: aconvasp_main.cpp, chull.cpp, symmetry_spacegroup.cpp, compare_structure.cpp, compare_structure_function.cpp, compare_structure.h) (DX)
 3.1.166 - 2018/02/02
         Location: http://materials.duke.edu/AFLOW/HISTORIC/aflow.3.1.165.tar.xz
@@ -1245,7 +1245,7 @@
         -- customized avasp.cpp (--proto) with options from .aflow.rc, --mpi, and --np (CO)
         -- fixed QHA/AAPL aflow.in keyword bug (CO)
         -- added ANRL modifiers to directory for --proto (Ex: label:ANRL=param1,param2,...) (DX)
-        (AFLOW: aconvasp_main.cpp, aflowrc.cpp, avasp.cpp, chull.cpp, aflow.cpp, aflow.h, init.cpp, kbin.cpp, Makefile, README_AFLOW_ACONVASP.TXT, README_AFLOW_CHULL.TXT, README_AFLOW.TXT) (CO/DX)
+        (AFLOW: aconvasp_main.cpp, aflowrc.cpp, avasp.cpp, chull.cpp, aflow.cpp, aflow.h, init.cpp, kbin.cpp, Makefile, README_AFLOW_ACONVASP.TXT, README_AFLOW_CHULL.TXT, README_AFLOW.TXT) (CO+DX)
 3.1.162 - 2018/01/19
         Location: http://materials.duke.edu/AFLOW/HISTORIC/aflow.3.1.162.tar.xz
         -- added SU(2) complex matrix and su(2) generator coefficients representation of symmetry elements 
@@ -1264,7 +1264,7 @@
         -- uint chull gccV7 warning fix (CO)
         (AUROSTD: xscalar.h, xvector.h, xmatrix.h)
         (AFLOW: chull.cpp)
-        Added README_AFLOW_SYM.TXT (init.cpp aflow.h aflow.cpp data.cpp) (DX/SC)
+        Added README_AFLOW_SYM.TXT (init.cpp aflow.h aflow.cpp data.cpp) (DX+SC)
 3.1.160 - 2018/01/13
         Location: http://materials.duke.edu/AFLOW/HISTORIC/aflow.3.1.160.tar.xz
         convex hull mods:
@@ -1278,7 +1278,7 @@
         (AFLOW: chull.cpp, chull.h)
 3.1.159 - 2018/01/10 -
         Location: http://materials.duke.edu/AFLOW/HISTORIC/aflow.3.1.159.tar.xz
-        MAJOR UPDATE -- convex hull code rewritten, includes: (CO)
+        MAJOR UPDATE - convex hull code rewritten, includes: (CO)
          -- complete generalization of input (need not be thermodynamic hull, can be ANY data)
          -- new major classes for naries, alloys, and coordinate (stoichiometry) groups
          -- for hulls with stoichiometric coordinates, the hull and properties are calculated in steps of increasing dimensionality
@@ -1346,7 +1346,7 @@
         (libraries.cpp) (SC)
 3.1.148 - 2017/10/27 -
         fixed --edata (txt + json print outs)
-        (aconvasp_main.cpp,pflow.h,pflow_print.cpp,aflowlib_libraries.cpp) (CO/DX)
+        (aconvasp_main.cpp,pflow.h,pflow_print.cpp,aflowlib_libraries.cpp) (CO+DX)
 3.1.147 - 2017/10/25 -
         added skew test for structures (sym_eps),
         incorporated full symmetry analysis in more functions,
@@ -1357,7 +1357,7 @@
         fixed nbondxx units,
         added jsons for sym/structure/bandsdata/dosdata to lib2raw,
         incorporated scale (ReScale()) in more functions
-        (aurostd.h,boot.cpp,main.cpp,xmatrix.cpp,xmatrix.h,Makefile,README_AFLOW_ACONVASP.TXT,aflow.h,aconvasp_main.cpp,bader.cpp,defects.cpp,estructure.cpp,init.cpp,ovasp.cpp,pflow.h,pflow_print.cpp,surface.cpp,symmetry.cpp,symmetry_spacegroup.cpp,xatom.cpp,xclasses.cpp,xproto.cpp,aflowlib.h,aflowlib_libraries.cpp) (CO/DX)
+        (aurostd.h,boot.cpp,main.cpp,xmatrix.cpp,xmatrix.h,Makefile,README_AFLOW_ACONVASP.TXT,aflow.h,aconvasp_main.cpp,bader.cpp,defects.cpp,estructure.cpp,init.cpp,ovasp.cpp,pflow.h,pflow_print.cpp,surface.cpp,symmetry.cpp,symmetry_spacegroup.cpp,xatom.cpp,xclasses.cpp,xproto.cpp,aflowlib.h,aflowlib_libraries.cpp) (CO+DX)
 3.1.146 - 2017/10/16 -
         rewritten bandgap code,
         added extensive FHI-AIMS support (APL),
@@ -1376,7 +1376,7 @@
         fixed false positive message in structure_comparison,
         fixed APL bugs with reading aflow.in,
         avoid SYMPREC vs. PREC confusion
-        (ovasp.cpp,estructure.cpp,xatom.cpp,aconvasp_main.cpp,pflow.h,aflow.h,aurostd.h,aflowlib_libraries.cpp,poccupation_edos.cpp,Makefile,ivasp.cpp,apl_phoncalc.cpp,qha_eosrun.cpp,apl.h,apl_kphonons.cpp,compare_structure.cpp,symmetry_spacegroup_functions.cpp,symmetry_spacegroup.h) (CO/DX)
+        (ovasp.cpp,estructure.cpp,xatom.cpp,aconvasp_main.cpp,pflow.h,aflow.h,aurostd.h,aflowlib_libraries.cpp,poccupation_edos.cpp,Makefile,ivasp.cpp,apl_phoncalc.cpp,qha_eosrun.cpp,apl.h,apl_kphonons.cpp,compare_structure.cpp,symmetry_spacegroup_functions.cpp,symmetry_spacegroup.h) (CO+DX)
 3.1.143 - 2017/09/28 -
         added magnetic symmetry analysis (crystal + spin) to sgdata,
         aflowSG,aflowSYM,agroup,fgroup,pgroup_xtal,agroup,and sgroup; speed increase for space group routine,
@@ -1385,7 +1385,7 @@
 3.1.142 - 2017/09/14 -
         added mpcdf_eos machine,
         fixed proper nouns in symmetry output
-        (aflow.cpp,kbin.cpp,aflowrc.cpp,init.cpp,kvasp.cpp,README_AFLOW.TXT,Makefile,pflow_print.cpp) (CO/DX)
+        (aflow.cpp,kbin.cpp,aflowrc.cpp,init.cpp,kvasp.cpp,README_AFLOW.TXT,Makefile,pflow_print.cpp) (CO+DX)
 3.1.141 - 2017/09/12 -
         fixed sgdata/wyccar issue,
         added space group functions to SYM namespace,
@@ -1397,7 +1397,7 @@
         pgroupk speed up,
         added covalent radii info,
         dos/band structure gnuplot updates
-        (main.cpp,README_AFLOW_ACONVASP.TXT,aflow.h,aconvasp_main.cpp,lattice.cpp,pflow.h,pflow_print.cpp,symmetry.cpp,symmetry_spacegroup.cpp,symmetry_spacegroup.h,symmetry_spacegroup_functions.cpp,xatom.cpp,estructure.cpp,init.cpp) (DX/CO) 
+        (main.cpp,README_AFLOW_ACONVASP.TXT,aflow.h,aconvasp_main.cpp,lattice.cpp,pflow.h,pflow_print.cpp,symmetry.cpp,symmetry_spacegroup.cpp,symmetry_spacegroup.h,symmetry_spacegroup_functions.cpp,xatom.cpp,estructure.cpp,init.cpp) (DX+CO) 
 3.1.139 - 2017/08/29 -
         fixed edata issue (agroups/iatoms were not calculated) for library runs
         (README_AFLOW_ACONVASP.TXT,aconvasp_main.cpp,lattice.cpp,xatom.cpp,aflow.h) (DX)
@@ -1407,7 +1407,7 @@
         json serializers for symmetry groups,
         tolerance scan implemented for separate symmetry groups,
         chull latex fix
-        (chull.cpp,aconvasp_main.cpp,aflow.h,lattice.cpp,pflow.h,symmetry.cpp,xatom.cpp,xclasses.cpp,aapl_pairs.cpp,aapl_tcond.cpp,aapl_tensor.cpp,apl.h,apl_kphonons.cpp,aurostd.h,main.cpp) (JJPR/DX/CO)
+        (chull.cpp,aconvasp_main.cpp,aflow.h,lattice.cpp,pflow.h,symmetry.cpp,xatom.cpp,xclasses.cpp,aapl_pairs.cpp,aapl_tcond.cpp,aapl_tensor.cpp,apl.h,apl_kphonons.cpp,aurostd.h,main.cpp) (JJPR+DX+CO)
 3.1.137 - 2017/08/04 -
         incorporated aflow.Xgroup.json,
         json serializers for bands/dos,
@@ -1415,12 +1415,12 @@
         xvector/xmatrix lrows/urows/lcols/ucols bug fix,
         APL symmetry output append to ofstream,
         removed validation for sgroup (NOT NEEDED)
-        (aconvasp_main.cpp,aflow.h,pflow.h,symmetry.cpp,xatom.cpp,README_AFLOW_ACONVASP.TXT,main.cpp,aurostd.h,xvector.cpp,xmatrix.cpp,apl_supercell.cpp,Makefile,estructure.cpp) (DX/EG/CO)
+        (aconvasp_main.cpp,aflow.h,pflow.h,symmetry.cpp,xatom.cpp,README_AFLOW_ACONVASP.TXT,main.cpp,aurostd.h,xvector.cpp,xmatrix.cpp,apl_supercell.cpp,Makefile,estructure.cpp) (DX+EG+CO)
 3.1.136 - 2017/08/01 -
         speed up getFullSymBasis,
         fixed some Wyckoff positions,
         fixed printing in apl (spacegroup vs. lattice type)
-        (apl_pdisc.cpp,apl_phoncalc.cpp,aflow.h,symmetry.cpp,symmetry_spacegroup.cpp,symmetry_spacegroup.h,symmetry_spacegroup_ITC_library.cpp,symmetry_spacegroup_functions.cpp) (DX/CO)
+        (apl_pdisc.cpp,apl_phoncalc.cpp,aflow.h,symmetry.cpp,symmetry_spacegroup.cpp,symmetry_spacegroup.h,symmetry_spacegroup_ITC_library.cpp,symmetry_spacegroup_functions.cpp) (DX+CO)
 3.1.135 - 2017/07/25 -
         fixed xOUTCAR parsing issue with lattice vectors (vasp bug)
         (aflow.h,ovasp.cpp) (CO)
@@ -1428,13 +1428,13 @@
         fixed symmetry for library runs (angle/vol tolerance),
         added directory output,
         removed relaxed data from orig structure section in entry page
-        (aflowlib_web_interface.cpp,Makefile,aconvasp_main.cpp,aflow.h,lattice.cpp,aflowlib_libraries.cpp,pflow_print.cpp,symmetry.cpp,symmetry_spacegroup.cpp,xatom.cpp,xproto.cpp) (DX/GG/CO)
+        (aflowlib_web_interface.cpp,Makefile,aconvasp_main.cpp,aflow.h,lattice.cpp,aflowlib_libraries.cpp,pflow_print.cpp,symmetry.cpp,symmetry_spacegroup.cpp,xatom.cpp,xproto.cpp) (DX+GG+CO)
 3.1.133 - 2017/07/19 -
         AEL/AGL: Hugoniots,
         AEL vs pressure (CT) 
 3.1.132 - 2017/07/14 -
         added full_sym output to RAW
-        (aflowlib_libraries.cpp) (DX/CO)
+        (aflowlib_libraries.cpp) (DX+CO)
 3.1.131 - 2017/07/14 -
         allow global aflowrc in /etc/aflow.conf plus bug fixes in aflowrc (SC)
 3.1.130 - 2017/07/13 -
@@ -1452,7 +1452,7 @@
 3.1.124 - 2017/07/06 -
         quaternion representation additions,
         aflowSYM bug fixes (HfV2)
-        (lattice.cpp,xatom.cpp,aflow.h,symmetry.cpp,Makefile) (GG/DX/CO)
+        (lattice.cpp,xatom.cpp,aflow.h,symmetry.cpp,Makefile) (GG+DX+CO)
 3.1.123 - 2017/07/06 -
         adding flags for METAGGA and IVDW (xclasses.cpp) (SC)
 3.1.122 - 2017/07/04 -
