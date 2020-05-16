@@ -1500,6 +1500,7 @@ class xstructure {
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
+    void UpdateCartesianCoordinates();                            //AS20200514
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice

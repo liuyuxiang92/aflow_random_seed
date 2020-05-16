@@ -1334,6 +1334,51 @@ DEFAULT_QHA_SCQHA_PDIS_T
   type: string
   default: "50,100,600"
 
+DEFAULT_QHA_GP_FINITE_DIFF
+  description: Defines if Grueneisen parameter is calculated using finite difference method.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_IGNORE_IMAGINARY
+  description: Defines if imaginary frequencies in phonon calculations are ignored.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_FILE_PREFIX
+  description: QHA file prefix. All QHA output files start with this prefix.
+  type: string
+  default: "aflow.qha."
+
+DEFAULT_QHA_GP_PATH_FILE
+  description: Output file for mode-resolved Grueneisen parameter dispersion curve.
+  type: string
+  default: "gp.disp.out"
+
+DEFAULT_QHA_GP_MESH_FILE
+  description: Output file for mode-resolved Grueneisen parameter calculated on q-points mesh.
+  type: string
+  default: "gp.mesh.out"
+
+DEFAULT_QHA_GP_AVG_FILE
+  description: Output file for temperature-dependent average Grueneisen parameter calculated using finite differences.
+  type: string
+  default: "gp.avg.out"
+
+DEFAULT_QHA_THERMO_FILE
+  description: Output file for thermal properties (equilibrium volume, free energy, bulk modulus, isobaric and isochoric specific heat, average Grueneisen parameter).
+  type: string
+  default: "gp.thermo.out"
+
+DEFAULT_QHA_FREQS_FILE
+  description: Output file for volume-dependent phonon frequencies.
+  type: string
+  default: "frequencies.out"
+
+DEFAULT_QHA_FVT_FILE
+  description: Output file for temperature- and volume-dependent free energy.
+  type:
+  default: "FVT.out"
+
 ####################################################################################################
 DEFAULTS AAPL
 
