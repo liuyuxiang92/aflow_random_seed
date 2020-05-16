@@ -322,7 +322,7 @@ namespace apl {
   xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
     string function = "apl::Supercell::determineSupercellDimensions()";
     stringstream message;
-  
+
     xvector<int> dims(3);
     string method = opts.getattachedscheme("SUPERCELL::METHOD");
     if (method.empty()) {
@@ -348,8 +348,8 @@ namespace apl {
       }
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
-                << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
-                << " natoms=" << natoms;
+          << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
+          << " natoms=" << natoms;
         pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "MINATOMS_RESTRICTED") {
@@ -362,8 +362,8 @@ namespace apl {
       dims[1] = Ni; dims[2] = Ni; dims[3] = Ni;
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Ni=" << Ni
-                << " supercell=" << Ni << "x" << Ni << "x" << Ni
-                << " natoms=" << natoms;
+          << " supercell=" << Ni << "x" << Ni << "x" << Ni
+          << " natoms=" << natoms;
         pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "SHELLS") {
@@ -391,7 +391,7 @@ namespace apl {
     xvector<int> dims = determineSupercellDimensions(opts);
     build(dims);
   }
-  
+
   void Supercell::build(const xvector<int>& dims, bool VERBOSE) {
     build(dims[1], dims[2], dims[3], VERBOSE);
   }
@@ -518,9 +518,9 @@ namespace apl {
     for (uint ia = 0; ia < _inStructure.iatoms.size(); ia++) {
       for (uint iia = 0; iia < _inStructure.iatoms[ia].size(); iia++) {
         // Replicate this atom by given mesh...
-        for (_AFLOW_APL_REGISTER_ int i = 0; i <= p; i++)
-          for (_AFLOW_APL_REGISTER_ int j = 0; j <= p; j++)
-            for (_AFLOW_APL_REGISTER_ int k = 0; k <= p; k++) {
+        for (int i = 0; i <= p; i++)
+          for (int j = 0; j <= p; j++)
+            for (int k = 0; k <= p; k++) {
               // Create position of new atoms...
               atom = _inStructure.atoms[_inStructure.iatoms[ia][iia]];
               cshift = (((double)i) * _inStructure.lattice(1) +
@@ -575,10 +575,10 @@ namespace apl {
     // Feed the factor group list (not efficient in this order, but we have all
     // similar operations in order just shifted...
     if (constructSymmetry) {
-      for (_AFLOW_APL_REGISTER_ uint l = 0; l < _inStructure.fgroup.size(); l++) {
-        for (_AFLOW_APL_REGISTER_ int i = 0; i < p; i++)
-          for (_AFLOW_APL_REGISTER_ int j = 0; j < p; j++)
-            for (_AFLOW_APL_REGISTER_ int k = 0; k < p; k++) {
+      for (uint l = 0; l < _inStructure.fgroup.size(); l++) {
+        for (int i = 0; i < p; i++)
+          for (int j = 0; j < p; j++)
+            for (int k = 0; k < p; k++) {
               // Create position of new atoms...
               cshift = (((double)i) * _inStructure.lattice(1) +
                   ((double)j) * _inStructure.lattice(2) +
@@ -606,14 +606,14 @@ namespace apl {
 
     // Order atoms in VASP like style
     int start = 0;
-    for (_AFLOW_APL_REGISTER_ int i = 0; i < (int)_scStructure.num_each_type.size(); i++) {
+    for (int i = 0; i < (int)_scStructure.num_each_type.size(); i++) {
       int end = start + _scStructure.num_each_type[i];
-      for (_AFLOW_APL_REGISTER_ int j = start; j < end - 1; j++) {
+      for (int j = start; j < end - 1; j++) {
         if (aurostd::abs(_scStructure.atoms[j].fpos(1)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(1) = 0.0;
         if (aurostd::abs(_scStructure.atoms[j].fpos(2)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(2) = 0.0;
         if (aurostd::abs(_scStructure.atoms[j].fpos(3)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(3) = 0.0;
 
-        for (_AFLOW_APL_REGISTER_ int k = j + 1; k < end; k++) {
+        for (int k = j + 1; k < end; k++) {
           if (aurostd::abs(_scStructure.atoms[k].fpos(1)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(1) = 0.0;
           if (aurostd::abs(_scStructure.atoms[k].fpos(2)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(2) = 0.0;
           if (aurostd::abs(_scStructure.atoms[k].fpos(3)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(3) = 0.0;
@@ -623,7 +623,7 @@ namespace apl {
             _scStructure.atoms[j] = _scStructure.atoms[k];
             _scStructure.atoms[k] = ta;
 
-            for (_AFLOW_APL_REGISTER_ int l = 0; l < (int)_inStructure.atoms.size(); l++) {
+            for (int l = 0; l < (int)_inStructure.atoms.size(); l++) {
               if (_pc2scMap[l] == j)
                 _pc2scMap[l] = k;
               else if (_pc2scMap[l] == k)
@@ -639,7 +639,7 @@ namespace apl {
               _scStructure.atoms[j] = _scStructure.atoms[k];
               _scStructure.atoms[k] = ta;
 
-              for (_AFLOW_APL_REGISTER_ int l = 0; l < (int)_inStructure.atoms.size(); l++) {
+              for (int l = 0; l < (int)_inStructure.atoms.size(); l++) {
                 if (_pc2scMap[l] == j)
                   _pc2scMap[l] = k;
                 else if (_pc2scMap[l] == k)
@@ -655,7 +655,7 @@ namespace apl {
                 _scStructure.atoms[j] = _scStructure.atoms[k];
                 _scStructure.atoms[k] = ta;
 
-                for (_AFLOW_APL_REGISTER_ int l = 0; l < (int)_inStructure.atoms.size(); l++) {
+                for (int l = 0; l < (int)_inStructure.atoms.size(); l++) {
                   if (_pc2scMap[l] == j)
                     _pc2scMap[l] = k;
                   else if (_pc2scMap[l] == k)
@@ -758,7 +758,7 @@ namespace apl {
           uint i = 0;
           for (i = 0; i < iatoms_oc[iatoc].size(); i++) {
             if (SYM::FPOSMatch(fpos, _inStructure_original.atoms[iatoms_oc[iatoc][i]].fpos,
-                _inStructure_original.lattice, _inStructure_original.f2c, _skew, _sym_eps)) {
+                  _inStructure_original.lattice, _inStructure_original.f2c, _skew, _sym_eps)) {
               pcell.iatoms[iatoc] = _pcStructure.iatoms[iatpc];
               for (uint j = 0; j < iatoms_pc[iatpc].size(); j++) pcell.atoms[iatoms_pc[iatpc][j]].index_iatoms = iatoc;
               break;
@@ -796,8 +796,8 @@ namespace apl {
       // If the mapping fails for the original structure,
       // something went seriously wrong
       string function = "apl::Supercell::projectToOriginal()";
-      string message = "Mapping between original structure and supercell failed."
-                       " This is likely a bug in the code.";
+      string message = "Mapping between original structure and supercell failed.";
+      message +=  " This is likely a bug in the code.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
@@ -863,7 +863,7 @@ namespace apl {
           if (k == natoms_sc) {
             if (LDEBUG) {
               std::cerr << function << ": pc2scMap failed for atom " << i << "."
-                        << " Could not map original atom " << j << " to supercell." << std::endl;
+                << " Could not map original atom " << j << " to supercell." << std::endl;
             }
             return false;
           }
@@ -923,9 +923,9 @@ namespace apl {
     }
     _maxShellID = MIN_NN_SHELLS;
 
-    _AFLOW_APL_REGISTER_ int i = 1;
-    _AFLOW_APL_REGISTER_ int j = 1;
-    _AFLOW_APL_REGISTER_ int k = 1;
+    int i = 1;
+    int j = 1;
+    int k = 1;
 
     while (true) {
       _scStructure = GetSuperCell(_inStructure, i, j, k);
@@ -983,7 +983,7 @@ namespace apl {
     }
     sh.clear();
 
-     // ME20200102 - BEGIN
+    // ME20200102 - BEGIN
     //[OBSOLETE] return i * j * k * _inStructure.atoms.size();
     xvector<int> dims(3);
     dims[1] = i; dims[2] = j; dims[3] = k;
@@ -1212,7 +1212,7 @@ namespace apl {
     }
 
     // Find its id...
-    _AFLOW_APL_REGISTER_ int l = 0;
+    int l = 0;
     for (; l < (int)_scStructure.atoms.size(); l++) {
       if (SYM::FPOSMatch(rotatedAtom.fpos, _scStructure.atoms[l].fpos, _scStructure.lattice, _scStructure.f2c, _skew, _sym_eps)) {  //CO NEW, default to symmetry tolerance
         break;
@@ -1221,7 +1221,7 @@ namespace apl {
 
     if (l == (int)_scStructure.atoms.size()) {
 #if ERROR_VERBOSE
-      _AFLOW_APL_REGISTER_ int l = 0;
+      int l = 0;
       for (; l < (int)_scStructure.atoms.size(); l++) {
         printXVector(_scStructure.atoms[atomID].fpos, false);
         cout << " -> ";
@@ -1271,7 +1271,7 @@ namespace apl {
     }
 #endif
 
-     // ME20191219 - use basis_atoms_map
+    // ME20191219 - use basis_atoms_map
     if (symOp.basis_map_calculated) {
       int natoms = (int) _scStructure.atoms.size();
       for (int at = 0; at < natoms; at++) {
@@ -1303,7 +1303,7 @@ namespace apl {
 
     if (l == (int)_scStructure.atoms.size()) {
 #if ERROR_VERBOSE
-      _AFLOW_APL_REGISTER_ int l = 0;
+      int l = 0;
       for (; l < (int)_scStructure.atoms.size(); l++) {
         //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE, FALSE, _derivative_structure);  //CO no roff
         _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE, FALSE);  //CO no roff
@@ -1386,7 +1386,7 @@ namespace apl {
       cout << "ATOM " << whichAtomID << ": " << _scStructure.atoms[whichAtomID].fpos << std::endl;
       cout << "ATOM " << toAtomID << ": " << _scStructure.atoms[toAtomID].fpos << std::endl;
 
-      _AFLOW_APL_REGISTER_ uint l = 0;
+      uint l = 0;
       for (; l < symPool->size(); l++) {
         cout << "i=" << l << std::endl;
         cout << (*symPool)[l] << std::endl;
@@ -1600,7 +1600,7 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   // ME20200116 - Calculate the real space vectors for the phases once.
   // Calculating them once for all atoms is very quick and significantly speeds
   // up dynamical matrix calculations.
@@ -1657,8 +1657,8 @@ namespace apl {
 
   //ME20200116 - rewritten to accommodate new phase vectors
   bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-                                       xcomplex<double>& phase, int& multiplicity,
-                                       xvector<xcomplex<double> >& derivative, bool calc_derivative) {
+      xcomplex<double>& phase, int& multiplicity,
+      xvector<xcomplex<double> >& derivative, bool calc_derivative) {
     centerID = sc2pcMap(centerID);
     const vector<xvector<double> >& vec = phase_vectors[centerID][atomID];
     multiplicity = (int) vec.size();

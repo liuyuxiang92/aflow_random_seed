@@ -439,9 +439,9 @@ namespace apl {
     xcomplex<double> iONE(0.0, 1.0);
 
     bool isExact = false;
-    for (_AFLOW_APL_REGISTER_ int i = 1; i <= 1; i++) {
-      for (_AFLOW_APL_REGISTER_ int j = 1; j <= 1; j++) {
-        for (_AFLOW_APL_REGISTER_ int k = 1; k <= 1; k++) {
+    for (int i = 1; i <= 1; i++) {
+      for (int j = 1; j <= 1; j++) {
+        for (int k = 1; k <= 1; k++) {
           xvector<double> L = (((double)i) * lattice(1) +
               ((double)j) * lattice(2) +
               ((double)k) * lattice(3));

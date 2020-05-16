@@ -301,10 +301,10 @@ namespace apl {
           const _sym_op& symOp = agroup[symOpID];
 
           try {
-            //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO20190218
+            // int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO20190218
             // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
             // the basis has not been calculated for some reason
-            _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO20190218
+            int l = _supercell->atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO20190218
             m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO20190218
             //m = m + (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc));  //CO NEW //CO20190218
             if(LDEBUG){ //CO20190218
@@ -1785,7 +1785,7 @@ namespace apl {
         drift(2) = drift(2) / forcefield.size();
         drift(3) = drift(3) / forcefield.size();
         if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",AVG]=" << drift << std::endl;} //CO20190218
-        for (_AFLOW_APL_REGISTER_ uint k = 0; k < forcefield.size(); k++) {
+        for (uint k = 0; k < forcefield.size(); k++) {
           forcefield[k] = forcefield[k] - drift;
           if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-drift]=" << forcefield[k] << std::endl;} //CO20190218
         }
@@ -1841,7 +1841,7 @@ namespace apl {
               try {
                 // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
                 // the basis has not been calculated for some reason
-                _AFLOW_APL_REGISTER_ int l = _supercell->atomComesFrom(symOp, k, atomID, true); //CO20190218
+                int l = _supercell->atomComesFrom(symOp, k, atomID, true); //CO20190218
                 testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
               } catch (aurostd::xerror& e) {
                 message << "Mapping problem ? <-> " << k << ".";
@@ -1955,8 +1955,8 @@ namespace apl {
       xmatrix<double> m(3, 3);
       for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if(LDEBUG) {cerr << soliloquy << " looking at supercell atom[" << j << "]" << std::endl;} //CO20190218
-        for (_AFLOW_APL_REGISTER_ int k = 0; k < 3; k++)
-          for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++)
+        for (int k = 0; k < 3; k++)
+          for (int l = 1; l <= 3; l++)
             m(k + 1, l) = _uniqueForces[i][k][j](l);
         if(LDEBUG){ //CO20190218
           cerr << soliloquy << " BEFORE m = " << std::endl;
@@ -1969,8 +1969,8 @@ namespace apl {
           cerr << soliloquy << " AFTER m = " << std::endl;
           cerr << m << std::endl;
         }
-        for (_AFLOW_APL_REGISTER_ int k = 0; k < 3; k++)
-          for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++)
+        for (int k = 0; k < 3; k++)
+          for (int l = 1; l <= 3; l++)
             _uniqueForces[i][k][j](l) = m(k + 1, l);
       }
     }
@@ -2072,8 +2072,8 @@ namespace apl {
           for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
             try {
               //CO20190116 - read atomComesFrom() as: applying symOp to l makes k
-              //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, _supercell->getUniqueAtomID(i, j));  //CO NEW //CO20190218
-              _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, k, _supercell->getUniqueAtomID(i, j)); //JAHNATEK ORIGINAL //CO20190218
+              // int l = _supercell.atomComesFrom(symOp, k, _supercell->getUniqueAtomID(i, j));  //CO NEW //CO20190218
+              int l = _supercell->atomGoesTo(symOp, k, _supercell->getUniqueAtomID(i, j)); //JAHNATEK ORIGINAL //CO20190218
               //cout << "MAP " << k << " <-> " << l << std::endl;
               //row.push_back(inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc); //JAHNATEK ORIGINAL //CO20190218
               //row.push_back(symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc)); //CO NEW  //JAHNATEK ORIGINAL //CO20190218

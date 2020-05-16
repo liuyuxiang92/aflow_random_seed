@@ -23,8 +23,6 @@
 //Also perform other operations involved in calculating quasiharmonic properties.//
 //These functions have been built based on vectorview concepts//
 #include "aflow_qha_operations.h"
-//#define _AFLOW_APL_REGISTER_ register   // register ?
-#define _AFLOW_APL_REGISTER_
 
 //ME20190219 - Define the checksum algorithm used for APL hibernate files
 #define APL_CHECKSUM_ALGO  string("Fletcher32")

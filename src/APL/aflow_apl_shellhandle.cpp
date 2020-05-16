@@ -113,9 +113,9 @@ namespace apl {
     xvector<double> rfmin(3), rf(3);
     xvector<double> rf0 = fposAtom - fposCenter;
 
-    for (_AFLOW_APL_REGISTER_ int ii = 1; ii >= -1; ii--)
-      for (_AFLOW_APL_REGISTER_ int jj = 1; jj >= -1; jj--)
-        for (_AFLOW_APL_REGISTER_ int kk = 1; kk >= -1; kk--) {
+    for (int ii = 1; ii >= -1; ii--)
+      for (int jj = 1; jj >= -1; jj--)
+        for (int kk = 1; kk >= -1; kk--) {
           rf(1) = rf0(1) + (double)ii;
           rf(2) = rf0(2) + (double)jj;
           rf(3) = rf0(3) + (double)kk;
@@ -173,9 +173,9 @@ namespace apl {
 
     // Count shell radius and its possible total occupations
     xvector<double> shift(3);
-    for (_AFLOW_APL_REGISTER_ int ii = -n; ii <= n; ii++)
-      for (_AFLOW_APL_REGISTER_ int jj = -n; jj <= n; jj++)
-        for (_AFLOW_APL_REGISTER_ int kk = -n; kk <= n; kk++) {
+    for (int ii = -n; ii <= n; ii++)
+      for (int jj = -n; jj <= n; jj++)
+        for (int kk = -n; kk <= n; kk++) {
           shift(1) = ii;
           shift(2) = jj;
           shift(3) = kk;
@@ -250,12 +250,12 @@ namespace apl {
       for (uint ia = 0; ia < _initStructure.iatoms.size(); ia++) {
         for (uint iia = 0; iia < _initStructure.iatoms[ia].size(); iia++) {
           // Replicate this atom by given mesh...
-          //for(_AFLOW_APL_REGISTER_ int i = 0; i <= _safeDimension(1); i++)
-          //for(_AFLOW_APL_REGISTER_ int j = 0; j <= _safeDimension(2); j++)
-          //for(_AFLOW_APL_REGISTER_ int k = 0; k <= _safeDimension(3); k++)
-          for (_AFLOW_APL_REGISTER_ int i = -_safeDimension(1); i <= _safeDimension(1); i++)
-            for (_AFLOW_APL_REGISTER_ int j = -_safeDimension(2); j <= _safeDimension(2); j++)
-              for (_AFLOW_APL_REGISTER_ int k = -_safeDimension(3); k <= _safeDimension(3); k++) {
+          //for(int i = 0; i <= _safeDimension(1); i++)
+          //for(int j = 0; j <= _safeDimension(2); j++)
+          //for(int k = 0; k <= _safeDimension(3); k++)
+          for (int i = -_safeDimension(1); i <= _safeDimension(1); i++)
+            for (int j = -_safeDimension(2); j <= _safeDimension(2); j++)
+              for (int k = -_safeDimension(3); k <= _safeDimension(3); k++) {
                 // Create position of new atoms...
                 atom = _initStructure.atoms[_initStructure.iatoms[ia][iia]];
                 cshift = (((double)i) * _initStructure.lattice(1) +
@@ -272,7 +272,7 @@ namespace apl {
                 //atom.cpos = F2C(sclattice,atom.fpos);
 
                 // Get lowest index
-                for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++) {
+                for (int l = 1; l <= 3; l++) {
                   if (aurostd::abs(atom.cpos(l)) > _AFLOW_APL_EPS_CPOS_EQUIVALENCE_ &&  //CO20190904 - enclose abs() before > TOL
                       aurostd::abs(atom.cpos(l)) < _indexReductionConstant) {
                     _indexReductionConstant = atom.cpos(l);

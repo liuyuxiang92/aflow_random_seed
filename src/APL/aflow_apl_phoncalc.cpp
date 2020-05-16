@@ -557,7 +557,7 @@ namespace apl {
     double conversionFactor = getFrequencyConversionFactor(apl::RAW | apl::OMEGA, flags);
 
     // Transform values to desired format
-    for (_AFLOW_APL_REGISTER_ int i = omega.lrows; i <= omega.urows; i++) {
+    for (int i = omega.lrows; i <= omega.urows; i++) {
       if (omega(i) < 0) {
         if (flags & ALLOW_NEGATIVE)
           omega(i) = -sqrt(-omega(i));
@@ -711,8 +711,8 @@ namespace apl {
         uint ipc2 = _supercell.sc2pcMap(isc2);
         int neq = 0;  // Important for NAC derivative
         if (_supercell.calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME20180827
-          for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-            for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+          for (int ix = 1; ix <= 3; ix++) {
+            for (int iy = 1; iy <= 3; iy++) {
               value = 0.5 * (_forceConstantMatrices[isc1][isc2](ix, iy) + _forceConstantMatrices[isc2][isc1](iy, ix));
               dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += value * phase;
               if (_isPolarMaterial)
@@ -739,8 +739,8 @@ namespace apl {
     // Subtract the sum of all "forces" from the central atom, this is like an automatic sum rule...
     for (uint i = 0; i < pcAtomsSize; i++) {
       for (uint j = 0; j < pcAtomsSize; j++) {
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+        for (int ix = 1; ix <= 3; ix++) {
+          for (int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * i + iy) = dynamicalMatrix(3 * i + ix, 3 * i + iy) - dynamicalMatrix0(3 * i + ix, 3 * j + iy);
           }
         }
@@ -754,8 +754,8 @@ namespace apl {
     // Make it hermitian
     for (uint i = 0; i <= pcAtomsSize - 1; i++) {
       for (uint j = 0; j <= i; j++) {
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+        for (int ix = 1; ix <= 3; ix++) {
+          for (int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * j + iy) += conj(dynamicalMatrix(3 * j + iy, 3 * i + ix));
             dynamicalMatrix(3 * i + ix, 3 * j + iy) *= 0.5;
             dynamicalMatrix(3 * j + iy, 3 * i + ix) = conj(dynamicalMatrix(3 * i + ix, 3 * j + iy));
@@ -776,8 +776,8 @@ namespace apl {
       double mass_i = _supercell.getAtomMass(_supercell.pc2scMap(i));
       for (uint j = 0; j < pcAtomsSize; j++) {
         double mass_j = _supercell.getAtomMass(_supercell.pc2scMap(j));
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+        for (int ix = 1; ix <= 3; ix++) {
+          for (int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * j + iy) *= 1.0 / sqrt(mass_i * mass_j);
             if (calc_derivative) {
               for (int d = 0; d < 3; d++) {
@@ -846,8 +846,8 @@ namespace apl {
         int iat1 = pc.atoms[ipc1].index_iatoms;
         for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
           int iat2 = pc.atoms[ipc2].index_iatoms;
-          for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-            for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+          for (int ix = 1; ix <= 3; ix++) {
+            for (int iy = 1; iy <= 3; iy++) {
               //int typei = pc.atoms[ipc1].type;
               //int typej = pc.atoms[ipc2].type;
               //double borni = (q * _bornEffectiveChargeTensor[typei])(ix);
@@ -893,8 +893,8 @@ namespace apl {
       for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
         xmatrix<xcomplex<double> > sum(3, 3);
         for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
-          for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-            for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+          for (int ix = 1; ix <= 3; ix++)
+            for (int iy = 1; iy <= 3; iy++)
               sum(ix, iy) += dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy);
         }
         _gammaEwaldCorr.push_back(sum);
@@ -907,8 +907,8 @@ namespace apl {
     xmatrix<xcomplex<double> > dynamicalMatrix(getEwaldSumDipoleDipoleContribution(kpoint));
 
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-        for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+      for (int ix = 1; ix <= 3; ix++)
+        for (int iy = 1; iy <= 3; iy++)
           dynamicalMatrix(3 * ipc1 + ix, 3 * ipc1 + iy) -= _gammaEwaldCorr[ipc1](ix, iy);
     }
 
@@ -955,9 +955,9 @@ namespace apl {
     // Term 1 - Reciprocal space sum
 
     if (includeTerm1) {
-      for (_AFLOW_APL_REGISTER_ int m1 = -n1; m1 <= n1; m1++) {
-        for (_AFLOW_APL_REGISTER_ int m2 = -n2; m2 <= n2; m2++) {
-          for (_AFLOW_APL_REGISTER_ int m3 = -n3; m3 <= n3; m3++) {
+      for (int m1 = -n1; m1 <= n1; m1++) {
+        for (int m2 = -n2; m2 <= n2; m2++) {
+          for (int m3 = -n3; m3 <= n3; m3++) {
             xvector<double> g = m1 * klattice(1) + m2 * klattice(2) + m3 * klattice(3) + qpoint;
 
             geg = scalar_product(g, _dielectricTensor * g);
@@ -980,8 +980,8 @@ namespace apl {
                   //xcomplex<double> facg = fac2 * e;
                   xcomplex<double> facg = fac2 * exp(iONE * scalar_product(g, sc.atoms[ipc2].cpos - sc.atoms[ipc1].cpos));
 
-                  for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-                    for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+                  for (int ix = 1; ix <= 3; ix++) {
+                    for (int iy = 1; iy <= 3; iy++) {
                       dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += fac0 * facg * zag(ix) * zbg(iy);
                     }
                   }
@@ -994,9 +994,9 @@ namespace apl {
     }
 
     // Term 2 - Real space sum
-    //for(_AFLOW_APL_REGISTER_ int m1 = -n1; m1 <= n1; m1++)
-    //  for(_AFLOW_APL_REGISTER_ int m2 = -n2; m2 <= n2; m2++)
-    //    for(_AFLOW_APL_REGISTER_ int m3 = -n2; m3 <= n3; m3++) {
+    //for(int m1 = -n1; m1 <= n1; m1++)
+    //  for(int m2 = -n2; m2 <= n2; m2++)
+    //    for(int m3 = -n2; m3 <= n3; m3++) {
     //      xvector<double> rc = m1 * pc.lattice(1) + m2 * pc.lattice(2)
     //        + m3 * pc.lattice(3);
 
@@ -1020,8 +1020,8 @@ namespace apl {
     //      double erfcdy = erfc(y) / y;
     //      double c1 = ym2 * ( 3.0 * erfcdy * ym2 + ( emy2dpi * ( 3.0 * ym2 + 2.0 ) ) );
     //      double c2 = ym2 * ( erfcdy + emy2dpi );
-    //      for(_AFLOW_APL_REGISTER_ int a = 1; a <= 3; a++)
-    //        for(_AFLOW_APL_REGISTER_ int b = 1; b <= 3; b++) {
+    //      for(int a = 1; a <= 3; a++)
+    //        for(int b = 1; b <= 3; b++) {
     //          H(a,b) = x(a) * x(b) * c1 - _inverseDielectricTensor(a,b) * c2;
     //        }
 
@@ -1036,8 +1036,8 @@ namespace apl {
     //        for(uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
     //          xmatrix<double> zhz = zh * _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
 
-    //          for(_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-    //            for(_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+    //          for(int ix = 1; ix <= 3; ix++)
+    //            for(int iy = 1; iy <= 3; iy++)
     //              dynamicalMatrix(3*ipc1+ix,3*ipc2+iy) -= fac * zhz(ix,iy);
     //        }
     //      }
@@ -1070,8 +1070,8 @@ namespace apl {
         double erfcdy = erfc(y) / y;
         double c1 = ym2 * (3.0 * erfcdy * ym2 + (emy2dpi * (3.0 * ym2 + 2.0)));
         double c2 = ym2 * (erfcdy + emy2dpi);
-        for (_AFLOW_APL_REGISTER_ int a = 1; a <= 3; a++) {
-          for (_AFLOW_APL_REGISTER_ int b = 1; b <= 3; b++) {
+        for (int a = 1; a <= 3; a++) {
+          for (int b = 1; b <= 3; b++) {
             H(a, b) = x(a) * x(b) * c1 - _inverseDielectricTensor(a, b) * c2;
           }
         }
@@ -1090,8 +1090,8 @@ namespace apl {
 
         //
         xcomplex<double> fac = fac0 * lambda3 * _recsqrtDielectricTensorDeterminant * e;
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+        for (int ix = 1; ix <= 3; ix++)
+          for (int iy = 1; iy <= 3; iy++)
             dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) -= fac * zhz(ix, iy);
       }
     }
@@ -1105,8 +1105,8 @@ namespace apl {
       xmatrix<double> z = _bornEffectiveChargeTensor[iat1];
       xmatrix<double> zez = z * _inverseDielectricTensor * z;
 
-      for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-        for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+      for (int ix = 1; ix <= 3; ix++)
+        for (int iy = 1; iy <= 3; iy++)
           dynamicalMatrix(3 * ipc1 + ix, 3 * ipc1 + iy) -= facterm3 * zez(ix, iy);
     }
 
