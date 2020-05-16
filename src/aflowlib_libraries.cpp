@@ -1285,21 +1285,21 @@ namespace aflowlib {
       // do the THERMNODYNAMYCS
       if(perform_THERMODYNAMICS) {
         cout << soliloquy << " THERMODYNAMIC LOOP ---------------------------------------------------------------------------------" << endl;//perform_BANDS=FALSE;
-        aflowlib::LIB2RAW_Loop_Thermodynamics(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (thermodynamics):",LOCAL); // identifier inside
+        aflowlib::LIB2RAW_Loop_Thermodynamics(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (thermodynamics):",LOCAL); // identifier inside
       }
       if(LDEBUG) cerr << soliloquy << " [4]" << endl;
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the BANDS
       if(perform_BANDS) {
         cout << soliloquy << " BANDS LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_Bands(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (bands):");
+        aflowlib::LIB2RAW_Loop_Bands(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (bands):");
         // MOVE/LINK PICS data
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the MAGNETIC
       if((perform_MAGNETIC || perform_BANDS)) { //JX
         cout << soliloquy << " MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,"aflowlib::LIB2RAW (magnetic):"); 
+        aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (magnetic):"); 
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the BADER
@@ -1307,7 +1307,7 @@ namespace aflowlib {
       // [OBSOLETE]    if(0) // DEBUG NOW
       if(perform_BADER) {
         cout << soliloquy << " BADER LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_Bader(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (bader):");
+        aflowlib::LIB2RAW_Loop_Bader(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (bader):");
         // MOVE/LINK PICS data
         // [OBSOLETE] [MOVED DOWN] if(flag_WEB) {
         // [OBSOLETE] [MOVED DOWN] aurostd::LinkFile(directory_RAW+"/*_abader.out",directory_WEB);      // LINK
@@ -1318,7 +1318,7 @@ namespace aflowlib {
       // do the AGL
       if(perform_AGL) {
         cout << soliloquy << " AGL LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_AGL(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (agl):");
+        aflowlib::LIB2RAW_Loop_AGL(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (agl):");
         if(flag_WEB) {
           aurostd::LinkFile(directory_RAW+"/aflow.agl.out",directory_WEB);    // LINK
           aurostd::LinkFile(directory_RAW+"/AGL.out",directory_WEB);    // LINK
@@ -1337,7 +1337,7 @@ namespace aflowlib {
       // do the AEL
       if(perform_AEL) {
         cout << soliloquy << " AEL LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_AEL(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (ael):");
+        aflowlib::LIB2RAW_Loop_AEL(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (ael):");
         if(flag_WEB) {
           aurostd::LinkFile(directory_RAW+"/aflow.ael.out",directory_WEB);    // LINK
           aurostd::LinkFile(directory_RAW+"/AEL_Elastic_constants.out",directory_WEB);    // LINK
@@ -1350,13 +1350,13 @@ namespace aflowlib {
       // do the LOCK
       if(perform_LOCK) {
         cout << soliloquy << " LOCK LOOP ---------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (LOCK):"); 
+        aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (LOCK):"); 
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the PATCH
       if(perform_PATCH) {
         cout << soliloquy << " PATCH LOOP --------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,XHOST.sPID+soliloquy << " (PATCH):"); 
+        aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (PATCH):"); 
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // write DOS + BANDS JSON //CO20171025
