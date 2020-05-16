@@ -174,7 +174,9 @@ namespace apl {
 
   void QMesh::initialize(const xvector<int>& grid, const xstructure& xs,
       bool include_inversions, bool gamma_centered) {
-    clear_tetrahedra();
+    string tmp_dir = _directory;  // Do not delete the directory
+    clear();
+    _directory = tmp_dir;
     setGrid(grid);
     setupReciprocalCell(xs, include_inversions);
     generateGridPoints(gamma_centered);

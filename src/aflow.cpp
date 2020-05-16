@@ -27,6 +27,7 @@
 #include "aflow.h"
 #include "aflow_pflow.h"
 // [OBSOLETE] #include "aflow_aqe.h"
+#include "aflow_makefile.h" //DELETE ME!
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -331,6 +332,7 @@ int main(int _argc,char **_argv) {
 
     bool Arun=FALSE;
     if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--generate_makefile|--makefile"))  {Arun=TRUE;makefile::createMakefileAFLOW(".");}  //CO20200508 - if calling from command-line, you should be sitting inside aflow directory (will write out Makefile.aflow)
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {
       if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
       return 1;

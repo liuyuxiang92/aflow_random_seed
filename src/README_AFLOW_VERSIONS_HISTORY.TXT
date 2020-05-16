@@ -146,6 +146,7 @@
         -- patched time_delim in get_date_formatted() (CO)
         -- speeding up --poscar2aflowin with new AUTO settings (CO)
         -- adding TID (CO)
+        -- restructured Makefile for auto-generation of dependency tree (CO)
 3.2.2l - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- added PID to a bunch of messages 2l (SC)

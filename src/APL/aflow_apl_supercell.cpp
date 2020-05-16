@@ -189,6 +189,9 @@ namespace apl {
   void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::initialize():";
+    string tmp_dir = _directory;  // Do not delete directory
+    clear();
+    _directory = tmp_dir;
 
     //CO20190121 - need to sort by equivalent atoms
     //Discovered with help from Xiaoyu Wang of Eva Zurek's group (UBuffalo)
