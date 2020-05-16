@@ -111,7 +111,7 @@ namespace KBIN {
     xaims.aopts.flag("FLAG::XAIMS_CONTROL_generated",FALSE);
     xaims.aopts.flag("FLAG::XAIMS_CONTROL_changed",FALSE);
 
-    aus << "00000  MESSAGE CONTROL   generation in " << xaims.Directory << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE CONTROL   generation in " << xaims.Directory << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     bool KBIN_AIMS_CONTROL_MODE_EMPTY=!aimsflags.KBIN_AIMS_CONTROL_MODE.flag("IMPLICIT") && !aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT") && !aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXTERNAL");
@@ -122,20 +122,20 @@ namespace KBIN {
           aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXTERNAL") || KBIN_AIMS_CONTROL_MODE_EMPTY));
     if(!Krun) {
       aurostd::StringstreamClean(aus);
-      aus << "EEEEE  [AIMS_CONTROL_MODE_IMPLICIT] or [AIMS_CONTROL_MODE_EXPLICIT] or [AIMS_CONTROL_MODE_EXPLICIT] must be specified " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  [AIMS_CONTROL_MODE_IMPLICIT] or [AIMS_CONTROL_MODE_EXPLICIT] or [AIMS_CONTROL_MODE_EXPLICIT] must be specified " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=FALSE;
       return Krun;
     }
     // EMPTY ************************************************** CONTROL
     if(Krun && KBIN_AIMS_CONTROL_MODE_EMPTY) {  // [AIMS_CONTROL_MODE_EMPTY] construction
-      aus << "00000  MESSAGE CONTROL   generation EMPTY file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE CONTROL   generation EMPTY file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.CONTROL << "#AFLOW CONTROL automatically generated" << endl;
     }
     // IMPLICIT ************************************************** CONTROL
     if(Krun && aimsflags.KBIN_AIMS_CONTROL_MODE.flag("IMPLICIT")) {  // [AIMS_CONTROL_MODE_IMPLICIT] construction
-      aus << "00000  MESSAGE CONTROL   generation IMPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE CONTROL   generation IMPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("SYSTEM_AUTO")) {
         xaims.CONTROL << "#AFLOW CONTROL automatically generated" << endl;
@@ -144,19 +144,19 @@ namespace KBIN {
     // EXPLICIT ************************************************** CONTROL
     if(Krun && aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT")) {  // [AIMS_CONTROL_MODE_EXPLICIT] construction
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("KEYWORD") && !aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT_START_STOP")) {
-        aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // [OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.CONTROL,"[AIMS_CONTROL_FILE]");
         aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_FILE]");
       } else if(!aimsflags.KBIN_AIMS_CONTROL_FILE.flag("KEYWORD") && aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT_START_STOP")) {
-        aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]STOP"))
           // [OBSOLETE]	aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
           aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
       } else {
-        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] do not confuse aflow !!" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] Possible modes " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] do not confuse aflow !!" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] Possible modes " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aus << "----------------------------------------------------------------------------------------------------" << endl;
         aus << "[AFLOW] CONTROL EXPLICIT MODE without START/STOP (default)" << endl;
         aus << "[AIMS_CONTROL_MODE_EXPLICIT]" << endl;
@@ -185,10 +185,10 @@ namespace KBIN {
         aus << "[AIMS_CONTROL_MODE_EXPLICIT]STOP" << endl;
         aus << "[AFLOW]" << endl;
         aus << "----------------------------------------------------------------------------------------------------" << endl;
-        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] Note " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT]START must be present and no [AIMS_CONTROL_FILE]" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT]STOP  must be present and no [AIMS_CONTROL_FILE]" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  or [AIMS_CONTROL_FILE] present and NO START/STOP" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] Note " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT]START must be present and no [AIMS_CONTROL_FILE]" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT]STOP  must be present and no [AIMS_CONTROL_FILE]" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  or [AIMS_CONTROL_FILE] present and NO START/STOP" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
@@ -197,10 +197,10 @@ namespace KBIN {
     // EXTERNAL **************************************************
     if(Krun && aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXTERNAL")) {  // [AIMS_CONTROL_MODE_EXTERNAL] construction
       string file;
-      aus << "00000  MESSAGE CONTROL   generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE CONTROL   generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-        aus << "EEEEE   [AIMS_CONTROL_MODE]FILE=  and  [AIMS_CONTROL_MODE]COMMAND=  can not be used together " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE   [AIMS_CONTROL_MODE]FILE=  and  [AIMS_CONTROL_MODE]COMMAND=  can not be used together " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
@@ -212,17 +212,17 @@ namespace KBIN {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
           file=DEFAULT_AIMS_EXTERNAL_CONTROL;
-          aus << "00000  MESSAGE CONTROL   generation from DEFAULT file=" << DEFAULT_AIMS_EXTERNAL_CONTROL << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "00000  MESSAGE CONTROL   generation from DEFAULT file=" << DEFAULT_AIMS_EXTERNAL_CONTROL << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
         if(!aurostd::FileExist(file)) {
-          aus << "EEEEE  ERROR CONTROL file=" << file << " does not exist! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR CONTROL file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
         }
         if(aurostd::FileEmpty(file)) {
-          aus << "EEEEE  ERROR CONTROL file=" << file << " is empty! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR CONTROL file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
@@ -233,23 +233,23 @@ namespace KBIN {
         file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",FALSE);
         aus << "00000  MESSAGE CONTROL   generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        file=file+" > ./_aflow_CONTROL."+XHOST.ostrPID.str()+".tmp";    // create temp
+        file=file+" > ./_aflow_CONTROL."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp  //CO20200502 - threadID
         aurostd::execute(file);                           // create temp
-        file="./_aflow_CONTROL."+XHOST.ostrPID.str()+".tmp";            // file name
+        file="./_aflow_CONTROL."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";            // file name  //CO20200502 - threadID
         if(!aurostd::FileExist(file)) {  // could not write (directory protected)
-          aus << "EEEEE  ERROR CONTROL file=" << file << " does not exist! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR CONTROL file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
         }
         if(aurostd::FileEmpty(file)) {  // contains nothing good
-          aus << "EEEEE  ERROR CONTROL file=" << file << " is empty! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR CONTROL file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
         }
         xaims.CONTROL << aurostd::file2string(file);       // load CONTROL
-        file="rm -f ./_aflow_CONTROL."+XHOST.ostrPID.str()+".tmp";     // remove temp
+        file="rm -f ./_aflow_CONTROL."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";     // remove temp //CO20200502 - threadID
         aurostd::execute(file);                          // remove temp
       }
     }
@@ -269,30 +269,30 @@ namespace KBIN {
     if(Krun && kflags.KBIN_MPI) {
       xaims.NCPUS=kflags.KBIN_MPI_NCPUS;
       if(kflags.KBIN_MPI_AUTOTUNE) {
-        aus << "00000  MESSAGE CONTROL-MPI: found AUTOTUNE option " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "00000  MESSAGE CONTROL-MPI: input files WILL be auto-tuned for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE CONTROL-MPI: found AUTOTUNE option " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE CONTROL-MPI: input files WILL be auto-tuned for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         //KBIN::AIMS_MPI_Autotune(xaims,vflags.KBIN_AIMS_CONTROL_VERBOSE);
         //xaims.aopts.flag("FLAG::xaims_CONTROL_changed",TRUE);
       } else {
-        aus << "00000  MESSAGE CONTROL-MPI: AUTOTUNE option NOT found! (aflow_iaims.cpp) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "00000  MESSAGE CONTROL-MPI: input files MUST be appropriate for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE CONTROL-MPI: AUTOTUNE option NOT found! (aflow_iaims.cpp) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE CONTROL-MPI: input files MUST be appropriate for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
     }
     // CONVERT_UNIT_CELL
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_NOTUNE.isentry==FALSE) {                                                    /*************** CONTROL **************/
       if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.isentry) {                                                              /*************** CONTROL **************/
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=STANDARD_PRIMITIVE - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=STANDARD_CONVENTIONAL - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=NIGGLI - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=MINKOWSKI - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=INCELL - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=COMPACT - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=WIGNERSEITZ - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=CARTESIAN - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=FRACTIONAL - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=PRESERVE - "<< Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //CO
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=STANDARD_PRIMITIVE - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=STANDARD_CONVENTIONAL - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=NIGGLI - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=MINKOWSKI - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=INCELL - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=COMPACT - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=WIGNERSEITZ - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=CARTESIAN - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=FRACTIONAL - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        if(aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE"))  aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=PRESERVE - "<< Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //CO
       }
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -310,7 +310,7 @@ namespace KBIN {
     ostringstream aus;
     bool Krun=TRUE;
     if(!aurostd::FileExist(xaims.Directory+"/CONTROL")) {
-      aus << "EEEEE  KBIN::AIMS_Reread_CONTROL: CONTROL not present in directory: " << xaims.Directory << " - "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  KBIN::AIMS_Reread_CONTROL: CONTROL not present in directory: " << xaims.Directory << " - "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=FALSE;
       return Krun;
@@ -342,17 +342,17 @@ namespace KBIN {
           aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXTERNAL")));
     if(!Krun) {
       aurostd::StringstreamClean(aus);
-      aus << "EEEEE  [AIMS_GEOM_MODE_IMPLICIT] or [AIMS_GEOM_MODE_EXPLICIT] or [AIMS_GEOM_MODE_EXPLICIT] must be specified " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  [AIMS_GEOM_MODE_IMPLICIT] or [AIMS_GEOM_MODE_EXPLICIT] or [AIMS_GEOM_MODE_EXPLICIT] must be specified " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=FALSE;
       return Krun;
     }
     // IMPLICIT **************************************************
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT")) {  // [AIMS_GEOM_MODE_IMPLICIT] construction
-      aus << "00000  MESSAGE GEOM  generation IMPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  generation IMPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(!aimsflags.KBIN_AIMS_GEOM_FILE.flag("PROTOTYPE")) {
-        aus << "EEEEE  [AIMS_GEOM_FILE] In GEOM_MODE_IMPLICIT you must specify PROTOTYPE " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_GEOM_FILE] In GEOM_MODE_IMPLICIT you must specify PROTOTYPE " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
@@ -401,8 +401,8 @@ namespace KBIN {
           xaims.str=aflowlib::PrototypeLibraries(FileMESSAGE,label,parameters,atomX,volumeX,-1.0,LIBRARY_MODE_HTQC);
         }
         if(done==FALSE) {
-          aus << "EEEEE  GEOM_MODE_IMPLICIT error in the PROTOTYPE definition" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-          aus << "EEEEE  [AIMS_GEOM_FILE]PROTOTYPE=" << structure << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  GEOM_MODE_IMPLICIT error in the PROTOTYPE definition" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  [AIMS_GEOM_FILE]PROTOTYPE=" << structure << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
@@ -415,7 +415,7 @@ namespace KBIN {
     // EXPLICIT **************************************************
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT")) {  // [AIMS_GEOM_MODE_EXPLICIT] construction
       if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("KEYWORD") && !aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP") && !aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
-        aus << "00000  MESSAGE GEOM  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE GEOM  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // [OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.GEOM,"[AIMS_GEOM_FILE]");
         aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_FILE]");
@@ -424,7 +424,7 @@ namespace KBIN {
         xaims.str.iomode=IOAIMS_GEOM;
         xaims.GEOM << xaims.str;
       } else if(!aimsflags.KBIN_AIMS_GEOM_FILE.flag("KEYWORD") && (aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP") || aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT"))) {
-        aus << "00000  MESSAGE GEOM  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE GEOM  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
         if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP")) {
@@ -443,8 +443,8 @@ namespace KBIN {
         xaims.str.iomode=IOAIMS_GEOM;
         xaims.GEOM << xaims.str;
       } else {
-        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT] do not confuse aflow !!" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT] Possible modes " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT] do not confuse aflow !!" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT] Possible modes " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aus << "----------------------------------------------------------------------------------------------------" << endl;
         aus << "[AFLOW] GEOM EXPLICIT MODE without START/STOP (default)" << endl;
         aus << "[AIMS_GEOM_MODE_EXPLICIT]" << endl;
@@ -482,10 +482,10 @@ namespace KBIN {
         aus << "[AIMS_GEOM_MODE_EXPLICIT]STOP" << endl;
         aus << "[AFLOW]" << endl;
         aus << "----------------------------------------------------------------------------------------------------" << endl;
-        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT] Note " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT]START must be present and no [AIMS_GEOM_FILE]" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT]STOP  must be present and no [AIMS_GEOM_FILE]" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-        aus << "EEEEE  or [AIMS_GEOM_FILE] present and NO START/STOP" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT] Note " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT]START must be present and no [AIMS_GEOM_FILE]" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  [AIMS_GEOM_MODE_EXPLICIT]STOP  must be present and no [AIMS_GEOM_FILE]" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  or [AIMS_GEOM_FILE] present and NO START/STOP" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
@@ -494,10 +494,10 @@ namespace KBIN {
     // EXTERNAL **************************************************
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXTERNAL")) {  // [AIMS_GEOM_MODE_EXTERNAL] construction
       string file;
-      aus << "00000  MESSAGE GEOM  generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-        aus << "EEEEE   [AIMS_GEOM_MODE]FILE=  and  [AIMS_GEOM_MODE]COMMAND=  can not be used together " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE   [AIMS_GEOM_MODE]FILE=  and  [AIMS_GEOM_MODE]COMMAND=  can not be used together " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
@@ -509,17 +509,17 @@ namespace KBIN {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
           file=DEFAULT_AIMS_EXTERNAL_GEOM;
-          aus << "00000  MESSAGE GEOM  generation from DEFAULT file=" << DEFAULT_AIMS_EXTERNAL_GEOM << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "00000  MESSAGE GEOM  generation from DEFAULT file=" << DEFAULT_AIMS_EXTERNAL_GEOM << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
         if(!aurostd::FileExist(file)) {
-          aus << "EEEEE  ERROR GEOM file=" << file << " does not exist! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR GEOM file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
         }
         if(aurostd::FileEmpty(file)) {
-          aus << "EEEEE  ERROR GEOM file=" << file << " is empty! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR GEOM file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
@@ -531,24 +531,24 @@ namespace KBIN {
         file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",FALSE);
         aus << "00000  MESSAGE GEOM  generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        file=file+" > ./_aflow_GEOM."+XHOST.ostrPID.str()+".tmp";    // create temp
+        file=file+" > ./_aflow_GEOM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID
         aurostd::execute(file);                           // create temp
-        file="./_aflow_GEOM."+XHOST.ostrPID.str()+".tmp";            // file name
+        file="./_aflow_GEOM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";            // file name //CO20200502 - threadID
         if(!aurostd::FileExist(file)) {  // could not write (directory protected)
-          aus << "EEEEE  ERROR GEOM file=" << file << " does not exist! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR GEOM file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
         }
         if(aurostd::FileEmpty(file)) {  // contains nothing good
-          aus << "EEEEE  ERROR GEOM file=" << file << " is empty! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  ERROR GEOM file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
           return Krun;
         }
         xaims.GEOM << aurostd::file2string(file);       // load GEOM
         xaims.str=xstructure(xaims.GEOM,IOAIMS_GEOM);              // load structure
-        file="rm -f ./_aflow_GEOM."+XHOST.ostrPID.str()+".tmp";     // remove temp
+        file="rm -f ./_aflow_GEOM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";     // remove temp  //CO20200502 - threadID
         aurostd::execute(file);                          // remove temp
       }
     }
@@ -562,8 +562,8 @@ namespace KBIN {
 
     // CHECK for negative determinant
     if(det(xaims.str.scale*xaims.str.lattice)<0.0) {
-      aus << "EEEEE  GEOM ERROR: the triple product of the basis vectors is negative                      " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-      aus << "EEEEE  GEOM ERROR: exchange two basis vectors and adjust the atomic positions accordingly   " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  GEOM ERROR: the triple product of the basis vectors is negative                      " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  GEOM ERROR: exchange two basis vectors and adjust the atomic positions accordingly   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=FALSE;
       return Krun;
@@ -617,7 +617,7 @@ namespace KBIN {
     ostringstream aus;
     bool Krun=TRUE;
     if(xaims.aopts.flag("FLAG::XAIMS_GEOM_generated")==FALSE) {
-      aus << "EEEEE  KBIN::AIMS_Modify_GEOM: can`t modify GEOM if it does not exist ! " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  KBIN::AIMS_Modify_GEOM: can`t modify GEOM if it does not exist ! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=FALSE;
       return Krun;
@@ -630,22 +630,22 @@ namespace KBIN {
     // CONVERT_UNIT_CELL STUFF
     // GEOM must be modified before doing the KPOINTS
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.isentry) {        /*************** GEOM **************/
-      //    aus << "00000  MESSAGE GEOM  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-      aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      //    aus << "00000  MESSAGE GEOM  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE-OPTION  [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
     // GEOM must be modified before doing the KPOINTS
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_PRESERVE construction /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  PRESERVE Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  PRESERVE Unit Cell " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
     // GEOM must be modified before doing the KPOINTS
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_STANDARD_PRIMITIVE construction /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  STANDARD_PRIMITIVE Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  STANDARD_PRIMITIVE Unit Cell " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.Standard_Primitive_UnitCellForm();
       //CO START
@@ -671,14 +671,14 @@ namespace KBIN {
       xaims.str.bravais_lattice_type=bravais_lattice_type;xaims.str.bravais_lattice_variation_type=bravais_lattice_variation_type;xaims.str.pearson_symbol=pearson_symbol;
       xaims.aopts.flag("FLAG::XAIMS_GEOM_generated",TRUE);
       xaims.aopts.flag("FLAG::XAIMS_GEOM_changed",TRUE);
-      aus << "00000  MESSAGE GEOM  STANDARD_PRIMITIVE Unit Cell Lattice = ["+xaims.str.bravais_lattice_type << "," << xaims.str.bravais_lattice_variation_type << "," << xaims.str.pearson_symbol << "]" << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  STANDARD_PRIMITIVE Unit Cell Lattice = ["+xaims.str.bravais_lattice_type << "," << xaims.str.bravais_lattice_variation_type << "," << xaims.str.pearson_symbol << "]" << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
     // GEOM must be modified before doing the KPOINTS
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_STANDARD_CONVENTIONAL construction /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.Standard_Conventional_UnitCellForm();
       //CO START
@@ -706,7 +706,7 @@ namespace KBIN {
       // cout << xaims.str << endl;
       xaims.aopts.flag("FLAG::XAIMS_GEOM_generated",TRUE);
       xaims.aopts.flag("FLAG::XAIMS_GEOM_changed",TRUE);
-      aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell Lattice = ["+xaims.str.bravais_lattice_type << "," << xaims.str.bravais_lattice_variation_type << "," << xaims.str.pearson_symbol << "]" << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //CO
+      aus << "00000  MESSAGE GEOM  STANDARD_CONVENTIONAL Unit Cell Lattice = ["+xaims.str.bravais_lattice_type << "," << xaims.str.bravais_lattice_variation_type << "," << xaims.str.pearson_symbol << "]" << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //CO
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //CO
       // cerr << det(xaims.str.lattice) << endl;
     }
@@ -714,7 +714,7 @@ namespace KBIN {
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
     // GEOM must be modified before doing the KPOINTS
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_NIGGLI construction                     /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  NIGGLI Unit Cell Reduction " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  NIGGLI Unit Cell Reduction " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.NiggliUnitCellForm();
       xaims.str.title=xaims.str.title+" [Niggli Unit Cell Form]";
@@ -727,7 +727,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(MINKOWSKI)=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_MINKOWSKI construction               /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  MINKOWSKI Basis Reduction " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  MINKOWSKI Basis Reduction " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.MinkowskiBasisReduction();
       xaims.str.title=xaims.str.title+" [Minkowski Basis Reduction]";
@@ -740,7 +740,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_INCELL construction                     /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  INCELL Unit Cell Basis " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  INCELL Unit Cell Basis " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.BringInCell();
       xaims.str.title=xaims.str.title+" [Bring In Cell Basis]";
@@ -752,7 +752,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_COMPACT construction                   /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  COMPACT Unit Cell Basis " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  COMPACT Unit Cell Basis " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.BringInCompact();
       xaims.str.title=xaims.str.title+" [Bring In Compact Basis]";
@@ -764,7 +764,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_WIGNERSEITZ construction           /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  WIGNERSEITZ Unit Cell Basis " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  WIGNERSEITZ Unit Cell Basis " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.BringInWignerSeitz();
       xaims.str.title=xaims.str.title+" [WignerSeitz Basis]";
@@ -776,7 +776,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_CARTESIAN construction               /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  CARTESIAN Basis Coordinates" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  CARTESIAN Basis Coordinates" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetCoordinates(_COORDS_CARTESIAN_);
       xaims.str.title=xaims.str.title+" [WignerSeitz Basis]";
@@ -788,7 +788,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_FRACTIONAL construction            /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  FRACTIONAL Basis Coordinate" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FRACTIONAL Basis Coordinate" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetCoordinates(_COORDS_FRACTIONAL_);
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -799,7 +799,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT")) {  // [AIMS_FORCE_OPTION]CONVERT_UNIT_CELL_DIRECT construction                    /*************** GEOM **************/
-      aus << "00000  MESSAGE GEOM  DIRECT Basis Coordinate" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  DIRECT Basis Coordinate" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetCoordinates(_COORDS_FRACTIONAL_);
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -811,18 +811,18 @@ namespace KBIN {
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag(\"EQUAL_EQUAL\")=" << aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("EQUAL_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT") && aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("EQUAL_EQUAL")) {  // [AIMS_GEOM_FILE]VOLUME=                       /*************** GEOM **************/
       double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME=",FALSE);
-      aus << "00000  MESSAGE GEOM  IMPLICIT Volume = " << factor << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Volume = " << factor << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(factor<=0.0) {
-        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
       }
-      aus << "00000  MESSAGE GEOM  IMPLITIC Old Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(factor);
-      aus << "00000  MESSAGE GEOM  IMPLITIC New Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.title=xaims.str.title+" [Forced Volume =]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -835,18 +835,18 @@ namespace KBIN {
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("EQUAL_EQUAL")) {  // [AIMS_FORCE_OPTION]VOLUME=                                                    /*************** GEOM **************/
       double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME=",FALSE);
       double factor=aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedutype<double>("EQUAL_EQUAL");
-      aus << "00000  MESSAGE GEOM  FORCE Volume = " << factor << " (factor1=" << factor1 << ")  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE Volume = " << factor << " (factor1=" << factor1 << ")  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(factor<=0.0) {
-        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
       }
-      aus << "00000  MESSAGE GEOM  FORCE Old Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(factor);
-      aus << "00000  MESSAGE GEOM  FORCE New Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.title=xaims.str.title+" [Forced Volume =]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -860,18 +860,18 @@ namespace KBIN {
       double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME*=",FALSE);
       //     double factor=aurostd::string2utype<double>(aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.getattachedscheme("MULTIPLY_EQUAL"));
       //      cerr << "CORMAC MULTIPLY_EQUAL=" << factor << endl; exit(0);
-      aus << "00000  MESSAGE GEOM  IMPLICIT Volume *= " << factor << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Volume *= " << factor << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(factor<=0.0) {
-        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
       }
-      aus << "00000  MESSAGE GEOM  IMPLITIC Old Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(xaims.str.Volume()*factor);
-      aus << "00000  MESSAGE GEOM  IMPLITIC New Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.title=xaims.str.title+" [Forced Volume *=]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -884,18 +884,18 @@ namespace KBIN {
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("MULTIPLY_EQUAL")) {  // [AIMS_FORCE_OPTION]VOLUME*=                                                    /*************** GEOM **************/
       double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME*=",FALSE);
       double factor=aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedutype<double>("MULTIPLY_EQUAL");
-      aus << "00000  MESSAGE GEOM  FORCE Volume *= " << factor << " (factor1=" << factor1 << ")  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE Volume *= " << factor << " (factor1=" << factor1 << ")  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(factor<=0.0) {
-        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "EEEEE  KBIN::AIMS_Modify_GEOM Volume can not be <=0 (factor=" << factor << ")" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
         Krun=FALSE;
         return Krun;
       }
-      aus << "00000  MESSAGE GEOM  FORCE Old Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(xaims.str.Volume()*factor);
-      aus << "00000  MESSAGE GEOM  FORCE New Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.title=xaims.str.title+" [Forced Volume *=]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -907,12 +907,12 @@ namespace KBIN {
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag(PLUS_EQUAL)=" << aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("PLUS_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT") && aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("PLUS_EQUAL")) {  // [AIMS_GEOM_FILE]VOLUME+=               /*************** GEOM **************/
       double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME+=",FALSE);
-      aus << "00000  MESSAGE GEOM  IMPLICIT Volume += " << factor << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Volume += " << factor << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << "00000  MESSAGE GEOM  IMPLITIC Old Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(xaims.str.Volume()+factor);
-      aus << "00000  MESSAGE GEOM  IMPLITIC New Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.title=xaims.str.title+" [Forced Volume +=]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -925,12 +925,12 @@ namespace KBIN {
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("PLUS_EQUAL")) {  // [AIMS_FORCE_OPTION]VOLUME+=                                                    /*************** GEOM **************/
       double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME+=",FALSE);
       double factor=aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedutype<double>("PLUS_EQUAL");
-      aus << "00000  MESSAGE GEOM  FORCE Volume += " << factor << " (factor1=" << factor1 << ")  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE Volume += " << factor << " (factor1=" << factor1 << ")  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << "00000  MESSAGE GEOM  FORCE Old Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(xaims.str.Volume()+factor);
-      aus << "00000  MESSAGE GEOM  FORCE New Volume= " << xaims.str.Volume() << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  FORCE New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.title=xaims.str.title+" [Forced Volume +=]";
       xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -942,7 +942,7 @@ namespace KBIN {
     // GEOM done
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_NOTUNE.isentry==FALSE) {
       if(0) {
-        aus << "00000  MESSAGE-OPTION  XXXXX" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE-OPTION  XXXXX" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       }
     }
@@ -958,7 +958,7 @@ namespace KBIN {
     ostringstream aus;
     bool Krun=TRUE;
     if(!aurostd::FileExist(xaims.Directory+"/GEOM")) {
-      aus << "EEEEE  KBIN::AIMS_Reread_GEOM: GEOM not present in directory: " << xaims.Directory << " - "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  KBIN::AIMS_Reread_GEOM: GEOM not present in directory: " << xaims.Directory << " - "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=FALSE;
       return Krun;

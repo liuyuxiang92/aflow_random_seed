@@ -87,6 +87,10 @@ namespace pocc {
 
   string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
   string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
+
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
+  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
 } // namespace pocc
 
 namespace pocc {
@@ -495,6 +499,7 @@ namespace pocc {
 
       //post-processing
       vector<string> m_ARUN_directories;
+      double m_Hmix;
       double m_efa;
       int m_zero_padding_temperature;
       bool m_temperatures_int;
@@ -668,8 +673,21 @@ namespace pocc {
       void setConfigOrder();
       bool getNextSiteConfiguration();
       bool getNextSiteConfiguration(vector<vector<int> >& v_site_config);
-  };
 
+      // CT20200319 - POCC+AEL functions
+      void calculateElasticProperties(const vector<double>& v_temperatures);
+      void setAELOptions(bool& ael_run_postprocess, bool& ael_write_full_results);
+      void generateElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list);
+      void getElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list);
+      void getAverageElasticProperties(const vector<double>& v_temperatures, bool& ael_write_full_results, vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list);
+
+      // CT20200323 - POCC+AGL functions
+      void calculateDebyeThermalProperties(const vector<double>& v_temperatures);
+      void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results, uint& ntemperature, double& stemperature, uint& npressure, double& spressure);
+      void generateDebyeThermalProperties(const uint& ntemperature, const uint& stemperature, const uint& npressure, const double& spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+      void getDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+      void getAverageDebyeThermalProperties(const vector<double>& v_temperatures, bool& agl_write_full_results, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+  };
 } // namespace pocc
 
 namespace pocc {

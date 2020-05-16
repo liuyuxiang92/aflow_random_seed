@@ -71,9 +71,12 @@ namespace aurostd {
   string get_datetime(void) { return utype2string(get_date())+"_"+get_time();}
   string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215
     stringstream misc_ss;
-    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day(),h=get_hour(),m=get_min(),s=get_sec();
+    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day();
     misc_ss << y << date_delim << (b<10?"0":"") << b << date_delim << (d<10?"0":"") << d;
-    if(include_time){misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << ":" << (s<10?"0":"") << s;}
+    if(include_time){
+      int h=get_hour(),m=get_min(),s=get_sec();
+      misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << time_delim << (s<10?"0":"") << s;
+    }
     return misc_ss.str();
   }
   bool beep(uint freq,uint duration) {
@@ -82,17 +85,52 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// get threadID
+namespace aurostd {
+  unsigned long long int getTID(void){ //CO20200502 - threadID
+    //for mac these numbers can be QUITE large, so better to be safe and return unsigned long long int
+    //see here: http://elliotth.blogspot.com/2012/04/gettid-on-mac-os.html
+    //also for macs: pid!=tid
+    #ifdef _MACOSX_
+      #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+        uint64_t tid64;
+        pthread_threadid_np(NULL, &tid64);
+        pid_t tid = (pid_t)tid64;
+        return (unsigned long long int)tid;
+      #else
+      //////////////////////////////////////////////////////////
+        #ifdef __GLIBC__
+          #include <sys/syscall.h>  //CO20200502 - need for gettid()
+          pid_t tid = syscall(__NR_gettid);
+          return (unsigned long long int)tid;
+        #else //ONLY if _MACOSX_ AND not __GLIBC__
+          return (unsigned long long int)getpid();
+        #endif
+        //////////////////////////////////////////////////////////
+      #endif  //END _MACOSX_
+    #else //if NOT _MACOSX_
+    //////////////////////////////////////////////////////////
+      #ifdef __GLIBC__
+        return (unsigned long long int)gettid();
+      #else //for example CYGWIN
+        return (unsigned long long int)getpid();
+      #endif
+    //////////////////////////////////////////////////////////
+    #endif
+  }
+}
+
+// ***************************************************************************
 // FILES creation/destruction
 namespace aurostd {
   string TmpFileCreate(string identifier) {
-    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp";
+    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
     // cerr << str << endl;
     return str;
   }
-  string TmpFileCreate(void) {
-    return TmpFileCreate("");}
+  string TmpFileCreate(void) {return TmpFileCreate("");}
   string TmpDirectoryCreate(string identifier) {
-    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";
+    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
     DirectoryMake(dir);
     return dir;}
   string TmpDirectoryCreate(void) {

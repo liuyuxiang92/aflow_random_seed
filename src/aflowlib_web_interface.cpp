@@ -4200,1467 +4200,1464 @@ namespace aflowlib {
 
 
 // ***************************************************************************
-/* FUNCITON IS OBSOLETE SC20200327
-
-namespace aflowlib {
-  uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "aflowlib::WEB_Aflowlib_Entry():";
-    if(LDEBUG) cout << XHOST.sPID << "aflowlib::WEB_Aflowlib_Entry: begin<br>" << endl;
-
-    stringstream num_prec;
-    vector<string> voptions;
-    aurostd::string2tokens(options,voptions,",");
-    if(voptions.size()==0) {
-      init::ErrorOption(cout,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
-      exit(0);
-    } 
-
-    // move on
-    for(uint ioption=0;ioption<voptions.size();ioption++) {
-      //  oss << voptions.at(ioption) << endl;
-      string option=voptions.at(ioption); //aurostd::args2attachedstring(argv,"--aflowlib=",(string) "nan");
-      if(option.at(option.size()-1)=='/'|| option.at(option.size()-1)=='.') option.erase(option.end()-1,option.end()-0); //  some demoronization
-      if(option.at(0)=='/'|| option.at(0)=='.') option.erase(option.begin(),option.begin()+1); //  some demoronization
-      string directory="";
-      string directory_RAW="",directory_LIB="",directory_WEB="";
-      string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
-      string url_WEB;
-      string label="";
-      //string line_gif="<br><img border=0 width=60% height=2 src=http://materials.duke.edu/auro/images/line.gif><br><br>";
-      string line_rule="<hr width=\"60%\" style=\"background:black; border:0; height:2px; text-align:left;margin-left:0\" /><br>";
-      string art058_link=" [<a href=https://doi.org/10.1016/j.commatsci.2010.05.010 target=\"_blank\"><font color=black><i>cite</i></font></a>]";
-      string art064_link=" [<a href=https://doi.org/10.1021/co200012w target=\"_blank\"><font color=black><i>cite</i></font></a>]";
-      string icsd_link=" [<a href=https://www.fiz-karlsruhe.com/icsd.html target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string aflow_ael_readme=" [<a href=http://materials.duke.edu/AFLOW/README_AFLOW_AEL.TXT target=\"_blank\"><font color=black><i>info</i></font></a>]"; //CO20180817
-      string art096_link=" [<a href=https://doi.org/10.1103/PhysRevB.90.174107 target=\"_blank\"><font color=black><i>cite</i></font></a>]";
-      string art100_link=" [<a href=https://www.nature.com/articles/sdata20159 target=\"_blank\"><font color=black><i>cite</i></font></a>]";
-      string aflow_agl_readme=" [<a href=http://materials.duke.edu/AFLOW/README_AFLOW_AGL.TXT target=\"_blank\"><font color=black><i>info</i></font></a>]"; //CO20180817
-      string art115_link=" [<a href=https://doi.org/10.1103/PhysRevMaterials.1.015401 target=\"_blank\"><font color=black><i>cite</i></font></a>]"; //CO20180817
-      string aflow_sym_readme=" [<a href=http://materials.duke.edu/AFLOW/README_AFLOW_SYM.TXT target=\"_blank\"><font color=black><i>info</i></font></a>]"; //CO20180817
-      string art135_link=" [<a href=https://doi.org/10.1107/S2053273318003066 target=\"_blank\"><font color=black><i>cite</i></font></a>]"; //CO20180817
-      int atomCOUNT=0;
-
-      //DX20180817
-      string bravais_lattice_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bravais_lattice_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string bravais_lattice_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bravais_lattice_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string lattice_system_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_system_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string lattice_variation_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_variation_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string lattice_system_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_system_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string lattice_variation_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_variation_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string Pearson_symbol_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#pearson_symbol_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string Pearson_symbol_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#pearson_symbol_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string sg_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#sg target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string sg2_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#sg2 target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string spacegroup_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#spacegroup_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
-      string spacegroup_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#spacegroup_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
-
-      aflowlib::_aflowlib_entry aentry;
-
-      xoption vflags;
-      vflags.flag("FLAG::PREAMBLE",TRUE);
-      vflags.flag("FLAG::CALCULATION",TRUE);
-      vflags.flag("FLAG::JMOL",TRUE);
-      vflags.flag("FLAG::EDATA_ORIG",FALSE);
-      vflags.flag("FLAG::EDATA_RELAX",TRUE);
-      vflags.flag("FLAG::THERMODYNAMICS",TRUE);
-      vflags.flag("FLAG::MAGNETIC",TRUE);
-      vflags.flag("FLAG::ELECTRONIC",FALSE);     // will setup later
-      vflags.flag("FLAG::SCINTILLATION",TRUE);   // will setup later
-      vflags.flag("FLAG::AGL",FALSE);            // will setup later
-      vflags.flag("FLAG::AEL",FALSE);            // will setup later
-      vflags.flag("FLAG::BADER",FALSE);          // will setup later
-
-      // check if ICSD inside (anyway)
-      string lattices[]={"BCC","BCT","CUB","FCC","HEX","MCL","MCLC","ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
-      vector<string> vline,tokens;
-      // [OBSOLETE]   vector<string> tokens;
-
-      string html_TAB=" target=\"_blank\"";
-
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: [1]<br>" << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: [4]<br>" << endl;
-
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: option=" << option << endl;
-
-      // START SEARCH
-
-      vflags.flag("FLAG::FOUND",FALSE);
-      string catalog="",auid="";
-
-      // *****************************************************
-      if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
-        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: option=" << option << endl;
-        string auid=aurostd::tolower(option);
-        if(auid.size()!=22) {
-          cerr << "WEB_Aflowlib_Entry_PHP: error on size of auid=" << auid << endl;
-          oss << "WEB_Aflowlib_Entry_PHP: error on size of auid=" << auid << endl;
-          exit(0);
-        }
-        // OLD
-        // directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/LIB/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_LIB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
-        // directory_AUID_RAW=init::AFLOW_Projects_Directories("AUID")+"/RAW/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_RAW+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
-        // directory_AUID_WEB=init::AFLOW_Projects_Directories("AUID")+"/WEB/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_WEB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
-        // NEW
-        directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_LIB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
-        directory_AUID_WEB=directory_AUID_LIB+"/WEB";
-        directory_AUID_RAW=directory_AUID_LIB+"/RAW";
-        directory_AUID_LIB=directory_AUID_LIB+"/LIB";
-        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: directory_AUID_LIB=" << directory_AUID_LIB << endl;
-        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: directory_AUID_RAW=" << directory_AUID_RAW << endl;
-        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: directory_AUID_WEB=" << directory_AUID_WEB << endl;
-        directory="";
-        if(!aurostd::FileExist(directory_AUID_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-          cerr << "WEB_Aflowlib_Entry_PHP: entry does not exist =" << directory_AUID_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;exit(0);
-          oss << "WEB_Aflowlib_Entry_PHP: entry does not exist =" << directory_AUID_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;exit(0);
-        } else {
-          _aflowlib_entry entry_tmp(string(directory_AUID_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT));
-          directory=entry_tmp.aurl;
-          auid=entry_tmp.aurl;
-          aurostd::StringSubst(directory,"aflowlib.duke.edu:","");
-          aurostd::StringSubst(directory,"materials.duke.edu:","");
-          aurostd::StringSubst(directory,"AFLOWDATA/ICSD_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/ICSD_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB0_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB0_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB1_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB1_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB2_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB2_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB3_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB3_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB4_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB4_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB5_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB5_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB6_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB6_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB7_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB7_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB8_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB8_WEB/","");
-          aurostd::StringSubst(directory,"AFLOWDATA/LIB9_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB9_WEB/","");
-          vflags.flag("FLAG::AUID",TRUE);
-          vflags.flag("FLAG::FOUND",TRUE);
-          catalog=entry_tmp.catalog;
-          label=directory;
-          for(uint ilat=0;ilat<14;ilat++)
-            aurostd::StringSubst(label,lattices[ilat]+"/","");
-          aurostd::StringSubst(label,"/",".");
-        }
-      }
-      // *****************************************************
-      if(!vflags.flag("FLAG::FOUND")) { // tests with proto name
-        string dir2test;
-        dir2test=option;
-
-        vector<string> vdir2test;
-        for(uint i0=0;i0<dir2test.size();i0++) { // allow all identical indices...
-          for(uint i1=i0;i1<dir2test.size();i1++) { // allow all identical indices
-            for(uint i2=i1;i2<dir2test.size();i2++) { // allow all identical indices
-              //	    for(uint i3=i2;i3<dir2test.size();i3++) { // allow all identical indices
-              dir2test=option;
-              if(dir2test.at(i0)=='.') dir2test.at(i0)='/';
-              if(dir2test.at(i1)=='.') dir2test.at(i1)='/';
-              if(dir2test.at(i2)=='.') dir2test.at(i2)='/';
-              //      if(dir2test.at(i3)=='.') dir2test.at(i3)='/';
-              bool found=false;
-              for(uint i=0;i<vdir2test.size()&&!found;i++) if(dir2test==vdir2test.at(i)) found=true;
-              if(!found) {
-                vdir2test.push_back(dir2test);
-                //		cerr << vdir2test.size() << endl;
-              }
-            }
-            //	  }
-          }
-        }
-
-        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: testing dir2test=" << dir2test << endl;
-        for(uint i=0;i<vdir2test.size()&&!vflags.flag("FLAG::FOUND");i++) { // allow i=j=k so that 1 OR 2 OR 3 dots are also tested
-          dir2test=vdir2test.at(i);
-          //		cout << "testing(" << i << ") = " << dir2test << endl;
-          for(uint ilat=0;ilat<14&&!vflags.flag("FLAG::FOUND");ilat++) {
-            //	cerr << string(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl;
-            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-              catalog="ICSD";directory=lattices[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
-            }
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB0";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB1")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB1";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB2";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB3")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB3";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB4")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB4";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB5")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB5";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB6")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB6";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB7")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB7";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB8")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB8";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB9")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            catalog="LIB9";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
-          }
-        }
-      }
-
-
-
-      // **********************************************************************************************************
-      // TRY ICSD LINK
-      // **********************************************************************************************************
-      if(!vflags.flag("FLAG::FOUND")) { // icsd link
-        string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+option;
-        aurostd::StringSubst(directory_ICSD2LINK,"ICSD:","icsd:");
-        aurostd::StringSubst(directory_ICSD2LINK,"icsd:icsd:","icsd:");    
-        //	cerr << directory_ICSD2LINK << endl;
-        if(aurostd::FileExist(directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-          _aflowlib_entry entry_tmp(string(directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT));
-          directory=entry_tmp.aurl;
-          auid=entry_tmp.aurl;
-          aurostd::StringSubst(directory,"aflowlib.duke.edu:","");
-          aurostd::StringSubst(directory,"materials.duke.edu:","");
-          aurostd::StringSubst(directory,"AFLOWDATA/ICSD_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/ICSD_WEB/","");
-          vflags.flag("FLAG::ICSD",TRUE);
-          vflags.flag("FLAG::FOUND",TRUE);
-          catalog=entry_tmp.catalog;
-          label=directory;
-          for(uint ilat=0;ilat<14;ilat++)
-            aurostd::StringSubst(label,lattices[ilat]+"/","");
-          aurostd::StringSubst(label,"/",".");
-          //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
-        }
-      }
-
-      // **********************************************************************************************************
-      // SHOULD BE FOUND
-      // **********************************************************************************************************
-
-
-      if(catalog=="ICSD") {
-        vflags.flag("FLAG::ICSD",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("ICSD")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("ICSD")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/ICSD_WEB/"+directory;
-      }
-
-      if(catalog=="LIB0") {
-        vflags.flag("FLAG::LIB0",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB0")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB0")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB0_RAW/"+directory;
-      }
-      if(catalog=="LIB1") {
-        vflags.flag("FLAG::LIB1",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB1")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB1")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB1")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB1_RAW/"+directory;
-      }
-      if(catalog=="LIB2") {
-        vflags.flag("FLAG::LIB2",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB2")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+directory; // June 2016
-        directory_RAW=init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB2_RAW/"+directory; // May 2014
-      }
-      if(catalog=="LIB3") {
-        vflags.flag("FLAG::LIB3",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB3")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB3")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB3")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB3_WEB/"+directory;
-      }
-      if(catalog=="LIB4") {
-        vflags.flag("FLAG::LIB4",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB4")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB4")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB4")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB4_WEB/"+directory;
-      }
-      if(catalog=="LIB5") {
-        vflags.flag("FLAG::LIB5",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB5")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB5")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB5")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB5_WEB/"+directory;
-      }
-      if(catalog=="LIB6") {
-        vflags.flag("FLAG::LIB6",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB6")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB6")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB6")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB6_WEB/"+directory;
-      }
-      if(catalog=="LIB7") {
-        vflags.flag("FLAG::LIB7",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB7")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB7")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB7")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB7_WEB/"+directory;
-      }
-      if(catalog=="LIB8") {
-        vflags.flag("FLAG::LIB8",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB8")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB8")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB8")+"/RAW/"+directory;
-        url_WEB="/AFLOWDATA/LIB8_WEB/"+directory;
-      }
-      if(catalog=="LIB9") {
-        vflags.flag("FLAG::LIB9",TRUE);
-        directory_LIB=init::AFLOW_Projects_Directories("LIB9")+"/LIB/"+directory;
-        directory_WEB=init::AFLOW_Projects_Directories("LIB9")+"/WEB/"+directory;
-        directory_RAW=init::AFLOW_Projects_Directories("LIB9")+"/RAW/"+directory;	
-        url_WEB="/AFLOWDATA/LIB9_WEB/"+directory;
-      }
-
-      // LDEBUG=1;
-
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::FOUND\")=" << vflags.flag("FLAG::FOUND") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::ICSD\")=" << vflags.flag("FLAG::ICSD") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB1\")=" << vflags.flag("FLAG::LIB1") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB2\")=" << vflags.flag("FLAG::LIB2") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB3\")=" << vflags.flag("FLAG::LIB3") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB4\")=" << vflags.flag("FLAG::LIB4") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB5\")=" << vflags.flag("FLAG::LIB5") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB7\")=" << vflags.flag("FLAG::LIB6") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB7\")=" << vflags.flag("FLAG::LIB7") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB8\")=" << vflags.flag("FLAG::LIB8") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB9\")=" << vflags.flag("FLAG::LIB9") << endl;
-      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::AUID\")=" << vflags.flag("FLAG::AUID") << endl;   
-
-      // now start
-      // got it  ?
-      if(!aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_)) directory_RAW="";
-
-      if(!directory.empty()) { // play with aentry.entry
-        aurostd::StringSubst(label,"/",".");
-        aentry.file2aflowlib(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,oss);  //   oss << aentry.entry << endl;
-        directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aentry.auid);
-        directory_AUID_WEB=directory_AUID_LIB+"/WEB";
-        directory_AUID_RAW=directory_AUID_LIB+"/RAW";
-        directory_AUID_LIB=directory_AUID_LIB+"/LIB";    
-        aurostd::string2tokens(aentry.sg2,tokens,"#");if(tokens.size()>0) aentry.sg2=tokens.at(tokens.size()-1);
-        if(aentry.vfiles_WEB.size()==0) aentry.vfiles_WEB=aentry.vfiles;
-      }
-
-      // check AGL/AEL
-      vflags.flag("FLAG::ELECTRONIC",aurostd::substring2bool(aentry.vloop,"bands"));
-      vflags.flag("FLAG::SCINTILLATION",aurostd::substring2bool(aentry.vloop,"bands"));
-      vflags.flag("FLAG::AGL",aurostd::substring2bool(aentry.vloop,"agl"));
-      vflags.flag("FLAG::AEL",aurostd::substring2bool(aentry.vloop,"ael"));
-      vflags.flag("FLAG::BADER",aurostd::substring2bool(aentry.vloop,"bader"));
-
-      if(XHOST.hostname=="nietzsche.mems.duke.edu") {
-        oss << "<b>DEBUG: only in " << XHOST.hostname << "</b><br>" << endl;
-        oss << "XHOST.hostname=" << XHOST.hostname << "<br>" << endl;
-        oss << "auid=" << aentry.auid << "<br>" << endl;
-        oss << "option=" << option << "<br>" << endl;
-        oss << "label=" << label << "<br>" << endl;
-        oss << "directory=" << directory << "<br>" << endl;
-        oss << "catalog=" << aentry.catalog << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::ICSD\")=" << vflags.flag("FLAG::ICSD") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB0\")=" << vflags.flag("FLAG::LIB0") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB1\")=" << vflags.flag("FLAG::LIB1") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB2\")=" << vflags.flag("FLAG::LIB2") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB3\")=" << vflags.flag("FLAG::LIB3") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB4\")=" << vflags.flag("FLAG::LIB4") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB5\")=" << vflags.flag("FLAG::LIB5") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB6\")=" << vflags.flag("FLAG::LIB6") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB7\")=" << vflags.flag("FLAG::LIB7") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB8\")=" << vflags.flag("FLAG::LIB8") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::LIB9\")=" << vflags.flag("FLAG::LIB9") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::AUID\")=" << vflags.flag("FLAG::AUID") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::FOUND\")=" << vflags.flag("FLAG::FOUND") << "<br>" << endl;
-        oss << "directory_LIB=" << directory_LIB << "<br>" << endl;
-        oss << "directory_WEB=" << directory_WEB << "<br>" << endl;
-        oss << "directory_RAW=" << directory_RAW << "<br>" << endl;
-        oss << "directory_AUID_LIB=" << directory_AUID_LIB << "<br>" << endl;
-        oss << "directory_AUID_WEB=" << directory_AUID_WEB << "<br>" << endl;
-        oss << "directory_AUID_RAW=" << directory_AUID_RAW << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::PREAMBLE\")=" << vflags.flag("FLAG::PREAMBLE")  << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::CALCULATION\")=" << vflags.flag("FLAG::CALCULATION") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::JMOL\")=" << vflags.flag("FLAG::JMOL")  << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::EDATA_ORIG\")=" << vflags.flag("FLAG::EDATA_ORIG") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::EDATA_RELAX\")=" << vflags.flag("FLAG::EDATA_RELAX") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::THERMODYNAMICS\")=" << vflags.flag("FLAG::THERMODYNAMICS") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::MAGNETIC\")=" << vflags.flag("FLAG::MAGNETIC") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::ELECTRONIC\")=" << vflags.flag("FLAG::ELECTRONIC") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::SCINTILLATION\")=" << vflags.flag("FLAG::SCINTILLATION") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::AGL\")=" << vflags.flag("FLAG::AGL") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::AEL\")=" << vflags.flag("FLAG::AEL") << "<br>" << endl;
-        oss << "vflags.flag(\"FLAG::BADER\")=" << vflags.flag("FLAG::BADER") << "<br>" << endl;
-        oss << "aentry.loop=" << aentry.loop << "<br>" << endl;
-        // oss << "aflowlib.out=" << aurostd::efile2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << "<br>" << endl;
-        // oss << "aflowlib.json=" << aurostd::efile2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << "<br>" << endl;
-      }
-
-      //CO20180523 - fixing for LIB6 missing from /www directory
-      if(aurostd::substring2bool(XHOST.hostname, "aflowlib")){
-        vflags.flag("FLAG::JMOL",FALSE);
-        string web_path="/www"+url_WEB;
-        if(LDEBUG) {cerr << soliloquy << " web_path=" << web_path << endl;}
-        if(aurostd::IsDirectory(web_path)){
-          vector<string> web_path_vfiles;
-          aurostd::DirectoryLS(web_path,web_path_vfiles);
-          if(aurostd::substring2bool(web_path_vfiles,label+".cif")){vflags.flag("FLAG::JMOL",TRUE);}
-        }
-        if(LDEBUG) {cerr << soliloquy << " vflags.flag(\"FLAG::JMOL\")=" << vflags.flag("FLAG::JMOL") << endl;}
-      }
-
-      // make ORIG vs RELAX
-      vflags.flag("FLAG::EDATA_ORIG",FALSE);
-      if(aentry.Bravais_lattice_orig!=aentry.Bravais_lattice_relax && aentry.Bravais_lattice_orig!="nan" && aentry.Bravais_lattice_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
-      if(aentry.lattice_variation_orig!=aentry.lattice_variation_relax && aentry.lattice_variation_orig!="nan" && aentry.lattice_variation_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
-      if(aentry.lattice_system_orig!=aentry.lattice_system_relax && aentry.lattice_system_orig!="nan" && aentry.lattice_system_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
-      if(aentry.Pearson_symbol_orig!=aentry.Pearson_symbol_relax && aentry.Pearson_symbol_orig!="nan" && aentry.Pearson_symbol_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
-
-      // ***************************************************************************
-      // not found
-      // oss << "Thank you for your query, but unfortunately entry " << label << " has not yet been calculated. If you want to report this omission please email Dr. Rose at aflowdev@aflowlib.duke.ed.<br>" << endl;
-      // ***************************************************************************
-      // PREAMBLE BEGIN
-      string title=label;
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::PREAMBLE") && !directory.empty()) {
-        if(vflags.flag("FLAG::ICSD")) {
-          aurostd::string2tokens(label,tokens,"_");
-          title=tokens.at(0);
-          for(uint i=0;i<=9;i++) aurostd::StringSubst(title,aurostd::utype2string<uint>(i),string("<sub>"+aurostd::utype2string<uint>(i)+"</sub>"));
-          title+=" (ICSD# "+tokens.at(2)+")";//+directory;
-        }
-      }
-      if(vflags.flag("FLAG::ELECTRONIC")){ //CO20180502
-        oss.setf(std::ios::fixed,std::ios::floatfield);
-        oss.precision(4);
-        oss << "<script type=\"text/javascript\">" << endl;
-        aurostd::xoption aaa;
-        stringstream bandsdata;
-        oss << "var d3_bands_data = "; estructure::BANDSDATA_JSON(aaa, directory_LIB, bandsdata,true); oss << bandsdata.str();  //GG
-        oss << ";</script>" << endl;
-      }
-      oss << "<! HARVEY WORK BEFORE HERE> " << endl;
-      oss << "<div id=\"content\">" << endl;
-      oss << "<div class=\"title\">" << endl;
-      oss << "<FONT SIZE=+3> " << title << " </FONT></div>" << endl;
-      // ***************************************************************************
-      // COMPOUND
-      if(vflags.flag("FLAG::FOUND") && !directory.empty()) {
-        oss << "<!-- compound: BEGIN -->" << endl;
-        oss << "<FONT SIZE=+3> " << aentry.compound << " </FONT><br>" << endl;
-        oss << "<!-- compound: END -->" << endl;
-      }	
-      // ***************************************************************************
-      // LICENSE
-      if(vflags.flag("FLAG::FOUND") && !directory.empty()) {
-        string LICENSE="The data included within the aflow.org repository is free for scientific, academic and non-commercial purposes. Any other use is prohibited.";
-        oss << "<!-- license: BEGIN -->" << endl;
-        oss << "<div class = \"url_text\">" << endl;
-        oss << "<br><b>LICENSE: <span class=\"url_text\">" << LICENSE << "</span></b>" << endl;
-        oss << "</div>" << endl;
-        oss << "<!-- license: END -->" << endl;
-      }	
-      // ***************************************************************************
-      // PREAMBLE BEGIN
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::PREAMBLE") && !directory.empty()) {
-        // string URL=string("http://aflow.org/material.php?proto_name=")+label;
-        // string URL=string("http://aflow.org/material.php?id=")+label;   // with label
-        string URL=string("http://aflow.org/material.php?id=")+aentry.auid; // with auid
-        oss << "<!-- preamble: BEGIN -->" << endl;
-        //      oss << "<FONT SIZE=+3> " << aentry.compound << " </FONT>" << endl;
-        oss << "<div class = \"url\">" << endl;
-        oss << "Permanent URL: <span class=\"url_text\">" << URL << "</span>" << endl;
-        oss << "</div>" << endl;
-        oss << "<br><FONT SIZE=+0><b>aflow.org</b> web entry generator V" << string(AFLOW_VERSION) << " [built="  << TODAY << "]" << "</font>" << endl;
-        oss << "<!-- preamble: END -->" << endl;
-      }	
-      // ***************************************************************************
-      // NEW JSMOL BEGIN
-
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::JMOL") && !directory.empty() && aurostd::substring2bool(aentry.vfiles_WEB,label+".cif")) {  //CO20180523 - fixing for LIB6 missing from /www directory
-        //[OBSOLETE CO20170628 - per Bob/JMOL]if label+".cif" is available, assume "_sprim" and "_sconv" are too
-
-        //[OBSOLETE CO20170628 - per Bob/JMOL]space group stuff found in bob's file now
-        //[OBSOLETE CO20170628 - per Bob/JMOL]oss << "<br><br><b>Space Group</b>: " << (aurostd::string2utype<int>(aentry.spacegroup_relax)>0 ? GetSpaceGroupName(aurostd::string2utype<int>(aentry.spacegroup_relax)) : "N/A" ) << "  (#" << aentry.spacegroup_relax << ")" << endl;
-        //[OBSOLETE CO20170628 - per Bob/JMOL]if(aurostd::string2utype<int>(aentry.spacegroup_relax)>0) {
-        //[OBSOLETE CO20170628 - per Bob/JMOL]  oss << "<br><br><b>Space Group</b>: " <<  GetSpaceGroupName(aurostd::string2utype<int>(aentry.spacegroup_relax)) << "  (#" << aentry.spacegroup_relax << ")" << endl;
-        //[OBSOLETE CO20170628 - per Bob/JMOL]} else {
-        //[OBSOLETE CO20170628 - per Bob/JMOL]  oss << "<br><br><b>Space Group</b>: " <<  "N/A" << "  (#" << aentry.spacegroup_relax << ")" << endl;
-        //[OBSOLETE CO20170628 - per Bob/JMOL]}
-        oss << "<!-- jmol: BEGIN -->" << endl;
-        oss << "<!--div class = \"jmol\"-->" << endl;
-        //[OBSOLETE CO20170628 - per Bob/JMOL]oss << "<script type=\"text/javascript\" src=\"/search/Lib/JS/JSmol.min.js\"></script>" << endl;  //CO20170622
-        //[OBSOLETE CO20170628 - per Bob/JMOL]string JMOL_PATH="http://aflowlib.duke.edu/users/jmolers/test/jsmol";
-        string JMOL_PATH="http://aflowlib.duke.edu/search/Lib/JS/JSMol";
-        oss << "<script type=\"text/javascript\" src=\"" << JMOL_PATH << "/JSmol.min.js\"></script>" << endl;  //CO20170622
-        oss << "<script type=\"text/javascript\">" << endl;
-        //CO20170622 START
-        //build our standard AFLOW object, add from aentry as needed
-        oss << "AFLOW={};" << endl;
-        oss << "AFLOW.version = \"" << string(AFLOW_VERSION) << "\";" << endl;
-        oss << "AFLOW.url_WEB = \"http://aflowlib.duke.edu" << url_WEB << "\";" << endl; //CO check with bob, maybe aflowlib.duke.edu?
-        string system_name=KBIN::ExtractSystemName(directory_LIB);
-        //    cerr << system_name << endl; exit(0);
-        //  system_name="xxxx";
-        oss << "AFLOW.label = \"" << system_name << "\";" << endl;
-        //  oss << "AFLOW.label = \"" << "xxx" << "\";" << endl;
-
-
-        oss << "AFLOW.spaceGroupNo = " << aentry.spacegroup_relax << ";" << endl;
-        oss << "AFLOW.spaceGroupName = \"" << GetSpaceGroupName(aurostd::string2utype<int>(aentry.spacegroup_relax)) << "\";" << endl;
-        double aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF;
-        cif2data(directory_WEB+"/"+label+"_sconv.cif",aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF);
-        oss << "AFLOW.cif_sconv = [" << aCIF << "," << bCIF << "," << cCIF << "," << alphaCIF << "," << betaCIF << "," << gammaCIF << "];" << endl;
-        cif2data(directory_WEB+"/"+label+".cif",aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF);
-        oss << "AFLOW.cif = [" << aCIF << "," << bCIF << "," << cCIF << "," << alphaCIF << "," << betaCIF << "," << gammaCIF << "];" << endl;
-        cif2data(directory_WEB+"/"+label+"_sprim.cif",aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF);
-        oss << "AFLOW.cif_sprim = [" << aCIF << "," << bCIF << "," << cCIF << "," << alphaCIF << "," << betaCIF << "," << gammaCIF << "];" << endl;
-        string sym2json; //PC+DX20180723
-        if(aurostd::FileExist(directory_RAW+"/"+"aflow.fgroup.bands.json.xz")) //PC+DX20180723
-        { aurostd::xzfile2string(directory_RAW+"/"+"aflow.fgroup.bands.json.xz",sym2json); //PC+DX20180723
-          oss << "AFLOW.sym2json ="; //PC+DX20180723
-          oss << sym2json;    //PC+DX20180723
-          oss << ";" << endl; } //PC+DX20180723
-        else if (aurostd::FileExist(directory_RAW+"/"+"aflow.fgroup.relax.json.xz")) //PC+DX20180723
-        { aurostd::xzfile2string(directory_RAW+"/"+"aflow.fgroup.relax.json.xz",sym2json); //PC+DX20180723
-          oss << "AFLOW.sym2json ="; //PC+DX20180723
-          oss << sym2json;    //PC+DX20180723
-          oss << ";" << endl; }//PC+DX20180723
-        else {cerr << "error" << endl; //PC+DX20180723
-        }; //PC+DX20180723
-        //BEGIN BADER ISOSURFACES
-        if(vflags.flag("FLAG::BADER")){ //did we calculate bader?
-          if(aurostd::substring2bool(aentry.vfiles_WEB,label+"_Bader_20_"+aentry.vspecies.at(0)+".jvxl")) { //quick (not robust) test that bader loop ran fine
-            if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax")) {  //check that we have the right structure
-              xstructure xstr(directory_WEB+"/CONTCAR.relax",IOAFLOW_AUTO);
-              xstr.ReScale(1.0);
-              oss << "AFLOW.baderUnitcell = [";
-              string sep = "";
-              for(uint i=1;i<=3;i++)
-                for(uint j=1;j<=3;j++) {
-                  oss << sep << xstr.lattice(i,j);
-                  sep = ",";
-                }
-              oss << "];" << endl;
-              oss << "AFLOW.baderVSpecies = [" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aentry.vspecies,"\""),",") << "];" << endl;
-            }
-          }
-        }
-        //END BADER ISOSURFACES
-        oss << "AFLOW.jsmolDir = \"" << JMOL_PATH << "\";" << endl;
-
-        //adding bob's stuff
-        //string aflow_entry_js=AFLOW_ENTRY_JS;
-        oss << AFLOW_WEBAPP_ENTRY_JS;  //CO20170622 
-
-        oss << "</script>" << endl;
-        oss << "</td></tr></table>" << endl;
-        oss << "<!--/div-->" << endl;
-        oss << "<!-- jmol: END -->" << endl;
-      }
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
-        oss << "<!-- geena bands: BEGIN -->" << endl;
-        oss << "<script type=\"text/javascript\" src=\"./Lib/JS/d3.min.js\"></script>" << endl;  //CO20170622  ///www/search/Lib/JS/d3.min.js
-        oss << "<script type=\"text/javascript\">" << endl;
-        oss << AFLOW_WEBAPP_BANDS_JS; //PC20180515
-        oss << "</script>" << endl;
-        oss << "<!-- geena bands: END -->" << endl;
-      }
-      // NEW JSMOL END
-      // ***************************************************************************
-      // CALCULATION
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::CALCULATION") && !directory.empty()) {
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        oss << "<!-- Calculation properties: BEGIN -->" << endl;
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Calculation details</h1></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        //      oss << "<div class=\"calculation_details\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-        if(!aentry.code.empty()) {
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ":</h5><span class=\"value\">" << "[" << "<a href=\"" << url_WEB << "/\"" << html_TAB << ">entry</a>|" << "<a href=\"" << url_WEB << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << html_TAB << ">raw</a>]" << "</span></div></div>" << endl; //JPO20180731
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ":</h5><span class=\"value\">" << "[" << "<a href=\"" << url_WEB << "/?format=json\"" << html_TAB << ">entry</a>|" << "<a href=\"" << url_WEB << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "\"" << html_TAB << ">raw</a>]" << "</span></div></div>" << endl; //JPO20180731
-        }
-        if(!aentry.auid.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW-UID [<a href=\"" << url_WEB << "/?auid\">auid</a>]:</h5><span class=\"value\">" << aentry.auid << "</span></div></div>" << endl; //PC20180515  //JPO20180731
-        if(!aentry.aurl.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW-URL [<a href=\"" << url_WEB << "/?aurl\">aurl</a>]:</h5><span class=\"value\">" << aentry.aurl << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(!aentry.code.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"><i>Ab-initio</i> code [<a href=\"" << url_WEB << "/?code\">code</a>]:</h5><span class=\"value\">" << aentry.code << (aentry.calculation_cores>1?" (MPI) ":"") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.compound.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Composition per cell [<a href=\"" << url_WEB << "/?compound\">compound</a>]:</h5><span class=\"value\">" << aentry.compound << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(!aentry.icsd.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">ICSD entry" << icsd_link << ":</h5><span class=\"value\">" << aentry.icsd << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.dft_type.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Pseudopotentials type [<a href=\"" << url_WEB << "/?pp_type\">pp_type</a>]:</h5><span class=\"value\">" << aentry.dft_type << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        for(uint i=0;i<aentry.vspecies_pp.size();i++)  
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">PP - Species&middot;Version [<a href=\"" << url_WEB << "/?species_pp_version\">species_pp_version</a>]:</h5><span class=\"value\">" << aentry.vspecies_pp_version.at(i) << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        for(uint i=0;i<aentry.vspecies_pp_ZVAL.size();i++)  
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">PP - Species&middot;ZVAL [<a href=\"" << url_WEB << "/?species_pp_ZVAL\">species_pp_ZVAL</a>]:</h5><span class=\"value\">" << aentry.vspecies_pp_ZVAL.at(i) << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">LDAU [T;{L};{U};{J}] [<a href=\"" << url_WEB << "/?ldau_TLUJ\">ldau_TLUJ</a>]:</h5><span class=\"value\">" << (!aentry.ldau_TLUJ.empty()?aentry.ldau_TLUJ+"  (type;{angular-1};{eV};{eV}) ":"no-LDAU") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(aentry.calculation_time*aentry.calculation_cores>0.0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Total CPU&middot;hours [<a href=\"" << url_WEB << "/?calculation_time\">calculation_time</a>*<a href=\"" << url_WEB << "/?calculation_cores\">calculation_cores</a>]/3600:</h5><span class=\"value\">" << aentry.calculation_time*aentry.calculation_cores/3600 << " hours</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(aentry.calculation_time>0.0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Total Wall-time [<a href=\"" << url_WEB << "/?calculation_time\">calculation_time/3600</a>]:</h5><span class=\"value\">" << aentry.calculation_time/3600 << " hours</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(aentry.calculation_memory>0.0)
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Memory Used [<a href=\"" << url_WEB << "/?calculation_memory\">calculation_memory</a>]:</h5><span class=\"value\">" << aentry.calculation_memory << " MB</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(aentry.calculation_cores>0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Number of cores [<a href=\"" << url_WEB << "/?calculation_cores\">calculation_cores</a>]:</h5><span class=\"value\">" << aentry.calculation_cores << (aentry.calculation_cores>1?" (MPI) ":"(serial)") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(!aentry.node_CPU_Model.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Processor - CPU Model [<a href=\"" << url_WEB << "/?node_CPU_Model\">node_CPU_Model</a>]:</h5><span class=\"value\">" << (!aentry.node_CPU_Model.empty()?aentry.node_CPU_Model:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(aentry.node_CPU_MHz>0.0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Processor - CPU MHz [<a href=\"" << url_WEB << "/?node_CPU_MHz\">node_CPU_MHz</a>]:</h5><span class=\"value\">" << (aentry.node_CPU_MHz>1.0?aurostd::utype2string(aentry.node_CPU_MHz)+"MHz ":"unavailable") << " </span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.aflow_version.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?aflow_version\">aflow_version</a>]:</h5><span class=\"value\">" << (!aentry.aflow_version.empty()?aentry.aflow_version:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.catalog.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Catalog [<a href=\"" << url_WEB << "/?catalog\">catalog</a>]:</h5><span class=\"value\">" << (!aentry.catalog.empty()?aentry.catalog:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.data_api.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Data API [<a href=\"" << url_WEB << "/?data_api\">data_api</a>]:</h5><span class=\"value\">" << (!aentry.data_api.empty()?aentry.data_api:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.data_source.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Data Source [<a href=\"" << url_WEB << "/?data_source\">data_source</a>]:</h5><span class=\"value\">" << (!aentry.data_source.empty()?aentry.data_source:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.data_language.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Data Language [<a href=\"" << url_WEB << "/?data_language\">data_language</a>]:</h5><span class=\"value\">" << (!aentry.data_language.empty()?aentry.data_language:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.error_status.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Error Status [<a href=\"" << url_WEB << "/?error_status\">error_status</a>]:</h5><span class=\"value\">" << (!aentry.error_status.empty()?aentry.error_status:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.loop.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW loops [<a href=\"" << url_WEB << "/?loop\">loop</a>]:</h5><span class=\"value\">" << aentry.loop << "</span></div></div>" << endl; //JPO20180731
-        //     oss << "<li><span class=\"description\">AFLOW precision:</span>" << "unavailable" << "</li>" << endl; //JPO20180731
-        //    oss << "<li><span class=\"description\">AFLOW KPPRA:</span>" << "unavailable" << "</li>" << endl; //JPO20180731
-        if(!aentry.aflowlib_version.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry version [<a href=\"" << url_WEB << "/?aflowlib_version\">aflowlib_version</a>]:</h5><span class=\"value\">" << (!aentry.aflowlib_version.empty()?aentry.aflowlib_version:"unavailable") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(!aentry.aflowlib_date.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry date [<a href=\"" << url_WEB << "/?aflowlib_date\">aflowlib_date</a>]:</h5><span class=\"value\">" << (!aentry.aflowlib_date.empty()?aentry.aflowlib_date:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.author.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?author\">author</a>]:</h5><span class=\"value\">" << (!aentry.author.empty()?aentry.author:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.corresponding.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?corresponding\">corresponding</a>]:</h5><span class=\"value\">" << (!aentry.corresponding.empty()?aentry.corresponding:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-        if(!aentry.sponsor.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?sponsor\">sponsor</a>]:</h5><span class=\"value\">" << (!aentry.sponsor.empty()?aentry.sponsor:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
-
-        // CORMAC
-        if(aentry.energy_cutoff!=AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">energy_cutoff [<a href=\"" << url_WEB << "/?energy_cutoff\">energy_cutoff</a>]:</h5><span class=\"value\">" << aentry.energy_cutoff << " eV</span></div></div>" << endl; //PC20180515 //JPO20180731
-        //      oss.precision(6);
-        if(aentry.delta_electronic_energy_convergence!=AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">delta_electronic_energy_convergence [<a href=\"" << url_WEB << "/?delta_electronic_energy_convergence\">delta_electronic_energy_convergence</a>]:</h5><span class=\"value\">" << 1000*aentry.delta_electronic_energy_convergence << " meV</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(aentry.delta_electronic_energy_threshold!=AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">delta_electronic_energy_threshold_ [<a href=\"" << url_WEB << "/?delta_electronic_energy_threshold\">delta_electronic_energy_threshold</a>]:</h5><span class=\"value\">" << 1000*aentry.delta_electronic_energy_threshold << " meV</span></div></div>" << endl; //PC20180515 //JPO20180731
-        if(aentry.nkpoints!=0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">nkpoints [<a href=\"" << url_WEB << "/?nkpoints\">nkpoints</a>]:</h5><span class=\"value\">" << aentry.nkpoints << " </span></div></div>" << endl; //JPO20180731
-        if(aentry.nkpoints_irreducible!=0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">nkpoints_irreducible [<a href=\"" << url_WEB << "/?nkpoints_irreducible\">nkpoints_irreducible</a>]:</h5><span class=\"value\">" << aentry.nkpoints_irreducible << " </span></div></div>" << endl; //JPO20180731
-        if(aentry.kppra!=0) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">kppra [<a href=\"" << url_WEB << "/?kppra\">kppra</a>]:</h5><span class=\"value\">" << aentry.kppra << " </span></div></div>" << endl; //JPO20180731
-        if(aentry.kpoints.empty()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">kpoints [<a href=\"" << url_WEB << "/?kpoints\">kpoints</a>]:</h5><span class=\"value\">" << aentry.kpoints << " </span></div></div>" << endl; //JPO20180731
-        //  oss.precision(3);
-
-        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-        oss << "</div>" << endl;  //JPO20180731
-        oss << "<!-- Calculation properties: END -->" << endl;
-      }
-
-      // ***************************************************************************
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::EDATA_ORIG")&& !directory.empty()) {
-        oss << line_rule << endl;
-        oss << "<!-- Warning: BEGIN -->" << endl;
-        oss << "<span class=\"title\"><FONT SIZE=+3 color=red> Warning!</font></span>" << endl;
-        oss << "<span class=\"title\"><FONT SIZE=+3 color=red> Original and relaxed structures</font></span>" << endl;
-        oss << "<span class=\"title\"><FONT SIZE=+3 color=red> have different symmetries: listing both.</font></span>" << endl;
-        oss << "<!-- Warning: END -->" << endl;
-        oss << line_rule << endl;
-      }
-
-      // ***************************************************************************
-      // EDATA ORIG/RELAX
-      if((vflags.flag("FLAG::EDATA_ORIG") || vflags.flag("FLAG::EDATA_RELAX")) && !directory.empty()) {
-        for(uint i=0;i<=1;i++)  {
-          if((vflags.flag("FLAG::EDATA_ORIG") && i==0) || (vflags.flag("FLAG::EDATA_RELAX") && i==1)) {
-            // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-            oss << "<!-- EDATA: BEGIN -->" << endl;
-            oss << "<div class=\"container\">" << endl; //JPO20180731
-            if(i==0) oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Original Structure</h1></div>" << endl; //JPO20180731
-            if(i==1) oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Relaxed Structure</h1></div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-            // [OBSOLETE] oss << "<ht /> " << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class = \"real_space\">" << endl; //JPO20180731
-            if(i==0) oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Real Space Lattice</h4></div>" << endl; //JPO20180731
-            if(i==1) oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Real Space Lattice</h4></div>" << endl; //JPO20180731
-            vector<string> vline_edata;
-            if(i==0 && aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT)) aurostd::file2vectorstring(directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT,vline_edata);
-            if(i==1 && aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT)) aurostd::file2vectorstring(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT,vline_edata);
-            // 
-            vector<double> abcR(6);
-            double volumeR,density=0.0,coveraR;
-            string Crystal_Real_space_Bravais_Lattice_Primitive="",Crystal_Real_space_Lattice_Variation="",Crystal_Real_space_Lattice_System="";
-            string Crystal_Real_space_Pearson_Symbol="",Crystal_Real_space_Crystal_Family="",Crystal_Real_space_Crystal_System="";
-            string Crystal_Real_space_Crystal_Class="",Crystal_Real_space_Point_Group_Hermann_Mauguin="",Crystal_Real_space_Point_Group_Schoenflies="";
-            string Crystal_Real_space_Point_Group_Orbifold="",Crystal_Real_space_Point_Group_Type="",Crystal_Real_space_Point_Group_Order="";
-            string Crystal_Real_space_Point_Group_Structure="";
-
-            string Lattice_Real_space_Bravais_Lattice_Primitive="",Lattice_Real_space_Lattice_Variation="",Lattice_Real_space_Lattice_System="";
-
-            string Superattice_Real_space_Bravais_Superlattice_Primitive="",Superattice_Real_space_Superlattice_Variation="",Superattice_Real_space_Superlattice_System="";
-            string Superattice_Real_space_Pearson_Symbol_Superlattice="",Reciprocal_lattice_primitive="",Reciprocal_lattice_variation="";
-
-            vector<double> abcK(6);
-            double volumeK;
-            if(vline_edata.size()>0) {
-              for(uint iline=0;iline<vline_edata.size();iline++) {
-                if(aurostd::substring2bool(vline_edata.at(iline),"Real space a b c alpha beta gamma"))
-                  if(!aurostd::substring2bool(vline_edata.at(iline),"Bohrs/Degs")) {
-                    aurostd::string2tokens(vline_edata.at(iline),tokens);
-                    for(uint i=0;i<6;i++) abcR.at(i)=aurostd::string2utype<double>(tokens.at(tokens.size()-6+i));}
-                if(aurostd::substring2bool(vline_edata.at(iline),"Real space Volume")) {
-                  aurostd::string2tokens(vline_edata.at(iline),tokens);
-                  volumeR=aurostd::string2utype<double>(tokens.at(tokens.size()-1));}
-                if(aurostd::substring2bool(vline_edata.at(iline),"Real space c/a")) {
-                  aurostd::string2tokens(vline_edata.at(iline),tokens);
-                  coveraR=aurostd::string2utype<double>(tokens.at(tokens.size()-1));}
-
-                if(aurostd::substring2bool(vline_edata.at(iline),"BRAVAIS LATTICE OF THE CRYSTAL")) {
-                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Crystal_Real_space_Bravais_Lattice_Primitive=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Crystal_Real_space_Lattice_Variation=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Crystal_Real_space_Lattice_System=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+4),tokens,"="); Crystal_Real_space_Pearson_Symbol=tokens.at(tokens.size()-1);}
-                if(aurostd::substring2bool(vline_edata.at(iline),"POINT GROUP CRYSTAL")) {
-                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Crystal_Real_space_Crystal_Family=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Crystal_Real_space_Crystal_System=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Crystal_Real_space_Crystal_Class=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+4),tokens,"="); Crystal_Real_space_Point_Group_Hermann_Mauguin=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+5),tokens,"="); Crystal_Real_space_Point_Group_Schoenflies=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+6),tokens,"="); Crystal_Real_space_Point_Group_Orbifold=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+7),tokens,"="); Crystal_Real_space_Point_Group_Type=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+8),tokens,"="); Crystal_Real_space_Point_Group_Order=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+9),tokens,"="); Crystal_Real_space_Point_Group_Structure=tokens.at(tokens.size()-1);}
-                if(aurostd::substring2bool(vline_edata.at(iline),"BRAVAIS LATTICE OF THE LATTICE")) {
-                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Lattice_Real_space_Bravais_Lattice_Primitive=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Lattice_Real_space_Lattice_Variation=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Lattice_Real_space_Lattice_System=tokens.at(tokens.size()-1);}
-                if(aurostd::substring2bool(vline_edata.at(iline),"SUPERLATTICE")) {
-                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Superattice_Real_space_Bravais_Superlattice_Primitive=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Superattice_Real_space_Superlattice_Variation=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Superattice_Real_space_Superlattice_System=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+4),tokens,"="); Superattice_Real_space_Pearson_Symbol_Superlattice=tokens.at(tokens.size()-1);}
-                if(aurostd::substring2bool(vline_edata.at(iline),"Reciprocal space a b c alpha beta gamma")) {
-                  aurostd::string2tokens(vline_edata.at(iline),tokens);
-                  for(uint i=0;i<6;i++) abcK.at(i)=aurostd::string2utype<double>(tokens.at(tokens.size()-6+i));}
-                if(aurostd::substring2bool(vline_edata.at(iline),"Reciprocal space Volume")) {
-                  aurostd::string2tokens(vline_edata.at(iline),tokens);
-                  volumeK=aurostd::string2utype<double>(tokens.at(tokens.size()-1));}
-                if(aurostd::substring2bool(vline_edata.at(iline),"RECIPROCAL LATTICE")) {
-                  aurostd::string2tokens(vline_edata.at(iline+7),tokens,"="); Reciprocal_lattice_primitive=tokens.at(tokens.size()-1);
-                  aurostd::string2tokens(vline_edata.at(iline+8),tokens,"="); Reciprocal_lattice_variation=tokens.at(tokens.size()-1);}
-              }
-            }
-
-            if(aentry.vcomposition.size()==aentry.vspecies.size()) {
-              for(uint i=0;i<aentry.vspecies.size();i++) 
-                density=density+aentry.vcomposition.at(i)*GetAtomMass(aentry.vspecies.at(i))/volumeR*1000.0*1e8*1e8*1e8; //grams/cm^3
-            }
-
-            // Print out structural data    
-            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<li>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Lattice:</h5>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"lattice_table\">" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<table class=\"lattice\">" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
-            oss << "<div class=\"value\">" << endl << "a=" << abcR.at(0) << "&Aring;" << "&nbsp;" << endl << " b=" << abcR.at(1) << "&Aring;" << "&nbsp;" <<  endl << " c=" << abcR.at(2) << "&Aring;" << "&nbsp;" << endl << " c/a=" << coveraR <<  endl << "</div>" << endl; //JPO20180731
-            oss << "<div class=\"value\">" << endl << "&alpha;=" << abcR.at(3) << "&deg" << endl << " &beta;=" << abcR.at(4) << "&deg" << endl << " &gamma;=" << abcR.at(5) << "&deg" << endl << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 vector<double> lattice_params(6);
-            // [OBSOLETE] DX20180824 vector<string> rtokens;
-            // [OBSOLETE] DX20180824 aurostd::string2tokens(aentry.geometry,rtokens,";");
-            // [OBSOLETE] DX20180824 for(uint t=0;t<rtokens.size();t++){ lattice_params[t] = aurostd::string2utype<double>(rtokens[t]); }
-            // [OBSOLETE] DX20180824 double covera = lattice_params.at(0)/lattice_params.at(2);
-            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << endl << "a=" << lattice_params.at(0) << "&Aring;" << "&nbsp;" << endl << " b=" << lattice_params.at(1) << "&Aring;" << "&nbsp;" <<  endl << " c=" << lattice_params.at(2) << "&Aring;" << "&nbsp;" << endl << " c/a=" << covera <<  endl << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << endl << "&alpha;=" << lattice_params.at(3) << "&deg" << endl << " &beta;=" << lattice_params.at(4) << "&deg" << endl << " &gamma;=" << lattice_params.at(5) << "&deg" << endl << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</li>" << endl; //JPO20180731
-            oss << "</div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << volumeR << "&Aring;<sup>3</sup></span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << aentry.volume_cell << "&Aring;<sup>3</sup></span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Number of Atoms per Cell:</h5><span class=\"value\">" << aentry.natoms << "</span></div></div>" << endl; //JPO20180731
-            //  if(html && aentry.density==0.0) oss << "<li><span class=\"description\"> Density(calc):</span> " << density << " g/cm<sup>3</sup></li>" << endl;
-            // if(html && aentry.density>0.0) oss << "<li><span class=\"description\"> Density(entry):</span> " << aentry.density << " g/cm<sup>3</sup></li>" << endl;
-            if(aentry.density<0.1)  aentry.density=density;
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Density(calc):</h5><span class=\"value\"> " << density << " g/cm<sup>3</sup></span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Density(aflowlib):</h5><span class=\"value\"> " << aentry.density << " g/cm<sup>3</sup></span></div></div>" << endl; //JPO20180731
-
-            //	  if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax")) {
-            //    oss << "<li><span class=\"description\"> Relaxed position (aflowlib/VASP):</span>" << "[<a href=\"" << url_WEB << "/CONTCAR.relax\">POSCAR</a>]" << "</li>" << endl;
-            // }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.vasp")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/VASP):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.vasp\"" << html_TAB << ">VASP-POSCAR</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.qe")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/QE):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.qe\"" << html_TAB << ">QE-GEOMETRY</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.abinit")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/ABINIT):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.abinit\"" << html_TAB << ">ABINIT-GEOMETRY</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.aims")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/AIMS):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.aims\"" << html_TAB << ">AIMS-GEOMETRY</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"INCAR.relax")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> INCAR for relax calculation (aflowlib/VASP):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/INCAR.relax\"" << html_TAB << ">INCAR.relax</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if(aurostd::substring2bool(aentry.vfiles_WEB,"INCAR.static")) {
-              oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> INCAR for static calculation (aflowlib/VASP):</h5><span class=\"value\">" 
-                << "[<a href=\"" << url_WEB << "/INCAR.static\"" << html_TAB << ">INCAR.static</a>]" << "</span></div></div>" << endl; //JPO20180731
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"INCAR.bands")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> INCAR for bands calculation (aflowlib/VASP):</h5><span class=\"value\">"
-                  << "[<a href=\"" << url_WEB << "/INCAR.bands\"" << html_TAB << ">INCAR.bands</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"KPOINTS.relax")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> KPOINTS for relax calculation (aflowlib/VASP):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/KPOINTS.relax\"" << html_TAB << ">KPOINTS.relax</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"KPOINTS.static")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> KPOINTS for static calculation (aflowlib/VASP):</h5><span class=\"value\">"
-                  << "[<a href=\"" << url_WEB << "/KPOINTS.static\"" << html_TAB << ">KPOINTS.static</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,"KPOINTS.bands")) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> KPOINTS for bands calculation (aflowlib/VASP):</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/KPOINTS.bands\"" << html_TAB << ">KPOINTS.bands</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-            if(aurostd::substring2bool(aentry.vfiles_WEB,DEFAULT_FILE_EDATA_ORIG_OUT)) {
-              oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Extended crystallographic data for original structure:</h5><span class=\"value\">" 
-                << "[<a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_ORIG_OUT << "\"" << html_TAB << ">" << DEFAULT_FILE_EDATA_ORIG_OUT << "</a>]" << "</span></div></div>" << endl; //JPO20180731
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,DEFAULT_FILE_EDATA_RELAX_OUT)) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Extended crystallographic data for relaxed structure:</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_RELAX_OUT << "\"" << html_TAB << ">" << DEFAULT_FILE_EDATA_RELAX_OUT << "</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            if (i==1){  //GG20170714 - removed relaxed data from orig
-              if(aurostd::substring2bool(aentry.vfiles_WEB,DEFAULT_FILE_EDATA_BANDS_OUT)) {
-                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Extended crystallographic data for band-structure:</h5><span class=\"value\">" 
-                  << "[<a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_BANDS_OUT << "\"" << html_TAB << ">" << DEFAULT_FILE_EDATA_BANDS_OUT << "</a>]" << "</span></div></div>" << endl; //JPO20180731
-              }
-            }
-
-            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"space_group\">" << endl; //JPO20180731
-            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Bravais Lattice of the Crystal" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731  //CO20180817
-            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Space Group Number:</h5><span class=\"value\">" << aentry.sg2 << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Pearson Symbol:</h5><span class=\"value\">" << Crystal_Real_space_Pearson_Symbol << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive:</h5><span class=\"value\">" << Crystal_Real_space_Bravais_Lattice_Primitive << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << Crystal_Real_space_Lattice_Variation << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << Crystal_Real_space_Lattice_System << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"point_group\">" << endl; //JPO20180731
-            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Point Group of the Crystal" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
-            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Family:</h5><span class=\"value\">" << Crystal_Real_space_Crystal_Family << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal System:</h5><span class=\"value\">" << Crystal_Real_space_Crystal_System << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Class:</h5><span class=\"value\">" << Crystal_Real_space_Crystal_Class << "</span></div></div>" << endl; //JPO20180731
-            //	oss << "<li><span class=\"description\"> Point Group (Hermann Mauguin):</span>" << Crystal_Real_space_Point_Group_Hermann_Mauguin << "</li><!br>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Herm. Maug.):</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Hermann_Mauguin << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Schoenflies):</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Schoenflies << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Orbifold:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Orbifold << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180827 - new point group type output - START
-            string point_group_type = Crystal_Real_space_Point_Group_Type;
-            if(aurostd::RemoveWhiteSpaces(point_group_type) == "-" || aurostd::RemoveWhiteSpaces(point_group_type) == "none"){
-              point_group_type = "non-centrosymmetric, non-enantiomorphic, non-polar";
-            }
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << point_group_type << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180827 - new point group type output - END
-            // [OBSOLETE] DX20180827 [OBSOLETE] oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Type << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Type << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Order:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Order << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Structure:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Structure << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Family:</h5><span class=\"value\">" << aentry.crystal_family << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal System:</h5><span class=\"value\">" << aentry.crystal_system << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Class:</h5><span class=\"value\">" << aentry.crystal_class << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Herm. Maug.):</h5><span class=\"value\">" << aentry.point_group_Hermann_Mauguin << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Schoenflies):</h5><span class=\"value\">" << aentry.point_group_Schoenflies << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Orbifold:</h5><span class=\"value\">" << aentry.point_group_orbifold << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << aentry.point_group_type << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Order:</h5><span class=\"value\">" << aentry.point_group_order << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Structure:</h5><span class=\"value\">" << aentry.point_group_structure << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"bravais_lattice\">" << endl; //JPO20180731
-            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Bravais Lattice of the Lattice" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
-            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive</h5><span class=\"value\">" << Lattice_Real_space_Bravais_Lattice_Primitive << "</span></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_Variation << "</span></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_System << "</span></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive</h5><span class=\"value\">" << aentry.Bravais_lattice_lattice_type << "</span></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << aentry.Bravais_lattice_lattice_variation_type << "</span></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << aentry.Bravais_lattice_lattice_system << "</span></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            oss << "</div>" << endl; //JPO20180731
-            if(aurostd::substring2bool(aentry.vfiles_WEB,label+"_BZ.png")) {
-              oss << "<div class=\"container__cell\"><div class=\"container__card--img\">" << endl; //JPO20180731
-              oss << "<h5 class=\"value-name\"> Brillouin Zone " << art058_link<< "</h5>" << endl; //JPO20180731
-              // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
-              // [OBSOLETE] oss << "<div class=\"picture_BZ\">" << endl; //JPO20180731
-              // [OBSOLETE] oss << "<img class=\"pic_BZ\" src=\"../SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; //CO20170621 - relative path
-              oss << "<img class=\"BZ-img\" src=\"http://aflowlib.duke.edu/SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; //CO20170621 - abs path WORKS  //JPO20180731
-              oss << "</div></div>" << endl; //JPO20180731
-            }
-            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "<div class=\"bravais_lattice\">" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Bravais Lattice of the Lattice" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
-            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive</h5><span class=\"value\">" << Lattice_Real_space_Bravais_Lattice_Primitive << "</span></div>" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_Variation << "</span></div>" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_System << "</span></div>" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            //[MOVED UP JPO20180731]oss << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"superlattice\">" << endl; //JPO20180731
-            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Superlattice" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
-            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Primitive unit cell:</h5><span class=\"value\">" << Superattice_Real_space_Bravais_Superlattice_Primitive << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Variation:</h5><span class=\"value\">" << Superattice_Real_space_Superlattice_Variation << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Lattice System :</h5><span class=\"value\">" << Superattice_Real_space_Superlattice_System << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Pearson Symbol:</h5><span class=\"value\">" << Superattice_Real_space_Pearson_Symbol_Superlattice << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Primitive unit cell:</h5><span class=\"value\">" << aentry.Bravais_superlattice_lattice_type << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Variation:</h5><span class=\"value\">" << aentry.Bravais_superlattice_lattice_variation_type << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Lattice System :</h5><span class=\"value\">" << aentry.Bravais_superlattice_lattice_system << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Pearson Symbol:</h5><span class=\"value\">" << aentry.Pearson_symbol_superlattice << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"reciprocal\">" << endl; //JPO20180731
-            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Reciprocal Space Lattice </h4></div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Reciprocal Lattices:</h5>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<div class=\"lattice_table\">" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<table class=\"reciprocal_lattice\">" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
-            oss << "<div class=\"value\">" << endl << "a=" << abcK.at(0) << "&Aring;<sup>-1</sup>" << endl << "b=" << abcK.at(1) << "&Aring;<sup>-1</sup>" << endl << "c=" << abcK.at(2) << "&Aring;<sup>-1</sup>" << endl << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-            oss << "<div class=\"value\">" << "&alpha;=" << abcK.at(3) << "&deg;" << endl << "&beta;=" << abcK.at(4) << "&deg;" << endl << "&gamma;=" << abcK.at(5) << "&deg;" << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 vector<double> reciprocal_lattice_params(6);
-            // [OBSOLETE] DX20180824 vector<string> ktokens;
-            // [OBSOLETE] DX20180824 aurostd::string2tokens(aentry.reciprocal_geometry,ktokens,";");
-            // [OBSOLETE] DX20180824 for(uint t=0;t<ktokens.size();t++){ reciprocal_lattice_params[t] = aurostd::string2utype<double>(ktokens[t]); }
-            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << endl << "a=" << reciprocal_lattice_params.at(0) << "&Aring;<sup>-1</sup>" << endl << "b=" << reciprocal_lattice_params.at(1) << "&Aring;<sup>-1</sup>" << endl << "c=" << reciprocal_lattice_params.at(2) << "&Aring;<sup>-1</sup>" << endl << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << "&alpha;=" << reciprocal_lattice_params.at(3) << "&deg;" << endl << "&beta;=" << reciprocal_lattice_params.at(4) << "&deg;" << endl << "&gamma;=" << reciprocal_lattice_params.at(5) << "&deg;" << "</div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
-            // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
-            oss << "</div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << volumeK << " &Aring;<sup>-3</sup></span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Lattice Primitive:</h5><span class=\"value\">" << Reciprocal_lattice_primitive << "</span></div></div>" << endl; //JPO20180731
-            oss << "<div class=\"container__cell\"><div class =\"container__card\"><h5 class=\"value-name\"> Lattice Variation:</h5><span class=\"value\">" << Reciprocal_lattice_variation << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << aentry.reciprocal_volume_cell << " &Aring;<sup>-3</sup></span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Lattice Primitive:</h5><span class=\"value\">" << aentry.reciprocal_lattice_type << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class =\"container__card\"><h5 class=\"value-name\"> Lattice Variation:</h5><span class=\"value\">" << aentry.reciprocal_lattice_variation_type << "</span></div></div>" << endl; //JPO20180731
-            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
-            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-            oss << "</div>" << endl;  //JPO20180731
-            oss << "<!-- EDATA: END -->" << endl;
-          }
-        }
-      }
-      // ***************************************************************************
-      // THERMODYNAMICS 
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::THERMODYNAMICS") && !directory.empty()) {
-        oss << "<!-- Thermodynamics properties: BEGIN -->" << endl;
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div class=\"Thermodynamics\">" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Thermodynamics Properties</h1></div>" << endl; //JPO20180731
-        //   oss << line_rule << endl; //JPO20180731
-        //     oss << "<br>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<span class=\"Thermodynamics_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Formation Enthalpy_cell:</h5><span class=\"value\">" << (aentry.enthalpy_formation_cell!=0.0?aurostd::utype2string(aentry.enthalpy_formation_cell,5)+" (eV) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Formation Enthalpy_atom:</h5><span class=\"value\">" << (aentry.enthalpy_formation_atom!=0.0?aurostd::utype2string(aentry.enthalpy_formation_atom,5)+" (eV/atom) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"><i>Ab-initio</i> energy_cell:</h5><span class=\"value\">" << (aentry.energy_cell!=0.0?aurostd::utype2string(aentry.energy_cell,5)+" (eV) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"><i>Ab-initio</i> energy_atom:</h5><span class=\"value\">" << (aentry.energy_cell!=0.0?aurostd::utype2string(aentry.energy_atom,5)+" (eV/atom) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<!-- Thermodynamics properties: END -->" << endl;
-      }
-      // ***************************************************************************
-      // AGL
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::AGL") && !directory.empty()) {
-        oss << "<!-- AGL properties: BEGIN -->" << endl;
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div class=\"AGL\">" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">AGL Properties (Aflow Gibbs Library)" << aflow_agl_readme << art115_link << "</h1></div>" << endl; //PC20180620 //JPO20180731  //CO20180817
-        //   oss << line_rule << endl; //JPO20180731
-        //     oss << "<br>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<span class=\"AGL_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.agl.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Output" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/aflow.agl.out\"" << html_TAB << ">aflow.agl.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Complete Output" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL.out\"" << html_TAB << ">AGL.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_energies_temperature.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Energy versus Temperature" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL_energies_temperature.out\"" << html_TAB << ">AGL_energies_temperature.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_thermal_properties_temperature.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Thermal Properties versus Temperature" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL_thermal_properties_temperature.out\"" << html_TAB << ">AGL_thermal_properties_temperature.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_Hugoniot.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Hugoniot Relation" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL_Hugoniot.out\"" << html_TAB << ">AGL_Hugoniot.out</a>]" << "</span></div></div>" << endl; //XCT 20181212
-        if(aentry.agl_thermal_conductivity_300K<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_thermal_conductivity_300K_td\">AGL Thermal Conductivity at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_thermal_conductivity_300K << " (W/m*K)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_debye<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_debye_td\">AGL Debye Temperature" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_debye << " (K)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_acoustic_debye<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_acoustic_debye_td\">AGL Debye Acoustic Temperature" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_acoustic_debye << " (K)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_gruneisen<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_gruneisen_td\">AGL Gruneisen parameter" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_gruneisen << "</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_heat_capacity_Cv_300K<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_heat_capacity_Cv_300K_td\">AGL Specific Heat Cv at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_heat_capacity_Cv_300K << " (kB/cell)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_heat_capacity_Cp_300K<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_heat_capacity_Cp_300K_td\">AGL Specific Heat Cp at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_heat_capacity_Cp_300K << " (kB/cell)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_thermal_expansion_300K<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_thermal_expansion_300K_td\">AGL Thermal Expansion at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_thermal_expansion_300K << " (1/K)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_bulk_modulus_static_300K<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_bulk_modulus_static_300K_td\">AGL Bulk Modulus Static at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_bulk_modulus_static_300K << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_bulk_modulus_isothermal_300K<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_bulk_modulus_isothermal_300K_td\">AGL Bulk Modulus Isothermal at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_bulk_modulus_isothermal_300K << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.agl_poisson_ratio_source.size()) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_poisson_ratio_source_td\">AGL Poisson Ratio Source" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_poisson_ratio_source << " </span></div></div>" << endl; //CT20181212
-        if(aentry.agl_vibrational_free_energy_300K_cell<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_free_energy_300K_cell_td\">AGL Vibrational Free Energy per cell at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_free_energy_300K_cell << " (meV/cell)</span></div></div>" << endl; //CT20181212
-        if(aentry.agl_vibrational_free_energy_300K_atom<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_free_energy_300K_atom_td\">AGL Vibrational Free Energy per atom at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_free_energy_300K_atom << " (meV/atom)</span></div></div>" << endl; //CT20181212
-        if(aentry.agl_vibrational_entropy_300K_cell<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_entropy_300K_cell_td\">AGL Vibrational Entropy per cell at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_entropy_300K_cell << " (meV/cell*K)</span></div></div>" << endl; //CT20181212
-        if(aentry.agl_vibrational_entropy_300K_atom<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_entropy_300K_atom_td\">AGL Vibrational Entropy per atom at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_entropy_300K_atom << " (meV/atom*K)</span></div></div>" << endl; //CT20181212
-        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<!-- AGL properties: END -->" << endl;
-      }
-      // ***************************************************************************
-      // AEL
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::AEL") && !directory.empty()) {
-        oss << "<!-- AEL properties: BEGIN -->" << endl;
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div class=\"AEL\">" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">AEL Properties (Aflow Elastic Library)</font>" << aflow_ael_readme << art096_link << "</h1></div>" << endl; //PC20180620 //JPO20180731  //CO20180817
-        // [OBSOLETE] oss << "<span class=\"AEL_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.ael.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AEL Output" << art100_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/aflow.ael.out\"" << html_TAB << ">aflow.ael.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Elastic_constants.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AEL Elastic Constants (stiffness tensor)" << art100_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AEL_Elastic_constants.out\"" << html_TAB << ">AEL_Elastic_constants.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Compliance_tensor.out")) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AEL Compliance Constants (compliance tensor)" << art100_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AEL_Compliance_tensor.out\"" << html_TAB << ">AEL_Compliance_tensor.out</a>]" << "</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_poisson_ratio<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_poisson_ratio_td\">AEL Poisson Ratio" << art100_link << ":</h5><span class=\"value\"> " << aentry.ael_poisson_ratio << "</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_bulk_modulus_voigt<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_bulk_modulus_voigt_td\">AEL Bulk Modulus Voigt" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_bulk_modulus_voigt << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_bulk_modulus_reuss<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_bulk_modulus_reuss_td\">AEL Bulk Modulus Reuss" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_bulk_modulus_reuss << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_bulk_modulus_vrh<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_bulk_modulus_vrh_td\">AEL Bulk Modulus VRH" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_bulk_modulus_vrh << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_shear_modulus_voigt<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_shear_modulus_voigt_td\">AEL Shear Modulus Voigt" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_shear_modulus_voigt << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_shear_modulus_reuss<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_shear_modulus_reuss_td\">AEL Shear Modulus Reuss" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_shear_modulus_reuss << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_shear_modulus_vrh<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_shear_modulus_vrh_td\">AEL Shear Modulus VRH" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_shear_modulus_vrh << " (GPa)</span></div></div>" << endl; //JPO20180731
-        if(aentry.ael_elastic_anisotropy<AUROSTD_NAN) //CO20181129
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_elastic_anisotropy_td\">AEL Elastic Anisotropy" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_elastic_anisotropy << "</span></div></div>" << endl; //JPO20180731 //CO20181129
-        if(aentry.ael_youngs_modulus_vrh<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_youngs_modulus_vrh_td\">AEL Young's Modulus VRH" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_youngs_modulus_vrh << " (GPa)</span></div></div>" << endl; //CT20181212
-        if(aentry.ael_speed_sound_transverse<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_speed_sound_transverse_td\">AEL Speed of Sound in Transverse Direction" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_speed_sound_transverse << " (m/s)</span></div></div>" << endl; //CT20181212
-        if(aentry.ael_speed_sound_longitudinal<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_speed_sound_longitudinal_td\">AEL Speed of Sound in Longitudinal Direction" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_speed_sound_longitudinal << " (m/s)</span></div></div>" << endl; //CT20181212
-        if(aentry.ael_speed_sound_average<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_speed_sound_average_td\">AEL Speed of Sound, Average" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_speed_sound_average << " (m/s)</span></div></div>" << endl; //CT20181212
-        if(aentry.ael_pughs_modulus_ratio<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_pughs_modulus_ratio_td\">AEL Pugh's Modulus Ratio" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_pughs_modulus_ratio << " </span></div></div>" << endl; //CT20181212
-        if(aentry.ael_debye_temperature<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_debye_temperature_td\">AEL Debye Temperature" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_debye_temperature << " (K)</span></div></div>" << endl; //CT20181212
-        if(aentry.ael_applied_pressure<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_applied_pressure_td\">AEL Applied Pressure" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_applied_pressure << " (GPa)</span></div></div>" << endl; //CT20181212
-        if(aentry.ael_average_external_pressure<AUROSTD_NAN) 
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_average_external_pressure_td\">AEL Average External Pressure" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_average_external_pressure << " (GPa)</span></div></div>" << endl; //CT20181212
-        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<!-- AEL properties: END -->" << endl;
-      }
-      // BADER
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::BADER") && !directory.empty()) {
-        oss << "<!-- Bader properties: BEGIN -->" << endl;
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div class=\"Bader\">" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Bader Atoms in Molecules Properties</font>" << "</h1></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<span class=\"title\"><FONT SIZE=+3>Bader Atoms in Molecules Properties</font>" << "<a href=http://materials.duke.edu/AFLOW/README_AFLOW_BADER.TXT>[info]</a>" << "</span>" << endl;
-        // [OBSOLETE] oss << "<span class=\"Bader_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-        string abader_out=aentry.prototype+"_abader.out";
-        if(aurostd::substring2bool(aentry.vfiles_WEB,abader_out)) {oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bader Output" << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/" << abader_out << "\"" << html_TAB << ">" << abader_out << "</a>]" << "</span></div></div>" << endl;} //JPO20180731
-        // [OBSOLETE] oss << "<li><span class=\"description\"> Bader Output" << art100_link << ":</span>" << "[<a href=\"" << url_WEB << "/" << abader_out << "\"" << html_TAB << ">" << abader_out << "</a>]" << "</li><!br>" << endl;
-        string bader_net_charges_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bader_net_charges target=\"_blank\"><font color=black><i>info</i></font></a>]";
-        string bader_atomic_volumes_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bader_atomic_volumes target=\"_blank\"><font color=black><i>info</i></font></a>]";
-        if(!aentry.vbader_net_charges.empty()) {
-          aurostd::string2tokens(aentry.species,tokens,",");  //tokens=species
-          oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"bader_net_charges_td\">Net Charges" << bader_net_charges_wiki_link << ":</h5><span class=\"value\"> "; //JPO20180731
-          atomCOUNT=0;
-          for(uint i=0;i<tokens.size();i++) {
-            oss << tokens.at(i) << "={";
-            for(uint j=0;j<(uint)aentry.vcomposition.at(i);j++) {
-              num_prec.str("");
-              num_prec << std::fixed << setprecision(4) << aentry.vbader_net_charges.at(atomCOUNT++);
-              oss << num_prec.str();
-              if(j<(uint)aentry.vcomposition.at(i)-1) {oss << ", ";}
-            }
-            if(i<tokens.size()-1) {oss << "}; ";} else {oss << "}";}
-          }
-          oss << " (electrons)</span></div></div>" << endl; //JPO20180731
-        }
-        if(!aentry.bader_atomic_volumes.empty()) {
-          aurostd::string2tokens(aentry.species,tokens,",");  //tokens=species
-          oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"bader_atomic_volumes_td\">Atomic Volumes" << bader_atomic_volumes_wiki_link << ":</h5><span class=\"value\">"; //JPO20180731
-          atomCOUNT=0;
-          for(uint i=0;i<tokens.size();i++) {
-            oss << tokens.at(i) << "={";
-            for(uint j=0;j<(uint)aentry.vcomposition.at(i);j++) {
-              num_prec.str("");
-              num_prec << std::fixed << setprecision(4) << aentry.vbader_atomic_volumes.at(atomCOUNT++);
-              oss << num_prec.str();
-              if(j<(uint)aentry.vcomposition.at(i)-1) {oss << ", ";}
-            }
-            if(i<tokens.size()-1) {oss << "}; ";} else {oss << "}";}
-          }
-          oss << " (Angst<sup>3</sup>)</span></div></div>" << endl; //JPO20180731
-        }
-        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<!-- Bader properties: END -->" << endl;
-      }
-      // ***************************************************************************
-      // MAGNETIC
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::MAGNETIC") && !directory.empty()) {
-        oss << "<!-- Magnetic properties: BEGIN -->" << endl;
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div class=\"Magnetic\">" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Magnetic Properties </h1></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<!span class=\"Magnetic_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<li><span class=\"description\" id=\"spin_cell_td\">Magnetic Moment:</span> " << aentry.spin_cell << " &mu;<sub>B</sub></li><!br>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<li><span class=\"description\" id=\"spin_atom_td\">Magnetic Moment/atom:</span> " << aentry.spin_atom << " &mu;<sub>B</sub>/atom</li><!br>" << endl; //JPO20180731
-        if(aurostd::substring2bool(aentry.loop,"magnetic")) {
-          oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spinD_td\">Spin Decomposition per atoms:</h5><span class=\"value\"> {" << aentry.spinD << "} &mu;<sub>B</sub></span></div></div>" << endl; //JPO20180731
-          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spinF_td\">Spin Polarization (E<sub>F</sub>):</h5><span class=\"value\">" << aentry.spinF << "</span></div></div>" << endl; //JPO20180731
-        }
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spin_cell_td\">Magnetic Moment:</h5><span class=\"value\">" << aentry.spin_cell << " &mu;<sub>B</sub></span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spin_atom_td\">Magnetic Moment/atom:</h5><span class=\"value\">" << aentry.spin_atom << " &mu;<sub>B</sub>/atom</span></div></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<!-- Magnetic properties: END -->" << endl;
-      }
-      // ***************************************************************************
-      // SCINTILLATION
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::SCINTILLATION") && !directory.empty()) {
-        double scintillation_attenuation_length=GetCompoundAttenuationLength(aentry.vspecies,aentry.vcomposition,aentry.density);
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        oss << "<!-- Scintillation properties: BEGIN -->" << endl;
-        // [OBSOLETE] oss << "<div class=\"scintillation\">" << endl; //JPO20180731
-        //    oss << "<hr />" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Scintillation Properties</h1></div>" << endl; //JPO20180731
-        //   oss << line_rule << endl; //JPO20180731
-        // [OBSOLETE] oss << "<br>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<table class=\"scintillation_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
-        if(aentry.scintillation_attenuation_length>0.0) {
-          oss << "<div class=\"container__cell\"><div class=\"container__card\">" << endl << "<h5 class=\"value-name\">Attenuation Length" << art064_link << ":</h5><span class=\"value\">" << aentry.scintillation_attenuation_length << " cm" << endl << "</span></div></div>" << endl; //JPO20180731
-        } else {
-          oss << "<div class=\"container__cell\"><div class=\"container__card\">" << endl << "<h5 class=\"value-name\">Attenuation Length" << art064_link << ":</h5><span class=\"value\">" << scintillation_attenuation_length << " cm" << endl << "</span></div></div>" << endl; //JPO20180731
-        }
-        // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<!-- Scintillation properties: END -->" << endl;
-      }
-      // ***************************************************************************
-      // ELECTRONIC BANDS
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
-        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
-        oss << "<!-- Electronic properties: BEGIN -->" << endl;
-        //   oss << "<hr />" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<div class=\"electronic\">" << endl; //JPO20180731
-        oss << "<div class=\"container\">" << endl; //JPO20180731
-        oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Electronic Properties </h1></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<table class=\"electronic_table\">" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\">Spin Decomposition per atoms:</h5><span class=\"value\"> {" << aentry.spinD << "} &mu;<sub>B</sub> </span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Spin Polarization (E<sub>F</sub>):</h5><span class=\"value\"> " << aentry.spinF << " </span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"band_gap_td\"><h5 class=\"value-name\">Band Gap:</h5><span class=\"value\">" << aentry.Egap << " eV "
-          << (aentry.Egap_type=="insulator_direct"?"(insulator)":"") << (aentry.Egap_type=="insulator_indirect"?"(insulator)":"") << (aentry.Egap_type=="metal"?"(metal)":"") << "</span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"fit_band_gap_td\"><h5 class=\"value-name\">Fit Band Gap:</h5><span class=\"value\">" << aentry.Egap_fit << " eV</span></div></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</tr>" << endl;  //JPO20180731
-        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_m_atom_td\"><h5 class=\"value-name\">Magnetic Moment:</h5><span class=\"value\">" << aentry.spin_cell << " &mu;<sub>B</sub></span></div></div>" << endl; //JPO20180731
-        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_m_atom_td\"><h5 class=\"value-name\">Magnetic Moment/atom:</h5><span class=\"value\">" << aentry.spin_atom << " &mu;<sub>B</sub>/atom</span></div></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-        // (No values available - do not display yet) oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_e_mass_td\"><h5 class=\"value-name\">Electron Mass(FIX):</h5><span class=\"value\"> XXX (m<sub>0</sub>)</span></div></div>" << endl; //JPO20180731
-        // (No values available - do not display yet) oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_hole_mass_td\"><h5 class=\"value-name\">Hole Mass(FIX):</h5><span class=\"value\"> XXX (m<sub>0</sub>)</span></div></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-        if(aentry.Egap_type=="insulator_direct")
-          oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_band_gap_type_td\"><h5 class=\"value-name\">Band Gap Type:</h5><span class=\"value\">  Direct</span></div></div>" << endl; //JPO20180731
-        if(aentry.Egap_type=="insulator_indirect")
-          oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_band_gap_type_td\"><h5 class=\"value-name\">Band Gap Type:</h5><span class=\"value\">  Indirect</span></div></div>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<td class=\"electronic_table_td\"><span class=\"table_description\">Spin Polarization (E<sub>F</sub>):</span> " << aentry.spinF << " </td>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "<td class=\"electronic_table_td\"><span class=\"table_description\">Spin Decomposition per atoms:</span> {" << aentry.spinD << "} &mu;<sub>B</sub> </td>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
-        // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
-        oss << "</div>" << endl; //JPO20180731
-        oss << "<ul>" << endl;
-        oss << "<li>" << endl;
-        // [OBSOLETE] oss << "<div class=\"container-subtitle\">" << endl;
-        // [OBSOLETE] oss << "<h4 class=\"section-subtitle\">Band Structure</h4></div>" << endl;
-
-        // ****************************************************************************
-        // INTERACTIVE BANDS PLOT
-        //GG
-        // [OBSOLETE] oss << "<div class=\"container__cell--full\" >" << endl;  //PC20180515 //JPO20180731
-        oss << "<div class=\"flex-container\">" << endl; //JPO20180731
-        oss << "<span class=\"pic_description_band\">Band Structure:</span>" << endl; //JPO20180731
-        oss << "<div class=\"DosOptions\">" 				<< endl;  //PC20180515
-        oss << "<div> Zoom/Pan type:" << endl;  //PC20180515
-        oss << "<select id=\"zoomOptions\"> "								<< endl;  //PC20180515
-        oss << "<option value=\"both\">Both X & Y</option>"				<< endl;
-        oss << "<option value=\"xOnly\">X Only</option>"				<< endl;
-        oss << "<option value=\"yOnly\">Y Only</option>"				<< endl;
-        oss << "</select></div>" << endl; //PC20180515
-        //if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spinF),0.0,_ZERO_TOL_))) //PC20180515
-        if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spin_atom),0.0,_ZERO_TOL_))) //PC20180515
-        { //CO20200106 - patching for auto-indenting
-          oss << "<div>Majority/Minority Spin Selection:**" << endl;  //PC20180525
-          oss << "<select id =\"spinBandsOptions\">" << endl; //PC20180515
-          oss << "<option value=\"bothS\">Both Spins</option>"				<< endl;  //PC20180515
-          oss << "<option value=\"majority\">Majority Spin</option>"				<< endl;  //PC20180515
-          oss << "<option value=\"minority\">Minority Spin</option>"				<< endl;  //PC20180515
-          oss << "</select></div>"								<< endl;  //PC20180515
-        }
-        oss << "<div class=\"reset\">Reset Zoom</div>" << endl; //PC20180515
-        oss << "</div>"				<< endl;  //PC20180515
-        if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spin_atom),0.0,_ZERO_TOL_))){  //PC20180515
-          oss << "<div class=\"star\">**For smoother tracing of bands </div>" << endl; //PC20180525
-        } //PC20180525
-        oss << "<div class=\"plots\">" << endl; //PC20180515
-        oss << "<div class=\"Bands_plot\">" << endl;  //PC20180515
-        oss << "<svg id=\"bands_wrapper\" width=\"900\" height=\"550\"></svg>"						<< endl;  //PC20180515
-        if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spin_atom),0.0,_ZERO_TOL_))){  //PC20180515
-          oss << "<div id=\"bandLegend\" class=\"legend\">"				<< endl;
-          oss << "<text class=\"legendText \">Majority Spin"				<< endl;  //PC20180515
-          oss << "<line class=\"legendLine\" style=\"border-color:black;\"></line>"	        << endl;  //PC20180515
-          oss << "</text>" 								<< endl;  //PC20180515
-          oss << "<text class=\"legendText \">Minority Spin" 				<< endl;  //PC20180515
-          oss << "<line class=\"legendLine min\"></line>" 					<< endl;  //PC20180515
-          oss << "</text></div>"							<< endl;  //PC20180515
-        } //PC20180515
-        oss << "</div>"  << endl; //PC20180515
-        oss << "<div class=\"Dos_plot\">" << endl;  //PC20180515
-        oss << "<svg id=\"dos_wrapper\" width=\"300px\" height=\"550px\" ></svg>" << endl;  //PC20180515
-        oss << " <div id=\"dosLegend\" class=\"legend\" >" << endl; //PC20180515
-        oss << "<text id=\"dosText\"></text>"						<< endl;  //PC20180515
-        oss << "</div>" 								<< endl;
-        oss << "</div></div></div>" << endl;  //PC20180515
-        //[OBSOLETE PC20180515]oss << "<div class=\"legendLine min\"></div>" 					<< endl;
-        //[OBSOLETE PC20180515]oss << "</div></div></svg>"							<< endl;
-        //[OBSOLETE PC20180515]oss << "<svg id=\"dos_wrapper\">"						<< endl;
-        //[OBSOLETE PC20180515]oss << "<div id=\"dosText\"></div>"						<< endl;
-        //[OBSOLETE PC20180515]oss << "<div id=\"dosLegend\" class=\"legend \"></div></svg></div></div>"	<< endl;
-        // ********************************************************************************** 
-
-        if(aentry.vfiles_WEB.size()>0) 
-          for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-            if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png"))  //ME20190621 - include new file naming convention 
-              oss << "<div class = \"picture_band\" id=\"band_dos_pic\"><a id=\"imgPopup\"><img class=\"pic\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\" style='display:block;background:white; margin: 0 auto;' /></a></div>" << endl;
-        oss << "<div id=\"small_figure\" style=\'display:flex;justify-content:center;\'>" << endl;
-        if(aentry.vfiles_WEB.size()>0) 
-          for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-            if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "_dos_")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  //ME20190621 - include new file name convention
-              oss << "<img class=\"pic_small\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of pdos_" << label << "\" style='background:white; margin: 0 auto;height:0%;' >" << endl;
-        oss << "</div>" << endl;
-        oss << "</li></ul>" << endl;
-        oss << "</div>" << endl;
-        oss << "<!-- Electronic properties: END -->" << endl;
-      }
-
-      // ***************************************************************************
-      // ELECTRONIC POPUP
-      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
-        oss << "<!-- Electronic popup: BEGIN -->" << endl;
-        oss << "</div> <!close global>" << endl;
-        oss << "<div id=\"popupImg\">  <! make popup>" << endl;
-        oss << "<a id=\"popupImgClose\">" << endl;
-        oss << "<img id=\"closeButton\" src=\"img/closeButton.png\" alt=\"close\" ></a>" << endl;
-        oss << "<a id=\"backwardArrow\">" << endl;
-        oss << "<img src=\"img/backwardArrow.png\" alt=\"backward arrow\" ></a>" << endl;
-        oss << "<ul class=\"pic_popup_list\">" << endl;
-        //ME20190621 BEGIN
-        // Include new file naming convention
-        if(aentry.vfiles_WEB.size()>0) {
-          for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
-            if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png")) {
-              oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\"  ></li>" << endl;
-              break;
-            }
-          }
-        }
-        if(aentry.vfiles_WEB.size()>0) {
-          for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
-            if((aentry.vfiles_WEB.at(i)==label+"_DOS.png") || (aentry.vfiles_WEB.at(i) == label + "_dos.png")) {
-              oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"DOS of " << label << "\"  ></li>" << endl;
-              break;
-            }
-          }
-        }
-        //ME20190621 END
-        if(aentry.vfiles_WEB.size()>0) 
-          for(uint iline=0;iline<aentry.vfiles_WEB.size();iline++)
-            if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "_dos_"))  //ME20190621 - include new file name convention
-              if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"png"))
-                oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(iline) << "\" alt=\"Band Structure of pdos_" << label << "\"  ></li>" << endl;
-        oss << "</ul>" << endl;
-        oss << "<a id=\"forwardArrow\"><img src=\"img/forwardArrow.png\" alt=\"forward arrow\" ></a>" << endl;
-        oss << "</div>" << endl;
-        oss << "<!-- Electronic popup: END -->" << endl;
-      }
-      oss << "<!-- Downloadable Files: BEGIN -->" << endl; //JPO20180809
-      oss << "<div class=\"container\">" << endl; //JPO20180809
-      oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Downloadable Files </h1></div>" << endl; //JPO20180809
-      oss << "<div class=\"container__cell--full\"><div class=\"container__card\">" << endl; //JPO20180809
-      oss << "<ul class=\"file-list\">" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/\"" << html_TAB << " download=\"aflowlib.out\" >aflowlib.out</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/?format=json\"" << html_TAB << "download=\"aflowlib.json\">aflowlib.json</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.vasp\"" << html_TAB << "download=\"CONTCAR.relax.vasp\">Relaxed Position (aflowlib/VASP)</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.qe\"" << html_TAB << " download=\"CONTCAR.relax.ge\">Relaxed Position (aflowlib/QE)</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.abinit\"" << html_TAB << "download=\"CONTCAR.relax.abinit\">Relaxed Position (aflowlib/AIMS)</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.aims\"" << html_TAB << "download=\"CONTCAR.relax.aims\">Relaxed Position (aflowlib/AIMS)</a>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/INCAR.relax\"" << html_TAB << "download=\"INCAR.relax\">INCAR for relaxed calculation</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/INCAR.static\"" << html_TAB << "download=\"INCAR.static\">INCAR for static calculation</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/INCAR.bands\"" << html_TAB << "download=\"INCAR.bands\">INCAR for bands calculation</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/KPOINTS.relax\"" << html_TAB << "download=\"KPOINTS.relax\">KPOINTS for relaxed calculation</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/KPOINTS.static\"" << html_TAB << "download=\"KPOINTS.static\">KPOINTS for static calculation</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/KPOINTS.bands\"" << html_TAB << "download=\"KPOINTS.bands\">KPOINTS for bands calculation</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_ORIG_OUT << "\"" << html_TAB << "download=\"edata.orig.out\">Extended crystallographic data for original structure</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_RELAX_OUT << "\"" << html_TAB << "download=\"edata.relax.out\">Extended crystallographic data for relaxed structure</a></li>" << endl; //JPO20180809
-      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_BANDS_OUT << "\"" << html_TAB << "download=\"edata.bands.out\">Extended crystallographic data for band-structure</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.agl.out"))  //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/aflow.agl.out\"" << html_TAB << "download=\"aflow.agl.out\">AGL Output</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL.out")) //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL.out\"" << html_TAB << "download=\"AGL.out\">AGL complete output</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_energies_temperature.out")) //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL_energies_temperature.out\"" << html_TAB << "download=\"AGL_energies_temperature.out\">AGL Energy versus Temperature</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_thermal_properties_temperature.out")) //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL_thermal_properties_temperature.out\"" << html_TAB << "download=\"AGL_thermal_properties_temperature.out\">AGL Thermal Properties versus Temperature</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"Hugoniot.out")) //CT20181212
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL_Hugoniot.out\"" << html_TAB << "download=\"AGL_Hugoniot.out\">AGL Hugoniot Relation</a></li>" << endl; //CT20181212
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.ael.out")) //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/aflow.ael.out\"" << html_TAB << "download=\"aflow.ael.out\">AEL Output</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Elastic_constants.out")) //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AEL_Elastic_constants.out\"" << html_TAB << "download=\"AEL_Elastic_constants.out\">AEL Elastic constants</a></li>" << endl; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Compliance_tensor.out")) //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AEL_Compliance_tensor.out\"" << html_TAB << "download=\"AEL_Compliance_tensor.out\">AEL Compliance constants</a></li>" << endl; //JPO20180809
-      string abader_out=aentry.prototype+"_abader.out"; //JPO20180809
-      if(aurostd::substring2bool(aentry.vfiles_WEB,abader_out)) { //JPO20180809
-        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << abader_out << "\"" << html_TAB << "download=\"abader.out\">Bader Output</a></li>" << endl; } //JPO20180809
-      oss << "</ul></div></div>" << endl; //JPO20180809
-      oss << "<!-- Downloadable Files: END -->" << endl; //JPO20180809
-
-      // ***************************************************************************
-      // OTHER
-      if(0) if((XHOST.hostname=="nietzsche.mems.duke.edu" || XHOST.hostname=="materials.duke.edu" )&& !directory.empty()) {
-        oss << line_rule << endl;
-        oss << "<!-- DEBUG: BEGIN -->" << endl;
-        oss << "<b>DEBUG: only in " << XHOST.hostname << "</b><br>" << endl;
-        oss << aentry.entry << "<br><br>" << endl;
-        oss << line_rule << endl;
-        oss << "<!-- DEBUG: END -->" << endl;
-      }
-      // DONE
-
-      oss << "<! HARVEY WORK AFTER HERE> " << endl;
-    }
-    return voptions.size();
-  }
-}
-
-//#include "aflowlib_web_interface_test2.cpp"
-//#include "aflowlib_web_interface_test3.cpp"
-*/
+//[SC20200327 - OBSOLETE]namespace aflowlib {
+//[SC20200327 - OBSOLETE]  uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss) {
+//[SC20200327 - OBSOLETE]    bool LDEBUG=(FALSE || XHOST.DEBUG);
+//[SC20200327 - OBSOLETE]    string soliloquy="aflowlib::WEB_Aflowlib_Entry():";
+//[SC20200327 - OBSOLETE]    if(LDEBUG) cout << "aflowlib::WEB_Aflowlib_Entry: begin<br>" << endl;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]    stringstream num_prec;
+//[SC20200327 - OBSOLETE]    vector<string> voptions;
+//[SC20200327 - OBSOLETE]    aurostd::string2tokens(options,voptions,",");
+//[SC20200327 - OBSOLETE]    if(voptions.size()==0) {
+//[SC20200327 - OBSOLETE]      init::ErrorOption(cout,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
+//[SC20200327 - OBSOLETE]      exit(0);
+//[SC20200327 - OBSOLETE]    } 
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]    // move on
+//[SC20200327 - OBSOLETE]    for(uint ioption=0;ioption<voptions.size();ioption++) {
+//[SC20200327 - OBSOLETE]      //  oss << voptions.at(ioption) << endl;
+//[SC20200327 - OBSOLETE]      string option=voptions.at(ioption); //aurostd::args2attachedstring(argv,"--aflowlib=",(string) "nan");
+//[SC20200327 - OBSOLETE]      if(option.at(option.size()-1)=='/'|| option.at(option.size()-1)=='.') option.erase(option.end()-1,option.end()-0); //  some demoronization
+//[SC20200327 - OBSOLETE]      if(option.at(0)=='/'|| option.at(0)=='.') option.erase(option.begin(),option.begin()+1); //  some demoronization
+//[SC20200327 - OBSOLETE]      string directory="";
+//[SC20200327 - OBSOLETE]      string directory_RAW="",directory_LIB="",directory_WEB="";
+//[SC20200327 - OBSOLETE]      string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
+//[SC20200327 - OBSOLETE]      string url_WEB;
+//[SC20200327 - OBSOLETE]      string label="";
+//[SC20200327 - OBSOLETE]      //string line_gif="<br><img border=0 width=60% height=2 src=http://materials.duke.edu/auro/images/line.gif><br><br>";
+//[SC20200327 - OBSOLETE]      string line_rule="<hr width=\"60%\" style=\"background:black; border:0; height:2px; text-align:left;margin-left:0\" /><br>";
+//[SC20200327 - OBSOLETE]      string art058_link=" [<a href=https://doi.org/10.1016/j.commatsci.2010.05.010 target=\"_blank\"><font color=black><i>cite</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string art064_link=" [<a href=https://doi.org/10.1021/co200012w target=\"_blank\"><font color=black><i>cite</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string icsd_link=" [<a href=https://www.fiz-karlsruhe.com/icsd.html target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string aflow_ael_readme=" [<a href=http://materials.duke.edu/AFLOW/README_AFLOW_AEL.TXT target=\"_blank\"><font color=black><i>info</i></font></a>]"; //CO20180817
+//[SC20200327 - OBSOLETE]      string art096_link=" [<a href=https://doi.org/10.1103/PhysRevB.90.174107 target=\"_blank\"><font color=black><i>cite</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string art100_link=" [<a href=https://www.nature.com/articles/sdata20159 target=\"_blank\"><font color=black><i>cite</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string aflow_agl_readme=" [<a href=http://materials.duke.edu/AFLOW/README_AFLOW_AGL.TXT target=\"_blank\"><font color=black><i>info</i></font></a>]"; //CO20180817
+//[SC20200327 - OBSOLETE]      string art115_link=" [<a href=https://doi.org/10.1103/PhysRevMaterials.1.015401 target=\"_blank\"><font color=black><i>cite</i></font></a>]"; //CO20180817
+//[SC20200327 - OBSOLETE]      string aflow_sym_readme=" [<a href=http://materials.duke.edu/AFLOW/README_AFLOW_SYM.TXT target=\"_blank\"><font color=black><i>info</i></font></a>]"; //CO20180817
+//[SC20200327 - OBSOLETE]      string art135_link=" [<a href=https://doi.org/10.1107/S2053273318003066 target=\"_blank\"><font color=black><i>cite</i></font></a>]"; //CO20180817
+//[SC20200327 - OBSOLETE]      int atomCOUNT=0;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      //DX20180817
+//[SC20200327 - OBSOLETE]      string bravais_lattice_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bravais_lattice_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string bravais_lattice_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bravais_lattice_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string lattice_system_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_system_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string lattice_variation_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_variation_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string lattice_system_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_system_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string lattice_variation_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#lattice_variation_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string Pearson_symbol_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#pearson_symbol_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string Pearson_symbol_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#pearson_symbol_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string sg_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#sg target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string sg2_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#sg2 target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string spacegroup_orig_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#spacegroup_orig target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]      string spacegroup_relax_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#spacegroup_relax target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      aflowlib::_aflowlib_entry aentry;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      xoption vflags;
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::PREAMBLE",TRUE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::CALCULATION",TRUE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::JMOL",TRUE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::EDATA_ORIG",FALSE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::EDATA_RELAX",TRUE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::THERMODYNAMICS",TRUE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::MAGNETIC",TRUE);
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::ELECTRONIC",FALSE);     // will setup later
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::SCINTILLATION",TRUE);   // will setup later
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::AGL",FALSE);            // will setup later
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::AEL",FALSE);            // will setup later
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::BADER",FALSE);          // will setup later
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // check if ICSD inside (anyway)
+//[SC20200327 - OBSOLETE]      string lattices[]={"BCC","BCT","CUB","FCC","HEX","MCL","MCLC","ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
+//[SC20200327 - OBSOLETE]      vector<string> vline,tokens;
+//[SC20200327 - OBSOLETE]      // [OBSOLETE]   vector<string> tokens;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      string html_TAB=" target=\"_blank\"";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: [1]<br>" << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: [4]<br>" << endl;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: option=" << option << endl;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // START SEARCH
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::FOUND",FALSE);
+//[SC20200327 - OBSOLETE]      string catalog="",auid="";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // *****************************************************
+//[SC20200327 - OBSOLETE]      if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
+//[SC20200327 - OBSOLETE]        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: option=" << option << endl;
+//[SC20200327 - OBSOLETE]        string auid=aurostd::tolower(option);
+//[SC20200327 - OBSOLETE]        if(auid.size()!=22) {
+//[SC20200327 - OBSOLETE]          cerr << "WEB_Aflowlib_Entry_PHP: error on size of auid=" << auid << endl;
+//[SC20200327 - OBSOLETE]          oss << "WEB_Aflowlib_Entry_PHP: error on size of auid=" << auid << endl;
+//[SC20200327 - OBSOLETE]          exit(0);
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        // OLD
+//[SC20200327 - OBSOLETE]        // directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/LIB/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_LIB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
+//[SC20200327 - OBSOLETE]        // directory_AUID_RAW=init::AFLOW_Projects_Directories("AUID")+"/RAW/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_RAW+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
+//[SC20200327 - OBSOLETE]        // directory_AUID_WEB=init::AFLOW_Projects_Directories("AUID")+"/WEB/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_WEB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
+//[SC20200327 - OBSOLETE]        // NEW
+//[SC20200327 - OBSOLETE]        directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_AUID_LIB+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
+//[SC20200327 - OBSOLETE]        directory_AUID_WEB=directory_AUID_LIB+"/WEB";
+//[SC20200327 - OBSOLETE]        directory_AUID_RAW=directory_AUID_LIB+"/RAW";
+//[SC20200327 - OBSOLETE]        directory_AUID_LIB=directory_AUID_LIB+"/LIB";
+//[SC20200327 - OBSOLETE]        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: directory_AUID_LIB=" << directory_AUID_LIB << endl;
+//[SC20200327 - OBSOLETE]        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: directory_AUID_RAW=" << directory_AUID_RAW << endl;
+//[SC20200327 - OBSOLETE]        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: directory_AUID_WEB=" << directory_AUID_WEB << endl;
+//[SC20200327 - OBSOLETE]        directory="";
+//[SC20200327 - OBSOLETE]        if(!aurostd::FileExist(directory_AUID_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]          cerr << "WEB_Aflowlib_Entry_PHP: entry does not exist =" << directory_AUID_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;exit(0);
+//[SC20200327 - OBSOLETE]          oss << "WEB_Aflowlib_Entry_PHP: entry does not exist =" << directory_AUID_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;exit(0);
+//[SC20200327 - OBSOLETE]        } else {
+//[SC20200327 - OBSOLETE]          _aflowlib_entry entry_tmp(string(directory_AUID_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT));
+//[SC20200327 - OBSOLETE]          directory=entry_tmp.aurl;
+//[SC20200327 - OBSOLETE]          auid=entry_tmp.aurl;
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"aflowlib.duke.edu:","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"materials.duke.edu:","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/ICSD_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/ICSD_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB0_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB0_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB1_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB1_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB2_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB2_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB3_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB3_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB4_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB4_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB5_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB5_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB6_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB6_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB7_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB7_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB8_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB8_WEB/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/LIB9_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/LIB9_WEB/","");
+//[SC20200327 - OBSOLETE]          vflags.flag("FLAG::AUID",TRUE);
+//[SC20200327 - OBSOLETE]          vflags.flag("FLAG::FOUND",TRUE);
+//[SC20200327 - OBSOLETE]          catalog=entry_tmp.catalog;
+//[SC20200327 - OBSOLETE]          label=directory;
+//[SC20200327 - OBSOLETE]          for(uint ilat=0;ilat<14;ilat++)
+//[SC20200327 - OBSOLETE]            aurostd::StringSubst(label,lattices[ilat]+"/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(label,"/",".");
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // *****************************************************
+//[SC20200327 - OBSOLETE]      if(!vflags.flag("FLAG::FOUND")) { // tests with proto name
+//[SC20200327 - OBSOLETE]        string dir2test;
+//[SC20200327 - OBSOLETE]        dir2test=option;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        vector<string> vdir2test;
+//[SC20200327 - OBSOLETE]        for(uint i0=0;i0<dir2test.size();i0++) { // allow all identical indices...
+//[SC20200327 - OBSOLETE]          for(uint i1=i0;i1<dir2test.size();i1++) { // allow all identical indices
+//[SC20200327 - OBSOLETE]            for(uint i2=i1;i2<dir2test.size();i2++) { // allow all identical indices
+//[SC20200327 - OBSOLETE]              //	    for(uint i3=i2;i3<dir2test.size();i3++) { // allow all identical indices
+//[SC20200327 - OBSOLETE]              dir2test=option;
+//[SC20200327 - OBSOLETE]              if(dir2test.at(i0)=='.') dir2test.at(i0)='/';
+//[SC20200327 - OBSOLETE]              if(dir2test.at(i1)=='.') dir2test.at(i1)='/';
+//[SC20200327 - OBSOLETE]              if(dir2test.at(i2)=='.') dir2test.at(i2)='/';
+//[SC20200327 - OBSOLETE]              //      if(dir2test.at(i3)=='.') dir2test.at(i3)='/';
+//[SC20200327 - OBSOLETE]              bool found=false;
+//[SC20200327 - OBSOLETE]              for(uint i=0;i<vdir2test.size()&&!found;i++) if(dir2test==vdir2test.at(i)) found=true;
+//[SC20200327 - OBSOLETE]              if(!found) {
+//[SC20200327 - OBSOLETE]                vdir2test.push_back(dir2test);
+//[SC20200327 - OBSOLETE]                //		cerr << vdir2test.size() << endl;
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]            //	  }
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: testing dir2test=" << dir2test << endl;
+//[SC20200327 - OBSOLETE]        for(uint i=0;i<vdir2test.size()&&!vflags.flag("FLAG::FOUND");i++) { // allow i=j=k so that 1 OR 2 OR 3 dots are also tested
+//[SC20200327 - OBSOLETE]          dir2test=vdir2test.at(i);
+//[SC20200327 - OBSOLETE]          //		cout << "testing(" << i << ") = " << dir2test << endl;
+//[SC20200327 - OBSOLETE]          for(uint ilat=0;ilat<14&&!vflags.flag("FLAG::FOUND");ilat++) {
+//[SC20200327 - OBSOLETE]            //	cerr << string(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl;
+//[SC20200327 - OBSOLETE]            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]              catalog="ICSD";directory=lattices[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB0";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB1")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB1";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB2";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB3")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB3";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB4")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB4";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB5")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB5";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB6")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB6";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB7")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB7";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB8")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB8";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB9")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]            catalog="LIB9";directory=dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);		
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // **********************************************************************************************************
+//[SC20200327 - OBSOLETE]      // TRY ICSD LINK
+//[SC20200327 - OBSOLETE]      // **********************************************************************************************************
+//[SC20200327 - OBSOLETE]      if(!vflags.flag("FLAG::FOUND")) { // icsd link
+//[SC20200327 - OBSOLETE]        string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+option;
+//[SC20200327 - OBSOLETE]        aurostd::StringSubst(directory_ICSD2LINK,"ICSD:","icsd:");
+//[SC20200327 - OBSOLETE]        aurostd::StringSubst(directory_ICSD2LINK,"icsd:icsd:","icsd:");    
+//[SC20200327 - OBSOLETE]        //	cerr << directory_ICSD2LINK << endl;
+//[SC20200327 - OBSOLETE]        if(aurostd::FileExist(directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+//[SC20200327 - OBSOLETE]          _aflowlib_entry entry_tmp(string(directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT));
+//[SC20200327 - OBSOLETE]          directory=entry_tmp.aurl;
+//[SC20200327 - OBSOLETE]          auid=entry_tmp.aurl;
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"aflowlib.duke.edu:","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"materials.duke.edu:","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(directory,"AFLOWDATA/ICSD_RAW/","");aurostd::StringSubst(directory,"AFLOWDATA/ICSD_WEB/","");
+//[SC20200327 - OBSOLETE]          vflags.flag("FLAG::ICSD",TRUE);
+//[SC20200327 - OBSOLETE]          vflags.flag("FLAG::FOUND",TRUE);
+//[SC20200327 - OBSOLETE]          catalog=entry_tmp.catalog;
+//[SC20200327 - OBSOLETE]          label=directory;
+//[SC20200327 - OBSOLETE]          for(uint ilat=0;ilat<14;ilat++)
+//[SC20200327 - OBSOLETE]            aurostd::StringSubst(label,lattices[ilat]+"/","");
+//[SC20200327 - OBSOLETE]          aurostd::StringSubst(label,"/",".");
+//[SC20200327 - OBSOLETE]          //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // **********************************************************************************************************
+//[SC20200327 - OBSOLETE]      // SHOULD BE FOUND
+//[SC20200327 - OBSOLETE]      // **********************************************************************************************************
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(catalog=="ICSD") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::ICSD",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("ICSD")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("ICSD")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/ICSD_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB0") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB0",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB0")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB0")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB0_RAW/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB1") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB1",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB1")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB1")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB1")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB1_RAW/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB2") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB2",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB2")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+directory; // June 2016
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB2_RAW/"+directory; // May 2014
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB3") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB3",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB3")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB3")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB3")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB3_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB4") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB4",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB4")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB4")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB4")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB4_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB5") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB5",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB5")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB5")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB5")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB5_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB6") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB6",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB6")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB6")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB6")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB6_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB7") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB7",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB7")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB7")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB7")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB7_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB8") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB8",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB8")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB8")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB8")+"/RAW/"+directory;
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB8_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(catalog=="LIB9") {
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::LIB9",TRUE);
+//[SC20200327 - OBSOLETE]        directory_LIB=init::AFLOW_Projects_Directories("LIB9")+"/LIB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_WEB=init::AFLOW_Projects_Directories("LIB9")+"/WEB/"+directory;
+//[SC20200327 - OBSOLETE]        directory_RAW=init::AFLOW_Projects_Directories("LIB9")+"/RAW/"+directory;	
+//[SC20200327 - OBSOLETE]        url_WEB="/AFLOWDATA/LIB9_WEB/"+directory;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // LDEBUG=1;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::FOUND\")=" << vflags.flag("FLAG::FOUND") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::ICSD\")=" << vflags.flag("FLAG::ICSD") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB1\")=" << vflags.flag("FLAG::LIB1") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB2\")=" << vflags.flag("FLAG::LIB2") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB3\")=" << vflags.flag("FLAG::LIB3") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB4\")=" << vflags.flag("FLAG::LIB4") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB5\")=" << vflags.flag("FLAG::LIB5") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB7\")=" << vflags.flag("FLAG::LIB6") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB7\")=" << vflags.flag("FLAG::LIB7") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB8\")=" << vflags.flag("FLAG::LIB8") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::LIB9\")=" << vflags.flag("FLAG::LIB9") << endl;
+//[SC20200327 - OBSOLETE]      if(LDEBUG) cout << "WEB_Aflowlib_Entry_PHP: vflags.flag(\"FLAG::AUID\")=" << vflags.flag("FLAG::AUID") << endl;   
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // now start
+//[SC20200327 - OBSOLETE]      // got it  ?
+//[SC20200327 - OBSOLETE]      if(!aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_)) directory_RAW="";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(!directory.empty()) { // play with aentry.entry
+//[SC20200327 - OBSOLETE]        aurostd::StringSubst(label,"/",".");
+//[SC20200327 - OBSOLETE]        aentry.file2aflowlib(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,oss);  //   oss << aentry.entry << endl;
+//[SC20200327 - OBSOLETE]        directory_AUID_LIB=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aentry.auid);
+//[SC20200327 - OBSOLETE]        directory_AUID_WEB=directory_AUID_LIB+"/WEB";
+//[SC20200327 - OBSOLETE]        directory_AUID_RAW=directory_AUID_LIB+"/RAW";
+//[SC20200327 - OBSOLETE]        directory_AUID_LIB=directory_AUID_LIB+"/LIB";    
+//[SC20200327 - OBSOLETE]        aurostd::string2tokens(aentry.sg2,tokens,"#");if(tokens.size()>0) aentry.sg2=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]        if(aentry.vfiles_WEB.size()==0) aentry.vfiles_WEB=aentry.vfiles;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // check AGL/AEL
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::ELECTRONIC",aurostd::substring2bool(aentry.vloop,"bands"));
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::SCINTILLATION",aurostd::substring2bool(aentry.vloop,"bands"));
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::AGL",aurostd::substring2bool(aentry.vloop,"agl"));
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::AEL",aurostd::substring2bool(aentry.vloop,"ael"));
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::BADER",aurostd::substring2bool(aentry.vloop,"bader"));
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(XHOST.hostname=="nietzsche.mems.duke.edu") {
+//[SC20200327 - OBSOLETE]        oss << "<b>DEBUG: only in " << XHOST.hostname << "</b><br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "XHOST.hostname=" << XHOST.hostname << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "auid=" << aentry.auid << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "option=" << option << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "label=" << label << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory=" << directory << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "catalog=" << aentry.catalog << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::ICSD\")=" << vflags.flag("FLAG::ICSD") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB0\")=" << vflags.flag("FLAG::LIB0") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB1\")=" << vflags.flag("FLAG::LIB1") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB2\")=" << vflags.flag("FLAG::LIB2") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB3\")=" << vflags.flag("FLAG::LIB3") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB4\")=" << vflags.flag("FLAG::LIB4") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB5\")=" << vflags.flag("FLAG::LIB5") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB6\")=" << vflags.flag("FLAG::LIB6") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB7\")=" << vflags.flag("FLAG::LIB7") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB8\")=" << vflags.flag("FLAG::LIB8") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::LIB9\")=" << vflags.flag("FLAG::LIB9") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::AUID\")=" << vflags.flag("FLAG::AUID") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::FOUND\")=" << vflags.flag("FLAG::FOUND") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory_LIB=" << directory_LIB << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory_WEB=" << directory_WEB << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory_RAW=" << directory_RAW << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory_AUID_LIB=" << directory_AUID_LIB << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory_AUID_WEB=" << directory_AUID_WEB << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "directory_AUID_RAW=" << directory_AUID_RAW << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::PREAMBLE\")=" << vflags.flag("FLAG::PREAMBLE")  << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::CALCULATION\")=" << vflags.flag("FLAG::CALCULATION") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::JMOL\")=" << vflags.flag("FLAG::JMOL")  << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::EDATA_ORIG\")=" << vflags.flag("FLAG::EDATA_ORIG") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::EDATA_RELAX\")=" << vflags.flag("FLAG::EDATA_RELAX") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::THERMODYNAMICS\")=" << vflags.flag("FLAG::THERMODYNAMICS") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::MAGNETIC\")=" << vflags.flag("FLAG::MAGNETIC") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::ELECTRONIC\")=" << vflags.flag("FLAG::ELECTRONIC") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::SCINTILLATION\")=" << vflags.flag("FLAG::SCINTILLATION") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::AGL\")=" << vflags.flag("FLAG::AGL") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::AEL\")=" << vflags.flag("FLAG::AEL") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "vflags.flag(\"FLAG::BADER\")=" << vflags.flag("FLAG::BADER") << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "aentry.loop=" << aentry.loop << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        // oss << "aflowlib.out=" << aurostd::efile2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << "<br>" << endl;
+//[SC20200327 - OBSOLETE]        // oss << "aflowlib.json=" << aurostd::efile2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << "<br>" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      //CO20180523 - fixing for LIB6 missing from /www directory
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(XHOST.hostname, "aflowlib")){
+//[SC20200327 - OBSOLETE]        vflags.flag("FLAG::JMOL",FALSE);
+//[SC20200327 - OBSOLETE]        string web_path="/www"+url_WEB;
+//[SC20200327 - OBSOLETE]        if(LDEBUG) {cerr << soliloquy << " web_path=" << web_path << endl;}
+//[SC20200327 - OBSOLETE]        if(aurostd::IsDirectory(web_path)){
+//[SC20200327 - OBSOLETE]          vector<string> web_path_vfiles;
+//[SC20200327 - OBSOLETE]          aurostd::DirectoryLS(web_path,web_path_vfiles);
+//[SC20200327 - OBSOLETE]          if(aurostd::substring2bool(web_path_vfiles,label+".cif")){vflags.flag("FLAG::JMOL",TRUE);}
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        if(LDEBUG) {cerr << soliloquy << " vflags.flag(\"FLAG::JMOL\")=" << vflags.flag("FLAG::JMOL") << endl;}
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // make ORIG vs RELAX
+//[SC20200327 - OBSOLETE]      vflags.flag("FLAG::EDATA_ORIG",FALSE);
+//[SC20200327 - OBSOLETE]      if(aentry.Bravais_lattice_orig!=aentry.Bravais_lattice_relax && aentry.Bravais_lattice_orig!="nan" && aentry.Bravais_lattice_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
+//[SC20200327 - OBSOLETE]      if(aentry.lattice_variation_orig!=aentry.lattice_variation_relax && aentry.lattice_variation_orig!="nan" && aentry.lattice_variation_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
+//[SC20200327 - OBSOLETE]      if(aentry.lattice_system_orig!=aentry.lattice_system_relax && aentry.lattice_system_orig!="nan" && aentry.lattice_system_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
+//[SC20200327 - OBSOLETE]      if(aentry.Pearson_symbol_orig!=aentry.Pearson_symbol_relax && aentry.Pearson_symbol_orig!="nan" && aentry.Pearson_symbol_relax!="nan") vflags.flag("FLAG::EDATA_ORIG",TRUE);
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // not found
+//[SC20200327 - OBSOLETE]      // oss << "Thank you for your query, but unfortunately entry " << label << " has not yet been calculated. If you want to report this omission please email Dr. Rose at aflowdev@aflowlib.duke.ed.<br>" << endl;
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // PREAMBLE BEGIN
+//[SC20200327 - OBSOLETE]      string title=label;
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::PREAMBLE") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        if(vflags.flag("FLAG::ICSD")) {
+//[SC20200327 - OBSOLETE]          aurostd::string2tokens(label,tokens,"_");
+//[SC20200327 - OBSOLETE]          title=tokens.at(0);
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<=9;i++) aurostd::StringSubst(title,aurostd::utype2string<uint>(i),string("<sub>"+aurostd::utype2string<uint>(i)+"</sub>"));
+//[SC20200327 - OBSOLETE]          title+=" (ICSD# "+tokens.at(2)+")";//+directory;
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::ELECTRONIC")){ //CO20180502
+//[SC20200327 - OBSOLETE]        oss.setf(std::ios::fixed,std::ios::floatfield);
+//[SC20200327 - OBSOLETE]        oss.precision(4);
+//[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\">" << endl;
+//[SC20200327 - OBSOLETE]        aurostd::xoption aaa;
+//[SC20200327 - OBSOLETE]        stringstream bandsdata;
+//[SC20200327 - OBSOLETE]        oss << "var d3_bands_data = "; estructure::BANDSDATA_JSON(aaa, directory_LIB, bandsdata,true); oss << bandsdata.str();  //GG
+//[SC20200327 - OBSOLETE]        oss << ";</script>" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      oss << "<! HARVEY WORK BEFORE HERE> " << endl;
+//[SC20200327 - OBSOLETE]      oss << "<div id=\"content\">" << endl;
+//[SC20200327 - OBSOLETE]      oss << "<div class=\"title\">" << endl;
+//[SC20200327 - OBSOLETE]      oss << "<FONT SIZE=+3> " << title << " </FONT></div>" << endl;
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // COMPOUND
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- compound: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<FONT SIZE=+3> " << aentry.compound << " </FONT><br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- compound: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }	
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // LICENSE
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        string LICENSE="The data included within the aflow.org repository is free for scientific, academic and non-commercial purposes. Any other use is prohibited.";
+//[SC20200327 - OBSOLETE]        oss << "<!-- license: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<div class = \"url_text\">" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<br><b>LICENSE: <span class=\"url_text\">" << LICENSE << "</span></b>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- license: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }	
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // PREAMBLE BEGIN
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::PREAMBLE") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        // string URL=string("http://aflow.org/material.php?proto_name=")+label;
+//[SC20200327 - OBSOLETE]        // string URL=string("http://aflow.org/material.php?id=")+label;   // with label
+//[SC20200327 - OBSOLETE]        string URL=string("http://aflow.org/material.php?id=")+aentry.auid; // with auid
+//[SC20200327 - OBSOLETE]        oss << "<!-- preamble: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        //      oss << "<FONT SIZE=+3> " << aentry.compound << " </FONT>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<div class = \"url\">" << endl;
+//[SC20200327 - OBSOLETE]        oss << "Permanent URL: <span class=\"url_text\">" << URL << "</span>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<br><FONT SIZE=+0><b>aflow.org</b> web entry generator V" << string(AFLOW_VERSION) << " [built="  << TODAY << "]" << "</font>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- preamble: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }	
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // NEW JSMOL BEGIN
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::JMOL") && !directory.empty() && aurostd::substring2bool(aentry.vfiles_WEB,label+".cif")) {  //CO20180523 - fixing for LIB6 missing from /www directory
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]if label+".cif" is available, assume "_sprim" and "_sconv" are too
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]space group stuff found in bob's file now
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]oss << "<br><br><b>Space Group</b>: " << (aurostd::string2utype<int>(aentry.spacegroup_relax)>0 ? GetSpaceGroupName(aurostd::string2utype<int>(aentry.spacegroup_relax)) : "N/A" ) << "  (#" << aentry.spacegroup_relax << ")" << endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]if(aurostd::string2utype<int>(aentry.spacegroup_relax)>0) {
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]  oss << "<br><br><b>Space Group</b>: " <<  GetSpaceGroupName(aurostd::string2utype<int>(aentry.spacegroup_relax)) << "  (#" << aentry.spacegroup_relax << ")" << endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]} else {
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]  oss << "<br><br><b>Space Group</b>: " <<  "N/A" << "  (#" << aentry.spacegroup_relax << ")" << endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]}
+//[SC20200327 - OBSOLETE]        oss << "<!-- jmol: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!--div class = \"jmol\"-->" << endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]oss << "<script type=\"text/javascript\" src=\"/search/Lib/JS/JSmol.min.js\"></script>" << endl;  //CO20170622
+//[SC20200327 - OBSOLETE]        //[OBSOLETE CO20170628 - per Bob/JMOL]string JMOL_PATH="http://aflowlib.duke.edu/users/jmolers/test/jsmol";
+//[SC20200327 - OBSOLETE]        string JMOL_PATH="http://aflowlib.duke.edu/search/Lib/JS/JSMol";
+//[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\" src=\"" << JMOL_PATH << "/JSmol.min.js\"></script>" << endl;  //CO20170622
+//[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\">" << endl;
+//[SC20200327 - OBSOLETE]        //CO20170622 START
+//[SC20200327 - OBSOLETE]        //build our standard AFLOW object, add from aentry as needed
+//[SC20200327 - OBSOLETE]        oss << "AFLOW={};" << endl;
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.version = \"" << string(AFLOW_VERSION) << "\";" << endl;
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.url_WEB = \"http://aflowlib.duke.edu" << url_WEB << "\";" << endl; //CO check with bob, maybe aflowlib.duke.edu?
+//[SC20200327 - OBSOLETE]        string system_name=KBIN::ExtractSystemName(directory_LIB);
+//[SC20200327 - OBSOLETE]        //    cerr << system_name << endl; exit(0);
+//[SC20200327 - OBSOLETE]        //  system_name="xxxx";
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.label = \"" << system_name << "\";" << endl;
+//[SC20200327 - OBSOLETE]        //  oss << "AFLOW.label = \"" << "xxx" << "\";" << endl;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.spaceGroupNo = " << aentry.spacegroup_relax << ";" << endl;
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.spaceGroupName = \"" << GetSpaceGroupName(aurostd::string2utype<int>(aentry.spacegroup_relax)) << "\";" << endl;
+//[SC20200327 - OBSOLETE]        double aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF;
+//[SC20200327 - OBSOLETE]        cif2data(directory_WEB+"/"+label+"_sconv.cif",aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF);
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.cif_sconv = [" << aCIF << "," << bCIF << "," << cCIF << "," << alphaCIF << "," << betaCIF << "," << gammaCIF << "];" << endl;
+//[SC20200327 - OBSOLETE]        cif2data(directory_WEB+"/"+label+".cif",aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF);
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.cif = [" << aCIF << "," << bCIF << "," << cCIF << "," << alphaCIF << "," << betaCIF << "," << gammaCIF << "];" << endl;
+//[SC20200327 - OBSOLETE]        cif2data(directory_WEB+"/"+label+"_sprim.cif",aCIF,bCIF,cCIF,alphaCIF,betaCIF,gammaCIF);
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.cif_sprim = [" << aCIF << "," << bCIF << "," << cCIF << "," << alphaCIF << "," << betaCIF << "," << gammaCIF << "];" << endl;
+//[SC20200327 - OBSOLETE]        string sym2json; //PC+DX20180723
+//[SC20200327 - OBSOLETE]        if(aurostd::FileExist(directory_RAW+"/"+"aflow.fgroup.bands.json.xz")) //PC+DX20180723
+//[SC20200327 - OBSOLETE]        { aurostd::xzfile2string(directory_RAW+"/"+"aflow.fgroup.bands.json.xz",sym2json); //PC+DX20180723
+//[SC20200327 - OBSOLETE]          oss << "AFLOW.sym2json ="; //PC+DX20180723
+//[SC20200327 - OBSOLETE]          oss << sym2json;    //PC+DX20180723
+//[SC20200327 - OBSOLETE]          oss << ";" << endl; } //PC+DX20180723
+//[SC20200327 - OBSOLETE]        else if (aurostd::FileExist(directory_RAW+"/"+"aflow.fgroup.relax.json.xz")) //PC+DX20180723
+//[SC20200327 - OBSOLETE]        { aurostd::xzfile2string(directory_RAW+"/"+"aflow.fgroup.relax.json.xz",sym2json); //PC+DX20180723
+//[SC20200327 - OBSOLETE]          oss << "AFLOW.sym2json ="; //PC+DX20180723
+//[SC20200327 - OBSOLETE]          oss << sym2json;    //PC+DX20180723
+//[SC20200327 - OBSOLETE]          oss << ";" << endl; }//PC+DX20180723
+//[SC20200327 - OBSOLETE]        else {cerr << "error" << endl; //PC+DX20180723
+//[SC20200327 - OBSOLETE]        }; //PC+DX20180723
+//[SC20200327 - OBSOLETE]        //BEGIN BADER ISOSURFACES
+//[SC20200327 - OBSOLETE]        if(vflags.flag("FLAG::BADER")){ //did we calculate bader?
+//[SC20200327 - OBSOLETE]          if(aurostd::substring2bool(aentry.vfiles_WEB,label+"_Bader_20_"+aentry.vspecies.at(0)+".jvxl")) { //quick (not robust) test that bader loop ran fine
+//[SC20200327 - OBSOLETE]            if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax")) {  //check that we have the right structure
+//[SC20200327 - OBSOLETE]              xstructure xstr(directory_WEB+"/CONTCAR.relax",IOAFLOW_AUTO);
+//[SC20200327 - OBSOLETE]              xstr.ReScale(1.0);
+//[SC20200327 - OBSOLETE]              oss << "AFLOW.baderUnitcell = [";
+//[SC20200327 - OBSOLETE]              string sep = "";
+//[SC20200327 - OBSOLETE]              for(uint i=1;i<=3;i++)
+//[SC20200327 - OBSOLETE]                for(uint j=1;j<=3;j++) {
+//[SC20200327 - OBSOLETE]                  oss << sep << xstr.lattice(i,j);
+//[SC20200327 - OBSOLETE]                  sep = ",";
+//[SC20200327 - OBSOLETE]                }
+//[SC20200327 - OBSOLETE]              oss << "];" << endl;
+//[SC20200327 - OBSOLETE]              oss << "AFLOW.baderVSpecies = [" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aentry.vspecies,"\""),",") << "];" << endl;
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        //END BADER ISOSURFACES
+//[SC20200327 - OBSOLETE]        oss << "AFLOW.jsmolDir = \"" << JMOL_PATH << "\";" << endl;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        //adding bob's stuff
+//[SC20200327 - OBSOLETE]        //string aflow_entry_js=AFLOW_ENTRY_JS;
+//[SC20200327 - OBSOLETE]        oss << AFLOW_WEBAPP_ENTRY_JS;  //CO20170622 
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        oss << "</script>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</td></tr></table>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!--/div-->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- jmol: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- geena bands: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\" src=\"./Lib/JS/d3.min.js\"></script>" << endl;  //CO20170622  ///www/search/Lib/JS/d3.min.js
+//[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\">" << endl;
+//[SC20200327 - OBSOLETE]        oss << AFLOW_WEBAPP_BANDS_JS; //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "</script>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- geena bands: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // NEW JSMOL END
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // CALCULATION
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::CALCULATION") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Calculation properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Calculation details</h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //      oss << "<div class=\"calculation_details\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.code.empty()) {
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ":</h5><span class=\"value\">" << "[" << "<a href=\"" << url_WEB << "/\"" << html_TAB << ">entry</a>|" << "<a href=\"" << url_WEB << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << html_TAB << ">raw</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ":</h5><span class=\"value\">" << "[" << "<a href=\"" << url_WEB << "/?format=json\"" << html_TAB << ">entry</a>|" << "<a href=\"" << url_WEB << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "\"" << html_TAB << ">raw</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        if(!aentry.auid.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW-UID [<a href=\"" << url_WEB << "/?auid\">auid</a>]:</h5><span class=\"value\">" << aentry.auid << "</span></div></div>" << endl; //PC20180515  //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.aurl.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW-URL [<a href=\"" << url_WEB << "/?aurl\">aurl</a>]:</h5><span class=\"value\">" << aentry.aurl << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.code.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"><i>Ab-initio</i> code [<a href=\"" << url_WEB << "/?code\">code</a>]:</h5><span class=\"value\">" << aentry.code << (aentry.calculation_cores>1?" (MPI) ":"") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.compound.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Composition per cell [<a href=\"" << url_WEB << "/?compound\">compound</a>]:</h5><span class=\"value\">" << aentry.compound << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.icsd.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">ICSD entry" << icsd_link << ":</h5><span class=\"value\">" << aentry.icsd << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.dft_type.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Pseudopotentials type [<a href=\"" << url_WEB << "/?pp_type\">pp_type</a>]:</h5><span class=\"value\">" << aentry.dft_type << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        for(uint i=0;i<aentry.vspecies_pp.size();i++)  
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">PP - Species&middot;Version [<a href=\"" << url_WEB << "/?species_pp_version\">species_pp_version</a>]:</h5><span class=\"value\">" << aentry.vspecies_pp_version.at(i) << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        for(uint i=0;i<aentry.vspecies_pp_ZVAL.size();i++)  
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">PP - Species&middot;ZVAL [<a href=\"" << url_WEB << "/?species_pp_ZVAL\">species_pp_ZVAL</a>]:</h5><span class=\"value\">" << aentry.vspecies_pp_ZVAL.at(i) << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">LDAU [T;{L};{U};{J}] [<a href=\"" << url_WEB << "/?ldau_TLUJ\">ldau_TLUJ</a>]:</h5><span class=\"value\">" << (!aentry.ldau_TLUJ.empty()?aentry.ldau_TLUJ+"  (type;{angular-1};{eV};{eV}) ":"no-LDAU") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.calculation_time*aentry.calculation_cores>0.0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Total CPU&middot;hours [<a href=\"" << url_WEB << "/?calculation_time\">calculation_time</a>*<a href=\"" << url_WEB << "/?calculation_cores\">calculation_cores</a>]/3600:</h5><span class=\"value\">" << aentry.calculation_time*aentry.calculation_cores/3600 << " hours</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.calculation_time>0.0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Total Wall-time [<a href=\"" << url_WEB << "/?calculation_time\">calculation_time/3600</a>]:</h5><span class=\"value\">" << aentry.calculation_time/3600 << " hours</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.calculation_memory>0.0)
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Memory Used [<a href=\"" << url_WEB << "/?calculation_memory\">calculation_memory</a>]:</h5><span class=\"value\">" << aentry.calculation_memory << " MB</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.calculation_cores>0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Number of cores [<a href=\"" << url_WEB << "/?calculation_cores\">calculation_cores</a>]:</h5><span class=\"value\">" << aentry.calculation_cores << (aentry.calculation_cores>1?" (MPI) ":"(serial)") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.node_CPU_Model.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Processor - CPU Model [<a href=\"" << url_WEB << "/?node_CPU_Model\">node_CPU_Model</a>]:</h5><span class=\"value\">" << (!aentry.node_CPU_Model.empty()?aentry.node_CPU_Model:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.node_CPU_MHz>0.0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Processor - CPU MHz [<a href=\"" << url_WEB << "/?node_CPU_MHz\">node_CPU_MHz</a>]:</h5><span class=\"value\">" << (aentry.node_CPU_MHz>1.0?aurostd::utype2string(aentry.node_CPU_MHz)+"MHz ":"unavailable") << " </span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.aflow_version.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?aflow_version\">aflow_version</a>]:</h5><span class=\"value\">" << (!aentry.aflow_version.empty()?aentry.aflow_version:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.catalog.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Catalog [<a href=\"" << url_WEB << "/?catalog\">catalog</a>]:</h5><span class=\"value\">" << (!aentry.catalog.empty()?aentry.catalog:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.data_api.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Data API [<a href=\"" << url_WEB << "/?data_api\">data_api</a>]:</h5><span class=\"value\">" << (!aentry.data_api.empty()?aentry.data_api:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.data_source.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Data Source [<a href=\"" << url_WEB << "/?data_source\">data_source</a>]:</h5><span class=\"value\">" << (!aentry.data_source.empty()?aentry.data_source:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.data_language.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Data Language [<a href=\"" << url_WEB << "/?data_language\">data_language</a>]:</h5><span class=\"value\">" << (!aentry.data_language.empty()?aentry.data_language:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.error_status.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Error Status [<a href=\"" << url_WEB << "/?error_status\">error_status</a>]:</h5><span class=\"value\">" << (!aentry.error_status.empty()?aentry.error_status:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.loop.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW loops [<a href=\"" << url_WEB << "/?loop\">loop</a>]:</h5><span class=\"value\">" << aentry.loop << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //     oss << "<li><span class=\"description\">AFLOW precision:</span>" << "unavailable" << "</li>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //    oss << "<li><span class=\"description\">AFLOW KPPRA:</span>" << "unavailable" << "</li>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.aflowlib_version.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry version [<a href=\"" << url_WEB << "/?aflowlib_version\">aflowlib_version</a>]:</h5><span class=\"value\">" << (!aentry.aflowlib_version.empty()?aentry.aflowlib_version:"unavailable") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.aflowlib_date.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry date [<a href=\"" << url_WEB << "/?aflowlib_date\">aflowlib_date</a>]:</h5><span class=\"value\">" << (!aentry.aflowlib_date.empty()?aentry.aflowlib_date:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.author.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?author\">author</a>]:</h5><span class=\"value\">" << (!aentry.author.empty()?aentry.author:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.corresponding.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?corresponding\">corresponding</a>]:</h5><span class=\"value\">" << (!aentry.corresponding.empty()?aentry.corresponding:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.sponsor.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?sponsor\">sponsor</a>]:</h5><span class=\"value\">" << (!aentry.sponsor.empty()?aentry.sponsor:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        // CORMAC
+//[SC20200327 - OBSOLETE]        if(aentry.energy_cutoff!=AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">energy_cutoff [<a href=\"" << url_WEB << "/?energy_cutoff\">energy_cutoff</a>]:</h5><span class=\"value\">" << aentry.energy_cutoff << " eV</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        //      oss.precision(6);
+//[SC20200327 - OBSOLETE]        if(aentry.delta_electronic_energy_convergence!=AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">delta_electronic_energy_convergence [<a href=\"" << url_WEB << "/?delta_electronic_energy_convergence\">delta_electronic_energy_convergence</a>]:</h5><span class=\"value\">" << 1000*aentry.delta_electronic_energy_convergence << " meV</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.delta_electronic_energy_threshold!=AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">delta_electronic_energy_threshold_ [<a href=\"" << url_WEB << "/?delta_electronic_energy_threshold\">delta_electronic_energy_threshold</a>]:</h5><span class=\"value\">" << 1000*aentry.delta_electronic_energy_threshold << " meV</span></div></div>" << endl; //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.nkpoints!=0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">nkpoints [<a href=\"" << url_WEB << "/?nkpoints\">nkpoints</a>]:</h5><span class=\"value\">" << aentry.nkpoints << " </span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.nkpoints_irreducible!=0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">nkpoints_irreducible [<a href=\"" << url_WEB << "/?nkpoints_irreducible\">nkpoints_irreducible</a>]:</h5><span class=\"value\">" << aentry.nkpoints_irreducible << " </span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.kppra!=0) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">kppra [<a href=\"" << url_WEB << "/?kppra\">kppra</a>]:</h5><span class=\"value\">" << aentry.kppra << " </span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.kpoints.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">kpoints [<a href=\"" << url_WEB << "/?kpoints\">kpoints</a>]:</h5><span class=\"value\">" << aentry.kpoints << " </span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //  oss.precision(3);
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl;  //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Calculation properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::EDATA_ORIG")&& !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << line_rule << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- Warning: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<span class=\"title\"><FONT SIZE=+3 color=red> Warning!</font></span>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<span class=\"title\"><FONT SIZE=+3 color=red> Original and relaxed structures</font></span>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<span class=\"title\"><FONT SIZE=+3 color=red> have different symmetries: listing both.</font></span>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- Warning: END -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << line_rule << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // EDATA ORIG/RELAX
+//[SC20200327 - OBSOLETE]      if((vflags.flag("FLAG::EDATA_ORIG") || vflags.flag("FLAG::EDATA_RELAX")) && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        for(uint i=0;i<=1;i++)  {
+//[SC20200327 - OBSOLETE]          if((vflags.flag("FLAG::EDATA_ORIG") && i==0) || (vflags.flag("FLAG::EDATA_RELAX") && i==1)) {
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<!-- EDATA: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            if(i==0) oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Original Structure</h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            if(i==1) oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Relaxed Structure</h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ht /> " << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class = \"real_space\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            if(i==0) oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Real Space Lattice</h4></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            if(i==1) oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Real Space Lattice</h4></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            vector<string> vline_edata;
+//[SC20200327 - OBSOLETE]            if(i==0 && aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT)) aurostd::file2vectorstring(directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT,vline_edata);
+//[SC20200327 - OBSOLETE]            if(i==1 && aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT)) aurostd::file2vectorstring(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT,vline_edata);
+//[SC20200327 - OBSOLETE]            // 
+//[SC20200327 - OBSOLETE]            vector<double> abcR(6);
+//[SC20200327 - OBSOLETE]            double volumeR,density=0.0,coveraR;
+//[SC20200327 - OBSOLETE]            string Crystal_Real_space_Bravais_Lattice_Primitive="",Crystal_Real_space_Lattice_Variation="",Crystal_Real_space_Lattice_System="";
+//[SC20200327 - OBSOLETE]            string Crystal_Real_space_Pearson_Symbol="",Crystal_Real_space_Crystal_Family="",Crystal_Real_space_Crystal_System="";
+//[SC20200327 - OBSOLETE]            string Crystal_Real_space_Crystal_Class="",Crystal_Real_space_Point_Group_Hermann_Mauguin="",Crystal_Real_space_Point_Group_Schoenflies="";
+//[SC20200327 - OBSOLETE]            string Crystal_Real_space_Point_Group_Orbifold="",Crystal_Real_space_Point_Group_Type="",Crystal_Real_space_Point_Group_Order="";
+//[SC20200327 - OBSOLETE]            string Crystal_Real_space_Point_Group_Structure="";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            string Lattice_Real_space_Bravais_Lattice_Primitive="",Lattice_Real_space_Lattice_Variation="",Lattice_Real_space_Lattice_System="";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            string Superattice_Real_space_Bravais_Superlattice_Primitive="",Superattice_Real_space_Superlattice_Variation="",Superattice_Real_space_Superlattice_System="";
+//[SC20200327 - OBSOLETE]            string Superattice_Real_space_Pearson_Symbol_Superlattice="",Reciprocal_lattice_primitive="",Reciprocal_lattice_variation="";
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            vector<double> abcK(6);
+//[SC20200327 - OBSOLETE]            double volumeK;
+//[SC20200327 - OBSOLETE]            if(vline_edata.size()>0) {
+//[SC20200327 - OBSOLETE]              for(uint iline=0;iline<vline_edata.size();iline++) {
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"Real space a b c alpha beta gamma"))
+//[SC20200327 - OBSOLETE]                  if(!aurostd::substring2bool(vline_edata.at(iline),"Bohrs/Degs")) {
+//[SC20200327 - OBSOLETE]                    aurostd::string2tokens(vline_edata.at(iline),tokens);
+//[SC20200327 - OBSOLETE]                    for(uint i=0;i<6;i++) abcR.at(i)=aurostd::string2utype<double>(tokens.at(tokens.size()-6+i));}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"Real space Volume")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline),tokens);
+//[SC20200327 - OBSOLETE]                  volumeR=aurostd::string2utype<double>(tokens.at(tokens.size()-1));}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"Real space c/a")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline),tokens);
+//[SC20200327 - OBSOLETE]                  coveraR=aurostd::string2utype<double>(tokens.at(tokens.size()-1));}
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"BRAVAIS LATTICE OF THE CRYSTAL")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Crystal_Real_space_Bravais_Lattice_Primitive=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Crystal_Real_space_Lattice_Variation=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Crystal_Real_space_Lattice_System=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+4),tokens,"="); Crystal_Real_space_Pearson_Symbol=tokens.at(tokens.size()-1);}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"POINT GROUP CRYSTAL")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Crystal_Real_space_Crystal_Family=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Crystal_Real_space_Crystal_System=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Crystal_Real_space_Crystal_Class=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+4),tokens,"="); Crystal_Real_space_Point_Group_Hermann_Mauguin=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+5),tokens,"="); Crystal_Real_space_Point_Group_Schoenflies=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+6),tokens,"="); Crystal_Real_space_Point_Group_Orbifold=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+7),tokens,"="); Crystal_Real_space_Point_Group_Type=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+8),tokens,"="); Crystal_Real_space_Point_Group_Order=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+9),tokens,"="); Crystal_Real_space_Point_Group_Structure=tokens.at(tokens.size()-1);}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"BRAVAIS LATTICE OF THE LATTICE")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Lattice_Real_space_Bravais_Lattice_Primitive=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Lattice_Real_space_Lattice_Variation=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Lattice_Real_space_Lattice_System=tokens.at(tokens.size()-1);}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"SUPERLATTICE")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+1),tokens,"="); Superattice_Real_space_Bravais_Superlattice_Primitive=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+2),tokens,"="); Superattice_Real_space_Superlattice_Variation=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+3),tokens,"="); Superattice_Real_space_Superlattice_System=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+4),tokens,"="); Superattice_Real_space_Pearson_Symbol_Superlattice=tokens.at(tokens.size()-1);}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"Reciprocal space a b c alpha beta gamma")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline),tokens);
+//[SC20200327 - OBSOLETE]                  for(uint i=0;i<6;i++) abcK.at(i)=aurostd::string2utype<double>(tokens.at(tokens.size()-6+i));}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"Reciprocal space Volume")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline),tokens);
+//[SC20200327 - OBSOLETE]                  volumeK=aurostd::string2utype<double>(tokens.at(tokens.size()-1));}
+//[SC20200327 - OBSOLETE]                if(aurostd::substring2bool(vline_edata.at(iline),"RECIPROCAL LATTICE")) {
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+7),tokens,"="); Reciprocal_lattice_primitive=tokens.at(tokens.size()-1);
+//[SC20200327 - OBSOLETE]                  aurostd::string2tokens(vline_edata.at(iline+8),tokens,"="); Reciprocal_lattice_variation=tokens.at(tokens.size()-1);}
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if(aentry.vcomposition.size()==aentry.vspecies.size()) {
+//[SC20200327 - OBSOLETE]              for(uint i=0;i<aentry.vspecies.size();i++) 
+//[SC20200327 - OBSOLETE]                density=density+aentry.vcomposition.at(i)*GetAtomMass(aentry.vspecies.at(i))/volumeR*1000.0*1e8*1e8*1e8; //grams/cm^3
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            // Print out structural data    
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<li>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Lattice:</h5>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"lattice_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<table class=\"lattice\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"value\">" << endl << "a=" << abcR.at(0) << "&Aring;" << "&nbsp;" << endl << " b=" << abcR.at(1) << "&Aring;" << "&nbsp;" <<  endl << " c=" << abcR.at(2) << "&Aring;" << "&nbsp;" << endl << " c/a=" << coveraR <<  endl << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"value\">" << endl << "&alpha;=" << abcR.at(3) << "&deg" << endl << " &beta;=" << abcR.at(4) << "&deg" << endl << " &gamma;=" << abcR.at(5) << "&deg" << endl << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 vector<double> lattice_params(6);
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 vector<string> rtokens;
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 aurostd::string2tokens(aentry.geometry,rtokens,";");
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 for(uint t=0;t<rtokens.size();t++){ lattice_params[t] = aurostd::string2utype<double>(rtokens[t]); }
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 double covera = lattice_params.at(0)/lattice_params.at(2);
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << endl << "a=" << lattice_params.at(0) << "&Aring;" << "&nbsp;" << endl << " b=" << lattice_params.at(1) << "&Aring;" << "&nbsp;" <<  endl << " c=" << lattice_params.at(2) << "&Aring;" << "&nbsp;" << endl << " c/a=" << covera <<  endl << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << endl << "&alpha;=" << lattice_params.at(3) << "&deg" << endl << " &beta;=" << lattice_params.at(4) << "&deg" << endl << " &gamma;=" << lattice_params.at(5) << "&deg" << endl << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</li>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "</div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << volumeR << "&Aring;<sup>3</sup></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << aentry.volume_cell << "&Aring;<sup>3</sup></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Number of Atoms per Cell:</h5><span class=\"value\">" << aentry.natoms << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //  if(html && aentry.density==0.0) oss << "<li><span class=\"description\"> Density(calc):</span> " << density << " g/cm<sup>3</sup></li>" << endl;
+//[SC20200327 - OBSOLETE]            // if(html && aentry.density>0.0) oss << "<li><span class=\"description\"> Density(entry):</span> " << aentry.density << " g/cm<sup>3</sup></li>" << endl;
+//[SC20200327 - OBSOLETE]            if(aentry.density<0.1)  aentry.density=density;
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Density(calc):</h5><span class=\"value\"> " << density << " g/cm<sup>3</sup></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Density(aflowlib):</h5><span class=\"value\"> " << aentry.density << " g/cm<sup>3</sup></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            //	  if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax")) {
+//[SC20200327 - OBSOLETE]            //    oss << "<li><span class=\"description\"> Relaxed position (aflowlib/VASP):</span>" << "[<a href=\"" << url_WEB << "/CONTCAR.relax\">POSCAR</a>]" << "</li>" << endl;
+//[SC20200327 - OBSOLETE]            // }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.vasp")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/VASP):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.vasp\"" << html_TAB << ">VASP-POSCAR</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.qe")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/QE):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.qe\"" << html_TAB << ">QE-GEOMETRY</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.abinit")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/ABINIT):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.abinit\"" << html_TAB << ">ABINIT-GEOMETRY</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"CONTCAR.relax.aims")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Relaxed position (aflowlib/AIMS):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/CONTCAR.relax.aims\"" << html_TAB << ">AIMS-GEOMETRY</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"INCAR.relax")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> INCAR for relax calculation (aflowlib/VASP):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/INCAR.relax\"" << html_TAB << ">INCAR.relax</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if(aurostd::substring2bool(aentry.vfiles_WEB,"INCAR.static")) {
+//[SC20200327 - OBSOLETE]              oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> INCAR for static calculation (aflowlib/VASP):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                << "[<a href=\"" << url_WEB << "/INCAR.static\"" << html_TAB << ">INCAR.static</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"INCAR.bands")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> INCAR for bands calculation (aflowlib/VASP):</h5><span class=\"value\">"
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/INCAR.bands\"" << html_TAB << ">INCAR.bands</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"KPOINTS.relax")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> KPOINTS for relax calculation (aflowlib/VASP):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/KPOINTS.relax\"" << html_TAB << ">KPOINTS.relax</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"KPOINTS.static")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> KPOINTS for static calculation (aflowlib/VASP):</h5><span class=\"value\">"
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/KPOINTS.static\"" << html_TAB << ">KPOINTS.static</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,"KPOINTS.bands")) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> KPOINTS for bands calculation (aflowlib/VASP):</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/KPOINTS.bands\"" << html_TAB << ">KPOINTS.bands</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]            if(aurostd::substring2bool(aentry.vfiles_WEB,DEFAULT_FILE_EDATA_ORIG_OUT)) {
+//[SC20200327 - OBSOLETE]              oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Extended crystallographic data for original structure:</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                << "[<a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_ORIG_OUT << "\"" << html_TAB << ">" << DEFAULT_FILE_EDATA_ORIG_OUT << "</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,DEFAULT_FILE_EDATA_RELAX_OUT)) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Extended crystallographic data for relaxed structure:</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_RELAX_OUT << "\"" << html_TAB << ">" << DEFAULT_FILE_EDATA_RELAX_OUT << "</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            if (i==1){  //GG20170714 - removed relaxed data from orig
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB,DEFAULT_FILE_EDATA_BANDS_OUT)) {
+//[SC20200327 - OBSOLETE]                oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Extended crystallographic data for band-structure:</h5><span class=\"value\">" 
+//[SC20200327 - OBSOLETE]                  << "[<a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_BANDS_OUT << "\"" << html_TAB << ">" << DEFAULT_FILE_EDATA_BANDS_OUT << "</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              }
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"space_group\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Bravais Lattice of the Crystal" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731  //CO20180817
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Space Group Number:</h5><span class=\"value\">" << aentry.sg2 << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Pearson Symbol:</h5><span class=\"value\">" << Crystal_Real_space_Pearson_Symbol << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive:</h5><span class=\"value\">" << Crystal_Real_space_Bravais_Lattice_Primitive << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << Crystal_Real_space_Lattice_Variation << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << Crystal_Real_space_Lattice_System << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"point_group\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Point Group of the Crystal" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Family:</h5><span class=\"value\">" << Crystal_Real_space_Crystal_Family << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal System:</h5><span class=\"value\">" << Crystal_Real_space_Crystal_System << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Class:</h5><span class=\"value\">" << Crystal_Real_space_Crystal_Class << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //	oss << "<li><span class=\"description\"> Point Group (Hermann Mauguin):</span>" << Crystal_Real_space_Point_Group_Hermann_Mauguin << "</li><!br>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Herm. Maug.):</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Hermann_Mauguin << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Schoenflies):</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Schoenflies << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Orbifold:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Orbifold << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180827 - new point group type output - START
+//[SC20200327 - OBSOLETE]            string point_group_type = Crystal_Real_space_Point_Group_Type;
+//[SC20200327 - OBSOLETE]            if(aurostd::RemoveWhiteSpaces(point_group_type) == "-" || aurostd::RemoveWhiteSpaces(point_group_type) == "none"){
+//[SC20200327 - OBSOLETE]              point_group_type = "non-centrosymmetric, non-enantiomorphic, non-polar";
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << point_group_type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180827 - new point group type output - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180827 [OBSOLETE] oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Order:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Order << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Structure:</h5><span class=\"value\">" << Crystal_Real_space_Point_Group_Structure << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Family:</h5><span class=\"value\">" << aentry.crystal_family << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal System:</h5><span class=\"value\">" << aentry.crystal_system << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Crystal Class:</h5><span class=\"value\">" << aentry.crystal_class << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Herm. Maug.):</h5><span class=\"value\">" << aentry.point_group_Hermann_Mauguin << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group (Schoenflies):</h5><span class=\"value\">" << aentry.point_group_Schoenflies << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Orbifold:</h5><span class=\"value\">" << aentry.point_group_orbifold << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Type:</h5><span class=\"value\">" << aentry.point_group_type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Order:</h5><span class=\"value\">" << aentry.point_group_order << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Point Group Structure:</h5><span class=\"value\">" << aentry.point_group_structure << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"bravais_lattice\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Bravais Lattice of the Lattice" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive</h5><span class=\"value\">" << Lattice_Real_space_Bravais_Lattice_Primitive << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_Variation << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_System << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive</h5><span class=\"value\">" << aentry.Bravais_lattice_lattice_type << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << aentry.Bravais_lattice_lattice_variation_type << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << aentry.Bravais_lattice_lattice_system << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            if(aurostd::substring2bool(aentry.vfiles_WEB,label+"_BZ.png")) {
+//[SC20200327 - OBSOLETE]              oss << "<div class=\"container__cell\"><div class=\"container__card--img\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              oss << "<h5 class=\"value-name\"> Brillouin Zone " << art058_link<< "</h5>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              // [OBSOLETE] oss << "<div class=\"picture_BZ\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]              // [OBSOLETE] oss << "<img class=\"pic_BZ\" src=\"../SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; //CO20170621 - relative path
+//[SC20200327 - OBSOLETE]              oss << "<img class=\"BZ-img\" src=\"http://aflowlib.duke.edu/SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; //CO20170621 - abs path WORKS  //JPO20180731
+//[SC20200327 - OBSOLETE]              oss << "</div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "<div class=\"bravais_lattice\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Bravais Lattice of the Lattice" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Primitive</h5><span class=\"value\">" << Lattice_Real_space_Bravais_Lattice_Primitive << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice Variation:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_Variation << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]oss << "<div class=\"container__card\"><h5 class=\"value-name\"> Bravais Lattice System:</h5><span class=\"value\">" << Lattice_Real_space_Lattice_System << "</span></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]// [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            //[MOVED UP JPO20180731]oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"superlattice\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Superlattice" << aflow_sym_readme << art135_link << "</h4></div>" << endl; //PC20180620 //JPO20180731 //CO20180817
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Primitive unit cell:</h5><span class=\"value\">" << Superattice_Real_space_Bravais_Superlattice_Primitive << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Variation:</h5><span class=\"value\">" << Superattice_Real_space_Superlattice_Variation << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Lattice System :</h5><span class=\"value\">" << Superattice_Real_space_Superlattice_System << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Pearson Symbol:</h5><span class=\"value\">" << Superattice_Real_space_Pearson_Symbol_Superlattice << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Primitive unit cell:</h5><span class=\"value\">" << aentry.Bravais_superlattice_lattice_type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Variation:</h5><span class=\"value\">" << aentry.Bravais_superlattice_lattice_variation_type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Lattice System :</h5><span class=\"value\">" << aentry.Bravais_superlattice_lattice_system << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Superlattice Pearson Symbol:</h5><span class=\"value\">" << aentry.Pearson_symbol_superlattice << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"reciprocal\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container-subtitle\"><h4 class=\"section-subtitle\"> Reciprocal Space Lattice </h4></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Reciprocal Lattices:</h5>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<div class=\"lattice_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<table class=\"reciprocal_lattice\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"value\">" << endl << "a=" << abcK.at(0) << "&Aring;<sup>-1</sup>" << endl << "b=" << abcK.at(1) << "&Aring;<sup>-1</sup>" << endl << "c=" << abcK.at(2) << "&Aring;<sup>-1</sup>" << endl << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"value\">" << "&alpha;=" << abcK.at(3) << "&deg;" << endl << "&beta;=" << abcK.at(4) << "&deg;" << endl << "&gamma;=" << abcK.at(5) << "&deg;" << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 vector<double> reciprocal_lattice_params(6);
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 vector<string> ktokens;
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 aurostd::string2tokens(aentry.reciprocal_geometry,ktokens,";");
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 for(uint t=0;t<ktokens.size();t++){ reciprocal_lattice_params[t] = aurostd::string2utype<double>(ktokens[t]); }
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << endl << "a=" << reciprocal_lattice_params.at(0) << "&Aring;<sup>-1</sup>" << endl << "b=" << reciprocal_lattice_params.at(1) << "&Aring;<sup>-1</sup>" << endl << "c=" << reciprocal_lattice_params.at(2) << "&Aring;<sup>-1</sup>" << endl << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"value\">" << "&alpha;=" << reciprocal_lattice_params.at(3) << "&deg;" << endl << "&beta;=" << reciprocal_lattice_params.at(4) << "&deg;" << endl << "&gamma;=" << reciprocal_lattice_params.at(5) << "&deg;" << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "</div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << volumeK << " &Aring;<sup>-3</sup></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Lattice Primitive:</h5><span class=\"value\">" << Reciprocal_lattice_primitive << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<div class=\"container__cell\"><div class =\"container__card\"><h5 class=\"value-name\"> Lattice Variation:</h5><span class=\"value\">" << Reciprocal_lattice_variation << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - START
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Volume:</h5><span class=\"value\">" << aentry.reciprocal_volume_cell << " &Aring;<sup>-3</sup></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Lattice Primitive:</h5><span class=\"value\">" << aentry.reciprocal_lattice_type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 oss << "<div class=\"container__cell\"><div class =\"container__card\"><h5 class=\"value-name\"> Lattice Variation:</h5><span class=\"value\">" << aentry.reciprocal_lattice_variation_type << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] DX20180824 - will replace lines above when the database is sufficiently populated - END
+//[SC20200327 - OBSOLETE]            // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "</div>" << endl;  //JPO20180731
+//[SC20200327 - OBSOLETE]            oss << "<!-- EDATA: END -->" << endl;
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // THERMODYNAMICS 
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::THERMODYNAMICS") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- Thermodynamics properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"Thermodynamics\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Thermodynamics Properties</h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //   oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //     oss << "<br>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<span class=\"Thermodynamics_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Formation Enthalpy_cell:</h5><span class=\"value\">" << (aentry.enthalpy_formation_cell!=0.0?aurostd::utype2string(aentry.enthalpy_formation_cell,5)+" (eV) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Formation Enthalpy_atom:</h5><span class=\"value\">" << (aentry.enthalpy_formation_atom!=0.0?aurostd::utype2string(aentry.enthalpy_formation_atom,5)+" (eV/atom) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"><i>Ab-initio</i> energy_cell:</h5><span class=\"value\">" << (aentry.energy_cell!=0.0?aurostd::utype2string(aentry.energy_cell,5)+" (eV) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"><i>Ab-initio</i> energy_atom:</h5><span class=\"value\">" << (aentry.energy_cell!=0.0?aurostd::utype2string(aentry.energy_atom,5)+" (eV/atom) ":"unavailable") << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Thermodynamics properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // AGL
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::AGL") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- AGL properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"AGL\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">AGL Properties (Aflow Gibbs Library)" << aflow_agl_readme << art115_link << "</h1></div>" << endl; //PC20180620 //JPO20180731  //CO20180817
+//[SC20200327 - OBSOLETE]        //   oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //     oss << "<br>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<span class=\"AGL_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.agl.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Output" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/aflow.agl.out\"" << html_TAB << ">aflow.agl.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Complete Output" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL.out\"" << html_TAB << ">AGL.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_energies_temperature.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Energy versus Temperature" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL_energies_temperature.out\"" << html_TAB << ">AGL_energies_temperature.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_thermal_properties_temperature.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Thermal Properties versus Temperature" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL_thermal_properties_temperature.out\"" << html_TAB << ">AGL_thermal_properties_temperature.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_Hugoniot.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AGL Hugoniot Relation" << art096_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AGL_Hugoniot.out\"" << html_TAB << ">AGL_Hugoniot.out</a>]" << "</span></div></div>" << endl; //XCT 20181212
+//[SC20200327 - OBSOLETE]        if(aentry.agl_thermal_conductivity_300K<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_thermal_conductivity_300K_td\">AGL Thermal Conductivity at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_thermal_conductivity_300K << " (W/m*K)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_debye<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_debye_td\">AGL Debye Temperature" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_debye << " (K)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_acoustic_debye<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_acoustic_debye_td\">AGL Debye Acoustic Temperature" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_acoustic_debye << " (K)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_gruneisen<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_gruneisen_td\">AGL Gruneisen parameter" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_gruneisen << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_heat_capacity_Cv_300K<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_heat_capacity_Cv_300K_td\">AGL Specific Heat Cv at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_heat_capacity_Cv_300K << " (kB/cell)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_heat_capacity_Cp_300K<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_heat_capacity_Cp_300K_td\">AGL Specific Heat Cp at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_heat_capacity_Cp_300K << " (kB/cell)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_thermal_expansion_300K<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_thermal_expansion_300K_td\">AGL Thermal Expansion at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_thermal_expansion_300K << " (1/K)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_bulk_modulus_static_300K<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_bulk_modulus_static_300K_td\">AGL Bulk Modulus Static at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_bulk_modulus_static_300K << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_bulk_modulus_isothermal_300K<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_bulk_modulus_isothermal_300K_td\">AGL Bulk Modulus Isothermal at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_bulk_modulus_isothermal_300K << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.agl_poisson_ratio_source.size()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_poisson_ratio_source_td\">AGL Poisson Ratio Source" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_poisson_ratio_source << " </span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.agl_vibrational_free_energy_300K_cell<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_free_energy_300K_cell_td\">AGL Vibrational Free Energy per cell at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_free_energy_300K_cell << " (meV/cell)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.agl_vibrational_free_energy_300K_atom<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_free_energy_300K_atom_td\">AGL Vibrational Free Energy per atom at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_free_energy_300K_atom << " (meV/atom)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.agl_vibrational_entropy_300K_cell<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_entropy_300K_cell_td\">AGL Vibrational Entropy per cell at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_entropy_300K_cell << " (meV/cell*K)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.agl_vibrational_entropy_300K_atom<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"agl_vibrational_entropy_300K_atom_td\">AGL Vibrational Entropy per atom at 300K" << art096_link << ":</h5><span class=\"value\">" << aentry.agl_vibrational_entropy_300K_atom << " (meV/atom*K)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- AGL properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // AEL
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::AEL") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- AEL properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"AEL\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">AEL Properties (Aflow Elastic Library)</font>" << aflow_ael_readme << art096_link << "</h1></div>" << endl; //PC20180620 //JPO20180731  //CO20180817
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<span class=\"AEL_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.ael.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AEL Output" << art100_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/aflow.ael.out\"" << html_TAB << ">aflow.ael.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Elastic_constants.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AEL Elastic Constants (stiffness tensor)" << art100_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AEL_Elastic_constants.out\"" << html_TAB << ">AEL_Elastic_constants.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Compliance_tensor.out")) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> AEL Compliance Constants (compliance tensor)" << art100_link << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/AEL_Compliance_tensor.out\"" << html_TAB << ">AEL_Compliance_tensor.out</a>]" << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_poisson_ratio<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_poisson_ratio_td\">AEL Poisson Ratio" << art100_link << ":</h5><span class=\"value\"> " << aentry.ael_poisson_ratio << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_bulk_modulus_voigt<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_bulk_modulus_voigt_td\">AEL Bulk Modulus Voigt" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_bulk_modulus_voigt << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_bulk_modulus_reuss<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_bulk_modulus_reuss_td\">AEL Bulk Modulus Reuss" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_bulk_modulus_reuss << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_bulk_modulus_vrh<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_bulk_modulus_vrh_td\">AEL Bulk Modulus VRH" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_bulk_modulus_vrh << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_shear_modulus_voigt<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_shear_modulus_voigt_td\">AEL Shear Modulus Voigt" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_shear_modulus_voigt << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_shear_modulus_reuss<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_shear_modulus_reuss_td\">AEL Shear Modulus Reuss" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_shear_modulus_reuss << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_shear_modulus_vrh<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_shear_modulus_vrh_td\">AEL Shear Modulus VRH" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_shear_modulus_vrh << " (GPa)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.ael_elastic_anisotropy<AUROSTD_NAN) //CO20181129
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_elastic_anisotropy_td\">AEL Elastic Anisotropy" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_elastic_anisotropy << "</span></div></div>" << endl; //JPO20180731 //CO20181129
+//[SC20200327 - OBSOLETE]        if(aentry.ael_youngs_modulus_vrh<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_youngs_modulus_vrh_td\">AEL Young's Modulus VRH" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_youngs_modulus_vrh << " (GPa)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_speed_sound_transverse<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_speed_sound_transverse_td\">AEL Speed of Sound in Transverse Direction" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_speed_sound_transverse << " (m/s)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_speed_sound_longitudinal<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_speed_sound_longitudinal_td\">AEL Speed of Sound in Longitudinal Direction" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_speed_sound_longitudinal << " (m/s)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_speed_sound_average<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_speed_sound_average_td\">AEL Speed of Sound, Average" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_speed_sound_average << " (m/s)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_pughs_modulus_ratio<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_pughs_modulus_ratio_td\">AEL Pugh's Modulus Ratio" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_pughs_modulus_ratio << " </span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_debye_temperature<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_debye_temperature_td\">AEL Debye Temperature" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_debye_temperature << " (K)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_applied_pressure<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_applied_pressure_td\">AEL Applied Pressure" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_applied_pressure << " (GPa)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        if(aentry.ael_average_external_pressure<AUROSTD_NAN) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"ael_average_external_pressure_td\">AEL Average External Pressure" << art100_link << ":</h5><span class=\"value\">" << aentry.ael_average_external_pressure << " (GPa)</span></div></div>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- AEL properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // BADER
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::BADER") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- Bader properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"Bader\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Bader Atoms in Molecules Properties</font>" << "</h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<span class=\"title\"><FONT SIZE=+3>Bader Atoms in Molecules Properties</font>" << "<a href=http://materials.duke.edu/AFLOW/README_AFLOW_BADER.TXT>[info]</a>" << "</span>" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<span class=\"Bader_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        string abader_out=aentry.prototype+"_abader.out";
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.vfiles_WEB,abader_out)) {oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\"> Bader Output" << ":</h5><span class=\"value\">" << "[<a href=\"" << url_WEB << "/" << abader_out << "\"" << html_TAB << ">" << abader_out << "</a>]" << "</span></div></div>" << endl;} //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<li><span class=\"description\"> Bader Output" << art100_link << ":</span>" << "[<a href=\"" << url_WEB << "/" << abader_out << "\"" << html_TAB << ">" << abader_out << "</a>]" << "</li><!br>" << endl;
+//[SC20200327 - OBSOLETE]        string bader_net_charges_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bader_net_charges target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]        string bader_atomic_volumes_wiki_link=" [<a href=http://aflowlib.duke.edu/aflowwiki/doku.php?id=documentation:all_keywords&#bader_atomic_volumes target=\"_blank\"><font color=black><i>info</i></font></a>]";
+//[SC20200327 - OBSOLETE]        if(!aentry.vbader_net_charges.empty()) {
+//[SC20200327 - OBSOLETE]          aurostd::string2tokens(aentry.species,tokens,",");  //tokens=species
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"bader_net_charges_td\">Net Charges" << bader_net_charges_wiki_link << ":</h5><span class=\"value\"> "; //JPO20180731
+//[SC20200327 - OBSOLETE]          atomCOUNT=0;
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<tokens.size();i++) {
+//[SC20200327 - OBSOLETE]            oss << tokens.at(i) << "={";
+//[SC20200327 - OBSOLETE]            for(uint j=0;j<(uint)aentry.vcomposition.at(i);j++) {
+//[SC20200327 - OBSOLETE]              num_prec.str("");
+//[SC20200327 - OBSOLETE]              num_prec << std::fixed << setprecision(4) << aentry.vbader_net_charges.at(atomCOUNT++);
+//[SC20200327 - OBSOLETE]              oss << num_prec.str();
+//[SC20200327 - OBSOLETE]              if(j<(uint)aentry.vcomposition.at(i)-1) {oss << ", ";}
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]            if(i<tokens.size()-1) {oss << "}; ";} else {oss << "}";}
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          oss << " (electrons)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        if(!aentry.bader_atomic_volumes.empty()) {
+//[SC20200327 - OBSOLETE]          aurostd::string2tokens(aentry.species,tokens,",");  //tokens=species
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"bader_atomic_volumes_td\">Atomic Volumes" << bader_atomic_volumes_wiki_link << ":</h5><span class=\"value\">"; //JPO20180731
+//[SC20200327 - OBSOLETE]          atomCOUNT=0;
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<tokens.size();i++) {
+//[SC20200327 - OBSOLETE]            oss << tokens.at(i) << "={";
+//[SC20200327 - OBSOLETE]            for(uint j=0;j<(uint)aentry.vcomposition.at(i);j++) {
+//[SC20200327 - OBSOLETE]              num_prec.str("");
+//[SC20200327 - OBSOLETE]              num_prec << std::fixed << setprecision(4) << aentry.vbader_atomic_volumes.at(atomCOUNT++);
+//[SC20200327 - OBSOLETE]              oss << num_prec.str();
+//[SC20200327 - OBSOLETE]              if(j<(uint)aentry.vcomposition.at(i)-1) {oss << ", ";}
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]            if(i<tokens.size()-1) {oss << "}; ";} else {oss << "}";}
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]          oss << " (Angst<sup>3</sup>)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Bader properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // MAGNETIC
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::MAGNETIC") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- Magnetic properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"Magnetic\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Magnetic Properties </h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<!span class=\"Magnetic_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<li><span class=\"description\" id=\"spin_cell_td\">Magnetic Moment:</span> " << aentry.spin_cell << " &mu;<sub>B</sub></li><!br>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<li><span class=\"description\" id=\"spin_atom_td\">Magnetic Moment/atom:</span> " << aentry.spin_atom << " &mu;<sub>B</sub>/atom</li><!br>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aurostd::substring2bool(aentry.loop,"magnetic")) {
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spinD_td\">Spin Decomposition per atoms:</h5><span class=\"value\"> {" << aentry.spinD << "} &mu;<sub>B</sub></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spinF_td\">Spin Polarization (E<sub>F</sub>):</h5><span class=\"value\">" << aentry.spinF << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spin_cell_td\">Magnetic Moment:</h5><span class=\"value\">" << aentry.spin_cell << " &mu;<sub>B</sub></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\" id=\"spin_atom_td\">Magnetic Moment/atom:</h5><span class=\"value\">" << aentry.spin_atom << " &mu;<sub>B</sub>/atom</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</ul>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Magnetic properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // SCINTILLATION
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::SCINTILLATION") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        double scintillation_attenuation_length=GetCompoundAttenuationLength(aentry.vspecies,aentry.vcomposition,aentry.density);
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Scintillation properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"scintillation\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //    oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\">Scintillation Properties</h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        //   oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<br>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<table class=\"scintillation_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.scintillation_attenuation_length>0.0) {
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\">" << endl << "<h5 class=\"value-name\">Attenuation Length" << art064_link << ":</h5><span class=\"value\">" << aentry.scintillation_attenuation_length << " cm" << endl << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        } else {
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\">" << endl << "<h5 class=\"value-name\">Attenuation Length" << art064_link << ":</h5><span class=\"value\">" << scintillation_attenuation_length << " cm" << endl << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Scintillation properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // ELECTRONIC BANDS
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << line_rule << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<!-- Electronic properties: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        //   oss << "<hr />" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"electronic\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Electronic Properties </h1></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<table class=\"electronic_table\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell--full\"><div class=\"container__card\"><h5 class=\"value-name\">Spin Decomposition per atoms:</h5><span class=\"value\"> {" << aentry.spinD << "} &mu;<sub>B</sub> </span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">Spin Polarization (E<sub>F</sub>):</h5><span class=\"value\"> " << aentry.spinF << " </span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"band_gap_td\"><h5 class=\"value-name\">Band Gap:</h5><span class=\"value\">" << aentry.Egap << " eV "
+//[SC20200327 - OBSOLETE]          << (aentry.Egap_type=="insulator_direct"?"(insulator)":"") << (aentry.Egap_type=="insulator_indirect"?"(insulator)":"") << (aentry.Egap_type=="metal"?"(metal)":"") << "</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"fit_band_gap_td\"><h5 class=\"value-name\">Fit Band Gap:</h5><span class=\"value\">" << aentry.Egap_fit << " eV</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tr>" << endl;  //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_m_atom_td\"><h5 class=\"value-name\">Magnetic Moment:</h5><span class=\"value\">" << aentry.spin_cell << " &mu;<sub>B</sub></span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_m_atom_td\"><h5 class=\"value-name\">Magnetic Moment/atom:</h5><span class=\"value\">" << aentry.spin_atom << " &mu;<sub>B</sub>/atom</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // (No values available - do not display yet) oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_e_mass_td\"><h5 class=\"value-name\">Electron Mass(FIX):</h5><span class=\"value\"> XXX (m<sub>0</sub>)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // (No values available - do not display yet) oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_hole_mass_td\"><h5 class=\"value-name\">Hole Mass(FIX):</h5><span class=\"value\"> XXX (m<sub>0</sub>)</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.Egap_type=="insulator_direct")
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_band_gap_type_td\"><h5 class=\"value-name\">Band Gap Type:</h5><span class=\"value\">  Direct</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        if(aentry.Egap_type=="insulator_indirect")
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\" id=\"FIX_band_gap_type_td\"><h5 class=\"value-name\">Band Gap Type:</h5><span class=\"value\">  Indirect</span></div></div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<td class=\"electronic_table_td\"><span class=\"table_description\">Spin Polarization (E<sub>F</sub>):</span> " << aentry.spinF << " </td>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<td class=\"electronic_table_td\"><span class=\"table_description\">Spin Decomposition per atoms:</span> {" << aentry.spinD << "} &mu;<sub>B</sub> </td>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tr>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</tbody>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "</table>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<ul>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<li>" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"container-subtitle\">" << endl;
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<h4 class=\"section-subtitle\">Band Structure</h4></div>" << endl;
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        // ****************************************************************************
+//[SC20200327 - OBSOLETE]        // INTERACTIVE BANDS PLOT
+//[SC20200327 - OBSOLETE]        //GG
+//[SC20200327 - OBSOLETE]        // [OBSOLETE] oss << "<div class=\"container__cell--full\" >" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"flex-container\">" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<span class=\"pic_description_band\">Band Structure:</span>" << endl; //JPO20180731
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"DosOptions\">" 				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<div> Zoom/Pan type:" << endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<select id=\"zoomOptions\"> "								<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<option value=\"both\">Both X & Y</option>"				<< endl;
+//[SC20200327 - OBSOLETE]        oss << "<option value=\"xOnly\">X Only</option>"				<< endl;
+//[SC20200327 - OBSOLETE]        oss << "<option value=\"yOnly\">Y Only</option>"				<< endl;
+//[SC20200327 - OBSOLETE]        oss << "</select></div>" << endl; //PC20180515
+//[SC20200327 - OBSOLETE]        //if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spinF),0.0,_ZERO_TOL_))) //PC20180515
+//[SC20200327 - OBSOLETE]        if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spin_atom),0.0,_ZERO_TOL_))) //PC20180515
+//[SC20200327 - OBSOLETE]        { //CO20200106 - patching for auto-indenting
+//[SC20200327 - OBSOLETE]          oss << "<div>Majority/Minority Spin Selection:**" << endl;  //PC20180525
+//[SC20200327 - OBSOLETE]          oss << "<select id =\"spinBandsOptions\">" << endl; //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<option value=\"bothS\">Both Spins</option>"				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<option value=\"majority\">Majority Spin</option>"				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<option value=\"minority\">Minority Spin</option>"				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "</select></div>"								<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"reset\">Reset Zoom</div>" << endl; //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "</div>"				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spin_atom),0.0,_ZERO_TOL_))){  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"star\">**For smoother tracing of bands </div>" << endl; //PC20180525
+//[SC20200327 - OBSOLETE]        } //PC20180525
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"plots\">" << endl; //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"Bands_plot\">" << endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<svg id=\"bands_wrapper\" width=\"900\" height=\"550\"></svg>"						<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        if ((aentry.spinF!=AUROSTD_NAN) && (!aurostd::isequal(abs(aentry.spin_atom),0.0,_ZERO_TOL_))){  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<div id=\"bandLegend\" class=\"legend\">"				<< endl;
+//[SC20200327 - OBSOLETE]          oss << "<text class=\"legendText \">Majority Spin"				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<line class=\"legendLine\" style=\"border-color:black;\"></line>"	        << endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "</text>" 								<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<text class=\"legendText \">Minority Spin" 				<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "<line class=\"legendLine min\"></line>" 					<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]          oss << "</text></div>"							<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        } //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "</div>"  << endl; //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<div class=\"Dos_plot\">" << endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<svg id=\"dos_wrapper\" width=\"300px\" height=\"550px\" ></svg>" << endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << " <div id=\"dosLegend\" class=\"legend\" >" << endl; //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "<text id=\"dosText\"></text>"						<< endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        oss << "</div>" 								<< endl;
+//[SC20200327 - OBSOLETE]        oss << "</div></div></div>" << endl;  //PC20180515
+//[SC20200327 - OBSOLETE]        //[OBSOLETE PC20180515]oss << "<div class=\"legendLine min\"></div>" 					<< endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE PC20180515]oss << "</div></div></svg>"							<< endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE PC20180515]oss << "<svg id=\"dos_wrapper\">"						<< endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE PC20180515]oss << "<div id=\"dosText\"></div>"						<< endl;
+//[SC20200327 - OBSOLETE]        //[OBSOLETE PC20180515]oss << "<div id=\"dosLegend\" class=\"legend \"></div></svg></div></div>"	<< endl;
+//[SC20200327 - OBSOLETE]        // ********************************************************************************** 
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]        if(aentry.vfiles_WEB.size()>0) 
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<aentry.vfiles_WEB.size();i++)
+//[SC20200327 - OBSOLETE]            if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png"))  //ME20190621 - include new file naming convention 
+//[SC20200327 - OBSOLETE]              oss << "<div class = \"picture_band\" id=\"band_dos_pic\"><a id=\"imgPopup\"><img class=\"pic\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\" style='display:block;background:white; margin: 0 auto;' /></a></div>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<div id=\"small_figure\" style=\'display:flex;justify-content:center;\'>" << endl;
+//[SC20200327 - OBSOLETE]        if(aentry.vfiles_WEB.size()>0) 
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<aentry.vfiles_WEB.size();i++)
+//[SC20200327 - OBSOLETE]            if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "_dos_")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  //ME20190621 - include new file name convention
+//[SC20200327 - OBSOLETE]              oss << "<img class=\"pic_small\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of pdos_" << label << "\" style='background:white; margin: 0 auto;height:0%;' >" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</li></ul>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- Electronic properties: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // ELECTRONIC POPUP
+//[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << "<!-- Electronic popup: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</div> <!close global>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<div id=\"popupImg\">  <! make popup>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<a id=\"popupImgClose\">" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<img id=\"closeButton\" src=\"img/closeButton.png\" alt=\"close\" ></a>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<a id=\"backwardArrow\">" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<img src=\"img/backwardArrow.png\" alt=\"backward arrow\" ></a>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<ul class=\"pic_popup_list\">" << endl;
+//[SC20200327 - OBSOLETE]        //ME20190621 BEGIN
+//[SC20200327 - OBSOLETE]        // Include new file naming convention
+//[SC20200327 - OBSOLETE]        if(aentry.vfiles_WEB.size()>0) {
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
+//[SC20200327 - OBSOLETE]            if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png")) {
+//[SC20200327 - OBSOLETE]              oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\"  ></li>" << endl;
+//[SC20200327 - OBSOLETE]              break;
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        if(aentry.vfiles_WEB.size()>0) {
+//[SC20200327 - OBSOLETE]          for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
+//[SC20200327 - OBSOLETE]            if((aentry.vfiles_WEB.at(i)==label+"_DOS.png") || (aentry.vfiles_WEB.at(i) == label + "_dos.png")) {
+//[SC20200327 - OBSOLETE]              oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"DOS of " << label << "\"  ></li>" << endl;
+//[SC20200327 - OBSOLETE]              break;
+//[SC20200327 - OBSOLETE]            }
+//[SC20200327 - OBSOLETE]          }
+//[SC20200327 - OBSOLETE]        }
+//[SC20200327 - OBSOLETE]        //ME20190621 END
+//[SC20200327 - OBSOLETE]        if(aentry.vfiles_WEB.size()>0) 
+//[SC20200327 - OBSOLETE]          for(uint iline=0;iline<aentry.vfiles_WEB.size();iline++)
+//[SC20200327 - OBSOLETE]            if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "_dos_"))  //ME20190621 - include new file name convention
+//[SC20200327 - OBSOLETE]              if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"png"))
+//[SC20200327 - OBSOLETE]                oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(iline) << "\" alt=\"Band Structure of pdos_" << label << "\"  ></li>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</ul>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<a id=\"forwardArrow\"><img src=\"img/forwardArrow.png\" alt=\"forward arrow\" ></a>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "</div>" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- Electronic popup: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      oss << "<!-- Downloadable Files: BEGIN -->" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<div class=\"container\">" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<div class=\"container-title\"><h1 class=\"section-title\"> Downloadable Files </h1></div>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<div class=\"container__cell--full\"><div class=\"container__card\">" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<ul class=\"file-list\">" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/\"" << html_TAB << " download=\"aflowlib.out\" >aflowlib.out</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/?format=json\"" << html_TAB << "download=\"aflowlib.json\">aflowlib.json</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.vasp\"" << html_TAB << "download=\"CONTCAR.relax.vasp\">Relaxed Position (aflowlib/VASP)</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.qe\"" << html_TAB << " download=\"CONTCAR.relax.ge\">Relaxed Position (aflowlib/QE)</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.abinit\"" << html_TAB << "download=\"CONTCAR.relax.abinit\">Relaxed Position (aflowlib/AIMS)</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/CONTCAR.relax.aims\"" << html_TAB << "download=\"CONTCAR.relax.aims\">Relaxed Position (aflowlib/AIMS)</a>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/INCAR.relax\"" << html_TAB << "download=\"INCAR.relax\">INCAR for relaxed calculation</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/INCAR.static\"" << html_TAB << "download=\"INCAR.static\">INCAR for static calculation</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/INCAR.bands\"" << html_TAB << "download=\"INCAR.bands\">INCAR for bands calculation</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/KPOINTS.relax\"" << html_TAB << "download=\"KPOINTS.relax\">KPOINTS for relaxed calculation</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/KPOINTS.static\"" << html_TAB << "download=\"KPOINTS.static\">KPOINTS for static calculation</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/KPOINTS.bands\"" << html_TAB << "download=\"KPOINTS.bands\">KPOINTS for bands calculation</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_ORIG_OUT << "\"" << html_TAB << "download=\"edata.orig.out\">Extended crystallographic data for original structure</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_RELAX_OUT << "\"" << html_TAB << "download=\"edata.relax.out\">Extended crystallographic data for relaxed structure</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << DEFAULT_FILE_EDATA_BANDS_OUT << "\"" << html_TAB << "download=\"edata.bands.out\">Extended crystallographic data for band-structure</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.agl.out"))  //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/aflow.agl.out\"" << html_TAB << "download=\"aflow.agl.out\">AGL Output</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL.out")) //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL.out\"" << html_TAB << "download=\"AGL.out\">AGL complete output</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_energies_temperature.out")) //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL_energies_temperature.out\"" << html_TAB << "download=\"AGL_energies_temperature.out\">AGL Energy versus Temperature</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"AGL_thermal_properties_temperature.out")) //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL_thermal_properties_temperature.out\"" << html_TAB << "download=\"AGL_thermal_properties_temperature.out\">AGL Thermal Properties versus Temperature</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"Hugoniot.out")) //CT20181212
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AGL_Hugoniot.out\"" << html_TAB << "download=\"AGL_Hugoniot.out\">AGL Hugoniot Relation</a></li>" << endl; //CT20181212
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"aflow.ael.out")) //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/aflow.ael.out\"" << html_TAB << "download=\"aflow.ael.out\">AEL Output</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Elastic_constants.out")) //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AEL_Elastic_constants.out\"" << html_TAB << "download=\"AEL_Elastic_constants.out\">AEL Elastic constants</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,"AEL_Compliance_tensor.out")) //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/AEL_Compliance_tensor.out\"" << html_TAB << "download=\"AEL_Compliance_tensor.out\">AEL Compliance constants</a></li>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      string abader_out=aentry.prototype+"_abader.out"; //JPO20180809
+//[SC20200327 - OBSOLETE]      if(aurostd::substring2bool(aentry.vfiles_WEB,abader_out)) { //JPO20180809
+//[SC20200327 - OBSOLETE]        oss << "<li class=\"file-name\"><a href=\"" << url_WEB << "/" << abader_out << "\"" << html_TAB << "download=\"abader.out\">Bader Output</a></li>" << endl; } //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "</ul></div></div>" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]      oss << "<!-- Downloadable Files: END -->" << endl; //JPO20180809
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      // ***************************************************************************
+//[SC20200327 - OBSOLETE]      // OTHER
+//[SC20200327 - OBSOLETE]      if(0) if((XHOST.hostname=="nietzsche.mems.duke.edu" || XHOST.hostname=="materials.duke.edu" )&& !directory.empty()) {
+//[SC20200327 - OBSOLETE]        oss << line_rule << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- DEBUG: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<b>DEBUG: only in " << XHOST.hostname << "</b><br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << aentry.entry << "<br><br>" << endl;
+//[SC20200327 - OBSOLETE]        oss << line_rule << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- DEBUG: END -->" << endl;
+//[SC20200327 - OBSOLETE]      }
+//[SC20200327 - OBSOLETE]      // DONE
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]      oss << "<! HARVEY WORK AFTER HERE> " << endl;
+//[SC20200327 - OBSOLETE]    }
+//[SC20200327 - OBSOLETE]    return voptions.size();
+//[SC20200327 - OBSOLETE]  }
+//[SC20200327 - OBSOLETE]}
+//[SC20200327 - OBSOLETE]
+//[SC20200327 - OBSOLETE]//#include "aflowlib_web_interface_test2.cpp"
+//[SC20200327 - OBSOLETE]//#include "aflowlib_web_interface_test3.cpp"
 
 // ***************************************************************************
 namespace aflowlib {

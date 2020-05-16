@@ -54,6 +54,19 @@
 #include <list> //CO20170806 - need for POCC
 #include <netdb.h>  //CO20180321 - frisco needs for AFLUX
 
+#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
+
+//CO20200502 START - including gettid()
+#ifdef __GLIBC__
+#define GLIBC_VERSION (__GLIBC__ * 100 + __GLIBC_MINOR__)
+#if (GLIBC_VERSION < 230) //CO20200502 - apparently they patched at 230 - https://stackoverflow.com/questions/30680550/c-gettid-was-not-declared-in-this-scope
+//[CO20200502 - too many warnings]#warning "defining getid() with syscall(SYS_gettid)"
+#include <sys/syscall.h>  //CO20200502 - need for gettid()
+#define gettid() syscall(SYS_gettid)
+#endif  //GLIBC_VERSION
+#endif  //__GLIBC__
+//CO20200502 END - including gettid()
+
 #ifdef _USE_AFLOW_H_
 //#include "aflow.h"
 #endif
@@ -245,6 +258,11 @@ namespace aurostd {
   string get_datetime(void);
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
   bool beep(uint=2000,uint=100); // standard values
+}
+// ----------------------------------------------------------------------------
+// threadID stuff
+namespace aurostd {
+  unsigned long long int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
 namespace aurostd {

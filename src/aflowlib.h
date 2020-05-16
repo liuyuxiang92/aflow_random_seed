@@ -374,7 +374,9 @@ namespace aflowlib {
   bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,string MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   bool LIB2RAW(string options,bool overwrite,bool LOCAL=false);
-  bool XPLUG(vector<string> argv);
+  bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
+  bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
+  bool XPLUG(const vector<string>& argv);  //CO20200501
   bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
   bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
   // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);

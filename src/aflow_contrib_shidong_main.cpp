@@ -876,7 +876,7 @@ namespace pflow {
     string jmol_command = XHOST.command("jmol")+" " + cif_tmp + " -s " + jmol_script_tmp + " -x -i -L ";
 
     string gif_command = XHOST.command("convert")+" -delay 20 -loop 0 " + cif_tmp + "_movie00* ";
-    string gif_file = "animation_" + XHOST.ostrPID.str() + ".gif";
+    string gif_file = "animation_" + XHOST.ostrPID.str() + "_" + XHOST.ostrTID.str() + ".gif";  //CO20200502 - threadID
 
     if(argv.size()==3) { // give output file name
       gif_file = argv.at(2);
@@ -886,7 +886,7 @@ namespace pflow {
     ofstream foutAnime;
     foutAnime.open(gif_file.c_str());
     if(!foutAnime.is_open()) { // given file is not writable
-      gif_file = "/tmp/animation_" + XHOST.ostrPID.str() + ".gif";
+      gif_file = "/tmp/animation_" + XHOST.ostrPID.str() + "_" + XHOST.ostrTID.str() + ".gif";  //CO20200502 - threadID
       cerr << "Cannot write to " << argv.at(2) << ". ";
     }
     foutAnime.close();

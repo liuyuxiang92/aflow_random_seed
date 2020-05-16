@@ -15,7 +15,7 @@
 // #define  _AFLOW_TEMP_PRESERVE_  // to preseve /tmp files for debug
 
 #define NNN   -123456
-#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+//[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 
 //COMMON TOLERANCES
@@ -76,6 +76,9 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 ",_NC2"   //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
 ",_200eV"
 "";
+
+//MESSAGE defaults - CO20200502
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,tid,time"
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -297,7 +300,9 @@ class _XHOST {
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
     int PID;               // aflow_init.cpp  PID number
+    int TID;               // aflow_init.cpp  TID number
     ostringstream ostrPID; // aflow_init.cpp  PID in ostringstream...
+    ostringstream ostrTID; // aflow_init.cpp  TID in ostringstream...
     string sPID;           // aflow_init.cpp  [PID=12345678]
     bool showPID;          // aflow_init.cpp  check if --showPID
      // machinery
@@ -383,7 +388,7 @@ class _XHOST {
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
     // WEB MODE
-    bool WEB_MODE;  //CO20190401
+    //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //
     void free();                                           // free space
     void copy(const _XHOST& b);                            //
@@ -2616,9 +2621,10 @@ namespace anrl {
 // uint argsprint(vector<string> argv);
 // ----------------------------------------------------------------------------
 // aflow.cpp
-string aflow_get_time_string(void);
-string aflow_get_time_string_short(void);
-string strPID(void);
+//[CO20200502 - DUPLICATE?]string aflow_get_time_string(void);
+//[CO20200502 - DUPLICATE?]string aflow_get_time_string_short(void);
+//[CO20200502 - DUPLICATE?]string strPID(void);
+//[CO20200502 - DUPLICATE?]string strTID(void);  //CO20200502 - threadID
 int AFLOW_main(vector<string> &argv);
 namespace aflow {
   string License_Preamble_aflow(void);
@@ -4346,9 +4352,11 @@ namespace KBIN {
   // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
+  uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AGL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   // ----------------------------------------------------------------------------
   // aflow_ael_elasticity.cpp
+  uint relaxStructureAEL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AEL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
 }
 

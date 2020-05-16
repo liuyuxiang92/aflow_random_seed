@@ -66,6 +66,9 @@ class _AEL_data {
   bool relax_only;
   bool aflowin_overwrite;
 
+  // Variable to control if this is a postprocessing run (suppresses creation of new ARUN directories)
+  bool postprocess;
+
   // Variable to let other parts of AFLOW know where or not the material is mechanically stable
   bool mechanically_stable;
 
@@ -184,7 +187,9 @@ class _AEL_data {
 namespace AEL_functions {
   // Functions to actually run AEL, either directly or from another part of AFLOW
   uint RunElastic_AEL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
-  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, ofstream& FileMESSAGE);
+  uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint Get_ElasticProperties_AEL_postprocess(string directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor);
+  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool& postprocess, ofstream& FileMESSAGE);
   uint Get_BulkModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE);
   uint Get_ShearModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE);
   // Functions for generating aflow.in input files for strained structures and extracting stress tensor data calculated with VASP

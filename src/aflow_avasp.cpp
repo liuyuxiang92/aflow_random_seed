@@ -1607,7 +1607,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
           string FilePotcar,DataPotcar,AUIDPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO20190116
             if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
-              cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
+              cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
               return FALSE; // dont die
               //exit(0);
             } else {
@@ -2917,7 +2917,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
 
     bool write_all = false;  //ME20181023
     // HTQC do AUTO
-    if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD || xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) {
+    if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD || xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3 || xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {  //CO20200501 - now also works for --poscar2aflowin
       write_all = true;
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC; 
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
@@ -2931,31 +2931,31 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       //  aflowin << "[VASP_KPOINTS_FILE]BANDS_LATTICE=" << xvasp.AVASP_path_BANDS << endl;
       //  aflowin << "[VASP_KPOINTS_FILE]BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;
     }
-    // PROTOTYPE check the stuff out
-    if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
-      write_all = true;
-      if (LDEBUG) cerr << "DEBUG - AVASP calculating parameters for bands" << endl;  //ME20190107 - added LDEBUG
-      if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC;                           
-      if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
-      // kpoints for the brillouin zone
-      xvasp.str.GetLatticeType(); // takes care of everything
-      xvasp.AVASP_path_BANDS=xvasp.str.bravais_lattice_variation_type;  // ICSD BASTARDS
-      if(LDEBUG) cerr << "DEBUG - AVASP xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;  //ME20190107 - added LDEBUG
-      if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;                               
-      if(xvasp.AVASP_path_BANDS=="HEX" || xvasp.AVASP_path_BANDS=="FCC") {
-        xvasp.AVASP_KSCHEME="G";           // HEXAGONAL/FCC SYSTEMS GET GAMMA KPOINTS GRID
-        xvasp.AVASP_STATIC_KSCHEME="G";    // HEXAGONAL/FCC SYSTEMS GET GAMMA KPOINTS GRID
-      }
-      //  OBSOLETE ME20181023
-      //  if(xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
-      //    aflowin << "[VASP_KPOINTS_FILE]STATIC_KSCHEME=" << xvasp.AVASP_STATIC_KSCHEME << " " << endl;
-      //    aflowin << "[VASP_KPOINTS_FILE]STATIC_KPPRA=" << xvasp.AVASP_value_KPPRA_STATIC << endl;
-      //    if(xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
-      //	aflowin << "[VASP_KPOINTS_FILE]BANDS_LATTICE=" << xvasp.AVASP_path_BANDS << endl;
-      //	aflowin << "[VASP_KPOINTS_FILE]BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;
-      //    }
-      //  }
-    }
+    //[CO20200501 - OBSOLETE with AUTO as above]// PROTOTYPE check the stuff out
+    //[CO20200501 - OBSOLETE with AUTO as above]if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
+    //[CO20200501 - OBSOLETE with AUTO as above]  write_all = true;
+    //[CO20200501 - OBSOLETE with AUTO as above]  if (LDEBUG) cerr << "DEBUG - AVASP calculating parameters for bands" << endl;  //ME20190107 - added LDEBUG
+    //[CO20200501 - OBSOLETE with AUTO as above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC;                           
+    //[CO20200501 - OBSOLETE with AUTO as above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
+    //[CO20200501 - OBSOLETE with AUTO as above]  // kpoints for the brillouin zone
+    //[CO20200501 - OBSOLETE with AUTO as above]  xvasp.str.GetLatticeType(); // takes care of everything
+    //[CO20200501 - OBSOLETE with AUTO as above]  xvasp.AVASP_path_BANDS=xvasp.str.bravais_lattice_variation_type;  // ICSD BASTARDS
+    //[CO20200501 - OBSOLETE with AUTO as above]  if(LDEBUG) cerr << "DEBUG - AVASP xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;  //ME20190107 - added LDEBUG
+    //[CO20200501 - OBSOLETE with AUTO as above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;                               
+    //[CO20200501 - OBSOLETE with AUTO as above]  if(xvasp.AVASP_path_BANDS=="HEX" || xvasp.AVASP_path_BANDS=="FCC") {
+    //[CO20200501 - OBSOLETE with AUTO as above]    xvasp.AVASP_KSCHEME="G";           // HEXAGONAL/FCC SYSTEMS GET GAMMA KPOINTS GRID
+    //[CO20200501 - OBSOLETE with AUTO as above]    xvasp.AVASP_STATIC_KSCHEME="G";    // HEXAGONAL/FCC SYSTEMS GET GAMMA KPOINTS GRID
+    //[CO20200501 - OBSOLETE with AUTO as above]  }
+    //[CO20200501 - OBSOLETE with AUTO as above]  //  OBSOLETE ME20181023
+    //[CO20200501 - OBSOLETE with AUTO as above]  //  if(xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
+    //[CO20200501 - OBSOLETE with AUTO as above]  //    aflowin << "[VASP_KPOINTS_FILE]STATIC_KSCHEME=" << xvasp.AVASP_STATIC_KSCHEME << " " << endl;
+    //[CO20200501 - OBSOLETE with AUTO as above]  //    aflowin << "[VASP_KPOINTS_FILE]STATIC_KPPRA=" << xvasp.AVASP_value_KPPRA_STATIC << endl;
+    //[CO20200501 - OBSOLETE with AUTO as above]  //    if(xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
+    //[CO20200501 - OBSOLETE with AUTO as above]  //	aflowin << "[VASP_KPOINTS_FILE]BANDS_LATTICE=" << xvasp.AVASP_path_BANDS << endl;
+    //[CO20200501 - OBSOLETE with AUTO as above]  //	aflowin << "[VASP_KPOINTS_FILE]BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;
+    //[CO20200501 - OBSOLETE with AUTO as above]  //    }
+    //[CO20200501 - OBSOLETE with AUTO as above]  //  }
+    //[CO20200501 - OBSOLETE with AUTO as above]}
 
     //CO20181226 set pocc to G (low symemtry) unless there is a modifier
     if(pocc){
@@ -3643,7 +3643,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
           string FilePotcar,DataPotcar,AUIDPotcar;
           if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
-            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
+            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             return FALSE; // dont die
             //exit(0);
           } else {

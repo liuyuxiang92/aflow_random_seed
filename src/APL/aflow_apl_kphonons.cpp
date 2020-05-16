@@ -199,7 +199,7 @@ namespace KBIN {
     if (Krun) {
       int i;
       for (i = start_relax; Krun && i <= _NUM_RELAX_; i++) {
-        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
         aurostd::PrintMessageStream(fileMessage, aus, XHOST.QUIET);
         if (i < _NUM_RELAX_) {
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
@@ -211,7 +211,7 @@ namespace KBIN {
         }
       }
       if (Krun && (i == _NUM_RELAX_)) {
-        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
       }
     }
     if (!Krun) return false;

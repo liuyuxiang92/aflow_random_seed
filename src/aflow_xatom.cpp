@@ -13939,8 +13939,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //////////////////////////////////////////////////////////////////////////
     }
     if(!KRUN){
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       b.ClearSymmetry(); //CO20181226
       pflow::PerformFullSymmetry(b,FileMESSAGE,aflags,kflags,osswrite,oss);
       //FOOLPROOF!!!!!!!!!
@@ -14719,8 +14719,8 @@ void xstructure::FakeNames(void) {
 string xstructure::platon2sg(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3) {
   xstructure str=*this;
   stringstream aus;
-  // string directory="/tmp/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
-  string directory=XHOST.tmpfs+"/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
+  // string directory="/tmp/_aflow_platon_"+XHOST.ostrPID.str()+"_"+XHOST.ostrTID.str();  // dont change what works //CO20200502 - threadID
+  string directory=XHOST.tmpfs+"/_aflow_platon_"+XHOST.ostrPID.str()+"_"+XHOST.ostrTID.str();  // dont change what works  //CO20200502 - threadID
   string file=directory+"/aflow_platon_";
   string file_spf=file+".spf";
   string file_out=file+".out";

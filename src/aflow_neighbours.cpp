@@ -16,11 +16,11 @@
 //  int myints[] = {16,2,77,29};
 //  vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int));
 
-template<class utype>
-vector<utype> svector2vector(utype svec[]) {
-  vector<utype> vec(svec, svec + sizeof(svec) / sizeof(utype));
-  return vec;
-}
+//[CO20200502 - OBSOLETE]template<class utype>
+//[CO20200502 - OBSOLETE]vector<utype> svector2vector(utype svec[]) {
+//[CO20200502 - OBSOLETE]  vector<utype> vec(svec, svec + sizeof(svec) / sizeof(utype));
+//[CO20200502 - OBSOLETE]  return vec;
+//[CO20200502 - OBSOLETE]}
 
 // --------------------------------------------------------------------------
 // ----------------------------------------------------- NEIGHBOURS OPERATION
@@ -44,22 +44,22 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   // CALC = TRUE then prepare and act
   if(kflags.KBIN_NEIGHBOURS_RADIUS>0.0) {
     if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS found RADIUS="
-		     << kflags.KBIN_NEIGHBOURS_RADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		     << kflags.KBIN_NEIGHBOURS_RADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   } else {
     kflags.KBIN_NEIGHBOURS_RADIUS=KBIN_NEIGHBOURS_RADIUS_DEFAULT;
     if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS default RADIUS="
-		     << kflags.KBIN_NEIGHBOURS_RADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		     << kflags.KBIN_NEIGHBOURS_RADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   }
   if(kflags.KBIN_NEIGHBOURS_DRADIUS>0.0) {
     if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS found DRADIUS="
-		     << kflags.KBIN_NEIGHBOURS_DRADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		     << kflags.KBIN_NEIGHBOURS_DRADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else {
     kflags.KBIN_NEIGHBOURS_DRADIUS=KBIN_NEIGHBOURS_DRADIUS_DEFAULT;
     if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS default DRADIUS="
-		     << kflags.KBIN_NEIGHBOURS_DRADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		     << kflags.KBIN_NEIGHBOURS_DRADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   }
   
@@ -78,7 +78,7 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   str.ndims=LatticeDimensionSphere(lattice,str.neighbours_radius);
   if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS inside sphere, dimensions = ["
 		   << str.ndims[1] << "," << str.ndims[2] << "," << str.ndims[3] << "] "
-		   << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		   << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   
   _atom atom;
@@ -93,7 +93,7 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
     str.nshell.at(iat)=vector<int>(str.nbins,0);
   }
   // --------------------------- preparing list
-  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS preparing list " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS preparing list " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   for(iat1=0;iat1<numatoms;iat1++) {
     for(int i=-str.ndims[1];i<=str.ndims[1];i++)
@@ -119,13 +119,13 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
 	  }
   }
   //  --------------------------- sort the natoms by distance
-  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS sorting by distances " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS sorting by distances " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   for(iat1=0;iat1<numatoms;iat1++)                                                      // sort the natoms by distance
     sort(str.natoms.at(iat1).begin(),str.natoms.at(iat1).end(),_atom_reference_cmp());  // sort the natoms by distance
   
   //  --------------------------- normalize shell
-  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS normalize shell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS normalize shell " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS number: ";
   for(iat1=0;iat1<numatoms;iat1++) {                                                    // normalize shell
@@ -134,11 +134,11 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
       if(str.nshell.at(iat1).at(ibin)>0)                                                // normalize shell
 	str.rshell.at(iat1).at(ibin)/=str.nshell.at(iat1).at(ibin);                     // normalize shell
   }
-  if(LVERBOSE) aus << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  if(LVERBOSE) aus << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   
   //  --------------------------- create unique list
-  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS create unique list of atoms " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS create unique list of atoms " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
   if(LVERBOSE) cout << "00000  MESSAGE NEIGHBOURS working size(before)=";
   

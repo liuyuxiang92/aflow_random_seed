@@ -22,7 +22,9 @@
 
 _XHOST::_XHOST() {  // constructor PUBLIC
   PID=0;
+  TID=0;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   sPID="";
   showPID=FALSE;
   QUIET=FALSE;
@@ -120,7 +122,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   SKEW_TEST=FALSE; //DX20171019
   SKEW_TOL=AUROSTD_NAN; //DX20171019
   // WEB
-  WEB_MODE=FALSE; //CO20190402
+  //[CO20200404 - overload with --www]WEB_MODE=FALSE; //CO20190402
 };
 
 _XHOST::~_XHOST() { // destructor PUBLIC
@@ -129,7 +131,9 @@ _XHOST::~_XHOST() { // destructor PUBLIC
 
 void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   PID=b.PID;
+  TID=b.TID;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));ostrPID << b.ostrPID.str();
+  ostrTID.clear();ostrTID.str(string(""));ostrTID << b.ostrTID.str(); //CO20200502 - threadID
   sPID=b.sPID;
   showPID=b.showPID;
   QUIET=b.QUIET;
@@ -214,7 +218,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   SKEW_TEST=b.SKEW_TEST; //DX20171019
   SKEW_TOL=b.SKEW_TOL; //DX20171019
   // WEB
-  WEB_MODE=b.WEB_MODE;  //CO20190402
+  //[CO20200404 - overload with --www]WEB_MODE=b.WEB_MODE;  //CO20190402
 }
 
 const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
@@ -232,6 +236,7 @@ const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
 
 void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   vTemperatureCore.clear();
   //  thread.clear();
   //  iret.clear();

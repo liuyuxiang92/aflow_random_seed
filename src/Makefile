@@ -169,7 +169,7 @@ DATA_OBJ                = $(DATA_FUNCS_SRC:.cpp=.o)
 GFA_FUNCS_SRC = aflow_gfa.cpp
 
 #CO20180409
-POCC_FUNCS_SRC = aflow_pocc.cpp aflow_pocc.h
+POCC_FUNCS_SRC = aflow_pocc.cpp aflow_pocc_ael_agl.cpp aflow_pocc.h
 
 #AUROSTD_OBJ    = $(AUROSTD_CPP:.cpp=.o)
 AUROSTD_OBJ = aurostd.o

@@ -1035,14 +1035,21 @@ namespace aflowrc {
 namespace aflowrc {
   bool read(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    if(LDEBUG) oss << "aflowrc::read: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::read: XHOST.home=" << XHOST.home << endl;
+    string soliloquy="aflowrc::read():";  //CO20200404
+    stringstream message; //CO20200404
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << "aflowrc::read: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
-    if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)) 
-      if(!aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN"))
-        cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
+    if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)){
+      if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
+        if(!(aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN") || aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/uMAIN"))){ //CO20200404 - patching for new disk
+          //[CO20200404 - OBSOLETE]cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
+          message << XHOST.aflowrc_filename << " not found, loading DEFAULT values";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
+        }
+      }
+    }
 
     aurostd::file2string(XHOST.aflowrc_filename,XHOST.aflowrc_content);
     // oss << "BEGIN" << endl << XHOST.aflowrc_content << "END" << endl;
@@ -1551,7 +1558,8 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_MACHINE2",AFLOWRC_MPI_OPTIONS_MACHINE2); 
     aflowrc::load_default("MPI_COMMAND_MACHINE2",AFLOWRC_MPI_COMMAND_MACHINE2); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE2",AFLOWRC_MPI_BINARY_DIR_MACHINE2); 
-    if(LDEBUG) oss << "aflowrc::read: END" << endl;
+
+    if(LDEBUG) oss << soliloquy << " END" << endl;
 
     return TRUE;
   }
@@ -1564,10 +1572,12 @@ namespace aflowrc {
 namespace aflowrc {
   bool write_default(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    if(LDEBUG) oss << "aflowrc::write_default: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.home=" << XHOST.home << endl;
+    string soliloquy="aflowrc::write_default():"; //CO20200404
+    stringstream message;
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     stringstream aflowrc("");
     aflowrc << "// ****************************************************************************************************" << endl;
@@ -2095,9 +2105,12 @@ namespace aflowrc {
     //   XHOST.DEBUG=TRUE;
     //[CO20190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
-      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
+      if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
+        //[CO20200404 - OBSOLETE]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
+        message << "WRITING default " << XHOST.aflowrc_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
+      }
     }
-    if(LDEBUG) oss << "aflowrc::write_default: END" << endl;
+    if(LDEBUG) oss << soliloquy << " END" << endl;
     //    exit(0);
     return TRUE;
   }

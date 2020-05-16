@@ -176,7 +176,7 @@ void Logger::endl() {
       cout << " " << _moduleName;
     if (!_ss.str().empty())
       cout << " " << _ss.str();
-    cout << " " << Message(_aflowFlags, "user,host,time") << std::endl;
+    cout << " " << Message(_aflowFlags, _AFLOW_MESSAGE_DEFAULTS_) << std::endl;
     // Default
     cursor_attr_none();
   }
@@ -190,7 +190,7 @@ void Logger::endl() {
     *_os << " " << _moduleName;
   if (!_ss.str().empty())
     *_os << " " << _ss.str();
-  *_os << " " << Message(_aflowFlags, "user,host,time") << std::endl;
+  *_os << " " << Message(_aflowFlags, _AFLOW_MESSAGE_DEFAULTS_) << std::endl;
   _os->flush();
 
   // Reuse our _ss
