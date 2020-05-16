@@ -935,6 +935,27 @@ namespace aurostd { //CO20191201
   unsigned long long int powint(unsigned long long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO20191201
 }
 
+//AS20200513 BEGIN
+namespace aurostd{
+  double FermiDirac(double E, double mu, double T){
+    if (T<0) return 0;
+
+    if (T>_ZERO_TOL_){
+      return 1/(1+std::exp((E-mu)/(KBOLTZEV*T)));
+    }
+    else
+      // At T=0 FD transforms to Heaviside step function
+      if (E<mu){
+        return 1;
+      }
+      else if (E>mu){
+        return 0;
+      }
+      else return 0.5;
+  }
+}
+//AS20200513 END
+
 #endif // _AUROSTD_XSCALAR_CPP_
 
 

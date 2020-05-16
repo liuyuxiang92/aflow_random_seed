@@ -1482,6 +1482,7 @@ namespace apl {
       const std::vector<double>& getBins() const;  //ME20200108 - added const
       const std::vector<double>& getDOS() const;   //ME20200108 - added const
       const std::vector<double>& getIDOS() const;  //ME20200210
+      const std::vector<xvector<double> >& getFreqs() const;  //AS20200312
       bool hasNegativeFrequencies() const;  //ME20200108 - added const
       string _system;
     private:
@@ -1822,6 +1823,176 @@ namespace apl {
   void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
 }
 // ***************************************************************************
+//AS20200513 BEGIN
+#define QHA_ARUN_MODE "QHA" // used in filename
+
+namespace apl
+{
+  /// Fit to a nonlinear model using Levenberg-Marquardt algorithm.
+  ///
+  /// The implementation here is based on the ideas from Numerical Recipes and
+  /// K. Madsen et al. Methods For Non-linear Least Squares Problems
+  /// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
+  ///
+  /// Caution: the default value for the parameter tau (a scaling factor for the initial step size)
+  /// was picked to yield a correct fit to the Murnaghan equation of state. 
+  /// If you observe that this is not a good choice for your function,
+  /// try 1e-6 if the initial guess is believed to be a good approximation to the true
+  /// parameters. Otherwise 1e-3 or even 1 might be a better choice.
+  class NonlinearFit{
+    public:
+      NonlinearFit();
+      NonlinearFit(const NonlinearFit &nlf);
+      NonlinearFit(xvector<double> &x, xvector<double> &y, xvector<double> &guess,
+          double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
+          double tol=1e-6, double tau=1e-12, int max_iter=1000);
+      ~NonlinearFit();
+      const NonlinearFit& operator=(const NonlinearFit &qha);
+      int Npoints, Nparams;
+      double tol; /// convergence tolerance criterion
+      double tau; /// scaling parameter for initial step size
+      int max_iter; /// maximum number of allowed iterations
+      xvector<double> x,y;   // data points
+      xvector<double> residuals; // residuals of a given model function
+      xvector<double> guess; // initial guess for fit parameters
+      xvector<double> p;     // parameters obtained by fit
+      xvector<double> dydp;  // derivative of a given function w.r.t parameters
+      xmatrix<double> A;     // J^T.J matrix
+      xmatrix<double> J;     // Jacobian of a model function w.r.t parameters
+      double (*f)(const double x, const xvector<double> &p, xvector<double> &dydp);
+      bool fitLevenbergMarquardt();
+      void Jacobian(const xvector<double> &guess);
+      void calculateResiduals(const xvector<double> &params);
+      double calculateResidualSquareSum(const xvector<double> &params);
+      void clear();
+    private:
+      void free();
+      void copy(const NonlinearFit &nlf);
+  };
+}
+
+namespace apl
+{
+  enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
+  enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC};
+
+  /// Calculates QHA-related properties
+  ///
+  /// This class will substitute old QHA class.
+  /// The old QHA class will be kept until the new one is finished.
+  ///
+  class QHAN : public xStream {
+    public:
+      QHAN(ostream& oss=std::cout);
+      QHAN(const QHAN& qha);
+      QHAN(string &tpt,_xinput &xinput, _kflags &kflags, xoption &supercellopts,
+          ofstream &messageFile, ostream &oss=std::cout);
+      void initialize(string &tpt,_xinput &xinput, _kflags &kflags,
+          xoption &supercellopts, ofstream &messageFile, ostream &oss);
+      ~QHAN();
+      const QHAN& operator=(const QHAN &qha);
+      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
+      void clear();
+      double calcGrueneisen(double V, xvector<double> &xomega, double &w);
+      double calcGrueneisenFD(const xvector<double> &xomega);
+      void   calcCVandGP(double T, double &CV, double &GP);
+      void   calcCVandGPfit(double T, double V, double &CV, double &GP);
+      double FreeEnergy(double T, int id);
+      double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double electronicFreeEnergy(double T, int id);
+      xvector<double> electronicFreeEnergySommerfeld(double T);
+      xvector<double> DOSatEf();
+      double InternalEnergyFit(double T, double V);
+      xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
+      double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
+      double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
+      double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
+          QHAmethod qha_method);
+      // QHA3P and SCQHA
+      double extrapolateFrequency(double V, const xvector<double> &xomega);
+      double extrapolateGamma(double V, const xvector<double> &xomega);
+      // QHA3P
+      double FreeEnergyTaylorExpansion(double T, int Vid);
+      double InternalEnergyTaylorExpansion(double T, double V);
+      // SCQHA
+      double VPgamma(double T, double V);
+      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
+      // output
+      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
+      void   writeFVT();
+      void   writeGPpath(double V, const string &directory=".");
+      void   writeAverageGPfiniteDifferences();
+      void   writeGPmeshFD();
+      void   writeFrequencies();
+      // members
+      xoption apl_options;
+      string system_title;
+      double EOS_volume_at_equilibrium;
+      double EOS_energy_at_equilibrium;
+      double EOS_bulk_modulus_at_equilibrium;
+      double EOS_Bprime_at_equilibrium;
+    private:
+      xoption supercellopts;
+      bool isEOS;
+      bool isGP_FD;
+      bool ignore_imaginary;
+      bool runQHA, runQHA3P, runSCQHA;
+      bool isInitialized;
+      bool includeElectronicContribution;
+      int Ntemperatures;
+      int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
+      int N_EOSvolumes;  ///< number of volumes/calculations for EOS calc
+      int Nbranches;       ///< number of phonon dispersion branches
+      int NatomsOrigCell;  ///< number of atoms in original cell
+      //int NatomsSupercell; ///< number of atoms in supercell
+      xstructure origStructure;
+      vector<double> Temperatures;
+      vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
+      vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
+      vector<double> coefGPVolumes; ///< multiplication coefficient w.r.t initial volume
+      vector<double> coefEOSVolumes;
+      xvector<double> DOS_Ef;
+      // data necessary to calculate thermodynamic properties
+      vector<double> Efermi_V; ///< Fermi energy vs V
+      vector<double> E0_V;     ///< total energy vs V
+      vector<xEIGENVAL> static_eigvals;
+      vector<xIBZKPT>   static_ibzkpts;
+      vector<vector<double> > energies_V; ///< electronic energy bins vs V
+      vector<vector<double> > edos_V; ///< electronic DOS
+      vector<vector<double> > frequencies_V; ///< phonon frequency bins vs V
+      vector<vector<double> > pdos_V; ///< phonon DOS
+      vector<int> qpWeights;
+      vector<xvector<double> > qPoints;
+      // data needed for Grueneisen parameter calculation
+      xmatrix<double> gp_fit_matrix;
+      vector<vector<vector<double> > > omegaV_mesh;
+      vector<vector<vector<double> > > omegaV_mesh_EOS;
+      vector<xEIGENVAL> gp_ph_dispersions;
+      vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
+      //
+      vector<string> subdirectories_apl_eos;
+      vector<string> subdirectories_apl_gp;
+      vector<string> subdirectories_static;
+      vector<string> arun_runnames_static;
+      _xinput xinput;
+      string currentDirectory;
+      // methods
+      int  checkStaticCalculations();
+      void read();
+      bool runAPLcalculations(const vector<string> &subdirectories,
+          const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
+          _kflags &kflags, string &aflowin, bool gp=true);
+      void readStaticCalculationsData();
+      void calculate();
+      void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
+          const _kflags &kflags);
+      void free();
+      void copy(const QHAN &qha);
+  };
+}
+//AS20200513 END
 // ***************************************************************************
 namespace apl
 {
