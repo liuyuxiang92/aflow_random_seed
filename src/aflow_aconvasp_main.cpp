@@ -5630,14 +5630,11 @@ namespace pflow {
     //   << " udos 2 f\n"
     //   << "   energy fDOSup_elemnt1 fDOSdown_elemnt1 ... fDOSup_elmntN fDOSdown_elmntN\n"
     //   << " udos 2 s d\n"
-    //   << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dD\
-    //   OSdown_elmntN"
+    //   << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dDOSdown_elmntN"
     //   << " udos 2 d s\n"
-    //   << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dD\
-    //   OSdown_elmntN"
+    //   << "   energy sDOSup_elmnt1 sDOSdown_elmnt1 ... sDOSup_elmntN sDOSdown_elmntN dDOSup_elmnt1 dDOSdown_elmnt1 .. dDOSup_elmntN dDOSdown_elmntN"
     //   << " udos 2 s p d f\n"
-    //   << "   energy DOSup DOSdown sDOSup_elmnt1 sDOSdown_elmnt1 ...sDOSup_elmntN sDOSdown_elmntN ... fDOSup_elmntN fDOSdown_elmntN\n\\
-    //   n"
+    //   << "   energy DOSup DOSdown sDOSup_elmnt1 sDOSdown_elmnt1 ...sDOSup_elmntN sDOSdown_elmntN ... fDOSup_elmntN fDOSdown_elmntN\n\n"
     //   << " "
     //   << " note: DOS for spin down is given in (negative) sign.\n"
     //   << "       Splitting of the elements(or species) is according to POSCAR.\n";
