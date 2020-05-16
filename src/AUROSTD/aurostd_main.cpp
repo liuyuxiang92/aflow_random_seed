@@ -1915,7 +1915,7 @@ namespace aurostd {
   // ***************************************************************************
   // aurostd::ZIP2ZIP aurostd::BZ2XZ aurostd::GZ2XZ
   // ***************************************************************************
-  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE) {  // "" compliant April/2019 SC
+  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE,string message) {  // "" compliant April/2019 SC
     string from_cmd="bzip2",from_ext="bz2";
     string to_cmd="xz",to_ext="xz";
     string dir=aurostd::CleanFileName(_dir);
@@ -1929,17 +1929,17 @@ namespace aurostd {
     if((from=="tbz") && (to=="xz")) { from_cmd="bzip",from_ext="tbz";to_cmd="xz",to_ext="xz"; } 
     if((from=="tgz") && (to=="xz")) { from_cmd="gzip",from_ext="tgz";to_cmd="xz",to_ext="xz"; } 
 
-    if(VERBOSE) { cout << "aurostd::ZIP2ZIP: BEGIN - dir=" << dir << endl; }
+    if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: BEGIN - dir=" << dir << endl; }
     vector<string> vfile;
     //    cerr << string("ls \""+dir+"\"/* | grep "+from_ext) << endl;
     aurostd::string2vectorstring(aurostd::execute2string("ls \""+dir+"\"/* | grep "+from_ext),vfile);
 
     for(uint ifile=0;ifile<vfile.size();ifile++) {
-      if(VERBOSE) { cout << "aurostd::ZIP2ZIP: vfile.at(ifile)=" << vfile.at(ifile) << endl;}
+      if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: vfile.at(ifile)=" << vfile.at(ifile) << endl;}
       aurostd::StringSubst(vfile.at(ifile),"."+from_ext,"");
       if(aurostd::FileExist(vfile.at(ifile)+"."+from_ext)) {
         // PATCH to be removed	if(VERBOSE)
-        { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" vfile.at(" << ifile << ")=" << vfile.at(ifile) << " "; cout.flush(); }
+        { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" vfile.at(" << ifile << ")=" << vfile.at(ifile) << " "; cout.flush(); }
         aurostd::UncompressFile(vfile.at(ifile)+"."+from_ext);
         // PATCH to be removedif(VERBOSE)
         { cout << "[" << from_ext << "]"; cout.flush(); }
@@ -1952,41 +1952,41 @@ namespace aurostd {
     }
     if(aurostd::FileExist(dir+"/aflow.in"))
       if(aurostd::substring_present_file_FAST(dir+"/aflow.in",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/aflow.in" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/aflow.in" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/agl_aflow.in"))
       if(aurostd::substring_present_file_FAST(dir+"/agl_aflow.in",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/agl_aflow.in" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/agl_aflow.in" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/agl_aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/ael_aflow.in"))
       if(aurostd::substring_present_file_FAST(dir+"/ael_aflow.in",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/ael_aflow.in" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/ael_aflow.in" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/ael_aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/LOCK"))
       if(aurostd::substring_present_file_FAST(dir+"/LOCK",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LOCK" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LOCK" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/LOCK\"*");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/LLOCK"))
       if(aurostd::substring_present_file_FAST(dir+"/LLOCK",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LLOCK" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LLOCK" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"\"/LLOCK\"*");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
 
-    if(VERBOSE) { cout << "aurostd::ZIP2ZIP: END   - dir=" << dir << endl; }
+    if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: END   - dir=" << dir << endl; }
     return TRUE;
   }
 
-  bool BZ2XZ(string dir,bool VERBOSE) { return ZIP2ZIP(dir,"bz2","xz",VERBOSE); }
-  bool GZ2XZ(string dir,bool VERBOSE) { return ZIP2ZIP(dir,"gz","xz",VERBOSE); }
+  bool BZ2XZ(string dir,bool VERBOSE,string message) { return ZIP2ZIP(dir,"bz2","xz",VERBOSE,message); }
+  bool GZ2XZ(string dir,bool VERBOSE,string message) { return ZIP2ZIP(dir,"gz","xz",VERBOSE,message); }
 
   // ***************************************************************************
   // Function FileExist

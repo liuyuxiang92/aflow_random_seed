@@ -104,7 +104,7 @@ namespace KBIN {
 namespace KBIN {
   bool AIMS_Produce_CONTROL(_xaims& xaims,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_aimsflags &aimsflags) { // AFLOW_FUNCTION_IMPLEMENTATION
     if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::AIMS_Produce_CONTROL  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_AIMS) {cerr << "KBIN::AIMS_Produce_CONTROL: should kflags.AFLOW_MODE_AIMS be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_AIMS) {cerr << XHOST.sPID << "KBIN::AIMS_Produce_CONTROL: should kflags.AFLOW_MODE_AIMS be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
     xaims.CONTROL.str(std::string());
@@ -328,7 +328,7 @@ namespace KBIN {
   bool AIMS_Produce_GEOM(_xaims& xaims,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_aimsflags &aimsflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::AIMS_Produce_GEOM  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_AIMS) {cerr << "KBIN::AIMS_Produce_GEOM: should kflags.AFLOW_MODE_AIMS be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_AIMS) {cerr << XHOST.sPID << "KBIN::AIMS_Produce_GEOM: should kflags.AFLOW_MODE_AIMS be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
     xaims.GEOM.str(std::string());xaims.GEOM.clear();
@@ -1007,21 +1007,21 @@ namespace KBIN {
 
     // ***************************************************************************
 
-    if(LDEBUG) cout << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: RETURNING CORRECTLY" << endl;
-    if(LDEBUG) cout << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: command=" << command << endl;
-    if(LDEBUG) cout << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: svalue=" << svalue << endl;
-    if(LDEBUG) cout << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: ivalue=" << ivalue << endl;
-    if(LDEBUG) cout << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: dvalue=" << dvalue << endl;
-    if(LDEBUG) cout << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: OPTION=" << OPTION << endl;
+    if(LDEBUG) cout << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: RETURNING CORRECTLY" << endl;
+    if(LDEBUG) cout << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: command=" << command << endl;
+    if(LDEBUG) cout << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: svalue=" << svalue << endl;
+    if(LDEBUG) cout << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: ivalue=" << ivalue << endl;
+    if(LDEBUG) cout << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: dvalue=" << dvalue << endl;
+    if(LDEBUG) cout << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: OPTION=" << OPTION << endl;
 
     if(DONE) return TRUE;
 
-    cerr << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: ERROR" << endl;
-    cerr << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: command=" << command << " not found " << endl;
-    cerr << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: svalue=" << svalue << endl;
-    cerr << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: ivalue=" << ivalue << endl;
-    cerr << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: dvalue=" << dvalue << endl;
-    cerr << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: OPTION=" << OPTION << endl;
+    cerr << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: ERROR" << endl;
+    cerr << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: command=" << command << " not found " << endl;
+    cerr << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: svalue=" << svalue << endl;
+    cerr << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: ivalue=" << ivalue << endl;
+    cerr << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: dvalue=" << dvalue << endl;
+    cerr << XHOST.sPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: OPTION=" << OPTION << endl;
 
     exit(0);
 

@@ -76,7 +76,7 @@ namespace KBIN {
   // Sets all APL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAPL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAPL():";
+    string soliloquy = XHOST.sPID + "loadDefaultsAPL():";
     vector<aurostd::xoption> aplflags;
     aurostd::xoption opt;
     opt.keyword="RELAX"; opt.option = DEFAULT_APL_RELAX; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
@@ -164,7 +164,7 @@ namespace KBIN {
   void readParametersAPL(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="readParametersAPL():";
+    string soliloquy = XHOST.sPID + "readParametersAPL():";
     string key, entry, xvaspflag;
     module_opts.supercell_method.assign(4, false);
     for (uint i = 0; i < module_opts.aplflags.size(); i++) {
@@ -282,7 +282,7 @@ namespace KBIN {
   // Sets all AAPL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAAPL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAAPL():";
+    string soliloquy = XHOST.sPID + "loadDefaultsAAPL():";
     vector<aurostd::xoption> aaplflags;
     aurostd::xoption opt;
     opt.keyword="BTE"; opt.xscheme = DEFAULT_AAPL_BTE; aaplflags.push_back(opt); opt.clear();
@@ -334,7 +334,7 @@ namespace KBIN {
   void readParametersAAPL(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="readParametersAAPL():";
+    string soliloquy = XHOST.sPID + "readParametersAAPL():";
     string key, entry, xvaspflag;
     module_opts.cut_rad_shell.assign(2, false);
     for (uint i = 0; i < module_opts.aaplflags.size(); i++) {
@@ -386,7 +386,7 @@ namespace KBIN {
   // Sets all AEL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAEL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAEL():";
+    string soliloquy = XHOST.sPID + "loadDefaultsAEL():";
     vector<aurostd::xoption> aelflags;
     aurostd::xoption opt;
     opt.keyword="STRAIN_SYMMETRY"; opt.option = DEFAULT_AEL_STRAIN_SYMMETRY; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
@@ -448,7 +448,7 @@ namespace KBIN {
   // Sets all AGL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAGL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAGL():";
+    string soliloquy = XHOST.sPID + "loadDefaultsAGL():";
     vector<aurostd::xoption> aglflags;
     aurostd::xoption opt;
     opt.keyword="AEL_POISSON_RATIO"; opt.option = DEFAULT_AGL_AEL_POISSON_RATIO; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();

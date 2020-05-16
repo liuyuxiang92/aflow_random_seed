@@ -276,7 +276,7 @@ namespace aflowlib {
         grouped_Wyckoff_letters.push_back(compare::convertANRLWyckoffString2GroupedPositions(vlabel[i]));
       }
       if(LDEBUG) {
-        cerr << "aflowlib::GetPrototypesLabels(): All prototype labels: " << aurostd::joinWDelimiter(prototype_labels, ", ") << endl;
+        cerr << XHOST.sPID << "aflowlib::GetPrototypesLabels(): All prototype labels: " << aurostd::joinWDelimiter(prototype_labels, ", ") << endl;
       }
     }
     return prototype_labels.size();
@@ -297,7 +297,7 @@ namespace aflowlib {
       }
     }
     if(LDEBUG) {
-      cerr << "aflowlib::GetPrototypesBySpecies(): Prototype labels with " << number_of_species << " species: " << aurostd::joinWDelimiter(filtered_prototype_labels, ", ") << endl;
+      cerr << XHOST.sPID << "aflowlib::GetPrototypesBySpecies(): Prototype labels with " << number_of_species << " species: " << aurostd::joinWDelimiter(filtered_prototype_labels, ", ") << endl;
     }
     return filtered_prototype_labels;
   }
@@ -344,7 +344,7 @@ namespace aflowlib {
       }
     }
     if(LDEBUG) {
-      cerr << "aflowlib::GetPrototypesByStoichiometry(): Prototype labels with stoich: " << aurostd::joinWDelimiter(filtered_prototype_labels, ", ") << endl;
+      cerr << XHOST.sPID << "aflowlib::GetPrototypesByStoichiometry(): Prototype labels with stoich: " << aurostd::joinWDelimiter(filtered_prototype_labels, ", ") << endl;
     }
     return filtered_prototype_labels;
   }
@@ -375,13 +375,13 @@ namespace aflowlib {
     for(uint i=0;i<prototype_labels.size();i++){
       if(compare::matchableSpaceGroups(prototype_space_group_numbers[i],space_group_number) || space_group_number==0){ //DX20191107 - include space_group_number==0 if not specified
         if(LDEBUG) {
-          cerr << "aflowlib::GetPrototypesBySymmetry(): Prototype labels with matching space group number: " << prototype_labels[i] << endl;
+          cerr << XHOST.sPID << "aflowlib::GetPrototypesBySymmetry(): Prototype labels with matching space group number: " << prototype_labels[i] << endl;
         }
         vector<GroupedWyckoffPosition> prototype_grouped_Wyckoffs; 
         compare::groupWyckoffPositionsFromGroupedString(prototype_space_group_numbers[i],setting,prototype_grouped_Wyckoff_letters[i],prototype_grouped_Wyckoffs);
         if(grouped_Wyckoff_positions.size() == 0 || compare::matchableWyckoffPositions(grouped_Wyckoff_positions, prototype_grouped_Wyckoffs,false)){
           if(LDEBUG) {
-            cerr << "aflowlib::GetPrototypesBySymmetry(): Prototype labels with matching Wyckoff positions: " << prototype_labels[i] << endl;
+            cerr << XHOST.sPID << "aflowlib::GetPrototypesBySymmetry(): Prototype labels with matching Wyckoff positions: " << prototype_labels[i] << endl;
           }
           filtered_prototype_labels.push_back(prototype_labels[i]);
           candidate_prototype_space_groups.push_back(prototype_space_group_numbers[i]);
@@ -389,7 +389,7 @@ namespace aflowlib {
       }
     }
     if(LDEBUG) {
-      cerr << "aflowlib::GetPrototypesBySymmetry(): Prototypes matching symmetry requirements (space group and Wyckoff positions): " << aurostd::joinWDelimiter(filtered_prototype_labels,",") << endl;
+      cerr << XHOST.sPID << "aflowlib::GetPrototypesBySymmetry(): Prototypes matching symmetry requirements (space group and Wyckoff positions): " << aurostd::joinWDelimiter(filtered_prototype_labels,",") << endl;
     }
     return filtered_prototype_labels;
   }
@@ -401,9 +401,9 @@ namespace aflowlib {
 namespace aflowlib {
   uint PrototypeLibrariesSpeciesNumber(const string& _label,ostream& oss) { // CO20181226
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aflowlib::PrototypeLibrariesSpeciesNumber():"; // CO20181226
+    string soliloquy = XHOST.sPID + "aflowlib::PrototypeLibrariesSpeciesNumber():"; // CO20181226
     bool silent=false;  //CO20181226
-    if(LDEBUG) cerr << "aflowlib::PrototypeLibrariesSpeciesNumber: label=" << _label << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "aflowlib::PrototypeLibrariesSpeciesNumber: label=" << _label << endl;
     // search for _ICSD_XXXX or ICSD_XXXX
     //CO20180705 - START
     if(_label.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"label empty [1]",_VALUE_ILLEGAL_);}
@@ -467,7 +467,7 @@ namespace aflowlib {
         data.clear();
         if(!silent){oss << "aflowlib::PrototypeLibraries: Scanning " << vlattice.at(i) << " ";}
         data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",oss,FALSE);vdata.push_back(data);
-        if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl; }
+        if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl; }
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           _label2=data.vaflowlib_entries.at(j);
           aurostd::string2tokens(_label2,tokens,"_");
@@ -517,7 +517,7 @@ namespace aflowlib {
 namespace aflowlib {
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,int mode) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,int mode)" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,int mode)" << endl; }
     deque<string> atomX;
     deque<double> volumeX;
     uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label);
@@ -533,8 +533,8 @@ namespace aflowlib {
 namespace aflowlib { 
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,int mode) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aflowlib::PrototypeLibraries():"; //CO20181128
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX)" << endl; }
+    string soliloquy = XHOST.sPID + "aflowlib::PrototypeLibraries():"; //CO20181128
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX)" << endl; }
     deque<double> volumeX;
     for(uint i=0;i<atomX.size();i++){
       if(LDEBUG) { //CO20181106
@@ -551,7 +551,7 @@ namespace aflowlib {
 namespace aflowlib {
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,deque<double> &volumeX,int mode) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,deque<double> &volumeX)" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,deque<double> &volumeX)" << endl; }
     return aflowlib::PrototypeLibraries(oss,label,parameters,atomX,volumeX,-4.0,mode,(bool) FALSE);
   }
 } // namespace aflowlib
@@ -559,7 +559,7 @@ namespace aflowlib {
 namespace aflowlib {
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,deque<double> &volumeX,double volume_in,int mode) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,deque<double> &volumeX,double volume_in)" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,deque<double> &volumeX,double volume_in)" << endl; }
     // try GUS
     if(label.length()>1 && !aurostd::substring2bool(label,"_ICSD_") &&
         (label[0]=='F' || label[0]=='f' || label[0]=='B' || label[0]=='b' || label[0]=='H' || label[0]=='h' || label[0]=='S' || label[0]=='s') &&
@@ -605,22 +605,22 @@ namespace aflowlib {
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option) { // COMPLETE ONE
     // XHOST.DEBUG=TRUE;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aflowlib::PrototypeLibraries():"; //CO20181128
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option)" << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: label=" << label << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: parameters=" << parameters << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: vatomX.size()=" << vatomX.size() << endl;}
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;}
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: vvolumeX.size()=" << vvolumeX.size() << endl;}
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: vvolumeX ="; for(uint i=0;i<vvolumeX.size();i++) {cerr << " " << vvolumeX.at(i);} cerr << endl;}
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: volume_in=" << volume_in << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: mode=" << mode << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: flip_option=" << flip_option << endl; }
+    string soliloquy = XHOST.sPID + "aflowlib::PrototypeLibraries():"; //CO20181128
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option)" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: label=" << label << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: parameters=" << parameters << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: vatomX.size()=" << vatomX.size() << endl;}
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;}
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: vvolumeX.size()=" << vvolumeX.size() << endl;}
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: vvolumeX ="; for(uint i=0;i<vvolumeX.size();i++) {cerr << " " << vvolumeX.at(i);} cerr << endl;}
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: volume_in=" << volume_in << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: mode=" << mode << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: flip_option=" << flip_option << endl; }
 
     // check for ANRL
     vector<string> vlabel_ANRL;
     if(aurostd::string2tokens(label,vlabel_ANRL,"_")>=4) {
-      if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: ANRL=" << 1 << endl; }
+      if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: ANRL=" << 1 << endl; }
       // DX20190708 - START 
       // add default permutation to label if not included in input //DX20190708
       vector<string> perm_tokens;
@@ -2361,7 +2361,7 @@ string* LOAD_Library_ICSD(string file) {  // LOAD ONE BY ONE
     //   if(LDEBUG) { cerr << file << "=" << libaus.length() << endl; }
   }
 
-  cerr << "aflowlib::PrototypeLibraries: AFLOW_LIBRARY not found! " << endl;
+  cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: AFLOW_LIBRARY not found! " << endl;
   return NULL;
 }
 
@@ -2388,7 +2388,7 @@ namespace aflowlib {
 namespace aflowlib {
   string PrototypesIcsdHelp(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) { cerr << "aflowlib::PrototypesIcsdHelp: BEGIN" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypesIcsdHelp: BEGIN" << endl; }
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>1) {
@@ -2445,7 +2445,7 @@ namespace aflowlib {
     if((!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && *_pstrstream=="") || XHOST.vflag_control.flag("AFLOWLIB_SERVER")) { // FROM THE server **********************************
       if(!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && !XHOST.vflag_control.flag("AFLOWLIB_SERVER"))
         XHOST.vflag_control.push_attached("AFLOWLIB_SERVER",AFLOWLIB_SERVER_DEFAULT); // some default
-      cerr << "aflowlib::PrototypeLibraries: Contacting \"" <<  XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER") << "\"" << endl;
+      cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: Contacting \"" <<  XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER") << "\"" << endl;
       vector<string> vlattice,speciesX,tokens;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
       // vector<string> vlattice,speciesX,tokens;aurostd::string2tokens("BCC,BCT,CUB",vlattice,",");
       vector<double> vnatomsX;
@@ -2455,7 +2455,7 @@ namespace aflowlib {
 
       for(uint i=0;i<vlattice.size();i++) {
         data.clear();
-        cerr << "aflowlib::PrototypeLibraries: Scanning " << vlattice.at(i) << " "; //CO20181128
+        cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: Scanning " << vlattice.at(i) << " "; //CO20181128
         data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",cout,FALSE);vdata.push_back(data);
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           aurostd::string2tokens(data.vaflowlib_entries.at(j),tokens,"_");
@@ -2483,7 +2483,7 @@ namespace aflowlib {
         }
       }
     }
-    if(LDEBUG) { cerr << "aflowlib::PrototypesIcsdHelp: END" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypesIcsdHelp: END" << endl; }
     return strstream.str();
 
   }
@@ -2496,7 +2496,7 @@ namespace aflowlib {
 namespace aflowlib {
   string CALCULATED(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) { cerr << "aflowlib::CALCULATED: BEGIN" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::CALCULATED: BEGIN" << endl; }
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>1) {
@@ -2509,7 +2509,7 @@ namespace aflowlib {
     if(tokens.size()==1) library=tokens.at(0);
     library=aurostd::tolower(library);
 
-    if(LDEBUG) { cerr << "aflowlib::CALCULATED: library=" << library << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::CALCULATED: library=" << library << endl; }
 
     stringstream out;
     // LIBRARY_ICSD or LIBRARY_LIBN
@@ -2604,7 +2604,7 @@ namespace aflowlib {
 	  << sICSD+sLIB0+sLIB1+sLIB2+sLIB3+sLIB4+sLIB5+sLIB6+sLIB7+sLIB8+sLIB9 << endl;
 
     }
-    if(LDEBUG) { cerr << "aflowlib::CALCULATED: END" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::CALCULATED: END" << endl; }
     return out.str();
   }
 }  // namespace aflowlib
@@ -2651,11 +2651,11 @@ namespace aflowlib {
   xstructure _____PrototypeLibraries(ostream &oss,_PROTO_PARAMS *PARAMS) { // COMPLETE ONE
     //  DEBUG=TRUE;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,_PROTO_PARAMS *PARAMS)" << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: PARAMS->label=" << PARAMS->label << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: PARAMS->volume_in=" << PARAMS->volume_in << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: PARAMS->mode=" << PARAMS->mode << endl; }
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: PARAMS->flip_option=" << PARAMS->flip_option << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries(ostream &oss,_PROTO_PARAMS *PARAMS)" << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: PARAMS->label=" << PARAMS->label << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: PARAMS->volume_in=" << PARAMS->volume_in << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: PARAMS->mode=" << PARAMS->mode << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: PARAMS->flip_option=" << PARAMS->flip_option << endl; }
 
     deque<string> vatomX_backup(PARAMS->vatomX);
     deque<double> vvolumeX_backup(PARAMS->vvolumeX);
@@ -2686,7 +2686,7 @@ namespace aflowlib {
     uint iat,natoms=0,nspecies=0;
     double volume=0.0;
     int mode_load=0,mode_prim=0,mode_conventional=0,mode_volume=0,mode_remove=0,mode_species=0;
-    if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: XHOST_Library_HTQC.length()=" << XHOST_Library_HTQC.length() << endl; }
+    if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: XHOST_Library_HTQC.length()=" << XHOST_Library_HTQC.length() << endl; }
     init::InitGlobalObject("Library_HTQC");
 
     // *********************************************************************

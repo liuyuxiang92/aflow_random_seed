@@ -156,7 +156,7 @@ using std::vector;
 #include "aurostd_xoption.h"
 #include "aurostd_argv.h"
 #include "aurostd_xcombos.h"
-#include "aurostd_xerror.h" //ME 180627
+#include "aurostd_xerror.h" //ME20180627
 
 using aurostd::min;
 using aurostd::max;
@@ -374,8 +374,9 @@ namespace aurostd {
   //CO - END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
   bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default
-  bool ZIP2ZIP(string dir,string from,string to,bool=TRUE);
-  bool BZ2XZ(string dir,bool=TRUE); bool GZ2XZ(string dir,bool=TRUE);
+  bool ZIP2ZIP(string dir,string from,string to,bool=TRUE,string="");
+  bool BZ2XZ(string dir,bool=TRUE,string="");
+  bool GZ2XZ(string dir,bool=TRUE,string="");
   // [OBSOLETE]  bool BunzipFile(const string& FileName); bool BzipFile(const string& FileName);
   // [OBSOLETE]  bool GunzipFile(const string& FileName); bool GzipFile(const string& FileName); 
   // [OBSOLETE]  bool XunzipFile(const string& FileName); bool XzipFile(const string& FileName); 

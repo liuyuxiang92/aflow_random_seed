@@ -21,17 +21,19 @@ namespace aurostd {
   // List of error types and errors ////////////////////////////////////////////
 #define _AFLOW_NUM_ERR_TYPES_ 7  // Number of error types
 
+  string xerror_PID;
+
   static const std::string error_types[_AFLOW_NUM_ERR_TYPES_] = 
-  {"", "Input Error", "File Error", "Value Error",
-    "Index Error", "Runtime Error", "Allocation Error"};
+    {"", "Input Error", "File Error", "Value Error",
+     "Index Error", "Runtime Error", "Allocation Error"};
 
   //Errors associated with those types
   static const std::string errors[_AFLOW_NUM_ERR_TYPES_][9] =
-  {{"Generic error", "Illegal error code", "", "", "", "", "", "", ""},
-    {"unknown flag", "missing flag", "input ambiguous", "illegal parameter", "number of parameters", "", "", "", ""},
-    {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
-    {"illegal value", "out of range", "", "", "", "", "", "", ""},
-    {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
+    {{"Generic error", "Illegal error code", "", "", "", "", "", "", ""},
+     {"unknown flag", "missing flag", "input ambiguous", "illegal parameter", "number of parameters", "", "", "", ""},
+     {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
+     {"illegal value", "out of range", "", "", "", "", "", "", ""},
+     {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
     {"not initialized", "SQL error", "", "", "", "", "", "", ""},
     {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
@@ -85,10 +87,12 @@ namespace aurostd {
   //buildMessageString/////////////////////////////////////////////////////////
   std::string xerror::buildMessageString() {
     std::stringstream msgstr;
+    msgstr << xerror_PID;
     msgstr << "ERROR " << error_code << " in ";
     msgstr << whereFunction() << ": ";  // function name
     msgstr << error_string() << endl; //<< " - ";  // error type  //CO181226
     if (error_code == 2) {
+      //   msgstr << xerror_PID;
       msgstr << "There was an error, but the supplied error code is invalid. Please contact the developers. ";
       msgstr << "Supplied error message: ";
     }
@@ -126,6 +130,7 @@ namespace aurostd {
   }
 } // namespace aurostd
 #endif
+
 //****************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *

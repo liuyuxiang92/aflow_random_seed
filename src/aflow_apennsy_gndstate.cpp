@@ -44,7 +44,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   char string_line_TMELTING[1024],alloy_TMELTING[1024],*string_TMELTING_ptr;
   in_file_pointer_TMELTING=fopen(TMELTING_FILE,"r");
   if(in_file_pointer_TMELTING==NULL) {
-    cerr <<  "ERROR: file not found [M] " << MELTING_FILE << endl;
+    cerr << "ERROR: file not found [M] " << MELTING_FILE << endl;
     exit(0);
   }
   fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);

@@ -37,6 +37,7 @@ namespace aurostd {
 #define _ALLOC_ALLOCATE_      61
 #define _ALLOC_INSUFFICIENT_  62
 
+  extern string xerror_PID;
   // END CONSTANTS
 
   class xerror {

@@ -64,7 +64,7 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO2019052
 xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,const vector<xvector<double> >& rhs,
     bool normalize,double tol){ //CO20180801
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="balanceChemicalEquation():";
+  string soliloquy = XHOST.sPID + "balanceChemicalEquation():";
   xvector<double> dummy;
   if(lhs.size()==0 || rhs.size()==0){return dummy;}
   int dim=lhs[0].rows;
@@ -128,7 +128,7 @@ xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,cons
 //normalize === set first coefficient to 1
 xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matrix,bool normalize,double tol){ //CO20191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="balanceChemicalEquation():";
+  string soliloquy = XHOST.sPID + "balanceChemicalEquation():";
   stringstream message;
   if(composition_matrix.rows<=composition_matrix.cols){
     message << "Composition matrix (m<=n) will NOT yield a viable null space for this analysis";
@@ -214,7 +214,7 @@ namespace pflow {
   }
   void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pflow::GeneralizedStackingFaultEnergyCalculation():";
+    string soliloquy = XHOST.sPID + "pflow::GeneralizedStackingFaultEnergyCalculation():";
     stringstream message;
     std::streamsize prec = 8;
     bool check_min_dist=true; //turn off if it gets too slow
@@ -1136,7 +1136,7 @@ namespace pflow {
   }
   void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pflow::CleavageEnergyCalculation():";
+    string soliloquy = XHOST.sPID + "pflow::CleavageEnergyCalculation():";
     stringstream message;
     std::streamsize prec = 8;
     bool check_min_dist=true; //turn off if it gets too slow
@@ -1729,14 +1729,14 @@ namespace pflow {
       vector<double>& v_intensity_smooth,
       double lambda) { //CO20190520 //CO20190620 - v_peaks_amplitude not needed
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="GetXrayPeaks():";
+    string soliloquy = XHOST.sPID + "GetXrayPeaks():";
     if(LDEBUG){cerr << soliloquy << " input str=" << endl;cerr << str << endl;}
     GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
     return GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
   }
   vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO20190520 //CO20190620 - v_peaks_amplitude not needed
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="GetXrayPeaks():";
+    string soliloquy = XHOST.sPID + "GetXrayPeaks():";
 
     if(v_twotheta.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
     if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
@@ -2114,7 +2114,7 @@ namespace pflow {
   void GetXray(const xstructure& str, vector<double>& dist,vector<double>& sf,
       vector<double>& scatt_fact, //CO20190520
       vector<double>& mass, vector<double>& twoB_vec,double lambda) {
-    string soliloquy="pflow::GetXray():"; //CO20190322
+    string soliloquy = XHOST.sPID + "pflow::GetXray():"; //CO20190322
     stringstream message; //CO20190322
     // Get data from str.
     // Set scale to 1 so you don't need to rescale coordinates.
@@ -6294,7 +6294,7 @@ namespace pflow {
     //      Natom lines, each with 4 fields, with a newline after each one
     //      Natom entries (grouped by 5). // I don't think these are actually in the CHGCAR.
 
-    string soliloquy="pflow::ReadCHGCAR():  ";    // so you know who's talking
+    string soliloquy = XHOST.sPID + "pflow::ReadCHGCAR():  ";    // so you know who's talking
 
     // DEBUG
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -7346,7 +7346,7 @@ namespace pflow {
 
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO2019062
     // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
-    string soliloquy="pflow::prettyPrintCompound():";
+    string soliloquy = XHOST.sPID + "pflow::prettyPrintCompound():";
     uint precision=COEF_PRECISION;
     stringstream output;output.precision(precision);
     if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}

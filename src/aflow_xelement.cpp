@@ -139,7 +139,7 @@ std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting
 namespace pflow {
   void XelementPrint(string options,ostream& oss) {
     bool LDEBUG=0;//(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::XelementPrint [BEGIN]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::XelementPrint [BEGIN]" << endl;
     if(LDEBUG) cerr << "options=" << options << endl;
     if(LDEBUG) cerr << "velement.size()=" << velement.size() << endl;
 
@@ -177,9 +177,9 @@ namespace pflow {
     
       // found
     
-      //      cerr <<  xelement::xelement(3).name << endl;
-      //      cerr <<  xelement::xelement("Li").name << endl;
-      //      cerr <<  xelement::xelement("LiThIuM").name << endl;
+      //      cerr << xelement::xelement(3).name << endl;
+      //      cerr << xelement::xelement("Li").name << endl;
+      //      cerr << xelement::xelement("LiThIuM").name << endl;
       
       // now look at properties
       if(tokens.size()>=2) {
@@ -270,7 +270,7 @@ namespace pflow {
       }
     }
     
-    if(LDEBUG) cerr << "pflow::XelementPrint [END]" << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "pflow::XelementPrint [END]" << endl;
   }
 }
 

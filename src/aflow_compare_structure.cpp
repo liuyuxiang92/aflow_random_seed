@@ -321,7 +321,7 @@ namespace pflow {
 
     // This function compares multiple structures (i.e., more than two).
 
-    string function_name = "pflow::compareMultipleStructures()";
+    string function_name = XHOST.sPID + "pflow::compareMultipleStructures()";
     bool LDEBUG=(false || XHOST.DEBUG);
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
@@ -815,7 +815,7 @@ namespace pflow {
   vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream){ 
     bool LDEBUG=(false || XHOST.DEBUG);
 
-    string function_name = "pflow::compare2prototypes()";
+    string function_name = XHOST.sPID + "pflow::compare2prototypes()";
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
     stringstream message;
@@ -1078,7 +1078,7 @@ namespace pflow {
   string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){
     bool LDEBUG=(false || XHOST.DEBUG);
 
-    string function_name = "pflow::compare2database()";
+    string function_name = XHOST.sPID + "pflow::compare2database()";
     string directory = "";
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
@@ -1467,7 +1467,7 @@ namespace pflow {
             }
           }
           if(LDEBUG) {
-            cerr << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
+            cerr << XHOST.sPID << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
           }
           all_structures.push_back(str_proto_tmp);
         }
@@ -1620,7 +1620,7 @@ namespace pflow {
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ //DX20191125 - added ofstream and ostream
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "pflow::compareDatabaseEntries()";
+    string function_name = XHOST.sPID + "pflow::compareDatabaseEntries()";
     string directory = ".";
     stringstream message;
     stringstream oss;
@@ -2114,7 +2114,7 @@ namespace pflow {
           }
         }
         if(LDEBUG){
-          cerr << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
+          cerr << XHOST.sPID << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
         }
         all_structures.push_back(str_proto_tmp);
       }
@@ -2247,7 +2247,7 @@ namespace compare {
 namespace compare {
   vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions
 
-    string function_name = "compare::compareMultipleStructures()";
+    string function_name = XHOST.sPID + "compare::compareMultipleStructures()";
     bool LDEBUG=(false || XHOST.DEBUG);
     ostream& logstream = cout;
     stringstream message;

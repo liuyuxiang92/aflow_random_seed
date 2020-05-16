@@ -21,7 +21,7 @@
 namespace KBIN {
   bool QSUB_Extract(_xqsub& xqsub,string AflowIn,ifstream &FileAFLOWIN,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     if(AflowIn.length()) {;} // phony, just to keep AflowIn busy
-    if(!kflags.AFLOW_MODE_VASP) {cerr << "KBIN::VASP_Produce_QSUB: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_VASP) {cerr << XHOST.sPID << "KBIN::VASP_Produce_QSUB: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
     xqsub.QSUB.str(std::string());xqsub.QSUB.clear();

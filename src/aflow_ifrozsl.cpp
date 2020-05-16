@@ -278,9 +278,7 @@ namespace FROZSL {
     if(!aurostd::FileExist(aflowin)) {FileMESSAGE << "ERROR" << ": file not found " << aflowin << endl;return FALSE;}
     string AflowIn;aurostd::file2string(aflowin,AflowIn);
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - FROZSL::WGET_OUTPUT: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - FROZSL::WGET_OUTPUT: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
     // CHECK FOR INSIDE STUFF
     if(FROZSL::Already_Calculated_Input(AflowIn)) {
@@ -299,10 +297,10 @@ namespace FROZSL {
 
       for(uint i=0;i<vdirectories.size();i++) {
 	// cout << vdirectories.at(i) << "hihi" << endl;
-	for(uint iext=0;iext<vext.size();iext++) {
-	  if(aurostd::FileExist(aflags.Directory+"/ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+vext.at(iext)+"")) {
-	    vfiles.push_back("./ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+vext.at(iext)+"");
-	    vcommands.push_back(vcat.at(iext)+" "+aflags.Directory+"/ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+vext.at(iext)+""+" | grep \"H=\"");// >> aflow.frozsl.out");
+	for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	  if(aurostd::FileExist(aflags.Directory+"/ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+XHOST.vext.at(iext)+"")) {
+	    vfiles.push_back("./ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+XHOST.vext.at(iext)+"");
+	    vcommands.push_back(XHOST.vcat.at(iext)+" "+aflags.Directory+"/ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+XHOST.vext.at(iext)+""+" | grep \"H=\"");// >> aflow.frozsl.out");
 	  }
 	}
       }

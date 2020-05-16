@@ -957,7 +957,7 @@ namespace compare {
 
     // load all structures from a directory into a vector of StructurePrototype 
     // objects
-    string function_name = "compare:loadStructuresFromDirectory()";
+    string function_name = XHOST.sPID + "compare:loadStructuresFromDirectory()";
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
@@ -1050,7 +1050,7 @@ namespace compare {
     // load all structures from a file into a vector of StructurePrototype object
     // useful for reading in aflow.in relaxation steps or pocc structures
 
-    string function_name = "compare:loadStructuresFromFile()";
+    string function_name = XHOST.sPID + "compare:loadStructuresFromFile()";
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     //DX20191122 [OBSOLETE] ostream& logstream = cout;
@@ -1163,7 +1163,7 @@ namespace compare {
     // load all structures from a vector of filenames into a vector of StructurePrototype object
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare:loadStructuresFromStructureList()";
+    string function_name = XHOST.sPID + "compare:loadStructuresFromStructureList()";
     stringstream message;
     //DX20191122 [OBSOLETE] ostream& logstream = cout;
     //DX [OBSOLETE] ofstream FileMESSAGE;
@@ -1259,7 +1259,7 @@ namespace compare {
     // 3) input (cin)
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::generateStructure()";
+    string function_name = XHOST.sPID + "compare::generateStructure()";
     ofstream FileMESSAGE;
     vector<string> tokens;
 
@@ -1522,7 +1522,7 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
-    string function_name = "compare::comparePermutations()";
+    string function_name = XHOST.sPID + "compare::comparePermutations()";
     stringstream message;
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
 
@@ -2149,7 +2149,7 @@ namespace compare{
     // strutures for comparison
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "addAFLOWPrototypes2StructurePrototypeVector()";
+    string function_name = XHOST.sPID + "addAFLOWPrototypes2StructurePrototypeVector()";
 
     for(uint i=0;i<vlabel.size();i++){
       if(LDEBUG) { cerr << function_name << ": Storing AFLOW prototype information for " << vlabel[i] << endl; }
@@ -2327,7 +2327,7 @@ namespace compare{
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION]     // the least common multiple representation for the stoichiometry.
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION]     // deque version
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION] 
-//DX20191125 [OBSOLETE - USING AUROSTD VERSION]     string function_name = "compare::gcdStoich():";
+//DX20191125 [OBSOLETE - USING AUROSTD VERSION]     string function_name = XHOST.sPID + "compare::gcdStoich():";
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION]     stringstream message;
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION] 
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION]     int global_GCD = 0; //DX20180514 - added initialization
@@ -2401,7 +2401,7 @@ namespace compare{
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     // Split xstructures via indices, i.e., to be used in different threads for 
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     // calculating the symmetry (space group and Wyckoff positions)
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] 
-//DX20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = "compare::prepareSymmetryThreads()";
+//DX20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = XHOST.sPID + "compare::prepareSymmetryThreads()";
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     stringstream message;
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] 
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     vector<vector<xstructure> > vxstrs_split;
@@ -2472,7 +2472,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // split comparisons into threads via indices
-    string function_name = "compare::splitComparisonIntoThreads()";
+    string function_name = XHOST.sPID + "compare::splitComparisonIntoThreads()";
     stringstream message;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
@@ -2609,7 +2609,7 @@ namespace compare{
     // Same as the StructurePrototype version, just not as concise
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name="compare::calculateSymmetries()";
+    string function_name = XHOST.sPID + "compare::calculateSymmetries()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
@@ -2667,7 +2667,7 @@ namespace compare{
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] 
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     // ---------------------------------------------------------------------------
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     // split comparisons into threads via indices
-//DX20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = "compare::splitTaskIntoThread()";
+//DX20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = XHOST.sPID + "compare::splitTaskIntoThread()";
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     stringstream message;
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     bool safety_check=false; // safety check if split incorrectly
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] 
@@ -2763,7 +2763,7 @@ namespace compare{
     // Same as the vector<xstructure> version, just more concise
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name="compare::calculateSymmetries()";
+    string function_name = XHOST.sPID + "compare::calculateSymmetries()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
@@ -2829,7 +2829,7 @@ namespace compare{
     // stores it in the StructurePrototype object
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name="compare::calculateLFAEnvironments()";
+    string function_name = XHOST.sPID + "compare::calculateLFAEnvironments()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
@@ -3649,7 +3649,7 @@ namespace compare{
     // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::groupStructurePrototypes()";
+    string function_name = XHOST.sPID + "compare::groupStructurePrototypes()";
 
     // variable to store structure sets to compare 
     vector<StructurePrototype> comparison_schemes;
@@ -3757,7 +3757,7 @@ namespace compare{
 //DX [OBSOLETE]         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
 //DX [OBSOLETE]         const bool& structures_generated){
 //DX [OBSOLETE]
-//DX [OBSOLETE]    string function_name = "compare::compareMultipleStructures()";
+//DX [OBSOLETE]    string function_name = XHOST.sPID + "compare::compareMultipleStructures()";
 //DX [OBSOLETE]    ostream& logstream = cout;
 //DX [OBSOLETE]    stringstream message;
 //DX [OBSOLETE]    ofstream FileMESSAGE;
@@ -3836,7 +3836,7 @@ namespace compare{
     // this function checks if compounds/structures match better with another group 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::checkForBetterMatches()";
+    string function_name = XHOST.sPID + "compare::checkForBetterMatches()";
     stringstream message;
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
 
@@ -3964,7 +3964,7 @@ namespace compare{
 namespace compare{
   vector<StructurePrototype> compareDuplicateCompounds(vector<StructurePrototype>& prototype_schemes, uint& num_proc, 
       bool& ICSD_comparison, ostringstream& oss){
-    string function_name = "compare::compareDuplicateCompounds()";
+    string function_name = XHOST.sPID + "compare::compareDuplicateCompounds()";
     ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
@@ -4207,7 +4207,7 @@ namespace compare{
     // the single comparison only (prevents overwriting in the comparisons) 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::runComparisonThreads()";
+    string function_name = XHOST.sPID + "compare::runComparisonThreads()";
     stringstream message;
     //bool store_comparison_logs = false; //DX20190624
 
@@ -4303,7 +4303,7 @@ namespace compare{
       ostream& logstream){ //DX20200103 - condensed booleans to xoptions
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::runComparisonScheme()";
+    string function_name = XHOST.sPID + "compare::runComparisonScheme()";
 
     stringstream message;
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
@@ -4601,7 +4601,7 @@ namespace compare{
     // space group. A "representative" structure is chosen and will be compared to the 
     // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
 
-    string function_name = "compare::createStructurePermutations()";
+    string function_name = XHOST.sPID + "compare::createStructurePermutations()";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -4784,7 +4784,7 @@ namespace compare{
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
     stringstream message;
     //DX20191125 [OBSOLETE] ofstream FileMESSAGE;
-    string function_name = "compare::appendStructurePrototypes()";
+    string function_name = XHOST.sPID + "compare::appendStructurePrototypes()";
 
     vector<StructurePrototype> tmp_list;
     for(uint i=0; i<comparison_schemes.size(); i++){
@@ -5288,7 +5288,7 @@ namespace compare{
     // Determine if the structures have the same types and counts of species
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::sameSpecies()";
+    string function_name = XHOST.sPID + "compare::sameSpecies()";
 
     bool VERBOSE = (display && LDEBUG); //DX20191125
 
@@ -6000,7 +6000,7 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
-    string function_name = "compare::findMatch()";
+    string function_name = XHOST.sPID + "compare::findMatch()";
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  //Indices corresponding atoms
@@ -6522,7 +6522,7 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
-    string function_name = "compare::compatibleEnvironments()";
+    string function_name = XHOST.sPID + "compare::compatibleEnvironments()";
 
     double _TOL_EXACT_MATCH_ = 0.01; // hundredth of an Angstrom, perhaps put in header?
     double _TOL_RELATIVE_MATCH_ = 0.10; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1
@@ -6940,7 +6940,7 @@ namespace compare{
     double _NON_COLLINEAR_ANGLE_DEGREE_TOL_ = 10.0;
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::magneticDeviation()";
+    string function_name = XHOST.sPID + "compare::magneticDeviation()";
     double magmom_num = 0.0;
     double magmom_den = 0.0;
     uint mag_fail_1 = 0, mag_fail_2 = 0;
@@ -7255,7 +7255,7 @@ namespace compare{
     // to speed up translation vector search
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::GetLFASupercell()";
+    string function_name = XHOST.sPID + "compare::GetLFASupercell()";
 
     // ---------------------------------------------------------------------------
     // remove all atoms that are not of the LFA type 
@@ -7316,7 +7316,7 @@ namespace compare{
     // Performs lattice and origin search
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::latticeAndOriginSearch()";
+    string function_name = XHOST.sPID + "compare::latticeAndOriginSearch()";
 
     bool test_one_lfa_only = false; //DX20190318
     //DX SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
@@ -7745,7 +7745,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]         xvector<double> abc_angles_q1=Getabc_angles(q1,DEGREES);
 // [OBSOLETE - DX20190717] 
 // [OBSOLETE - DX20190717]         buildSimilarLattices(translation_vectors, q1, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match);
-// [OBSOLETE - DX20190717]         if(LDEBUG) {cerr << "pflow::threadGeneration: Number of lattices to compare: " << lattices.size() << endl;}
+// [OBSOLETE - DX20190717]         if(LDEBUG) {cerr << XHOST.sPID << "pflow::threadGeneration: Number of lattices to compare: " << lattices.size() << endl;}
 // [OBSOLETE - DX20190717] 
 // [OBSOLETE - DX20190717]         if(lattices.size()>0){
 // [OBSOLETE - DX20190717]           for(uint n=0; n<num_proc; n++){
@@ -7812,7 +7812,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]             cerr << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << lattices.size() << endl;
 // [OBSOLETE - DX20190717]             exit(1);
 // [OBSOLETE - DX20190717]           }
-// [OBSOLETE - DX20190717]           if(LDEBUG) {cerr << "pflow::threadGeneration: Performing structure search on " << lattices.size() << " lattices ..." << endl;}
+// [OBSOLETE - DX20190717]           if(LDEBUG) {cerr << XHOST.sPID << "pflow::threadGeneration: Performing structure search on " << lattices.size() << " lattices ..." << endl;}
 // [OBSOLETE - DX20190717]           
 // [OBSOLETE - DX20190717]              //for(uint n=0; n<num_of_threads; n++){
 // [OBSOLETE - DX20190717]              //threads1.push_back(std::thread(structureSearch,lfa,all_nn1,xstr,
@@ -8080,7 +8080,7 @@ namespace compare{
     // This function is parallelized since it is the time-limiting function.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::quadrupletSearch()";
+    string function_name = XHOST.sPID + "compare::quadrupletSearch()";
     bool relative_tolerance=true;
 
     double min_q1_a = 0.0; double max_q1_a = 0.0;
@@ -8202,7 +8202,7 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
-    string function_name = "compare::buildSimilarLattices():";
+    string function_name = XHOST.sPID + "compare::buildSimilarLattices():";
 
     // ---------------------------------------------------------------------------
     // sort via smallest misfit for speed up

@@ -999,7 +999,7 @@ namespace SYM {
 
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
       const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
-    string soliloquy="SYM::FPOSMatch():";
+    string soliloquy = XHOST.sPID + "SYM::FPOSMatch():";
 
     //DX20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
     if(XHOST.SKEW_TEST){
@@ -1066,7 +1066,7 @@ namespace SYM {
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="SYM::FPOSDistance():";
+    string soliloquy = XHOST.sPID + "SYM::FPOSDistance():";
     if(LDEBUG){
       cerr << soliloquy << " fpos1=" << fpos1 << endl;
       cerr << soliloquy << " fpos2=" << fpos2 << endl;
@@ -1103,7 +1103,7 @@ namespace SYM {
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
-    string soliloquy="SYM::CPOSDistance():";
+    string soliloquy = XHOST.sPID + "SYM::CPOSDistance():";
     if(VERBOSE){
       cerr << soliloquy << " fpos1=" << fpos1 << endl;
       cerr << soliloquy << " fpos2=" << fpos2 << endl;
@@ -4144,7 +4144,7 @@ namespace SYM {
 namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) { 
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-    string soliloquy="SYM::CalculatePointGroup():";
+    string soliloquy = XHOST.sPID + "SYM::CalculatePointGroup():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     // Obtain the structure tolerance
     //DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX20180426 - added current working directory

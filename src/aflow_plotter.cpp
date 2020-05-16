@@ -186,59 +186,107 @@ namespace plotter {
     }
   }
 
-  //savePlotGNUPLOT/////////////////////////////////////////////////////////////
+ //savePlotGNUPLOT/////////////////////////////////////////////////////////////
   // Executes the gnuplot script and converts into the desired image format.
   void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
-    string soliloquy="plotter::savePlotGNUPLOT():";
-    string directory = plotoptions.getattachedscheme("DIRECTORY");
-    if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
-    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+    string soliloquy = XHOST.sPID + "plotter::savePlotGNUPLOT():";
+    string directory_work = plotoptions.getattachedscheme("DIRECTORY");
+    if(directory_work.empty()){directory_work=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
+    if(LDEBUG) { cerr << soliloquy << " directory_work=" << directory_work << endl;}
     string filename = plotoptions.getattachedscheme("FILE_NAME");
-    if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+    if(LDEBUG) { cerr << soliloquy << " filename=" << filename << endl;}
     string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
     // PDF is default since we use pdflatex to compile
     string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
     if (format.empty()) format = "pdf";
     string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
     // Create temp directory
-    string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
-    chdir(tmp.c_str());
+    string directory_tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
+    chdir(directory_tmp.c_str());
     // Execute gnuplot and pdflatex
     aurostd::stringstream2file(gpfile, filename + ".plt");
-    aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
-    aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
+    aurostd::execute(XHOST.command("gnuplot") + " \"" + filename + ".plt\"");
+    if(LDEBUG) cerr << soliloquy << "directory_tmp = " << directory_tmp << endl;
+    if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
+    aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
     // Convert to the desired format if not pdf
     if (format != "pdf") {
-      aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
+      aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format);   // to avoid C: ... Carbon:PBE = C: in windows
+      if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
+      aurostd::execute("mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"");
+      if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
     }
     chdir(current_dir.c_str());
-    aurostd::CopyFile(tmp + filename_latex + "." + format, directory + "/" + filename + "." + format);
-    if(LDEBUG){cerr << soliloquy << " moving file to: " << directory + "/" + filename + "." + format << endl;}
+    aurostd::CopyFile(directory_tmp + filename_latex + "." + format,directory_work + "/" + filename + "." + format);
+    if(LDEBUG) { cerr << soliloquy << " moving file to: " << directory_work + "/" + filename + "." + format << endl;}
     // Keep gnuplot file if aflow was called with --keep=gpl
     if (XHOST.vflag_control.flag("KEEP::GPL")) {
-      aurostd::CopyFile(tmp + filename + ".plt", directory);
+      aurostd::CopyFile(directory_tmp + filename + ".plt", directory_work);
     }
     // Clean up
-    aurostd::RemoveDirectory(tmp);
-    if (!aurostd::FileExist(directory + "/" + filename + "." + format)) {
+    // exit(0);
+    aurostd::RemoveDirectory(directory_tmp);
+    if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
       string function = "plotter::savePlotGNUPLOT():";
       string message = "Error while generating plot.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
 
-  //setFileName/////////////////////////////////////////////////////////////////
+  // [OBSOLETE] //savePlotGNUPLOT/////////////////////////////////////////////////////////////
+  // [OBSOLETE] // Executes the gnuplot script and converts into the desired image format.
+  // [OBSOLETE] void savePlotGNUPLOT_OLD(const xoption& plotoptions, const stringstream& gpfile) {
+  // [OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG); 
+  // [OBSOLETE]   string soliloquy = XHOST.sPID + "plotter::savePlotGNUPLOT():";
+  // [OBSOLETE]   string directory_work = plotoptions.getattachedscheme("DIRECTORY");
+  // [OBSOLETE]   if(directory_work.empty()){directory_work=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
+  // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " directory_work=" << directory_work << endl;}
+  // [OBSOLETE]   string filename = plotoptions.getattachedscheme("FILE_NAME");
+  // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " filename=" << filename << endl;}
+  // [OBSOLETE]   string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
+  // [OBSOLETE]   // PDF is default since we use pdflatex to compile
+  // [OBSOLETE]   string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
+  // [OBSOLETE]   if (format.empty()) format = "pdf";
+  // [OBSOLETE]   string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+  // [OBSOLETE]  // Create temp directory
+  // [OBSOLETE]   string directory_tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
+  // [OBSOLETE] chdir(directory_tmp.c_str());
+  // [OBSOLETE] // Execute gnuplot and pdflatex
+  // [OBSOLETE] aurostd::stringstream2file(gpfile, filename + ".plt");
+  // [OBSOLETE]   aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
+  // [OBSOLETE]   aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
+  // [OBSOLETE]   // Convert to the desired format if not pdf
+  // [OBSOLETE]   if (format != "pdf") {
+  // [OBSOLETE]     aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
+  // [OBSOLETE]   }
+  // [OBSOLETE]   chdir(current_dir.c_str());
+  // [OBSOLETE]   aurostd::CopyFile(directory_tmp + filename_latex + "." + format,directory_work + "/" + filename + "." + format);
+  // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " moving file to: " << directory_work + "/" + filename + "." + format << endl;}
+  // [OBSOLETE]   // Keep gnuplot file if aflow was called with --keep=gpl
+  // [OBSOLETE]   if (XHOST.vflag_control.flag("KEEP::GPL")) {
+  // [OBSOLETE]    aurostd::CopyFile(directory_tmp + filename + ".plt", directory_work);
+  // [OBSOLETE]   }
+  // [OBSOLETE]   // Clean up
+  // [OBSOLETE]   aurostd::RemoveDirectory(directory_tmp);
+  // [OBSOLETE]   if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
+  // [OBSOLETE]      string function = "plotter::savePlotGNUPLOT():";
+  // [OBSOLETE]      string message = "Error while generating plot.";
+  // [OBSOLETE]     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+  // [OBSOLETE]   }
+  // [OBSOLETE] }
+
+   //setFileName/////////////////////////////////////////////////////////////////
   // Sets the file name of the final plot. FILE_NAME_LATEX is the name of the
   // tex file that is generated by gnuplot, which has different limitations than
   // the output image.
   void setFileName(xoption& plotoptions, string filename) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::setFileName():";
-    if(LDEBUG){cerr << soliloquy << " filename_in=" << filename << endl;}
+    string soliloquy = XHOST.sPID + "plotter::setFileName():";
+    if(LDEBUG) { cerr << soliloquy << " filename_in=" << filename << endl;}
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-      if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+      if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
       filename = default_title;
       // Get filename
       string ext = plotoptions.getattachedscheme("EXTENSION");
@@ -276,9 +324,9 @@ namespace plotter {
   // appropriately.
   string formatDefaultPlotTitle(const xoption& plotoptions) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::formatDefaultPlotTitle():";
+    string soliloquy = XHOST.sPID + "plotter::formatDefaultPlotTitle():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-    if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+    if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
     if (default_title.empty()) return default_title;
     string title;
     if (aurostd::substring2bool(default_title, "_ICSD_")) {  // Check if AFLOW ICSD format
@@ -293,7 +341,7 @@ namespace plotter {
         return aurostd::fixStringLatex(default_title, false, false);
       }
     } else if (aurostd::substring2bool(default_title, POCC_TAG)) {  // Check if in POCC format
-      if(LDEBUG){cerr << soliloquy << " found POCC" << endl;}
+      if(LDEBUG) { cerr << soliloquy << " found POCC" << endl;}
       title = formatDefaultTitlePOCC(plotoptions);
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
@@ -332,7 +380,7 @@ namespace plotter {
     } else {  // Not an AFLOW-formatted default
       return aurostd::fixStringLatex(default_title, false, false);
     }
-    if(LDEBUG){cerr << soliloquy << " title=" << title << endl;}
+    if(LDEBUG) { cerr << soliloquy << " title=" << title << endl;}
     // Code only gets here if the title is AFLOW-formatted
     string set = plotoptions.getattachedscheme("DATASET");
     if (aurostd::string2utype<int>(set) > 0) {
@@ -395,10 +443,10 @@ namespace plotter {
   string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_191004(plotoptions);} //CO20191110
   string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::formatDefaultTitlePOCC():";
+    string soliloquy = XHOST.sPID + "plotter::formatDefaultTitlePOCC():";
     stringstream message;
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-    if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+    if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
     //example: Cs_svEuIPb_d:PAW_PBE.AB3C_cP5_221_a_c_b:POCC_S0-1xA_S1-1xC_S2-0.5xB-0.5xD
     //ARUN example: Cs_afEuIPb_d:PAW_PBE.AB3C_cP5_221_a_c_b:POCC_S0-1xA_S1-1xC_S2-0.5xB-0.5xD:ARUN.POCC_1_H0C0
     //convert to: --proto=AB3C_cP5_221_a_c_b:Cs_sv:Eu:I:Pb_d --pocc_params=S0-1xA_S1-1xC_S2-0.5xB-0.5xD
@@ -438,7 +486,7 @@ namespace plotter {
       }
 
       velements=pflow::stringElements2VectorElements(pps,true,false,pp_string,true);  //clean, no sort_elements, pseudopotential string, keep_pp
-      if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
+      if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
       pocc_params=pocc_params_arun_str;
       c=pocc_params_arun_str.find(POCC_ARUN_TAG);
@@ -476,7 +524,7 @@ namespace plotter {
       return aurostd::fixStringLatex(default_title, false, false);
     }
 
-    if(LDEBUG){cerr << soliloquy << " xstr_found: " << endl;cerr << xstr << endl;}
+    if(LDEBUG) { cerr << soliloquy << " xstr_found: " << endl;cerr << xstr << endl;}
 
     if(xstr.species.size()!=xstr.comp_each_type.size()){ //use generic
       ostream& oss=cout;
@@ -489,7 +537,7 @@ namespace plotter {
     int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
     for(uint ispecies=0;ispecies<xstr.species.size();ispecies++){
       clean_specie=KBIN::VASP_PseudoPotential_CleanName(xstr.species[ispecies]);
-      if(LDEBUG){cerr << soliloquy << " species[ispecies=" << ispecies << "]=" << clean_specie << endl;}
+      if(LDEBUG) { cerr << soliloquy << " species[ispecies=" << ispecies << "]=" << clean_specie << endl;}
       new_title+=aurostd::fixStringLatex(clean_specie,false,false);
       new_title+=(aurostd::isequal(xstr.comp_each_type[ispecies],1.0,xstr.partial_occupation_stoich_tol) ? "" : "$_{"+aurostd::utype2string(xstr.comp_each_type[ispecies],comp_prec)+"}$");
     }
@@ -505,13 +553,13 @@ namespace plotter {
 
     new_title+=")";
 
-    if(LDEBUG){cerr << soliloquy << " new_title=" << new_title << endl;}
+    if(LDEBUG) { cerr << soliloquy << " new_title=" << new_title << endl;}
 
     return new_title; //aurostd::fixStringLatex(new_title, false, false);  //substs $ for \\$
   }
   string formatDefaultTitlePOCC_190101(const xoption& plotoptions) {  //ME version
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::formatDefaultTitlePOCC():";
+    string soliloquy = XHOST.sPID + "plotter::formatDefaultTitlePOCC():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     //Get all the pieces of the default title
     string::size_type t = default_title.find(":POCC");
@@ -524,7 +572,7 @@ namespace plotter {
     bool generic = false;
     // Need _S because S could theoretically also be a decorator
     if (aurostd::substring2bool(pocc, "_S")) generic = true;
-    if(LDEBUG){cerr << soliloquy << " found _S tag = " << generic << endl;}
+    if(LDEBUG) { cerr << soliloquy << " found _S tag = " << generic << endl;}
     pocc = pocc.substr(1, pocc.size());  // Remove the leading _
 
     // Get the HNF matrix string
@@ -534,7 +582,7 @@ namespace plotter {
       t = pocc.find(":");
       hnf = pocc.substr(t + 1, string::npos);
       pocc = pocc.substr(0, t);  // Remove ARUN from pocc
-      if(LDEBUG){cerr << soliloquy << " hnf=" << hnf << endl;}
+      if(LDEBUG) { cerr << soliloquy << " hnf=" << hnf << endl;}
       if (!hnf.empty()) {
         aurostd::string2tokens(hnf, tokens, "_");
         hnf = tokens.back();
@@ -734,12 +782,12 @@ namespace plotter {
 
   void PLOT_DOS(xoption& plotoptions, stringstream& out) { //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::PLOT_DOS():";
+    string soliloquy = XHOST.sPID + "plotter::PLOT_DOS():";
 
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
-    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+    if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
     xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
     PLOT_DOS(plotoptions, out, xdos);
     savePlotGNUPLOT(plotoptions, out);
@@ -747,27 +795,27 @@ namespace plotter {
 
   void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::PLOT_DOS():";
+    string soliloquy = XHOST.sPID + "plotter::PLOT_DOS():";
 
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
-    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+    if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
     string aflowin_path=directory+"/"+_AFLOWIN_;
     if(aurostd::FileExist(aflowin_path)){
       string aflowin="";
       aurostd::file2string(aflowin_path,aflowin);
       string SYSTEM=aurostd::RemoveWhiteSpaces(aurostd::substring2string(aflowin,"[AFLOW]SYSTEM=",FALSE));
       if(!SYSTEM.empty()){
-        if(LDEBUG){cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
+        if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
         plotoptions.pop_attached("DEFAULT_TITLE");
         plotoptions.push_attached("DEFAULT_TITLE", SYSTEM);
-        if(LDEBUG){cerr << soliloquy << " DEFAULT_TITLE(NEW)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
+        if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(NEW)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
       }
     }
   }
 
   void PLOT_DOS(xoption& plotoptions, stringstream& out, const xDOSCAR& xdos) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="plotter::PLOT_DOS():";
+    string soliloquy = XHOST.sPID + "plotter::PLOT_DOS():";
     string extension=plotoptions.getattachedscheme("EXTENSION");
     if(extension.empty()) plotoptions.push_attached("EXTENSION", "dos");
     // Make sure the projections are consistent with the DOSCAR file
@@ -791,7 +839,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    if(LDEBUG){cerr << soliloquy << " EFERMI set" << endl;}
+    if(LDEBUG) { cerr << soliloquy << " EFERMI set" << endl;}
 
     // Get Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
@@ -1108,7 +1156,7 @@ namespace plotter {
   // Generates the data for a DOS plot. 
   void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
-    string soliloquy="plotter::generateDosPlot():";
+    string soliloquy = XHOST.sPID + "plotter::generateDosPlot():";
     deque<deque<deque<double> > > dos;
     int pdos = aurostd::string2utype<int>(plotoptions.getattachedscheme("DATASET"));
     vector<string> labels;
@@ -1152,7 +1200,7 @@ namespace plotter {
           dos = xdos.vDOS[pdos];
         }
       }
-      if(LDEBUG){cerr << soliloquy << " norbitals=" << norbitals << endl;}
+      if(LDEBUG) { cerr << soliloquy << " norbitals=" << norbitals << endl;}
       //CO20191010 - do labels last
       for (int i = 0; i < norbitals; i++) {
         labels.push_back("$" + ORBITALS[i] + "$");
@@ -1458,7 +1506,7 @@ namespace plotter {
   double getDosLimits(const xoption& plotoptions, const xDOSCAR& xdos,
       const deque<deque<deque<double> > >& dos, const deque<double>& energies) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
-    string soliloquy="plotter::getDosLimits():";
+    string soliloquy = XHOST.sPID + "plotter::getDosLimits():";
 
     double Emin = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMIN"));
     double Emax = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMAX"));
@@ -1487,11 +1535,11 @@ namespace plotter {
       }
     }
 
-    if(LDEBUG){cerr << soliloquy << " dosmax(FOUND)=" << dosmax << endl;}
+    if(LDEBUG) { cerr << soliloquy << " dosmax(FOUND)=" << dosmax << endl;}
 
     if (!dosscale.empty()) dosmax *= aurostd::string2utype<double>(dosscale);
 
-    if(LDEBUG){cerr << soliloquy << " dosmax(SCALED)=" << dosmax << endl;}
+    if(LDEBUG) { cerr << soliloquy << " dosmax(SCALED)=" << dosmax << endl;}
 
     // l = order of magnitude
     // x = scalar multiple
@@ -1506,7 +1554,7 @@ namespace plotter {
 
     //CO20191110 - add 30% for every orbital bigger than d to account for larger key
     if(ndos>4){x+=3*(ndos-4);}
-    if(LDEBUG){cerr << soliloquy << " x(new1)=" << x << endl;}
+    if(LDEBUG) { cerr << soliloquy << " x(new1)=" << x << endl;}
 
     //[CO20191110 OBSOLETE]if ((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0)) {
     //[CO20191110 OBSOLETE]  dosmax = x * std::pow(10.0, l); 
@@ -1524,7 +1572,7 @@ namespace plotter {
     //  * The maximum (l) is smaller than 1, in which case they all have decimal points.
     //  * The number is divisible by 4.
     if (!((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0))) {x++;}
-    if(LDEBUG){cerr << soliloquy << " x(new2)=" << x << endl;}
+    if(LDEBUG) { cerr << soliloquy << " x(new2)=" << x << endl;}
 
     dosmax = x * std::pow(10.0, l); 
 
@@ -1537,7 +1585,7 @@ namespace plotter {
       const vector<double>& xvals, const vector<double>& ticvals,
       const vector<string>& ticlabels, const xoption& plotoptions) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
-    string soliloquy="plotter::generateBandPlotGNUPLOT():";
+    string soliloquy = XHOST.sPID + "plotter::generateBandPlotGNUPLOT():";
 
     // Initialize variables
     double Efermi = aurostd::string2utype<double>(plotoptions.getattachedscheme("EFERMI"));
@@ -2058,7 +2106,7 @@ namespace plotter {
   void generatePlotGNUPLOT(stringstream& out, const xoption& plotoptions,
       const vector<vector<double> >& data) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
-    string soliloquy="plotter::generatePlotGNUPLOT():";
+    string soliloquy = XHOST.sPID + "plotter::generatePlotGNUPLOT():";
     uint ndata = data[0].size() - 1;
 
     // Axes settings

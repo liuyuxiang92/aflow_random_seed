@@ -342,9 +342,9 @@ void xOUTCAR::clear() {  // clear PRIVATE
 ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  // SC20200330
   bool LVERBOSE=(FALSE || XHOST.DEBUG);
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cerr << "xOUTCAR::operator<<: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::operator<<: BEGIN (" << time_delay(seconds) << ")" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::operator<<: filename=[" << xOUT.filename << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::operator<<: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::operator<<: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::operator<<: filename=[" << xOUT.filename << "]" << endl;
   oss << " filename=" << xOUT.filename<< endl;
   oss << " vcontent.size()=" << xOUT.vcontent.size() << endl;
   oss << " SYSTEM=" << xOUT.SYSTEM << endl;
@@ -473,7 +473,7 @@ ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  // SC20200330
   oss << " Egap_type_net=" << xOUT.Egap_type_net << endl;
   oss << " ERROR=" << xOUT.ERROR << endl;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xOUTCAR::operator<<: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::operator<<: END (" << time_delay(seconds) << ")" << endl;
   return oss;   
 } // SC20200330
 
@@ -525,7 +525,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   vector<string> tokens;
   aurostd::string2tokens(line,tokens);
   if(tokens.size()==expected_count){return tokens;}
-  if(0||LVERBOSE) cerr << "xOUTCAR::GetCorrectPositions: issuing fix for bad lattice vectors (negative sign) on this line: " << line << endl;
+  if(0||LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetCorrectPositions: issuing fix for bad lattice vectors (negative sign) on this line: " << line << endl;
   //try fixing negative sign first
   vector<string> neg_tokens,_tokens;
   std::size_t pos;
@@ -542,7 +542,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   }
   if(neg_tokens.size()==expected_count){return neg_tokens;}
   //negative sign fix not enough, now  we need to look at large number problems
-  if(0||LVERBOSE) cerr << "xOUTCAR::GetCorrectPositions: issuing fix for bad lattice vectors (large numbers) on this line: " << line << endl;
+  if(0||LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetCorrectPositions: issuing fix for bad lattice vectors (large numbers) on this line: " << line << endl;
   vector<string> dec_tokens;
   string good_num;
   _tokens.clear();
@@ -554,7 +554,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   if(good_num.empty()){dec_tokens.clear();return dec_tokens;} //we have no hope
   //_tokens contains precision
   uint precision=_tokens[1].size();
-  if(0||LVERBOSE) cerr << "xOUTCAR::GetCorrectPositions: precision of numbers on this line: " << precision << endl;
+  if(0||LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetCorrectPositions: precision of numbers on this line: " << precision << endl;
   //let's build numbers with the right count of digits
   string num;
   bool fidelity=true;
@@ -593,7 +593,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   }
   if(!fidelity || dec_tokens.size()!=expected_count){dec_tokens.clear();return dec_tokens;}
   if(0||LVERBOSE){ 
-    cerr << "xOUTCAR::GetCorrectPositions: repaired vector: ";
+    cerr << XHOST.sPID << "xOUTCAR::GetCorrectPositions: repaired vector: ";
     for(uint i=0;i<dec_tokens.size();i++){cerr << dec_tokens[i] << " ";}
     cerr << endl;
   }
@@ -607,14 +607,14 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   clear(); // so it does not mess up vector/deque
 
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   stringstream sss; sss.str(stringstreamIN.str());
   content=stringstreamIN.str();
   vcontent.clear();
   vector<string> vline,tokens,vcontentRED;
   aurostd::string2vectorstring(content,vcontent);
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vcontent.size()=" << vcontent.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vcontent.size()=" << vcontent.size() << " (" << time_delay(seconds) << ")" << endl;
   for(uint iline=0;iline<vcontent.size();iline++) { // NEW - FROM THE BACK
     string saus=vcontent.at(iline);
     if(aurostd::substring2bool(saus,"="))  vcontentRED.push_back(saus);
@@ -622,18 +622,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(saus,"number")) vcontentRED.push_back(saus); // number
     if(aurostd::substring2bool(saus,"bands")) vcontentRED.push_back(saus); // bands
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vcontentRED.size()=" << vcontentRED.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vcontentRED.size()=" << vcontentRED.size() << " (" << time_delay(seconds) << ")" << endl;
   
   string line;
   if(filename=="") filename="stringstream";
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: filename=[" << filename << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: filename=[" << filename << "]" << endl;
   if(LVERBOSE) cerr.precision(12);
 
   // ----------------------------------------------------------------------
   // STEFANO
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
  
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SYSTEM (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD SYSTEM (" << time_delay(seconds) << ")" << endl;
   SYSTEM="";
   line="";
   for(uint iline=0;iline<vcontent.size();iline++) { // NEW - FROM THE BACK 
@@ -643,17 +643,17 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	break;
       }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl;
   if(line!="") {
     aurostd::string2tokens(line,tokens,"="); // cerr << tokens.size() << endl;
     SYSTEM=aurostd::RemoveWhiteSpaces(tokens.at(1));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SYSTEM=" << SYSTEM << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: SYSTEM=" << SYSTEM << endl; 
   // ----------------------------------------------------------------------
   // KESONG STUFF DONT TOUCH - GET Number of IONS and Fermi
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD KESONG STUFF (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD KESONG STUFF (" << time_delay(seconds) << ")" << endl;
   string anchor_word_NIONS="NIONS";
   string anchor_word_LSORBIT="LSORBIT =";
   string anchor_word_Efermi="E-fermi";
@@ -673,9 +673,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       Efermi=aurostd::string2utype<double>(tokens.at(2));
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: NIONS=" << NIONS << endl; //exit(0);
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: isLSCOUPLING=" << isLSCOUPLING << endl; //exit(0);
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: Efermi=" << Efermi << endl; //exit(0);
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: NIONS=" << NIONS << endl; //exit(0);
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: isLSCOUPLING=" << isLSCOUPLING << endl; //exit(0);
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: Efermi=" << Efermi << endl; //exit(0);
   // return TRUE;
   // ----------------------------------------------------------------------
   // DO STEFANO STUFF
@@ -683,8 +683,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   natoms=(double) NIONS;
   // ----------------------------------------------------------------------
   // LOAD EENTROPY DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD EENTROPY DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD EENTROPY DATA (" << time_delay(seconds) << ")" << endl;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"entropy"))
       if(aurostd::substring2bool(vcontent.at(iline),"EENTRO"))
@@ -692,7 +692,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl; 
   aurostd::string2tokens(line,tokens,"=");
   if(tokens.size()==0) {
     if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
@@ -701,9 +701,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   eentropy_cell=0;
   if(tokens.size()>1) eentropy_cell=aurostd::string2utype<double>(tokens.at(1));
   eentropy_atom=eentropy_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: eentropy_cell=" << eentropy_cell << endl; //exit(0);
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: eentropy_cell=" << eentropy_cell << endl; //exit(0);
   // LOAD ENERGY DATA  // without energy of electrons
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD ENERGY DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD ENERGY DATA" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"energy")) // VASP
@@ -712,7 +712,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         }  // VASP
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl;
   aurostd::string2tokens(line,tokens,"=");
   if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);
   if(tokens.size()>1) line=tokens.at(1);
@@ -720,11 +720,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);
   if(tokens.size()>0) energy_cell=aurostd::string2utype<double>(tokens.at(0));
   energy_atom=energy_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
   // ----------------------------------------------------------------------
   // LOAD PV DATA (IF PRESENT)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PV DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD PV DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"TOTEN"))  // VASP
@@ -735,7 +735,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
               line=vcontent.at(iline);
               break;
             } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl;
   if(line.length()<10) {
     PV_cell=0.0;
     PV_atom=PV_cell/natoms;
@@ -744,7 +744,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()!=3) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);
     if(tokens.size()>2) PV_cell=aurostd::string2utype<double>(tokens.at(2));
     PV_atom=PV_cell/natoms;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
   }
 
   // correct if PV
@@ -753,7 +753,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     enthalpy_cell=energy_cell;  // default without PV
     enthalpy_atom=energy_atom;   // default without PV
   } else {
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pressure=" << pressure << endl; 
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: pressure=" << pressure << endl; 
     // LOAD ENTHALPY DATA IF P!=0
     line="";
     for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW
@@ -762,7 +762,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         } 
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl;
     aurostd::string2tokens(line,tokens," ");
     //    if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (enthalpy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); 
 
@@ -773,20 +773,20 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           if(aurostd::substring2bool(tokens.at(i-1),"TOTEN")) {
             enthalpy_cell=aurostd::string2utype<double>(tokens.at(i+1));
             enthalpy_atom=enthalpy_cell/natoms;
-            if(LVERBOSE) cerr << "xOUTCAR::GetProperties: enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
+            if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
           }
         }
       }
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
 
   // ----------------------------------------------------------------------
   // LOAD PVstress DATA (IF PRESENT)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD STRESS DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD STRESS DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"external"))  // VASP
@@ -796,7 +796,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             line=vcontent.at(iline-1);
             break;
           }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl;
   stress.clear();
   aurostd::string2tokens(line,tokens," ");
   if(tokens.size()>=8) {
@@ -810,13 +810,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     stress(1,3)=aurostd::string2utype<double>(tokens.at(7));
     stress(3,1)=aurostd::string2utype<double>(tokens.at(7));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: stress=" << endl << stress << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: stress=" << endl << stress << endl; 
   //   Direction    XX        YY        ZX        XY       YZ       ZX
   //   in kB       -5.93     -5.93    -19.31      0.00      0.00     -0.00
   // ----------------------------------------------------------------------
   // LOAD VOLUME DATA (IF PRESENT)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD volume DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD volume DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"volume"))
@@ -825,7 +825,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl; 
   volume_cell=0.0;
   aurostd::string2tokens(line,tokens," ");
   if(tokens.size()>=5) {
@@ -834,11 +834,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   volume_atom=volume_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: volume_cell=" << volume_cell << " volume_atom=" << volume_atom << endl;   
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: volume_cell=" << volume_cell << " volume_atom=" << volume_atom << endl;   
   // ----------------------------------------------------------------------
   // LOAD PRESSURE_RESIDUAL/PULAY DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PRESSURE_RESIDUAL/PULAY DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD PRESSURE_RESIDUAL/PULAY DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"Pullay") || aurostd::substring2bool(vcontent.at(iline),"pullay") ||
@@ -847,7 +847,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         line=vcontent.at(iline);
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl;
   aurostd::string2tokens(line,tokens,"=");
   if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);
 
@@ -867,13 +867,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()>0) Pulay_stress=aurostd::string2utype<double>(tokens.at(0));
   }
 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pressure_residual=" << pressure_residual << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: Pulay_stress=" << Pulay_stress << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: pressure_residual=" << pressure_residual << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: Pulay_stress=" << Pulay_stress << endl;
 
   // ----------------------------------------------------------------------
   // LOAD SPIN
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SPIN DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD SPIN DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"magnetization"))
@@ -881,7 +881,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         line=vcontent.at(iline);
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: line=" << line << endl; 
   mag_cell=0.0;
   aurostd::string2tokens(line,tokens," ");
   if(tokens.size()>=6) {
@@ -889,11 +889,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       mag_cell=aurostd::string2utype<double>(tokens.at(5)); // junkai seems to work
   }
   mag_atom=mag_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
   // ----------------------------------------------------------------------
   // LOAD SPIN DECOMPOSITION
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SPIN DECOMPOSITION DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD SPIN DECOMPOSITION DATA" << endl;
   line="";
   uint mline=0;
   // DX20171205 - Check for magnetization z (non-collinear) - START
@@ -906,8 +906,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         found_magz_line=true;
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (z) line=" << line << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (z) mline=" << mline << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: magnetization (z) line=" << line << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: magnetization (z) mline=" << mline << endl; 
   if(found_magz_line) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
@@ -926,8 +926,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         found_magy_line=true;
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (y) line=" << line << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (y) mline=" << mline << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: magnetization (y) line=" << line << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: magnetization (y) mline=" << mline << endl; 
   if(found_magy_line) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
@@ -945,8 +945,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         found_magx_line=true;
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (x) line=" << line << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (x) mline=" << mline << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: magnetization (x) line=" << line << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: magnetization (x) mline=" << mline << endl; 
   if(found_magx_line) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
@@ -956,7 +956,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   // DX20171205 - Non-collinear vs collinear - START
   if(found_magx_line && found_magy_line && found_magz_line){ //non-collinear calculation
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: non-collinear magnetization found." << endl; 
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: non-collinear magnetization found." << endl; 
     if(vmag_x.size()!=vmag_y.size() || vmag_x.size()!=vmag_z.size()){
       if(!QUIET){cerr << "WARNING - xOUTCAR::GetProperties:" << " number of magnetization components (x, y, z) are not the same in OUTCAR; filename=[" << filename << "]" << endl;}
       ERROR_flag=TRUE;
@@ -967,16 +967,16 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   else if(found_magx_line && !found_magy_line && !found_magz_line){ //collinear calculation (x only)
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: collinear magnetization found." << endl; 
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: collinear magnetization found." << endl; 
     for(uint m=0;m<vmag_x.size();m++){
       vmag.push_back(vmag_x[m]);
     }
   }
-  //  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
+  //  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
   // ----------------------------------------------------------------------
   // LOAD FORCES/POSITIONS
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD FORCES/POSITIONS DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD FORCES/POSITIONS DATA (" << time_delay(seconds) << ")" << endl;
   vforces.clear();                    // QM FORCES calculation
   vpositions_cartesian.clear();                 // QM POSITIONS calculation
   for(uint i=0;i<(uint) natoms;i++) {
@@ -1004,8 +1004,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // ----------------------------------------------------------------------
   // ENCUT EDIFF EDIFFG POTIM TEIN TEBEG TEEND SMASS NPACO APACO PSTRESS  
   // NBANDS NKPTS NSW NBLOCK KBLOCK IBRION NFREE ISIF IWAVPR ISYM TEIN TEBEG ISPIN
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD \"Electronic convergence/Ionic relaxation\" DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD \"Electronic convergence/Ionic relaxation\" DATA (" << time_delay(seconds) << ")" << endl;
   vline.clear();
   ENCUT=0.0;EDIFF=0.0;EDIFFG=0.0;POTIM=0.0;TEIN=0.0;TEBEG=0.0;TEEND=0.0;SMASS=0.0;NPACO=0.0;APACO=0.0;PSTRESS=0.0;pressure=0.0;     // 
   NBANDS=0;NKPTS=0;NSW=0;NBLOCK=0;KBLOCK=0;IBRION=0;NFREE=0;ISIF=0;IWAVPR=0;ISYM=0;TEIN=0;TEBEG=0;ISPIN=0; //
@@ -1037,10 +1037,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"NBANDS") && aurostd::substring2bool(vcontentRED.at(iline),"number of bands")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"total energy-change") && aurostd::substring2bool(vcontentRED.at(iline),"(2. order)")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); 
   for(uint j=0;j<vline.size();j++) {   // to the back
-    //   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //   if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     aurostd::StringSubst(vline.at(j),":"," ");
@@ -1087,36 +1087,36 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       }
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENCUT=" << ENCUT << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EDIFF=" << EDIFF << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EDIFFG=" << EDIFFG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NSW=" << NSW << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NBLOCK=" << NBLOCK << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: KBLOCK=" << KBLOCK << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IBRION=" << IBRION << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NFREE=" << NFREE << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISIF=" << ISIF << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IWAVPR=" << IWAVPR << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISYM=" << ISYM << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: POTIM=" << POTIM << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TEIN=" << TEIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TEBEG=" << TEBEG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TEEND=" << TEEND << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: SMASS=" << SMASS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NPACO=" << NPACO << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: APACO=" << APACO << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: PSTRESS=" << PSTRESS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: pressure(PSTRESS)=" << pressure << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NBANDS=" << NBANDS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NKPTS=" << NKPTS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISPIN=" << ISPIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: total_energy_change=" << total_energy_change << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ENCUT=" << ENCUT << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EDIFF=" << EDIFF << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EDIFFG=" << EDIFFG << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: NSW=" << NSW << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: NBLOCK=" << NBLOCK << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: KBLOCK=" << KBLOCK << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: IBRION=" << IBRION << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: NFREE=" << NFREE << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ISIF=" << ISIF << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: IWAVPR=" << IWAVPR << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ISYM=" << ISYM << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: POTIM=" << POTIM << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: TEIN=" << TEIN << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: TEBEG=" << TEBEG << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: TEEND=" << TEEND << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: SMASS=" << SMASS << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: NPACO=" << NPACO << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: APACO=" << APACO << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: PSTRESS=" << PSTRESS << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: pressure(PSTRESS)=" << pressure << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: NBANDS=" << NBANDS << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: NKPTS=" << NKPTS << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ISPIN=" << ISPIN << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: total_energy_change=" << total_energy_change << endl;}
 
   // if pressure correct enthalpy
   // ----------------------------------------------------------------------
   // ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX (there are many)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX\" DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX\" DATA (" << time_delay(seconds) << ")" << endl;
   vline.clear();
   vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
   for(uint iline=0;iline<vcontentRED.size();iline++) {
@@ -1130,10 +1130,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"RAUG") && aurostd::substring2bool(vcontentRED.at(iline),"sphere")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"RMAX") && aurostd::substring2bool(vcontentRED.at(iline),"radius")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); 
   for(uint j=0;j<vline.size();j++) {
-    // if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    // if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     //    if(LVERBOSE) cerr << vline.at(j) << endl;
@@ -1161,37 +1161,37 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   ENMAX=aurostd::max(vENMAX);
   ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
 
   POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
 
   ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
 
   EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
 
   RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
 
   RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
 
   EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
 
   RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
 
   RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr  << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr  << " " << endl;}
   
   // ----------------------------------------------------------------------
   // KINETIC AND METAGGA DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD KINETIC AND METAGGA DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD KINETIC AND METAGGA DATA (" << time_delay(seconds) << ")" << endl;
   isKIN=FALSE;
   isMETAGGA=FALSE;
   METAGGA="";
@@ -1200,7 +1200,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontent.at(iline),"partial kinetic energy density read in")) { isKIN=TRUE; }
     if(aurostd::substring2bool(vcontent.at(iline),"METAGGA")) { vline.push_back(vcontent.at(iline)); }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
 
   if(vline.size()>0) {
     aurostd::string2tokens(vline.at(0),tokens,"=");
@@ -1214,15 +1214,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       }
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: isKIN=" << isKIN << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: isMETAGGA=" << isMETAGGA << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: METAGGA=" << METAGGA << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: isKIN=" << isKIN << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: isMETAGGA=" << isMETAGGA << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: METAGGA=" << METAGGA << endl;
 
   // ----------------------------------------------------------------------
   // PSEUDOPOTENTIAL DATA
   // LVERBOSE=1;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA (" << time_delay(seconds) << ")" << endl;
  
   vline.clear();
   vTITEL.clear();
@@ -1232,21 +1232,21 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(aurostd::substring2bool(vcontentRED.at(iline),"TITEL")) {
  	aurostd::string2tokens(vcontentRED.at(iline),tokens,"=");
 	if(tokens.size()>1) vTITEL.push_back(tokens.at(1));
-	//	if(LVERBOSE) cerr << "xOUTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
+	//	if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
       }
       if(aurostd::substring2bool(vcontentRED.at(iline),"LEXCH")) {
 	if(!aurostd::substring2bool(vcontentRED.at(iline),"exchange")) {
 	  aurostd::string2tokens(vcontentRED.at(iline),tokens,"=");
 	  if(tokens.size()>1) vLEXCH.push_back(tokens.at(1));
-	  //	if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
+	  //	if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
 	}
       }
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vEATOM.size()=" << vEATOM.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vEATOM.size()=" << vEATOM.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
   if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
   if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
   if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
@@ -1256,9 +1256,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
  
   for(uint j=0;j<vTITEL.size();j++) {
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") " << endl;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: SPECIES(" << j << ") " << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
     aurostd::string2tokens(vTITEL.at(j),tokens," ");
     pp_type=tokens.at(0);
     if(pp_type=="US" or pp_type=="NC") {
@@ -1271,10 +1271,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	}
       }
     }
-    if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xOUTCAR::GetProperties: PAW_LDA" << endl;
+    if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << XHOST.sPID << "xOUTCAR::GetProperties: PAW_LDA" << endl;
     if(isKIN) pp_type+="_KIN";
     if(isMETAGGA) pp_type+=":"+METAGGA;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pp_type=" << pp_type << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: pp_type=" << pp_type << endl;
     species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
     species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1))));
     species_pp.push_back(tokens.at(1));
@@ -1290,7 +1290,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
     species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
     
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
                       << species.at(species.size()-1) << " ["
                       << species_Z.at(species_Z.size()-1) << ", "
                       << species_pp.at(species_pp.size()-1) << ", "
@@ -1301,25 +1301,25 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
                       << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
  
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species.size()=" << species.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_Z.size()=" << species_Z.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp.size()=" << species_pp.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species.size()=" << species.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_Z.size()=" << species_Z.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp.size()=" << species_pp.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << endl;
   if(species_pp_AUID_collisions.size()) {
-    cerr << "xOUTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    cerr << XHOST.sPID << "xOUTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
     ERROR_flag=TRUE;
   }
   
   // ----------------------------------------------------------------------
   // LDAU DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD LDAU DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD LDAU DATA (" << time_delay(seconds) << ")" << endl;
   for(uint j=0;j<species.size();j++) 
     species_pp_vLDAU.push_back(deque<double>());  // make space for LDAU
 
@@ -1332,7 +1332,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             vline.push_back(vcontent.at(iline));
 
   if(vline.size()!=0) {
-    if(LVERBOSE) cout << "xOUTCAR::GetProperties: LDAU calculation in OUTCAR" << endl;
+    if(LVERBOSE) cout << XHOST.sPID << "xOUTCAR::GetProperties: LDAU calculation in OUTCAR" << endl;
     int LDAUT=0;
     vector<int> vLDAUL;vector<double> vLDAUU,vLDAUJ;
     for(uint j=0;j<vline.size();j++) {
@@ -1347,22 +1347,22 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(j==3) for(uint i=0;i<tokens.size();i++) vLDAUJ.push_back(((int) 100*aurostd::string2utype<double>(tokens.at(i)))/100.0);
     }
     if(species_pp_vLDAU.size()!=species.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]" << endl;
+      if(!QUIET) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]" << endl;
       ERROR_flag=TRUE;
       //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUL.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]" << endl;
+      if(!QUIET) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]" << endl;
       ERROR_flag=TRUE;
       //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUU.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]" << endl;
+      if(!QUIET) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]" << endl;
       ERROR_flag=TRUE;
       //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUJ.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]" << endl;
+      if(!QUIET) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]" << endl;
       ERROR_flag=TRUE;
       //exit(0);
     }
@@ -1374,18 +1374,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
 
     if(LVERBOSE) { 
-      cout << "xOUTCAR::GetProperties: LDA_type=" << LDAUT << endl;
-      cout << "xOUTCAR::GetProperties: LDAU_L=";
+      cout << XHOST.sPID << "xOUTCAR::GetProperties: LDA_type=" << LDAUT << endl;
+      cout << XHOST.sPID << "xOUTCAR::GetProperties: LDAU_L=";
       for(uint i=0;i<vLDAUL.size();i++) cout << vLDAUL.at(i) << ((i<vLDAUL.size()-1)?",":""); 
       cout << endl;
     }
     if(LVERBOSE) {
-      cout << "xOUTCAR::GetProperties: LDAU_U=";
+      cout << XHOST.sPID << "xOUTCAR::GetProperties: LDAU_U=";
       for(uint i=0;i<vLDAUU.size();i++) cout << vLDAUU.at(i) << ((i<vLDAUU.size()-1)?",":""); 
       cout << endl;
     }
     if(LVERBOSE) {
-      cout << "xOUTCAR::GetProperties: LDAU_J=";
+      cout << XHOST.sPID << "xOUTCAR::GetProperties: LDAU_J=";
       for(uint i=0;i<vLDAUJ.size();i++) cout << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
       cout << endl;
     }
@@ -1398,15 +1398,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     for(uint i=0;i<vLDAUJ.size();i++) sdata_ldau << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
     //sdata_ldau << ";";
     string_LDAU=sdata_ldau.str();
-    if(LVERBOSE) cout << "xOUTCAR::GetProperties: string_LDAU=" << string_LDAU << endl;
+    if(LVERBOSE) cout << XHOST.sPID << "xOUTCAR::GetProperties: string_LDAU=" << string_LDAU << endl;
   }
 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
 
   // ----------------------------------------------------------------------
   // DOS related values:
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD DOS related values DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD DOS related values DATA (" << time_delay(seconds) << ")" << endl;
   EMIN=0.0;EMAX=0.0;SIGMA=0.0;ISMEAR=0;  // for aflowlib_libraries.cpp 
   vline.clear();
   for(uint iline=vcontentRED.size()-1;iline>0;iline--) { 
@@ -1416,10 +1416,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"ISMEAR") && aurostd::substring2bool(vcontentRED.at(iline),"broadening in eV")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"SIGMA") && aurostd::substring2bool(vcontentRED.at(iline),"broadening in eV")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); 
   for(uint j=0;j<vline.size();j++) {
-    //   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //   if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     //    if(LVERBOSE) cerr << vline.at(j) << endl;
@@ -1431,15 +1431,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="SIGMA" && k+1<tokens.size()) SIGMA=aurostd::string2utype<double>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EMIN=" << EMIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EMAX=" << EMAX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISMEAR=" << ISMEAR << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: SIGMA=" << SIGMA << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EMIN=" << EMIN << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EMAX=" << EMAX << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: ISMEAR=" << ISMEAR << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: SIGMA=" << SIGMA << endl;}
 
   // ----------------------------------------------------------------------
   // Electronic relaxation
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD Electronic relaxation DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD Electronic relaxation DATA (" << time_delay(seconds) << ")" << endl;
   IALGO=0;                      // for aflowlib_libraries.cpp
   LDIAG="";                     // for aflowlib_libraries.cpp
   IMIX=0;INIMIX=0;MIXPRE=0;     // for aflowlib_libraries.cpp
@@ -1455,10 +1455,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"AMIN")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"WC") && aurostd::substring2bool(vcontentRED.at(iline),"INIMIX") && aurostd::substring2bool(vcontentRED.at(iline),"MIXPRE")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);
   for(uint j=0;j<vline.size();j++) {
-    //  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     //    if(LVERBOSE) cerr << vline.at(j) << endl;
@@ -1477,22 +1477,22 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="MIXPRE" && k+1<tokens.size()) MIXPRE=aurostd::string2utype<int>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IALGO=" << IALGO << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: LDIAG=" << LDIAG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IMIX=" << IMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: AMIX=" << AMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: BMIX=" << BMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: AMIX_MAG=" << AMIX_MAG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: BMIX_MAG=" << BMIX_MAG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: AMIN=" << AMIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: WC=" << WC << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: INIMIX=" << INIMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: MIXPRE=" << MIXPRE << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: IALGO=" << IALGO << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: LDIAG=" << LDIAG << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: IMIX=" << IMIX << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: AMIX=" << AMIX << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: BMIX=" << BMIX << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: AMIX_MAG=" << AMIX_MAG << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: BMIX_MAG=" << BMIX_MAG << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: AMIN=" << AMIN << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: WC=" << WC << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: INIMIX=" << INIMIX << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: MIXPRE=" << MIXPRE << endl;}
 
   // ----------------------------------------------------------------------
   // Intra band minimization
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD Intra band minimization DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD Intra band minimization DATA (" << time_delay(seconds) << ")" << endl;
   WEIMIN=0.0;EBREAK=0.0;DEPER=0.0;TIME=0.0;  // for aflowlib_libraries.cpp
   vline.clear();
   for(uint iline=vcontentRED.size()-1;iline>0;iline--) {
@@ -1502,10 +1502,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"DEPER") && aurostd::substring2bool(vcontentRED.at(iline),"relativ break condition")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"TIME") && aurostd::substring2bool(vcontentRED.at(iline),"timestep for ELM")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);
   for(uint j=0;j<vline.size();j++) {
-    //  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     //    if(LVERBOSE) cerr << vline.at(j) << endl;
@@ -1517,15 +1517,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="TIME" && k+1<tokens.size()) TIME=aurostd::string2utype<double>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: WEIMIN=" << WEIMIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EBREAK=" << EBREAK << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: DEPER=" << DEPER << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TIME=" << TIME; cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: WEIMIN=" << WEIMIN << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: EBREAK=" << EBREAK << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: DEPER=" << DEPER << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: TIME=" << TIME; cerr << endl;}
 
   // ----------------------------------------------------------------------
   // LOAD NWEIGHTS VKPOINT
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD NWEIGHTS KPOINTLIST DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD NWEIGHTS KPOINTLIST DATA (" << time_delay(seconds) << ")" << endl;
   uint nkpoints_line=0;
   nweights=0;
   nkpoints_irreducible=0;
@@ -1538,10 +1538,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     //  for(uint iline=0;iline<vcontent.size();iline++) {
     if(aurostd::substring2bool(vcontent.at(iline),"Found") && aurostd::substring2bool(vcontent.at(iline),"irreducible k-points")) {vline.push_back(vcontent.at(iline));nkpoints_line=iline+4;}
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); 
   for(uint j=0;j<vline.size();j++) {
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     //    if(LVERBOSE) cerr << vline.at(j) << endl;
@@ -1550,7 +1550,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="Found" && k+1<tokens.size()) nkpoints_irreducible=aurostd::string2utype<uint>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xOUTCAR::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;}
 
   if(nkpoints_irreducible) {
     for(uint iline=nkpoints_line;(iline<nkpoints_line+nkpoints_irreducible && iline<vcontent.size());iline++) {
@@ -1566,7 +1566,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         minweight=aurostd::min(minweight,aurostd::string2utype<uint>(tokens.at(3)));
         nweights+=aurostd::string2utype<uint>(tokens.at(3));
       } else {
-        //	if(!QUIET) cerr << "xOUTCAR::GetProperties: error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
+        //	if(!QUIET) cerr << XHOST.sPID << "xOUTCAR::GetProperties: error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
         //	ERROR_flag=TRUE;//exit(0);
       }
     }
@@ -1581,22 +1581,22 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         kpoint[3]=aurostd::string2utype<double>(tokens.at(2));
         vkpoint_cartesian.push_back(kpoint); // cerr.precision(20);
       } else {
-        //	if(!QUIET) cerr << "xOUTCAR::GetProperties: error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
+        //	if(!QUIET) cerr << XHOST.sPID << "xOUTCAR::GetProperties: error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
         //	ERROR_flag=TRUE;//exit(0);
       }
     }
   }
   //  nweights=nweights/minweight; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vkpoint_reciprocal.size()=" << vkpoint_reciprocal.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vkpoint_cartesian.size()=" << vkpoint_cartesian.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vweights.size()=" << vweights.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: nweights=" << nweights << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vkpoint_reciprocal.size()=" << vkpoint_reciprocal.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vkpoint_cartesian.size()=" << vkpoint_cartesian.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: vweights.size()=" << vweights.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: nweights=" << nweights << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
 
   // ----------------------------------------------------------------------
   // LOAD CALCULATION STUFF
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD CALCULATION STUFF DATA (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: LOAD CALCULATION STUFF DATA (" << time_delay(seconds) << ")" << endl;
   // CALCULATION_CORES
   calculation_cores=1;
   for(uint iline=0;iline<vcontent.size();iline++) 
@@ -1610,7 +1610,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()>2) calculation_cores=aurostd::string2utype<uint>(tokens.at(2));
   }
   if(calculation_cores<1) calculation_cores=1; 
-  if(LVERBOSE) cout << "xOUTCAR::GetProperties: calculation_cores=" << calculation_cores << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xOUTCAR::GetProperties: calculation_cores=" << calculation_cores << endl;
   // CALCULATION_TIME
   calculation_time=0.0;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -1622,7 +1622,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(line.empty()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: in OUTCAR (no calculation_time)" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;} // exit(0); 
   aurostd::string2tokens(line,tokens);
   if(tokens.size()>1) calculation_time=aurostd::string2utype<double>(tokens.at(tokens.size()-1));
-  if(LVERBOSE) cout << "xOUTCAR::GetProperties: calculation_time=" << calculation_time << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xOUTCAR::GetProperties: calculation_time=" << calculation_time << endl;
   // CALCULATION_MEMORY 
   calculation_memory=0.0;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -1634,11 +1634,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(line.empty()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: in OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;} // exit(0); 
   aurostd::string2tokens(line,tokens); //   cerr << tokens.at(3) << endl;
   if(tokens.size()>3) calculation_memory=aurostd::string2utype<double>(tokens.at(3));
-  if(LVERBOSE) cout << "xOUTCAR::GetProperties: calculation_memory=" << calculation_memory << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xOUTCAR::GetProperties: calculation_memory=" << calculation_memory << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: ---------------------------------" << endl;
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xOUTCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
 
   // DONE NOW RETURN
   if(ERROR_flag && !QUIET) cerr << "WARNING - xOUTCAR::GetProperties: ERROR_flag set in xOUTCAR" << endl;
@@ -1651,7 +1651,7 @@ bool xOUTCAR::GetXStructure() {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   xstr.clear(); //DX20191220 - uppercase to lowercase clear
 
-  if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: Trying to build the xstructure from the OUTCAR" << endl;}
+  if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: Trying to build the xstructure from the OUTCAR" << endl;}
 
   //get lattice
   bool found_lattice,found_types,found_positions;
@@ -1669,12 +1669,12 @@ bool xOUTCAR::GetXStructure() {
       aurostd::string2tokens(vcontent[iline],tokens);
       if((tokens.size()>5) && (tokens[0] == "direct") && (tokens[1] == "lattice") && (tokens[2] == "vectors") &&
 	 (tokens[3] == "reciprocal") && (tokens[4] == "lattice") && (tokens[5] == "vectors")){
-        if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: lattice found!" << endl;}
+        if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: lattice found!" << endl;}
         found_lattice=true;
         //
         tokens=GetCorrectPositions(vcontent[iline+1],6);
         if(!tokens.size()){
-          if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+1] << endl;}
+          if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+1] << endl;}
           return false;
         }
         lattice(1,1)=aurostd::string2utype<double>(tokens[0]);
@@ -1686,7 +1686,7 @@ bool xOUTCAR::GetXStructure() {
         //
         tokens=GetCorrectPositions(vcontent[iline+2],6);
         if(!tokens.size()){
-          if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+2] << endl;}
+          if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+2] << endl;}
           return false;
         }
         lattice(2,1)=aurostd::string2utype<double>(tokens[0]);
@@ -1698,7 +1698,7 @@ bool xOUTCAR::GetXStructure() {
         //
         tokens=GetCorrectPositions(vcontent[iline+3],6);
         if(!tokens.size()){
-          if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+3] << endl;}
+          if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+3] << endl;}
           return false;
         }
         lattice(3,1)=aurostd::string2utype<double>(tokens[0]);
@@ -1715,7 +1715,7 @@ bool xOUTCAR::GetXStructure() {
       if((tokens.size()>2) && (tokens[0]=="ions") && (tokens[1]=="per") && (tokens[2]=="type")){
         aurostd::string2tokens(vcontent[iline],tokens,"=");
         if(tokens.size()!=2){continue;}
-        if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: types found!" << endl;}
+        if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: types found!" << endl;}
         found_types=true;
         token=tokens[1];
         aurostd::string2tokens(token,tokens);
@@ -1729,11 +1729,11 @@ bool xOUTCAR::GetXStructure() {
     }
   }
   if(!found_lattice){
-    if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: lattice not found" << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: lattice not found" << endl;}
     return false;
   }
   if(!found_types){
-    if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: types not found" << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: types not found" << endl;}
     return false;
   }
 
@@ -1749,7 +1749,7 @@ bool xOUTCAR::GetXStructure() {
       if(!found_positions && (iline<(int)vcontent.size()-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
 	 (tokens[3] == "in") && (tokens[4] == "cartesian") && (tokens[5] == "coordinates")){
         found_positions=true;
-        if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: positions (cartesian) found!" << endl;}
+        if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: positions (cartesian) found!" << endl;}
         atoms.clear();
         for(uint itype=0;itype<num_each_type.size();itype++){
           for(uint iatom=0;iatom<(uint)num_each_type[itype];iatom++){
@@ -1757,7 +1757,7 @@ bool xOUTCAR::GetXStructure() {
             atoms.back().type=itype;
             tokens=GetCorrectPositions(vcontent[iline+atoms.size()],3);
             if(!tokens.size()){
-              if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
+              if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
               return false;
             }
             cpos(1)=aurostd::string2utype<double>(tokens[0]);
@@ -1771,7 +1771,7 @@ bool xOUTCAR::GetXStructure() {
       if(!found_positions && (iline<(int)vcontent.size()-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
 	 (tokens[3] == "in") && (tokens[4] == "fractional") && (tokens[5] == "coordinates")){
         found_positions=true;
-        if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: positions (fractional) found!" << endl;}
+        if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: positions (fractional) found!" << endl;}
         atoms.clear();
         for(uint itype=0;itype<num_each_type.size();itype++){
           for(uint iatom=0;iatom<(uint)num_each_type[itype];iatom++){
@@ -1779,7 +1779,7 @@ bool xOUTCAR::GetXStructure() {
             atoms.back().type=itype;
             tokens=GetCorrectPositions(vcontent[iline+atoms.size()],3);
             if(!tokens.size()){
-              if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
+              if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
               return false;
             }
             fpos(1)=aurostd::string2utype<double>(tokens[0]);
@@ -1794,7 +1794,7 @@ bool xOUTCAR::GetXStructure() {
   }
 
   if(!found_positions){
-    if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: atom positions not found" << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetXStructure: atom positions not found" << endl;}
     return false;
   }
 
@@ -1833,20 +1833,20 @@ bool xOUTCAR::GetXStructure() {
   xstr.MakeBasis();
 
   if(LDEBUG) {
-    cerr << "xOUTCAR::GetXStructure: lattice" << endl;
+    cerr << XHOST.sPID << "xOUTCAR::GetXStructure: lattice" << endl;
     cerr << lattice << endl;
-    cerr << "xOUTCAR::GetXStructure: klattice" << endl;
+    cerr << XHOST.sPID << "xOUTCAR::GetXStructure: klattice" << endl;
     cerr << 2.0*pi*klattice << endl;
-    cerr << "xOUTCAR::GetXStructure: reciprocal of lattice (check)" << endl;
+    cerr << XHOST.sPID << "xOUTCAR::GetXStructure: reciprocal of lattice (check)" << endl;
     cerr << ReciprocalLattice(lattice) << endl;
-    cerr << "xOUTCAR::GetXStructure: natoms = " << natoms << endl;
+    cerr << XHOST.sPID << "xOUTCAR::GetXStructure: natoms = " << natoms << endl;
     for(uint i=0;i<num_each_type.size();i++){
-      cerr << "xOUTCAR::GetXStructure: num_each_type[" << i << "] = " << num_each_type[i] << endl;
+      cerr << XHOST.sPID << "xOUTCAR::GetXStructure: num_each_type[" << i << "] = " << num_each_type[i] << endl;
     }
     for(uint i=0;i<atoms.size();i++){
-      cerr << "xOUTCAR::GetXStructure: atom[" << i << "] type=" << atoms[i].type << " cpos=" << atoms[i].cpos << " fpos=" << atoms[i].fpos << endl;
+      cerr << XHOST.sPID << "xOUTCAR::GetXStructure: atom[" << i << "] type=" << atoms[i].type << " cpos=" << atoms[i].cpos << " fpos=" << atoms[i].fpos << endl;
     }
-    cerr << "xOUTCAR::GetXStructure: full xstructure" << endl;
+    cerr << XHOST.sPID << "xOUTCAR::GetXStructure: full xstructure" << endl;
     cerr << xstr << endl;
   }
 
@@ -1887,7 +1887,7 @@ bool xOUTCAR::GetStartingKPointLines(vector<uint>& ilines) {
   ilines.clear();
   if(!(ISPIN==1 || ISPIN==2)){
     if(!GetProperties(content) || !(ISPIN==1 || ISPIN==2)){
-      if(LDEBUG) {cerr << "xOUTCAR::GetStartingKPointLines: GetProperties failed." << endl;}
+      if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetStartingKPointLines: GetProperties failed." << endl;}
       return false;
     }
   }
@@ -1899,7 +1899,7 @@ bool xOUTCAR::GetStartingKPointLines(vector<uint>& ilines) {
     }
   }
   if(ilines.size()!=(uint)ISPIN){
-    if(LDEBUG) {cerr << "xOUTCAR::GetStartingKPointLines: ISPIN does not match starting k-point set counts" << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::GetStartingKPointLines: ISPIN does not match starting k-point set counts" << endl;}
     return false;
   }
   return true;
@@ -1918,7 +1918,7 @@ bool xOUTCAR::ProcessKPoint(uint iline,double EFERMI,vector<double>& b_energies,
   b_energies.clear(); b_occs.clear();
 
   if(!isKPointLine(iline)){
-    if(LDEBUG) {cerr << "xOUTCAR::ProcessKPoint: this is NOT a k-point line" << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::ProcessKPoint: this is NOT a k-point line" << endl;}
     return false;
   }
   iline+=2; //march forward to first band
@@ -1928,19 +1928,19 @@ bool xOUTCAR::ProcessKPoint(uint iline,double EFERMI,vector<double>& b_energies,
   double b_energy, b_occ;
   for(uint iband=1;iband<(uint)NBANDS+1;iband++){
     if(iline>vcontent.size()-1){
-      if(LDEBUG) {cerr << "xOUTCAR::ProcessKPoint: reached the end of the file" << endl;}
+      if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::ProcessKPoint: reached the end of the file" << endl;}
       return false;
     }
     aurostd::string2tokens(vcontent[iline],tokens);
     if(tokens.size()!=3){
-      if(LDEBUG) {cerr << "xOUTCAR::ProcessKPoint: odd count of tokens(3) for iband=" << iband << endl;}
+      if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::ProcessKPoint: odd count of tokens(3) for iband=" << iband << endl;}
       return false;
     }
     iband_found=aurostd::string2utype<int>(tokens[0]);
     b_energy=aurostd::string2utype<double>(tokens[1]);
     b_occ=aurostd::string2utype<double>(tokens[2]);
     if(iband_found!=iband){
-      if(LDEBUG) {cerr << "xOUTCAR::ProcessKPoint: missing iband=" << iband << endl;}
+      if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::ProcessKPoint: missing iband=" << iband << endl;}
       return false;
     }
     b_energies.push_back(b_energy-EFERMI);  //adjust for E-fermi (STATIC) here!!!!!!!!!!!!!!! (not the OUTCAR Efermi, but one from STATIC hopefully)
@@ -1958,11 +1958,11 @@ bool xOUTCAR::bandEnergyOccCompare::operator()(const bandEnergyOcc& a,const band
 bool xOUTCAR::orderBands(vector<double>& b_energies,vector<double>& b_occs,double energy_tol){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   if(b_energies.size() != b_occs.size()){
-    if(LDEBUG) {cerr << "xOUTCAR::orderBands: size of energies != size of occupations" << endl;} 
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::orderBands: size of energies != size of occupations" << endl;} 
     return false;
   }
   if(b_energies.size()==0){
-    if(LDEBUG) {cerr << "xOUTCAR::orderBands: no input energies or occupations found" << endl;} 
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::orderBands: no input energies or occupations found" << endl;} 
     return false;
   }
   uint len=b_energies.size();
@@ -1980,7 +1980,7 @@ bool xOUTCAR::orderBands(vector<double>& b_energies,vector<double>& b_occs,doubl
     b_occs.push_back(beo[i].occ);
   }
   if(b_energies.size()!=len || b_occs.size()!=len){
-    if(LDEBUG) {cerr << "xOUTCAR::orderBands: size mismatch from input" << endl;} 
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::orderBands: size mismatch from input" << endl;} 
     return false;
   }
   return true;
@@ -2012,7 +2012,7 @@ bool xOUTCAR::GetBandEdge(vector<double>& b_energies,vector<double>& b_occs,doub
   //OUTPUT: iedge - index of VBT
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xOUTCAR::GetBandEdge():";
+  string soliloquy = XHOST.sPID + "xOUTCAR::GetBandEdge():";
 
   //////////////////////////////////////////////////////////////////////////////
   //tests of stupidity ROUND 1 - START
@@ -2174,7 +2174,7 @@ bool xOUTCAR::removeDuplicateKPoints(vector<xvector<double> >& vkpoints,vector<u
     for(uint j=0;j<vikpt_unique.size()&&!found;j++){
       if(identicalKPoints(vkpoints,vikpt[i],vikpt_unique[j])){
         if(LDEBUG) {
-          cerr << "xOUTCAR::removeDuplicateKPoints: removing duplicate k-point ";
+          cerr << XHOST.sPID << "xOUTCAR::removeDuplicateKPoints: removing duplicate k-point ";
           cerr << vkpoints[vikpt[i]] << " (kpt=" << vikpt[i] << ")" << endl;
         }
         found=true;
@@ -2197,7 +2197,7 @@ bool xOUTCAR::removeDuplicateKPoints(vector<vector<xvector<double> > >& vkpoints
     for(uint j=0;j<vikpt_unique.size()&&!found;j++){
       if(identicalKPoints(vkpoints[vispin[i]][vikpt[i]],vkpoints[vispin_unique[j]][vikpt_unique[j]])){
         if(LDEBUG) {
-          cerr << "xOUTCAR::removeDuplicateKPoints: removing duplicate k-point ";
+          cerr << XHOST.sPID << "xOUTCAR::removeDuplicateKPoints: removing duplicate k-point ";
           cerr << vkpoints[vispin[i]][vikpt[i]] << " (kpt=" << vikpt[i] << ",spin=" << vispin[i] << ")" << endl;
         }
         found=true;
@@ -2216,12 +2216,12 @@ double xOUTCAR::minimumDistanceKPoints(vector<xvector<double> >& vkpoints,uint i
   if((ikp1>vkpoints.size()-1) || (ikp2>vkpoints.size()-1)){return dist_min;}
   if(!xstr.atoms.size()){ //assume it's already loaded
     if(!GetXStructure()){
-      if(LDEBUG) {cerr << "xOUTCAR::minimumDistanceKPoints: GetXStructure failed." << endl;}
+      if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: GetXStructure failed." << endl;}
       return dist_min;
     }
   }
   if(LDEBUG) {
-    cerr << "xOUTCAR::minimumDistanceKPoints: subtracting ";
+    cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: subtracting ";
     cerr << "kpoint[" << ikp1 << "]";
     cerr << " from ";
     cerr << "kpoint[" << ikp2 << "]";
@@ -2230,7 +2230,7 @@ double xOUTCAR::minimumDistanceKPoints(vector<xvector<double> >& vkpoints,uint i
   //special case, identicalKPoints()
   if(ikp1==ikp2){
     dist_min=0.0;
-    if(LDEBUG) {cerr << "xOUTCAR::minimumDistanceKPoints: Found identical k-points, distance in cartesian = " << dist_min << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: Found identical k-points, distance in cartesian = " << dist_min << endl;}
     return dist_min;
   }
   return minimumDistanceKPoints(vkpoints[ikp1],vkpoints[ikp2]);
@@ -2242,15 +2242,15 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
   //special case, identicalKPoints()
   if(identicalKPoints(kpoint1_kl,kpoint2_kl)){
     dist_min=0.0;
-    if(LDEBUG) {cerr << "xOUTCAR::minimumDistanceKPoints: Found identical k-points, distance in cartesian = " << dist_min << endl;}
+    if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: Found identical k-points, distance in cartesian = " << dist_min << endl;}
     return dist_min;
   }
   xmatrix<double> klattice=ReciprocalLattice(xstr);  //repetita iuvant
   xmatrix<double> metric_tensor=MetricTensor(xstr);
   if(LDEBUG) {
-    cerr << "xOUTCAR::minimumDistanceKPoints: metric tensor" << endl;
+    cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: metric tensor" << endl;
     cerr << metric_tensor << endl;
-    cerr << "xOUTCAR::minimumDistanceKPoints: klattice" << endl;
+    cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: klattice" << endl;
     cerr << klattice << endl;
   }
 
@@ -2258,7 +2258,7 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
   xvector<double> kpoint1=kf2c*kpoint1_kl;  //units of 2pi/scale
   xvector<double> kpoint2=kf2c*kpoint2_kl;  //units of 2pi/scale
   if(LDEBUG) {
-    cerr << "xOUTCAR::minimumDistanceKPoints: subtracting (units of 2*pi/scale) " << endl;
+    cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: subtracting (units of 2*pi/scale) " << endl;
     cerr << "                                 kpoint=" << kpoint1 << endl;
     cerr << "                                 kpoint=" << kpoint2 << endl;
   }
@@ -2281,7 +2281,7 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
       }
     }
   }
-  if(LDEBUG) {cerr << "xOUTCAR::minimumDistanceKPoints: distance vector in reciprocal space  = " << vdist_kcart_min << endl;}
+  if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: distance vector in reciprocal space  = " << vdist_kcart_min << endl;}
 
   //convert distance to cartesian in real space
   xvector<double> vdist_dcart;
@@ -2290,9 +2290,9 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
   vdist_dcart(2)=sum(metric_tensor(2)*vdist_kcart_min(2));  //remember metric_tensor is symmetric!
   vdist_dcart(3)=sum(metric_tensor(3)*vdist_kcart_min(1));  //remember metric_tensor is symmetric!
   vdist_dcart/=(2*pi);  //conversion back requires undoing 2pi
-  if(LDEBUG) {cerr << "xOUTCAR::minimumDistanceKPoints: distance vector in real space        = " << vdist_dcart << endl;}
+  if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: distance vector in real space        = " << vdist_dcart << endl;}
   dist_dcart=aurostd::modulus(vdist_dcart);
-  if(LDEBUG) {cerr << "xOUTCAR::minimumDistanceKPoints: distance between kpoints (angstroms) = " << dist_dcart << endl;}
+  if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::minimumDistanceKPoints: distance between kpoints (angstroms) = " << dist_dcart << endl;}
   return dist_dcart;
 }
 
@@ -2367,7 +2367,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
   //repetita iuvant!!!!!!!!
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xOUTCAR::GetBandGap():";
+  string soliloquy = XHOST.sPID + "xOUTCAR::GetBandGap():";
   if((content == "") || (vcontent.size() == 0)) {
     ERROR = soliloquy + " xOUTCAR needs to be loaded before. \n"
       "        GetProperties(const stringstream&); \n"
@@ -3971,7 +3971,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -4249,35 +4249,35 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(0) cout << " spinF = " << ((spinF!=AUROSTD_NAN)?aurostd::utype2string(spinF,5):"unavailable") << endl;
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: title=" << title << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: spin=" << spin << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: Vol=" << Vol << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: lattice=" << lattice << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: POTIM=" << POTIM << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: temperature=" << temperature << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: RWIGS=" << RWIGS << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: Efermi=" << Efermi << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: spinF=" << spinF << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: number_energies=" << number_energies << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: energy_max=" << energy_max << " energy_min=" << energy_min << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: denergy=" << denergy << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  // ME20190614 - new vDOS format
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  // ME20190614 - new viDOS format
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
-  // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
-  // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
-  // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: title=" << title << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: spin=" << spin << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: Vol=" << Vol << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: lattice=" << lattice << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: POTIM=" << POTIM << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: temperature=" << temperature << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: RWIGS=" << RWIGS << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: Efermi=" << Efermi << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: spinF=" << spinF << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: number_energies=" << number_energies << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: energy_max=" << energy_max << " energy_min=" << energy_min << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: denergy=" << denergy << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  // ME20190614 - new vDOS format
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  // ME20190614 - new viDOS format
+  //if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
+  // if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
+  //if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
+  // if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
+  //if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
+  // if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;  
+  if(LVERBOSE) cout << XHOST.sPID << "xDOSCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;  
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -4285,7 +4285,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //CO20191217 - copies everything from spin channel 1 to spin channel 2
 void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xDOSCAR::convertSpinOFF2ON():";
+  string soliloquy = XHOST.sPID + "xDOSCAR::convertSpinOFF2ON():";
   long double seconds=aurostd::get_seconds();
   if(LDEBUG){cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;}
 
@@ -4320,7 +4320,7 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
 
 bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO20191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xDOSCAR::checkVDOS():";
+  string soliloquy = XHOST.sPID + "xDOSCAR::checkVDOS():";
   stringstream message;
 
   uint IENERGY=venergy.size();
@@ -4367,7 +4367,7 @@ bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO20191110
 
 bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xDOSCAR::GetBandGap():";
+  string soliloquy = XHOST.sPID + "xDOSCAR::GetBandGap():";
 
   if((content == "") || (vcontent.size() == 0)) {
     ERROR = soliloquy + " xDOSCAR needs to be loaded before. \n"
@@ -4536,7 +4536,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(const xstructure& xstr) const {return GetVDOSSpecies(xstr.num_each_type);} //CO20191004
 deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_each_type) const { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xDOSCAR::GetBandGap():";
+  string soliloquy = XHOST.sPID + "xDOSCAR::GetBandGap():";
   stringstream message;
 
   if((content == "") || (vcontent.size() == 0)) {
@@ -4827,7 +4827,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -4899,34 +4899,34 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: title=" << title << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: spin=" << spin << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: Vol=" << Vol << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: lattice=" << lattice << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: POTIM=" << POTIM << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: temperature=" << temperature << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: number_electrons=" << number_electrons << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: number_kpoints=" << number_kpoints << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: number_bands=" << number_bands << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: vweight.size()=" << vweight.size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.size()=" << venergy.size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at(max).size()=" << venergy.at(venergy.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at(max).at(max).size()=" 
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: title=" << title << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: spin=" << spin << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: Vol=" << Vol << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: lattice=" << lattice << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: POTIM=" << POTIM << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: temperature=" << temperature << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: number_electrons=" << number_electrons << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: number_kpoints=" << number_kpoints << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: number_bands=" << number_bands << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: vweight.size()=" << vweight.size() << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: venergy.size()=" << venergy.size() << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: venergy.at(max).size()=" << venergy.at(venergy.size()-1).size() << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: venergy.at(max).at(max).size()=" 
 		    << venergy.at(venergy.size()-1).at(venergy.at(venergy.size()-1).size()-1).size() << endl;
 
   // for(uint i=0;i<venergy.size();i++)
-  //   if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").size()=" << venergy.at(i).size() << endl;
+  //   if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").size()=" << venergy.at(i).size() << endl;
   // for(uint i=0;i<venergy.size();i++)
   //   for(uint j=0;j<venergy.at(i).size();j++)
-  //     if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").at.(" << j << ").size()=" << venergy.at(i).at(j).size() << endl;
+  //     if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").at.(" << j << ").size()=" << venergy.at(i).at(j).size() << endl;
 
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xEIGENVAL::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -5478,7 +5478,7 @@ bool near_to(const xvector<double> & k1, const xvector<double> & k2, const vecto
 // 2017: Corey Oses
 bool PrintBandGap(string& directory, ostream &oss) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="PrintBandGap():";
+  string soliloquy = XHOST.sPID + "PrintBandGap():";
   stringstream ss_outcar_static(""),ss_outcar_bands("");
   string path_outcar_static,path_outcar_bands, path_POSCAR;
   xOUTCAR xoutcar_static,xoutcar_bands;
@@ -5539,7 +5539,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
       //return FALSE;
     } else {
       EFERMI=xoutcar_static.Efermi;
-      if(LDEBUG) {cerr << "xOUTCAR::PrintBandGap: Found E-fermi from OUTCAR.static: " << EFERMI << endl;}
+      if(LDEBUG) {cerr << XHOST.sPID << "xOUTCAR::PrintBandGap: Found E-fermi from OUTCAR.static: " << EFERMI << endl;}
     }
   }
 
@@ -5615,7 +5615,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
 // 2019: Corey Oses
 bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="PrintBandGap_DOS():";
+  string soliloquy = XHOST.sPID + "PrintBandGap_DOS():";
   stringstream ss_outcar_static(""),ss_outcar_bands("");
   string path_outcar_static,path_outcar_bands, path_POSCAR;
   xOUTCAR xoutcar_static,xoutcar_bands;
@@ -7296,7 +7296,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool ERROR_flag=FALSE;
   // XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -7321,7 +7321,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   
   // ----------------------------------------------------------------------
   // EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: LOAD \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" DATA" << endl;
   vline.clear();
   vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
   for(uint iline=0;iline<vcontent.size();iline++) {
@@ -7335,8 +7335,8 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontent.at(iline),"RAUG") && aurostd::substring2bool(vcontent.at(iline),"sphere")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"RMAX") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
   }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(vline.size()==0) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  
   for(uint j=0;j<vline.size();j++) {
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
@@ -7365,37 +7365,37 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   
   ENMAX=aurostd::max(vENMAX);
   ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
   
   POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
   
   ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
   
   EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
   
   RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
   
   RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
   
   EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
 
   RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
 
   RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr << " " << endl;}
 
    
   // ----------------------------------------------------------------------
   // PSEUDOPOTENTIAL DATA
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
   
   vline.clear();
   vTITEL.clear();
@@ -7405,33 +7405,33 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(aurostd::substring2bool(vcontent.at(iline),"TITEL")) {
  	aurostd::string2tokens(vcontent.at(iline),tokens,"=");
 	if(tokens.size()>1) vTITEL.push_back(tokens.at(1));
-	//	if(LVERBOSE) cerr << "xPOTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
+	//	if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
       }
       if(aurostd::substring2bool(vcontent.at(iline),"LEXCH")) {
 	if(!aurostd::substring2bool(vcontent.at(iline),"exchange")) {
 	  aurostd::string2tokens(vcontent.at(iline),tokens,"=");
 	  if(tokens.size()>1) vLEXCH.push_back(tokens.at(1));
-	  //	if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
+	  //	if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
 	}
       }
     }
   }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
 
-  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vTITEL.size()==0) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vLEXCH.size()==0) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vEATOM.size()==0) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vRMAX.size()==0) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
   
   for(uint j=0;j<vTITEL.size();j++) {
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") " << endl;
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: SPECIES(" << j << ") " << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
     aurostd::string2tokens(vTITEL.at(j),tokens," ");
     pp_type=tokens.at(0);
     if(pp_type=="US" or pp_type=="NC") {
@@ -7442,8 +7442,8 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             pp_type="LDA";
     }
     if(tokens.size()>1) {
-      if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xPOTCAR::GetProperties: PAW_LDA" << endl;
-      if(LVERBOSE) cerr << "xPOTCAR::GetProperties: pp_type=" << pp_type << " " << "tokens.size()=" << tokens.size() << endl;
+      if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << XHOST.sPID << "xPOTCAR::GetProperties: PAW_LDA" << endl;
+      if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: pp_type=" << pp_type << " " << "tokens.size()=" << tokens.size() << endl;
       species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
       species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1))));
       species_pp.push_back(tokens.at(1));
@@ -7466,7 +7466,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
     species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
 
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
+    if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
 		      << species.at(species.size()-1) << " ["
 		      << species_Z.at(species_Z.size()-1) << ", "
 		      << species_pp.at(species_pp.size()-1) << ", "
@@ -7477,29 +7477,29 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 		      << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
   
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species.size()=" << species.size() << ": "; for(uint i=0;i<species.size();i++) { cerr << species.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_Z.size()=" << species_Z.size() << ": "; for(uint i=0;i<species_Z.size();i++) { cerr << species_Z.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp.size()=" << species_pp.size() << ": "; for(uint i=0;i<species_pp.size();i++) { cerr << species_pp.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << ": "; for(uint i=0;i<species_pp_type.size();i++) { cerr << species_pp_type.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << ": "; for(uint i=0;i<species_pp_version.size();i++) { cerr << species_pp_version.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << ": "; for(uint i=0;i<species_pp_AUID.size();i++) { cerr << species_pp_AUID.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<species_pp_AUID_collisions.size();i++) { cerr << species_pp_AUID_collisions.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << ": "; for(uint i=0;i<species_pp_groundstate_energy.size();i++) { cerr << species_pp_groundstate_energy.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << ": "; for(uint i=0;i<species_pp_groundstate_structure.size();i++) { cerr << species_pp_groundstate_structure.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << ": "; for(uint i=0;i<vTITEL.size();i++) { cerr << vTITEL.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << ": "; for(uint i=0;i<vLEXCH.size();i++) { cerr << vLEXCH.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: filename=" << filename << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: AUID=" << AUID << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species.size()=" << species.size() << ": "; for(uint i=0;i<species.size();i++) { cerr << species.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_Z.size()=" << species_Z.size() << ": "; for(uint i=0;i<species_Z.size();i++) { cerr << species_Z.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp.size()=" << species_pp.size() << ": "; for(uint i=0;i<species_pp.size();i++) { cerr << species_pp.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << ": "; for(uint i=0;i<species_pp_type.size();i++) { cerr << species_pp_type.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << ": "; for(uint i=0;i<species_pp_version.size();i++) { cerr << species_pp_version.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << ": "; for(uint i=0;i<species_pp_AUID.size();i++) { cerr << species_pp_AUID.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<species_pp_AUID_collisions.size();i++) { cerr << species_pp_AUID_collisions.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << ": "; for(uint i=0;i<species_pp_groundstate_energy.size();i++) { cerr << species_pp_groundstate_energy.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << ": "; for(uint i=0;i<species_pp_groundstate_structure.size();i++) { cerr << species_pp_groundstate_structure.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << ": "; for(uint i=0;i<vTITEL.size();i++) { cerr << vTITEL.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << ": "; for(uint i=0;i<vLEXCH.size();i++) { cerr << vLEXCH.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: filename=" << filename << endl;}
+  if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR::GetProperties: AUID=" << AUID << endl;}
   if(species_pp_AUID_collisions.size()) {
-    cerr << "xPOTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    cerr << XHOST.sPID << "xPOTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
     ERROR_flag=TRUE;
   }
   if(LVERBOSE) cerr.flush();
 
   // ----------------------------------------------------------------------
   // POTCAR_PAW POTCAR_TYPE POTCAR_KINETIC
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD POTCAR_PAW POTCAR_TYPE" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: LOAD POTCAR_PAW POTCAR_TYPE" << endl;
   POTCAR_PAW=FALSE;
   POTCAR_KINETIC=FALSE;
   POTCAR_GW=FALSE;
@@ -7529,27 +7529,27 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(0)=="PAW" && POTCAR_KINETIC) POTCAR_TYPE="PAW_LDA_KIN";
     }
   }    
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_PAW = " << POTCAR_PAW << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_TYPE = " << POTCAR_TYPE << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_KINETIC = " << POTCAR_KINETIC << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_GW = " << POTCAR_GW << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_AE = " << POTCAR_AE << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: POTCAR_PAW = " << POTCAR_PAW << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: POTCAR_TYPE = " << POTCAR_TYPE << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: POTCAR_KINETIC = " << POTCAR_KINETIC << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: POTCAR_GW = " << POTCAR_GW << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: POTCAR_AE = " << POTCAR_AE << endl;
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: WRITE vxpseudopotentials" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: WRITE vxpseudopotentials" << endl;
 
   if(XHOST.PSEUDOPOTENTIAL_GENERATOR && species.size()==1) xPOTCAR_PURE_Printer((*this),cout);
   
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: (BULLSHIT DONT USE) title=" << title << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: (BULLSHIT DONT USE) title=" << title << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: vcontent.size()=" << vcontent.size() << endl;
   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xPOTCAR::GetProperties: ERROR_flag set in xPOTCAR" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xPOTCAR::GetProperties: ERROR_flag set in xPOTCAR" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -7643,7 +7643,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xVASPRUNXML::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xVASPRUNXML::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -7654,18 +7654,18 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // crunching to eat the info
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vcontent.size()=" << vcontent.size() << endl;
 
   // ----------------------------------------------------------------------
   // LOAD natoms
 
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: LOAD natoms DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: LOAD natoms DATA" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"<atoms>"))
       if(aurostd::substring2bool(vcontent.at(iline),"</atoms>"))
 	{line=vcontent.at(iline);break;} 
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: line=" << line << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: line=" << line << endl;
   aurostd::StringSubst(line,"<atoms>","");
   aurostd::StringSubst(line,"</atoms>","");
 
@@ -7673,20 +7673,20 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // LOAD NATOMS
   natoms=0.0;
   aurostd::string2tokens(line,tokens,">");
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: tokens.size()=" << tokens.size() << endl; 
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: tokens.size()=" << tokens.size() << endl; 
   natoms=aurostd::string2utype<double>(line);
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: natoms=" << natoms << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: natoms=" << natoms << endl;
 
   // ----------------------------------------------------------------------
   // LOAD FORCES
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: LOAD FORCES DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: LOAD FORCES DATA" << endl;
   vforces.clear();                    // QM FORCES calculation
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--) {
     if(aurostd::substring2bool(vcontent.at(iline),"<varray name=\"forces\" >")) {
       for(uint iat=0;iat<(uint)natoms && iat<vcontent.size();iat++) {
         aurostd::StringSubst(vcontent.at(iline+iat+1),"<v>","");
         aurostd::StringSubst(vcontent.at(iline+iat+1),"</v>","");
-        // if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat+1)=" << vcontent.at(iline+iat+1) << endl;
+        // if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat+1)=" << vcontent.at(iline+iat+1) << endl;
         aurostd::string2tokens(vcontent.at(iline+iat+1),tokens," ");
         if(tokens.size()==3) {
           xvector<double> force(3);
@@ -7694,21 +7694,21 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           force[2]=aurostd::string2utype<double>(tokens.at(1));
           force[3]=aurostd::string2utype<double>(tokens.at(2));
           vforces.push_back(force); // cerr.precision(20);
-          if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: force=" << force << endl;
-          // if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: force=" << force[1]  << " " << force[2] << " " << force[3] << endl;
+          if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: force=" << force << endl;
+          // if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: force=" << force[1]  << " " << force[2] << " " << force[3] << endl;
         } else {
-          if(!QUIET) cerr << "xVASPRUNXML::GetProperties: error in QM FORCES calculation" << endl;
+          if(!QUIET) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: error in QM FORCES calculation" << endl;
           ERROR_flag=TRUE;//exit(0);
         }
       }
       iline=-1;
     }
   }
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: vforces.size()=" << vforces.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vforces.size()=" << vforces.size() << endl;
 
   // ----------------------------------------------------------------------
   // LOAD KPOINTLIST
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: LOAD KPOINTLIST DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: LOAD KPOINTLIST DATA" << endl;
   vkpoint.clear();                    // QM KPOINTLIST calculation
   for(int iline=0;iline<(int)vcontent.size();iline++) {
     if(aurostd::substring2bool(vcontent.at(iline),"<varray name=\"kpointlist\" >")) {
@@ -7717,7 +7717,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         if(aurostd::substring2bool(vcontent.at(iline+iat),"</varray>")) {
           iline=(int)vcontent.size();
         } else {
-          // cerr << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
+          // cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
           aurostd::StringSubst(vcontent.at(iline+iat),"<v>","");
           aurostd::StringSubst(vcontent.at(iline+iat),"</v>","");
           aurostd::string2tokens(vcontent.at(iline+iat),tokens," ");
@@ -7727,20 +7727,20 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             kpoint[2]=aurostd::string2utype<double>(tokens.at(1));
             kpoint[3]=aurostd::string2utype<double>(tokens.at(2));
             vkpoint.push_back(kpoint); // cerr.precision(20);
-            //	    if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: kpoint=" << kpoint << endl;
+            //	    if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: kpoint=" << kpoint << endl;
           } else {
-            if(!QUIET) cerr << "xVASPRUNXML::GetProperties: error in QM KPOINTLIST calculation" << endl;
+            if(!QUIET) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: error in QM KPOINTLIST calculation" << endl;
             ERROR_flag=TRUE;//exit(0);
           }
         }
       }
     }
   }
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
 
   // ----------------------------------------------------------------------
   // LOAD WEIGHTS
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: LOAD WEIGHTS DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: LOAD WEIGHTS DATA" << endl;
   vweights.clear();                    // QM WEIGHTS calculation
   for(int iline=0;iline<(int)vcontent.size();iline++) {
     if(aurostd::substring2bool(vcontent.at(iline),"<varray name=\"weights\" >")) {
@@ -7749,54 +7749,54 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         if(aurostd::substring2bool(vcontent.at(iline+iat),"</varray>")) {
           iline=(int)vcontent.size();
         } else {
-          // cerr << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
+          // cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
           aurostd::StringSubst(vcontent.at(iline+iat),"<v>","");
           aurostd::StringSubst(vcontent.at(iline+iat),"</v>","");
           aurostd::string2tokens(vcontent.at(iline+iat),tokens," ");
           if(tokens.size()==1) {
             vweights.push_back(aurostd::string2utype<double>(tokens.at(0))); // cerr.precision(20);
-            //	    if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: weight=" << weight << endl;
+            //	    if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: weight=" << weight << endl;
           } else {
-            if(!QUIET) cerr << "xVASPRUNXML::GetProperties: error in QM WEIGHTS calculation" << endl;
+            if(!QUIET) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: error in QM WEIGHTS calculation" << endl;
             ERROR_flag=TRUE;//exit(0);
           }
         }
       }
     }
   }
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: vweights.size()=" << vweights.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vweights.size()=" << vweights.size() << endl;
 
   // ----------------------------------------------------------------------
   // LOAD STRESS
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: LOAD STRESS DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: LOAD STRESS DATA" << endl;
   stress.clear();                    // QM STRESS calculation
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--) {
     if(aurostd::substring2bool(vcontent.at(iline),"<varray name=\"stress\" >")) {
       for(uint iat=0;iat<(uint)3 && iat<vcontent.size();iat++) { // only three lines
         aurostd::StringSubst(vcontent.at(iline+iat+1),"<v>","");
         aurostd::StringSubst(vcontent.at(iline+iat+1),"</v>","");
-        // if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat+1)=" << vcontent.at(iline+iat+1) << endl;
+        // if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: vcontent.at(iline+iat+1)=" << vcontent.at(iline+iat+1) << endl;
         aurostd::string2tokens(vcontent.at(iline+iat+1),tokens," ");
         if(tokens.size()==3) {
           stress(iat+1,1)=aurostd::string2utype<double>(tokens.at(0));
           stress(iat+1,2)=aurostd::string2utype<double>(tokens.at(1));
           stress(iat+1,3)=aurostd::string2utype<double>(tokens.at(2));
         } else {
-          if(!QUIET) cerr << "xVASPRUNXML::GetProperties: error in QM STRESS calculation" << endl;
+          if(!QUIET) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: error in QM STRESS calculation" << endl;
           ERROR_flag=TRUE;//exit(0);
         }
       }
       iline=-1;
     }
   }
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: stress=" << endl << stress << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: stress=" << endl << stress << endl;
 
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xVASPRUNXML::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xVASPRUNXML::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xVASPRUNXML::GetProperties: ERROR_flag set in xVASPRUNXML" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xVASPRUNXML::GetProperties: ERROR_flag set in xVASPRUNXML" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -7836,14 +7836,14 @@ bool xVASPRUNXML::GetForces(stringstream& stringstreamIN, bool QUIET) {
           force[3] = tokens[2];
           vforces.push_back(force);
         } else {
-          if (!QUIET) cerr << "xVASPRUNXML::GetForces: error in QM FORCES calculation" << endl;
+          if (!QUIET) cerr << XHOST.sPID << "xVASPRUNXML::GetForces: error in QM FORCES calculation" << endl;
           return false;
         }
       }
       return true;
     }
   }
-  if (!QUIET) cerr << "xVASPRUNXML::GetForces: forces not found" << endl;
+  if (!QUIET) cerr << XHOST.sPID << "xVASPRUNXML::GetForces: forces not found" << endl;
   return false;
 }
 // ME20190204 - END
@@ -7942,7 +7942,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xIBZKPT::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xIBZKPT::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -7953,11 +7953,11 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // crunching to eat the info
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: vcontent.size()=" << vcontent.size() << endl;
 
   // ----------------------------------------------------------------------
   // LOAD NWEIGHTS VKPOINT
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: LOAD VKPOINT DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: LOAD VKPOINT DATA" << endl;
   nweights=0;
   nkpoints_irreducible=0;
   vkpoint.clear();                    // QM VKPOINT calculation
@@ -7966,11 +7966,11 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontent.at(iline),"Automatically generated mesh")) {
       iline++;
       nkpoints_irreducible=aurostd::string2utype<double>(vcontent.at(iline));
-      if(LVERBOSE) cerr << "xIBZKPT::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
+      if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
       iline+=2; // skip text
-      //  cerr << "xIBZKPT::GetProperties: vcontent.at(iline)=" << vcontent.at(iline) << endl;
+      //  cerr << XHOST.sPID << "xIBZKPT::GetProperties: vcontent.at(iline)=" << vcontent.at(iline) << endl;
       for(uint iat=0;iat<nkpoints_irreducible;iat++) {
-        // 	cerr << "xIBZKPT::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
+        // 	cerr << XHOST.sPID << "xIBZKPT::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
         aurostd::string2tokens(vcontent.at(iline+iat),tokens," ");
         if(tokens.size()==4) {
           xvector<double> kpoint(3);
@@ -7980,22 +7980,22 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           vkpoint.push_back(kpoint); // cerr.precision(20);
           vweights.push_back(aurostd::string2utype<uint>(tokens.at(3)));
           nweights+=aurostd::string2utype<uint>(tokens.at(3));
-          //	  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: kpoint=" << kpoint << " " << "weight=" << aurostd::string2utype<double>(tokens.at(3))<< endl;
+          //	  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: kpoint=" << kpoint << " " << "weight=" << aurostd::string2utype<double>(tokens.at(3))<< endl;
         } else {
-          if(!QUIET) cerr << "xIBZKPT::GetProperties: error in QM NWEIGHTS/VKPOINT calculation" << endl;
+          if(!QUIET) cerr << XHOST.sPID << "xIBZKPT::GetProperties: error in QM NWEIGHTS/VKPOINT calculation" << endl;
           ERROR_flag=TRUE;//exit(0);
         }
       }
     }
   }
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: vweights.size()=" << vweights.size() << endl;
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: nweights=" << nweights << endl;
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: vweights.size()=" << vweights.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: nweights=" << nweights << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
 
   // ---------------------------------------------------------------------
   // LOAD NTETRAHEDRA WTETRAHEDRA TETRAHEDRA
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: LOAD TETRAHEDRA DATA" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: LOAD TETRAHEDRA DATA" << endl;
   ntetrahedra=0;
   wtetrahedra=0.0;
   vtetrahedra.clear();                    // QM TETRAHEDRA calculation
@@ -8005,12 +8005,12 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
       ntetrahedra=aurostd::string2utype<uint>(tokens.at(0));
       wtetrahedra=aurostd::string2utype<double>(tokens.at(1));
-      if(LVERBOSE) cerr << "xIBZKPT::GetProperties: ntetrahedra=" << ntetrahedra << endl;
-      if(LVERBOSE) cerr << "xIBZKPT::GetProperties: wtetrahedra=" << wtetrahedra << endl;
+      if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: ntetrahedra=" << ntetrahedra << endl;
+      if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: wtetrahedra=" << wtetrahedra << endl;
       iline+=1; // skip text
-      //     cerr << "xIBZKPT::GetProperties: vcontent.at(iline)=" << vcontent.at(iline) << endl; ERROR_flag=TRUE;//exit(0);
+      //     cerr << XHOST.sPID << "xIBZKPT::GetProperties: vcontent.at(iline)=" << vcontent.at(iline) << endl; ERROR_flag=TRUE;//exit(0);
       for(uint iat=0;iat<ntetrahedra;iat++) {
-        // 	cerr << "xIBZKPT::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
+        // 	cerr << XHOST.sPID << "xIBZKPT::GetProperties: vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
         aurostd::string2tokens(vcontent.at(iline+iat),tokens," ");
         if(tokens.size()==5) {
           xvector<int> tetrahedra(5);
@@ -8020,24 +8020,24 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           tetrahedra[4]=aurostd::string2utype<double>(tokens.at(3));
           tetrahedra[5]=aurostd::string2utype<double>(tokens.at(4));
           vtetrahedra.push_back(tetrahedra); // cerr.precision(20);
-          //	  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: tetrahedra=" << tetrahedra << " " << endl;
+          //	  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: tetrahedra=" << tetrahedra << " " << endl;
         } else {
-          if(!QUIET) cerr << "xIBZKPT::GetProperties: error in QM NTETRAHEDRA/WTETRAHEDRA/TETRAHEDRA calculation" << endl;
+          if(!QUIET) cerr << XHOST.sPID << "xIBZKPT::GetProperties: error in QM NTETRAHEDRA/WTETRAHEDRA/TETRAHEDRA calculation" << endl;
           ERROR_flag=TRUE;//exit(0);
         }
       }
     }
   }
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: ntetrahedra=" << ntetrahedra << endl;
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: wtetrahedra=" << wtetrahedra << endl;
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: vtetrahedra.size()=" << vtetrahedra.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: ntetrahedra=" << ntetrahedra << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: wtetrahedra=" << wtetrahedra << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: vtetrahedra.size()=" << vtetrahedra.size() << endl;
 
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xIBZKPT::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xIBZKPT::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xIBZKPT::GetProperties: ERROR_flag set in xIBZKPT" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xIBZKPT::GetProperties: ERROR_flag set in xIBZKPT" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -8147,7 +8147,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG || !QUIET);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xKPOINTS::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xKPOINTS::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8169,18 +8169,18 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   path_grid=0;
   vpath.clear();
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: vcontent.size()=" << vcontent.size() << endl;
 
   // ----------------------------------------------------------------------
   // CHECK IF WITH KPOINTS NUMBERS
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: CHECK IF WITH KPOINTS NUMBERS" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: CHECK IF WITH KPOINTS NUMBERS" << endl;
   if(!is_KPOINTS_NNN && !is_KPOINTS_PATH && vcontent.size()>=5) {
     if(vcontent.at(2).at(0)=='M'||vcontent.at(2).at(0)=='m' || vcontent.at(2).at(0)=='G'||vcontent.at(2).at(0)=='g') {
       aurostd::string2tokens(vcontent.at(3),tokens);
-      //    if(LVERBOSE) cerr << "xKPOINTS::GetProperties: tokens.size()=" << tokens.size() << endl;
+      //    if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: tokens.size()=" << tokens.size() << endl;
       if(tokens.size()==3) {
         aurostd::string2tokens(vcontent.at(4),tokens);
-        //     if(LVERBOSE) cerr << "xKPOINTS::GetProperties: tokens.size()=" << tokens.size() << endl;
+        //     if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: tokens.size()=" << tokens.size() << endl;
         if(tokens.size()==3) {
           is_KPOINTS_NNN=TRUE;
           is_KPOINTS_PATH=FALSE;
@@ -8203,7 +8203,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   // ----------------------------------------------------------------------
   // CHECK IF WITH PATH
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: CHECK IF WITH PATH" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: CHECK IF WITH PATH" << endl;
   if(!is_KPOINTS_NNN && !is_KPOINTS_PATH && vcontent.size()>=5) {
     if(vcontent.at(2).at(0)=='L'||vcontent.at(2).at(0)=='l') {
       is_KPOINTS_NNN=FALSE;
@@ -8219,7 +8219,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         if(aurostd::substring2bool(vcontent.at(iline),"@")) { // avoid removing ! as comment
           aurostd::string2tokens(vcontent.at(iline),tokens," ");
           if(tokens.size()>=5) {
-            //	    if(LVERBOSE) cerr << "xKPOINTS::GetProperties: tokens.size()=" << tokens.size() << endl;
+            //	    if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: tokens.size()=" << tokens.size() << endl;
             for(uint k=0;k<tokens.size();k++) {
               if(tokens.at(k)=="@" && k+1<tokens.size()) {
                 vpath.push_back(tokens.at(k+1));
@@ -8232,7 +8232,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         }
       }
       // ----------------------------------------------------------------------
-      //     if(LVERBOSE) cerr << "xKPOINTS::GetProperties: vpath.size()=" << vpath.size() << endl;
+      //     if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: vpath.size()=" << vpath.size() << endl;
       if(0) { // old
         path=vpath.at(0);
         for(uint i=1;i<vpath.size();i++) {
@@ -8251,10 +8251,10 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         // \Gamma-X,X-W,W-K,K-\Gamma,\Gamma-L,L-U,U-W,W-L,L-K,U-X
         // \Gamma-X-W-K-\Gamma-L-U-W-L-K,U-X
         // \Gamma-X-W-K-\Gamma-L-U-W-L-K,U-X
-        //	if(LVERBOSE) cerr << "xKPOINTS::GetProperties: path=[" << path << "]" << endl;
+        //	if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: path=[" << path << "]" << endl;
       }
       // ----------------------------------------------------------------------
-      if(LVERBOSE) cerr << "xKPOINTS::GetProperties: vpath.size()=" << vpath.size() << endl;
+      if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: vpath.size()=" << vpath.size() << endl;
       if(1) { // new
         path="";
         for(uint i=0;i<vpath.size();i+=2) 
@@ -8262,32 +8262,32 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         // \Gamma-X,X-W,W-K,K-\Gamma,\Gamma-L,L-U,U-W,W-L,L-K,U-X
         // \Gamma-X-W-K-\Gamma-L-U-W-L-K,U-X
         // \Gamma-X-W-K-\Gamma-L-U-W-L-K,U-X
-        //	if(LVERBOSE) cerr << "xKPOINTS::GetProperties: path=[" << path << "]" << endl;
+        //	if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: path=[" << path << "]" << endl;
       }
     }
   }
   // ----------------------------------------------------------------------
 
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: title=[" << title << "]" << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: mode=" << mode << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: grid_type=[" << grid_type << "]" << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: nkpoints=" << nkpoints << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: nnn_kpoints=" << nnn_kpoints << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: ooo_kpoints=" << ooo_kpoints << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: is_KPOINTS_NNN=" << is_KPOINTS_NNN << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: is_KPOINTS_PATH=" << is_KPOINTS_PATH << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: path_mode=[" << path_mode << "]" << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: path=[" << path << "]" << endl;
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: vpath.size()=" << vpath.size() << endl;
-  if(LVERBOSE) {cerr << "xKPOINTS::GetProperties: vpath="; for(uint i=0;i<vpath.size();i++) cerr << vpath.at(i) << " "; cerr << endl;}
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: path_grid=" << path_grid << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: title=[" << title << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: mode=" << mode << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: grid_type=[" << grid_type << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: nkpoints=" << nkpoints << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: nnn_kpoints=" << nnn_kpoints << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: ooo_kpoints=" << ooo_kpoints << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: is_KPOINTS_NNN=" << is_KPOINTS_NNN << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: is_KPOINTS_PATH=" << is_KPOINTS_PATH << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: path_mode=[" << path_mode << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: path=[" << path << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: vpath.size()=" << vpath.size() << endl;
+  if(LVERBOSE) {cerr << XHOST.sPID << "xKPOINTS::GetProperties: vpath="; for(uint i=0;i<vpath.size();i++) cerr << vpath.at(i) << " "; cerr << endl;}
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: path_grid=" << path_grid << endl;
 
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xKPOINTS::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xKPOINTS::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xKPOINTS::GetProperties: ERROR_flag set in xKPOINTS" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xKPOINTS::GetProperties: ERROR_flag set in xKPOINTS" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -8453,7 +8453,7 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG || !QUIET);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xCHGCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xCHGCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8470,48 +8470,48 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   tvalues.clear();
   uint index=5;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: vcontent.size()=" << vcontent.size() << endl;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: LOAD GRID " << endl;
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: vcontent.at(" << index << ")=" << vcontent.at(index) << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: LOAD GRID " << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: vcontent.at(" << index << ")=" << vcontent.at(index) << endl;
   aurostd::string2tokens(vcontent.at(index),tokens);
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tokens.size()=" << tokens.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tokens.size()=" << tokens.size() << endl;
   for(uint i=0;i<tokens.size();i++) {
     natoms+=aurostd::string2utype<uint>(tokens.at(i));
   }
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: natoms=" << natoms << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: natoms=" << natoms << endl;
   index+=natoms+1+2; // skip direct and atoms space and get grid
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: vcontent.at(" << index << ")=" << vcontent.at(index) << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: vcontent.at(" << index << ")=" << vcontent.at(index) << endl;
   aurostd::string2tokens(vcontent.at(index),tokens);
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tokens.size()=" << tokens.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tokens.size()=" << tokens.size() << endl;
   for(uint i=0;i<tokens.size();i++) {
     grid(i+1)=aurostd::string2utype<uint>(tokens.at(i));
   }
   index++;
   uint size_grid=grid(1)*grid(2)*grid(3);
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: grid=[" << grid(1) << "," << grid(2) << "," << grid(3) << "]" << endl;
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: size_grid=" << size_grid << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: grid=[" << grid(1) << "," << grid(2) << "," << grid(3) << "]" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: size_grid=" << size_grid << "]" << endl;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: LOAD VSTRING " << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: LOAD VSTRING " << endl;
   for(uint i=index;i<vcontent.size();i++) {
     aurostd::string2tokens(vcontent.at(i),tokens);
-    //    if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tokens.size()=" << tokens.size() << endl;
+    //    if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tokens.size()=" << tokens.size() << endl;
     for(uint j=0;j<tokens.size();j++) {
       if(vstring.size()<size_grid) vstring.push_back(tokens.at(j));
     }
   }
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: vstring.size()=" << vstring.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: vstring.size()=" << vstring.size() << endl;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: LOAD VVALUES " << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: LOAD VVALUES " << endl;
   xvector<double> vvalues_aus(vstring.size());
   for(uint i=0;i<vstring.size();i++) {
     vvalues_aus(i+1)=aurostd::string2utype<double>(vstring.at(i));
   }
   // now copy on the real vvalues which has undefined size
   vvalues=vvalues_aus;
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: vvalues.rows=" << vvalues.rows << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: vvalues.rows=" << vvalues.rows << endl;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: LOAD TVALUES " << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: LOAD TVALUES " << endl;
   //[OBSOLETE ME20180705]xtensor3<double> tvalues_aus(grid(1),grid(2),grid(3));
   xtensor<double> tvalues_aus(grid); //ME20180705
   int iii=0;
@@ -8526,19 +8526,19 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
 
   tvalues=tvalues_aus;
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[1]=" << tvalues.shape[1] << endl; //ME20180705
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[2]=" << tvalues.shape[2] << endl; //ME20180705
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[3]=" << tvalues.shape[3] << endl; //ME20180705
-  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[1]=" << tvalues.index[1] << endl;
-  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[2]=" << tvalues.index[2] << endl;
-  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[3]=" << tvalues.index[3] << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tvalues.shape[1]=" << tvalues.shape[1] << endl; //ME20180705
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tvalues.shape[2]=" << tvalues.shape[2] << endl; //ME20180705
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tvalues.shape[3]=" << tvalues.shape[3] << endl; //ME20180705
+  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tvalues.index[1]=" << tvalues.index[1] << endl;
+  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tvalues.index[2]=" << tvalues.index[2] << endl;
+  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: tvalues.index[3]=" << tvalues.index[3] << endl;
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xCHGCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xCHGCAR::GetProperties: ERROR_flag set in xCHGCAR" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xCHGCAR::GetProperties: ERROR_flag set in xCHGCAR" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
@@ -8616,11 +8616,11 @@ bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VER
 }
 
 bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
-  string soliloquy="xQMVASP::GetProperties():";
+  string soliloquy = XHOST.sPID + "xQMVASP::GetProperties():";
   bool LVERBOSE=(FALSE || XHOST.DEBUG || !QUIET);
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xQMVASP::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cout << XHOST.sPID << "xQMVASP::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8633,10 +8633,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xQMVASP::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xQMVASP::GetProperties: vcontent.size()=" << vcontent.size() << endl;
   // ----------------------------------------------------------------------
   for(uint iline=0;iline<vcontent.size();iline++){
-    if(LVERBOSE) cerr << "xQMVASP::GetProperties: vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
+    if(LVERBOSE) cerr << XHOST.sPID << "xQMVASP::GetProperties: vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
     if(aurostd::substring2bool(vcontent[iline],"STOP_relax")){inside_relax=false;}
     else if(aurostd::substring2bool(vcontent[iline],"START_relax")){inside_relax=true;}
     else if(aurostd::substring2bool(vcontent[iline],"STOP_static")){inside_static=false;}
@@ -8682,10 +8682,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xQMVASP::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LVERBOSE) cerr << XHOST.sPID << "xQMVASP::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xQMVASP::GetProperties: ERROR_flag set in xQMVASP" << endl;
+  if(ERROR_flag && !QUIET) cerr << XHOST.sPID << "WARNING - xQMVASP::GetProperties: ERROR_flag set in xQMVASP" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
 }

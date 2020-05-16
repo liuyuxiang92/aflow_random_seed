@@ -677,7 +677,7 @@ string AVASP_Get_PseudoPotential_PBE(string species) {
 
 bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,_xvasp& xvasp){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="AVASP_populateXVASP():";
+  string soliloquy = XHOST.sPID + "AVASP_populateXVASP():";
 
   if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
 
@@ -1195,7 +1195,7 @@ bool AVASP_MakeSingleAFLOWIN(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_W
 bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="AVASP_MakeSingleAFLOWIN():";
+  string soliloquy = XHOST.sPID + "AVASP_MakeSingleAFLOWIN():";
   stringstream message;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[0]" << endl;
@@ -1579,10 +1579,13 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
                 if(tokens.at(2)=="PAW_RPBE") {pottype="PAW_RPBE";date=tokens.at(4);}  // potpaw_GGA/DEFAULT_VASP_POTCAR_DATE/Ge_h
                 if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO20181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO20191110
                 if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO20181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
-                if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020
-                if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020
+		// [GIFT OF KRESSE]  if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020
+                // [GIFT OF KRESSE]  if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020
+            	if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
+                if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
                 // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
-              }
+		
+	      }
               if(pottype.empty()) {
                 cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << "  wrong pottype:" << sgrep << endl; 
                 return FALSE; // dont die
@@ -3237,7 +3240,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="AVASP_MakeSingleAFLOWIN():";
+  string soliloquy = XHOST.sPID + "AVASP_MakeSingleAFLOWIN():";
   stringstream message;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[0]" << endl;
@@ -4979,12 +4982,12 @@ bool AVASP_MakePrototype_AFLOWIN_LOOP(deque<_xvasp>& dxvasp,bool flag_WRITE) {
 // };
 
 bool AVASP_MakePrototype_AFLOWIN(_AVASP_PROTO *PARAMS) {
-  return AVASP_MakePrototype_AFLOWIN_181226(PARAMS);
+  return AVASP_MakePrototype_AFLOWIN_20181226(PARAMS);
 }
 
-bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
+bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="AVASP_MakePrototype_AFLOWIN():";
+  string soliloquy = XHOST.sPID + "AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
   if(LDEBUG) cerr << " " << soliloquy << " BEGIN" << endl; 
 
@@ -5530,7 +5533,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 
     if(aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_DELIMITER_)) {
       vector<string> tokens_string_POTENTIAL;
-      cerr << "PARAMS->vparams.getattachedscheme(\"AFLOWIN_STRING::POTENTIAL\")=" << string_POTENTIAL << endl;
+      if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->vparams.getattachedscheme(\"AFLOWIN_STRING::POTENTIAL\")=" << string_POTENTIAL << endl;
       aurostd::string2tokens(string_POTENTIAL,tokens_string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_DELIMITER_);
       if(tokens_string_POTENTIAL.size()>=1)
         xvasp.AVASP_potential=tokens_string_POTENTIAL.at(0);
@@ -5945,9 +5948,9 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 }
 
 #ifndef COMPILE_SLIM
-bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
+bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="AVASP_MakePrototype_AFLOWIN():";
+  string soliloquy = XHOST.sPID + "AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
   if(LDEBUG) cerr << " " << soliloquy << " BEGIN" << endl; 
 
@@ -6280,7 +6283,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
 
     if(aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_DELIMITER_)) {
       vector<string> tokens_string_POTENTIAL;
-      cerr << "PARAMS->vparams.getattachedscheme(\"AFLOWIN_STRING::POTENTIAL\")=" << string_POTENTIAL << endl;
+      if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->vparams.getattachedscheme(\"AFLOWIN_STRING::POTENTIAL\")=" << string_POTENTIAL << endl;
       aurostd::string2tokens(string_POTENTIAL,tokens_string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_DELIMITER_);
       if(tokens_string_POTENTIAL.size()>=1)
         xvasp.AVASP_potential=tokens_string_POTENTIAL.at(0);
@@ -6688,7 +6691,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
 { //CO200106 - patching for auto-indenting
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="AVASP_MakePrototypeICSD_AFLOWIN():";
+  string soliloquy = XHOST.sPID + "AVASP_MakePrototypeICSD_AFLOWIN():";
   if(LDEBUG) cerr << soliloquy << " 0a" << endl;
   _xvasp xvasp;
   AVASP_DefaultValuesICSD_AFLOWIN(xvasp);
