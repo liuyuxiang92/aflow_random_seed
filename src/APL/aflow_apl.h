@@ -28,7 +28,7 @@
 #define APL_CHECKSUM_ALGO  string("Fletcher32")
 
 // ***************************************************************************
-// "logger.h"
+
 namespace apl {
   class Logger;
   // Templates used for the definition of the one parameter manipulation
@@ -507,7 +507,7 @@ namespace apl {
 // ***************************************************************************
 // Engine core for phonon calculation
 // ***************************************************************************
-// "supercell.h"
+
 namespace apl {
   class Supercell : public xStream {
     private:
@@ -618,7 +618,6 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// "ipc.h"
 
 namespace apl {
   enum IPCFreqFlags {
@@ -645,7 +644,7 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// "phoncalc.h"
+
 #define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME20190108
 #define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME20190108
 //#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME20190108  // OBSOLETE ME20200213 - the calculation does not use force fields
@@ -1131,7 +1130,7 @@ namespace apl {
 // ***************************************************************************
 // Supplementary classes for calculation of dispersion curves and density of states
 // ***************************************************************************
-// "pathbuilder.h"
+
 namespace apl {
   class PathBuilder {
     public:
@@ -1191,7 +1190,7 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// "pdisc.h"
+
 namespace apl {
   class PhononDispersionCalculator {
     private:
@@ -1259,8 +1258,8 @@ namespace apl { //PN20180705
 } // namespace apl
 
 // ***************************************************************************
-// "doscalc.h"
 namespace apl {
+
 #define MIN_FREQ_TRESHOLD -0.1  //in AMU
 #define RAW2Hz 15.6333046177
 #define AMU2Kg 1.66053904
@@ -1322,7 +1321,7 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// thermalpc.h
+
 namespace apl {
   enum ThermalPropertiesUnits { eV,
     meV,
@@ -2378,7 +2377,6 @@ namespace apl
   };
 }
 // ***************************************************************************
-// shellhandle.h
 
 namespace apl {
 
@@ -2464,7 +2462,6 @@ namespace apl {
 }  // end namespace apl
 
 // ***************************************************************************
-// cursor.h
 
 #define cursor_moveyx(y, x) printf("\033[%d;%dH", y, x) /*Move cursor to position y,x (rows, columns) with (1,1) as origin*/
 #define cursor_moveup(y) printf("\033[%dA", y)          /*Move cursor up y*/
