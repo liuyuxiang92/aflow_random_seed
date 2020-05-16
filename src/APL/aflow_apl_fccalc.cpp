@@ -889,12 +889,14 @@ namespace apl {
 
   DirectMethodPC::DirectMethodPC(ostream& oss) : ForceConstantCalculator(oss) {
     free();
+    _directory = "."; //AS20200512
   }
 
   DirectMethodPC::DirectMethodPC(Supercell& sc, ofstream& mf, ostream& oss)
     : ForceConstantCalculator(sc, mf, oss) {
       free();
-    }
+    _directory = "."; //AS20200512
+  }
 
   DirectMethodPC::DirectMethodPC(const DirectMethodPC& that)
     : ForceConstantCalculator(*that._supercell, *that.getOFStream(), *that.getOSS()) {

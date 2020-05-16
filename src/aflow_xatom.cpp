@@ -13031,6 +13031,16 @@ xstructure SetScale(const xstructure& a,const double &in_scale) {
   return b;
 }
 
+//AS20200514 START
+// ***************************************************************************
+// Function UpdateCartesianCoordinates
+// ***************************************************************************
+void xstructure::UpdateCartesianCoordinates()
+{
+  for (uint at=0; at<atoms.size(); at++) atoms[at].cpos = scale*f2c*atoms[at].fpos;
+}
+//AS20200514 END
+
 // ***************************************************************************
 // Function SetVolume
 // ***************************************************************************
@@ -13148,6 +13158,7 @@ void xstructure::InflateVolume(const double &coefficient) {
   // scale=std::pow((double) coefficient,(double) 1/3)*scale;
   lattice=std::pow((double) coefficient,(double) 1/3)*lattice;
   FixLattices();  // touched scale/lattice, then fix the lattices
+  UpdateCartesianCoordinates(); //AS20200514
 }
 
 xstructure InflateVolume(const xstructure& a,const double &coefficient) {
@@ -13156,6 +13167,7 @@ xstructure InflateVolume(const xstructure& a,const double &coefficient) {
   //  b.scale=std::pow((double) coefficient,(double) 1/3)*b.scale;
   b.lattice=std::pow((double) coefficient,(double) 1/3)*b.lattice;
   b.FixLattices(); // touched scale/lattice, need to fix the lattices
+  b.UpdateCartesianCoordinates(); //AS20200514
   return b;
 }
 

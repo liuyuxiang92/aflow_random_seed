@@ -600,6 +600,29 @@ namespace aurostd {
 
   void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd); //CO20191201
   void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my); //CO20191201
+
+  //AS20200512 BEGIN
+  /// gives maximum among diagonal elements
+  template<class utype> utype
+    maxDiagonalElement(const xmatrix<utype>& M)
+    {
+      utype maxM = M[M.lrows][M.lcols];
+      for (int i=M.lrows+1,j=M.lcols+1; i<=M.urows && j<=M.ucols; i++, j++){
+        if (M[i][j] > maxM) maxM = M[i][j];
+      }
+      return maxM;
+    }
+  /// gives minimum among diagonal elements
+  template<class utype> utype
+    minDiagonalElement(const xmatrix<utype>& M)
+    {
+      utype minM = M[M.lrows][M.lcols];
+      for (int i=M.lrows+1,j=M.lcols+1; i<=M.urows && j<=M.ucols; i++, j++){
+        if (M[i][j] < minM) minM = M[i][j];
+      }
+      return minM;
+    }
+  //AS20200512 END
 }
 
 namespace aurostd {
