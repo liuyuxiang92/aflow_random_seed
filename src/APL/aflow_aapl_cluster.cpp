@@ -287,7 +287,6 @@ namespace apl {
       int countshell = 0;
       double shell_rad = 0.0;
       double max_rad = 0.0;
-      const double _DIST_TOL_ = 0.1;
       uint natoms = cell.atoms.size();
       xvector<double> distances(natoms - 1, 0);
       for (uint i = 0; i < cell.iatoms.size(); i++) {
@@ -303,11 +302,11 @@ namespace apl {
         }
         distances = aurostd::sort(distances);
         for (uint j = 1; j < natoms; j++) {
-          if (distances[j] > distances[j - 1] + _DIST_TOL_ ){
+          if (distances[j] > distances[j - 1] + _APL_SHELL_TOL_ ){
             countshell++;
           }
           if (countshell == cut_shell) {
-            shell_rad = distances[j] + _DIST_TOL_;
+            shell_rad = distances[j] + _APL_SHELL_TOL_;
             j = natoms;
             if (shell_rad > max_rad){
               max_rad = shell_rad;

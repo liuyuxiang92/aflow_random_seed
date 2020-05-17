@@ -15,6 +15,9 @@
 #define _TMPDIR_ string("ARUN.APL.QH.TMP")  //[PN]
 #define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
+//AS20200427
+#define NEW_QHA false
+
 //CO fixing cpp version issues with auto_ptr (depreciated)
 #if __cplusplus >= 201103L
 template <typename T>
@@ -1383,6 +1386,49 @@ namespace KBIN {
         USER_DOS_PROJECTIONS[p] = xinput.getXStr().f2c * USER_DOS_PROJECTIONS[p];
       }
     }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //                                                                         //
+    //                           QHA                                           //
+    //                                                                         //
+    /////////////////////////////////////////////////////////////////////////////
+
+    //AS20200513 BEGIN
+    bool run_any_qha =
+          kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
+          kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
+          kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
+    if (NEW_QHA && run_any_qha){
+      apl::QHAN qha(USER_TPT, xinput, kflags, supercell_opts, messageFile, oss);
+      qha.apl_options = aplopts;
+      // OBSOLETE ME20200516 - APL options are already recast into xoptions.
+      //[OBSOLETE] qha.apl_options.push_attached("ENGINE", USER_ENGINE);
+      //[OBSOLETE] qha.apl_options.flag("AUTO_DIST", USER_AUTO_DISTORTIONS);
+      //[OBSOLETE] qha.apl_options.flag("DPM", USER_DPM);
+      //[OBSOLETE] qha.apl_options.flag("XYZONLY", USER_DISTORTIONS_XYZ_ONLY);
+      //[OBSOLETE] qha.apl_options.flag("SYMMETRIZE", USER_DISTORTIONS_SYMMETRIZE);
+      //[OBSOLETE] qha.apl_options.flag("INEQUIVONLY", USER_DISTORTIONS_INEQUIVONLY);
+      //[OBSOLETE] qha.apl_options.flag("ZEROSTATE", USER_ZEROSTATE);
+      //[OBSOLETE] qha.apl_options.flag("POLAR", USER_POLAR);
+      //[OBSOLETE] qha.apl_options.push_attached("DIST_MAGNITUDE",
+      //[OBSOLETE]     aurostd::utype2string<double>(USER_DISTORTION_MAGNITUDE));
+
+      //[OBSOLETE] qha.apl_options.push_attached("DOS_METHOD", USER_DOS_METHOD);
+      //[OBSOLETE] qha.apl_options.push_attached("DOS_MESH", DOS_MESH_SCHEME);
+      //[OBSOLETE] qha.apl_options.push_attached("DOS_NPOINTS",
+      //[OBSOLETE]     aurostd::utype2string<int>(USER_DOS_NPOINTS));
+      //[OBSOLETE] qha.apl_options.push_attached("DOS_SMEAR",
+      //[OBSOLETE]     aurostd::utype2string<double>(USER_DOS_SMEAR));
+      //[OBSOLETE] qha.apl_options.push_attached("DOS_NPOINTS",
+      //[OBSOLETE]     aurostd::utype2string<int>(USER_DOS_NPOINTS));
+      //[OBSOLETE] qha.apl_options.push_attached("BAND_NPOINTS",
+      //[OBSOLETE]     aurostd::utype2string<int>(USER_DC_NPOINTS));
+
+      qha.system_title = phcalc.getSystemName();
+      qha.run(xflags, aflags, kflags, AflowIn);
+      return;
+    }
+    //AS20200513 END
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //

@@ -227,7 +227,7 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return U0;
+    if (T < _AFLOW_APL_EPS_) return getScalingFactor(unit) * U0; //AS20200508
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
@@ -255,7 +255,7 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return U0;
+    if (T < _AFLOW_APL_EPS_) return getScalingFactor(unit) * U0; //AS20200508
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)

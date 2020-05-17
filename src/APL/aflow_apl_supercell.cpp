@@ -1,4 +1,8 @@
-// [OBSOLETE] #include <limits>
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -47,12 +51,12 @@ namespace apl {
   }
 
   Supercell::Supercell(const Supercell& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   Supercell& Supercell::operator=(const Supercell& that) {
-    free();
+    if (this != &that) free();
     copy(that);
     return *this;
   }
@@ -81,6 +85,7 @@ namespace apl {
     _maxShellRadius.clear();
     _maxShellRadius = that._maxShellRadius;
     _isConstructed = that._isConstructed;  //CO
+    _initialized = that._initialized;
     phase_vectors = that.phase_vectors;  // ME20200116
   }
 
@@ -107,6 +112,7 @@ namespace apl {
     _isShellRestricted = false;
     _maxShellRadius.clear();
     _isConstructed = false;
+    _initialized = false;
     phase_vectors.clear();
     _scStructure.clear();
   }
@@ -241,6 +247,7 @@ namespace apl {
     _sym_eps = _inStructure.sym_eps;
 
     clearSupercell();
+    _initialized = true;
   }
 
 
@@ -322,6 +329,10 @@ namespace apl {
   xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
     string function = "apl::Supercell::determineSupercellDimensions()";
     stringstream message;
+    if (!_initialized) {
+      message << "Not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
 
     xvector<int> dims(3);
     string method = opts.getattachedscheme("SUPERCELL::METHOD");
@@ -340,9 +351,10 @@ namespace apl {
       dims = aurostd::vector2xvector(tokens);
     } else if (method == "MINATOMS") {
       int minatoms = aurostd::string2utype<int>(value);
-      double radius = 0.0;
       int natoms = (int) _inStructure.atoms.size();
-      for (radius = 0.01; natoms < minatoms; radius += 0.01) {
+      // ME20200516 - Use the shortest lattice vector as the starting point
+      double radius = std::min(std::min(_inStructure.a, _inStructure.b), _inStructure.c)/2.0 - 0.1;
+      for ( ; natoms < minatoms; radius += 0.01) {
         dims = LatticeDimensionSphere(_inStructure.lattice, radius);
         natoms = dims[1] * dims[2] * dims[3] * (int) _inStructure.atoms.size();
       }
@@ -368,15 +380,12 @@ namespace apl {
       }
     } else if (method == "SHELLS") {
       int shells = aurostd::string2utype<int>(value);
-      // There is currently no option nor any documentation about
-      // using full shells or not, so this feature will be turned off
-      // for now.
-      bool full_shell = false;
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Searching for suitable cell to handle " << shells << " shells...";
         pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
-      dims = buildSuitableForShell(shells, full_shell, opts.flag("SUPERCELL::VERBOSE"));
+      bool get_full_shells = true;
+      dims = getSupercellDimensionsShell(shells, get_full_shells);
     } else {
       message << "Unknown supercell method " + method + ".";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
@@ -401,6 +410,10 @@ namespace apl {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::build():"; //CO20190218
     stringstream message;
+    if (!_initialized) {
+      message << "Not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+    }
     //BEGIN JJPR
     scell(1) = nx;
     scell(2) = ny;
@@ -696,7 +709,7 @@ namespace apl {
     _scStructure.write_inequivalent_flag = TRUE;
 
     // Set the information about this construction
-    _scStructure.info = "Trimed supercell";
+    _scStructure.info = "Trimmed supercell";
 
     // OK.
     //_logger << "Done." << apl::endl;
@@ -885,144 +898,127 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200102 - do not build the supercell here, just retrieve dimensions.
-  xvector<int> Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
-    // What is the dimension of the supercell ? OK, user wants to have MAX_NN_SHELLS
-    // shell occupied for each nonequvalent atom. Try to find it...
+  // ME20200516
+  // Calculates the supercell dimensions to fit cut_shell number of coordination
+  // shells into the supercell.
+  xvector<int> Supercell::getSupercellDimensionsShell(uint cut_shell, bool get_full_shells) {
+    _inStructure.grid_atoms.clear();
+    uint natoms_iat = _inStructure.iatoms.size();
+    vector<bool> shells_in_scell(natoms_iat, false);
+    bool all_shells_in_scell = false;
 
-    // Precompute shellhandles for each unique atom
-    vector<ShellHandle> sh;
-    bool useSplitShells = true;
-    for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
-      ShellHandle s;
-      sh.push_back(s);
-      sh.back().init(_inStructure, _inStructure.iatoms[i][0], MIN_NN_SHELLS);
-      try {
-        if (useSplitShells)
-          sh.back().splitBySymmetry();
-      }
-      catch (aurostd::xerror& e)
-      { //CO20200106 - patching for auto-indenting
-        //CO, we may want to kill this if we create supercells of uniform expansion (not derivative_structures)
-        //come back to fix later, but for now, leave as is (NOT WELL TESTED)
-        //also, see exit below (throw error), this indicates to me that we do not NEED to exit, but can proceed until next error
-        //CO, kill if errors with symmetry
-        //_logger << apl::error << e.what() << apl::endl;
-        //_logger << apl::error << "The splitting of shells by the symmetry has failed [" << i << "]." << apl::endl;
-        //throw APLRuntimeError("apl::Supercell::buildSuitableForShell(); Symmetry failed.");
-        //_logger << apl::error << e.what() << apl::endl;
-        stringstream message;
-        message << e.error_message;
-        message << " The splitting of shells by symmetry has failed [" << i << "]. Continuing without this...";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        useSplitShells = false;
-        for (uint j = 0; j < sh.size(); j++) {
-          sh[j].removeSplitBySymmetry();
+    // Initialize variables that are needed during the loop
+    vector<double> distances;
+    vector<int> gridatoms_indices;
+    xvector<int> dims(3), dims_prev(3);
+    xvector<double> fpos, fpos_image;
+    xmatrix<double> scell_lattice = _inStructure.lattice;
+    xmatrix<double> scell_matrix = aurostd::identity((double) 0, 3);
+    xmatrix<double> scell_f2c(3, 3), scell_c2f;
+    uint iat = 0, gat = 0, at = 0, ngridatoms = 0, countshell = 0;
+
+    // Set the starting radius to half the length of the smallest lattice vector
+    double radius = std::min(std::min(_inStructure.a, _inStructure.b), _inStructure.c)/2.0 - 0.1;
+    // Expand the supercell until the coordination shells fit completely into the unit cell
+    for ( ; !all_shells_in_scell; radius += 0.01) {
+      dims = LatticeDimensionSphere(_inStructure.lattice, radius);
+      if (dims == dims_prev) continue;  // No need to check if the supercell dimensions have not changed
+      dims_prev = dims;
+      scell_matrix[1][1] = dims[1];
+      scell_matrix[2][2] = dims[2];
+      scell_matrix[3][3] = dims[3];
+      scell_lattice = scell_matrix * _inStructure.lattice;
+      scell_f2c = trasp(scell_lattice);
+      scell_c2f = inverse(scell_f2c);
+      _inStructure.GenerateGridAtoms(0, dims[1] - 1, 0, dims[2] - 1, 0, dims[3] - 1);
+      ngridatoms = _inStructure.grid_atoms.size();
+      distances.clear();
+      distances.resize(ngridatoms);
+      gridatoms_indices.clear();
+      gridatoms_indices.resize(ngridatoms);
+      for (iat = 0; iat < natoms_iat; iat++) {
+        if (!shells_in_scell[iat]) {  // Only check for atoms for which the cell was not big enough yet
+          const xvector<double>& cpos_iat = _inStructure.atoms[_inStructure.iatoms[iat][0]].cpos;
+          // Determine how many partial coordination shells are inside the cell
+          // by finding the number of "unique" interatomic distances.
+          for (gat = 0; gat < ngridatoms; gat++) {
+            gridatoms_indices[gat] = gat;
+            distances[gat] = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(cpos_iat, _inStructure.grid_atoms[gat].cpos, scell_lattice));
+          }
+          aurostd::sort(distances, gridatoms_indices);
+          countshell = 0;
+          for (gat = 1; (gat < ngridatoms) && (countshell < cut_shell); gat++) {
+            if (distances[gat] > distances[gat - 1] + _APL_SHELL_TOL_) countshell++;
+          }
+          if (get_full_shells && countshell == cut_shell) {
+            // For full shells, every atom of the last coordination shell
+            // needs to be inside the supercell. If there is more than one
+            // periodic image that havs the same distance to the central atom,
+            // this condition is not fulfilled.
+            bool full_shell = true;
+            for (uint i = gat; full_shell && (i < ngridatoms) && (distances[i] < distances[gat] + _APL_SHELL_TOL_); i++) {
+              at = gridatoms_indices[i];
+              fpos = scell_c2f * _inStructure.grid_atoms[at].cpos;
+              uint image_count = 0;
+              for (double nx = -1; full_shell && (nx <= 1); nx++) {
+                fpos_image[1] = fpos[1] + nx;
+                for (double ny = -1; full_shell && (ny <= 1); ny++) {
+                  fpos_image[2] = fpos[2] + ny;
+                  for (double nz = -1; full_shell && (nz <= 1); nz++) {
+                    fpos_image[3] = fpos[3] + nz;
+                    if (aurostd::modulus(scell_f2c * fpos_image - cpos_iat) < distances[gat] + _APL_SHELL_TOL_) {
+                      image_count++;
+                      full_shell = (image_count < 2);
+                    }
+                  }
+                }
+              }
+            }
+            shells_in_scell[iat] = full_shell;
+          } else {
+            shells_in_scell[iat] = (countshell == cut_shell);
+          }
         }
+        if (!shells_in_scell[iat]) break;  // No need to check other atoms - it has to fit for all
       }
+      all_shells_in_scell = (iat == natoms_iat);
     }
-    _maxShellID = MIN_NN_SHELLS;
-
-    int i = 1;
-    int j = 1;
-    int k = 1;
-
-    while (true) {
-      _scStructure = GetSuperCell(_inStructure, i, j, k);
-      //build(i,j,k);
-
-      uint ia = 0;
-      for (; ia < _inStructure.iatoms.size(); ia++) {
-        // Get ID of origin atom from pc in the sc
-        uint l = 0;
-        for (; l < _scStructure.atoms.size(); l++) {
-          if (aurostd::modulus(_scStructure.atoms[l].cpos -
-                _inStructure.atoms[_inStructure.iatoms[ia][0]].cpos) < _AFLOW_APL_EPS_)
-            break;
-        }
-        if (l == _scStructure.atoms.size()) {
-          string function = "apl::Supercell::buildSuitableForShell()";
-          string message = "Mapping error.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-        }
-
-        // Map with this center
-        sh[ia].mapStructure(_scStructure, l, useSplitShells);
-
-        // Get last shell
-        int lastShell;
-        if (shouldBeFullShell)
-          lastShell = sh[ia].getLastFullShell();
-        else
-          lastShell = sh[ia].getLastRegularShell();
-
-        if (lastShell < MIN_NN_SHELLS) break;
-      }
-
-      if (ia != _inStructure.iatoms.size()) {
-        i++;
-        j = k = i;
-        //   if( i == j && j == k )
-        //   i++;
-        //   else if( j == k )
-        //   j++;
-        //   else
-        //   k++;
-      } else {
-        break;
-      }
-    }
-
-    // Build structure
-    //build(i, j, k, VERBOSE);  // OBSOLETE ME20200102
-
-    // Print info about shells
-    for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
-      if (VERBOSE) sh[i].printReport(cout);
-      sh[i].clear();
-    }
-    sh.clear();
-
-    // ME20200102 - BEGIN
-    //[OBSOLETE] return i * j * k * _inStructure.atoms.size();
-    xvector<int> dims(3);
-    dims[1] = i; dims[2] = j; dims[3] = k;
+    _inStructure.grid_atoms.clear();
     return dims;
-    // ME20200102 - END
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   void Supercell::setupShellRestrictions(int MAX_NN_SHELLS) {
-    // Precompute shellhandles for each unique atom
-    vector<ShellHandle> sh;
-    stringstream message;
-    for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
-      ShellHandle s;
-      sh.push_back(s);
-      sh.back().init(_inStructure, _inStructure.iatoms[i][0], MAX_NN_SHELLS);
-      sh.back().mapStructure(_scStructure, _scStructure.iatoms[i][0]);
-    }
-    _maxShellID = MAX_NN_SHELLS;
-
-    // Set flag to shell restriction
-    _isShellRestricted = true;
-    message << "Setting shell restrictions up to " << MAX_NN_SHELLS << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
-
-    // Calculate the truncate radius for each atom
-    _maxShellRadius.clear();
-    for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
-      double r = sh[i].getShellRadius(MAX_NN_SHELLS);
-      for (uint j = 0; j < _inStructure.iatoms[i].size(); j++) {
-        _maxShellRadius.push_back(r);
+    uint niatoms = _scStructure.iatoms.size();
+    uint natoms = _scStructure.atoms.size();
+    uint iat = 0, at = 0;
+    vector<double> shell_radii(niatoms);
+    int countshell = 0;
+    vector<double> distances(natoms);
+    for (uint iat = 0; iat < niatoms; iat++) {
+      countshell = 0;
+      const xvector<double>& cpos_iat = _scStructure.atoms[_scStructure.iatoms[iat][0]].cpos;
+      for (at = 0; at < natoms; at++) {
+        distances[at] = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(_scStructure.atoms[at].cpos, cpos_iat, _scStructure.lattice));
       }
+      aurostd::sort(distances);
+      for (at = 1; (at < natoms) && (countshell < MAX_NN_SHELLS); at++) {
+        if (distances[at] > distances[at - 1] + _APL_SHELL_TOL_) countshell++;
+      }
+      if (countshell < MAX_NN_SHELLS) {
+        stringstream message;
+        message << "The supercell is too small to set up shell restrictions for " << MAX_NN_SHELLS << " shells.";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        break;
+      }
+      shell_radii[iat] = distances[at];
     }
-
-    // Print info about shells
-    for (uint i = 0; i < _inStructure.iatoms.size(); i++)
-      sh[i].clear();
-    sh.clear();
+    _isShellRestricted = ((iat == niatoms) && (countshell == MAX_NN_SHELLS));
+    if (_isShellRestricted) {
+      _maxShellRadius = shell_radii;
+      _maxShellID = MAX_NN_SHELLS;
+    }
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -1684,3 +1680,9 @@ namespace apl {
   }
 
 }  // namespace apl
+
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************
