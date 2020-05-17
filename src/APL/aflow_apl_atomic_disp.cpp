@@ -355,7 +355,7 @@ namespace apl {
     string tag = "[APL_DISPLACEMENTS]";
 
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    output << tag << "SYSTEM=" << _pc->getSystemName() << std::endl;
+    output << tag << "SYSTEM=" << _pc->_system << std::endl;
     output << tag << "START" << std::endl;
     output << "#" << std::setw(9) << "T (K)" << setw(15) << "Species"
       << std::setw(15) << "x (A^2)" << std::setw(15) << "y (A^2)" << std::setw(15) << "z (A^2)" << std::endl;

@@ -1,7 +1,8 @@
-// [OBSOLETE] #include <iostream>
-// [OBSOLETE] #include <sstream>
-// [OBSOLETE] #include <string>
-// [OBSOLETE] #include <limits>
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -109,7 +110,7 @@ namespace apl {
     }
     _bzmethod = method;
     _projections = projections;
-    _system = _pc->getSystemName();
+    _system = _pc->_system;
 
     if (!_pc->getSupercell().isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
@@ -731,3 +732,9 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl
+
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************

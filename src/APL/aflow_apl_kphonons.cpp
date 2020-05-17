@@ -871,7 +871,6 @@ namespace KBIN {
     // QHA ----------------------------------------------------------------------
 
     //  //PN QUASI-HARMONIC START
-    aurostd::xoption CALCULATE_GROUPVELOCITY_OPTION; CALCULATE_GROUPVELOCITY_OPTION.option = false; //PN20180705
     aurostd::xoption CALCULATE_GRUNEISEN_OPTION; CALCULATE_GRUNEISEN_OPTION.option = false;
     aurostd::xoption CALCULATE_DISPLACEMENTS_OPTION; CALCULATE_DISPLACEMENTS_OPTION.option = false;
     aurostd::xoption CALCULATE_GRUNEISEN_SUBDIRECTORIES_OPTION; CALCULATE_GRUNEISEN_SUBDIRECTORIES_OPTION.option = false;
@@ -951,13 +950,6 @@ namespace KBIN {
     aurostd::xoption FITTING_TYPE_OPTION; FITTING_TYPE_OPTION.xscheme = "BM1"; string FITTING_TYPE = "BM1";
     aurostd::xoption SCQHA_PDIS_T_OPTION; SCQHA_PDIS_T_OPTION.xscheme = "100,400,600"; std::vector<double> scqha_pdis_T; //PN20180705
     //PN QUASI-HARMONIC END
-
-    //PN PHONON START
-    //GROUPVELOCITY=y/n
-    CALCULATE_GROUPVELOCITY_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "GROUP_VELOCITY=" + "|" + _ASTROPT_APL_OLD_ + "GROUP_VELOCITY="), CALCULATE_GROUPVELOCITY_OPTION.option,  CALCULATE_GROUPVELOCITY_OPTION.xscheme);
-    logger << (CALCULATE_GROUPVELOCITY_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "GROUP_VELOCITY=" << (CALCULATE_GROUPVELOCITY_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
-
-    //PN PHONON END
 
     //PN QUASI-HARMONIC START
     if(!USER_TCOND){
@@ -1321,9 +1313,9 @@ namespace KBIN {
     // Set up the phonon calculator
     apl::PhononCalculator phcalc(messageFile, oss);
     if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
-      phcalc.setSystem(xinput.getXStr().title);
+      phcalc._system = xinput.getXStr().title;
     } else {
-      phcalc.setSystem(xflags.vflags.AFLOW_SYSTEM.content_string);
+      phcalc._system = xflags.vflags.AFLOW_SYSTEM.content_string;
     }
     phcalc.setDirectory(aflags.Directory);
     phcalc.setNCPUs(kflags);
@@ -1424,7 +1416,7 @@ namespace KBIN {
       //[OBSOLETE] qha.apl_options.push_attached("BAND_NPOINTS",
       //[OBSOLETE]     aurostd::utype2string<int>(USER_DC_NPOINTS));
 
-      qha.system_title = phcalc.getSystemName();
+      qha.system_title = phcalc._system;
       qha.run(xflags, aflags, kflags, AflowIn);
       return;
     }
@@ -1861,6 +1853,14 @@ namespace KBIN {
           ad.calculateMeanSquareDisplacements(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
           ad.writeMeanSquareDisplacementsToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
         }
+
+        if (aplopts.flag("GROUP_VELOCITY")) {
+          string gvelfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_GVEL_FILE);
+          message << "Writing group velocities into file " << gvelfile << ".";
+          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
+          vector<vector<xvector<double> > > gvel = phcalc.calculateGroupVelocitiesOnMesh();
+          phcalc.writeGroupVelocitiesToFile(gvelfile, gvel);
+        }
         //QHA/SCQHA/QHA3P START //PN20180705
         //calculate Gruneisen
         //ME20190428 START
@@ -1871,12 +1871,6 @@ namespace KBIN {
           apl::QMesh& qmesh = phcalc.getQMesh();
           if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  //ME20190625
 
-          if(CALCULATE_GROUPVELOCITY_OPTION.option){
-            apl::GroupVelocity vg(phcalc, qmesh, logger);
-            if(vg.check_negative_frequencies()){
-              vg.write();
-              vg.clear();
-            }}
           //ME20190428 END
           //QHA calculate Gruneisen
           std::vector< std::vector< double> > scqha_tv;

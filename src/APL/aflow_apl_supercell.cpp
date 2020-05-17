@@ -123,16 +123,6 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void Supercell::setDirectory(const string& directory) {
-    _directory = directory;
-  }
-
-  string Supercell::getDirectory() const {
-    return _directory;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
   void Supercell::readFromStateFile(const string& filename) {
     string function = "apl::Supercell::readFromStateFile()";
     if (!aurostd::EFileExist(filename)) {
@@ -810,7 +800,7 @@ namespace apl {
       // something went seriously wrong
       string function = "apl::Supercell::projectToOriginal()";
       string message = "Mapping between original structure and supercell failed.";
-      message +=  " This is likely a bug in the code.";
+      message += " This is likely a bug in the code.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }

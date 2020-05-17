@@ -183,15 +183,6 @@ namespace apl {
     return clusters[i];
   }
 
-  //Directory/////////////////////////////////////////////////////////////////
-  const string& ClusterSet::getDirectory() const {
-    return directory;
-  }
-
-  void ClusterSet::setDirectory(const string& dir) {
-    directory = dir;
-  }
-
 }
 
 /************************** INITIAL CALCULATIONS ****************************/

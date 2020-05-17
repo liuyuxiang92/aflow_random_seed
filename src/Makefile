@@ -132,7 +132,7 @@ LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp aflowlib_libraries_scrubber.cpp
 CALCULATED_SRC = aflow_data_calculated.cpp
 AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp aflowlib_database.cpp SQLITE/aflow_sqlite.cpp
 #DX and CO - START
-APL_SRC = APL/aflow_apl_kphonons.cpp APL/aflow_qha_operations.cpp APL/aflow_apl_function_fitting.cpp APL/aflow_apl_qmesh.cpp APL/aflow_apl_doscalc.cpp APL/aflow_apl_logger.cpp APL/aflow_apl_pdisc.cpp APL/aflow_apl_phoncalc.cpp APL/aflow_apl_supercell.cpp APL/aflow_apl_thermalpc.cpp APL/aflow_aapl_cluster.cpp APL/aflow_aapl_ifcs.cpp APL/aflow_aapl_tcond.cpp APL/aflow_qha_aflowin_creator.cpp APL/aflow_qha_dm_pdos_save.cpp APL/aflow_apl_hsqpoints.cpp APL/aflow_qha_gruneisen.cpp APL/aflow_apl_group_velocity.cpp APL/aflow_apl_atomic_disp.cpp APL/aflow_scqha_gruneisen.cpp APL/aflow_scqha_eos.cpp APL/aflow_qha_energies.cpp APL/aflow_qha3phonons_eos.cpp APL/aflow_qha_eos.cpp APL/aflow_scqha_T_freqs.cpp APL/aflow_apl_fccalc.cpp APL/aflow_qha.cpp
+APL_SRC = APL/aflow_apl_kphonons.cpp APL/aflow_qha_operations.cpp APL/aflow_apl_function_fitting.cpp APL/aflow_apl_qmesh.cpp APL/aflow_apl_doscalc.cpp APL/aflow_apl_logger.cpp APL/aflow_apl_pdisc.cpp APL/aflow_apl_phoncalc.cpp APL/aflow_apl_supercell.cpp APL/aflow_apl_thermalpc.cpp APL/aflow_aapl_cluster.cpp APL/aflow_aapl_ifcs.cpp APL/aflow_aapl_tcond.cpp APL/aflow_qha_aflowin_creator.cpp APL/aflow_qha_dm_pdos_save.cpp APL/aflow_apl_hsqpoints.cpp APL/aflow_qha_gruneisen.cpp APL/aflow_apl_atomic_disp.cpp APL/aflow_scqha_gruneisen.cpp APL/aflow_scqha_eos.cpp APL/aflow_qha_energies.cpp APL/aflow_qha3phonons_eos.cpp APL/aflow_qha_eos.cpp APL/aflow_scqha_T_freqs.cpp APL/aflow_apl_fccalc.cpp APL/aflow_qha.cpp
 #DX and CO - END
 
 AGL_SRC = aflow_agl_debye.cpp aflow_agl_eqn_state.cpp aflow_agl_get_ev.cpp aflow_agl_plot_write.cpp aflow_agl_polynomial.cpp aflow_agl_rungibbs.cpp aflow_agl_thermal.cpp aflow_agl_hugoniot.cpp aflow_agl_electronic.cpp
@@ -825,6 +825,10 @@ aflow_wyckoff.o: aflow_wyckoff.cpp $(AFLOW_HPP) $(AUROSTD_HPP)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" -D_WICKOFF_PRE_ aflow_wyckoff.cpp -c
 ####### APL STUFF ####################################################
 #DX and CO - START
+APL/aflow_apl_phoncalc.o: APL/aflow_apl_phoncalc.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_phoncalc.cpp -c
+	touch $@
 APL/aflow_apl_doscalc.o: APL/aflow_apl_doscalc.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
 	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_doscalc.cpp -c

@@ -34,7 +34,7 @@ namespace apl {
     _supercell = &sc;
     _sc_set = true;
     xStream::initialize(mf, oss);
-    _directory = _supercell->getDirectory();
+    _directory = _supercell->_directory;
   }
 
   ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, const aurostd::xoption& opts, ofstream& mf, ostream& oss) {
@@ -42,7 +42,7 @@ namespace apl {
     _supercell = &sc;
     _sc_set = true;
     xStream::initialize(mf, oss);
-    _directory = _supercell->getDirectory();
+    _directory = _supercell->_directory;
     initialize(opts);
   }
 
@@ -64,7 +64,7 @@ namespace apl {
   void ForceConstantCalculator::clear(Supercell& sc) {
     free();
     _supercell = &sc;
-    _directory = _supercell->getDirectory();
+    _directory = _supercell->_directory;
   }
 
   void ForceConstantCalculator::copy(const ForceConstantCalculator& that) {

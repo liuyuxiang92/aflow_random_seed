@@ -187,7 +187,9 @@ namespace apl {
     calc_rta_only = (opts.getattachedscheme("BTE") == "RTA");
 
     // Frequencies and group velocities
-    calculateFrequenciesGroupVelocities();
+    message = "Calculating frequencies and group velocities.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    gvel = _pc->calculateGroupVelocitiesOnMesh(freq, eigenvectors);
     _initialized = true;
   }
 
@@ -228,17 +230,13 @@ namespace apl {
   }
 
   void TCONDCalculator::writeOutputFiles(const string& directory) {
-    // q-points
-    string filename = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE;
-    _qm->writeQpoints(filename);
-    filename = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE;
-    _qm->writeIrredQpoints(filename);
-
     // Frequencies and group velocities
-    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
-    writeTempIndepOutput(filename, "Frequency", "THz", freq);
-    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
-    writeGroupVelocities(filename);
+    string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
+    _pc->writeGroupVelocitiesToFile(filename, gvel, freq, "THz");
+
+    // Irreducible q-points
+    filename = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE;
+    _qm->writeIrredQpoints(filename);
 
     // Grueneisen parameters
     filename = aurostd::CleanFileName(directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
@@ -269,75 +267,6 @@ namespace apl {
 
 
 } // namespace apl
-
-/*********************** FREQUENCIES/GROUP VELOCITIES ***********************/
-
-namespace apl {
-
-  //calculateFrequenciesGroupVelocities///////////////////////////////////////
-  // Calculates the frequencies and group velocities for each q-point.
-  // This function is mostly overhead, the actual calculation happens in
-  // calculateFreqGvel.
-  void TCONDCalculator::calculateFrequenciesGroupVelocities() {
-    string message = "Calculating frequencies and group velocities.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
-
-    // Prepare storage
-    xmatrix<xcomplex<double> > eigen(nBranches, nBranches, 1, 1);
-    eigenvectors.assign(nQPs, eigen);
-    freq.assign(nQPs, vector<double>(nBranches));
-    xvector<double> g(3);
-    gvel.assign(nQPs, vector<xvector<double> >(nBranches, g));
-
-    // Calculate frequencies and group velocities
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = _pc->getNCPUs();
-    vector<vector<int> > thread_dist = getThreadDistribution(nQPs, ncpus);
-    vector<std::thread*> threads;
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::calculateFreqGvel, this,
-            thread_dist[icpu][0], thread_dist[icpu][1]));
-    }
-    for (uint t = 0; t < threads.size(); t++) {
-      threads[t]->join();
-      delete threads[t];
-    }
-#else
-    calculateFreqGvel(0, nQPs);
-#endif
-  }
-
-  //calculateFreqGvel/////////////////////////////////////////////////////////
-  // Calculates the frequencies and group velocities using the eigenvalue
-  // solver implemented in apl::PhononCalculator.
-  void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
-    xmatrix<xcomplex<double> > eigen(nBranches, nBranches, 1, 1);
-    vector<xmatrix<xcomplex<double> > > dDynMat(3, eigen);
-    xvector<double> f;
-    for (int q = startIndex; q < endIndex; q++) {
-      // Frequency
-      f = _pc->getFrequency(_qm->getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], dDynMat);
-      freq[q] = aurostd::xvector2vector(f);  // Convert to vector to have same indexing as gvel
-      // Group velocity
-      for (int br = 0; br < nBranches; br++) {
-        if (freq[q][br] > _AFLOW_APL_EPS_) {
-          xvector<xcomplex<double> > eigenvec = eigenvectors[q].getcol(br+1);
-          xvector<xcomplex<double> > eigenvec_conj = conj(eigenvec);
-          for (int i = 1; i < 4; i++) {
-            xcomplex<double> integral = eigenvec_conj * (dDynMat[i-1] * eigenvec);
-            gvel[q][br][i] = au2nmTHz * integral.re/(2.0 * freq[q][br]);
-          }
-        } else {
-          for (int i = 1; i < 4; i++) {
-            gvel[q][br][i] = 0.0;
-          }
-        }
-      }
-    }
-  }
-
-}  // namespace apl
 
 /******************************** GRUENEISEN ********************************/
 
@@ -1358,8 +1287,8 @@ namespace apl {
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
-    if (!_pc->getSystemName().empty()) {
-      output << key << "SYSTEM=" << _pc->getSystemName() << std::endl;
+    if (!_pc->_system.empty()) {
+      output << key << "SYSTEM=" << _pc->_system << std::endl;
     }
     output << key << "START" << std::endl;
     output << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -1386,8 +1315,8 @@ namespace apl {
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
-    if (!_pc->getSystemName().empty()) {
-      output << key << "SYSTEM=" << _pc->getSystemName() << std::endl;
+    if (!_pc->_system.empty()) {
+      output << key << "SYSTEM=" << _pc->_system << std::endl;
     }
     output << key << "START" << std::endl;
     for (uint t = 0; t < temps.size(); t++) {
@@ -1424,50 +1353,6 @@ namespace apl {
     }
   }
 
-  //writeGroupVelocities//////////////////////////////////////////////////////
-  // Writes the group velocities into a file. Each row belongs to a q-point,
-  // and each column triplet belongs to a phonon branch.
-  void TCONDCalculator::writeGroupVelocities(const string& filename) {
-    if (gvel.size() == 0) return;  // Nothing to write
-    stringstream output;
-
-    // Header
-    output << AFLOWIN_SEPARATION_LINE << std::endl;
-    if (!_pc->getSystemName().empty()) {
-      output << "[AAPL_GROUP_VELOCITY]SYSTEM=" << _pc->getSystemName() << std::endl;
-    }
-    output << "[AAPL_GROUP_VELOCITY]START" << std::endl;
-    output << std::setiosflags(std::ios::fixed | std::ios::right);
-    output << std::setw(10) << "# Q-point";
-    output << std::setw(20) << " ";
-    output << "Group Velocity (km/s)" << std::endl;
-
-    // Body
-    for (int q = 0; q < nQPs; q++) {
-      output << std::setiosflags(std::ios::fixed | std::ios::right);
-      output << std::setw(10) << q;
-      for (int br = 0; br < nBranches; br++) {
-        for (int i = 1; i < 4; i++) {
-          output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-          output << std::setw(20) << std::setprecision(10) << std::scientific << gvel[q][br][i];
-        }
-        output << std::setw(5) << " ";
-      }
-      output << std::endl;
-    }
-
-    output << "[AAPL_GROUP_VELOCITY]STOP" << std::endl;
-    output << AFLOWIN_SEPARATION_LINE << std::endl;
-
-    // Write to file
-    aurostd::stringstream2file(output, filename);
-    if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeGroupVelocities()";
-      string message = "Could not write group velocities to file.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
-  }
-
   //writePhaseSpace///////////////////////////////////////////////////////////
   // Writes the scattering phase space into an output file. Numbers are
   // converted into fs to get "nicer" numbers. OOO should be zero, but it is
@@ -1495,7 +1380,7 @@ namespace apl {
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     output << "# 3-phonon scattering phase space (in fs)" << std::endl;
-    output << "[AAPL_SCATTERING_PHASE_SPACE]SYSTEM=" << _pc->getSystemName() << std::endl;
+    output << "[AAPL_SCATTERING_PHASE_SPACE]SYSTEM=" << _pc->_system << std::endl;
     output << "[AAPL_TOTAL_SCATTERING_PHASE_SPACE]START" << std::endl;
     output << std::setiosflags(std::ios::left | std::ios::fixed | std::ios::showpoint);
     output << std::setw(15) << "total" << std::setw(10) << std::setprecision(8) << std::dec << ps_total << std::endl;
@@ -1525,7 +1410,7 @@ namespace apl {
     if (grueneisen_mode.size() == 0) return;  // Nothing to write
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc->getSystemName() << std::endl;
+    output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc->_system << std::endl;
     output << "[AAPL_GRUENEISEN_AVERAGE]START" << std::endl;
     output << std::setiosflags(std::ios::right | std::ios::fixed | std::ios::showpoint);
     output << std::setw(8) << "# T (K)"
@@ -1555,8 +1440,8 @@ namespace apl {
 
     // Header
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    if (!_pc->getSystemName().empty()) {
-      output << "[AAPL_THERMAL_CONDUCTIVITY]SYSTEM=" << _pc->getSystemName() << std::endl;
+    if (!_pc->_system.empty()) {
+      output << "[AAPL_THERMAL_CONDUCTIVITY]SYSTEM=" << _pc->_system << std::endl;
     }
     output << "[AAPL_THERMAL_CONDUCTIVITY]START" << std::endl;
     output << std::setw(8) << "# T (K)"

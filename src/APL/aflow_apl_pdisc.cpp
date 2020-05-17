@@ -37,7 +37,7 @@ namespace apl {
     free();
     _pc = &pc;
     _pc_set = true;
-    _system = _pc->getSystemName();  // ME20190614
+    _system = _pc->_system;  // ME20190614
   }
 
   PhononDispersionCalculator::PhononDispersionCalculator(const PhononDispersionCalculator& that) {
@@ -519,7 +519,7 @@ namespace apl {
     xeigen.POTIM = 0.5E-15;
     xeigen.temperature = _temperature;
     xeigen.carstring = "PHON";
-    xeigen.title = _pc->getSystemName();
+    xeigen.title = _pc->_system;
     xeigen.number_electrons = 0;
     for (uint at = 0; at < xeigen.number_atoms; at++) {
       xeigen.number_electrons += _pc->getInputCellStructure().species_pp_ZVAL[at];

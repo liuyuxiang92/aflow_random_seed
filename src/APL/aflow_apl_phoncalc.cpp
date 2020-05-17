@@ -6,6 +6,16 @@
 
 #include "aflow_apl.h"
 
+// Some parts are written within the C++0x support in GCC, especially the std::thread,
+// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
+// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
+#if GCC_VERSION >= 40400  // added two zeros
+#define AFLOW_APL_MULTITHREADS_ENABLE 1
+#include <thread>
+#else
+#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
+#endif
+
 #define _DEBUG_APL_PHONCALC_ false  //CO20190116
 
 using std::string;
@@ -127,10 +137,6 @@ namespace apl {
   }
 
   // ME20190614
-  string PhononCalculator::getSystemName() const {
-    return _system;
-  }
-
   string PhononCalculator::getDirectory() const {
     return _directory;
   }
@@ -162,14 +168,10 @@ namespace apl {
 
 namespace apl {
 
-  void PhononCalculator::setSystem(const string& sys) {
-    _system = sys;
-  }
-
   void PhononCalculator::setDirectory(const string& dir) {
     _directory = dir;
-    _qm.setDirectory(dir);
-    _supercell.setDirectory(dir);
+    _qm._directory = dir;
+    _supercell._directory = dir;
   }
 
   void PhononCalculator::setNCPUs(const _kflags& kfl) {
@@ -537,21 +539,22 @@ namespace apl {
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac,
       const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors) {
-    vector<xmatrix<xcomplex<double> > > placeholder_mat;
-    return getFrequency(kpoint, kpoint_nac, flags, eigenvectors, placeholder_mat, false);
+    vector<xvector<double> > placeholder_gvel;
+    return getFrequency(kpoint, kpoint_nac, flags, eigenvectors, placeholder_gvel, false);
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint,
       const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors,
-      vector<xmatrix<xcomplex<double> > >& dDynMat, bool calc_derivative) {
-    return getFrequency(kpoint, kpoint, flags, eigenvectors, dDynMat, calc_derivative);
+      vector<xvector<double> >& gvel, bool calc_derivative) {
+    return getFrequency(kpoint, kpoint, flags, eigenvectors, gvel, calc_derivative);
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac,
       const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors,
-      vector<xmatrix<xcomplex<double> > >& dDynMat, bool calc_derivative) {
+      vector<xvector<double> >& gvel, bool calc_gvel) {
     // Compute frequency(omega) from eigenvalues [in eV/A/A/atomic_mass_unit]
-    xvector<double> omega = getEigenvalues(kpoint, kpoint_nac, eigenvectors, dDynMat, calc_derivative);
+    vector<xmatrix<xcomplex<double> > > dDynMat;
+    xvector<double> omega = getEigenvalues(kpoint, kpoint_nac, eigenvectors, dDynMat, calc_gvel);
 
     // Get value of conversion factor
     double conversionFactor = getFrequencyConversionFactor(apl::RAW | apl::OMEGA, flags);
@@ -569,6 +572,25 @@ namespace apl {
 
       // Convert to desired units
       omega(i) *= conversionFactor;
+    }
+
+    if (calc_gvel) {
+      double conversionFactorGvel = getFrequencyConversionFactor(flags, apl::THZ | apl::OMEGA);
+      uint nbranches = getNumberOfBranches();
+      gvel.clear();
+      gvel.resize(nbranches, xvector<double>(3));
+      xvector<xcomplex<double> > eigenvec(3), eigenvec_conj(3);
+      xcomplex<double> prod;
+      for (uint br = 0; br < nbranches; br++) {
+        if (omega[br + 1] > _AFLOW_APL_EPS_) {
+          eigenvec = eigenvectors.getcol(br + 1);
+          eigenvec_conj = conj(eigenvec);
+          for (uint i = 1; i < 4; i++) {
+            prod = eigenvec_conj * (dDynMat[i - 1] * eigenvec);
+            gvel[br][i] = au2nmTHz * prod.re/(2.0 * omega[br + 1] * conversionFactorGvel);
+          }
+        }
+      }
     }
 
     // Return
@@ -714,16 +736,20 @@ namespace apl {
           for (int ix = 1; ix <= 3; ix++) {
             for (int iy = 1; iy <= 3; iy++) {
               value = 0.5 * (_forceConstantMatrices[isc1][isc2](ix, iy) + _forceConstantMatrices[isc2][isc1](iy, ix));
-              dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += value * phase;
-              if (_isPolarMaterial)
+              if (!aurostd::iszero(value)) {
+                dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += value * phase;
+                dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy) += value;
+                if (calc_derivative) {
+                  for (int d = 0; d < 3; d++) {
+                    dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += value * derivative[d+1];
+                  }
+                }
+              }
+              if (_isPolarMaterial) {
                 dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += dynamicalMatrixNA(3 * ipc1 + ix, 3 * ipc2 + iy) * phase;
-              dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy) += value;
-              if (_isPolarMaterial)
                 dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy) += dynamicalMatrixNA(3 * ipc1 + ix, 3 * ipc2 + iy);
-              if (calc_derivative) {
-                for (int d = 0; d < 3; d++) {
-                  dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += value * derivative[d+1];
-                  if (_isPolarMaterial && (aurostd::modulus(kpoint) > _AFLOW_APL_EPS_)) {
+                if (calc_derivative && !aurostd::iszero(kpoint)) {
+                  for (int d = 0; d < 3; d++) {
                     nac = ((double) neq) * phase * dDynMat_NAC[d](3 * ipc1 + ix, 3 * ipc2 + iy);
                     dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += nac;
                   }
@@ -872,7 +898,6 @@ namespace apl {
       }
     }
 
-    //
     return dynamicalMatrix;
   }
 
@@ -1112,6 +1137,196 @@ namespace apl {
 
     //
     return dynamicalMatrix;
+  }
+
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           GROUP VELOCITIES                               //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  // Calculate the group velocities on a q-point mesh using the Hellman-Feynman
+  // theorem. Group velocities will be in km/s (nm THz).
+  vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh() {
+    vector<vector<double> > freqs_placeholder;
+    vector<xmatrix<xcomplex<double> > > eigenvectors_placeholder;
+    return calculateGroupVelocitiesOnMesh(freqs_placeholder, eigenvectors_placeholder);
+  }
+
+  vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh(vector<vector<double> >& freqs) {
+    vector<xmatrix<xcomplex<double> > > eigenvectors_placeholder;
+    return calculateGroupVelocitiesOnMesh(freqs, eigenvectors_placeholder);
+  }
+
+  vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh(vector<vector<double> >& freqs, vector<xmatrix<xcomplex<double> > >& eigenvectors) {
+    string function = "PhononCalculator::calculateGroupVelocitiesOnMesh():";
+    string message = "";
+    if (!_supercell.isConstructed()) {
+      message = "Supercell not constructed yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    uint nQPs = _qm.getnQPs();
+    if (nQPs == 0) {
+      message = "Mesh has no q-points.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+
+    freqs.clear();
+    eigenvectors.clear();
+
+    uint nbranches = getNumberOfBranches();
+    freqs.resize(nQPs);
+    eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
+    vector<vector<xvector<double> > > gvel(nQPs);
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+    vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
+    vector<std::thread*> threads;
+    threads.clear();
+    for (int icpu = 0; icpu < _ncpus; icpu++) {
+      threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
+            thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
+    }
+    for (uint t = 0; t < threads.size(); t++) {
+      threads[t]->join();
+      delete threads[t];
+    }
+#else
+    calculateGroupVelocitiesThread(0, nQPs, freq, gvel);
+#endif
+    return gvel;
+  }
+
+  void PhononCalculator::calculateGroupVelocitiesThread(int startIndex, int endIndex,
+      vector<vector<double> >& freqs, vector<xmatrix<xcomplex<double> > >& eigenvectors, vector<vector<xvector<double> > >& gvel) {
+    xvector<double> f;
+    for (int q = startIndex; q < endIndex; q++) {
+      f = getFrequency(_qm.getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], gvel[q]);
+      freqs[q] = aurostd::xvector2vector(f);
+    }
+  }
+
+  //writeGroupVelocitiesToFile////////////////////////////////////////////////
+  // Writes the group velocities into a file. Each row belongs to a q-point,
+  // and each column triplet belongs to a phonon branch.
+  void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
+    const vector<vector<xvector<double> > >& gvel) {
+    vector<vector<double> > freqs;
+    writeGroupVelocitiesToFile(filename, gvel, freqs);
+  }
+  void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
+    const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
+    if (gvel.size() == 0) return;  // Nothing to write
+    string function = "PhononCalculator::writeGroupVelocitiesToFile():";
+    string message = "";
+    stringstream output;
+
+    uint nBranches = getNumberOfBranches();
+    uint nQPs = _qm.getnQPs();
+
+    // Consistency check
+    if (gvel.size() != nQPs) {
+      message = "Number of group velocities is not equal to the number of q-points.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
+    for (uint q = 0; q < nQPs; q++) {
+      if (gvel[q].size() != nBranches) {
+        message = "Number of group velocities for q-point " + aurostd::utype2string<uint>(q) + " is not equal to the number branches.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+    }
+
+    if (freqs.size() > 0) {
+      if (freqs.size() != nQPs) {
+        message = "Number of frequencies is not equal to the number of q-points.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      for (uint q = 0; q < nQPs; q++) {
+        if (freqs[q].size() != nBranches) {
+          message = "Number of frequencies for q-point " + aurostd::utype2string<uint>(q) + " is not equal to the number branches.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        }
+      }
+    }
+
+    // Header
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+    if (!_system.empty()) {
+      output << "[APL_GROUP_VELOCITY]SYSTEM=" << _system << std::endl;
+      output << AFLOWIN_SEPARATION_LINE << std::endl;
+    }
+
+    output << "[APL_GROUP_VELOCITY]START" << std::endl;
+    output << std::setiosflags(std::ios::fixed | std::ios::right);
+    output << std::setw(10) << "# Q-point";
+    output << std::setw(20) << " ";
+    output << "Group Velocity (km/s)" << std::endl;
+
+    // Body
+    for (uint q = 0; q < nQPs; q++) {
+      output << std::setiosflags(std::ios::fixed | std::ios::right);
+      output << std::setw(10) << q;
+      for (uint br = 0; br < nBranches; br++) {
+        for (uint i = 1; i < 4; i++) {
+          output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+          output << std::setw(20) << std::setprecision(10) << std::scientific << gvel[q][br][i];
+        }
+        output << std::setw(5) << " ";
+      }
+      output << std::endl;
+    }
+
+    output << "[APL_GROUP_VELOCITY]STOP" << std::endl;
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    // Write frequencies if provided
+    if (freqs.size() > 0) {
+      output << "[APL_FREQUENCY]STOP" << std::endl;
+      output << std::setiosflags(std::ios::fixed | std::ios::right);
+      output << std::setw(10) << "# Q-point"
+        << std::setw(20) << " "
+        << "Frequency " << (unit.empty()?"":("(" + unit + ")")) << std::endl;
+      for (uint q = 0; q < nQPs; q++) {
+        output << std::setiosflags(std::ios::fixed | std::ios::right);
+        output << std::setw(10) << q;
+        for (uint br = 0; br < nBranches; br++) {
+          output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+          output << std::setw(20) << std::setprecision(10) << std::scientific << freqs[q][br];
+        }
+        output << std::endl;
+      }
+      output << "[APL_FREQUENCY]STOP" << std::endl;
+      output << AFLOWIN_SEPARATION_LINE << std::endl;
+    }
+
+    // Write q-points
+    output << "[APL_QPOINTS]START" << std::endl;
+    output << std::setiosflags(std::ios::fixed | std::ios::right);
+    output << std::setw(10) << "# Index";
+    output << std::setw(20) << " ";
+    output << "Q-points (fractional)" << std::endl;
+    // Body
+    for (uint q = 0; q < nQPs; q++) {
+      output << std::setiosflags(std::ios::fixed | std::ios::right);
+      output << std::setw(10) << q;
+      for (uint i = 1; i < 4; i++) {
+        output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+        output << std::setw(20) << std::setprecision(10) << std::scientific << _qm.getQPoint(q).fpos[i];
+      }
+      output << std::endl;
+    }
+    output << "[APL_QPOINTS]STOP" << std::endl;
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    // Write to file
+    aurostd::stringstream2file(output, filename);
+    if (!aurostd::FileExist(filename)) {
+      message = "Could not write group velocities to file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
   }
 
 }  // namespace apl

@@ -1255,6 +1255,16 @@ DEFAULT_APL_HSKPTS_FILE
   type: string
   default: "hskpoints.out"
 
+DEFAULT_APL_MSQRDISP_FILE
+  description: Output file for the mean square displacements.
+  type: string
+  default: "displacements.out"
+
+DEFAULT_APL_GVEL_FILE
+  description: Output file for the mean square displacements.
+  type: string
+  default: "group_velocities.out"
+
 DEFAULT_APL_PHDOSCAR_FILE
   description: Output file for the phonon DOS in VASP DOSCAR format.
   type: string
@@ -1452,20 +1462,10 @@ DEFAULT_AAPL_FILE_PREFIX
   type: string
   default: "aflow.aapl."
 
-DEFAULT_AAPL_QPOINTS_FILE
-  description: Output file for the q-points used for thermal conductivity calculations.
-  type: string
-  default: "qpoints.out"
-
 DEFAULT_AAPL_IRRQPTS_FILE
   description: Output file for the irreducible q-points used for thermal conductivity calculations.
   type: string
   default: "irred_qpoints.out"
-
-DEFAULT_AAPL_FREQ_FILE
-  description: Output file for the harmonic frequencies of the phonon modes used for thermal conductivity calculations.
-  type: string
-  default: "frequencies.out"
 
 DEFAULT_AAPL_GVEL_FILE
   description: Output file for the group velocities of the phonon modes used for thermal conductivity calculations.

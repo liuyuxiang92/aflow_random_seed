@@ -192,8 +192,6 @@ namespace apl {
       vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
 
       const _cluster& getCluster(const int& i) const;  //ME20190520
-      const string& getDirectory() const;
-      void setDirectory(const string&);
       void build();
       void buildDistortions();
       void writeClusterSetToFile(const string&);
@@ -512,7 +510,6 @@ namespace apl {
 namespace apl {
   class Supercell : public xStream {
     private:
-      string _directory;  // for the logger
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
       xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
@@ -534,7 +531,6 @@ namespace apl {
       bool _initialized;
       vector<vector<vector<xvector<double> > > > phase_vectors;  // ME20200116
 
-    private:
       void calculateWholeSymmetry(xstructure&, bool=true);
       xstructure calculatePrimitiveStructure() const;
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME20200117
@@ -550,8 +546,6 @@ namespace apl {
       Supercell& operator=(const Supercell&);
       ~Supercell();
       void clear();
-      void setDirectory(const string&);
-      string getDirectory() const;
       void readFromStateFile(const string&);  // ME20200212
       void initialize(const xstructure&, bool=true);  // ME20191225
       void clearSupercell();
@@ -616,6 +610,7 @@ namespace apl {
       vector<int> _pc2scMap;
       vector<int> _sc2pcMap;
       // **** END  JJPR *****
+      string _directory;  // for the logger
   };
 }  // namespace apl
 
@@ -926,15 +921,12 @@ namespace apl {
       void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
-      void setDirectory(const string& dir);
-      void setModule(const string&);
-      const string& getDirectory() const;
-      const string& getModule() const;
-
       void makeIrreducible();
       void calculateLittleGroups();  // ME20200109
       void writeQpoints(string, bool=true);
       void writeIrredQpoints(string, bool=true);
+
+      string _directory;
 
       int getnIQPs() const;
       int getnQPs() const;
@@ -988,8 +980,6 @@ namespace apl {
       void free();
       void copy(const QMesh&);
 
-      string _directory;
-
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
       bool _initialized;  // Indicates whether the QMesh object has been intialized
       bool _isGammaCentered;  // Indicates whether the includes the Gamma point
@@ -1029,9 +1019,8 @@ namespace apl {
 
 namespace apl {
   class PhononCalculator : public xStream {
-    protected:
+    private:
       // USER PARAMETERS
-      string _system;  // ME20190614 - for VASP-style output files
       string _directory;  // for loggers
       int _ncpus;
 
@@ -1057,7 +1046,6 @@ namespace apl {
       vector<vector<vector<double> > > anharmonicIFCs;
       vector<vector<vector<int> > > clusters;
 
-    private:
       void copy(const PhononCalculator&);  // ME20191228
       void free();
 
@@ -1070,6 +1058,8 @@ namespace apl {
       xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
       xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
 
+      void calculateGroupVelocitiesThread(int, int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&);
+
     public:
       PhononCalculator(ostream& oss=std::cout);
       PhononCalculator(ofstream&, ostream& oss=std::cout);
@@ -1077,13 +1067,15 @@ namespace apl {
       PhononCalculator& operator=(const PhononCalculator&);
       ~PhononCalculator();
       void clear();
+
+      string _system;  // ME20190614 - for VASP-style output files
+
       // Getter functions
       Supercell& getSupercell();
       QMesh& getQMesh();
       const xstructure& getInputCellStructure() const;
       const xstructure& getSuperCellStructure() const;
       uint getNumberOfBranches() const;
-      string getSystemName() const;  // ME20190614
       string getDirectory() const;
       int getNCPUs() const;
       bool isPolarMaterial() const;  // ME20200206
@@ -1092,7 +1084,6 @@ namespace apl {
       const vector<vector<int> >& getClusters(int) const;
 
       // Set functions
-      void setSystem(const string&);
       void setDirectory(const string&);
       void setNCPUs(const _kflags&);
       void setPolarMaterial(bool);
@@ -1121,10 +1112,17 @@ namespace apl {
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME20190624
       xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME20200206
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+          vector<xvector<double> >&, bool=true);  // ME20180827
       xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20200206
+          vector<xvector<double> >&, bool=true);  // ME20200206
       double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
+
+      // Group velocities
+      vector<vector<xvector<double> > > calculateGroupVelocitiesOnMesh();
+      vector<vector<xvector<double> > > calculateGroupVelocitiesOnMesh(vector<vector<double> >&);
+      vector<vector<xvector<double> > > calculateGroupVelocitiesOnMesh(vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&);
+      void writeGroupVelocitiesToFile(const string&, const vector<vector<xvector<double> > >&);
+      void writeGroupVelocitiesToFile(const string&, const vector<vector<xvector<double> > >&, const vector<vector<double> >&, const string& unit="THz");
   };
 }  // namespace apl
 
@@ -1449,8 +1447,6 @@ namespace apl {
       vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
       double calculateAverageGrueneisen(double T, const vector<vector<double> >&);
 
-      void calculateFrequenciesGroupVelocities();
-      void calculateFreqGvel(int, int);
       void getWeightsLT(double, const vector<double>&, vector<double>&);
       void calculateTransitionProbabilities();
       vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
@@ -1478,7 +1474,6 @@ namespace apl {
       void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
       void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
       void writeDataBlock(stringstream&, const vector<vector<double> >&);
-      void writeGroupVelocities(const string&);
       void writePhaseSpace(const string&);
       void writeGrueneisen(const string&);
       void writeThermalConductivity(const string&);
@@ -1490,57 +1485,6 @@ namespace apl {
 // END ME: Lattice Thermal Conductivity (AAPL)
 // ***************************************************************************
 
-// ***************************************************************************
-//Functions in this class are used to calculate group velocities and related properties//
-namespace apl
-{
-  class GroupVelocity
-  { //PN20180705
-    private:
-      PhononCalculator& _pc;
-      //UniformMesh& _umesh;  OBSOLETE ME20190428
-      QMesh& _umesh;  //ME20190428
-      Logger& _logger;
-
-      std::vector< aurostd::xvector<double> > _freq_kp;
-      std::vector< aurostd::xvector<double> > _freq_km;
-      std::vector< aurostd::xvector<double> > _freq;
-      std::vector< aurostd::xmatrix<xcomplex<double> > > _eigenvectors;
-      vector<bool> _freq_test;
-
-      std::vector< aurostd::xmatrix<double> > _gv;//direction dependent group velocities
-      std::vector< aurostd::xvector<double> > _phvel;//group velocities average over directions
-
-      std::vector< aurostd::xvector<double> > _kpoints_kp;
-      std::vector< aurostd::xvector<double> > _kpoints_km;
-      vector<aurostd::xvector<double> > _kpoints;
-
-      //std::vector< double > _weights;  OBSOLETE ME20190428 - not used
-      uint  _nBranches;
-      double _sound_speed;
-      double _kshift;
-      void populate_variables();
-      void solve_eigenvalues_at_k(int startIndex, int endIndex, int cpuid, int ktype);
-      bool eigen_solver(int ktype);
-      bool eigen_solver();
-      void sound_speed();
-      int  indexofSmallestElement(const vector<double> &array);
-      void clear_auxiliary_variables();
-
-    public:
-      GroupVelocity(PhononCalculator&, QMesh&, Logger&);  //ME20190428
-      ~GroupVelocity();
-      void clear();
-
-    public:
-      bool check_negative_frequencies();
-      bool compute_group_velocities();
-      void write();
-      std::vector< aurostd::xvector<double> > get_freq(){return _freq;}
-      std::vector< aurostd::xmatrix<double> > get_gv(){return _gv;}
-      std::vector< aurostd::xvector<double> > get_phvel(){return _phvel;}
-  };
-}
 // ***************************************************************************
 namespace apl {
 
