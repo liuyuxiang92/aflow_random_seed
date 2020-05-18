@@ -500,10 +500,10 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="43daba3719e5e3b4" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-0.7795479;volume_atom=21.42407;spin_atom=0.0;} // Cd_sv_GW:PAW_PBE_KIN:16Apr2014
 
   // Cl
-  // if(AUID=="6bf17162620b7ce3" && nKIN) {found=TRUE;groundstate_structure="A11";groundstate_energy=-1.81560;volume_atom=37.3299;spin_atom=0.0;} // Cl:PAW_PBE:17Jan2003
-  if(AUID=="6bf17162620b7ce3" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.787206;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE:17Jan2003  RICO
-  if(AUID=="9d680135d96b4029" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-7.906078;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE_KIN:SCAN:06Sep2000 RICO
-
+  if(AUID=="6bf17162620b7ce3" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.787206;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE:17Jan2003
+  if(AUID=="6dca7e86aecb68cc" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.776937;volume_atom=500;spin_atom=0.0;} // Cl_h:PAW_PBE:08Apr2002
+  if(AUID=="9d680135d96b4029" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-7.906078;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE_KIN:SCAN:06Sep2000
+  
   // Co
   if(AUID=="41f6635e51e063f9" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-8.13760;volume_atom=10.0906;spin_atom=1.51284;} // Co:LDA:01Apr2000
   if(AUID=="4fb418aa1d0f1607" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-7.05079;volume_atom=10.9889;spin_atom=1.62675;} // Co:GGA:01Apr2000
@@ -551,6 +551,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="485f7a26842607ea" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-0.8521117;volume_atom=115.6232;spin_atom=0.0;} // Cs_sv:PAW_PBE_KIN:08Apr2002
   if(AUID=="a7b37bbd60c921b0" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-0.9924374;volume_atom=94.68309;spin_atom=0.0;} // Cs_sv:PAW_LDA_KIN:07Sep2000
   if(AUID=="e33c8a4092f5c27c" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-2.526557;volume_atom=114.9539;spin_atom=0.0;} // Cs_sv_GW:PAW_PBE_KIN:23Mar2010
+  if(AUID=="e054d996abee22c5" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-0.852451;volume_atom=115.5724;spin_atom=0.0;} // Cs_sv:PAW_PBE:08Apr2002
 
   // Cu
   // find /common/LIB1/LIB/Cu* -name "A1" | sed "s/\/common/aflow --force --lib2raw=&/g" > /tmp/xpot && aflow --multi=8 --file=/tmp/xpot | grep XXX | sort | uniq
@@ -581,10 +582,11 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="b7037854f4315aa3" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-4.527491;volume_atom=31.7888;spin_atom=0.0;} // Dy_3:PAW_PBE_KIN:06Sep2000
 
   // F
-  if(AUID=="675e493e51b0f2f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.859526;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE:08Apr2002
-  if(AUID=="4c13232a0a03cdc4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.780263;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:08Apr2002
-  if(AUID=="4c13232a0a03cdc4" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.16947;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:SCAN:08Apr2002
-  
+ if(AUID=="3defbdd6f1dad3f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.790868;volume_atom=500;spin_atom=0.0;} // F_s:PAW_PBE:06Sep2000
+ if(AUID=="4c13232a0a03cdc4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.780263;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:08Apr2002
+ if(AUID=="4c13232a0a03cdc4" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.16947;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:SCAN:08Apr2002
+ if(AUID=="675e493e51b0f2f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.859526;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE:08Apr2002
+ 
   // Fe
   if(AUID=="53451df4122ca435" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-9.27793;volume_atom=10.5121;spin_atom=2.03940;} // Fe:LDA:01Apr2000
   if(AUID=="8a9cdad8b2fd617c" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-8.16576;volume_atom=11.2687;spin_atom=2.15865;} // Fe:PAW_GGA:03Mar1998
@@ -632,9 +634,10 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="39a1162598519002" && nKIN) {found=TRUE;groundstate_structure="A4";groundstate_energy=-4.49199;volume_atom=24.1778;spin_atom=0.0;} // Ge:PAW_PBE_KIN:05Jan2001
 
   // H
+  if(AUID=="48b40c1ec0fc696e" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.369226;volume_atom=500;spin_atom=0.0;} // H_h:PAW_PBE:07Sep2000
+  if(AUID=="772cd4ac80b01737" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.386066;volume_atom=500;spin_atom=0.0;} // H:PAW_PBE:15Jun2001
   if(AUID=="772cd4ac80b01737" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.448563;volume_atom=500;spin_atom=0.0;} // H:PAW_PBE:SCAN:15Jun2001
   if(AUID=="b4cc088636d527f0" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.386348;volume_atom=500;spin_atom=0.0;} // H:PAW_PBE:15Jun2001
-  if(AUID=="772cd4ac80b01737" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.386066;volume_atom=500;spin_atom=0.0;} // H:PAW_PBE:15Jun2001
 
   // He
   if(AUID=="c135275f4a0c77c9" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=0.481074;volume_atom=5.48651;spin_atom=0.0;} // He:PAW_GGA:05Jan2001
@@ -813,9 +816,10 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="0f8c2e9ac364f9e3" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-12.13006;volume_atom=15.06347;spin_atom=0.0;} // Mo_sv:PAW_LDA_KIN:29Jan2005
 
   // N
-  if(AUID=="4ce4637079c90d89" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.31918;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:08Apr2002
-  if(AUID=="3cd4003f27559a49" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.3187;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE:08Apr2002
-  if(AUID=="4ce4637079c90d89" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-9.252821;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:SCAN:08Apr2002
+ if(AUID=="3cd4003f27559a49" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.318698;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE:08Apr2002
+ if(AUID=="be869d8257082ad4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.324198;volume_atom=500;spin_atom=0.0;} // N_h:PAW_PBE:13Feb2001
+ if(AUID=="4ce4637079c90d89" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.319179;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:08Apr2002
+ if(AUID=="4ce4637079c90d89" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-9.252821;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:SCAN:08Apr2002
 
   // Na
   if(AUID=="bd75e1ab544c0ed0" && nKIN) {found=TRUE;groundstate_structure="A2/A7";groundstate_energy=-1.31096;volume_atom=36.2541;spin_atom=0.0;} // Na_pv:PAW_PBE:05Jan2001
@@ -895,10 +899,10 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="fd7da3695dd95380" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.482908;volume_atom=10.80456;spin_atom=0.6293194;} // Ni_GW:PAW_PBE_KIN:31Mar2010
 
   // O
-  if(AUID=="5c530b0eaed90a00" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.93107;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE_KIN:08Apr2002
-  if(AUID=="85ded82734544fa9" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.93114;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE:08Apr2002
-  if(AUID=="5c530b0eaed90a00" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-6.022492;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE_KIN:SCAN:08Apr2002
-  // if(AUID=="85ded82734544fa9" && nKIN) {found=TRUE;groundstate_structure="A8";groundstate_energy=-4.50622;volume_atom=12.5315;spin_atom=0.0;} // O:PAW_PBE:08Apr2002
+ if(AUID=="85ded82734544fa9" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.931145;volume_atom=500;spin_atom=1;} // O:PAW_PBE:08Apr2002
+ if(AUID=="5c530b0eaed90a00" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.931071;volume_atom=500;spin_atom=1;} // O:PAW_PBE_KIN:08Apr2002
+ if(AUID=="5c530b0eaed90a00" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-6.022492;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE_KIN:SCAN:08Apr2002
+ if(AUID=="847e34315251cef5" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.701027;volume_atom=500;spin_atom=1.0;} // O_s:PAW_PBE:07Sep2000
 
   // Os
   if(AUID=="4cdd79622cbed39c" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-11.1466;volume_atom=14.3178;spin_atom=0.0;} // Os:PAW_GGA:06Feb2003

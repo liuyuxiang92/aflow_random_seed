@@ -3751,18 +3751,17 @@ namespace aflowlib {
 	if(data.anrl_label_orig=="A_hR1_166_a" && (s=="Hg")) { // A10
 	  cout << TXT1 << "A10" << TXT2 << endl;}
 	// A11
-	if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga")) { // A11
+	if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="I")) { // A11
 	  cout << TXT1 << "A11" << TXT2 << endl;}
 	// A12
 	if(data.anrl_label_orig=="A_cI58_217_ac2g" && (s=="Mn")) { // A12
 	  cout << TXT1 << "A12" << TXT2 << endl;} 
 	// diatom (A_tP2_123_g)
-	if((s=="O" || s=="N" || s=="F" || s=="H" || s=="Cl")) { // diatom //  cat /tmp/xscrubber_ppAUID.LIB1 | grep diatom | grep '/O'
+	if(data.anrl_label_orig=="A_tP2_123_g" && (s=="O" || s=="N" || s=="F" || s=="H" || s=="Cl")) { // diatom //  cat /tmp/xscrubber_ppAUID.LIB1 | grep diatom | grep '/O'
 	  cout << TXT1 << "diatom" << TXT2 << endl;} 
       }
     }
  
-    
     
     if(flag_EDATA_RELAX_) { // RELAX
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT) && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
