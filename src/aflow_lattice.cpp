@@ -6566,7 +6566,7 @@ namespace LATTICE {
 
     foundBZ=FALSE;
     uint nkpoint=0;
-    
+
     //   1. TRI order: kalpha,kbeta,kgamma  > 90 (kgamma<kalpha, kgamma<kbeta)
     //   or kalpha,kbeta,kgamma  < 90 (kgamma>kalpha, kgamma>kbeta)
     //   special case when kgamma=90

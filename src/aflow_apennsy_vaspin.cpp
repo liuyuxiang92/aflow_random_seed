@@ -1315,7 +1315,7 @@ namespace apennsy_std {
         //   if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
         //   cout << endl;}}}}
         cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
-      }
+    }
     }
 
     cerr << " *********************************************************************** END " << endl;
