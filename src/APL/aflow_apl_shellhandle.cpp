@@ -317,7 +317,7 @@ namespace apl {
 
     // We will use the site point group of central atom, hence take the center
     // to this atom
-    //_initStructure.ShifOriginToAtom(_centralAtomID); //CO
+    //_initStructure.ShiftOriginToAtom(_centralAtomID); //CO
     //_initStructure.BringInCell(); //CO
     //CO START
     //we now do the same thing as with supercell, shiftorigin to central atom, then shift back original (not 0)
@@ -458,7 +458,7 @@ namespace apl {
     }
 
     // Take the center of init structure into atom 0 (by default)
-    //_initStructure.ShifOriginToAtom(0); //CO
+    //_initStructure.ShiftOriginToAtom(0); //CO
     //_initStructure.BringInCell(); //CO
     //CO START
     //we now do the same thing as with supercell, shiftorigin to central atom, then shift back original (not 0)
@@ -847,7 +847,7 @@ namespace apl {
 
   //CO START
   void ShellHandle::center(int i) {
-    //_initStructure.ShifOriginToAtom(i);
+    //_initStructure.ShiftOriginToAtom(i);
     //_initStructure.BringInCell();
     xvector<double> origin(3), frigin(3);
     origin = _initStructure_original.atoms[i].cpos;

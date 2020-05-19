@@ -1057,29 +1057,69 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     }
 
     // Set k-points
-    string scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
-    if (!scheme.empty()) {
-      xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", scheme);
+    // ME20200427 - implemented grid option
+    string scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS_GRID");
+    if (scheme.empty()) {
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
+
+      if (!scheme.empty()) {
+        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", scheme);
+      }
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
+      //ME20190408 - START
+      if ((xvasp.AVASP_arun_mode == "AAPL") && xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL")) {
+        scheme = xvasp.aaplopts.getattachedscheme("AFLOWIN_FLAG::AAPL_KPPRA_AAPL");
+      }
+      //ME20190408 - END
+      if (!scheme.empty()) {
+        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", scheme);
+      }
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS");
+      if (!scheme.empty()) {
+        xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS", TRUE); //CO20181226
+        xvasp.aopts.push_attached("AFLOWIN_FLAG::KPOINTS", scheme);
+      }
+
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS_SHIFT");
+      if (!scheme.empty()) {
+        xvasp.aopts.flag("AFLOWIN_FLAG::KSHIFT_STATIC", true);
+        vector<string> tokens;
+        aurostd::string2tokens(scheme, tokens, " ,;");
+        xvasp.aopts.push_attached("AFLOWIN_FLAG::KSHIFT_STATIC", aurostd::joinWDelimiter(tokens, " "));
+      }
+
+      // Set to implicit
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", true);
+    } else {
+      vector<int> kpts;
+      aurostd::string2tokens(scheme, kpts, " xX");
+      string k_scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str("");
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "k-points set by APL" << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << k_scheme << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << aurostd::joinWDelimiter(kpts, " ") << std::endl;
+
+      // k-point shift
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS_SHIFT");
+      if (scheme.empty()) {
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << std::endl;
+      } else {
+        vector<double> shift;
+        aurostd::string2tokens(scheme, shift, " ,;");
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(shift), " ") << std::endl;
+      }
+
+      // Set to explicit
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", true);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_KEYWORD", false);
     }
-    scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
-    //ME20190408 START
-    if ((xvasp.AVASP_arun_mode == "AAPL") && xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL")) {
-      scheme = xvasp.aaplopts.getattachedscheme("AFLOWIN_FLAG::AAPL_KPPRA_AAPL");
-    }
-    //ME20190408 END
-    if (!scheme.empty()) {
-      xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", scheme);
-    }
-    scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS");
-    if (!scheme.empty()) {
-      xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS", TRUE); //CO20181226
-      xvasp.aopts.push_attached("AFLOWIN_FLAG::KPOINTS", scheme);
-    }
-    // ME20200205 - set to implicit. There is currently no explicit option for phonons.
-    xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
-    xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", false);
-    xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
-    xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", true);
 
     // Setup run
     setStatic(xvasp);
@@ -1088,6 +1128,14 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     // Set precision
     xvasp.aopts.pop_attached("AFLOWIN_FLAG::PRECISION");xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION", xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC"));
 
+    // ME20200427 - Scale number of bands appropriately when NBANDS has been
+    // set in the parent aflow.in
+    if (vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.isentry && !xvasp.aopts.flag("APL_FLAG::AVASP_BORN")) {
+      int nbands = vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.content_int;
+      nbands *= aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOW_APL::NCELLS"));
+      xvasp.aopts.pop_attached("AFLOWIN_FLAG::NBANDS_EQUAL");
+      xvasp.aopts.push_attached("AFLOWIN_FLAG::NBANDS_EQUAL", aurostd::utype2string<int>(nbands));
+    }
     // Set Born charge and linear response parameters
     if (xvasp.aopts.flag("APL_FLAG::AVASP_BORN") || xvasp.aopts.flag("APL_FLAG::AVASP_LR")) {
       // Add INCAR flags
@@ -1149,6 +1197,9 @@ void setStatic(_xvasp& xvasp) {
 //ME20181102 - Do not convert unit cell
 void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL", false);
+  // ME20200307 - Safety, in case the flag get re-activated somewhere else
+  xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
+  xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_PRESERVE", true);
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_STANDARD_PRIMITIVE", false);
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_STANDARD_CONVENTIONAL", false);

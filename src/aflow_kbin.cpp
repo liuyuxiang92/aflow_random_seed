@@ -2154,6 +2154,29 @@ namespace KBIN {
   }
 } // namespace KBIN
 
+// *******************************************************************************************
+// KBIN::XClean
+// *******************************************************************************************
+
+// ME20200219 - based on CO's code in old PhononCalculator
+namespace KBIN {
+  int get_NCPUS() {
+    _kflags kflags;
+    return get_NCPUS(kflags);
+  }
+
+  int get_NCPUS(const _kflags& kflags) {
+    string ncpus_str = "MAX";
+    int ncpus = 1;
+    if (kflags.KBIN_MPI_NCPUS > 0) ncpus_str = aurostd::utype2string<int>(kflags.KBIN_MPI_NCPUS);
+    if (XHOST.vflag_control.isdefined("XPLUG_NUM_THREADS")) ncpus_str = XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
+    if (ncpus_str == "MAX") ncpus = MPI_NCPUS_MAX;
+    else ncpus = aurostd::string2utype<int>(ncpus_str);
+    if (ncpus < 1) ncpus = 1;
+    return ncpus;
+  }
+}  // namespace KBIN
+
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *

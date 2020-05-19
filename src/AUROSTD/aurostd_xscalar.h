@@ -74,9 +74,14 @@
 #define eV2Hz                         1/PLANCKSCONSTANTEV_h
 #define eV2rcm                        1/(PLANCKSCONSTANTEV_h*100*C_VACUUM)
 #define au2nmTHz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_h_THz         PLANCKSCONSTANT_h*THz2Hz // J/THz
 #define PLANCKSCONSTANT_hbar_THz      PLANCKSCONSTANT_hbar*THz2Hz // J/THz
 #define PLANCKSCONSTANTAMU_hbar_THz   PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2nmTHz)  // amu A^2 THz
 #define BEfactor_hbar_THz             PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
+#define BEfactor_h_THz                PLANCKSCONSTANTEV_h/(KBOLTZEV*Hz2THz)  // h/kB in K/THz
+
+//AS20200427 - QHA-related conversion factors
+#define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
@@ -536,6 +541,12 @@ namespace aurostd {
   long long int powint(long long int x,uint exp); //CO20191201
   unsigned long long int powint(unsigned long long int x,uint exp); //CO20191201
 }
+
+//AS20200513 BEGIN
+namespace aurostd{
+  double FermiDirac(double E, double mu, double T);
+}
+//AS20200513 END
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

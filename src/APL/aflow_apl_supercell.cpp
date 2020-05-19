@@ -6,8 +6,6 @@
 
 //CO START
 #define ERROR_VERBOSE false
-//[CO20190218 - OBSOLETE]#define GETFULLSYMBASIS false  //TRUE is NOT well tested with atomGoesTo() and atomComesFrom(), also slower //CO20190218
-//[CO20190218 - OBSOLETE]#define JAHNATEK_ORIGINAL false
 #define CENTER_PRIM false
 #define MAP_VERBOSE false
 #define COPY_XSTRUCTURE_FULL false
@@ -16,18 +14,179 @@
 using namespace std;
 
 static const xcomplex<double> iONE(0.0, 1.0);  // ME20200116
+static const string _APL_SUPERCELL_MODULE_ = "SUPERCELL";  // for the logger
 
 namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  Supercell::Supercell(ostream& oss) : xStream() {
+    free();
+    xStream::initialize(oss);
+  }
+
+  Supercell::Supercell(ofstream& mf, ostream& oss) : xStream() {
+    free();
+    xStream::initialize(mf, oss);
+  }
+
   // ME20200102 - Refactored
-  Supercell::Supercell(const xstructure& _xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO181226
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, const string& directory, ostream& oss) : xStream() {  //CO20181226
+    free();
+    xStream::initialize(mf, oss);
+    _directory = directory;
     initialize(_xstr);
   }
 
-  void Supercell::initialize(const xstructure& _xstr) {
+  // ME20200212 - read from a state file
+  Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) {
+    free();
+    xStream::initialize(mf, oss);
+    _directory = directory;
+    readFromStateFile(filename);
+  }
+
+  Supercell::Supercell(const Supercell& that) {
+    free();
+    copy(that);
+  }
+
+  Supercell& Supercell::operator=(const Supercell& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
+
+  void Supercell::copy(const Supercell& that) {
+    xStream::copy(that);
+    _directory = that._directory;
+    _inStructure = that._inStructure;
+    _inStructure_original = that._inStructure_original;  //CO
+    _inStructure_light = that._inStructure_light;        //CO
+    _pcStructure = that._pcStructure;                    //CO
+    _scStructure = that._scStructure;                    //CO
+    _scStructure_original = that._scStructure_original;  //CO
+    _scStructure_light = that._scStructure_light;        //CO
+    _pc2scMap.clear();
+    _pc2scMap = that._pc2scMap;
+    _sc2pcMap.clear();
+    _sc2pcMap = that._sc2pcMap;
+    //CO - START
+    _skew = that._skew;
+    _derivative_structure = that._derivative_structure;
+    _sym_eps = that._sym_eps;
+    //CO - END
+    _isShellRestricted = that._isShellRestricted;
+    _maxShellRadius.clear();
+    _maxShellRadius = that._maxShellRadius;
+    _isConstructed = that._isConstructed;  //CO
+    phase_vectors = that.phase_vectors;  // ME20200116
+  }
+
+  // Destructor
+  Supercell::~Supercell() {
+    xStream::free();
+    free();
+  }
+
+  void Supercell::free() {
+    _directory = "";
+    _inStructure.clear();
+    _inStructure_original.clear();
+    _inStructure_light.clear();
+    _pcStructure.clear();
+    _scStructure.clear();
+    _scStructure_original.clear();
+    _scStructure_light.clear();
+    _pc2scMap.clear();
+    _sc2pcMap.clear();
+    _skew = false;
+    _derivative_structure = false;
+    _sym_eps = 0.0;
+    _isShellRestricted = false;
+    _maxShellRadius.clear();
+    _isConstructed = false;
+    phase_vectors.clear();
+    _scStructure.clear();
+  }
+
+  void Supercell::clear() {
+    free();
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void Supercell::setDirectory(const string& directory) {
+    _directory = directory;
+  }
+
+  string Supercell::getDirectory() const {
+    return _directory;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void Supercell::readFromStateFile(const string& filename) {
+    string function = "apl::Supercell::readFromStateFile()";
+    if (!aurostd::EFileExist(filename)) {
+      string message = "Could not find file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    // Read data
+    vector<string> vlines;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    stringstream poscar;
+
+    // Supercell dimensions
+    xvector<int> dims;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "SUPERCELL=")) {
+        vector<string> tokens;
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        vector<int> vdims;
+        aurostd::string2tokens(tokens[1], vdims);
+        if (vdims.size() == 3) {
+          dims = aurostd::vector2xvector(vdims);
+          break;
+        }
+      }
+    }
+    if (iline == nlines) {
+      string message = "SUPERCELL tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Structure
+    xstructure xstr;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "INPUT_STRUCTURE=START")) {
+        while ((++iline < nlines) && !aurostd::substring2bool(vlines[iline], "INPUT_STRUCTURE=STOP")) {
+          poscar << vlines[iline] << std::endl;
+        }
+        if (iline < nlines) {
+          xstr = xstructure(poscar);
+          break;
+        }
+      }
+    }
+    if (iline == nlines) {
+      string message = "INPUT_STRUCTURE tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Build
+    initialize(xstr, false);
+    build(dims, false);
+  }
+
+  // ME20200315 - Added VERBOSE to prevent excessive file output when
+  // reading from state file
+  void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::initialize():";
 
@@ -45,7 +204,7 @@ namespace apl {
     // Copy
     _inStructure = xstr;
     _inStructure.ReScale(1.0);
-    _inStructure.ShifOriginToAtom(0);
+    _inStructure.ShiftOriginToAtom(0);
     _inStructure.BringInCell();  //clean up
 
     if(LDEBUG){
@@ -54,8 +213,12 @@ namespace apl {
     }
 
     //CO, DO NOT MODIFY THE STRUCTURE BELOW HERE, THIS INCLUDES RESCALE(), BRINGINCELL(), SHIFORIGINATOM(), etc.
-    _logger << "Estimating the symmetry of structure and calculating the input structure. Please be patient." << apl::endl; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
-    calculateWholeSymmetry(_inStructure);
+    if (VERBOSE) {
+      stringstream message;
+      message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    }
+    calculateWholeSymmetry(_inStructure, VERBOSE);
     if(LDEBUG){ //CO20190218
       bool write_inequivalent_flag=_inStructure.write_inequivalent_flag;
       _inStructure.write_inequivalent_flag=true;
@@ -75,82 +238,13 @@ namespace apl {
     _skew = SYM::isLatticeSkewed(_inStructure.lattice, _inStructure.dist_nn_min, _inStructure.sym_eps);
     _sym_eps = _inStructure.sym_eps;
 
-    clear();
+    clearSupercell();
   }
-  //[CO20190218 - OBSOLETE]#else
-  //[CO20190218 - OBSOLETE]Supercell::Supercell(const xstructure& xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO20181226
-  //[CO20190218 - OBSOLETE]  // Copy
-  //[CO20190218 - OBSOLETE]  _inStructure = xstr;
-  //[CO20190218 - OBSOLETE]  _inStructure.ReScale(1.0);
-  //[CO20190218 - OBSOLETE]  _inStructure.ShifOriginToAtom(0);
-  //[CO20190218 - OBSOLETE]  _inStructure.BringInCell();
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  //
-  //[CO20190218 - OBSOLETE]  _logger << "Reducing the input structure into a standard primitive form." << apl::endl;
-  //[CO20190218 - OBSOLETE]  //_inStructure = GetPrimitive(xstr);
-  //[CO20190218 - OBSOLETE]  _inStructure.Standard_Primitive_UnitCellForm();
-  //[CO20190218 - OBSOLETE]  _inStructure.ReScale(1.0);
-  //[CO20190218 - OBSOLETE]  _inStructure.ShifOriginToAtom(0);
-  //[CO20190218 - OBSOLETE]  _inStructure.BringInCell();
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  // Calculate symmetry
-  //[CO20190218 - OBSOLETE]  _logger << "Estimating the symmetry of primitive cell." << apl::endl;
-  //[CO20190218 - OBSOLETE]  calculateWholeSymmetry(_inStructure);
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  //
-  //[CO20190218 - OBSOLETE]  clear();
-  //[CO20190218 - OBSOLETE]}
-  //[CO20190218 - OBSOLETE]#endif
+
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  Supercell::Supercell(const Supercell& that) : _aflowFlags(that._aflowFlags), _logger(that._logger) {  //CO20181226
-    *this = that;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  Supercell& Supercell::operator=(const Supercell& that) {
-    if (this != &that) {
-      _aflowFlags = that._aflowFlags; //CO20181226
-      _logger = that._logger;
-
-      _inStructure = that._inStructure;
-      _inStructure_original = that._inStructure_original;  //CO
-      _inStructure_light = that._inStructure_light;        //CO
-      _pcStructure = that._pcStructure;                    //CO
-      _scStructure = that._scStructure;                    //CO
-      _scStructure_original = that._scStructure_original;  //CO
-      _scStructure_light = that._scStructure_light;        //CO
-      _pc2scMap.clear();
-      _pc2scMap = that._pc2scMap;
-      _sc2pcMap.clear();
-      _sc2pcMap = that._sc2pcMap;
-      //CO START
-      _skew = that._skew;
-      _derivative_structure = that._derivative_structure;
-      _sym_eps = that._sym_eps;
-      //CO END
-      _isShellRestricted = that._isShellRestricted;
-      _maxShellRadius.clear();
-      _maxShellRadius = that._maxShellRadius;
-      _isConstructed = that._isConstructed;  //CO
-      phase_vectors = that.phase_vectors;  // ME20200116
-    }
-
-    return *this;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  Supercell::~Supercell() {
-    clear();
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  void Supercell::clear() {
-    _aflowFlags.clear();  //CO20181226
+  void Supercell::clearSupercell() {
     _scStructure.info = "not constructed";
     _isConstructed = FALSE;
     _isShellRestricted = FALSE;
@@ -166,60 +260,21 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //CO START
-  void Supercell::LightCopy(const xstructure& a, xstructure& b) {
-#if COPY_XSTRUCTURE_FULL
-    b = a;
-    b.pgroup.clear();
-    b.pgroupk.clear();
-    b.pgroupk_xtal.clear();
-    b.fgroup.clear();
-    for (uint i = 0; i < b.agroup.size(); i++) {
-      b.agroup[i].clear();
-    }
-    b.agroup.clear();
-#else
-    b.clear(); //DX20191220 - uppercase to lowercase clear
-    stringstream POSCAR;
-    POSCAR.str("");
-    if(0){cerr << a << std::endl;}
-    POSCAR << a;
-    POSCAR >> b;
-    //enable inequivalent flag to work
-    for (uint i = 0; i < b.atoms.size(); i++) {
-      b.atoms[i].equivalent = a.atoms[i].equivalent;
-      b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
-      b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
-    }
-    //[OBSOLETE] pseudo-potential stuff
-    //for(uint i=0;i<b.species.size();i++){
-    //  b.species[i]=a.species[i];
-    //  b.species_pp[i]=a.species_pp[i]; //VERY IMPORTANT
-    //}
-    //enable inequivalent flag to work
-    b.write_inequivalent_flag = a.write_inequivalent_flag;
-    b.info = a.info;
-    if(0){cerr << b << std::endl;}
-#endif
-  }
-  //CO END
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  void Supercell::calculateWholeSymmetry(xstructure& xstr) {
-    //[CO20181226 needs to write to correct directory]_aflags af;
-    //[CO20181226 needs to write to correct directory]af.Directory = "./";
-    //[CO20181226 needs to write to correct directory]af.QUIET = FALSE;
-
+  // ME20200315 - Added VERBOSE to prevent excessive file output when reading
+  // from state file
+  void Supercell::calculateWholeSymmetry(xstructure& xstr, bool VERBOSE) {
     //CO20170804 - we want to append symmetry stuff to ofstream
     _kflags kflags;
-    kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_SGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_IATOMS_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
+    // ME20200330 - Only write for verbose output
+    kflags.KBIN_SYMMETRY_PGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_FGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_SGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_IATOMS_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_AGROUP_WRITE=VERBOSE;
 
     //DX CAN REMOVE string options = "";
 
@@ -228,46 +283,13 @@ namespace apl {
 
     //CO20170804 - we want to append symmetry stuff to ofstream
     //if (!pflow::CalculateFullSymmetry(af, xstr))
-    if (!pflow::PerformFullSymmetry(xstr,_logger.getOutputStream(),_aflowFlags,kflags,true,cout)) //CO20181226
+    if (!pflow::PerformFullSymmetry(xstr,*p_FileMESSAGE,_directory,kflags,VERBOSE,*p_oss)) //CO20181226
     { //CO20200106 - patching for auto-indenting
-      //ME20191031 - use xerror
-      //throw APLRuntimeError("apl::Supercell::calculateWholeSymmetry(): Symmetry routine failed.");
       string function = "apl::Supercell::calculateWholeSymmetry()";
       string message = "Symmetry routine failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
-  //[CO20190218 - OBSOLETE]#else
-  //[CO20190218 - OBSOLETE]void Supercell::calculateWholeSymmetry(xstructure& xstr) {
-  //[CO20190218 - OBSOLETE]  ofstream fileDevNull("/dev/null");
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  if (!fileDevNull.is_open()) {
-  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::calculateWholeSymmetry(): Cannot open output stream /dev/null.");
-  //[CO20190218 - OBSOLETE]  }
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  _aflags af;
-  //[CO20190218 - OBSOLETE]  af.Directory = "./";
-  //[CO20190218 - OBSOLETE]  // af.hostname = "";
-  //[CO20190218 - OBSOLETE]  af.QUIET = TRUE;
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  xstr.LatticeReduction_avoid = TRUE;
-  //[CO20190218 - OBSOLETE]  xstr.sgroup_radius = 8.0;
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  //if( xstr.pgroup_calculated == FALSE )
-  //[CO20190218 - OBSOLETE]  SYM::CalculatePointGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO20190218 - OBSOLETE]  //if( xstr.fgroup_calculated == FALSE )
-  //[CO20190218 - OBSOLETE]  SYM::CalculateFactorGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO20190218 - OBSOLETE]  //if( xstr.sgroup_calculated == FALSE )
-  //[CO20190218 - OBSOLETE]  SYM::CalculateSpaceGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO20190218 - OBSOLETE]  //if( xstr.iatoms_calculated == FALSE )
-  //[CO20190218 - OBSOLETE]  SYM::CalculateInequivalentAtoms(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO20190218 - OBSOLETE]  //if( xstr.agroup_calculated == FALSE )
-  //[CO20190218 - OBSOLETE]  SYM::CalculateSitePointGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO20190218 - OBSOLETE]
-  //[CO20190218 - OBSOLETE]  fileDevNull.clear();
-  //[CO20190218 - OBSOLETE]  fileDevNull.close();
-  //[CO20190218 - OBSOLETE]}
-  //[CO20190218 - OBSOLETE]#endif
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -297,17 +319,17 @@ namespace apl {
   // Determine the supercell dimensions of the supercell for different methods
   xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
     string function = "apl::Supercell::determineSupercellDimensions()";
-    string message = "";
+    stringstream message;
   
     xvector<int> dims(3);
     string method = opts.getattachedscheme("SUPERCELL::METHOD");
     if (method.empty()) {
-      message = "Supercell method empty.";
+      message << "Supercell method empty.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     string value = opts.getattachedscheme("SUPERCELL::VALUE");
     if (value.empty()) {
-      message = "Supercell value empty.";
+      message << "Supercell value empty.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     if (method == "SUPERCELL") {
@@ -323,9 +345,10 @@ namespace apl {
         natoms = dims[1] * dims[2] * dims[3] * (int) _inStructure.atoms.size();
       }
       if (opts.flag("SUPERCELL::VERBOSE")) {
-        _logger << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
+        message << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
                 << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
-                << " natoms=" << natoms << apl::endl;
+                << " natoms=" << natoms;
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "MINATOMS_RESTRICTED") {
       int minatoms = aurostd::string2utype<int>(value);
@@ -336,9 +359,10 @@ namespace apl {
       }
       dims[1] = Ni; dims[2] = Ni; dims[3] = Ni;
       if (opts.flag("SUPERCELL::VERBOSE")) {
-        _logger << "Ni=" << Ni
+        message << "Ni=" << Ni
                 << " supercell=" << Ni << "x" << Ni << "x" << Ni
-                << " natoms=" << natoms << apl::endl;
+                << " natoms=" << natoms;
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "SHELLS") {
       int shells = aurostd::string2utype<int>(value);
@@ -347,11 +371,12 @@ namespace apl {
       // for now.
       bool full_shell = false;
       if (opts.flag("SUPERCELL::VERBOSE")) {
-        _logger << "Searching for suitable cell to handle " << shells << " shells..." << apl::endl;
+        message << "Searching for suitable cell to handle " << shells << " shells...";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
       dims = buildSuitableForShell(shells, full_shell, opts.flag("SUPERCELL::VERBOSE"));
     } else {
-      message = "Unknown supercell method " + method + ".";
+      message << "Unknown supercell method " + method + ".";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     return dims;
@@ -373,6 +398,7 @@ namespace apl {
   void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::build():"; //CO20190218
+    stringstream message;
     //BEGIN JJPR
     scell(1) = nx;
     scell(2) = ny;
@@ -383,12 +409,14 @@ namespace apl {
 
     // Print info
     if (VERBOSE) {
-      _logger << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
-        << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms)." << apl::endl;
+      message << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
+        << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms).";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     if (VERBOSE && _derivative_structure) {
-      _logger << "Derivative structure detected, be patient as we calculate symmetry of the supercell." << apl::endl;
+      message << "Derivative structure detected, be patient as we calculate symmetry of the supercell.";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
     // Create lattice of the supercell
     xmatrix<double> scale(3, 3);
@@ -442,7 +470,10 @@ namespace apl {
     _scStructure.info = "Supercell " + stringify(nx) + "x" + stringify(ny) + "x" + stringify(nz);
 
     // OK.
-    if (VERBOSE) _logger << "Supercell successfully created." << apl::endl;
+    if (VERBOSE) {
+      message << "Supercell successfully created.";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    }
     _isConstructed = TRUE;
 
     _scStructure_original = _scStructure;  //COPY EVERYTHING ONCE, will be very slow
@@ -827,7 +858,7 @@ namespace apl {
   // ME20200116 - rebase to primitive
   // Does not capture rotated conventional cells yet, but does work for AFLOW's
   // standard conventional unit cells.
-  void Supercell::projectToPrimitive() {
+  bool Supercell::projectToPrimitive() {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     string function = "apl::Supercell::projectToPrimitive()";
     vector<int> pc2sc, sc2pc;
@@ -837,8 +868,8 @@ namespace apl {
 
     // The original structure may be a rotated primitive cell. Transform the
     // primitive cell so that they overlap or else the mapping will not work
-    if (_inStructure_original.atoms.size() == _pcStructure.atoms.size()) {
-      xmatrix<double> U = trasp(_inStructure_original.scale*_inStructure_original.lattice) * inverse(trasp(_pcStructure.scale*_pcStructure.lattice));
+    if (_inStructure_original.atoms.size() == pcell.atoms.size()) {
+      xmatrix<double> U = trasp(_inStructure_original.scale*_inStructure_original.lattice) * inverse(trasp(pcell.scale*_pcStructure.lattice));
       // For a rotation matrix, trasp(U) * U = I
       if (aurostd::isidentity(trasp(U) * U)) {
         pcell = Rotate(pcell, U);
@@ -855,6 +886,7 @@ namespace apl {
         pcell.atoms[at].fpos = ones - pcell.atoms[at].fpos;
         pcell.atoms[at].cpos = pcell.f2c * pcell.atoms[at].fpos;
       }
+      pcell.BringInCell();
       mapped = getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc);
     }
     if (mapped) {
@@ -895,11 +927,9 @@ namespace apl {
       _sc2pcMap = sc2pc;
       _pc2scMap = pc2sc;
       calculatePhaseVectors();
+      return true;
     } else {
-      _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
-        << " not map the AFLOW standard primitive cell to the supercell."
-        << " Phonon dispersions will be calculated using the original"
-        << " structure instead." << apl::endl;
+      return false;
     }
   }
 
@@ -948,7 +978,7 @@ namespace apl {
     // sc2pcMap - convert scell positions into primitive coordinates
     // and do straightforward fpos matching
     for (uint i = 0; i < natoms_sc; i++) {
-      fpos = pcell.c2f * _scStructure.atoms[i].cpos;
+      fpos = pcell.c2f * scell.atoms[i].cpos;
       uint j = 0;
       for (j = 0; j < natoms_pc; j++) {
         if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, _skew, _sym_eps)) {
@@ -1032,8 +1062,10 @@ namespace apl {
         //_logger << apl::error << "The splitting of shells by the symmetry has failed [" << i << "]." << apl::endl;
         //throw APLRuntimeError("apl::Supercell::buildSuitableForShell(); Symmetry failed.");
         //_logger << apl::error << e.what() << apl::endl;
-        _logger << apl::error << e.error_message << apl::endl;
-        _logger << apl::warning << "The splitting of shells by symmetry has failed [" << i << "]. Continuing without this..." << apl::endl;
+        stringstream message;
+        message << e.error_message;
+        message << " The splitting of shells by symmetry has failed [" << i << "]. Continuing without this...";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         useSplitShells = false;
         for (uint j = 0; j < sh.size(); j++) {
           sh[j].removeSplitBySymmetry();
@@ -1117,6 +1149,7 @@ namespace apl {
   void Supercell::setupShellRestrictions(int MAX_NN_SHELLS) {
     // Precompute shellhandles for each unique atom
     vector<ShellHandle> sh;
+    stringstream message;
     for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
       ShellHandle s;
       sh.push_back(s);
@@ -1127,7 +1160,8 @@ namespace apl {
 
     // Set flag to shell restriction
     _isShellRestricted = true;
-    _logger << "Setting shell restrictions up to " << MAX_NN_SHELLS << "." << apl::endl;
+    message << "Setting shell restrictions up to " << MAX_NN_SHELLS << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Calculate the truncate radius for each atom
     _maxShellRadius.clear();
@@ -1239,9 +1273,14 @@ namespace apl {
 
   xstructure Supercell::calculatePrimitiveStructure() const { //CO20180409
     xstructure pcStructure=_inStructure;
+    // ME20200324 - Setting LatticeReduction_avoid to true can results in
+    // primitive cells with slightly different lattice parameters, especially
+    // for monoclinic cells. This error can propagate and break mappings from
+    // the conventional to the primitive cell.
+    pcStructure.LatticeReduction_avoid = false;
     pcStructure.Standard_Primitive_UnitCellForm();
     pcStructure.ReScale(1.0);
-    pcStructure.ShifOriginToAtom(0);
+    pcStructure.ShiftOriginToAtom(0);
     pcStructure.BringInCell();
     return pcStructure;
   }
@@ -1283,21 +1322,21 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   //ME20190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfAtoms() const {
+  uint Supercell::getNumberOfAtoms() const {
     return _scStructure.atoms.size();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   //ME20190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfUniqueAtoms() const {
+  uint Supercell::getNumberOfUniqueAtoms() const {
     return _scStructure.iatoms.size();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   //ME20190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO20190218
+  uint Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO20190218
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       //ME20191031 - use xerror
@@ -1429,7 +1468,7 @@ namespace apl {
     }
 #endif
 
-    // ME191219 - use basis_atoms_map
+    // ME20191219 - use basis_atoms_map
     if (symOp.basis_map_calculated) return symOp.basis_atoms_map[atomID];
 
     // Get the center atom center...
@@ -1596,7 +1635,7 @@ namespace apl {
     }
 #endif
 
-     // ME191219 - use basis_atoms_map
+     // ME20191219 - use basis_atoms_map
     if (symOp.basis_map_calculated) {
       int natoms = (int) _scStructure.atoms.size();
       for (int at = 0; at < natoms; at++) {
@@ -1951,7 +1990,7 @@ namespace apl {
   void Supercell::center(int i) {
     xvector<double> origin(3), frigin(3);
 #if CENTER_PRIM
-    //_inStructure.ShifOriginToAtom(_sc2pcMap[i]);
+    //_inStructure.ShiftOriginToAtom(_sc2pcMap[i]);
     //_inStructure.BringInCell();
     origin = _inStructure_original.atoms[_sc2pcMap[i]].cpos;
     frigin = _inStructure_original.atoms[_sc2pcMap[i]].fpos;
@@ -1962,7 +2001,7 @@ namespace apl {
       _inStructure.atoms[i] = BringInCell(_inStructure.atoms[i], _inStructure.lattice);
     }
 #endif
-    //_scStructure.ShifOriginToAtom(i);
+    //_scStructure.ShiftOriginToAtom(i);
     //_scStructure.BringInCell();
     origin = _scStructure_original.atoms[i].cpos;
     frigin = _scStructure_original.atoms[i].fpos;
@@ -1976,7 +2015,7 @@ namespace apl {
 
   void Supercell::center_original(void) {
     //just a (fast) undo for center(atom);
-    //refer to ShifOriginToAtom in case more properties need to be updated
+    //refer to ShiftOriginToAtom in case more properties need to be updated
 #if CENTER_PRIM
     _inStructure.origin = _inStructure_original.origin;
     for (uint i = 0; i < _inStructure.atoms.size(); i++) {
@@ -2002,10 +2041,12 @@ namespace apl {
 
   //ME20191219
   void Supercell::getFullBasisAGROUP() {
-    _logger << "Calculating full basis for the site point groups of the supercell." << apl::endl;
+    string message = "Calculating the full basis for the site point groups of the supercell.";
+    message += " This may take a few minutes for high-symmetry structures.";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
       string function = "apl::Supercell::getFullBasisAGROUP()";
-      string message = "Could not calculate the bases of the site point groups.";
+      message = "Could not calculate the bases of the site point groups.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
@@ -2178,10 +2219,10 @@ namespace apl {
     return calcShellPhaseFactor(atomID, centerID, qpoint, phase, i, placeholder, false);
   }
 
-// ME20200116 - rewritten to accommodate new phase vectors
-bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-                                     xcomplex<double>& phase, int& multiplicity,
-                                     xvector<xcomplex<double> >& derivative, bool calc_derivative) {
+  //ME20200116 - rewritten to accommodate new phase vectors
+  bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
+                                       xcomplex<double>& phase, int& multiplicity,
+                                       xvector<xcomplex<double> >& derivative, bool calc_derivative) {
     centerID = sc2pcMap(centerID);
     const vector<xvector<double> >& vec = phase_vectors[centerID][atomID];
     multiplicity = (int) vec.size();

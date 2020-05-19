@@ -814,6 +814,26 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+// ME20200330 - Multiplication of a real matrix with a complex vector
+namespace aurostd {
+  template<class utype>
+    xvector<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xvector<xcomplex<utype> >& b) {
+      if (a.cols != b.rows) {
+        string function = "aurostd::xmatrix::operator*";
+        string message = "Matrix and vector have different dimensions.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      xvector<xcomplex<utype> > c(a.lrows, a.urows);
+      for (int i = a.lrows; i <= a.urows; i++) {
+        for (int j = a.lcols; j <= a.ucols; j++) {
+          c[i].re += a[i][j] * b[j - b.lrows + 1].re;
+          c[i].im += a[i][j] * b[j - b.lrows + 1].im;
+        }
+      }
+      return c;
+    }
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
@@ -834,6 +854,32 @@ namespace aurostd {  // namespace aurostd
       return s*a;
     }
 }
+
+// ME20200329 - real * complex matrix
+namespace aurostd {
+  template<class utype> xmatrix<xcomplex<utype> >
+    operator*(utype s, const xmatrix<xcomplex<utype> >& a) {
+      xmatrix<xcomplex<utype> > c(a.urows, a.ucols, a.lrows, a.lcols);
+      for (int i = c.lrows; i <= c.urows; i++) {
+        for (int j = c.lcols; j <= c.ucols; j++) {
+          c[i][j].re = a[i][j].re * s;
+          c[i][j].im = a[i][j].im * s;
+        }
+      }
+      return c;
+    }
+
+  template<class utype> xmatrix<xcomplex<utype> >
+    operator*(const xmatrix<xcomplex<utype> >& a, utype s) {
+      return s*a;
+    }
+
+  template<class utype> xmatrix<xcomplex<utype> >
+    operator/(const xmatrix<xcomplex<utype> >& a, utype s) {
+      return ((utype) (1/s)) * a;
+    }
+}
+
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd

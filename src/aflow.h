@@ -907,6 +907,8 @@ class _vflags {
     xoption KBIN_VASP_KPOINTS_PHONONS_KPPRA;      // isentry and content_int
     xoption KBIN_VASP_KPOINTS_PHONONS_KSCHEME;    // isentry and content_string
     xoption KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;  // EVEN ODD
+    xoption KBIN_VASP_KPOINTS_PHONONS_GRID;       // ME20200427
+    xoption KBIN_VASP_KPOINTS_PHONONS_SHIFT;      // ME20200427
     // BANDS
     xoption KBIN_VASP_KPOINTS_BANDS_LATTICE;
     //  bool KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -1469,7 +1471,7 @@ class xstructure {
     void clear(void);                                             // clear everything //DX20191220 - uppercase to lowercase clear
     void clean(void);                                             // performs stringstream clean //DX20191220 - uppercase to lowercase clean
     void ClearSpecies(void);                                      // Clear all the symmetry
-    void ShifOriginToAtom(const int& iat);                        // Shift the origin to atom(iat)
+    void ShiftOriginToAtom(const int& iat);                       // Shift the origin to atom(iat)
     void IdenticalAtoms(void);                                    // Make identical atoms
     void SwapCoordinates(const uint& i,const uint& j);            // Permute Coordinates i with j
     string SpeciesLabel(const uint& A);                           // Returns the Label of the specie A (if available)
@@ -1501,6 +1503,7 @@ class xstructure {
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
+    void UpdateCartesianCoordinates();                            //AS20200514
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice
@@ -1827,6 +1830,8 @@ class xstructure {
     void free();                                                  // to free everything
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
+
+void LightCopy(const xstructure&, xstructure&);  // ME20200220
 
 //CO20180420
 //for stream management with objects
@@ -2171,7 +2176,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); //DX
 string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
 string GetLaueLabel(string& point_group); //DX20170901 //DX20180526 - add directory
 
-#define RADIANTS 0
+#define RADIANS 0
 #define DEGREES  1
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 
@@ -2699,6 +2704,8 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir);
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
+  int get_NCPUS();  // ME20200219
+  int get_NCPUS(const _kflags&);  // ME20200219
 }
 
 // ----------------------------------------------------------------------------
@@ -4335,11 +4342,11 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME 20181107
-  void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
-  void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general
-  void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO20181216
-  void RunPhonons_APL_20180101(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO20181216
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  // ME20181107
+  bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME20200427
+  void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
+  void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
+  void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
   // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
@@ -4390,10 +4397,10 @@ namespace pflow {
   _atom SetName(const _atom& a,const string& in_name);
   _atom SetType(const _atom& a,const int in_type);
   _atom SetNum(const _atom& a,const int in_num);
-  vector<int> GetTypes(const xstructure& a);
-  vector<string> GetNames(const xstructure& a);
-  vector<string> GetCleanNames(const xstructure& a);
-  vector<double> GetSpins(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<int> GetTypes(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<string> GetNames(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<string> GetCleanNames(const xstructure& a);
+  // [RF20200415 - duplicate from xatom]vector<double> GetSpins(const xstructure& a);
   aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
