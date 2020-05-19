@@ -1104,7 +1104,7 @@ namespace AGL_functions {
   // Adapted from original Fortran version written by M. A. Blanco et al.
   // See Computer Physics Communications 158, 57-72 (2004) and Journal of Molecular Structure (Theochem) 368, 245-255 (1996) for details
   // 
-  uint polynom_fit(uint& first_entry_tofit, uint& last_entry_tofit, vector<double>& xdata, vector<double>& ydata, vector<double>& weight, double& rms, int & npolycoeffwork, vector<double>& polycoeffwork, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint polynom_fit(uint& first_entry_tofit, uint& last_entry_tofit, vector<double>& xdata, vector<double>& ydata, vector<double>& weight, double& rms, int& npolycoeffwork, vector<double>& polycoeffwork, bool gxmdebug, ofstream& FileMESSAGE) {
     vector<vector<double> > cmatrix;
     double weightnorm;
     int ij;
@@ -1175,7 +1175,7 @@ namespace AGL_functions {
   //	  Also contains optional debugging to print out values of input matrices		
   // 
 namespace AGL_functions {
-  uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool gxmdebug, ofstream& FileMESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     xmatrix<double> cxm(n, n);
     xmatrix<double> bxm(n, 1);

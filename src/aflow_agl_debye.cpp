@@ -358,7 +358,7 @@ namespace KBIN {
       _vflags& vflags, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror = 0;
+    uint aglerror = 1;
     ostringstream aus;
     bool USER_RELAX=true;
 
@@ -416,17 +416,17 @@ namespace KBIN {
     // uint num_relax = xvasp.NRELAX;
     uint num_relax = 2;
     bool relax_complete = true;
-    bool krun = true;
+    bool krun = false;
 
     aurostd::StringstreamClean(aus);
-    aus << _AELSTR_MESSAGE_ + "Number of requested relaxation runs = " << num_relax << endl;  
+    aus << _AGLSTR_MESSAGE_ + "Number of requested relaxation runs = " << num_relax << endl;  
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     // First check if relaxation has already been performed
     for (uint i = 1; i <= num_relax; i++) {
       string filename = aurostd::CleanFileName(xvasp.Directory) + "CONTCAR.relax" + aurostd::utype2string<int>(num_relax);
       aurostd::StringstreamClean(aus);
-      aus << _AELSTR_MESSAGE_ + "Relaxation CONTCAR filename = " << filename << endl;  
+      aus << _AGLSTR_MESSAGE_ + "Relaxation CONTCAR filename = " << filename << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if (aurostd::FileExist(filename) || aurostd::FileExist(filename + ".xz")) {
         aurostd::StringstreamClean(aus);
@@ -471,10 +471,10 @@ namespace KBIN {
   // Run AGL postprocessing: calls AGL from other parts of AFLOW, to run AGL postprocessing on previously run calculations
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
   //  void VASP_RunPhonons_AGL_postprocess(  _xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE)
-  void VASP_RunPhonons_AGL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
+  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror = 0;
+    // [OBSOLETE] uint aglerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn = "";
@@ -484,7 +484,7 @@ namespace KBIN {
     ofstream FileMESSAGE;
 
     // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
-    aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
+    uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
     if (aglerror != 0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_ERROR_ + "AGL set xvasp flags failed" << endl;  
@@ -521,10 +521,10 @@ namespace AGL_functions {
   // Run AGL postprocessing: calls AGL from other parts of AFLOW, to run AGL postprocessing on previously run calculations
   // Returns thermal properties: Debye temperature, Gruneisen parameter, Gibbs free energy per atom, vibrational free energy per atom
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
-  uint Get_ThermalProperties_AGL_postprocess(string directory, const uint& ntemperature, const double& stemperature, const uint& npressure, const double& spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom) {  
+  uint Get_ThermalProperties_AGL_postprocess(const string& directory, uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror = 0;
+    // [OBSOLETE] uint aglerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn = "";
@@ -557,7 +557,7 @@ namespace AGL_functions {
 
 
     // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
-    aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
+    uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
 
     // Set AGL postprocess flag to true
     AGL_data.postprocess = true;
@@ -607,14 +607,14 @@ namespace AGL_functions {
 // AGL_functions::Get_EquilibriumVolumeTemperature
 // ***************************************************************************
 namespace AGL_functions {
-  uint Get_EquilibriumVolumeTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
+  uint Get_EquilibriumVolumeTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    // [OBSOLETE] uint aglerror;
     ostringstream aus;
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "AGL Debye run completed successfully!" << endl;  
@@ -640,14 +640,14 @@ namespace AGL_functions {
 // AGL_functions::Get_EquilibriumVolumeAngstromTemperature
 // ***************************************************************************
 namespace AGL_functions {
-  uint Get_EquilibriumVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
+  uint Get_EquilibriumVolumeAngstromTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    // [OBSOLETE] uint aglerror;
     ostringstream aus;
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "AGL Debye run completed successfully!" << endl;  
@@ -674,14 +674,14 @@ namespace AGL_functions {
 // AGL_functions::Get_BulkModulusStaticTemperature
 // ***************************************************************************
 namespace AGL_functions {
-  uint Get_BulkModulusStaticTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusStatic, ofstream& FileMESSAGE) {
+  uint Get_BulkModulusStaticTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusStatic, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    // [OBSOLETE] uint aglerror;
     ostringstream aus;
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       for (uint i = 0; i < AGL_data.temperature_external.size(); i++) {
         Temperature.push_back(AGL_data.temperature_external.at(i));
@@ -707,14 +707,14 @@ namespace AGL_functions {
 // AGL_functions::Get_BulkModulusIsothermalTemperature
 // ***************************************************************************
 namespace AGL_functions {
-  uint Get_BulkModulusIsothermalTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, ofstream& FileMESSAGE) {
+  uint Get_BulkModulusIsothermalTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    // [OBSOLETE] uint aglerror;
     ostringstream aus;
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       for (uint i = 0; i < AGL_data.temperature_external.size(); i++) {
         Temperature.push_back(AGL_data.temperature_external.at(i));
@@ -743,14 +743,14 @@ namespace AGL_functions {
   // Function to be specifically called from APL 2.0 which calculates Gruneisen parameter 
   // Runs AGL to obtain Equilibrium Volume in cubic Bohr and Isothermal Bulk Modulus in GPa as a function of temperature for use in calculating thermal expansion 
   // Used in APL 2.0 to get thermal expansion and heat capacity at constant pressure 
-  uint Get_BulkModulusVolumeTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
+  uint Get_BulkModulusVolumeTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror = 0;
+    // [OBSOLETE] uint aglerror = 0;
     ostringstream aus;
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       for (uint i = 0; i < AGL_data.temperature_external.size(); i++) {
         Temperature.push_back(AGL_data.temperature_external.at(i));
@@ -780,14 +780,14 @@ namespace AGL_functions {
   // Function to be specifically called from APL 2.0 which calculates Gruneisen parameter 
   // Runs AGL to obtain Equilibrium Volume in cubic Angstrom and Isothermal Bulk Modulus in GPa as a function of temperature for use in calculating thermal expansion 
   // Used in APL 2.0 to get thermal expansion and heat capacity at constant pressure 
-  uint Get_BulkModulusVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
+  uint Get_BulkModulusVolumeAngstromTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror = 0;
+    // [OBSOLETE] uint aglerror = 0;
     ostringstream aus;
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       for (uint i = 0; i < AGL_data.temperature_external.size(); i++) {
         Temperature.push_back(AGL_data.temperature_external.at(i));
@@ -818,10 +818,10 @@ namespace AGL_functions {
   // Function to be called from APL or AEL to calculate thermal or mechanical properties as a function of pressure
   // Runs AGL to obtain Volume in cubic Angstrom and Volume scaling factors as a function of static pressure in GPa 
   // Required pressure values should be specified in the aflow.in file
-  uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, bool& postprocess, ofstream& FileMESSAGE) {
+  uint Get_VolumeStaticPressure(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, bool postprocess, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror = 0;
+    // [OBSOLETE] uint aglerror = 0;
     ostringstream aus;
 
     // Set ael_pressure_calc to true
@@ -831,7 +831,7 @@ namespace AGL_functions {
     AGL_data.postprocess = postprocess;    
 
     // Call RunDebye_AGL to run AGL
-    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    uint aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
     if(aglerror == 0) {
       if(AGL_data.VolumeStaticPressure.size() != AGL_data.StaticPressure.size()) {
         aurostd::StringstreamClean(aus);
@@ -876,7 +876,7 @@ namespace AGL_functions {
 // ***************************************************************************
 namespace AGL_functions {
   // Function to actually run the AGL method
-  uint RunDebye_AGL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
+  uint RunDebye_AGL(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
     // [OBSOLETE] bool LDEBUG=(FALSE || XHOST.DEBUG);
     // User's control of parameters for GIBBS calculation; setting defaults
 
@@ -3724,7 +3724,7 @@ namespace AGL_functions {
       }
 
       // Writes thermal property values at 300K in file for REST-API
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[AGL_RESULTS]START" << endl;
       oss << "agl_thermal_conductivity_300K=" << kappaT.at(jtd300K) << "  (W/m*K)" << endl;
       oss << "agl_debye=" << AGL_data.DebyeTemperature0pressure.at(jtdbest) << "  (K)" << endl;
@@ -3741,7 +3741,7 @@ namespace AGL_functions {
       oss << "agl_vibrational_entropy_300K_cell=" << AGL_data.Entropy0pressuremeV.at(jtd300K) << "  (meV/cell*K)" << endl;
       oss << "agl_vibrational_entropy_300K_atom=" << AGL_data.Entropy0pressuremeV.at(jtd300K) / AGL_data.natoms << "  (meV/atom*K)" << endl;
       oss << "[AGL_RESULTS]STOP" << endl;
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[AGL_THERMAL_PROPERTIES_TEMPERATURE]START" << endl;
       // [OBSOLETE] oss << "#  T (K)" << "\t" << "Kappa (W/(m*K)) " << "\t" << "Debye temp. (K) " << "\t" << "Gruneisen Parameter" << "\t" << "Cv (kB/cell)" << "\t" << "Cp (kB/cell)" << "\t" << "Thermal Expan. (10^5/K)" << "\t" << "            B_static (Gpa)" << "\t" << "    B_isothermal (GPa)" << endl; 
       oss << "#  T (K)" << "        " << aurostd::PaddedPRE("Kappa (W/(m*K))",8," ") << "         " << aurostd::PaddedPRE("Debye temp. (K)",9," ") << "         " << aurostd::PaddedPRE("Gruneisen Parameter",9," ") << "     " << aurostd::PaddedPRE("Cv (kB/cell)",5," ") << "    " << aurostd::PaddedPRE("Cp (kB/cell)",4," ") << "    " << aurostd::PaddedPRE("Thermal Expan. (10^{-5}/K)",4," ") << "             " << aurostd::PaddedPRE("B_static (Gpa)",13," ") << "          " << aurostd::PaddedPRE("B_isothermal (GPa)",10," ") << endl;
@@ -3750,7 +3750,7 @@ namespace AGL_functions {
         oss << setw(8) << setprecision(2) << fixed << AGL_data.temperature_external.at(i) << "        " << setw(15) << setprecision(6) << kappaT.at(i) << " " << setw(23) << setprecision(6) << AGL_data.DebyeTemperature0pressure.at(i) << "   " << setw(25) << setprecision(6) << AGL_data.GruneisenParameter0pressure.at(i) << "      " << setw(12) << setprecision(6) << AGL_data.CvunitkB0pressure.at(i) << "   " << setw(12) << setprecision(6) << AGL_data.CpunitkB0pressure.at(i) << "    " << setw(26) << setprecision(6) << AGL_data.ThermalExpansion0pressure.at(i) * 100000.0 << "               " << setw(12) << setprecision(6) << AGL_data.bulkmodulusstatic_0pressure.at(i) << "      " << setw(22) << setprecision(6) << AGL_data.bulkmodulusisothermal_0pressure.at(i) << endl;
       }
       oss << "[AGL_THERMAL_PROPERTIES_TEMPERATURE]STOP" << endl;
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[AGL_ENERGIES_TEMPERATURE]START" << endl;
       // [OBSOLETE] oss << "#  T (K)" << "\t" << "G (eV/cell) " << "\t" << "Fvib (meV/cell) " << "\t" << "Uvib (meV/cell) "  << "\t" << "Svib (meV/cell) " << "\t" << "G (eV/atom) " << "\t" << "Fvib (meV/atom) " << "\t" << "Uvib (meV/atom) "  << "\t" << "Svib (meV/atom) " << endl;
       oss << "#  T (K)" << "        " << aurostd::PaddedPRE("G (eV/cell)",8," ") << "     " << aurostd::PaddedPRE("Fvib (meV/cell)",5," ") << "         " << aurostd::PaddedPRE("Uvib (meV/cell)",9," ")  << "         " << aurostd::PaddedPRE("Svib (meV/cell*K)",9," ") << "         " << aurostd::PaddedPRE("G (eV/atom)",8," ") << "     " << aurostd::PaddedPRE("Fvib (meV/atom)",5," ") << "         " << aurostd::PaddedPRE("Uvib (meV/atom)",9," ")  << "         " << aurostd::PaddedPRE("Svib (meV/atom*K)",9," ") << endl;
@@ -3759,7 +3759,7 @@ namespace AGL_functions {
         oss << setw(8) << setprecision(2) << fixed << AGL_data.temperature_external.at(i) << "        " << setw(11) << setprecision(6) << AGL_data.GibbsFreeEnergy0pressureeV.at(i) << "     " << setw(15) << setprecision(6) << AGL_data.HelmholtzEnergy0pressuremeV.at(i) << "    " << setw(20) << setprecision(6) << AGL_data.InternalEnergy0pressuremeV.at(i) << "    " << setw(22) << setprecision(6) << AGL_data.Entropy0pressuremeV.at(i) << "     " << setw(15) << setprecision(6) << AGL_data.GibbsFreeEnergy0pressureeV.at(i) / AGL_data.natoms << "     " << setw(15) << setprecision(6) << AGL_data.HelmholtzEnergy0pressuremeV.at(i) / AGL_data.natoms << "    " << setw(20) << setprecision(6) << AGL_data.InternalEnergy0pressuremeV.at(i) / AGL_data.natoms << "    " << setw(22) << setprecision(6) << AGL_data.Entropy0pressuremeV.at(i) / AGL_data.natoms << endl;
       }
       oss << "[AGL_ENERGIES_TEMPERATURE]STOP" << endl;
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       string ofileafaglname = AGL_data.dirpathname + "/aflow.agl.out";
       if(!aurostd::stringstream2file(oss, ofileafaglname, "WRITE")) {
         aurostd::StringstreamClean(aus);
