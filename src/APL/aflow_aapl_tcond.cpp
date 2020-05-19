@@ -173,8 +173,8 @@ namespace apl {
       message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
-    if (aurostd::isequal(tstep, 0.0)) {
-      message = "Tstep cannot be zero.";
+    if (tstep < _ZERO_TOL_) {
+      message = "Tstep cannot be zero or negative.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);

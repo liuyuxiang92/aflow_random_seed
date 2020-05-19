@@ -652,6 +652,9 @@ namespace apl {
 // Interface
 namespace apl {
 
+  void validateParametersAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersSupercellAPL(xoption&);
+  void validateParametersDispersionsAPL(xoption&);
   void validateParametersDosAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
   void validateParametersAAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
   bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
@@ -1649,7 +1652,7 @@ namespace apl
       double EOS_bulk_modulus_at_equilibrium;
       double EOS_Bprime_at_equilibrium;
     private:
-      xoption supercellopts;
+      //xoption supercellopts;  // OBSOLETE ME20200518
       bool isEOS;
       bool isGP_FD;
       bool ignore_imaginary;

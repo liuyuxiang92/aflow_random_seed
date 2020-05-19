@@ -176,7 +176,7 @@ namespace KBIN {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
     string soliloquy="readParametersAPL():";
     string key, entry, xvaspflag;
-    module_opts.supercell_method.assign(4, false);
+    vector<bool> supercell_method(4, false);
     for (uint i = 0; i < module_opts.aplflags.size(); i++) {
       key = module_opts.aplflags[i].keyword;
       entry = _ASTROPT_APL_ + key + "=|" + _ASTROPT_APL_OLD_ + key + "="; //CO20181226
@@ -214,34 +214,30 @@ namespace KBIN {
 
       // Supercell options
       if ((key == "SUPERCELL") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[0] = true;
+        supercell_method[0] = true;
         continue;
       }
       if ((key == "MINATOMS") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[1] = true;
+        supercell_method[1] = true;
         continue;
       }
       if ((key == "MINATOMS_RESTRICTED") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[1] = true;
-        module_opts.minatoms_restricted = true;
+        supercell_method[2] = true;
         continue;
       }
       // MAXSHELL will be skipped because it's not documented at all
       if ((key == "MINSHELL") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[3] = true;
+        supercell_method[3] = true;
         continue;
       }
     }
 
     // Was a supercell entry found? If not, switch to MINATOMS
     bool supercell_found = false;
-    for (uint i = 0; i < module_opts.supercell_method.size(); i++) {
-      if (module_opts.supercell_method[i]) {
-        supercell_found = true;
-        break;
-      }
+    for (uint i = 0; i < supercell_method.size() && !supercell_found; i++) {
+      if (supercell_method[i]) supercell_found = true;
     }
-    if (!supercell_found) module_opts.supercell_method[1] = true;
+    if (!supercell_found) supercell_method[1] = true;
 
     // Unset contradicting/unnecessary xvasp flags
     if (xinput.AFLOW_MODE_VASP) {
@@ -261,10 +257,10 @@ namespace KBIN {
       }
 
       // Supercell
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_SUPERCELL", module_opts.supercell_method[0]);
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS", (module_opts.supercell_method[1] && !module_opts.minatoms_restricted));
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS_RESTRICTED", (module_opts.supercell_method[1] && module_opts.minatoms_restricted));
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINSHELL", module_opts.supercell_method[3]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_SUPERCELL", supercell_method[0]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS", supercell_method[1]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS_RESTRICTED", supercell_method[2]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINSHELL", supercell_method[3]);
 
       // Phonon dispersion
       if (xinput.xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_DCPATH") == "LATTICE") {
@@ -346,7 +342,6 @@ namespace KBIN {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
     string soliloquy="readParametersAAPL():";
     string key, entry, xvaspflag;
-    module_opts.cut_rad_shell.assign(2, false);
     for (uint i = 0; i < module_opts.aaplflags.size(); i++) {
       key = module_opts.aaplflags[i].keyword;
       entry = _ASTROPT_AAPL_ + key + "=|" + _ASTROPT_APL_OLD_ + key + "=";  //CO20181226
@@ -360,14 +355,6 @@ namespace KBIN {
         xinput.xvasp.aaplopts.push_attached(xvaspflag, module_opts.aaplflags[i].xscheme); //this should become pop/push or changeattachedscheme (eventually)
       }
       // Special rules for certain keywords
-      if (key == "CUT_RAD") {
-        module_opts.cut_rad_shell[0] = module_opts.aaplflags[i].isentry;
-        continue;
-      }
-      if (key == "CUT_SHELL") {
-        module_opts.cut_rad_shell[1] = module_opts.aaplflags[i].isentry;
-        continue;
-      }
       //ME20190408 START
       // If KPPRA_AAPL is not set, use APL KPPRA
       if (key == "KPPRA_AAPL" && module_opts.aaplflags[i].content_int < 1) {
@@ -375,12 +362,6 @@ namespace KBIN {
         continue;
       }
       //ME20190408 END
-    }
-    if (module_opts.cut_rad_shell[0] != module_opts.cut_rad_shell[1]) {
-      if (xinput.AFLOW_MODE_VASP) {
-        xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_CUT_SHELL", module_opts.cut_rad_shell[0]);
-        xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_CUT_RAD", module_opts.cut_rad_shell[1]);
-      }
     }
     if (LDEBUG) {
       for (uint i = 0; i < module_opts.aaplflags.size(); i++) {

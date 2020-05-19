@@ -419,76 +419,24 @@ namespace KBIN {
     /***************************** READ PARAMETERS *****************************/
 
     aurostd::xoption aplopts;
-    string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO20190114 - initialize everything
-    string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; //ME20190625
-    string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO20190114 - initialize everything
-    bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false; //USER_ZEROSTATE_CHGCAR = false; //CO20190114 - initialize everything
-    bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO20190114 - initialize everything
-    bool USER_DOS_PROJECT = false, USER_RELAX_COMMENSURATE = false, USER_DISPLACEMENTS;  // ME20200213
-    double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO20190114 - initialize everything  
-    int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO20190114 - initialize everything
-    vector<int> USER_DOS_MESH(3);
-    vector<xvector<double> > USER_DOS_PROJECTIONS;
+    int USER_MAXSHELL = 0;
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
       const string& key = kflags.KBIN_MODULE_OPTIONS.aplflags[i].keyword;
       message << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme;
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       aplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].option);
       aplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme);
-      if (key == "RELAX") {USER_RELAX = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "RELAX_COMMENSURATE") {USER_RELAX_COMMENSURATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "HIBERNATE") {USER_HIBERNATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "ENGINE") {USER_ENGINE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "SUPERCELL") {USER_SUPERCELL = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "MINATOMS") {USER_MINATOMS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "MINATOMS_RESTRICTED") {USER_MINATOMS_RESTRICTED = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "MINSHELL") {USER_MINSHELL = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "POLAR") {USER_POLAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DMAG") {USER_DISTORTION_MAGNITUDE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
-      if (key == "DXYZONLY") {USER_DISTORTIONS_XYZ_ONLY = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DSYMMETRIZE") {USER_DISTORTIONS_SYMMETRIZE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DINEQUIV_ONLY") {USER_DISTORTIONS_INEQUIVONLY = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;} //CO20190131
-      // Special case: DPM can be true, false, or empty
-      if (key == "DPM") {
-        USER_DPM = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option;
-        USER_AUTO_DISTORTIONS=(!kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme.empty() && (kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'A' || kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'a')); //CO20190131
-        continue;
-      }
-      if (key == "ZEROSTATE") {USER_ZEROSTATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      //if (key == "ZEROSTATE_CHGCAR") {USER_ZEROSTATE_CHGCAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  //OBSOLETE ME20200507
-      if (key == "FREQFORMAT") {USER_FREQFORMAT = aurostd::toupper(kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme); continue;}
-      if (key == "DC") {USER_DC = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DCPATH") {USER_DC_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DCPOINTS") {USER_DC_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "DCINITCOORDSFRAC") {USER_DC_INITCOORDS_FRAC = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DCINITCOORDSCART") {USER_DC_INITCOORDS_CART = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DCINITCOORDSLABELS") {USER_DC_INITCOORDS_LABELS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DCUSERPATH") {USER_DC_USERPATH = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DOS") {USER_DOS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DOSMESH") {DOS_MESH_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DOSMETHOD") {USER_DOS_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
-      if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME20200213
-      if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  //ME20190625
-      if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  //ME20190625
-      if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DISPLACEMENTS") {USER_DISPLACEMENTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     }
 
     /***************************** CHECK PARAMETERS *****************************/
 
-    //ME20190313 START
-    // Do not relax with --generate_aflowin_only option
-    if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
-      USER_RELAX = false;
-      message << "RELAX will be switched OFF for generate_aflowin_only.";
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-    }
-    //ME20190313 END
+    apl::validateParametersAPL(aplopts, aflags, messageFile, oss);
+    aplopts.flag("SUPERCELL::VERBOSE", true);  // Use verbose output for supercell construction
+
+    // Process some APL strings
     // Relax structure
-    if (USER_RELAX) {
+    int START_RELAX = 0;
+    if (aplopts.flag("RELAX")) {
       START_RELAX = 1;
       if(xinput.AFLOW_MODE_VASP){
         // Check if the structure has already been relaxed
@@ -502,159 +450,37 @@ namespace KBIN {
         }
         if (START_RELAX == _NUM_RELAX_ + 1) {
           message << "Structure has already been relaxed. Relaxation will be skipped.";
-          USER_RELAX = false;
+          aplopts.flag("RELAX", false);
         } else if (START_RELAX != 1) {
           message << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
           message << " Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << ".";
         }
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       } else {
-        USER_RELAX = false;
+        aplopts.flag("RELAX", false);
         message << "RELAX option only supported for VASP. Relaxations will be skipped.";
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
       }
     }
 
-    // Correct user engine
-    if (USER_ENGINE == "GSA") {
-      message << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM).";
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
-      USER_ENGINE = "DM";
-    }
-    if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
-      message << "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
-      message << "See README_AFLOW_APL.TXT for more information.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
-    }
-    //OBSOLETE ME20200507
-    //[OBSOLETE]if (USER_ZEROSTATE_CHGCAR) {
-    //[OBSOLETE]  if (USER_ENGINE == "DM") {
-    //[OBSOLETE]    logger << "ZEROSTATE_CHGCAR requires the calculation of the undistorted supercell. ZEROSTATE will be switched on." << apl::endl;
-    //[OBSOLETE]    USER_ZEROSTATE = true;
-    //[OBSOLETE]  } else if (USER_ENGINE == "LR") {
-    //[OBSOLETE]    logger << "ZEROSTATE_CHGCAR cannot be used with Linear Response calculations and will be switched off." << apl::endl;
-    //[OBSOLETE]    USER_ZEROSTATE_CHGCAR = false;
-    //[OBSOLETE]  }
-    //[OBSOLETE]}
-
-    // SUPERCELL
-    // Correct MINATOMS if restricted
-    if (kflags.KBIN_MODULE_OPTIONS.minatoms_restricted) USER_MINATOMS = USER_MINATOMS_RESTRICTED;
-
-    vector<string> tokens;
-    // Check supercell settings
-    if (!USER_SUPERCELL.empty()) {
-      tokens.clear();
-      aurostd::string2tokens(USER_SUPERCELL, tokens, string(" xX"));
-      if (tokens.size() != 3) {
-        message << "Wrong setting in " + _ASTROPT_ + "SUPERCELL. ";
-        message << "See README_AFLOW_APL.TXT for the correct format.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-      }
-    }
-
-    // ME20200102 - BEGIN
-    // Store supercell generation parameters in xoption.
-    aurostd::xoption supercell_opts;
-    if (kflags.KBIN_MODULE_OPTIONS.supercell_method[0]) {
-      supercell_opts.push_attached("SUPERCELL::METHOD", "SUPERCELL");
-      supercell_opts.push_attached("SUPERCELL::VALUE", USER_SUPERCELL);
-    } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[1]) {
-      if (kflags.KBIN_MODULE_OPTIONS.minatoms_restricted) {
-        supercell_opts.push_attached("SUPERCELL::METHOD", "MINATOMS_RESTRICTED");
-        supercell_opts.push_attached("SUPERCELL::VALUE", aurostd::utype2string<int>(USER_MINATOMS_RESTRICTED));
-      } else {
-        supercell_opts.push_attached("SUPERCELL::METHOD", "MINATOMS");
-        supercell_opts.push_attached("SUPERCELL::VALUE", aurostd::utype2string<int>(USER_MINATOMS));
-      }
-    } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[2]) {
-      supercell_opts.push_attached("SUPERCELL::METHOD", "SHELLS");
-      supercell_opts.push_attached("SUPERCELL::VALUE", aurostd::utype2string<int>(USER_MAXSHELL));
-    } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[3]) {
-      supercell_opts.push_attached("SUPERCELL::METHOD", "SHELLS");
-      supercell_opts.push_attached("SUPERCELL::VALUE", aurostd::utype2string<int>(USER_MINSHELL));
-    } else {
-      message << "Could not determine supercell method.";
-      aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
-    }
-    supercell_opts.flag("SUPERCELL::VERBOSE", true);  // Use verbose output for supercell construction
-    // ME20200102 - END
-
-    if (USER_DC) {
-      if (USER_DC_METHOD == "LATTICE") {
-        //USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // OBSOLETE ME20200117 - this will be determined by the phonon dispersion calculator
-      } else if (USER_DC_METHOD == "MANUAL") {
-        // Make sure that the number of coordinates and labels agree
-        tokens.clear();
-        if (!USER_DC_INITCOORDS_FRAC.empty()) {
-          aurostd::string2tokens(USER_DC_INITCOORDS_FRAC, tokens, string(" ;"));
-        } else {
-          aurostd::string2tokens(USER_DC_INITCOORDS_CART, tokens, string(" ;"));
-        }
-        uint ncoords = tokens.size();
-        tokens.clear();
-        aurostd::string2tokens(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  //ME20190427 - also break along semicolon
-        if (tokens.size() != ncoords) {
-          message << "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
-          message << "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
-          message << "See README_AFLOW_APL.TXT for more information.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-        }
-      } else {
-        message << "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
-        message << "See README_AFLOW_APL.TXT for more information.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
-      }
-    }
-
     // DOS
-    if (USER_DOS || USER_TP) {  //ME20190423
-      tokens.clear();
-      if (USER_DOS_METHOD != "LT" && USER_DOS_METHOD != "RS") {
-        message << "Wrong setting in " + _ASTROPT_ + "DOSMETHOD. Use either LT or RS. ";
-        message << "See README_AFLOW_APL.TXT for more information.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
-      }
-      if ((USER_DOS_METHOD == "RS") && (USER_DOS_SMEAR < _ZERO_TOL_)) {
-        message << "Smearing value for DOS not set or set to zero.";
-        message << " APL will overwrite the smearing value to 0.05 eV.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
-        USER_DOS_SMEAR = 0.05;
-      }
-      aurostd::string2tokens(DOS_MESH_SCHEME, tokens, string(" xX"));
-      if (tokens.size() != 3) {
-        message << "Wrong setting in " + _ASTROPT_ + "DOSMESH. ";
-        message << "See README_AFLOW_APL.TXT for the correct format.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-      } else {
-        USER_DOS_MESH[0] = aurostd::string2utype<int>(tokens[0]);
-        USER_DOS_MESH[1] = aurostd::string2utype<int>(tokens[1]);
-        USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
-      }
+    vector<string> tokens;
+    vector<int> USER_DOS_MESH;
+    vector<xvector<double> > USER_DOS_PROJECTIONS;
+    if (aplopts.flag("DOS") || aplopts.flag("TP")) {  //ME20190423
+      aurostd::string2tokens(aplopts.getattachedscheme("DOSMESH"), USER_DOS_MESH, " xX");
       // ME20190625 - projected DOS
       // ME20200213 - now has fully atom projected DOS (use zero vector to indicate)
-      if (USER_DOS_PROJECT) {
-        if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
-          if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
-            message << "Ambiguous input in APL DOS projections. ";
-            message << "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
-          }
+      if (aplopts.flag("DOS_PROJECT")) {
+        if (aplopts.flag("DOS_CART") || aplopts.flag("DOS_FRAC")) {
           string projscheme = "";
-          if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
-          else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
+          if (aplopts.flag("DOS_CART")) projscheme = aplopts.getattachedscheme("DOSPROJECTIONS_CART");
+          else projscheme = aplopts.getattachedscheme("DOSPROJECTIONS_FRAC");
           aurostd::string2tokens(projscheme, tokens, "; ");
+          vector<double> proj;
           for (uint i = 0; i < tokens.size(); i++) {
-            vector<double> proj;
             aurostd::string2tokens(tokens[i], proj, ", ");
-            if (proj.size() == 3) {
-              USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
-            } else {
-              message << "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
-              message << string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
-              message << "See README_AFLOW_APL.TXT for the correct format.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-            }
+            USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
           }
         } else {
           xvector<double> proj(3);
@@ -663,100 +489,87 @@ namespace KBIN {
       }
     }
 
-    // TPT
-    if (USER_TP) {
-      tokens.clear();
-      aurostd::string2tokens(USER_TPT, tokens, string(" :"));
-      if (tokens.size() != 3) {
-        message << "Wrong setting in " + _ASTROPT_ + "TPT. ";
-        message << "See README_AFLOW_APL.TXT for the correct format.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-      }
-      USER_TP_TSTART = aurostd::string2utype<double>(tokens[0]);
-      USER_TP_TEND = aurostd::string2utype<double>(tokens[1]);
-      USER_TP_TSTEP = aurostd::string2utype<double>(tokens[2]);
-    }
-
     /****************************** OUTPUT SUMMARY ******************************/
 
     message << "Parameters for the Automatic Phonon Library successfully read." << std::endl;
-    message << "The structure will " << (USER_RELAX?"":"NOT ") << "be relaxed before running APL." << std::endl;
-    message << "The hibernate feature is switched " << (USER_HIBERNATE?"ON":"OFF") << "." << std::endl;
-    message << "Phonons will be calculated using the " << (USER_ENGINE=="DM"?"Direct":"Linear Response") << " Method." << std::endl;
+    message << "The structure will " << (aplopts.flag("RELAX")?"":"NOT ") << "be relaxed before running APL." << std::endl;
+    message << "The hibernate feature is switched " << (aplopts.flag("HIBERNATE")?"ON":"OFF") << "." << std::endl;
+    message << "Phonons will be calculated using the " << (aplopts.getattachedscheme("ENGINE")=="DM"?"Direct":"Linear Response") << " Method." << std::endl;
 
-    if (USER_ENGINE == "DM") {
-      message << "The distortion magnitude will be " << USER_DISTORTION_MAGNITUDE << " Angstrom." << std::endl;
-      if (USER_DISTORTIONS_XYZ_ONLY) {
+    if (aplopts.getattachedscheme("ENGINE") == "DM") {
+      message << "The distortion magnitude will be " << aplopts.getattachedscheme("DMAG") << " Angstrom." << std::endl;
+      if (aplopts.flag("DXYZONLY")) {
         message << "Only distortions along the lattice vectors will be used." << std::endl;
       } else {
         message << "Atoms will be distorted along the lattice vectors, face diagonals, and body diagonals." << std::endl;
       }
-      if (USER_DISTORTIONS_SYMMETRIZE) {
+      if (aplopts.flag("DSYMMETRIZE")) {
         message << "Non-symmetric distortion directions will be determined for each site." << std::endl;
       } else {
         message << "Distortions will be generated in three independent directions." << std::endl;
       }
-      if (USER_DISTORTIONS_INEQUIVONLY) { //CO20190131
-        message << "Distortion directions will be determined for inequivalent site only." << std::endl;
+      if (aplopts.flag("DSYMMETRIZE")) { //CO20190131
+        message << "Distortion directions will be determined for inequivalent sites only." << std::endl;
       } else {
-        message << "Distortion directions will be determined for ALL site." << std::endl;
+        message << "Distortion directions will be determined for ALL sites." << std::endl;
       }
       // Output now so that the warning about positive directions are can be displayed properly
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-      if (USER_AUTO_DISTORTIONS) {
+      if (aurostd::toupper(aplopts.getattachedscheme("DPM"))[0] == 'A') {
         message << "Positive/negative distortion directions will be determined for each site."; 
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-      } else if (USER_DPM) {
+      } else if (aplopts.flag("DPM")) {
         message << "Distortions will be generated in both the positive and negative direction.";
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       } else {
         message << "Distortions will only be generated in the positive direction - this is NOT recommended.";
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
       }
-      message << "Forces from the undistored state will " << (USER_ZEROSTATE?"":"NOT ") << "be used." << std::endl;
+      message << "Forces from the undistored state will " << (aplopts.flag("ZEROSTATE")?"":"NOT ") << "be used." << std::endl;
       //logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  //OBSOLETE ME20200507
     }
 
-    message << "Polar corrections will " << (USER_POLAR?"":"NOT ") << "be employed." << std::endl;
-    message << "Frequencies will be returned in this format: " << USER_FREQFORMAT << "." << std::endl;
+    message << "Polar corrections will " << (aplopts.flag("POLAR")?"":"NOT ") << "be employed." << std::endl;
+    message << "Frequencies will be returned in this format: " << aplopts.getattachedscheme("FREQFORMAT") << "." << std::endl;
 
     message << "The supercell will be built using ";
-    if (kflags.KBIN_MODULE_OPTIONS.supercell_method[0]) {
-      message << "the dimensions " << USER_SUPERCELL << "." << std::endl;
-    } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[1]) {
-      message << "at least " << USER_MINATOMS << " atoms." << std::endl;
-    } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[2]) {
-      message << "at most " << USER_MAXSHELL << " shells." << std::endl;
-    } else {
-      message << "at least " << USER_MINSHELL << " shells." << std::endl;
+    if (aplopts.flag("SUPERCELL")) {
+      message << "the dimensions " << aplopts.getattachedscheme("SUPERCELL::VALUE") << "." << std::endl;
+    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_RESTRICTED")) {
+      message << "at least " << aplopts.getattachedscheme("SUPERCELL::VALUE") << " atoms." << std::endl;
+    } else if (aplopts.flag("MINSHELLS")) {
+      message << "at least " << aplopts.getattachedscheme("SUPERCELL:VALUE") << " shells." << std::endl;
     }
 
-    if (USER_DC) {
+    if (aplopts.flag("DC")) {
       message << "Phonon dispersion curves will be calculated ";
-      if (USER_DC_METHOD == "LATTICE") {
+      if (aplopts.getattachedscheme("DCPATH") == "LATTICE") {
         message << "using the default path of the lattice (see DOI 10.1016/j.commatsci.2010.05.010). ";
       } else {
-        message << "along the " << (USER_DC_INITCOORDS_FRAC.empty()?"Cartesian":"fractional") << " coordinates ";
-        message << "[" << (USER_DC_INITCOORDS_FRAC.empty()?USER_DC_INITCOORDS_CART:USER_DC_INITCOORDS_FRAC) << "].";
+        string dc_initcoords_frac = aplopts.getattachedscheme("DCINITCOORDSFRAC");
+        string dc_initcoords_cart = aplopts.getattachedscheme("DCINITCOORDSCART");
+        message << "along the " << (aplopts.flag("DC_CART")?"Cartesian":"fractional") << " coordinates ";
+        message << "[" << (aplopts.flag("DC_CART")?aplopts.getattachedscheme("DCINITCOORDSCART"):aplopts.getattachedscheme("DCINITCOORDSFRAC")) << "].";
       }
-      message << " Each subpath will be divided into " << USER_DC_NPOINTS << " points." << std::endl;
+      message << " Each subpath will be divided into " << aplopts.getattachedscheme("DCPOINTS") << " points." << std::endl;
     } else {
       message << "Phonon dispersion curves will NOT be calculated." << std::endl;
     }
 
-    if (USER_DOS || USER_TP) {  //ME20190423
+    if (aplopts.flag("DOS") || aplopts.flag("TP")) {  //ME20190423
+      string dosmethod = aplopts.getattachedscheme("DOSMETHOD");
       message << "Phonon DOS will be calculated using the ";
-      message << (USER_DOS_METHOD == "LT"?"Linear Tetrahedron":"Root Sampling") << " method ";
-      message << "along a " << USER_DOS_MESH[0] << "x" << USER_DOS_MESH[1] << "x" << USER_DOS_MESH[2];
-      message << " mesh with " << USER_DOS_NPOINTS << " bins.";
-      if (USER_DOS_METHOD == "RS")
-        message << " A smearing value of " << USER_DOS_SMEAR << " eV will be used.";
+      message << (dosmethod == "LT"?"Linear Tetrahedron":"Root Sampling") << " method ";
+      message << "along a " << aplopts.getattachedscheme("DOSMESH");
+      message << " mesh with " << aplopts.getattachedscheme("DOSPOINTS") << " bins.";
+      if (dosmethod == "RS")
+        message << " A smearing value of " << aplopts.getattachedscheme("DOSSMEAR") << " eV will be used.";
       //ME20190626 - projected DOS
-      if ((USER_DOS_PROJECTIONS.size() == 0) || (USER_DOS_METHOD == "RS")) {
+      if ((USER_DOS_PROJECTIONS.size() == 0) || (dosmethod == "RS")) {
         message << " Projected phonon DOS will NOT be calculated.";
       } else {
         message << " Projected phonon DOS will be calculated along the "
-          << (USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"fractional":"Cartesian") << " directions ";
+          << (aplopts.flag("DOS_CART")?"fractional":"Cartesian") << " directions ";
         for (uint i = 0; i < USER_DOS_PROJECTIONS.size(); i++) {
           message << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(aurostd::xvector2vector<double>(USER_DOS_PROJECTIONS[i])), ", ") << "]";
           message << ((i < USER_DOS_PROJECTIONS.size() - 1)?", ":".");
@@ -767,10 +580,10 @@ namespace KBIN {
       message << "Phonon DOS will NOT be calculated." << std::endl;
     }
 
-    if (USER_TP) {
+    if (aplopts.flag("TP")) {
       message << "Thermodynamic properties will be calculated between ";
-      message << USER_TP_TSTART << " K and " << USER_TP_TEND << " K ";
-      message << "in " << USER_TP_TSTEP << " K steps." << std::endl;
+      message << aplopts.getattachedscheme("TSTART") << " K and " << aplopts.getattachedscheme("TEND") << " K ";
+      message << "in " << aplopts.getattachedscheme("TSTEP") << " K steps." << std::endl;
     } else {
       message << "Thermodynamic properties will NOT be calculated." << std::endl;
     }
@@ -1260,7 +1073,7 @@ namespace KBIN {
     if (LDEBUG) std::cerr << function << " DEBUG [2]" << std::endl;
 
     //fix vasp bin for LR or DM+POLAR
-    if (USER_ENGINE == string("LR") || (USER_ENGINE == string("DM") && USER_POLAR)) {
+    if (aplopts.getattachedscheme("ENGINE") == "LR" || (aplopts.getattachedscheme("ENGINE") == string("DM") && aplopts.flag("POLAR"))) {
       if(xflags.AFLOW_MODE_VASP && !XHOST.GENERATE_AFLOWIN_ONLY){  //ME20190313 - Do not check the VASP binary for generate_aflowin_only
         try {
           // Check the version of VASP binary
@@ -1319,23 +1132,23 @@ namespace KBIN {
     }
     phcalc.setDirectory(aflags.Directory);
     phcalc.setNCPUs(kflags);
-    phcalc.setPolarMaterial(USER_POLAR);
+    phcalc.setPolarMaterial(aplopts.flag("POLAR"));
     phcalc.initialize_supercell(xinput.getXStr());
     apl::Supercell& supercell = phcalc.getSupercell();
 
     // Determine the supercell dimensions
-    xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
+    xvector<int> scell_dims = supercell.determineSupercellDimensions(aplopts);
 
     // Don't relax when we already have a PHPOSCAR file (state saved)
-    if (!aurostd::EFileExist(phposcar_file) && USER_RELAX) {
+    if (!aurostd::EFileExist(phposcar_file) && aplopts.flag("RELAX")) {
       // ME20190107 - Relax after fixing the vasp bin to make version consistent.
       // Run relaxations if necessary
       bool Krun=true;
       string function;
       if (xinput.AFLOW_MODE_VASP) {
         function = "KBIN::relaxStructureAPL_VASP";
-        Krun = relaxStructureAPL_VASP(START_RELAX, AflowIn, supercell_opts, scell_dims,
-            USER_RELAX_COMMENSURATE, xinput.xvasp, aflags, kflags, xflags.vflags, messageFile);
+        Krun = relaxStructureAPL_VASP(START_RELAX, AflowIn, aplopts, scell_dims,
+            aplopts.flag("COMMENSURATE"), xinput.xvasp, aflags, kflags, xflags.vflags, messageFile);
       }
       if (!Krun) {
         message << "Relaxation calculations did not run successfully.";
@@ -1373,7 +1186,7 @@ namespace KBIN {
     // ME20200102 - END
 
     //ME20190626 - Convert projection directions for DOS to Cartesian
-    if ((USER_DOS_PROJECTIONS.size() > 0) && (!USER_DOS_PROJECTIONS_FRAC_SCHEME.empty())) {
+    if ((USER_DOS_PROJECTIONS.size() > 0) && aplopts.flag("DOS_FRAC")) {
       for (uint p = 0; p < USER_DOS_PROJECTIONS.size(); p++) {
         USER_DOS_PROJECTIONS[p] = xinput.getXStr().f2c * USER_DOS_PROJECTIONS[p];
       }
@@ -1391,9 +1204,11 @@ namespace KBIN {
           kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
           kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
     if (NEW_QHA && run_any_qha){
-      apl::QHAN qha(USER_TPT, xinput, kflags, supercell_opts, messageFile, oss);
-      qha.apl_options = aplopts;
-      // OBSOLETE ME20200516 - APL options are already recast into xoptions.
+      // ME20200516 - APL options are recast into xoption now, so no need to
+      // distinguish between supercell_opts, aplopts, and qha.apl_options.
+      string USER_TPT = aplopts.getattachedscheme("TPT");
+      apl::QHAN qha(USER_TPT, xinput, kflags, aplopts, messageFile, oss);
+      //[OBSOLETE] qha.apl_options = aplopts;
       //[OBSOLETE] qha.apl_options.push_attached("ENGINE", USER_ENGINE);
       //[OBSOLETE] qha.apl_options.flag("AUTO_DIST", USER_AUTO_DISTORTIONS);
       //[OBSOLETE] qha.apl_options.flag("DPM", USER_DPM);
@@ -1433,7 +1248,7 @@ namespace KBIN {
 
     // Harmonic force constants
     string hibfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE);
-    bool awakeHarmIFCs = (USER_HIBERNATE && aurostd::EFileExist(hibfile));
+    bool awakeHarmIFCs = (aplopts.flag("HIBERNATE") && aurostd::EFileExist(hibfile));
     bool apl_stagebreak = false;
     // Try to read first
     if (awakeHarmIFCs) {
@@ -1456,7 +1271,7 @@ namespace KBIN {
       if (!apl_stagebreak) {
         apl_stagebreak = !(fccalc.run());
         if (!apl_stagebreak) {
-          if (USER_HIBERNATE) fccalc.hibernate();
+          if (aplopts.flag("HIBERNATE")) fccalc.hibernate();
           phcalc.setHarmonicForceConstants(fccalc);
         }
       }
@@ -1512,7 +1327,7 @@ namespace KBIN {
       for (int o = 3; o <= max_order; o++) {
         // Try and load IFCs from file
         string ifcs_hib_file = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[o-3]);
-        bool awakeAnharmIFCs = (USER_HIBERNATE && aurostd::EFileExist(ifcs_hib_file));
+        bool awakeAnharmIFCs = (aplopts.flag("HIBERNATE") && aurostd::EFileExist(ifcs_hib_file));
         if (awakeAnharmIFCs) {
           try {
             message << "Reading anharmonic IFCs from " + ifcs_hib_file + ".";
@@ -1539,7 +1354,7 @@ namespace KBIN {
           if (!aapl_stagebreak) {
             aapl_stagebreak = !(anharm.calculateForceConstants());
             if (!aapl_stagebreak) {
-              if (USER_HIBERNATE) anharm.writeIFCsToFile(ifcs_hib_file);
+              if (aplopts.flag("HIBERNATE")) anharm.writeIFCsToFile(ifcs_hib_file);
               phcalc.setAnharmonicForceConstants(anharm);
             }
           }
@@ -1622,16 +1437,15 @@ namespace KBIN {
 
         // Init path according to the aflow's definition for elec. struc.
         // ME20181029 - Restructured
-        if (USER_DC_METHOD == "LATTICE") {
-          pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
+        if (aplopts.getattachedscheme("DCPATH") == "LATTICE") {
+          pdisc.initPathLattice("", aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")));
         } else {
-          if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {
-            pdisc.initPathCoords(USER_DC_INITCOORDS_FRAC, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, false);
-          } else if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_CART.empty()) {
-            pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
-          }
+          pdisc.initPathCoords(aplopts.getattachedscheme("DCINITCOORDS"),
+            aplopts.getattachedscheme("DCINITCOORDSLABELS"),
+            aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
         }
         //ME20190501 Allow user to override path
+        string USER_DC_USERPATH = aplopts.getattachedscheme("DCUSERPATH");
         if(!USER_DC_USERPATH.empty()){  // Set path
           pdisc.setPath(USER_DC_USERPATH);
         }
@@ -1652,10 +1466,10 @@ namespace KBIN {
       string dirname=store.getdir_name(aflags.Directory);
 
       if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-      apl::DOSCalculator dosc(phcalc, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
+      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOS_METHOD"), USER_DOS_PROJECTIONS);
       // Calculate DOS
-      dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
-      if (USER_DOS) dosc.writePDOS(_TMPDIR_, dirname);
+      dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
+      if (aplopts.flag("DOS")) dosc.writePDOS(_TMPDIR_, dirname);
       store.clear();
       return;
     }
@@ -1682,17 +1496,16 @@ namespace KBIN {
 
           // Init path according to the aflow's definition for elec. struc.
           //ME20181029 - Restructured
-          if (USER_DC_METHOD == "LATTICE") {
-            pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
+          if (aplopts.getattachedscheme("DCPATH") == "LATTICE") {
+            pdisc.initPathLattice("", aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")));
           } else {
-            if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {
-              pdisc.initPathCoords(USER_DC_INITCOORDS_FRAC, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, false);
-            } else if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_CART.empty()) {
-              pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
-            }
+            pdisc.initPathCoords(aplopts.getattachedscheme("DCINITCOORDS"),
+              aplopts.getattachedscheme("DCINITCOORDSLABELS"),
+              aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
           }
-          // ME20190501 Allow user to override path
-          if(!USER_DC_USERPATH.empty()) {  // Set path
+          //ME20190501 Allow user to override path
+          string USER_DC_USERPATH = aplopts.getattachedscheme("DCUSERPATH");
+          if(!USER_DC_USERPATH.empty()){  // Set path
             pdisc.setPath(USER_DC_USERPATH);
           }
 
@@ -1702,10 +1515,10 @@ namespace KBIN {
         }
         {
           if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-          apl::DOSCalculator dosc(phcalc, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
+          apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOS_METHOD"), USER_DOS_PROJECTIONS);
           // Calculate DOS
-          dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
-          if(USER_DOS)dosc.writePDOS(_TMPDIR_, dirname);
+          dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
+          if(aplopts.flag("DOS"))dosc.writePDOS(_TMPDIR_, dirname);
         }
         store.clear();
       }
@@ -1725,6 +1538,7 @@ namespace KBIN {
 
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
+    string USER_FREQFORMAT = aplopts.getattachedscheme("FREQFORMAT");
     if (!USER_FREQFORMAT.empty()) {
       // Convert format to machine representation
       tokens.clear();
@@ -1769,26 +1583,25 @@ namespace KBIN {
 
     if (LDEBUG) std::cerr << function << " DEBUG [5b]" << std::endl;
 
-    if (USER_DC) {
+    if (aplopts.flag("DC")) {
       apl::PhononDispersionCalculator pdisc(phcalc);
 
       // Init path according to the aflow's definition for elec. struc.
       //ME20181029 - Restructured
-      if (USER_DC_METHOD == "LATTICE") {
+      if (aplopts.getattachedscheme("DCPATH") == "LATTICE") {
         if (!supercell.projectToPrimitive()) {  //ME20200117 - project to primitive
           message << "Could not map the AFLOW standard primitive cell to the supercell.";
           message << " Phonon dispersions will be calculated using the original structure instead.";
           pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         }
-        pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
+        pdisc.initPathLattice("", aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")));
       } else {
-        if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {
-          pdisc.initPathCoords(USER_DC_INITCOORDS_FRAC, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, false);
-        } else if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_CART.empty()) {
-          pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
-        }
+        pdisc.initPathCoords(aplopts.getattachedscheme("DCINITCOORDS"),
+          aplopts.getattachedscheme("DCINITCOORDSLABELS"),
+          aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
       }
-      // ME20190501 Allow user to override path
+      //ME20190501 Allow user to override path
+      string USER_DC_USERPATH = aplopts.getattachedscheme("DCUSERPATH");
       if(!USER_DC_USERPATH.empty()){  // Set path
         pdisc.setPath(USER_DC_USERPATH);
       }
@@ -1799,7 +1612,7 @@ namespace KBIN {
       // Write results into PDIS file
       pdisc.writePDIS(aflags.Directory);
       pdisc.writePHEIGENVAL(aflags.Directory);  //ME20190614
-      if (USER_DC_METHOD == "LATTICE") supercell.projectToOriginal();  //ME20200117 - reset to original
+      if (aplopts.getattachedscheme("DCPATH") == "LATTICE") supercell.projectToOriginal();  //ME20200117 - reset to original
       //QHA/SCQHA/QHA3P  START //PN20180705
       //////////////////////////////////////////////////////////////////////
       ptr_hsq.reset(new apl::PhononHSQpoints(logger));
@@ -1830,25 +1643,28 @@ namespace KBIN {
 
     if (LDEBUG) std::cerr << function << " DEBUG [5c]" << std::endl;
 
-    if (USER_DOS || USER_TP) {
+    if (aplopts.flag("DOS") || aplopts.flag("TP")) {
       // Calculate DOS
       if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-      apl::DOSCalculator dosc(phcalc, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
-      dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
-      if (USER_DOS) {
+      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOS_METHOD"), USER_DOS_PROJECTIONS);
+      dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
+      if (aplopts.flag("DOS")) {
         dosc.writePDOS(aflags.Directory);
         dosc.writePHDOSCAR(aflags.Directory);  //ME20190614
       }
 
       // Calculate thermal properties
-      if (USER_TP) {
+      if (aplopts.flag("TP")) {
         //if (!dosc.hasNegativeFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
         apl::ThermalPropertiesCalculator tpc(dosc, messageFile, aflags.Directory, oss);  //ME20190423
         // ME20200108 - new ThermalPropertiesCalculator format
+        double USER_TP_TSTART = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTART"));
+        double USER_TP_TEND = aurostd::string2utype<double>(aplopts.getattachedscheme("TEND"));
+        double USER_TP_TSTEP = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTEP"));
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
 
-        if (USER_DISPLACEMENTS) {
+        if (aplopts.flag("DISPLACEMENTS")) {
           apl::AtomicDisplacements ad(phcalc);
           ad.calculateMeanSquareDisplacements(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
           ad.writeMeanSquareDisplacementsToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
@@ -2095,25 +1911,136 @@ namespace KBIN {
 
 namespace apl {
 
-  // ME200224
+  void validateParametersAPL(aurostd::xoption& aplopts, const _aflags& aflags, ofstream& messageFile, ostream& oss) {
+    string function = "apl::validateParametersAPL():";
+    stringstream message;
+    vector<string> tokens;
+
+    if (XHOST.GENERATE_AFLOWIN_ONLY && aplopts.flag("RELAX")) {
+      aplopts.flag("RELAX", false);
+      message << "RELAX will be switched OFF for generate_aflowin_only.";
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss);
+    }
+
+    // Correct user engine
+    string USER_ENGINE = aurostd::toupper(aplopts.getattachedscheme("ENGINE"));
+    if (USER_ENGINE == "GSA") {
+      message << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM).";
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
+      USER_ENGINE = "DM";
+    }
+    if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
+      message << "Wrong setting in [AFLOW_APL]ENGINE. Use either DM or LR. ";
+      message << "See README_AFLOW_APL.TXT for more information.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
+    aplopts.push_attached("ENGINE", USER_ENGINE);  // To make sure it's all caps
+
+    if (aplopts.flag("DC")) {
+      validateParametersDispersionsAPL(aplopts);
+    }
+    if (aplopts.flag("DOS") || aplopts.flag("TP")) {
+      validateParametersDosAPL(aplopts, aflags, messageFile, oss);
+    }
+  }
+
+  void validateParametersSupercellAPL(aurostd::xoption& aplopts) {
+    if (aplopts.flag("SUPERCELL")) {
+      vector<int> tokens;
+      string supercell_scheme = aplopts.getattachedscheme("SUPERCELL");
+      aurostd::string2tokens(supercell_scheme, tokens, " xX");
+      if (tokens.size() != 3) {
+        string function = "apl::validateParametersSupercellAPL():";
+        string message = "Wrong setting in [AFLOW_APL]SUPERCELL.";
+        message += "See README_AFLOW_APL.TXT for the correct format.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      }
+      aplopts.push_attached("SUPERCELL::METHOD", "SUPERCELL");
+      aplopts.push_attached("SUPERCELL::VALUE", supercell_scheme);
+      aplopts.flag("MINATOMS", false);
+      aplopts.flag("MINATOMS_RESTRICTED", false);
+      aplopts.flag("MINSHELL", false);
+    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_RESTRICTED")) {
+      if (aplopts.flag("MINATOMS_RESTRICTED")) {
+        aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS_RESTRICTED");
+        aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS_RESTRICTED"));
+        aplopts.flag("MINATOMS", false);
+      } else {
+        aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS");
+        aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS"));
+      }
+      aplopts.flag("SUPERCELL", false);
+      aplopts.flag("MINSHELL", false);
+    } else if (aplopts.flag("MINSHELL")) {
+      aplopts.push_attached("SUPERCELL::METHOD", "SHELLS");
+      aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINSHELL"));
+      aplopts.flag("SUPERCELL", false);
+      aplopts.flag("MINATOMS_RESTRICTED", false);
+      aplopts.flag("MINATOMS", false);
+    } else { // Default: MINATOMS
+      aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS");
+      aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS"));
+      aplopts.flag("SUPERCELL", false);
+      aplopts.flag("MINATOMS_RESTRICTED", false);
+      aplopts.flag("MINSHELL", false);
+    }
+  }
+
+  void validateParametersDispersionsAPL(aurostd::xoption& aplopts) {
+    string function = "apl::validateParametersDispersionsAPL():";
+    string message = "";
+    vector<string> tokens;
+    string scheme = "";
+
+    scheme = aurostd::toupper(aplopts.getattachedscheme("DCPATH"));
+    if (scheme == "MANUAL") {
+      string dc_initcoords_cart = aplopts.getattachedscheme("DCINITCOORDSCART");
+      string dc_initcoords_frac = aplopts.getattachedscheme("DCINITCOORDSFRAC");
+      if (dc_initcoords_cart.empty()) {
+        aplopts.push_attached("DCINITCOORDS", dc_initcoords_frac);
+        aurostd::string2tokens(dc_initcoords_frac, tokens, "  ;");
+        aplopts.flag("DCCOORDS_FRAC", true);
+        aplopts.flag("DCCOORDS_CART", false);
+      } else {
+        aplopts.push_attached("DCINITCOORDS", dc_initcoords_cart);
+        aurostd::string2tokens(dc_initcoords_cart, tokens, "  ;");
+        aplopts.flag("DCCOORDS_FRAC", false);
+        aplopts.flag("DCCOORDS_CART", true);
+      }
+      uint ncoords = tokens.size();
+      aurostd::string2tokens(aplopts.getattachedscheme("DCINITCOORDSLABELS"), tokens, " ,;");
+      if (ncoords != tokens.size()) {
+        message = "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
+        message += "Check the parameters DCINITCOORDS" + string(dc_initcoords_frac.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
+        message += "See README_AFLOW_APL.TXT for more information.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      }
+    } else if (scheme != "LATTICE") {
+      message = "Wrong setting in [AFLOW_APL]DCPATH. Use either LATTICE or MANUAL. ";
+      message += "See README_AFLOW_APL.TXT for more information.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
+    aplopts.push_attached("DCPATH", scheme);  // to make sure it's all caps
+  }
+
   void validateParametersDosAPL(aurostd::xoption& aplopts, const _aflags& aflags, ofstream& messageFile, ostream& oss) {
-    string function = "apl::validateParametersDosAPL()";
+    string function = "apl::validateParametersDosAPL():";
     string message = "";
     vector<string> tokens;
 
     // DOS Method
-    string dos_method = aplopts.getattachedscheme("DOSMETHOD");
+    string dos_method = aurostd::toupper(aplopts.getattachedscheme("DOSMETHOD"));
     if ((dos_method != "LT") && (dos_method != "RS")) {
       message = "Wrong setting in DOSMETHOD. Use either LT or RS.";
       message += " See README_AFLOW_APL.TXT for more information.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
+    aplopts.push_attached("DOSMETHOD", dos_method);  // To make sure the option is all caps
     double dos_smear = aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR"));
     if ((dos_method == "RS") && (dos_smear < _ZERO_TOL_)) {
       message = "Smearing value for DOS not set or set to zero.";
       message += " APL will overwrite the smearing value to 0.05 eV.";
       pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
-      aplopts.pop_attached("DOSSMEAR");
       aplopts.push_attached("DOSSMEAR", "0.05");
     }
 
@@ -2136,8 +2063,15 @@ namespace apl {
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
         } else {
           string projscheme;
-          if (!dos_proj_cart.empty()) projscheme = dos_proj_cart;
-          else projscheme = dos_proj_frac;
+          if (!dos_proj_cart.empty()) {
+            aplopts.flag("DOS_CART", true);
+            aplopts.flag("DOS_FRAC", false);
+            projscheme = dos_proj_cart;
+          } else {
+            aplopts.flag("DOS_CART", false);
+            aplopts.flag("DOS_FRAC", true);
+            projscheme = dos_proj_frac;
+          }
           tokens.clear();
           aurostd::string2tokens(projscheme, tokens, "; ");
           for (uint i = 0; i < tokens.size(); i++) {
@@ -2152,6 +2086,30 @@ namespace apl {
           }
         }
       }
+    }
+
+    // Thermal properties temperature
+    if (aplopts.flag("TP")) {
+      aurostd::string2tokens(aplopts.getattachedscheme("TPT"), tokens, " :");
+      if (tokens.size() != 3) {
+        message = "Wrong setting in [AFLOW_APL]TPT. ";
+        message += "See README_AFLOW_APL.TXT for the correct format.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      }
+      double tstart = aurostd::string2utype<double>(tokens[0]);
+      double tend = aurostd::string2utype<double>(tokens[1]);
+      double tstep = aurostd::string2utype<double>(tokens[2]);
+      if (tstart > tend) {
+        message = "Start temperature is larger than end temperature.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      }
+      if (tstep < _ZERO_TOL_) {
+        message = "Temperature step cannot be zero or negative.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      }
+      aplopts.push_attached("TSTART", tokens[0]);
+      aplopts.push_attached("TEND", tokens[1]);
+      aplopts.push_attached("TSTEP", tokens[2]);
     }
   }
 
@@ -2569,6 +2527,6 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020               *
 // *                                                                         *
 // ***************************************************************************

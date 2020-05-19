@@ -651,14 +651,10 @@ class _aflags {
 
 //ME20181026 - Container for APL options
 struct _moduleOptions {
-  _moduleOptions() : minatoms_restricted(false) {;}  //CO20181226
   // APL
-  vector<bool> supercell_method;
-  bool minatoms_restricted; //CO20181226 = false;
   vector<aurostd::xoption> aplflags;
 
   // AAPL
-  vector<bool> cut_rad_shell;
   vector<aurostd::xoption> aaplflags;
 
   // QHA

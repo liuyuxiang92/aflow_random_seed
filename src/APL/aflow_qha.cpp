@@ -444,7 +444,7 @@ namespace apl
   void QHAN::free()
   {
     system_title = "";
-    supercellopts.clear();
+    //supercellopts.clear();  // OBSOLETE ME20200518
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
     runQHA   = false; runQHA3P = false; runSCQHA = false;
@@ -491,7 +491,7 @@ namespace apl
 
     apl_options       = qha.apl_options;
     system_title      = qha.system_title;
-    supercellopts     = qha.supercellopts;
+    //supercellopts     = qha.supercellopts;  // OBSOLETE ME20200518
     isEOS             = qha.isEOS;
     isGP_FD           = qha.isGP_FD;
     ignore_imaginary  = qha.ignore_imaginary;
@@ -539,16 +539,16 @@ namespace apl
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  QHAN::QHAN(string &tpt, _xinput &xinput, _kflags &kflags, xoption &supercellopts,
+  QHAN::QHAN(string &tpt, _xinput &xinput, _kflags &kflags, xoption &apl_options,
       ofstream &messageFile, ostream &oss)
   {
-    initialize(tpt, xinput, kflags, supercellopts, messageFile, oss);
+    initialize(tpt, xinput, kflags, apl_options, messageFile, oss);
   }
 
   /// Initializes the QHA class with all the necessary data.
   ///
   void QHAN::initialize(string &tpt, _xinput &xinput, _kflags &kflags,
-      xoption &supercellopts, ofstream &messageFile, ostream &oss)
+      xoption &apl_options, ofstream &messageFile, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
     static const int precision_format = 3;
@@ -565,7 +565,8 @@ namespace apl
     free();
 
     this->xinput = xinput;
-    this->supercellopts = supercellopts;
+    //this->supercellopts = supercellopts;  // OBSOLETE ME20200518
+    this->apl_options = apl_options;
 
     currentDirectory = xinput.xvasp.Directory; // remember the current directory
 
@@ -917,10 +918,11 @@ namespace apl
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xinput.getXStr());
-      phcalc.getSupercell().build(supercellopts);
+      phcalc.getSupercell().build(apl_options);  // ME20200518
       phcalc.setDirectory(subdirectories[i]);
       phcalc.setNCPUs(kflags);
 
+      // ME20200517 - New ForceConstantCalculator format
       ForceConstantCalculator fccalc(phcalc.getSupercell(), apl_options, *p_FileMESSAGE, *p_oss);
       //[OBSOLETE] auto_ptr<apl::ForceConstantCalculator> fccalc;
 
@@ -969,7 +971,8 @@ namespace apl
 
       vector<string> tokens;
 
-      aurostd::string2tokens(apl_options.getattachedscheme("DOS_MESH"), tokens, 
+      //ME20200518 - Changed keywords to correspond to rest of APL
+      aurostd::string2tokens(apl_options.getattachedscheme("DOSMESH"), tokens,
           string(" xX"));
       for (uint j=0; j<tokens.size(); j++){
         dos_mesh[j] = aurostd::string2utype<int>(tokens[j]);
@@ -977,10 +980,10 @@ namespace apl
 
       phcalc.initialize_qmesh(dos_mesh);
 
-      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOS_METHOD"),
+      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOSMETHOD"),
            dummy_dos_projections);
-      dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_NPOINTS")),
-          aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_SMEAR")));
+      dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
+          aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
       dosc.writePHDOSCAR(subdirectories[i]);
 
       if (dosc.hasNegativeFrequencies()){
@@ -988,7 +991,7 @@ namespace apl
         msg << "Phonon dispersions of the APL calculation in the " << subdirectories[i];
         msg << " directory contain imaginary frequencies." << std::endl;
         if (ignore_imaginary){
-          msg << "Imaginary part of the phonon dispersions and phonon DOS will be ignored.";
+          msg << "The imaginary parts of the phonon dispersions and phonon DOS will be ignored.";
           msg << " Check if the results are still meaningful!" << std::endl;
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
@@ -1021,8 +1024,9 @@ namespace apl
       Nbranches = phcalc.getNumberOfBranches();
 
       string USER_DC_INITLATTICE="";
+      //ME20200518 - Changed keyword to common APL keywords
       int USER_DC_NPOINTS = aurostd::string2utype<int>(
-          apl_options.getattachedscheme("BAND_NPOINTS"));
+          apl_options.getattachedscheme("DCPOINTS"));
       apl::PhononDispersionCalculator pdisc(phcalc);
       pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
