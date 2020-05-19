@@ -37,26 +37,22 @@ static const string _APL_TPC_MODULE_ = "APL";
 namespace apl {
 
   // Default Constructor
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ostream& oss): xStream() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ostream& oss): xStream(oss) {
     free();
-    xStream::initialize(oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf, ostream& oss) : xStream() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory, ostream& oss) : xStream() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(dosc.getBins(), dosc.getDOS(), dosc._system);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory, ostream& oss) : xStream() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     vector<double> freq = aurostd::deque2vector(xdos.venergy);
     // Convert to THz
@@ -66,7 +62,7 @@ namespace apl {
   }
 
   // Copy constructors
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
     copy(that);
   }

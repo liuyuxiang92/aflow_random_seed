@@ -48,22 +48,20 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
-  AnharmonicIFCs::AnharmonicIFCs(ostream& oss) {
+  AnharmonicIFCs::AnharmonicIFCs(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
     clst = ClusterSet(oss);
     directory = "./";
   }
 
-  AnharmonicIFCs::AnharmonicIFCs(ofstream& mf, ostream& oss) {
+  AnharmonicIFCs::AnharmonicIFCs(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     clst = ClusterSet(mf, oss);
     directory = "./";
   }
 
   //Copy constructors
-  AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that) {
+  AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
     copy(that);
   }

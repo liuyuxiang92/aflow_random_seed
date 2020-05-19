@@ -19,34 +19,19 @@ string time_delay(long double seconds) { return aurostd::utype2string<long doubl
 // class xOUTCAR
 //---------------------------------------------------------------------------------
 //ME20200427 - included xStream::initialize
-xOUTCAR::xOUTCAR(ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss); //CO20200404 - xStream integration for logging
-}
+xOUTCAR::xOUTCAR(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
 
-xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
-}
-
-xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
-xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
-bool xOUTCAR::initialize(const string& fileIN, bool QUIET) {
+bool xOUTCAR::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xOUTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xOUTCAR::initialize(const string& fileIN,bool QUIET) {
   filename = fileIN;
   return GetPropertiesFile(fileIN,QUIET);
 }
 
-xOUTCAR::xOUTCAR(const xOUTCAR& b) {free();copy(b);} // copy PUBLIC
+xOUTCAR::xOUTCAR(const xOUTCAR& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
 
 xOUTCAR::~xOUTCAR() {xStream::free();free();}  //CO20200404 - xStream integration for logging
 
@@ -4030,34 +4015,19 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 // ***************************************************************************
 // class xDOSCAR
 //ME20200427 - included xStream::initialize
-xDOSCAR::xDOSCAR(ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss); //CO20200404 - xStream integration for logging
-}
+xDOSCAR::xDOSCAR(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
 
-xDOSCAR::xDOSCAR(ofstream& FileMESSAGE,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
-}
-
-xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
-xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
+bool xDOSCAR::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xDOSCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xDOSCAR::initialize(const string& fileIN, bool QUIET) {
   filename = fileIN;
   return GetPropertiesFile(fileIN, QUIET);
 }
 
-xDOSCAR::xDOSCAR(const xDOSCAR& b) {free();copy(b);} // copy PUBLIC
+xDOSCAR::xDOSCAR(const xDOSCAR& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
 
 xDOSCAR::~xDOSCAR() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
@@ -4963,34 +4933,19 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
 // ***************************************************************************
 // class xEIGENVAL
 //ME20200427 - included xStream::initialize
-xEIGENVAL::xEIGENVAL(ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss); //CO20200404 - xStream integration for logging
-}
+xEIGENVAL::xEIGENVAL(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
 
-xEIGENVAL::xEIGENVAL(ofstream& FileMESSAGE,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
-}
-
-xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
-xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
+bool xEIGENVAL::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xEIGENVAL::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xEIGENVAL::initialize(const string& fileIN, bool QUIET) {
   filename = fileIN;
   return GetPropertiesFile(fileIN,QUIET);
 }
 
-xEIGENVAL::xEIGENVAL(const xEIGENVAL& b) {free();copy(b);} // copy PUBLIC
+xEIGENVAL::xEIGENVAL(const xEIGENVAL& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
 
 xEIGENVAL::~xEIGENVAL() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
@@ -7459,34 +7414,19 @@ void CompareEdges (vector<vector<xvector<int> > >& branches,
 // ***************************************************************************
 // class xPOTCAR
 //ME20200427 - included xStream::initialize
-xPOTCAR::xPOTCAR(ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss); //CO20200404 - xStream integration for logging
-}
+xPOTCAR::xPOTCAR(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
 
-xPOTCAR::xPOTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE,oss); //CO20200404 - xStream integration for logging
-}
-
-xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
-xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
+bool xPOTCAR::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xPOTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xPOTCAR::initialize(const string& fileIN, bool QUIET) {
   filename = fileIN;
   return GetPropertiesFile(fileIN, QUIET);
 }
 
-xPOTCAR::xPOTCAR(const xPOTCAR& b) {free();copy(b);} // copy PUBLIC
+xPOTCAR::xPOTCAR(const xPOTCAR& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
 
 xPOTCAR::~xPOTCAR() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
@@ -8922,34 +8862,19 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //------------------------------------------------------------------------------
 // constructor
 //ME20200427 - included xStream::initialize
-xQMVASP::xQMVASP(ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss); //CO20200404 - xStream integration for logging
-}
+xQMVASP::xQMVASP(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized = initialize(fileIN, QUIET);} //CO20200404 - xStream integration for logging
 
-xQMVASP::xQMVASP(ofstream& FileMESSAGE,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
-}
-
-xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
-xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
-  free();
-  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
-  m_initialized = initialize(fileIN, QUIET);
-}
-
+bool xQMVASP::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xQMVASP::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xQMVASP::initialize(const string& fileIN, bool QUIET) {
   filename = fileIN;
   return GetPropertiesFile(fileIN, QUIET);
 }
 
-xQMVASP::xQMVASP(const xQMVASP& b) {free();copy(b);} // copy PUBLIC
+xQMVASP::xQMVASP(const xQMVASP& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
 
 xQMVASP::~xQMVASP() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 

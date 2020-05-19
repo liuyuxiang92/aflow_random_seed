@@ -423,8 +423,8 @@ double Bprime(double V0, const xvector<double> &fit_parameters){
 //                         Definitions of the QHA class members
 namespace apl
 {
-  QHAN::QHAN(ostream& oss) { free(); xStream::initialize(oss); }
-  QHAN::QHAN(const QHAN &qha){
+  QHAN::QHAN(ostream& oss) : xStream(oss) { free(); }
+  QHAN::QHAN(const QHAN &qha) : xStream(*qha.getOFStream(),*qha.getOSS()) {
     free(); copy(qha);
   }
   QHAN::~QHAN() { xStream::free(); free(); }

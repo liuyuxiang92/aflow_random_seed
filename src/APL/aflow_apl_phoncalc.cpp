@@ -22,18 +22,16 @@ static const string _APL_PHCALC_ERR_PREFIX_ = "apl::PhononCalculator::";
 
 namespace apl {
 
-  PhononCalculator::PhononCalculator(ostream& oss) : xStream() {
+  PhononCalculator::PhononCalculator(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
     _qm = QMesh(oss);
     _supercell = Supercell(oss);
     setDirectory("./");
     _ncpus = 1;
   }
 
-  PhononCalculator::PhononCalculator(ofstream& mf, ostream& oss) : xStream() {
+  PhononCalculator::PhononCalculator(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _qm = QMesh(mf, oss);
     _supercell = Supercell(mf, oss);
     setDirectory("./");
@@ -41,7 +39,7 @@ namespace apl {
   }
 
 
-  PhononCalculator::PhononCalculator(const PhononCalculator& that) {
+  PhononCalculator::PhononCalculator(const PhononCalculator& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
     copy(that);
   }
