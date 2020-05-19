@@ -369,7 +369,7 @@ namespace aurostd {
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
   bool DirectoryLS(string Directory,vector<string> &vfiles);
-   bool DirectoryLS(string Directory,deque<string> &vfiles);
+  bool DirectoryLS(string Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -562,7 +562,7 @@ namespace aurostd {
   uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
   uint efile2dequestring(string FileNameIN,deque<string>& vline);
   bool dequestring2file(const deque<string>& vline,string FileNameOUT);
- // file2vectorstring overloading with deque
+  // file2vectorstring overloading with deque
   uint file2vectorstring(string FileNameIN,deque<string>& vline);
   uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
   uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
@@ -1313,7 +1313,7 @@ namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
   deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with ME
   deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with ME
- }
+}
 
 //base64 stuff
 //CO START

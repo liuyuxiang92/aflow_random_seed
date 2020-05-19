@@ -328,7 +328,7 @@ namespace compare {
     //DX20200103 ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
-    
+
     if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
 
     // ---------------------------------------------------------------------------
@@ -694,11 +694,11 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow){ 
-    
+
     string function_name = "compare::IsopointalPrototypes():";
     string usage="aflow --isopointal_prototypes|--get_isopointal_prototypes < POSCAR";
     string options="";
-    
+
     // ---------------------------------------------------------------------------
     // load input structure
     xstructure xstr(input,IOAFLOW_AUTO);
@@ -712,7 +712,7 @@ namespace compare {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Catalog/library can only be htqc, anrl, or all.",_INPUT_ILLEGAL_);
       }
     }
-    
+
     // ---------------------------------------------------------------------------
     // get isopointal structures 
     // (calculates symmetry of input structure and grabs symmetrically similar prototypes)
@@ -721,7 +721,7 @@ namespace compare {
     if(isopointal_prototypes.size()==0){
       return "no isopointal prototypes in AFLOW";
     }
-    
+
     return aurostd::joinWDelimiter(isopointal_prototypes,",");
   }
 }
@@ -731,13 +731,13 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog){ 
-    
+
     string function_name = "compare::getIsopointalPrototypes():";
-    
+
     // ---------------------------------------------------------------------------
     // stoichiometry
     vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
-    
+
     // ---------------------------------------------------------------------------
     // symmetry
     if(xstr.space_group_ITC<1 || xstr.space_group_ITC>230){ // don't recalculate symmetry if already calculated 
@@ -745,7 +745,7 @@ namespace compare {
     }
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
-    
+
     // ---------------------------------------------------------------------------
     // extract isopointal prototypes from AFLOW 
     vector<string> vlabel;
@@ -1164,11 +1164,11 @@ namespace compare {
   // load input structure
   bool isMatchingStructureInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){ ofstream FileMESSAGE; return isMatchingStructureInDatabase(xstrIN, vpflow, FileMESSAGE, logstream); }
   bool isMatchingStructureInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
-    
+
     // ---------------------------------------------------------------------------
     // main compare2database() function
     vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
-   
+
     // ---------------------------------------------------------------------------
     // safety against bad input geometry files
     if(final_prototypes.empty()){
@@ -1183,7 +1183,7 @@ namespace compare {
     if(final_prototypes[0].structures_duplicate_names.size()){
       return true;
     }
-   
+
     // ---------------------------------------------------------------------------
     // database DOESN'T contain equivalent structure in input
     return false;
@@ -1198,11 +1198,11 @@ namespace compare {
   // load input structure
   vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){ ofstream FileMESSAGE; return matchingStructuresInDatabase(xstrIN, vpflow, FileMESSAGE, logstream); }
   vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
-    
+
     // ---------------------------------------------------------------------------
     // main compare2database() function
     vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
-   
+
 
     vector<matching_structure> matched_database_structures;
 
@@ -1211,7 +1211,7 @@ namespace compare {
     if(!final_prototypes[0].structures_duplicate_names.size()){
       return matched_database_structures;
     }
-   
+
     // ---------------------------------------------------------------------------
     // return equivalent structures to input
     for(uint i=0;i<final_prototypes[0].structures_duplicate_names.size();i++){
@@ -1406,7 +1406,7 @@ namespace compare {
     vector<string> vspecies = pflow::stringElements2VectorElements(species_str); //DX20200212
     xstr.species = aurostd::vector2deque(vspecies); //DX20200212 - needed to perform material comparisons with database entries
     xstr.SetSpecies(xstr.species);
-    
+
     //DX20190329 - added species check - START
     // check if fake names for same species comparison
     if(LDEBUG){cerr << function_name << " input structure species=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
@@ -1781,24 +1781,24 @@ namespace compare {
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO); ofstream FileMESSAGE; return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //DX20200225
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //CO20200225
   string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::printCompare2Database():";
     stringstream message;
     ostringstream oss;
-    
+
     if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
-  
+
     // ---------------------------------------------------------------------------
     // main compare2database() function
     vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
-    
+
     // ---------------------------------------------------------------------------
     // return if there are no similar structures
     if(final_prototypes.size()==0){
       return oss.str();
     }
-    
+
     // ---------------------------------------------------------------------------
     // FLAG: print format
     string format = "both";
@@ -1808,21 +1808,21 @@ namespace compare {
     else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       format = "json";
     }
-    
+
     // ---------------------------------------------------------------------------
     // FLAG: print format
     bool screen_only = false;
     if(vpflow.flag("COMPARE2DATABASE::SCREEN_ONLY")) {
       screen_only=true;
     }
-    
+
     // ---------------------------------------------------------------------------
     // FLAG: type of comparison (material-type or structure-type)
     bool same_species = true;
     if(vpflow.flag("COMPARE2DATABASE::STRUCTURE")) {
       same_species = false;
     }
-    
+
     // ---------------------------------------------------------------------------
     // print results 
     stringstream ss_out;
@@ -2078,7 +2078,7 @@ namespace compare {
       message << "OPTIONS: Structure type (POSCAR.orig, POSCAR.relax1, POSCAR.relax2, CONTCAR.relax1, ...): " << geometry_file << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
     uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
@@ -2586,7 +2586,7 @@ namespace compare {
     stringstream message;
     bool quiet = false;
     //DX20190319 [OBSOLETE] ofstream FileMESSAGE;
-    
+
     if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
 
     message << "Total number of structures to compare: " << all_structures.size();

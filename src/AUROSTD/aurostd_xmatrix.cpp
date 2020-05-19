@@ -5559,7 +5559,7 @@ namespace aurostd {
   template<class utype> matrix<utype>::matrix(const matrix& b){copy(b);}
   template<class utype> matrix<utype>::~matrix(void){free();}
   template<class utype> void matrix<utype>::clear() {matrix a;copy(a);}  //clear PUBLIC
-  
+
   template<class utype>
     const matrix<utype>& matrix<utype>::operator=(const matrix& other) {
       if(this!=&other) {copy(other);}

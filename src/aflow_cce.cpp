@@ -419,8 +419,8 @@ namespace cce {
       message << " Setting functionals=PBE since only 1 DFT formation energy is provided and PBE is the default functional!";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       cce_vars.vfunctionals.push_back("PBE");
-    // otherwise if sizes of provided DFT formation energies and functionals do not match, throw error
-    // if only functional argument is set corrections should only be returned for desired functional
+      // otherwise if sizes of provided DFT formation energies and functionals do not match, throw error
+      // if only functional argument is set corrections should only be returned for desired functional
     } else if(cce_vars.dft_energies.size()!=cce_vars.vfunctionals.size() && !dft_energies_input_str.empty() ){ 
       message << " BAD NEWS: The number of provided precalculated DFT formation energies and functionals must match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -476,12 +476,12 @@ namespace cce {
   //get_offset////////////////////////////////////////////////////////
   // get offset needed for reading corrections from lookup table for different functionals
   int get_offset(const string& functional) {
-  if (functional=="PBE")          {return 0;}
-  if (functional=="LDA")          {return 2;}
-  if (functional=="SCAN")         {return 4;}
-  if (functional=="PBE+U_ICSD")   {return 6;}
-  if (functional=="exp")          {return 8;}
-  else {return -1;}
+    if (functional=="PBE")          {return 0;}
+    if (functional=="LDA")          {return 2;}
+    if (functional=="SCAN")         {return 4;}
+    if (functional=="PBE+U_ICSD")   {return 6;}
+    if (functional=="exp")          {return 8;}
+    else {return -1;}
   }
 
   //get_oxidation_states////////////////////////////////////////////////////////
@@ -512,8 +512,8 @@ namespace cce {
       if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
         string function = "cce::get_oxidation_states()";
         message << " BAD NEWS: The formation energy of this system is not correctable!"
-        << " The oxidation numbers that you provided do not add up to zero!"
-        << " Please correct and rerun.";
+          << " The oxidation numbers that you provided do not add up to zero!"
+          << " Please correct and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);	
       }
     } else {
@@ -1202,7 +1202,7 @@ namespace cce {
     // using aurostd sort functions
     vector<double> electronegativities_sorted = cce_vars.electronegativities;
     for(uint j=0,jsize=structure.species.size();j<jsize;j++){ //loop over all species
-     cce_vars.species_electronegativity_sorted[j] = KBIN::VASP_PseudoPotential_CleanName(structure.species[j]);
+      cce_vars.species_electronegativity_sorted[j] = KBIN::VASP_PseudoPotential_CleanName(structure.species[j]);
     }
     // for the oxidation state algorithm the species must be sorted by electronegativity and the preferred 
     // and all known oxidation states will be automatically sorted by electronegativity in the subsequent loading
@@ -1940,7 +1940,7 @@ namespace cce {
           if (structure.atoms[i].cleanname == "Mn"){
             cce_vars.oxidation_states[i]=2;
             if(cce_flags.flag("SCREEN_ONLY")){
-             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
             }
           }
           if (structure.atoms[i].cleanname == "Mo"){
@@ -2005,7 +2005,7 @@ namespace cce {
           cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
           cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
         }
-      //making sure it is CaFe2O4
+        //making sure it is CaFe2O4
       } else if (amount_Ca/amount_Fe == 0.5 && amount_Ca/amount_O == 0.25 && amount_Fe/amount_O == 0.5) {
         if(cce_flags.flag("SCREEN_ONLY")){
           oss << "CaFe2O4 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
@@ -2455,15 +2455,15 @@ namespace cce {
           if ( Bader_deviation == Bader_deviation_0 ){ // only if no oxidation state was found, i. e. Bader deviation was not changed but there are corrections (Bader charges) for this species (get_Bader_templates returns non-empty string), display the following error message after handling the special cases
             // FIRST point to deal with special cases known from (ternary) oxides; other cases will be dealt with when looking at the oxidation numbers and checking the sum
             // since it can happen that the Bader charge for W in the compound (especially for W+6) is too far away 
-	    // from the Bader charge template, here W+6 is set and later the sum over the oxidation states will still be checked
+            // from the Bader charge template, here W+6 is set and later the sum over the oxidation states will still be checked
             if (structure.atoms[i].cleanname == "W") {
               cce_vars.oxidation_states[i]=6;
-            // since it can happen that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
-	    // from the Bader charge template, here Pb+2 is set and later the sum over the oxidation states will still be checked
+              // since it can happen that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
+              // from the Bader charge template, here Pb+2 is set and later the sum over the oxidation states will still be checked
             } else if (structure.atoms[i].cleanname == "Pb") {
               cce_vars.oxidation_states[i]=2;
-            // since it can happen that the Bader charge for Ag in the compound (especially for Ag+1) is too far away 
-            // from the Bader charge template, here Ag+1 is set and later the sum over the oxidation states will still be checked
+              // since it can happen that the Bader charge for Ag in the compound (especially for Ag+1) is too far away 
+              // from the Bader charge template, here Ag+1 is set and later the sum over the oxidation states will still be checked
             } else if (structure.atoms[i].cleanname == "Ag") {
               cce_vars.oxidation_states[i]=1;
             } else {
@@ -2556,7 +2556,7 @@ namespace cce {
   //                            ASSIGN CORRECTIONS                           //
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
- 
+
   //get_corrections////////////////////////////////////////////////////////
   // determine the corrections after oxidation numbers are known (from input or Bader)
   void get_corrections(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& considered_anion_species, const vector<uint>& num_neighbors, vector<vector<double> >& corrections_atom) {
@@ -2728,7 +2728,7 @@ namespace cce {
   //         APPLY CORRECTIONS AND GET CORRECTED FORMATION ENTHALPIES        //
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
- 
+
   //check_apply_per_super_ox_corrections////////////////////////////////////////////////////////
   // check whether corrections for per- or superoxide ions are needed and apply accordingly
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars) {
@@ -2780,7 +2780,7 @@ namespace cce {
   //                        WRITE OUTPUT AND CITATION                        //
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
- 
+
   //print_JSON/////////////////////////////////////////////////////////////
   // ME20200213
   // Returns CCE results in JSON format

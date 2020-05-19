@@ -33,11 +33,11 @@ using std::auto_ptr;
 #define SW 5  // width of columns with blank space separator
 #define TW 15 // width of columns containing label/number
 #define DCOEFF 1e-2 // this coefficient is used in numerical differentiation
-                    // (should not be too small). Usage dT = DCOEFF*T
+// (should not be too small). Usage dT = DCOEFF*T
 
 #define DEBUG_QHA false // toggles QHA-related debug output
 #define DEBUG_QHA_GP_FIT false // toggles debug output related to the fit functionality
-                               // in the calcGrueneisen function
+// in the calcGrueneisen function
 
 //=============================================================================
 //              Definitions of the NonlinearFit class members
@@ -123,26 +123,26 @@ namespace apl
     J = nlf.J;
     f = nlf.f;
   }
-  
+
   /// Calculates the residual sum of squares of a model function w.r.t the given data
   ///
   double NonlinearFit::calculateResidualSquareSum(const xvector<double> &params)
   {
     double chi_sqr = 0.0;
-  
+
     calculateResiduals(params); // calculate residuals and save them to residuals
     for (int i=1; i<= Npoints; i++) chi_sqr += pow(residuals[i], 2);
-  
+
     return chi_sqr;
   }
-  
+
   /// Calculates residuals of a given model function and stores the results
   ///
   void NonlinearFit::calculateResiduals(const xvector<double> &params)
   {
     for (int i=1; i<=Npoints; i++) residuals[i] = y[i] - f(x[i], params, dydp);
   }
-  
+
   /// Calculates the Jacobian of a given model function for the given "guess" parameters
   ///
   void NonlinearFit::Jacobian(const xvector<double> &guess)
@@ -154,7 +154,7 @@ namespace apl
       }
     }
   }
-  
+
   /// Nonlinear fit using the Levenberg-Marquardt algorithm.
   /// The implementation here is based on the ideas from Numerical Recipes and
   /// K.Madsen et al. Methods For Non-linear Least Squares Problems
@@ -165,54 +165,54 @@ namespace apl
     string function = "NonlinearFit::fit(): ";
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
     if (LDEBUG) cerr << function << "begin"  << std::endl;
-  
+
     static const double step_scaling_factor = 10.0;
-  
+
     xvector<double> pnew(Nparams);
     xmatrix<double> G(Nparams, 1), M(Nparams, Nparams);
-  
+
     int iter = 0;
     double chi_sqr = 0.0, new_chi_sqr =0.0; // old and new residual square sums
-  
+
     p = guess; Jacobian(p); calculateResiduals(p); // p are the fitted parameters
 
     xmatrix<double> A = trasp(J)*J;
     xvector<double> g = -trasp(J)*residuals;
-    
+
     // determine initial step
     double lambda = tau*maxDiagonalElement(A);
     if (LDEBUG) cerr << function << "lambda = " << lambda << std::endl;
-  
+
     while (iter<max_iter){
       iter++;
       if (LDEBUG) cerr << function << "iteration: " << iter << std::endl;
-  
+
       // M = A + lambda*diag(A)
       M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
-  
+
       if (LDEBUG) cerr << function << " M:" << std::endl << M << std::endl;
-  
+
       // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
       for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
       aurostd::GaussJordan(M,G);
-  
+
       pnew = p + M*g;
-  
+
       chi_sqr = calculateResidualSquareSum(p);
       new_chi_sqr = calculateResidualSquareSum(pnew);
-  
+
       if (abs(new_chi_sqr - chi_sqr) < tol){
         p = pnew;
         break;
       }
-  
+
       // update only if step leads to a smaller residual sum of squares
       if (new_chi_sqr < chi_sqr){
         p = pnew; Jacobian(p); calculateResiduals(p);
-  
+
         A = trasp(J)*J;
         g = -trasp(J)*residuals;
-  
+
         lambda /= step_scaling_factor;
       }
       else{
@@ -220,7 +220,7 @@ namespace apl
       }
       if (LDEBUG) cerr << function << "pnew = " << p << std::endl;
     }
-  
+
     if (LDEBUG) cerr << function << "end"  << std::endl;
     return iter < max_iter;
   }
@@ -246,7 +246,7 @@ double Murnaghan(const double x, const xvector<double> &p, xvector<double> &dydp
   dydp[2] = (B*(Veq-V*pow(Veq/V,Bp)))/(Veq-Bp*Veq);
   dydp[3] = -(Veq/(Bp-1.0))+(V*(1+pow(Veq/V,Bp)/(Bp-1.0)))/Bp;
   dydp[4] = (B*(-V+2.0*Bp*V-pow(Bp,2)*V+pow(Bp,2)*Veq+V*pow(Veq/V,Bp)*(1.0-2.0*Bp
-            +(Bp-1.0)*Bp*log(Veq/V))))/(pow(Bp-1.0,2)*pow(Bp,2));
+          +(Bp-1.0)*Bp*log(Veq/V))))/(pow(Bp-1.0,2)*pow(Bp,2));
 
   return Eeq-(B*Veq)/(Bp-1.0)+(B*V*(1+pow(Veq/V,Bp)/(Bp-1)))/Bp;
 }
@@ -293,28 +293,28 @@ bool isMinimumWithinBounds(const xvector<double> &y){
 double EOSpoly(double V, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return p[1] + p[2]*pow(V,-2/3.0) + p[3]*pow(V,-4/3.0)
-              + p[4]*pow(V,-6/3.0) + p[5]*pow(V,-8/3.0);
+    + p[4]*pow(V,-6/3.0) + p[5]*pow(V,-8/3.0);
 }
 
 /// First derivative w.r.t volume of the polynomial model
 double dEOSpoly(double x, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return -2/3.0*p[2]*pow(x,-5/3.0) - 4/3.0*p[3]*pow(x, -7/3.0)
-         -6/3.0*p[4]*pow(x,-9/3.0) - 8/3.0*p[5]*pow(x,-11/3.0);
+    -6/3.0*p[4]*pow(x,-9/3.0) - 8/3.0*p[5]*pow(x,-11/3.0);
 }
 
 /// Second derivative w.r.t volume of the polynomial model
 double d2EOSpoly(double x, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return  10/9.0*p[2]*pow(x, -8/3.0) + 28/9.0*p[3]*pow(x,-10/3.0)
-         +     6*p[4]*pow(x,-12/3.0) + 88/9.0*p[5]*pow(x,-14/3.0);
+    +     6*p[4]*pow(x,-12/3.0) + 88/9.0*p[5]*pow(x,-14/3.0);
 }
 
 /// Third derivative w.r.t volume of the polynomial model
 double d3EOSpoly(double x, const xvector<double> &p){
   if (p.rows != 5) return 0;
   return -(80.0/27.0*p[2]*pow(x, -11.0/3.0) + 280.0/27.0*p[3]*pow(x, -13.0/3.0) +
-                24.0*p[4]*pow(x, -15.0/3.0) + 88*14/27.0*p[5]*pow(x, -17.0/3.0));
+      24.0*p[4]*pow(x, -15.0/3.0) + 88*14/27.0*p[5]*pow(x, -17.0/3.0));
 }
 
 /// Calculates the equilibrium volume for the polynomial model.
@@ -536,7 +536,7 @@ namespace apl
     xStream::copy(qha);
   }
 
-///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
 
   QHAN::QHAN(string &tpt, _xinput &xinput, _kflags &kflags, xoption &supercellopts,
       ofstream &messageFile, ostream &oss)
@@ -582,7 +582,7 @@ namespace apl
     vector<string> tokens;
     vector<xoption>::iterator option;
     for (option  = kflags.KBIN_MODULE_OPTIONS.qhaflags.begin();
-         option != kflags.KBIN_MODULE_OPTIONS.qhaflags.end(); ++option){
+        option != kflags.KBIN_MODULE_OPTIONS.qhaflags.end(); ++option){
       if (option->keyword=="EOS") isEOS = option->option;
       if (option->keyword=="INCLUDE_ELE") includeElectronicContribution = option->option;
       if (option->keyword=="GP_FINITE_DIFF") isGP_FD = option->option;
@@ -771,7 +771,7 @@ namespace apl
       // This flag is used when one is interested in T-dependent properties.
       if (isEOS && runQHA){
         eos_data_available = runAPLcalculations(subdirectories_apl_eos,
-                coefEOSVolumes, xflags, aflags, kflags, aflowin, false);
+            coefEOSVolumes, xflags, aflags, kflags, aflowin, false);
 
         if (eos_data_available){
           if (includeElectronicContribution) DOSatEf();
@@ -892,8 +892,8 @@ namespace apl
   /// and processes data from finished APL calculations.
   /// 
   bool QHAN::runAPLcalculations(const vector<string> &subdirectories,
-          const vector<double> &coefVolumes, _xflags &xflags,
-          _aflags &aflags, _kflags &kflags, string &aflowin, bool gp)
+      const vector<double> &coefVolumes, _xflags &xflags,
+      _aflags &aflags, _kflags &kflags, string &aflowin, bool gp)
   {
     string function = "QHAN::runAPLcalculations():";
     string msg = "Reading phonon DOS and dispersion relations.";
@@ -924,7 +924,7 @@ namespace apl
 
       if (apl_options.getattachedscheme("ENGINE") == string("DM")){
         apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
-          *p_FileMESSAGE, *p_oss);
+            *p_FileMESSAGE, *p_oss);
         fccalc.reset(dmPC);
 
         // set options for direct method phonon calculations
@@ -933,7 +933,7 @@ namespace apl
         dmPC->setDistortionSYMMETRIZE(apl_options.flag("SYMMETRIZE"));
         dmPC->setDistortionINEQUIVONLY(apl_options.flag("INEQUIVONLY"));
         dmPC->setDistortionMagnitude(aurostd::string2utype<double>(
-            apl_options.getattachedscheme("DIST_MAGNITUDE")));
+              apl_options.getattachedscheme("DIST_MAGNITUDE")));
         dmPC->setCalculateZeroStateForces(apl_options.flag("ZEROSTATE"));
       }
       else{
@@ -976,7 +976,7 @@ namespace apl
       phcalc.initialize_qmesh(dos_mesh);
 
       apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOS_METHOD"),
-           dummy_dos_projections);
+          dummy_dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_NPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_SMEAR")));
       dosc.writePHDOSCAR(subdirectories[i]);
@@ -1014,7 +1014,7 @@ namespace apl
         msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
         msg += "Phonon dispersions will be calculated using the original structure instead.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_ERROR_);
+            *p_oss, _LOGGER_ERROR_);
       }
       Nbranches = phcalc.getNumberOfBranches();
 
@@ -1053,7 +1053,7 @@ namespace apl
         // data will be reordered)
         if (i==0){
           omegaV_mesh = vector<vector<vector<double> > > (Nqpoints,
-            vector<vector<double> >(Nbranches, vector<double>(N_GPvolumes)));
+              vector<vector<double> >(Nbranches, vector<double>(N_GPvolumes)));
         }
 
         vector<xvector<double> > freqs = dosc.getFreqs();
@@ -1073,7 +1073,7 @@ namespace apl
         // data will be reordered)
         if (i==0){
           omegaV_mesh_EOS = vector<vector<vector<double> > > (Nqpoints,
-            vector<vector<double> >(Nbranches, vector<double>(N_EOSvolumes)));
+              vector<vector<double> >(Nbranches, vector<double>(N_EOSvolumes)));
         }
 
         vector<xvector<double> > freqs = dosc.getFreqs();
@@ -1169,7 +1169,7 @@ namespace apl
     w = 0; // frequency of a given branch that corresponds to the input volume V
 
     /** Workaround: for w=0, gamma_i is assumed to be zero, since
-    / the actual value depends on the path used to approach w->0. */
+      / the actual value depends on the path used to approach w->0. */
     bool freqs_are_nonzero = true;
     for (int i=xomega.lrows; i<=xomega.urows; i++){
       if (!(xomega[i] > AUROSTD_ROUNDOFF_TOL)){
@@ -1194,7 +1194,7 @@ namespace apl
       // check the fit error
       for (int Vid=0; Vid<N_EOSvolumes; Vid++){
         err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
-              -xomega[Vid+1])/xomega[Vid+1];
+            -xomega[Vid+1])/xomega[Vid+1];
         err *= 100.0;
         if (err>=10.0){
           string msg="Relative error of the log(w)=f(V) fit (used to ";
@@ -1300,7 +1300,7 @@ namespace apl
   double QHAN::FreeEnergy(double T, int id)
   {
     return eos_vib_thermal_properties[id].getVibrationalFreeEnergy(T, apl::eV)
-           /NatomsOrigCell + E0_V[id];
+      /NatomsOrigCell + E0_V[id];
   }
 
   /// Fits the (free) energy-volume dependency to one of the following equation of state
@@ -1326,36 +1326,36 @@ namespace apl
         break;
       case(EOS_BIRCH_MURNAGHAN):
         {
-        guess[1] = min(E);
-        guess[2] = (max(V)+min(V))/2;
-        guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences
-        guess[4] = 3.5; // a reasonable initial value for most materials
-  
-        NonlinearFit bmfit(V,E,guess,BirchMurnaghan);
-        bmfit.fitLevenbergMarquardt();
+          guess[1] = min(E);
+          guess[2] = (max(V)+min(V))/2;
+          guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences
+          guess[4] = 3.5; // a reasonable initial value for most materials
 
-        fit_params = bmfit.p;
-        EOS_energy_at_equilibrium = bmfit.p[1];
-        EOS_volume_at_equilibrium = bmfit.p[2];
-        EOS_bulk_modulus_at_equilibrium   = bmfit.p[3]*eV2GPa;
-        EOS_Bprime_at_equilibrium  = bmfit.p[4];
+          NonlinearFit bmfit(V,E,guess,BirchMurnaghan);
+          bmfit.fitLevenbergMarquardt();
+
+          fit_params = bmfit.p;
+          EOS_energy_at_equilibrium = bmfit.p[1];
+          EOS_volume_at_equilibrium = bmfit.p[2];
+          EOS_bulk_modulus_at_equilibrium   = bmfit.p[3]*eV2GPa;
+          EOS_Bprime_at_equilibrium  = bmfit.p[4];
         }
         break;
       case(EOS_MURNAGHAN):
         {
-        guess[1] = min(E);
-        guess[2] = (max(V)+min(V))/2;
-        guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
-        guess[4] = 3.5; // a reasonable initial value for most materials
-  
-        NonlinearFit nlfit(V,E,guess,Murnaghan);
-        nlfit.fitLevenbergMarquardt();
+          guess[1] = min(E);
+          guess[2] = (max(V)+min(V))/2;
+          guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
+          guess[4] = 3.5; // a reasonable initial value for most materials
 
-        fit_params = nlfit.p;
-        EOS_energy_at_equilibrium = nlfit.p[1];
-        EOS_volume_at_equilibrium = nlfit.p[2];
-        EOS_bulk_modulus_at_equilibrium   = nlfit.p[3]*eV2GPa;
-        EOS_Bprime_at_equilibrium  = nlfit.p[4];
+          NonlinearFit nlfit(V,E,guess,Murnaghan);
+          nlfit.fitLevenbergMarquardt();
+
+          fit_params = nlfit.p;
+          EOS_energy_at_equilibrium = nlfit.p[1];
+          EOS_volume_at_equilibrium = nlfit.p[2];
+          EOS_bulk_modulus_at_equilibrium   = nlfit.p[3]*eV2GPa;
+          EOS_Bprime_at_equilibrium  = nlfit.p[4];
         }
         break;
       default:
@@ -1372,7 +1372,7 @@ namespace apl
   {
     string function = "EOSfit::eval():", msg = "";
     double energy = 0;
-  
+
     static xvector<double> dydp(4);
     switch(method){
       case(EOS_POLYNOMIAL):
@@ -1389,7 +1389,7 @@ namespace apl
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-  
+
     return energy;
   }
 
@@ -1476,20 +1476,20 @@ namespace apl
 
     for (uint q=0; q<NIrQpoints; q++){
       for (uint branch=0; branch<omegaV_mesh[q].size(); branch++){
-          xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
+        xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
 
-          w = xomega[2]*THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
-          if (w>0){
-            expx = exp(beta*w);
+        w = xomega[2]*THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
+        if (w>0){
+          expx = exp(beta*w);
 
-            Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
+          Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
 
-            GP += calcGrueneisenFD(xomega) * Cvi;
-            CV += Cvi;
-          }
+          GP += calcGrueneisenFD(xomega) * Cvi;
+          CV += Cvi;
         }
-        NQpoints += qpWeights[q];
       }
+      NQpoints += qpWeights[q];
+    }
 
     GP /= CV;
     CV /= NQpoints; CV /= Nbranches;
@@ -1519,21 +1519,21 @@ namespace apl
 
     for (uint q=0; q<NIrQpoints; q++){
       for (int branch=0; branch<Nbranches; branch++){
-          xomega = aurostd::vector2xvector(omegaV_mesh_EOS[q][branch]);
+        xomega = aurostd::vector2xvector(omegaV_mesh_EOS[q][branch]);
 
-          gamma = calcGrueneisen(V, xomega, w);
-          w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
-          if (w > AUROSTD_ROUNDOFF_TOL){
-            expx = exp(w*beta);
+        gamma = calcGrueneisen(V, xomega, w);
+        w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
+        if (w > AUROSTD_ROUNDOFF_TOL){
+          expx = exp(w*beta);
 
-            Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
+          Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
 
-            GP += gamma * Cvi;
-            CV += Cvi;
-          }
+          GP += gamma * Cvi;
+          CV += Cvi;
         }
-        NQpoints += qpWeights[q];
       }
+      NQpoints += qpWeights[q];
+    }
 
     GP /= CV;
     CV /= NQpoints; CV /= NatomsOrigCell;
@@ -1558,8 +1558,8 @@ namespace apl
 
     double dT = DCOEFF*T;
     return 0.5*(getEqVolumeT(T+dT,eos_method,qha_method)
-               -getEqVolumeT(T-dT,eos_method,qha_method))/
-                dT/getEqVolumeT(T,eos_method,qha_method);
+        -getEqVolumeT(T-dT,eos_method,qha_method))/
+      dT/getEqVolumeT(T,eos_method,qha_method);
   }
 
   /// Calculates the isochoric specific heat as a temperature derivative of the free
@@ -1574,8 +1574,8 @@ namespace apl
     double CV = 0;
     if (T>0){
       CV = -(FreeEnergyFit(T+dT, V, eos_method, qha_method)
-           -2*FreeEnergyFit(T, V, eos_method, qha_method)
-           +FreeEnergyFit(T-dT ,V, eos_method, qha_method));
+          -2*FreeEnergyFit(T, V, eos_method, qha_method)
+          +FreeEnergyFit(T-dT ,V, eos_method, qha_method));
       CV *= T/pow(dT,2);
     }
 
@@ -1613,7 +1613,7 @@ namespace apl
       for (uint band=0; band<static_eigvals[id].number_bands; band++){
         for (uint i=0; i<static_ibzkpts[id].ntetrahedra; i++){
           weighted_volume = static_ibzkpts[id].wtetrahedra * static_ibzkpts[id].vtetrahedra[i][1];
-       
+
           for (uint s=0; s<static_eigvals[id].spin+1; s++){
             for (int j=1; j<=4; j++)
               energy_tetrahedron[j] = static_eigvals[id].venergy[static_ibzkpts[id].vtetrahedra[i][j+1]-1][band][s];
@@ -1719,7 +1719,7 @@ namespace apl
         xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
 
         w = extrapolateFrequency(EOSvolumes[Vid], xomega) * THz2Hz *
-            PLANCKSCONSTANTEV_h;
+          PLANCKSCONSTANTEV_h;
         fi = 0.5*w;
 
         if (w> AUROSTD_ROUNDOFF_TOL && T>_ZERO_TOL_) fi += KBOLTZEV*T*log(1-exp(-w*beta));
@@ -1729,7 +1729,7 @@ namespace apl
       }
       NQpoints += qpWeights[q];
     }
- 
+
     F /= NQpoints;
     F /= NatomsOrigCell;
 
@@ -1761,7 +1761,7 @@ namespace apl
       }
       NQpoints += qpWeights[q];
     }
- 
+
     U /= NQpoints;
     U /= NatomsOrigCell;
 
@@ -1871,14 +1871,14 @@ namespace apl
 
     // print header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
-            setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
-            setw(TW) << "F(Veq)[eV/atom]"      << setw(SW) << ' ' <<
-            setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
-            setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
-            setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
-            setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
-            setw(TW) << "gamma"                << setw(SW) << ' ' <<
-            std::endl;
+      setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
+      setw(TW) << "F(Veq)[eV/atom]"      << setw(SW) << ' ' <<
+      setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
+      setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
+      setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
+      setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
+      setw(TW) << "gamma"                << setw(SW) << ' ' <<
+      std::endl;
 
     double T = Temperatures[0];
 
@@ -1984,7 +1984,7 @@ namespace apl
             fi *= qpWeights[q];
 
             d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
-                      pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
+              pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
             d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
 
             gamma = extrapolateGamma(V, xomega);
@@ -2021,14 +2021,14 @@ namespace apl
 
       CP = CV + V*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
       file << setw(5)  << T                   << setw(SW) << ' ' <<
-              setw(TW) << V                   << setw(SW) << ' ' <<
-              setw(TW) << Feq                 << setw(SW) << ' ' <<
-              setw(TW) << B                   << setw(SW) << ' ' <<
-              setw(TW) << beta * 1e6          << setw(SW) << ' ' << //[10^-6/K]
-              setw(TW) << CV                  << setw(SW) << ' ' <<
-              setw(TW) << CP                  << setw(SW) << ' ' <<
-              setw(TW) << GP                  << setw(SW) << ' ' <<
-              std::endl;
+        setw(TW) << V                   << setw(SW) << ' ' <<
+        setw(TW) << Feq                 << setw(SW) << ' ' <<
+        setw(TW) << B                   << setw(SW) << ' ' <<
+        setw(TW) << beta * 1e6          << setw(SW) << ' ' << //[10^-6/K]
+        setw(TW) << CV                  << setw(SW) << ' ' <<
+        setw(TW) << CP                  << setw(SW) << ' ' <<
+        setw(TW) << GP                  << setw(SW) << ' ' <<
+        std::endl;
     }
     file << "[SCQHA_THERMAL_PROPERTIES]STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -2101,21 +2101,21 @@ namespace apl
     file << "[QHA_THERMAL_PROPERTIES]START" << std::endl;
     // write header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
-            setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
-            setw(TW) << "F(V0)[eV/atom]"       << setw(SW) << ' ' <<
-            setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
-            setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
-            setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
-            setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
-            setw(TW) << "gamma(beta,B,Cv)"     << setw(SW) << ' ' <<
-            setw(TW) << "Bprime";
+      setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
+      setw(TW) << "F(V0)[eV/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
+      setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
+      setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
+      setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
+      setw(TW) << "gamma(beta,B,Cv)"     << setw(SW) << ' ' <<
+      setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
     if (qha_method==QHA_CALC){
       file  << setw(SW) << ' ' <<
-            setw(TW) << "beta_mesh[10^-6/K]"   << setw(SW) << ' ' <<
-            setw(TW) << "Cv_mesh[kB/atoms]"    << setw(SW) << ' ' <<
-            setw(TW) << "Cp_mesh[kB/atoms]"    << setw(SW) << ' ' <<
-            setw(TW) << "gamma_mesh";
+        setw(TW) << "beta_mesh[10^-6/K]"   << setw(SW) << ' ' <<
+        setw(TW) << "Cv_mesh[kB/atoms]"    << setw(SW) << ' ' <<
+        setw(TW) << "Cp_mesh[kB/atoms]"    << setw(SW) << ' ' <<
+        setw(TW) << "gamma_mesh";
     }
     file << std::endl;
 
@@ -2189,21 +2189,21 @@ namespace apl
 
       // write values to file
       file << setw(5)  << T                   << setw(SW) << ' ' <<
-              setw(TW) << Veq                 << setw(SW) << ' ' <<
-              setw(TW) << Feq                 << setw(SW) << ' ' <<
-              setw(TW) << B                   << setw(SW) << ' ' <<
-              setw(TW) << beta * 1e6          << setw(SW) << ' ' << //[10^-6/K]
-              setw(TW) << CV                  << setw(SW) << ' ' <<
-              setw(TW) << CP                  << setw(SW) << ' ' <<
-              setw(TW) << GP                  << setw(SW) << ' ' <<
-              setw(TW) << Bp;
+        setw(TW) << Veq                 << setw(SW) << ' ' <<
+        setw(TW) << Feq                 << setw(SW) << ' ' <<
+        setw(TW) << B                   << setw(SW) << ' ' <<
+        setw(TW) << beta * 1e6          << setw(SW) << ' ' << //[10^-6/K]
+        setw(TW) << CV                  << setw(SW) << ' ' <<
+        setw(TW) << CP                  << setw(SW) << ' ' <<
+        setw(TW) << GP                  << setw(SW) << ' ' <<
+        setw(TW) << Bp;
       // the following properties are calculated only with a regular QHA calculation
       if (qha_method==QHA_CALC){
         file << setw(SW) << ' ' <<
-              setw(TW) << beta_mesh * 1e6     << setw(SW) << ' ' << //[10^-6/K]
-              setw(TW) << CV_mesh             << setw(SW) << ' ' <<
-              setw(TW) << CP_mesh             << setw(SW) << ' ' <<
-              setw(TW) << GP_mesh             << setw(SW);
+          setw(TW) << beta_mesh * 1e6     << setw(SW) << ' ' << //[10^-6/K]
+          setw(TW) << CV_mesh             << setw(SW) << ' ' <<
+          setw(TW) << CP_mesh             << setw(SW) << ' ' <<
+          setw(TW) << GP_mesh             << setw(SW);
       }
       file << std::endl;
     }
@@ -2241,10 +2241,10 @@ namespace apl
         T = Temperatures[Tid];
         if (includeElectronicContribution) Felec = electronicFreeEnergySommerfeld(T);
         file << setw(TW) << EOSvolumes[Vid]    << setw(SW) << ' '
-             << setw(TW) << FreeEnergy(T, Vid) << setw(SW) << ' '
-             << setw(TW) << Felec[Vid+1]       << setw(SW) << ' '
-             << setw(TW) << E0_V[Vid] <<
-	     std::endl;
+          << setw(TW) << FreeEnergy(T, Vid) << setw(SW) << ' '
+          << setw(TW) << Felec[Vid+1]       << setw(SW) << ' '
+          << setw(TW) << E0_V[Vid] <<
+          std::endl;
       }
       file << std::endl << std::endl;
     }
@@ -2324,9 +2324,9 @@ namespace apl
     file << "[QHA_AVG_GP]START" << std::endl;
 
     file << setw(5)  << "# T[K]"           << setw(SW) << ' ' <<
-            setw(TW) << "gamma"            << setw(SW) << ' ' <<
-            setw(TW) << "CV"               << setw(SW) << ' ' <<
-            std::endl;
+      setw(TW) << "gamma"            << setw(SW) << ' ' <<
+      setw(TW) << "CV"               << setw(SW) << ' ' <<
+      std::endl;
 
     double T = 0.0, CV =0.0, GP = 0.0;
     for (int Tid=0; Tid<Ntemperatures; Tid++){
@@ -2335,9 +2335,9 @@ namespace apl
       calcCVandGP(T, CV, GP);
 
       file << setw(5)  << T                   << setw(SW) << ' ' <<
-              setw(TW) << GP                  << setw(SW) << ' ' <<
-              setw(TW) << CV                  << setw(SW) << ' ' <<
-              std::endl;
+        setw(TW) << GP                  << setw(SW) << ' ' <<
+        setw(TW) << CV                  << setw(SW) << ' ' <<
+        std::endl;
     }
 
     file << "[QHA_AVG_GP]STOP" << std::endl;

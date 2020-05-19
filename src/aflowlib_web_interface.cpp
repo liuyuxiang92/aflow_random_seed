@@ -668,9 +668,9 @@ namespace aflowlib {
         else if(keyword=="species_pp") {species_pp=content;for(uint j=0;j<stokens.size();j++) vspecies_pp.push_back(stokens.at(j));}
         else if(keyword=="species_pp_version") {species_pp_version=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_version.push_back(stokens.at(j));}
         else if(keyword=="species_pp_ZVAL") {species_pp_ZVAL=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_ZVAL.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-	else if(keyword=="species_pp_AUID") {species_pp_AUID=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_AUID.push_back(stokens.at(j));}
-	else if(keyword=="metagga" || keyword=="METAGGA") {METAGGA=content;}
-	else if(keyword=="spin_cell") {spin_cell=aurostd::string2utype<double>(content);}
+        else if(keyword=="species_pp_AUID") {species_pp_AUID=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_AUID.push_back(stokens.at(j));}
+        else if(keyword=="metagga" || keyword=="METAGGA") {METAGGA=content;}
+        else if(keyword=="spin_cell") {spin_cell=aurostd::string2utype<double>(content);}
         else if(keyword=="spin_atom") {spin_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="spinD") {spinD=content;for(uint j=0;j<stokens.size();j++) vspinD.push_back(aurostd::string2utype<double>(stokens.at(j)));}
         else if(keyword=="spinD_magmom_orig") {spinD_magmom_orig=content;for(uint j=0;j<stokens.size();j++) vspinD_magmom_orig.push_back(aurostd::string2utype<double>(stokens.at(j)));}
@@ -3228,7 +3228,7 @@ namespace aflowlib {
     ofstream FileMESSAGE;
     return correctBadDatabase(FileMESSAGE,verbose,oss);
   }
-  
+
   void _aflowlib_entry::correctBadDatabase(ofstream& FileMESSAGE,bool verbose,ostream& oss){
     //CO20180828 - LIB2 also contains unaries //so far we only know of bad binaries
     //APENNSY neglect - LIB2 only //CO20180828 - LIB2 also contains unaries  //binaries only
@@ -3611,7 +3611,7 @@ namespace aflowlib {
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")){server=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");}
     else{server="aflowlib.duke.edu";}
-    
+
     path_full=server+"/"+path;
     return path_full;
   }
@@ -3658,18 +3658,18 @@ namespace aflowlib {
       conflict=FALSE;
       string aurl_found;
       if(aflowlib::auid2present(auid,aurl_found,1)) {
-       if(LDEBUG) cerr << XHOST.sPID << "_aflowlib_entry::directory2auid: conflict auid=" << auid << endl;	
-          cerr << XHOST.sPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl << endl;
+        if(LDEBUG) cerr << XHOST.sPID << "_aflowlib_entry::directory2auid: conflict auid=" << auid << endl;	
+        cerr << XHOST.sPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl << endl;
         if(aurl_found!=aurl) { // avoid conflict with yourself
           string salt="AUID_salt["+aurostd::utype2string<long double>(aurostd::get_useconds())+"]";
           cerr << XHOST.sPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRUE      " << auid << " " << aurl_found << " " << aurl << "  " << salt << endl;
           string file=vfiles2.at(0);
-	  //
+          //
           for(uint iext=0;iext<XHOST.vext.size();iext++) { aurostd::StringSubst(file,XHOST.vext.at(iext),""); }
           stringstream sss;aurostd::efile2stringstream(directory+"/"+file+DEFAULT_KZIP_EXT,sss); sss << endl << salt << endl;
           aurostd::execute("mv \""+directory+"/"+file+DEFAULT_KZIP_EXT+"\""+" \""+directory+"/"+file+".conflict_auid"+DEFAULT_KZIP_EXT+"\"");
           aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,sss,directory+"/"+file);
-	  //
+          //
           conflict=TRUE; // recheck
         } else {
           cerr << XHOST.sPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl << endl;
@@ -3699,12 +3699,12 @@ namespace aflowlib {
       start+=key.length();
       end=json.find("\":",start);
       if(end!=string::npos){
-	value=json.substr(start,end-start);
-	end=value.find_last_of(",");
-	value=value.substr(0,end);
+        value=json.substr(start,end-start);
+        end=value.find_last_of(",");
+        value=value.substr(0,end);
       } else {
-	end=json.find("}",start);
-	value=json.substr(start,end-start);
+        end=json.find("}",start);
+        value=json.substr(start,end-start);
       }
       //    if((value[0]=='\"') && (value[value.size()-1]=='\"')) value=value.substr(1,value.size()-2);  // Remove quotes
     } else {
@@ -3723,7 +3723,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: BEGIN mode=" << mode << endl;
     string loop="",json="";aurl="";
     if(auid=="" || auid.size()!=22) { cerr << XHOST.sPID << "aflowlib::auid2present: auid.size() needs to be 22 characters long" << endl; return FALSE;}
- 
+
     // [OBSOLETE]    if(mode==0) {
     // [OBSOLETE]    if(XHOST_vAUID.size()==0 || XHOST_vAURL.size()==0) init::InitGlobalObject("vLIBS","",FALSE);
     // [OBSOLETE]    if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: [4] XHOST_vAURL.size()=" << XHOST_vAURL.size() << "  XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
@@ -3736,59 +3736,57 @@ namespace aflowlib {
     // [OBSOLETE]    return found;
     // [OBSOLETE]   }
     if(mode==1) { // PICK THIS ONE DEFAULT
-      //  bool aflowlib::auid2present(string auid,string& aurl) {
+      //  bool aflowlib::auid2present(string auid,string& aurl)
       string jsonl_file=XHOST_LIBRARY_JSONL+"/"; for(uint i=0;i<8;i++) jsonl_file+=auid.at(i); jsonl_file+=".jsonl";
       bool found=FALSE;
       jsonl_file=aurostd::CleanFileName(jsonl_file);
       for(uint i=0;i<XHOST.vext.size()&&aurl.empty()&&!found;i++) {
-	if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
-	//	cout << XHOST.sPID << "aflowlib::auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
-	if(aurostd::FileExist(jsonl_file+XHOST.vext.at(i))) {
-	  found=TRUE;
-	  if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl; 
-	  //  cout << XHOST.sPID << "aflowlib::auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl; 
-	  json=aurostd::execute2string(XHOST.vcat.at(i)+" "+jsonl_file+XHOST.vext.at(i)+" | grep "+auid);
-	  aflowlib::json2aflowlib(json,"aurl",aurl);
-	  aflowlib::json2aflowlib(json,"loop",loop);
-	}
+        if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
+        //	cout << XHOST.sPID << "aflowlib::auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
+        if(aurostd::FileExist(jsonl_file+XHOST.vext.at(i))) {
+          found=TRUE;
+          if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl; 
+          //  cout << XHOST.sPID << "aflowlib::auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl; 
+          json=aurostd::execute2string(XHOST.vcat.at(i)+" "+jsonl_file+XHOST.vext.at(i)+" | grep "+auid);
+          aflowlib::json2aflowlib(json,"aurl",aurl);
+          aflowlib::json2aflowlib(json,"loop",loop);
+        }
       }
       if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: END  auid=" << auid << "  aurl=" << aurl << "  loop=" << loop << "  json.size()=" << json.size() << endl;
       cout << XHOST.sPID << "aflowlib::auid2present: auid=" << auid << "  aurl=" << aurl << "  loop=" << loop << "  json.size()=" << json.size() << endl;
       return json.size();
     }
     if(mode==2) { // not that faster and does not keep an outside vAUID table so it does not see the TRIVIAL CONFLICTS
-      //  bool aflowlib::auid2present(string auid,string& aurl) { 
+      //  bool aflowlib::auid2present(string auid,string& aurl)
       string jsonl_file=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)+"/"+aflowlib::auid2directory(auid)+"/RAW/aflowlib.json";
       bool found=FALSE;
       jsonl_file=aurostd::CleanFileName(jsonl_file);
       for(uint i=0;i<XHOST.vext.size()&&!found;i++) {
-	if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
-	if(aurostd::FileExist(jsonl_file+XHOST.vext.at(i))) {
-	  found=TRUE;
-	  if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl;
-	  json=aurostd::execute2string(XHOST.vcat.at(i)+" "+jsonl_file+XHOST.vext.at(i));
-	  aflowlib::json2aflowlib(json,"aurl",aurl);
-	  aflowlib::json2aflowlib(json,"loop",loop);
-	}
+        if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
+        if(aurostd::FileExist(jsonl_file+XHOST.vext.at(i))) {
+          found=TRUE;
+          if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl;
+          json=aurostd::execute2string(XHOST.vcat.at(i)+" "+jsonl_file+XHOST.vext.at(i));
+          aflowlib::json2aflowlib(json,"aurl",aurl);
+          aflowlib::json2aflowlib(json,"loop",loop);
+        }
       }
       if(LDEBUG) cerr << XHOST.sPID << "aflowlib::auid2present: END  auid=" << auid << "  aurl=" << aurl << "  loop=" << loop << "  json.size()=" << json.size() << endl;
       cout << XHOST.sPID << "aflowlib::auid2present: auid=" << auid << "  aurl=" << aurl << "  loop=" << loop << "  json.size()=" << json.size() << endl;
       return json.size();
     }
-    
+
     return FALSE;
   }
 
-  /*
-   time ./aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/Cu_pvHgSn/TFCC004.CAB
-   time aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/Cu_pvHgSn/TFCC004.CAB  
-   time ./aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/AgCdCo/TFCC001.ABC   
-   time aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/AgCdCo/TFCC001.ABC  
-   time ./aflow --beep --force --showPID --lib2raw="/common/LIB4/LIB/AgCdCoZr_sv:PAW_PBE/ABCD_cF16_216_c_d_b_a.ABCD"
-   time aflow --beep --force --showPID --lib2raw="/common/LIB4/LIB/AgCdCoZr_sv:PAW_PBE/ABCD_cF16_216_c_d_b_a.ABCD"
-   
+  // [OBSOLETE]   time ./aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/Cu_pvHgSn/TFCC004.CAB
+  // [OBSOLETE]   time aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/Cu_pvHgSn/TFCC004.CAB  
+  // [OBSOLETE]   time ./aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/AgCdCo/TFCC001.ABC   
+  // [OBSOLETE]   time aflow --beep --force --showPID --lib2raw=/common/LIB3/LIB/AgCdCo/TFCC001.ABC  
+  // [OBSOLETE]   time ./aflow --beep --force --showPID --lib2raw="/common/LIB4/LIB/AgCdCoZr_sv:PAW_PBE/ABCD_cF16_216_c_d_b_a.ABCD"
+  // [OBSOLETE]   time aflow --beep --force --showPID --lib2raw="/common/LIB4/LIB/AgCdCoZr_sv:PAW_PBE/ABCD_cF16_216_c_d_b_a.ABCD"
 
-  */
+
   uint auid2vauid(const string auid, deque<string>& vauid) {                // splits the auid into vauid
     vauid.clear();
     //    vauid.push_back(auid.substr(0,6)); for(uint i=6;i<=20;i+=2) vauid.push_back(auid.substr(i,2));  // splitting aflow:/ab/cd..

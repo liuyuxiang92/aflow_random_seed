@@ -186,7 +186,7 @@ namespace KBIN {
   }
 
   bool runRelaxationsAPL_VASP(int start_relax, const string& AflowIn, _xvasp& xvasp,
-    _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& fileMessage) {
+      _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& fileMessage) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     ostringstream aus;
 
@@ -1514,9 +1514,9 @@ namespace KBIN {
 
     //AS20200513 BEGIN
     bool run_any_qha =
-          kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
-          kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
+      kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
+      kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
+      kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
     if (NEW_QHA && run_any_qha){
       apl::QHAN qha(USER_TPT, xinput, kflags, supercell_opts, messageFile, oss);
       qha.apl_options.push_attached("ENGINE", USER_ENGINE);
@@ -2359,7 +2359,7 @@ namespace apl {
       string geom_filename = xaims.Directory + "/" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM;
       aurostd::stringstream2file(xaims.GEOM, geom_filename);
       if(!aurostd::FileExist(geom_filename)){
-      string function = "apl::createAflowInPhononsAIMS():";
+        string function = "apl::createAflowInPhononsAIMS():";
         string message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
@@ -2472,8 +2472,8 @@ namespace apl {
     // Load data....
     if(xinp.AFLOW_MODE_VASP) {
       if (!aurostd::EFileExist(xinp.getDirectory() + "/" + DEFAULT_AFLOW_QMVASP_OUT)
-        && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml.static")
-        && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml")) {
+          && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml.static")
+          && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml")) {
         return false;
       }
       // ME20190607 - BEGIN

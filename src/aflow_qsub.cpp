@@ -34,150 +34,150 @@ namespace KBIN {
       aus      << "00000  [AFLOW_MODE_QSUB] found in " << _AFLOWIN_ << " "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       Krun=kflags.KBIN_QSUB;
-    
+
       // INPUT FILES
       kflags.KBIN_QSUB_FILE                      =
-	aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_FILE]");          
+        aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_FILE]");          
       kflags.KBIN_QSUB_MODE_EXPLICIT             =
-	aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]");
+        aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]");
       kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP   =
-	aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]START") &&
-	aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]STOP");
+        aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]START") &&
+        aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]STOP");
       kflags.KBIN_QSUB_MODE_IMPLICIT             =
-	aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_IMPLICIT]");
-    
+        aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_IMPLICIT]");
+
       if(0) {
-	cerr << " kflags.KBIN_QSUB                          =  " << kflags.KBIN_QSUB << endl;
-	cerr << " kflags.KBIN_QSUB_FILE                     =  " << kflags.KBIN_QSUB_FILE << endl;
-	cerr << " kflags.KBIN_QSUB_MODE_EXPLICIT            =  " << kflags.KBIN_QSUB_MODE_EXPLICIT << endl;
-	cerr << " kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP =  " << kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP << endl;
-	cerr << " kflags.KBIN_QSUB_MODE_IMPLICIT            =  " << kflags.KBIN_QSUB_MODE_IMPLICIT << endl;
+        cerr << " kflags.KBIN_QSUB                          =  " << kflags.KBIN_QSUB << endl;
+        cerr << " kflags.KBIN_QSUB_FILE                     =  " << kflags.KBIN_QSUB_FILE << endl;
+        cerr << " kflags.KBIN_QSUB_MODE_EXPLICIT            =  " << kflags.KBIN_QSUB_MODE_EXPLICIT << endl;
+        cerr << " kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP =  " << kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP << endl;
+        cerr << " kflags.KBIN_QSUB_MODE_IMPLICIT            =  " << kflags.KBIN_QSUB_MODE_IMPLICIT << endl;
       }
-    
+
       // get (string) kflags.KBIN_QSUB_COMMAND
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE)) {
-	kflags.KBIN_QSUB_COMMAND=QSUB_COMMAND_DEFAULT;
-	aus << "00000  MESSAGE QSUB: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_QSUB_COMMAND=QSUB_COMMAND_DEFAULT;
+        aus << "00000  MESSAGE QSUB: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE),'"');
-	aus << "00000  MESSAGE QSUB: found COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE),'"');
+        aus << "00000  MESSAGE QSUB: found COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       // get (string) kflags.KBIN_QSUB_PARAMS
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE)) {
-	kflags.KBIN_QSUB_PARAMS=QSUB_PARAMS_DEFAULT;
-	aus << "00000  MESSAGE QSUB: PARAMS string is missing, taking PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_QSUB_PARAMS=QSUB_PARAMS_DEFAULT;
+        aus << "00000  MESSAGE QSUB: PARAMS string is missing, taking PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE),'"');
-	aus << "00000  MESSAGE QSUB: found PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE),'"');
+        aus << "00000  MESSAGE QSUB: found PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
-    
+
       Krun=(Krun && kflags.KBIN_QSUB_MODE_EXPLICIT);
       if(!Krun) {
-	aus << "EEEEE  [AFLOW_QSUB_MODE_IMPLICIT] is the only supported mode "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
-	Krun=FALSE;
-	return Krun;
+        aus << "EEEEE  [AFLOW_QSUB_MODE_IMPLICIT] is the only supported mode "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
+        Krun=FALSE;
+        return Krun;
       }
       if(Krun && kflags.KBIN_QSUB_MODE_EXPLICIT) {  // [AFLOW_QSUB_MODE_EXPLICIT] construction
-	if(kflags.KBIN_QSUB_FILE && !kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
-	  aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-	  aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_FILE]");
-	} else if(!kflags.KBIN_QSUB_FILE && kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
-	  aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  if(aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]STOP"))
-	    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_MODE_EXPLICIT]START","[AFLOW_QSUB_MODE_EXPLICIT]STOP");
-	} else {
-	  aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] do not confuse aflow !!"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] Possible modes "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aus << "----------------------------------------------------------------------------------------------------" << endl;
-	  aus << "[AFLOW] QSUB EXPLICIT MODE without START/STOP (default)" << endl;
-	  aus << "[AFLOW_QSUB_MODE_EXPLICIT] " << endl;
-	  aus << "[AFLOW_QSUB_FILE]#!/usr/local/bin/bash " << endl;
-	  aus << "[AFLOW_QSUB_FILE]# automatic qsub by AFLOW " << endl;
-	  aus << "[AFLOW_QSUB_FILE]# For Marylou4 " << endl;
-	  aus << "[AFLOW_QSUB_FILE]#PBS -l walltime=16:00:00:00 " << endl;
-	  aus << "[AFLOW_QSUB_FILE]#PBS -N pdpt.1 " << endl;
-	  // aus << "[AFLOW_QSUB_FILE]#PBS -m abe " << endl;
-	  aus << "[AFLOW_QSUB_FILE]#PBS -V " << endl;
-	  aus << "[AFLOW_QSUB_FILE]PROG=~/bin/vasp46s " << endl;
-	  aus << "[AFLOW_QSUB_FILE]WDIR=$PBS_O_WORKDIR " << endl;
-	  aus << "[AFLOW_QSUB_FILE]SCRATCH=~/compute/$PBS_JOBID " << endl;
-	  aus << "[AFLOW_QSUB_FILE]mkdir -p $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]if [ $? -ne 0 ]; then " << endl;
-	  aus << "[AFLOW_QSUB_FILE]    exit 1 " << endl;
-	  aus << "[AFLOW_QSUB_FILE]fi " << endl;
-	  aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/POTCAR  $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/INCAR   $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/POSCAR  $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/KPOINTS $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]cd $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]if [ $? -ne 0 ]; then " << endl;
-	  aus << "[AFLOW_QSUB_FILE]    exit 1 " << endl;
-	  aus << "[AFLOW_QSUB_FILE]fi " << endl;
-	  aus << "[AFLOW_QSUB_FILE]# run " << endl;
-	  aus << "[AFLOW_QSUB_FILE]rm -f vasp.out " << endl;
-	  aus << "[AFLOW_QSUB_FILE]$PROG >> vasp.out " << endl;
-	  aus << "[AFLOW_QSUB_FILE]rm -f WAVECAR core " << endl;
-	  aus << "[AFLOW_QSUB_FILE]mv * $WDIR/ " << endl;
-	  aus << "[AFLOW_QSUB_FILE]cd $WDIR  " << endl;
-	  aus << "[AFLOW_QSUB_FILE]rm -r $SCRATCH " << endl;
-	  aus << "[AFLOW_QSUB_FILE]echo \"DONE\" > aflow.qsub.done " << endl;
-	  aus << "[AFLOW_QSUB_FILE]exit 0  " << endl;
-	  aus << "[AFLOW_QSUB_FILE]# automatic qsub by AFLOW " << endl;
-	  aus << "[AFLOW]" << endl;
-	  aus << "----------------------------------------------------------------------------------------------------" << endl;
-	  aus << "[AFLOW] QSUB EXPLICIT MODE with START/STOP" << endl;
-	  aus << "[AFLOW_QSUB_MODE_EXPLICIT]" << endl;
-	  aus << "[AFLOW_QSUB_MODE_EXPLICIT]START" << endl;
-	  aus << "#!/usr/local/bin/bash " << endl;
-	  aus << "# automatic qsub by AFLOW " << endl;
-	  aus << "# For Marylou4 " << endl;
-	  aus << "#PBS -l walltime=16:00:00:00 " << endl;
-	  aus << "#PBS -N pdpt.1 " << endl;
-	  // aus << "#PBS -m abe " << endl;
-	  aus << "#PBS -V " << endl;
-	  aus << "PROG=~/bin/vasp46s " << endl;
-	  aus << "WDIR=$PBS_O_WORKDIR " << endl;
-	  aus << "SCRATCH=~/compute/$PBS_JOBID " << endl;
-	  aus << "mkdir -p $SCRATCH " << endl;
-	  aus << "if [ $? -ne 0 ]; then " << endl;
-	  aus << "    exit 1 " << endl;
-	  aus << "fi " << endl;
-	  aus << "cp -p $WDIR/POTCAR  $SCRATCH " << endl;
-	  aus << "cp -p $WDIR/INCAR   $SCRATCH " << endl;
-	  aus << "cp -p $WDIR/POSCAR  $SCRATCH " << endl;
-	  aus << "cp -p $WDIR/KPOINTS $SCRATCH " << endl;
-	  aus << "cd $SCRATCH " << endl;
-	  aus << "if [ $? -ne 0 ]; then " << endl;
-	  aus << "    exit 1 " << endl;
-	  aus << "fi " << endl;
-	  aus << "# run " << endl;
-	  aus << "rm -f vasp.out " << endl;
-	  aus << "$PROG >> vasp.out " << endl;
-	  aus << "rm -f WAVECAR core " << endl;
-	  aus << "mv * $WDIR/ " << endl;
-	  aus << "cd $WDIR  " << endl;
-	  aus << "rm -r $SCRATCH " << endl;
-	  aus << "echo \"DONE\" > aflow.qsub.done " << endl;
-	  aus << "exit 0  " << endl;
-	  aus << "# automatic qsub by AFLOW " << endl;
-	  aus << "[AFLOW_QSUB_MODE_EXPLICIT]STOP" << endl;
-	  aus << "[AFLOW]" << endl;
-	  aus << "----------------------------------------------------------------------------------------------------" << endl;
-	  aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] Note "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT]START must be present and no [AFLOW_QSUB_FILE]"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT]STOP  must be present and no [AFLOW_QSUB_FILE]"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aus << "EEEEE  or [AFLOW_QSUB_FILE] present and NO START/STOP"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
-	  Krun=FALSE;
-	  return Krun;
-	}      
+        if(kflags.KBIN_QSUB_FILE && !kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
+          aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+          aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_FILE]");
+        } else if(!kflags.KBIN_QSUB_FILE && kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
+          aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          if(aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]STOP"))
+            aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_MODE_EXPLICIT]START","[AFLOW_QSUB_MODE_EXPLICIT]STOP");
+        } else {
+          aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] do not confuse aflow !!"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] Possible modes "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "----------------------------------------------------------------------------------------------------" << endl;
+          aus << "[AFLOW] QSUB EXPLICIT MODE without START/STOP (default)" << endl;
+          aus << "[AFLOW_QSUB_MODE_EXPLICIT] " << endl;
+          aus << "[AFLOW_QSUB_FILE]#!/usr/local/bin/bash " << endl;
+          aus << "[AFLOW_QSUB_FILE]# automatic qsub by AFLOW " << endl;
+          aus << "[AFLOW_QSUB_FILE]# For Marylou4 " << endl;
+          aus << "[AFLOW_QSUB_FILE]#PBS -l walltime=16:00:00:00 " << endl;
+          aus << "[AFLOW_QSUB_FILE]#PBS -N pdpt.1 " << endl;
+          // aus << "[AFLOW_QSUB_FILE]#PBS -m abe " << endl;
+          aus << "[AFLOW_QSUB_FILE]#PBS -V " << endl;
+          aus << "[AFLOW_QSUB_FILE]PROG=~/bin/vasp46s " << endl;
+          aus << "[AFLOW_QSUB_FILE]WDIR=$PBS_O_WORKDIR " << endl;
+          aus << "[AFLOW_QSUB_FILE]SCRATCH=~/compute/$PBS_JOBID " << endl;
+          aus << "[AFLOW_QSUB_FILE]mkdir -p $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]if [ $? -ne 0 ]; then " << endl;
+          aus << "[AFLOW_QSUB_FILE]    exit 1 " << endl;
+          aus << "[AFLOW_QSUB_FILE]fi " << endl;
+          aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/POTCAR  $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/INCAR   $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/POSCAR  $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]cp -p $WDIR/KPOINTS $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]cd $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]if [ $? -ne 0 ]; then " << endl;
+          aus << "[AFLOW_QSUB_FILE]    exit 1 " << endl;
+          aus << "[AFLOW_QSUB_FILE]fi " << endl;
+          aus << "[AFLOW_QSUB_FILE]# run " << endl;
+          aus << "[AFLOW_QSUB_FILE]rm -f vasp.out " << endl;
+          aus << "[AFLOW_QSUB_FILE]$PROG >> vasp.out " << endl;
+          aus << "[AFLOW_QSUB_FILE]rm -f WAVECAR core " << endl;
+          aus << "[AFLOW_QSUB_FILE]mv * $WDIR/ " << endl;
+          aus << "[AFLOW_QSUB_FILE]cd $WDIR  " << endl;
+          aus << "[AFLOW_QSUB_FILE]rm -r $SCRATCH " << endl;
+          aus << "[AFLOW_QSUB_FILE]echo \"DONE\" > aflow.qsub.done " << endl;
+          aus << "[AFLOW_QSUB_FILE]exit 0  " << endl;
+          aus << "[AFLOW_QSUB_FILE]# automatic qsub by AFLOW " << endl;
+          aus << "[AFLOW]" << endl;
+          aus << "----------------------------------------------------------------------------------------------------" << endl;
+          aus << "[AFLOW] QSUB EXPLICIT MODE with START/STOP" << endl;
+          aus << "[AFLOW_QSUB_MODE_EXPLICIT]" << endl;
+          aus << "[AFLOW_QSUB_MODE_EXPLICIT]START" << endl;
+          aus << "#!/usr/local/bin/bash " << endl;
+          aus << "# automatic qsub by AFLOW " << endl;
+          aus << "# For Marylou4 " << endl;
+          aus << "#PBS -l walltime=16:00:00:00 " << endl;
+          aus << "#PBS -N pdpt.1 " << endl;
+          // aus << "#PBS -m abe " << endl;
+          aus << "#PBS -V " << endl;
+          aus << "PROG=~/bin/vasp46s " << endl;
+          aus << "WDIR=$PBS_O_WORKDIR " << endl;
+          aus << "SCRATCH=~/compute/$PBS_JOBID " << endl;
+          aus << "mkdir -p $SCRATCH " << endl;
+          aus << "if [ $? -ne 0 ]; then " << endl;
+          aus << "    exit 1 " << endl;
+          aus << "fi " << endl;
+          aus << "cp -p $WDIR/POTCAR  $SCRATCH " << endl;
+          aus << "cp -p $WDIR/INCAR   $SCRATCH " << endl;
+          aus << "cp -p $WDIR/POSCAR  $SCRATCH " << endl;
+          aus << "cp -p $WDIR/KPOINTS $SCRATCH " << endl;
+          aus << "cd $SCRATCH " << endl;
+          aus << "if [ $? -ne 0 ]; then " << endl;
+          aus << "    exit 1 " << endl;
+          aus << "fi " << endl;
+          aus << "# run " << endl;
+          aus << "rm -f vasp.out " << endl;
+          aus << "$PROG >> vasp.out " << endl;
+          aus << "rm -f WAVECAR core " << endl;
+          aus << "mv * $WDIR/ " << endl;
+          aus << "cd $WDIR  " << endl;
+          aus << "rm -r $SCRATCH " << endl;
+          aus << "echo \"DONE\" > aflow.qsub.done " << endl;
+          aus << "exit 0  " << endl;
+          aus << "# automatic qsub by AFLOW " << endl;
+          aus << "[AFLOW_QSUB_MODE_EXPLICIT]STOP" << endl;
+          aus << "[AFLOW]" << endl;
+          aus << "----------------------------------------------------------------------------------------------------" << endl;
+          aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] Note "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT]START must be present and no [AFLOW_QSUB_FILE]"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT]STOP  must be present and no [AFLOW_QSUB_FILE]"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "EEEEE  or [AFLOW_QSUB_FILE] present and NO START/STOP"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
+          Krun=FALSE;
+          return Krun;
+        }      
       }
     }
     // extra
@@ -216,7 +216,7 @@ namespace KBIN {
     }
     // aflow.qsub.done EXISTS
     if(aurostd::substring_present_file(aflags.Directory+"/aflow.qsub.done","DONE",TRUE) ||
-       aurostd::substring_present_file(aflags.Directory+"/aflow.qsub.done","done",TRUE)) {
+        aurostd::substring_present_file(aflags.Directory+"/aflow.qsub.done","done",TRUE)) {
       if(verbose) aus << "00000  MESSAGE RUN FINISHED (aflow.qsub.done is complete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::execute(aus_exec);    
@@ -225,7 +225,7 @@ namespace KBIN {
     aurostd::execute(aus_exec);
     if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done is incomplete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-  
+
     return FALSE;
   }
 }  // namespace KBIN
@@ -258,16 +258,16 @@ namespace KBIN {
     aus      << "00000  [AFLOW_MODE_QSUB] QSUB Mode1 "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     Krun=kflags.KBIN_QSUB;
-  
+
     // INPUT FILES
     kflags.KBIN_QSUB_FILE = TRUE;
     kflags.KBIN_QSUB_MODE_EXPLICIT = TRUE;
     kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP = TRUE;
     kflags.KBIN_QSUB_MODE_IMPLICIT = FALSE;
-  
+
     kflags.KBIN_QSUB_COMMAND="qsub";
     kflags.KBIN_QSUB_PARAMS=" ";
-  
+
     xqsub.QSUB << "#!/usr/local/bin/bash " << endl;
     xqsub.QSUB << "# automatic qsub by AFLOW " << endl;
     xqsub.QSUB << "# For Marylou4 " << endl;
@@ -301,7 +301,7 @@ namespace KBIN {
     xqsub.QSUB << "echo \"DONE\" > aflow.qsub.done " << endl;
     xqsub.QSUB << "exit 0  " << endl;
     xqsub.QSUB << "# automatic qsub by AFLOW " << endl;
-  
+
     // done
     xqsub.QSUB_orig << xqsub.QSUB.str();
     xqsub.QSUB_generated=TRUE;
@@ -325,16 +325,16 @@ namespace KBIN {
     aus      << "00000  [AFLOW_MODE_QSUB] QSUB Mode2 "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     Krun=kflags.KBIN_QSUB;
-  
+
     // INPUT FILES
     kflags.KBIN_QSUB_FILE = TRUE;
     kflags.KBIN_QSUB_MODE_EXPLICIT = TRUE;
     kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP  = TRUE;
     kflags.KBIN_QSUB_MODE_IMPLICIT = FALSE;
-  
+
     kflags.KBIN_QSUB_COMMAND="qsub";
     kflags.KBIN_QSUB_PARAMS=" ";
-  
+
     xqsub.QSUB << "#!/usr/local/bin/bash " << endl;
     xqsub.QSUB << "# automatic qsub by AFLOW " << endl;
     xqsub.QSUB << "# For Marylou4 " << endl;
@@ -348,7 +348,7 @@ namespace KBIN {
     xqsub.QSUB << "echo \"DONE\" > aflow.qsub.done " << endl;
     xqsub.QSUB << "exit 0  " << endl;
     xqsub.QSUB << "# automatic qsub by AFLOW " << endl;
-  
+
     // done
     xqsub.QSUB_orig << xqsub.QSUB.str();
     xqsub.QSUB_generated=TRUE;
@@ -372,20 +372,20 @@ namespace KBIN {
     aus      << "00000  [AFLOW_MODE_QSUB] QSUB Mode3 "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     Krun=kflags.KBIN_QSUB;
-  
+
     // INPUT FILES
     kflags.KBIN_QSUB_FILE = TRUE;
     kflags.KBIN_QSUB_MODE_EXPLICIT = TRUE;
     kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP  = TRUE;
     kflags.KBIN_QSUB_MODE_IMPLICIT = FALSE;
-  
+
     kflags.KBIN_QSUB_COMMAND="qsub";
     kflags.KBIN_QSUB_PARAMS=" ";
-  
+
     xqsub.QSUB << "#!/usr/local/bin/bash " << endl;
     xqsub.QSUB << "# QSUB MODE 3 " << endl;  
     xqsub.QSUB << "# automatic qsub by AFLOW " << endl;
-  
+
     // done
     xqsub.QSUB_orig << xqsub.QSUB.str();
     xqsub.QSUB_generated=TRUE;
@@ -402,12 +402,10 @@ namespace KBIN {
 // *                                                                        *
 // **************************************************************************
 
-/*
-  bool   KBIN_QSUB;
-  string KBIN_QSUB_COMMAND;
-  string KBIN_QSUB_PARAMS;
-  bool   KBIN_QSUB_MODE_EXPLICIT;
-  bool   KBIN_QSUB_MODE_EXPLICIT_START;
-  bool   KBIN_QSUB_MODE_EXPLICIT_STOP;
-  bool   KBIN_QSUB_MODE_IMPLICIT;
-*/
+//   bool   KBIN_QSUB;
+//   string KBIN_QSUB_COMMAND;
+//   string KBIN_QSUB_PARAMS;
+//   bool   KBIN_QSUB_MODE_EXPLICIT;
+//   bool   KBIN_QSUB_MODE_EXPLICIT_START;
+//   bool   KBIN_QSUB_MODE_EXPLICIT_STOP;
+//   bool   KBIN_QSUB_MODE_IMPLICIT;

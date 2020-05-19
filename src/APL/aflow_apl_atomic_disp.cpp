@@ -514,7 +514,7 @@ namespace apl {
       message = "Unrecognized format " + format + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
-    
+
     // Amplitude
     string amplitude_str = vpflow.getattachedscheme("ADISP::AMPLITUDE");
     double amplitude = 0.0;

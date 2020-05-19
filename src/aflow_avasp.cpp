@@ -1640,8 +1640,8 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
                 if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
                 if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
                 // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
-		
-	      }
+
+              }
               if(pottype.empty()) {
                 cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << "  wrong pottype:" << sgrep << endl; 
                 return FALSE; // dont die
@@ -6757,8 +6757,7 @@ bool AVASP_REMOVE_LDAU(_xvasp &xvasp) {
 }
 
 //bool AVASP_MakePrototypeICSD_AFLOWIN(vector<string> params_UCELL_SPECIES,bool flag_AFLOW_IN_ONLY_IF_MISSING)
-bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONLY_IF_MISSING)
-{ //CO20200106 - patching for auto-indenting
+bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONLY_IF_MISSING) { //CO20200106 - patching for auto-indenting
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XHOST.sPID + "AVASP_MakePrototypeICSD_AFLOWIN():";
@@ -6825,13 +6824,13 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
 
     // TEST IF CALCULATED
     init::InitGlobalObject("vLIBS");
-    // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {
+    // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" "))
     if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,xvasp.AVASP_label+" ")) {
       if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl;
       return TRUE;
     }
     for(uint ilattice=1;ilattice<=14;ilattice++) {
-      // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" "))
       if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
         if(DEBUG_SKIP) cerr << "SKIP (calculated): " << lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;

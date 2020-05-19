@@ -91,32 +91,32 @@ namespace aurostd {
     //for mac these numbers can be QUITE large, so better to be safe and return unsigned long long int
     //see here: http://elliotth.blogspot.com/2012/04/gettid-on-mac-os.html
     //also for macs: pid!=tid
-    #ifdef _MACOSX_
-      #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
-        uint64_t tid64;
-        pthread_threadid_np(NULL, &tid64);
-        pid_t tid = (pid_t)tid64;
-        return (unsigned long long int)tid;
-      #else
-      //////////////////////////////////////////////////////////
-        #ifdef __GLIBC__
-          #include <sys/syscall.h>  //CO20200502 - need for gettid()
-          pid_t tid = syscall(__NR_gettid);
-          return (unsigned long long int)tid;
-        #else //ONLY if _MACOSX_ AND not __GLIBC__
-          return (unsigned long long int)getpid();
-        #endif
-        //////////////////////////////////////////////////////////
-      #endif  //END _MACOSX_
-    #else //if NOT _MACOSX_
+#ifdef _MACOSX_
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+    uint64_t tid64;
+    pthread_threadid_np(NULL, &tid64);
+    pid_t tid = (pid_t)tid64;
+    return (unsigned long long int)tid;
+#else
     //////////////////////////////////////////////////////////
-      #ifdef __GLIBC__
-        return (unsigned long long int)gettid();
-      #else //for example CYGWIN
-        return (unsigned long long int)getpid();
-      #endif
+#ifdef __GLIBC__
+#include <sys/syscall.h>  //CO20200502 - need for gettid()
+    pid_t tid = syscall(__NR_gettid);
+    return (unsigned long long int)tid;
+#else //ONLY if _MACOSX_ AND not __GLIBC__
+    return (unsigned long long int)getpid();
+#endif
     //////////////////////////////////////////////////////////
-    #endif
+#endif  //END _MACOSX_
+#else //if NOT _MACOSX_
+    //////////////////////////////////////////////////////////
+#ifdef __GLIBC__
+    return (unsigned long long int)gettid();
+#else //for example CYGWIN
+    return (unsigned long long int)getpid();
+#endif
+    //////////////////////////////////////////////////////////
+#endif
   }
 }
 
@@ -3566,7 +3566,7 @@ namespace aurostd {
   uint efile2vectorstring(string FileNameIN,vector<string>& vline) {
     return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
-  
+
   bool vectorstring2file(const vector<string>& vline,string FileNameOUT) {
     string file=aurostd::CleanFileName(FileNameOUT);
     ofstream FileOUT;
@@ -4132,7 +4132,7 @@ namespace aurostd {
     aurostd::execute("mv \""+file+"\" \""+destination+"\"");
     return TRUE;
   }
-  
+
   //***************************************************************************//
   // aurostd::file2md5sum
   //***************************************************************************//
@@ -4145,7 +4145,7 @@ namespace aurostd {
     }
     return "";
   }
-  
+
   //***************************************************************************//
   // aurostd::file2auid
   //***************************************************************************//
@@ -4153,13 +4153,13 @@ namespace aurostd {
   string file2auid(const string& file) { //SC20200326
     vector<string> vtokens;
     if(aurostd::FileExist(file)) {
-    uint64_t crc=0;
-    crc=aurostd::crc64(crc,aurostd::efile2string(file)); // DONT TOUCH THIS
-    return aurostd::crc2string(crc);
+      uint64_t crc=0;
+      crc=aurostd::crc64(crc,aurostd::efile2string(file)); // DONT TOUCH THIS
+      return aurostd::crc2string(crc);
     }
     return "";
   }
-  
+
   // ***************************************************************************
   // Function IsDirectory
   // ***************************************************************************
@@ -5459,7 +5459,7 @@ namespace aurostd {
 
     double numerator = aurostd::string2utype<double>(tokens[0]);
     double denominator = aurostd::string2utype<double>(tokens[1]);
-    
+
     // --------------------------------------------------------------------------
     // protect against division by zero
     if(aurostd::isequal(denominator,_ZERO_TOL_)){
@@ -6687,7 +6687,7 @@ namespace aurostd {
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
-  // [OBSOLETE]  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {  // USE OVERLOADING
+  // [OBSOLETE]  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT)  // USE OVERLOADING
   deque<string> vecDouble2vecString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) { //SC20200330
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
@@ -6698,7 +6698,7 @@ namespace aurostd {
     return vout;
   }
 }
- 
+
 namespace aurostd {
   //***************************************************************************//
   // aurostd::wrapVecEntries(vector<string>& vin,string wrap)

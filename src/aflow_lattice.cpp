@@ -68,22 +68,21 @@ namespace LATTICE {
 // ***************************************************************************
 namespace LATTICE {
   bool SpaceGroup2Lattice(uint sg,string &lattice_type,string& lattice_system) {
-    /* FROM SAXENA BOOK
-       1 TRI  (triclinic)
-       2 MCL  (monoclinic)
-       3 MCLC (C-centered monoclinic)
-       4 ORC  (orthorhombic)
-       5 ORCC (C-centered orthorhombic)
-       6 ORCF (face-centered orthorhombic)
-       7 ORCI (body-centered orthorhombic)
-       8 TET  (tetragonal)
-       9 BCT  (body-centered tetragonal)
-       10 RHL  (rhombohedral/trigonal)
-       11 HEX  (hexagonal)
-       12 CUB  (simple cubic)
-       13 FCC  (face-centered cubic)
-       14 BCC  (body-centered cubic)
-       */
+    // FROM SAXENA BOOK
+    //   1 TRI  (triclinic)
+    //   2 MCL  (monoclinic)
+    //   3 MCLC (C-centered monoclinic)
+    //   4 ORC  (orthorhombic)
+    //   5 ORCC (C-centered orthorhombic)
+    //   6 ORCF (face-centered orthorhombic)
+    //   7 ORCI (body-centered orthorhombic)
+    //   8 TET  (tetragonal)
+    //   9 BCT  (body-centered tetragonal)
+    //   10 RHL  (rhombohedral/trigonal)
+    //   11 HEX  (hexagonal)
+    //   12 CUB  (simple cubic)
+    //   13 FCC  (face-centered cubic)
+    //   14 BCC  (body-centered cubic)
     lattice_type="";lattice_system="";
     // tri
     if(sg==1 || sg==2) lattice_type="TRI";
@@ -692,25 +691,25 @@ namespace LATTICE {
 //**************************JX EDITED START****************************
 namespace LATTICE {
   bool Standard_Lattice_StructureDefault(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {
-    //DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);}
+    //DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);
     return LATTICE::Standard_Lattice_Structure_20170718(str_in,str_sp,str_sc,full_sym);} //DX
-    //bool Standard_Lattice_StructureCoarse(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
-    ////  return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.1,1.0,time,_EPS_);}
-    //bool Standard_Lattice_StructureNormal(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
-    //bool Standard_Lattice_StructureMedium(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.01,0.1,time,_EPS_);}
-    //bool Standard_Lattice_StructurePrecise(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.002,0.02,time,_EPS_);}
-    //bool Standard_Lattice_StructureUltra(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0004,0.004,time,_EPS_);} // epsabc //epsang
-    }
+  //bool Standard_Lattice_StructureCoarse(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
+  ////  return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.1,1.0,time,_EPS_);
+  //bool Standard_Lattice_StructureNormal(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
+  //bool Standard_Lattice_StructureMedium(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.01,0.1,time,_EPS_);}
+  //bool Standard_Lattice_StructurePrecise(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.002,0.02,time,_EPS_);}
+  //bool Standard_Lattice_StructureUltra(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0004,0.004,time,_EPS_);} // epsabc //epsang
+}
 //**************************JX EDITED END****************************
 
 namespace LATTICE {
@@ -6113,15 +6112,15 @@ namespace LATTICE {
     //output
     if(mode==0) {
       cout << glatt << endl
-         << gpath << endl
-         << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
-         << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
-         << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
-         << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
-         << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
-         << "  arrow label position in fractions of recip. vec. norm" << endl
-         << "Reciprocal lattice vectors:" << endl
-         << klattice << endl;
+        << gpath << endl
+        << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
+        << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
+        << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
+        << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
+        << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
+        << "  arrow label position in fractions of recip. vec. norm" << endl
+        << "Reciprocal lattice vectors:" << endl
+        << klattice << endl;
       cout << Nirbz << " #kpoints in kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
         cout << bzsetf << cirbz(i,1) << " "
@@ -6130,7 +6129,7 @@ namespace LATTICE {
           << irbzlab[i] << endl;
       }
       cout << "Each line represents a line segment p1 to p2, " << endl
-         << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
+        << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
       cout << Nircon << " #segments for kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
         cout << bzsetf << cirbz(ircon(1,i),1) << " "
@@ -6175,7 +6174,7 @@ namespace LATTICE {
           << irbzlab[i] << endl;
       }
       cout << "Each line represents a line segment p1 to p2, " << endl
-         << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
+        << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
       cout << Nircon << " #segments for kpath (fractional coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
         cout << bzsetf << irbz(ircon(1,i),1) << " "
@@ -6218,15 +6217,15 @@ namespace LATTICE {
       fout.open("bzplot.dat");
       cerr << "Generating plotbz.dat file" << endl;
       fout << glatt << endl
-         << gpath << endl
-         << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
-         << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
-         << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
-         << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
-         << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
-         << "  arrow label position in fractions of recip. vec. norm" << endl
-         << "Reciprocal lattice vectors:" << endl
-         << klattice << endl;
+        << gpath << endl
+        << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
+        << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
+        << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
+        << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
+        << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
+        << "  arrow label position in fractions of recip. vec. norm" << endl
+        << "Reciprocal lattice vectors:" << endl
+        << klattice << endl;
       fout << Nirbz << " #kpoints in kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
         fout << bzsetf << cirbz(i,1) << " "
@@ -6235,7 +6234,7 @@ namespace LATTICE {
           << irbzlab[i] << endl;
       }
       fout << "Each line represents a line segment p1 to p2, " << endl
-         << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
+        << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
       fout << Nircon << " #segments for kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
         fout << bzsetf << cirbz(ircon(1,i),1) << " "
@@ -6280,7 +6279,7 @@ namespace LATTICE {
           << irbzlab[i] << endl;
       }
       fout << "Each line represents a line segment p1 to p2, " << endl
-         << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
+        << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
       fout << Nircon << " #segments for kpath (fractional coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
         fout << bzsetf << irbz(ircon(1,i),1) << " "
@@ -6323,127 +6322,127 @@ namespace LATTICE {
       cerr << "Generating gnuplot script plotbz.sh" << endl;
 
       fout << "#!/bin/ksh" << endl
-         << "# A script to plot brillouin zone and kpath." << endl
-         << "# It needs aflow with --bzplotdata option" << endl
-         << "# input files: bzplot.dat" << endl
-         << "# output files: bzplot.eps bzplot.png" << endl
-         << "#" << endl << "# written: 2010 wahyu@alumni.duke.edu" << endl << endl
-         << "datfile=bzplot.dat" << endl
-         << "recipfile=recip.dat #reciprocal vectors" << endl
-         << "kptsfile=kpts.dat #kpts" << endl
-         << "kpathfile=kpath.dat #kpath" << endl
-         << "nonkpathfile=nonkpath.dat #irbz non kpath" << endl
-         << "fbzfile=fbz.dat #front bz" << endl
-         << "bbzfile=bbz.dat #back bz" << endl << endl
-         << "#-----reading datfile-----" << endl
-         << "#---reciprocal lattice vectors b1 b2 b3---" << endl
-         << "exec 0< $datfile" << endl
-         << "$IFS read glatt" << endl
-         << "$IFS read gpath" << endl
-         << "$IFS read xrotview zrotview srest" << endl
-         << "read srest" << endl
-         << "$IFS read Lb1 Lb2 Lb3 srest" << endl
-         << "$IFS read Tb1 Tb2 Tb3 srest" << endl
-         << "read srest" << endl
-         << "$IFS read b11 b12 b13" << endl
-         << "$IFS read b21 b22 b23" << endl
-         << "$IFS read b31 b32 b33" << endl
-         << "((hb11=b11/2.0)); ((hb12=b12/2.0)); ((hb13=b13/2.0)); " << endl
-         << "((hb21=b21/2.0)); ((hb22=b22/2.0)); ((hb23=b23/2.0)); " << endl
-         << "((hb31=b31/2.0)); ((hb32=b32/2.0)); ((hb33=b33/2.0)); " << endl
-         << "#--length of b1 b2 b3 arrows--" << endl
-         << "((db11=b11*Lb1)); ((db12=b12*Lb1)); ((db13=b13*Lb1)); " << endl
-         << "((db21=b21*Lb2)); ((db22=b22*Lb2)); ((db23=b23*Lb2)); " << endl
-         << "((db31=b31*Lb3)); ((db32=b32*Lb3)); ((db33=b33*Lb3)); " << endl
-         << "echo $hb11 $hb12 $hb13 $db11 $db12 $db13 > $recipfile" << endl
-         << "echo $hb21 $hb22 $hb23 $db21 $db22 $db23 >> $recipfile" << endl
-         << "echo $hb31 $hb32 $hb33 $db31 $db32 $db33 >> $recipfile" << endl
-         << "((tb11=hb11+b11*Tb1)); ((tb12=hb12+b12*Tb1)); ((tb13=hb13+b13*Tb1));" << endl
-         << "((tb21=hb21+b21*Tb2)); ((tb22=hb22+b22*Tb2)); ((tb23=hb23+b23*Tb2));" << endl
-         << "((tb31=hb31+b31*Tb3)); ((tb32=hb32+b32*Tb3)); ((tb33=hb33+b33*Tb3));" << endl
-         << "" << endl
-         << "#---kpts---" << endl
-         << "$IFS read Nkpts srest" << endl
-         << "rm -f $kptsfile" << endl
-         << "for ((i=0;i<Nkpts;i++))" << endl
-         << "do" << endl
-         << "  read kptsx[$i] kptsy[$i] kptsz[$i] klab[$i]" << endl
-         << "  echo ${kptsx[$i]} ${kptsy[$i]} ${kptsz[$i]} ${klab[$i]} >> $kptsfile" << endl
-         << "done" << endl
-         << "" << endl
-         << "#---kpath---" << endl
-         << "read srest" << endl
-         << "read srest" << endl
-         << "$IFS read N srest" << endl
-         << "rm -f $kpathfile" << endl
-         << "for ((i=0;i<N;i++))" << endl
-         << "do" << endl
-         << "  read srest" << endl
-         << "  echo $srest >> $kpathfile" << endl
-         << "done" << endl
-         << "#---irbz non kpath---" << endl
-         << "$IFS read Nnonkpath srest" << endl
-         << "rm -f $nonkpathfile" << endl
-         << "for ((i=0;i<Nnonkpath;i++))" << endl
-         << "do" << endl
-         << "  read srest" << endl
-         << "  echo $srest >> $nonkpathfile" << endl
-         << "done" << endl
-         << "#---front bz---" << endl
-         << "$IFS read N srest" << endl
-         << "rm -f $fbzfile" << endl
-         << "for ((i=0;i<N;i++))" << endl
-         << "do" << endl
-         << "  read srest" << endl
-         << "  echo $srest >> $fbzfile" << endl
-         << "done" << endl
-         << "#---back bz---" << endl
-         << "$IFS read N srest" << endl
-         << "rm -f $bbzfile" << endl
-         << "for ((i=0;i<N;i++))" << endl
-         << "do" << endl
-         << "  read srest" << endl
-         << "  echo $srest >> $bbzfile" << endl
-         << "done" << endl
-         << "" << endl;
+        << "# A script to plot brillouin zone and kpath." << endl
+        << "# It needs aflow with --bzplotdata option" << endl
+        << "# input files: bzplot.dat" << endl
+        << "# output files: bzplot.eps bzplot.png" << endl
+        << "#" << endl << "# written: 2010 wahyu@alumni.duke.edu" << endl << endl
+        << "datfile=bzplot.dat" << endl
+        << "recipfile=recip.dat #reciprocal vectors" << endl
+        << "kptsfile=kpts.dat #kpts" << endl
+        << "kpathfile=kpath.dat #kpath" << endl
+        << "nonkpathfile=nonkpath.dat #irbz non kpath" << endl
+        << "fbzfile=fbz.dat #front bz" << endl
+        << "bbzfile=bbz.dat #back bz" << endl << endl
+        << "#-----reading datfile-----" << endl
+        << "#---reciprocal lattice vectors b1 b2 b3---" << endl
+        << "exec 0< $datfile" << endl
+        << "$IFS read glatt" << endl
+        << "$IFS read gpath" << endl
+        << "$IFS read xrotview zrotview srest" << endl
+        << "read srest" << endl
+        << "$IFS read Lb1 Lb2 Lb3 srest" << endl
+        << "$IFS read Tb1 Tb2 Tb3 srest" << endl
+        << "read srest" << endl
+        << "$IFS read b11 b12 b13" << endl
+        << "$IFS read b21 b22 b23" << endl
+        << "$IFS read b31 b32 b33" << endl
+        << "((hb11=b11/2.0)); ((hb12=b12/2.0)); ((hb13=b13/2.0)); " << endl
+        << "((hb21=b21/2.0)); ((hb22=b22/2.0)); ((hb23=b23/2.0)); " << endl
+        << "((hb31=b31/2.0)); ((hb32=b32/2.0)); ((hb33=b33/2.0)); " << endl
+        << "#--length of b1 b2 b3 arrows--" << endl
+        << "((db11=b11*Lb1)); ((db12=b12*Lb1)); ((db13=b13*Lb1)); " << endl
+        << "((db21=b21*Lb2)); ((db22=b22*Lb2)); ((db23=b23*Lb2)); " << endl
+        << "((db31=b31*Lb3)); ((db32=b32*Lb3)); ((db33=b33*Lb3)); " << endl
+        << "echo $hb11 $hb12 $hb13 $db11 $db12 $db13 > $recipfile" << endl
+        << "echo $hb21 $hb22 $hb23 $db21 $db22 $db23 >> $recipfile" << endl
+        << "echo $hb31 $hb32 $hb33 $db31 $db32 $db33 >> $recipfile" << endl
+        << "((tb11=hb11+b11*Tb1)); ((tb12=hb12+b12*Tb1)); ((tb13=hb13+b13*Tb1));" << endl
+        << "((tb21=hb21+b21*Tb2)); ((tb22=hb22+b22*Tb2)); ((tb23=hb23+b23*Tb2));" << endl
+        << "((tb31=hb31+b31*Tb3)); ((tb32=hb32+b32*Tb3)); ((tb33=hb33+b33*Tb3));" << endl
+        << "" << endl
+        << "#---kpts---" << endl
+        << "$IFS read Nkpts srest" << endl
+        << "rm -f $kptsfile" << endl
+        << "for ((i=0;i<Nkpts;i++))" << endl
+        << "do" << endl
+        << "  read kptsx[$i] kptsy[$i] kptsz[$i] klab[$i]" << endl
+        << "  echo ${kptsx[$i]} ${kptsy[$i]} ${kptsz[$i]} ${klab[$i]} >> $kptsfile" << endl
+        << "done" << endl
+        << "" << endl
+        << "#---kpath---" << endl
+        << "read srest" << endl
+        << "read srest" << endl
+        << "$IFS read N srest" << endl
+        << "rm -f $kpathfile" << endl
+        << "for ((i=0;i<N;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $kpathfile" << endl
+        << "done" << endl
+        << "#---irbz non kpath---" << endl
+        << "$IFS read Nnonkpath srest" << endl
+        << "rm -f $nonkpathfile" << endl
+        << "for ((i=0;i<Nnonkpath;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $nonkpathfile" << endl
+        << "done" << endl
+        << "#---front bz---" << endl
+        << "$IFS read N srest" << endl
+        << "rm -f $fbzfile" << endl
+        << "for ((i=0;i<N;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $fbzfile" << endl
+        << "done" << endl
+        << "#---back bz---" << endl
+        << "$IFS read N srest" << endl
+        << "rm -f $bbzfile" << endl
+        << "for ((i=0;i<N;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $bbzfile" << endl
+        << "done" << endl
+        << "" << endl;
       /*
          fout << "#getting the structure name and icsd number" << endl
-          << "name=$(pwd)" << endl
-          << "echo $name | sed \"s/\//\n/g\" | grep '_ICSD_' > wahyutmp" << endl
-          << "exec 0< wahyutmp" << endl
-          << "$IFS read name" << endl
-          << "rm -f wahyutmp" << endl
-          << "" << endl;
+         << "name=$(pwd)" << endl
+         << "echo $name | sed \"s/\//\n/g\" | grep '_ICSD_' > wahyutmp" << endl
+         << "exec 0< wahyutmp" << endl
+         << "$IFS read name" << endl
+         << "rm -f wahyutmp" << endl
+         << "" << endl;
          */
       fout << "echo \"set terminal postscript eps color enhanced \\\"" << DEFAULT_GNUPLOT_EPS_FONT << "\\\" 18 \"> plotbz.gnu" << endl;
       //fout << "echo \"set output \\\"bz_$name.eps\\\" \">> plotbz.gnu" << endl
       fout << "echo \"set output \\\"bzplot.eps\\\" \">> plotbz.gnu" << endl
-         << "echo \"set key off \">> plotbz.gnu" << endl
-         << "echo \"unset border \">> plotbz.gnu" << endl
-         << "echo \"unset xtics \">> plotbz.gnu" << endl
-         << "echo \"unset ytics \">> plotbz.gnu" << endl
-         << "echo \"unset ztics \">> plotbz.gnu" << endl
-         << "echo \"set view equal xyz \">> plotbz.gnu" << endl
-         << "echo \"set view $xrotview,$zrotview \">> plotbz.gnu" << endl
-         << "echo \"set title \\\"$glatt  path: $gpath\\\" \">> plotbz.gnu" << endl
-         << "for ((i=0;i<Nkpts;i++))" << endl
-         << "do" << endl
-         << "  echo \"set label \\\"${klab[$i]}\\\" at ${kptsx[i]},${kptsy[i]},${kptsz[i]}\" >> plotbz.gnu" << endl
-         << "done" << endl
-         << "echo \"set label \\\"b{/Symbol _1}\\\" at $tb11,$tb12,$tb13 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
-         << "echo \"set label \\\"b{/Symbol _2}\\\" at $tb21,$tb22,$tb23 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
-         << "echo \"set label \\\"b{/Symbol _3}\\\" at $tb31,$tb32,$tb33 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
-         << "echo \"splot '$recipfile' using 1:2:3:4:5:6 with vectors head filled lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
-         << "echo \"'$fbzfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
-         << "echo \"'$bbzfile' using 1:2:3:4:5:6 with vector nohead lt 0 lw 1.5 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
-         << "echo \"'$kpathfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
-         << "if((Nnonkpath>0))" << endl
-         << "then" << endl
-         << "  echo \"'$nonkpathfile' using 1:2:3:4:5:6 with vector nohead lt 2 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
-         << "fi" << endl
-         << "echo \"'$kptsfile' using 1:2:3 with points pt 7 ps 0.8 lc rgb \\\"#FF0000\\\" \" >> plotbz.gnu" << endl
-         << "" << endl
-         << XHOST.command("gnuplot") << " plotbz.gnu" << endl;
+        << "echo \"set key off \">> plotbz.gnu" << endl
+        << "echo \"unset border \">> plotbz.gnu" << endl
+        << "echo \"unset xtics \">> plotbz.gnu" << endl
+        << "echo \"unset ytics \">> plotbz.gnu" << endl
+        << "echo \"unset ztics \">> plotbz.gnu" << endl
+        << "echo \"set view equal xyz \">> plotbz.gnu" << endl
+        << "echo \"set view $xrotview,$zrotview \">> plotbz.gnu" << endl
+        << "echo \"set title \\\"$glatt  path: $gpath\\\" \">> plotbz.gnu" << endl
+        << "for ((i=0;i<Nkpts;i++))" << endl
+        << "do" << endl
+        << "  echo \"set label \\\"${klab[$i]}\\\" at ${kptsx[i]},${kptsy[i]},${kptsz[i]}\" >> plotbz.gnu" << endl
+        << "done" << endl
+        << "echo \"set label \\\"b{/Symbol _1}\\\" at $tb11,$tb12,$tb13 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+        << "echo \"set label \\\"b{/Symbol _2}\\\" at $tb21,$tb22,$tb23 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+        << "echo \"set label \\\"b{/Symbol _3}\\\" at $tb31,$tb32,$tb33 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+        << "echo \"splot '$recipfile' using 1:2:3:4:5:6 with vectors head filled lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "echo \"'$fbzfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "echo \"'$bbzfile' using 1:2:3:4:5:6 with vector nohead lt 0 lw 1.5 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "echo \"'$kpathfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "if((Nnonkpath>0))" << endl
+        << "then" << endl
+        << "  echo \"'$nonkpathfile' using 1:2:3:4:5:6 with vector nohead lt 2 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "fi" << endl
+        << "echo \"'$kptsfile' using 1:2:3 with points pt 7 ps 0.8 lc rgb \\\"#FF0000\\\" \" >> plotbz.gnu" << endl
+        << "" << endl
+        << XHOST.command("gnuplot") << " plotbz.gnu" << endl;
       //fout << XHOST.command("convert") << " -density 200 bz_$name.eps bz_$name.png" << endl;
       fout << XHOST.command("convert") << " -density 200 bzplot.eps bzplot.png" << endl;
       fout << "rm -f plotbz.gnu $recipfile $kptsfile $kpathfile $nonkpathfile $fbzfile $bbzfile" << endl;
@@ -6490,9 +6489,9 @@ namespace LATTICE {
     oss.precision(4);
     nkpoint++;
     oss << "  " << (Kx[1]>=0.0?" ":"") << Kx[1] 
-       << " " << (Kx[2]>=0.0?" ":"") << Kx[2] 
-       << " " << (Kx[3]>=0.0?" ":"") << Kx[3] 
-       << "   " << double(1.0) << "   ! " << aurostd::PaddedPOST(Ks,20," ") << " // nkpoint=" << nkpoint << endl;
+      << " " << (Kx[2]>=0.0?" ":"") << Kx[2] 
+      << " " << (Kx[3]>=0.0?" ":"") << Kx[3] 
+      << "   " << double(1.0) << "   ! " << aurostd::PaddedPOST(Ks,20," ") << " // nkpoint=" << nkpoint << endl;
     return nkpoint;
   }
   uint kpoint2stream(stringstream& oss, bool isVASP, bool isQE, string A, string B, double grid,uint &nkpoint) {
@@ -6567,39 +6566,38 @@ namespace LATTICE {
 
     foundBZ=FALSE;
     uint nkpoint=0;
-    /*
-       1. TRI order: kalpha,kbeta,kgamma  > 90 (kgamma<kalpha, kgamma<kbeta)
-       or kalpha,kbeta,kgamma  < 90 (kgamma>kalpha, kgamma>kbeta)
-       special case when kgamma=90
-       "TRI1a" kalpha>90 kbeta>90 kgamma>90
-       "TRI1b" kalpha<90 kbeta<90 kgamma<90
-       "TRI2a" kalpha>90 kbeta>90 kgamma=90
-       "TRI2b" kalpha<90 kbeta<90 kgamma=90
-       2. "MCL" unique (order b<=c)
-       3. MCLC (order alpha<90)
-       "MCLC1"  kgamma>90
-       "MCLC2"  kgamma=90
-       "MCLC3"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 < 1
-       "MCLC4"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 = 1
-       "MCLC5"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 > 1
-       4. "ORC" unique (order a<b<c)
-       5. "ORCC" unique (order a<b)
-       6. ORCF (order a<b<c)
-       "ORCF1" "ORCF_invb2+invc2<inva2"  for 1/a^2 > 1/b^2 + 1/c^2
-       "ORCF2" "ORCF_inva2<invb2+invc2"  for 1/a^2 < 1/b^2 + 1/c^2
-       "ORCF3"                           for 1/a^2 = 1/b^2 + 1/c^2
-       7. "ORCI" unique (order a<b<c)
-       8. "TET" unique (order a a c)
-       9. BCT (order a a c)
-       "BCT1" "BCT_c<a" for c<a
-       "BCT2" "BCT_c>a" for c>a
-       10. "RHL1" alpha<90
-       "RHL2" alpha>90
-       11. "HEX" unique (order 60 90 90)
-       12. "CUB" unique
-       13. "FCC" unique (order 60 60 60)
-       14. "BCC" unique
-       */
+    
+    //   1. TRI order: kalpha,kbeta,kgamma  > 90 (kgamma<kalpha, kgamma<kbeta)
+    //   or kalpha,kbeta,kgamma  < 90 (kgamma>kalpha, kgamma>kbeta)
+    //   special case when kgamma=90
+    //   "TRI1a" kalpha>90 kbeta>90 kgamma>90
+    //   "TRI1b" kalpha<90 kbeta<90 kgamma<90
+    //   "TRI2a" kalpha>90 kbeta>90 kgamma=90
+    //   "TRI2b" kalpha<90 kbeta<90 kgamma=90
+    //   2. "MCL" unique (order b<=c)
+    //   3. MCLC (order alpha<90)
+    //   "MCLC1"  kgamma>90
+    //   "MCLC2"  kgamma=90
+    //   "MCLC3"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 < 1
+    //   "MCLC4"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 = 1
+    //   "MCLC5"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 > 1
+    //   4. "ORC" unique (order a<b<c)
+    //   5. "ORCC" unique (order a<b)
+    //   6. ORCF (order a<b<c)
+    //   "ORCF1" "ORCF_invb2+invc2<inva2"  for 1/a^2 > 1/b^2 + 1/c^2
+    //   "ORCF2" "ORCF_inva2<invb2+invc2"  for 1/a^2 < 1/b^2 + 1/c^2
+    //   "ORCF3"                           for 1/a^2 = 1/b^2 + 1/c^2
+    //   7. "ORCI" unique (order a<b<c)
+    //   8. "TET" unique (order a a c)
+    //   9. BCT (order a a c)
+    //   "BCT1" "BCT_c<a" for c<a
+    //   "BCT2" "BCT_c>a" for c>a
+    //   10. "RHL1" alpha<90
+    //   "RHL2" alpha>90
+    //   11. "HEX" unique (order 60 90 90)
+    //   12. "CUB" unique
+    //   13. "FCC" unique (order 60 60 60)
+    //   14. "BCC" unique
 
     xvector<double> b1(3),b2(3),b3(3);
     b1(1)=klattice(1,1); b1(2)=klattice(1,2); b1(3)=klattice(1,3);

@@ -29,9 +29,9 @@ namespace KBIN{
     AflowIn=aurostd::RemoveComments(AflowIn); // for safety
     vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn);
     string BflowIn=AflowIn;
-    
+
     if(LDEBUG) cerr << "DEBUG: KBIN::AIMS_Get_AIMSflags_from_AflowIN (START)" << endl;
-    
+
     aimsflags.KBIN_AIMS_RUN.clear();
     if((aurostd::substring2bool(AflowIn,"[AIMS_RUN_GENERATE]") || aurostd::substring2bool(AflowIn,"[AIMS_RUN]GENERATE")) || aflags.KBIN_GEN_AIMS_FROM_AFLOWIN) 
       aimsflags.KBIN_AIMS_RUN.push("GENERATE");
@@ -44,7 +44,7 @@ namespace KBIN{
     if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]STOP")) aimsflags.KBIN_AIMS_CONTROL_MODE.push("EXPLICIT_START_STOP");
     if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_IMPLICIT]")) aimsflags.KBIN_AIMS_CONTROL_MODE.push("IMPLICIT");
     if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXTERNAL]")) aimsflags.KBIN_AIMS_CONTROL_MODE.push("EXTERNAL");
-    
+
     if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_FILE]"))  aimsflags.KBIN_AIMS_GEOM_FILE.push("KEYWORD");
     if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]")) aimsflags.KBIN_AIMS_GEOM_MODE.push("EXPLICIT");
     if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START") &&  aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]STOP")) aimsflags.KBIN_AIMS_GEOM_MODE.push("EXPLICIT_START_STOP");
@@ -64,7 +64,7 @@ namespace KBIN{
       }
       if(kflags.KBIN_FROZSL_DOWNLOAD)    FROZSL::Setup_frozsl_init_input(AflowIn,FileMESSAGE,input_file,aflags,kflags);
       if(kflags.KBIN_FROZSL_FILE)        FROZSL::File_INPUT(AflowIn,FileMESSAGE,input_file,aflags,kflags);
-      
+
       if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) input_file.str(AflowIn);
 
       aimsflags.KBIN_AIMS_GEOM_MODE.push("EXPLICIT_START_STOP_POINT");
@@ -99,7 +99,7 @@ namespace KBIN{
       aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear();
       aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear();
     }
-    
+
     // the rest for GEOM
     if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_IMPLICIT]")) aimsflags.KBIN_AIMS_GEOM_MODE.push("IMPLICIT");
     if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",TRUE)) aimsflags.KBIN_AIMS_GEOM_FILE.push("PROTOTYPE");
@@ -171,7 +171,7 @@ namespace KBIN{
     if(LDEBUG) cerr << "CORMAC STUFF  " << "aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedscheme(\"MULTIPLY_EQUAL\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedscheme("MULTIPLY_EQUAL") << endl;
 
     if(aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.xscheme!="") aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.isentry=TRUE;
-    
+
     if(LDEBUG) cerr << "DEBUG: KBIN::AIMS_Get_AIMSflags_from_AflowIN (START)" << endl;
 
     return aimsflags;
@@ -334,7 +334,7 @@ namespace KBIN{
         }
         // ***************************************************************************
         // DO THE SYMMETRY NEIGHBOURS CALCULATION
-        //if(!kflags.KBIN_PHONONS_CALCULATION_FROZSL) {
+        //if(!kflags.KBIN_PHONONS_CALCULATION_FROZSL)
         //DX
         if(!(kflags.KBIN_PHONONS_CALCULATION_FROZSL || 
               kflags.KBIN_PHONONS_CALCULATION_APL ||
@@ -452,16 +452,16 @@ namespace KBIN{
         if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
       }
       aflags=aflags_backup;kflags=kflags_backup; // RESTORE
-      } // LOOP ixinput
-      // ***************************************************************************
-      aflags=aflags_backup;kflags=kflags_backup; // RESTORE
-      // POSTSCRIPT
-      if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT"))
-        if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
-          KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
-      // ***************************************************************************
-      FileAFLOWIN.clear();FileAFLOWIN.close();
-      return Krun;
+    } // LOOP ixinput
+    // ***************************************************************************
+    aflags=aflags_backup;kflags=kflags_backup; // RESTORE
+    // POSTSCRIPT
+    if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT"))
+      if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
+        KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
+    // ***************************************************************************
+    FileAFLOWIN.clear();FileAFLOWIN.close();
+    return Krun;
   }
 } // namespace KBIN
 

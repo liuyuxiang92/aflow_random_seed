@@ -2576,7 +2576,7 @@ namespace aflowlib {
     // LIBRARY_ALL
     if(aurostd::substring2bool(library,"all")) {
       out << "AFLOW V"<<string(AFLOW_VERSION)<< "  "  << TODAY << endl;
-   
+
       init::InitLoadString("vLIBS");
       uint sICSD=XHOST_Library_CALCULATED_ICSD_LIB.size();
       uint sLIB0=XHOST_Library_CALCULATED_LIB0_LIB.size();
@@ -2589,7 +2589,7 @@ namespace aflowlib {
       uint sLIB7=XHOST_Library_CALCULATED_LIB7_LIB.size();
       uint sLIB8=XHOST_Library_CALCULATED_LIB8_LIB.size();
       uint sLIB9=XHOST_Library_CALCULATED_LIB9_LIB.size();
-      
+
       out << "Library_ICSD_CALCULATED = " << sICSD << endl;
       out << "Library_LIB0_CALCULATED = " << sLIB0 << endl;
       out << "Library_LIB1_CALCULATED = " << sLIB1 << endl;
@@ -2603,12 +2603,12 @@ namespace aflowlib {
       out << "Library_LIB9_CALCULATED = " << sLIB9 << endl;
 
       out << "AFLOW V" 
-	  << string(AFLOW_VERSION)
-	  << " [date="  <<  aurostd::get_datetime() << "]" 
-	  << " [built="  << TODAY << "]" 
-	  << " Calcs=" 
-	  << sICSD << "," << sLIB0 << "," << sLIB1 << "," << sLIB2 << "," << sLIB3 << "," << sLIB4 << "," << sLIB5 << "," << sLIB6 << "," << sLIB7 << "," << sLIB8 << "," << sLIB9 << "="
-	  << sICSD+sLIB0+sLIB1+sLIB2+sLIB3+sLIB4+sLIB5+sLIB6+sLIB7+sLIB8+sLIB9 << endl;
+        << string(AFLOW_VERSION)
+        << " [date="  <<  aurostd::get_datetime() << "]" 
+        << " [built="  << TODAY << "]" 
+        << " Calcs=" 
+        << sICSD << "," << sLIB0 << "," << sLIB1 << "," << sLIB2 << "," << sLIB3 << "," << sLIB4 << "," << sLIB5 << "," << sLIB6 << "," << sLIB7 << "," << sLIB8 << "," << sLIB9 << "="
+        << sICSD+sLIB0+sLIB1+sLIB2+sLIB3+sLIB4+sLIB5+sLIB6+sLIB7+sLIB8+sLIB9 << endl;
 
     }
     if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::CALCULATED: END" << endl; }

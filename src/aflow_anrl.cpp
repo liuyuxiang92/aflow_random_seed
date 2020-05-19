@@ -769,7 +769,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // not found
     if(!found) {
-      
+
       cerr << "ERROR - anrl::PrototypeANRL: prototype not found [label=" << label << "]" << endl;
       exit(0);
     }

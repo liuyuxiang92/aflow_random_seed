@@ -401,7 +401,7 @@ namespace apl {
       outfile << setw(15) << x << " ";
       //[OBSOLETE PN20180705]path.push_back(x);  //[PN]
       for (uint j = 1; j <= _pc->getNumberOfBranches(); j++)
-      outfile << setw(15) << _freqs[i](j) << " ";
+        outfile << setw(15) << _freqs[i](j) << " ";
       outfile << std::endl;
 
       // Step of x will change in each subpath

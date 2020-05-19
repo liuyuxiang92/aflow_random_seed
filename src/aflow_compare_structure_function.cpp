@@ -1230,7 +1230,7 @@ namespace compare {
       //DX20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX20190711
       structure_tmp.structure_representative_generated = true;
       structure_tmp.structure_representative_source = "file";
-        structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
+      structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
       if(LDEBUG) {
         cerr << function_name << ": loaded structure " << i << endl;
       }
@@ -6146,7 +6146,7 @@ namespace compare{
     // declare variables outside of loop (efficiency) //DX20200401
     xvector<double> min_xvec, incell_dist, tmp_xvec, a_component, ab_component;
     std::pair<xvector<double>,xvector<double> > tmp_pair;
-    
+
     for(j=0;j<xstr1_atoms.size();j++){
       //cerr << "xstr1.atoms[j]: " << xstr1.atoms[j] << endl;
       tmp_xvec = xstr1_atoms[j].cpos;
@@ -8065,7 +8065,7 @@ namespace compare{
       // (don't calculate unnecessary matrix-vector multiplication)
       // Note: C2F (done later) changes lattice to one that is aligned with Cartesian directions (a along +X, etc.) 
       //       this is like rotating the global coordinates, therefore, fpos does not change
-      
+
       deque<_atom> new_basis_2;
       // ---------------------------------------------------------------------------
       // supercell method : orig, slow
@@ -8276,11 +8276,11 @@ namespace compare{
       if((tmp_mod <= max_q1_a && tmp_mod >= min_q1_a) || 
           (tmp_mod <= max_q1_b && tmp_mod >= min_q1_b) || 
           (tmp_mod <= max_q1_c && tmp_mod >= min_q1_c)){ 
-          lattice_vecs.push_back(tmp_vec);
-          // Store indices of atoms comprising the vector
-          vector<uint> ij;
-          ij.push_back(i); ij.push_back(j);
-          ij_index.push_back(ij); 
+        lattice_vecs.push_back(tmp_vec);
+        // Store indices of atoms comprising the vector
+        vector<uint> ij;
+        ij.push_back(i); ij.push_back(j);
+        ij_index.push_back(ij); 
         // DX20200414 [OBSOLETE - redundant] bool vec_stored = false;
         // DX20200414 [OBSOLETE - redundant] for(uint p=0;p<lattice_vecs.size();p++){
         // DX20200414 [OBSOLETE - redundant]   if(identical(lattice_vecs[p],tmp_vec,1e-3)){ //DX 20190318 - changed from -10 to -3

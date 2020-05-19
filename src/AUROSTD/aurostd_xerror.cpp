@@ -24,16 +24,16 @@ namespace aurostd {
   string xerror_PID;  //SC20200508
 
   static const std::string error_types[_AFLOW_NUM_ERR_TYPES_] = 
-    {"", "Input Error", "File Error", "Value Error",
-     "Index Error", "Runtime Error", "Allocation Error"};
+  {"", "Input Error", "File Error", "Value Error",
+    "Index Error", "Runtime Error", "Allocation Error"};
 
   //Errors associated with those types
   static const std::string errors[_AFLOW_NUM_ERR_TYPES_][9] =
-    {{"Generic error", "Illegal error code", "", "", "", "", "", "", ""},
-     {"unknown flag", "missing flag", "input ambiguous", "illegal parameter", "number of parameters", "", "", "", ""},
-     {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
-     {"illegal value", "out of range", "", "", "", "", "", "", ""},
-     {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
+  {{"Generic error", "Illegal error code", "", "", "", "", "", "", ""},
+    {"unknown flag", "missing flag", "input ambiguous", "illegal parameter", "number of parameters", "", "", "", ""},
+    {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
+    {"illegal value", "out of range", "", "", "", "", "", "", ""},
+    {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
     {"not initialized", "SQL error", "", "", "", "", "", "", ""},
     {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 

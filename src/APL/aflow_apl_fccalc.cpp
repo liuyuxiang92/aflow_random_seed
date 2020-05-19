@@ -270,7 +270,7 @@ namespace apl {
 //////////////////////////////////////////////////////////////////////////////
 
 namespace apl {
- 
+
   // Sets up the calculations that determine the Born effective charges and
   // the dielectric tensor
   bool ForceConstantCalculator::runVASPCalculationsBE(_xinput& xInput, _aflags& _aflowFlags,
@@ -305,7 +305,7 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  
+
   // Calculates the dielectric tensor and Born effective charges
   bool ForceConstantCalculator::calculateBornChargesDielectricTensor(const _xinput& xinpBE) {
     stringstream message;
@@ -573,7 +573,7 @@ namespace apl {
       // Get line
       //CO - START
       if (line_count == vlines.size()) {
-      string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
+        string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
         string message = "No information on dielectric tensor in OUTCAR.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
@@ -895,14 +895,14 @@ namespace apl {
   DirectMethodPC::DirectMethodPC(Supercell& sc, ofstream& mf, ostream& oss)
     : ForceConstantCalculator(sc, mf, oss) {
       free();
-    _directory = "."; //AS20200512
-  }
+      _directory = "."; //AS20200512
+    }
 
   DirectMethodPC::DirectMethodPC(const DirectMethodPC& that)
     : ForceConstantCalculator(*that._supercell, *that.getOFStream(), *that.getOSS()) {
-    free();
-    copy(that);
-  }
+      free();
+      copy(that);
+    }
 
   DirectMethodPC& DirectMethodPC::operator=(const DirectMethodPC& that) {
     if (this != &that) {
@@ -1837,57 +1837,57 @@ namespace apl {
 
 namespace apl {
 
-   // Writes the forces into a VASP DYNMAT format
-   void DirectMethodPC::writeDYNMAT() {
-     string filename = aurostd::CleanFileName(_directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
-     string message = "Writing forces into file " + filename + ".";
-     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // Writes the forces into a VASP DYNMAT format
+  void DirectMethodPC::writeDYNMAT() {
+    string filename = aurostd::CleanFileName(_directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
+    string message = "Writing forces into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
-     stringstream outfile;
+    stringstream outfile;
 
-     // 1st line
-     outfile << _supercell->getNumberOfUniqueAtoms() << " ";
-     outfile << _supercell->getNumberOfAtoms() << " ";
-     int dof = 0;
-     for (uint i = 0; i < _uniqueDistortions.size(); i++)
-       dof += _uniqueDistortions[i].size();
-     outfile << dof << std::endl;
+    // 1st line
+    outfile << _supercell->getNumberOfUniqueAtoms() << " ";
+    outfile << _supercell->getNumberOfAtoms() << " ";
+    int dof = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++)
+      dof += _uniqueDistortions[i].size();
+    outfile << dof << std::endl;
 
-     // 2nd line
-     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-     outfile << setprecision(3);
-     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-       if (i != 0) outfile << " ";
-       outfile << _supercell->getUniqueAtomMass(i);
-     }
-     outfile << std::endl;
+    // 2nd line
+    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+    outfile << setprecision(3);
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      if (i != 0) outfile << " ";
+      outfile << _supercell->getUniqueAtomMass(i);
+    }
+    outfile << std::endl;
 
-     // forces + 1 line info about distortion
-     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-         // line info
-         outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
-         outfile << (j + 1) << " ";
-         xvector<double> shift(3);
-         shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-         outfile << setprecision(3);
-         outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
-         // forces
-         outfile << setprecision(6);
-         for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
-           outfile << setw(15) << _uniqueForces[i][j][k](1)
-             << setw(15) << _uniqueForces[i][j][k](2)
-             << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
-       }
-     }
+    // forces + 1 line info about distortion
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        // line info
+        outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
+        outfile << (j + 1) << " ";
+        xvector<double> shift(3);
+        shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+        outfile << setprecision(3);
+        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+        // forces
+        outfile << setprecision(6);
+        for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
+          outfile << setw(15) << _uniqueForces[i][j][k](1)
+            << setw(15) << _uniqueForces[i][j][k](2)
+            << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
+      }
+    }
 
-     aurostd::stringstream2file(outfile, filename);
-     if (!aurostd::FileExist(filename)) {
-       string function = "DirectMethodPC::writeDYNMAT()";
-       message = "Cannot open output file " + filename + ".";
-       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-     }
-   }
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "DirectMethodPC::writeDYNMAT()";
+      message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
+  }
 
   // [OBSOLETE]  //////////////////////////////////////////////////////////////////////////////
 
@@ -2281,9 +2281,9 @@ namespace apl {
 
   LinearResponsePC::LinearResponsePC(const LinearResponsePC& that)
     : ForceConstantCalculator(*that._supercell, *that.getOFStream(), *that.getOSS()) {
-    free();
-    copy(that);
-  }
+      free();
+      copy(that);
+    }
 
   LinearResponsePC& LinearResponsePC::operator=(const LinearResponsePC& that) {
     if (this != &that) {

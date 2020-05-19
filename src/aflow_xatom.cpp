@@ -1756,14 +1756,14 @@ vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const str
 // Reset dims for RadiusSphereLattice() - DX20191122
 // ***************************************************************************
 void resetLatticeDimensions(const xmatrix<double>& lattice, 
-			    double radius, 
-			    xvector<int>& dims,
-			    vector<xvector<double> >& l1, 
-			    vector<xvector<double> >& l2, 
-			    vector<xvector<double> >& l3, 
-			    vector<int>& a_index, 
-			    vector<int>& b_index, 
-			    vector<int>& c_index){
+    double radius, 
+    xvector<int>& dims,
+    vector<xvector<double> >& l1, 
+    vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, 
+    vector<int>& a_index, 
+    vector<int>& b_index, 
+    vector<int>& c_index){
 
   // resets the lattice dimensions (dims) based on radius
   // generates lattice vectors (l1,l2,l3) right away = speed increase
@@ -1801,9 +1801,9 @@ void resetLatticeDimensions(const xmatrix<double>& lattice,
 // minimumCoordinationShellLatticeOnly() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-					 double& min_dist, 
-					 uint& frequency, 
-					 vector<xvector<double> >& coordinates){
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates){
 
   // determine the minimum coordination shell of the lattice
   // i.e., find the set of closest neighbors to the origin
@@ -1820,10 +1820,10 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 // minimumCoordinationShellLatticeOnly() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-					 double& min_dist, 
-					 uint& frequency, 
-					 vector<xvector<double> >& coordinates, 
-					 double radius){
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates, 
+    double radius){
 
   // determine the minimum coordination shell of the lattice
   // i.e., find the set of closest neighbors to the origin
@@ -1837,25 +1837,25 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
   resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
 
   minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
-				      a_index, b_index, c_index, 
-				      min_dist, frequency, coordinates, radius);
+      a_index, b_index, c_index, 
+      min_dist, frequency, coordinates, radius);
 }
 
 // ***************************************************************************
 // minimumCoordinationShellLatticeOnly() - DX20191122
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, 
-					 xvector<int>& dims,
-					 vector<xvector<double> >& l1, 
-					 vector<xvector<double> >& l2, 
-					 vector<xvector<double> >& l3, 
-					 vector<int>& a_index, 
-					 vector<int>& b_index, 
-					 vector<int>& c_index, 
-					 double& min_dist, 
-					 uint& frequency, 
-					 vector<xvector<double> >& coordinates,
-					 double radius){
+    xvector<int>& dims,
+    vector<xvector<double> >& l1, 
+    vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, 
+    vector<int>& a_index, 
+    vector<int>& b_index, 
+    vector<int>& c_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates,
+    double radius){
 
   // determine the minimum coordination shell environment of the lattice
   // i.e., find the set of closest neighbors to the origin
@@ -1912,10 +1912,10 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 // minimumCoordinationShell() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShell(const xstructure& xstr, 
-			      uint center_index, 
-			      double& min_dist, 
-			      uint& frequency, 
-			      vector<xvector<double> >& coordinates){
+    uint center_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates){
 
   string type = "";
 
@@ -1926,11 +1926,11 @@ void minimumCoordinationShell(const xstructure& xstr,
 // minimumCoordinationShell() - DX20191122
 // ***************************************************************************
 void minimumCoordinationShell(const xstructure& xstr, 
-			      uint center_index, 
-			      double& min_dist, 
-			      uint& frequency, 
-			      vector<xvector<double> >& coordinates, 
-			      const string& type){
+    uint center_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates, 
+    const string& type){
 
   // determine the minimum coordination shell environment
   // "type" enables the search of environments by certain elements/types only
@@ -1987,8 +1987,8 @@ void minimumCoordinationShell(const xstructure& xstr,
       // use variant that stores the lattice dimension information so it can be 
       // updated for the "minimumCoordinationShell" function
       minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
-					  a_index, b_index, c_index, 
-					  min_dist, frequency, coordinates, search_radius);
+          a_index, b_index, c_index, 
+          min_dist, frequency, coordinates, search_radius);
     }
   }
 }
@@ -3110,7 +3110,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     oss << "# AFLOW::ABINIT END " << endl;
     return oss;
   } 
-  
+
   // ----------------------------------------------------------------------
   //  ELK OUTPUT //DX20200315
   if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
@@ -3621,7 +3621,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       tokens.clear();
     }
   }
-  
+
   // ----------------------------------------------------------------------
   // QUANTUM ESPRESSO FINDER
   if(!IOMODE_found) {
@@ -3752,9 +3752,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       aurostd::string2tokens(vinput[i],tokens_line," ");
       if(tokens_line.size()){
         IOMODE_found=(IOMODE_found || 
-		      tokens_line[0]=="atom" || 
-		      tokens_line[0]=="atom_frac" || 
-		      tokens_line[0]=="lattice_vector");
+            tokens_line[0]=="atom" || 
+            tokens_line[0]=="atom_frac" || 
+            tokens_line[0]=="lattice_vector");
       }
     }
     if(IOMODE_found){
@@ -4774,7 +4774,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp5_poscar_format=FALSE;
     // DONE ?
   } // QE INPUT
-  
+
   // ----------------------------------------------------------------------
   // ABINIT INPUT (DX20200310)
   if(a.iomode==IOABINIT_AUTO || a.iomode==IOABINIT_GEOM) { // ABINIT
@@ -6452,27 +6452,27 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 // change coordinates type
 void xstructure::SetCoordinates(const int& mode)  {
   switch(mode) {
-  case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-    cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
-    break;
-  }
-  case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-    cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
-    break;
-  }
-  case _COORDS_CARTESIAN_ : {
-    coord_flag=_COORDS_CARTESIAN_;
-    strcpy(coord_type,"C");
-    break;
-  }
-  case _COORDS_FRACTIONAL_ : {
-    coord_flag=_COORDS_FRACTIONAL_;
-    strcpy(coord_type,"D");
-    break;
-  }
-  default: {
-    cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
-  }
+    case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
+                                                   cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
+                                                   break;
+                                                 }
+    case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
+                                                   cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
+                                                   break;
+                                                 }
+    case _COORDS_CARTESIAN_ : {
+                                coord_flag=_COORDS_CARTESIAN_;
+                                strcpy(coord_type,"C");
+                                break;
+                              }
+    case _COORDS_FRACTIONAL_ : {
+                                 coord_flag=_COORDS_FRACTIONAL_;
+                                 strcpy(coord_type,"D");
+                                 break;
+                               }
+    default: {
+               cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
+             }
   }
 }
 
@@ -6581,15 +6581,15 @@ void xstructure::AddAtom(const _atom& atom) {
   // NEW STYLE
   bool found=FALSE;
   if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
-      if(iat<atoms.size()-1) {
-	if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
-	  //	if(LDEBUG)
-	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-	  atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
-	  found=TRUE;
-	}
+    if(iat<atoms.size()-1) {
+      if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
+        //	if(LDEBUG)
+        cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+        atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
+        found=TRUE;
       }
     }
+  }
   if(1) {
     std::deque<_atom>::iterator it=atoms.begin();
     for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
@@ -7391,7 +7391,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   stringstream message;
   int spacegroupnumber=0;
   if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
-     spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
+      spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
@@ -8364,7 +8364,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   if(setting==0){ //signals default //DX20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
-       spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
+        spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
       setting=2;
     }
     // else setting==1
@@ -9419,8 +9419,8 @@ double det(const xvector<double>& v1,const xvector<double>& v2,const xvector<dou
   return scalar_product(v1,vector_product(v2,v3));
 }
 double det(const double& a11,const double& a12,const double& a13,
-	   const double& a21,const double& a22,const double& a23,
-	   const double& a31,const double& a32,const double& a33) {
+    const double& a21,const double& a22,const double& a23,
+    const double& a31,const double& a32,const double& a33) {
   return a11*a22*a33+a12*a23*a31+a13*a21*a32-a13*a22*a31-a12*a21*a33-a11*a23*a32;
 }
 double GetVol(const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
@@ -9484,9 +9484,9 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& per
 }
 
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -9495,10 +9495,10 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
 }
 
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
-			      const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
+    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -10518,7 +10518,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Start loop
 
- LoopHead:
+LoopHead:
 
   cnt++;
   //  cerr << "DEBUG: Niggli() cnt=" << cnt << endl;
@@ -10788,7 +10788,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Start loop
 
- LoopHead:
+LoopHead:
 
   cnt++;
   //  cerr << "DEBUG: Niggli() cnt=" << cnt << endl;
@@ -10860,8 +10860,8 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 5
   if(((abs(ksi)-b)>=TOL) ||
-     ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
-     ((abs(ksi+b)<TOL) && (zeta<0)) ) {
+      ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
+      ((abs(ksi+b)<TOL) && (zeta<0)) ) {
     m5(2,3)=-(SignNoZero(ksi));
     P=P*m5;
     temp1=b+c-ksi*SignNoZero(ksi);
@@ -10877,7 +10877,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 6
   if(((abs(eta)-a)>TOL) || ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
-     ((abs(eta+a)<TOL) && (zeta<0))) {
+      ((abs(eta+a)<TOL) && (zeta<0))) {
     m6(1,3)=-SignNoZero(eta);
     P=P*m6;
     temp1=a+c-eta*SignNoZero(eta);
@@ -10892,7 +10892,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 7
   if(((abs(zeta)-a)>TOL) || ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
-     ((abs(zeta+a)<TOL) && (eta<0))) {
+      ((abs(zeta+a)<TOL) && (eta<0))) {
     m7(1,2)=-SignNoZero(zeta);
     P=P*m7;
     temp1=a+b-zeta*SignNoZero(zeta);
@@ -10908,7 +10908,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 8
   if((ksi+eta+zeta+a+b<0) ||
-     ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
+      ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
     P=P*m8;
     temp1=a+b+c+ksi+eta+zeta;
     temp2=2.0*b+ksi+zeta;
@@ -11026,7 +11026,7 @@ xmatrix<double> GetNiggliStr(const xmatrix<double>& lattice) {
 }
 
 void _sdebug_GetNiggliCell(int step,int iter,double a,double b,double c,
-			   double ksi,double eta,double zeta,ostream& sout) {
+    double ksi,double eta,double zeta,ostream& sout) {
   if(0) {
     // tpx
     sout << "Step: " << step << endl;
@@ -11817,12 +11817,12 @@ void xstructure::BringInWignerSeitz(void) {
           proj_a23=scalar_product(rat,a23)/na23/na23;
           proj_a123=scalar_product(rat,a123)/na123/na123;
           if((proj_a1>-0.5 && proj_a1<=0.5) &&
-	     (proj_a2>-0.5 && proj_a2<=0.5) &&
-	     (proj_a3>-0.5 && proj_a3<=0.5) &&
-	     (proj_a12>-0.5 && proj_a12<=0.5) &&
-	     (proj_a31>-0.5 && proj_a31<=0.5) &&
-	     (proj_a23>-0.5 && proj_a23<=0.5) &&
-	     (proj_a123>-0.5 && proj_a123<=0.5)) {
+              (proj_a2>-0.5 && proj_a2<=0.5) &&
+              (proj_a3>-0.5 && proj_a3<=0.5) &&
+              (proj_a12>-0.5 && proj_a12<=0.5) &&
+              (proj_a31>-0.5 && proj_a31<=0.5) &&
+              (proj_a23>-0.5 && proj_a23<=0.5) &&
+              (proj_a123>-0.5 && proj_a123<=0.5)) {
             atoms.at(iat).cpos(1)=rat(1);
             atoms.at(iat).cpos(2)=rat(2);
             atoms.at(iat).cpos(3)=rat(3);
@@ -12285,7 +12285,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   plattice=olattice;
 
   // done
-  
+
   if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
   xstructure b=sstr;
   b.lattice=plattice;//b.lattice=roundoff(b.lattice,_EPS_FPOS_EQUAL_);
@@ -12489,8 +12489,8 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
   for(uint iat1=0;iat1<sstr.atoms.size();iat1++) {
     for(uint iat2=0;iat2<sstr.atoms.size();iat2++) {
       if(iat2!=iat1 &&
-	 sstr.atoms.at(iat1).type==ispecie_min &&
-	 sstr.atoms.at(iat2).type==ispecie_min) {
+          sstr.atoms.at(iat1).type==ispecie_min &&
+          sstr.atoms.at(iat2).type==ispecie_min) {
         fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
         cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
         if(IsTranslationFVector(sstr,fdisp)) candidate_lattice_vector.push_back(cdisp);
@@ -12550,8 +12550,8 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -12726,8 +12726,8 @@ xstructure GetPrimitive2(const xstructure& a) {
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -12867,8 +12867,8 @@ xstructure GetPrimitive3(const xstructure& a) {
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -13285,8 +13285,8 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
     fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX20190613
     //DX20190613 [OBSOLETE] SYM::PBC(fdiff);
     if(aurostd::abs(fdiff(1))<_ZERO_TOL_ && 
-       aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
-       aurostd::abs(fdiff(3))<_ZERO_TOL_){
+        aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
+        aurostd::abs(fdiff(3))<_ZERO_TOL_){
       return TRUE;
     }
   }
@@ -14633,13 +14633,13 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   oss << "TITL " << str.title << endl;
   oss.precision(8);
   oss << "CELL "
-      << str.scale*aurostd::modulus(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3)) << " "
-      << str.scale*aurostd::modulus(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3)) << " "
-      << str.scale*aurostd::modulus(str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-      << aurostd::angle(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-      << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-      << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(2,1),str.lattice(2,2),str.lattice(2,3))
-      << endl;
+    << str.scale*aurostd::modulus(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3)) << " "
+    << str.scale*aurostd::modulus(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3)) << " "
+    << str.scale*aurostd::modulus(str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+    << aurostd::angle(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+    << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+    << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(2,1),str.lattice(2,2),str.lattice(2,3))
+    << endl;
   // oss << str.atoms.size() << endl;
   oss.precision(10);
   k=0;
@@ -14682,9 +14682,9 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   if(P_EQUAL) oss << "EQUAL ";
   if(P_EXACT) oss << "EXACT ";
   if(!aurostd::isequal(P_ang,PLATON_TOLERANCE_ANGLE,1.0e-6) ||
-     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D1,1.0e-6) ||
-     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D2,1.0e-6) ||
-     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D3,1.0e-6))
+      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D1,1.0e-6) ||
+      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D2,1.0e-6) ||
+      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D3,1.0e-6))
     //    printf("%14.10f %14.10f %14.10f %14.10f ",P_ang,P_d1,P_d2,P_d3);  printf("\n");
     oss << P_ang << " " << P_d1 << " " << P_d2 << " " << P_d3 << " ";//
   oss << endl;
@@ -15401,20 +15401,20 @@ int GenerateGridAtoms(xstructure& str) {
 // **************************************************************************
 namespace aurostd {   // INT
   class _ssort_int_value0123 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const {
-      if(v1[0]<v2[0]) return TRUE;
-      if(v1[0]==v2[0]) {
-	if(v1[1]>v2[1]) return TRUE;
-	if(v1[1]==v2[1]) {
-	  if(v1[2]>v2[2]) return TRUE;
-	  if(v1[2]==v2[2]) {
-	    if(v1[3]>v2[3]) return TRUE;
-	  }
-	}
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const {
+        if(v1[0]<v2[0]) return TRUE;
+        if(v1[0]==v2[0]) {
+          if(v1[1]>v2[1]) return TRUE;
+          if(v1[1]==v2[1]) {
+            if(v1[2]>v2[2]) return TRUE;
+            if(v1[2]==v2[2]) {
+              if(v1[3]>v2[3]) return TRUE;
+            }
+          }
+        }
+        return FALSE;
       }
-      return FALSE;
-    }
   };
 }
 
@@ -15597,8 +15597,8 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk) {
 //CO20170717 - Compare this with PBC() function, this function brings in to 0th cell, PBC brings in to cell between -0.5 and 0.5
 // PBC() is good for minimizing overall fpos
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
-		    xvector<int>& ijk,const xmatrix<double>& lattice,
-		    const bool coord_flag) {
+    xvector<int>& ijk,const xmatrix<double>& lattice,
+    const bool coord_flag) {
   double TOL=1e-11;
   xvector<double> cpos(3),fpos(3);
   // p_cell0=xvector<double> (3);
@@ -15632,38 +15632,38 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
 // **************************************************************************
 // For sort algorithm in GetNeighData
 class compare_GetNeighData {
-public:  
-  int operator()(const _atom& a, const _atom& b) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)" << endl;
-    double tol=1e-15;
-    // Sort by distance
-    if(aurostd::isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)) {
-      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
-      // Sort by unit cell values
-      if(a.name==b.name) {
-	if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name==b.name" << endl;
-	xvector<int> ijka=a.ijk;
-	xvector<int> ijkb=b.ijk;
-	int va=100*ijka(1)+10*ijka(2)+1*ijka(3);
-	int vb=100*ijkb(1)+10*ijkb(2)+1*ijkb(3);
-	return va<vb;
+  public:  
+    int operator()(const _atom& a, const _atom& b) {
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)" << endl;
+      double tol=1e-15;
+      // Sort by distance
+      if(aurostd::isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)) {
+        if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
+        // Sort by unit cell values
+        if(a.name==b.name) {
+          if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name==b.name" << endl;
+          xvector<int> ijka=a.ijk;
+          xvector<int> ijkb=b.ijk;
+          int va=100*ijka(1)+10*ijka(2)+1*ijka(3);
+          int vb=100*ijkb(1)+10*ijkb(2)+1*ijkb(3);
+          return va<vb;
+        } else {
+          if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name!=b.name" << endl;
+          return a.name<b.name;
+        }
       } else {
-	if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name!=b.name" << endl;
-	return a.name<b.name;
+        if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  !isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
+        return GetDistFromOrigin(a)<GetDistFromOrigin(b);
       }
-    } else {
-      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  !isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
-      return GetDistFromOrigin(a)<GetDistFromOrigin(b);
+      // Sort by name
+      // if(a.name==b.name) {
+      //  return GetDistFromOrigin(a)<GetDistFromOrigin(b);
+      // }
+      // else {
+      //  return a.name<b.name;
+      // }
     }
-    // Sort by name
-    // if(a.name==b.name) {
-    //  return GetDistFromOrigin(a)<GetDistFromOrigin(b);
-    // }
-    // else {
-    //  return a.name<b.name;
-    // }
-  }
 };
 
 // **************************************************************************
@@ -15673,8 +15673,8 @@ public:
 // it for each atom in a vector of atom objects in order of increasing distance.  
 
 void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,		
-			      const double& rmin, const double& rmax,
-			      deque<deque<_atom> >& neigh_mat) {
+    const double& rmin, const double& rmax,
+    deque<deque<_atom> >& neigh_mat) {
   double epsilon=1.0e-3;  // sometimes you have wrong images due to roundoff
   deque<_atom> neigh_vec;
   // Get data from str.

@@ -41,7 +41,7 @@ namespace makefile {
     //find #include and get files
     bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
     string soliloquy="makefile::getDependencies():";
-    
+
     string filename=aurostd::CleanFileName(_filename);
     aurostd::CleanStringASCII_InPlace(filename);
     trimPath(filename);
@@ -63,7 +63,7 @@ namespace makefile {
 
     vector<string> vlines;
     aurostd::file2vectorstring(filename,vlines);
-    
+
     uint i=0;
     string::size_type loc;
     string line="",dfile="";
@@ -89,7 +89,7 @@ namespace makefile {
     std::sort(dfiles.begin(),dfiles.end());dfiles.erase( std::unique( dfiles.begin(), dfiles.end() ), dfiles.end() );  //get unique set of dependent files
     if(LDEBUG){cerr << soliloquy << " dfiles=" << aurostd::joinWDelimiter(dfiles,",") << endl;}
   }
-  
+
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<string>& vdefinitions){
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::replaceMakefileDefinitions():";
@@ -277,7 +277,7 @@ namespace makefile {
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  splitMakefileDefinitions(vdefinitions,vvdefinitions);
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
-  
+
   void updateDependenciesAUROSTD(vector<string>& vdependencies){
     bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
     string soliloquy="makefile::updateDependenciesAUROSTD():";
@@ -321,9 +321,9 @@ namespace makefile {
     //DX20200512 vsubdirectories.push_back(directory+"/ANRL");
     vsubdirectories.push_back(directory+"/SQLITE");
     std::sort(vsubdirectories.begin(),vsubdirectories.end()); //sort before adding AUROSTD, which must come first
-    
+
     //[do AUROSTD separately]vsubdirectories.insert(vsubdirectories.begin(),directory+"/AUROSTD");  //do first
-    
+
     uint i=0,j=0;
     string dir="",file="",_file="";
     vector<string> vfs,vfiles,files_already_explored;
@@ -333,7 +333,7 @@ namespace makefile {
     vector<string> vcpp_aurostd,vhpp_aurostd,vhpp_aflow; //SC variables - hack
 
     string Makefile_aflow="Makefile.aflow",Makefile_aflow_OLD="Makefile.aflow.OLD";
-    
+
     //do AUROSTD first - it gets compiled separately
     file=directory+"/AUROSTD/aurostd.cpp";
     trimPath(file);
@@ -437,7 +437,7 @@ namespace makefile {
     //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
     //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vobj_files,"aflow_matlab_funcs.cpp")){vobj_files.push_back("aflow_matlab_funcs.cpp");}  //safety
     //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vobj_files,"aflow_gnuplot_funcs.cpp")){vobj_files.push_back("aflow_gnuplot_funcs.cpp");}  //safety
-    
+
     stringstream makefile_definitions_ss;
     if(vaflow_deps.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vaflow_deps," ") << endl;}  //SC variables - hack
     if(vobj_files.size()){makefile_definitions_ss << "AFLOW_OBJS=" << aurostd::joinWDelimiter(vobj_files," ") << endl;}  //SC variables - hack

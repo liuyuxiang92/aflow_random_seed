@@ -1543,7 +1543,7 @@ namespace apl {
 
       void free();
       void copy(const ThermalPropertiesCalculator&);
- 
+
       double getStepDOS(const vector<double>&);
       double getScalingFactor(const ThermalPropertiesUnits&);
 
@@ -1582,7 +1582,7 @@ namespace apl {
       double getVibrationalEntropy(double, double, double, ThermalPropertiesUnits=apl::kB);
       double getIsochoricSpecificHeat(double, ThermalPropertiesUnits=apl::kB);
       double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
-   
+
       void writePropertiesToFile(string);
   };
 }  // namespace apl

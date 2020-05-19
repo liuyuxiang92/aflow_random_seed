@@ -31,7 +31,7 @@ namespace pflow {
       init::ErrorOption(cout,options,"pflow::AClusterExpansionMethodMain",aurostd::liststring2string("aflow --cluster-expansion=... | --ce=structure_type,A,B,EA,EB"));
       exit(0);
     } 
-    
+
     string structure_type;
     string AlloyName; // alloy name
 
@@ -45,7 +45,7 @@ namespace pflow {
     int num_input_str = 0;
 
     structure_type = tokens.at(0);
-    
+
     for (uint i = 0; i < structure_type.size(); i++) {
       structure_type[i] = tolower(structure_type[i]);
     }
@@ -83,10 +83,10 @@ namespace pflow {
       species_tmp.name = tokens.at(i-3+1);
 
       for (uint j=1; j<vatom_symbol.size(); j++) {
-	if(species_tmp.name==vatom_symbol.at(j)) {
-	  species_tmp.volume = vatom_volume.at(j);
-	  break;
-	}
+        if(species_tmp.name==vatom_symbol.at(j)) {
+          species_tmp.volume = vatom_volume.at(j);
+          break;
+        }
       }
 
       atom_species.push_back(species_tmp);
@@ -110,7 +110,7 @@ namespace pflow {
     cerr << "***********************************************************" << endl;
 
     ceallclusters allcluster(structure_type);
-    
+
     string filename;
     filename = structure_type+_FILENAME;
 
@@ -150,21 +150,21 @@ namespace pflow {
 
 
       if(cal_count > 0) {
-	str_list.clear();
+        str_list.clear();
 
-	ifstream myfilein;
-	myfilein.open(_FITSTRUCTUREFILE.c_str());
+        ifstream myfilein;
+        myfilein.open(_FITSTRUCTUREFILE.c_str());
 
-	str_list = ReadInFitStructure(myfilein, structure_type);
+        str_list = ReadInFitStructure(myfilein, structure_type);
 
-	myfilein.close();
+        myfilein.close();
 
-	//RenameFiles(cal_count-1);
+        //RenameFiles(cal_count-1);
       } else {
-	ofstream fit_file;
-	fit_file.open(_FITSTRUCTUREFILE.c_str());
-	WriteOutFitStructure(fit_file, AlloyName, str_list);
-	fit_file.close();
+        ofstream fit_file;
+        fit_file.open(_FITSTRUCTUREFILE.c_str());
+        WriteOutFitStructure(fit_file, AlloyName, str_list);
+        fit_file.close();
       }
 
       cerr << "***********************************************************" << endl;
@@ -179,28 +179,28 @@ namespace pflow {
 
       vector<cestructure>::iterator str_list_itr;
       if(!corfilein.is_open()) {
-	// calcuate correlations and output them
-	ofstream corfile;
-	string corfilename = structure_type+_CORFILENAME;
-	corfile.open(corfilename.c_str(), ios_base::out | ios_base::app);
+        // calcuate correlations and output them
+        ofstream corfile;
+        string corfilename = structure_type+_CORFILENAME;
+        corfile.open(corfilename.c_str(), ios_base::out | ios_base::app);
 
-	for (str_list_itr = str_list.begin();
-	     str_list_itr < str_list.end(); str_list_itr++) {
-	  //(*str_list_itr).SetUp(allcluster, ECIcluster_orig);
-	  (*str_list_itr).SetUp(allcluster, ECIcluster);
-	  (*str_list_itr).WriteFile(corfile);
-	}
+        for (str_list_itr = str_list.begin();
+            str_list_itr < str_list.end(); str_list_itr++) {
+          //(*str_list_itr).SetUp(allcluster, ECIcluster_orig);
+          (*str_list_itr).SetUp(allcluster, ECIcluster);
+          (*str_list_itr).WriteFile(corfile);
+        }
 
-	corfile.close();
+        corfile.close();
       } else {
 
-	// read calculated correlations
+        // read calculated correlations
 
-	for (str_list_itr = str_list.begin();
-	     str_list_itr < str_list.end(); str_list_itr++) {
-	  (*str_list_itr).SetUp(allcluster, ECIcluster, corfilein);
-	}
-	corfilein.close();
+        for (str_list_itr = str_list.begin();
+            str_list_itr < str_list.end(); str_list_itr++) {
+          (*str_list_itr).SetUp(allcluster, ECIcluster, corfilein);
+        }
+        corfilein.close();
       }
 
       /////////////////////////////////////////////////////////////////
@@ -209,16 +209,16 @@ namespace pflow {
       vector<double> blist;
       srand(time(0));
       for (str_list_itr = str_list.begin();
-	   str_list_itr < str_list.end(); str_list_itr++) {
-	blist.clear();
-	blist.push_back((*str_list_itr).StoichB());
-	if(cal_count==0) {
-	  blist.push_back((*str_list_itr).EnergyIn());
-	} else {
-	  blist.push_back((*str_list_itr).Energy());
-	}
+          str_list_itr < str_list.end(); str_list_itr++) {
+        blist.clear();
+        blist.push_back((*str_list_itr).StoichB());
+        if(cal_count==0) {
+          blist.push_back((*str_list_itr).EnergyIn());
+        } else {
+          blist.push_back((*str_list_itr).Energy());
+        }
 
-	alist.push_back(blist);
+        alist.push_back(blist);
       }
 
       vector<int> ground_state_candidates;
@@ -236,68 +236,68 @@ namespace pflow {
       vector<int>::iterator int_vec_itr;
 
       for (int_vec_itr = ground_state_candidates.begin();
-	   int_vec_itr < ground_state_candidates.end();
-	   int_vec_itr++) {
+          int_vec_itr < ground_state_candidates.end();
+          int_vec_itr++) {
 
-	int index = *int_vec_itr;
-	double x_b = alist.at(index).at(0);
-	double energy = alist.at(index).at(1);
+        int index = *int_vec_itr;
+        double x_b = alist.at(index).at(0);
+        double energy = alist.at(index).at(1);
 
-	for (uint j=0; j<str_list.size(); j++) {
-	  if(str_list.at(j).StoichB()==x_b) {
-	    if(str_list.at(j).EnergyIn()==energy) {
-	      ground_state_names.push_back(str_list.at(j).Name());
-	      break;
-	    }
-	  } else {
-	    continue;
-	  }
-	}
+        for (uint j=0; j<str_list.size(); j++) {
+          if(str_list.at(j).StoichB()==x_b) {
+            if(str_list.at(j).EnergyIn()==energy) {
+              ground_state_names.push_back(str_list.at(j).Name());
+              break;
+            }
+          } else {
+            continue;
+          }
+        }
       }
 
       for (int_vec_itr=hull_indices.begin();
-	   int_vec_itr < hull_indices.end(); int_vec_itr++) {
-	//int index = hull_indices.at(i);
-	int index = *int_vec_itr;
-	double x_b = alist.at(index).at(0);
-	double energy = alist.at(index).at(1);
+          int_vec_itr < hull_indices.end(); int_vec_itr++) {
+        //int index = hull_indices.at(i);
+        int index = *int_vec_itr;
+        double x_b = alist.at(index).at(0);
+        double energy = alist.at(index).at(1);
 
-	for (uint j=0; j<str_list.size(); j++) {
-	  if(str_list.at(j).StoichB()==x_b) {
-	    if(str_list.at(j).EnergyIn()==energy) {
-	      hull_state_names.push_back(str_list.at(j).Name());
-	      break;
-	    }
-	  } else {
-	    continue;
-	  }
-	}
+        for (uint j=0; j<str_list.size(); j++) {
+          if(str_list.at(j).StoichB()==x_b) {
+            if(str_list.at(j).EnergyIn()==energy) {
+              hull_state_names.push_back(str_list.at(j).Name());
+              break;
+            }
+          } else {
+            continue;
+          }
+        }
       }
 
       vector<string>::iterator str_it;
 
       cerr << "ground state points \n";
       for (uint i=0; i<ground_state_names.size(); i++) {
-	int index = ground_state_candidates.at(i);
-	cerr << setw(12)
-	     << ground_state_names.at(i)
-	     << setw(12)
-	     << alist.at(index).at(0)
-	     << setw(12)
-	     << alist.at(index).at(1)
-	     << endl;
+        int index = ground_state_candidates.at(i);
+        cerr << setw(12)
+          << ground_state_names.at(i)
+          << setw(12)
+          << alist.at(index).at(0)
+          << setw(12)
+          << alist.at(index).at(1)
+          << endl;
       }
 
       cerr << "hull points \n";
       for (uint i=0; i<hull_state_names.size(); i++) {
-	int index = hull_indices.at(i);
-	cerr << setw(12)
-	     << hull_state_names.at(i)
-	     << setw(12)
-	     << alist.at(index).at(0)
-	     << setw(12)
-	     << alist.at(index).at(1)
-	     << endl;
+        int index = hull_indices.at(i);
+        cerr << setw(12)
+          << hull_state_names.at(i)
+          << setw(12)
+          << alist.at(index).at(0)
+          << setw(12)
+          << alist.at(index).at(1)
+          << endl;
       }
 
       /////////////////////////////////////////////////////////////////
@@ -315,37 +315,37 @@ namespace pflow {
       ecifilein.open(ecifilename.c_str());
 
       if(cal_count==0) {
-	cal_eci = (! ecifilein.is_open());
+        cal_eci = (! ecifilein.is_open());
       }
 
       ecifilein.close();
 
       if(cal_eci) {
-	ECIcluster = ECIcluster_orig;
-	ACEOptimalECIClusters( str_list, ECIcluster);
+        ECIcluster = ECIcluster_orig;
+        ACEOptimalECIClusters( str_list, ECIcluster);
 
-	cerr << " Optimal ECI size " << ECIcluster.ECIValue().size() << endl;
-	for (uint i=0; i<ECIcluster.ECIValue().size(); i++) {
-	  cerr << ECIcluster.ECIValue().at(i) << endl;
-	}
+        cerr << " Optimal ECI size " << ECIcluster.ECIValue().size() << endl;
+        for (uint i=0; i<ECIcluster.ECIValue().size(); i++) {
+          cerr << ECIcluster.ECIValue().at(i) << endl;
+        }
 
-	BackUpFile(ecifilename, "mv", cal_count);
+        BackUpFile(ecifilename, "mv", cal_count);
 
-	ofstream ecifile;
-	ecifile.open(ecifilename.c_str());
+        ofstream ecifile;
+        ecifile.open(ecifilename.c_str());
 
-	ECIcluster.WriteFile(ecifile);
+        ECIcluster.WriteFile(ecifile);
 
-	ecifile.close();
+        ecifile.close();
       } else {
 
-	BackUpFile(ecifilename, "cp", cal_count);
+        BackUpFile(ecifilename, "cp", cal_count);
 
-	ecifilein.open(ecifilename.c_str());
+        ecifilein.open(ecifilename.c_str());
 
-	ECIcluster.ReadIn(ecifilein);
+        ECIcluster.ReadIn(ecifilein);
 
-	ecifilein.close();
+        ecifilein.close();
       }
 
       ofstream fout_eciresult;
@@ -362,13 +362,13 @@ namespace pflow {
       // show the predict (formation) energy and entropy of each input strucutre
 
       for (str_list_itr = str_list.begin();
-	   str_list_itr < str_list.end(); str_list_itr++) {
+          str_list_itr < str_list.end(); str_list_itr++) {
 
-	(*str_list_itr).SetECICluster(ECIcluster); // get the optimal ECI_cluster
-	(*str_list_itr).GetECICorrelation();
-	(*str_list_itr).SetECI(ECIcluster.ECIValue()); // store ECI to cestructure object
-	(*str_list_itr).GetEnergy();
-	cout << *str_list_itr << endl;
+        (*str_list_itr).SetECICluster(ECIcluster); // get the optimal ECI_cluster
+        (*str_list_itr).GetECICorrelation();
+        (*str_list_itr).SetECI(ECIcluster.ECIValue()); // store ECI to cestructure object
+        (*str_list_itr).GetEnergy();
+        cout << *str_list_itr << endl;
 
       }
 
@@ -376,8 +376,8 @@ namespace pflow {
       fout_comparison.open(_FITCOMPARISONFILE.c_str());
 
       for (str_list_itr = str_list.begin();
-	   str_list_itr < str_list.end(); str_list_itr++) {
-	(*str_list_itr).PrintOutComparison(fout_comparison);
+          str_list_itr < str_list.end(); str_list_itr++) {
+        (*str_list_itr).PrintOutComparison(fout_comparison);
       }
 
       fout_comparison.close();
@@ -400,17 +400,17 @@ namespace pflow {
       fout_ralloy.open(_RALLOYRESULT.c_str());
 
       for (int i=0; i<nstep+1; i++) {
-	stoich_b_ra = ds * i;
-	ralloy = ceralloy(structure_type, stoich_b_ra);
+        stoich_b_ra = ds * i;
+        ralloy = ceralloy(structure_type, stoich_b_ra);
 
-	cerr << endl << ralloy << endl;
+        cerr << endl << ralloy << endl;
 
-	ralloy.SetUp(allcluster, ECIcluster);
-	ralloy.GetECICorrelation();
-	ralloy.GetEnergy();
+        ralloy.SetUp(allcluster, ECIcluster);
+        ralloy.GetECICorrelation();
+        ralloy.GetEnergy();
 
 
-	fout_ralloy << ralloy << endl;
+        fout_ralloy << ralloy << endl;
 
       }
 
@@ -429,7 +429,7 @@ namespace pflow {
       ifstream mySLfilein;
       mySLfilein.open(_SLFILENAME.c_str());
       ACESLProperties_Readin_Corfile(mySLfilein, structure_type,  allcluster,
-				     ECIcluster);
+          ECIcluster);
       mySLfilein.close();
 
       string SL_name;
@@ -453,83 +453,83 @@ namespace pflow {
 
 
       if(new_hull_state.size()==0) {
-	// no new ground state structure found
-	flag_stop = true;
+        // no new ground state structure found
+        flag_stop = true;
 
-	aurostd::execute("cp " + _FITSTRUCTUREFILE + " " + _FITSTRUCTUREFILE + "tmp");
+        aurostd::execute("cp " + _FITSTRUCTUREFILE + " " + _FITSTRUCTUREFILE + "tmp");
 
-	cerr << "no new hull state is found \n";
+        cerr << "no new hull state is found \n";
       } else {
 
-	cerr << "new hull state\n";
-	for (str_it = new_hull_state.begin();
-	     str_it < new_hull_state.end(); str_it++) {
-	  cerr << *str_it << endl;
-	}
+        cerr << "new hull state\n";
+        for (str_it = new_hull_state.begin();
+            str_it < new_hull_state.end(); str_it++) {
+          cerr << *str_it << endl;
+        }
 
-	for (uint i=0; i<1; i++) {
-	  // calculate the correlation functions
-	  // and insert into correlation input file
+        for (uint i=0; i<1; i++) {
+          // calculate the correlation functions
+          // and insert into correlation input file
 
-	  // calculate only one new ground state
+          // calculate only one new ground state
 
-	  SL_name = new_hull_state.at(i);
-	  sl1.SetUp(SL_name);
+          SL_name = new_hull_state.at(i);
+          sl1.SetUp(SL_name);
 
-	  sl1.SetStrCluster(allcluster);
-	  sl1.SetAllECICluster(ECIcluster);
+          sl1.SetStrCluster(allcluster);
+          sl1.SetAllECICluster(ECIcluster);
 
-	  sl1.GetAllECICorrelation();
-	  sl1.PrintOutCorrelation();
+          sl1.GetAllECICorrelation();
+          sl1.PrintOutCorrelation();
 
-	  ofstream corfile;
-	  corfile.open(corfilename.c_str(), ios::app);
-	  sl1.WriteFile(corfile);
-	  corfile.close();
+          ofstream corfile;
+          corfile.open(corfilename.c_str(), ios::app);
+          sl1.WriteFile(corfile);
+          corfile.close();
 
-	  // calculate the fit_quality by other method
-	  // here to calculate the formation energy per atom
-	  // by VASP
-	  bool mpi_flag = false;
-	  GenerateAflowInputFile(structure_type, AlloyName,
-				 SL_name, atom_species, mpi_flag);
+          // calculate the fit_quality by other method
+          // here to calculate the formation energy per atom
+          // by VASP
+          bool mpi_flag = false;
+          GenerateAflowInputFile(structure_type, AlloyName,
+              SL_name, atom_species, mpi_flag);
 
-	  // backup result files
-	  RenameFiles(cal_count);
-	  MoveFiles(cal_count);
+          // backup result files
+          RenameFiles(cal_count);
+          MoveFiles(cal_count);
 
-	  // create a working directory
-	  // and insert the calculated resulst to fit structure input file
-	  GenerateNewTrainingItem(SL_name);
+          // create a working directory
+          // and insert the calculated resulst to fit structure input file
+          GenerateNewTrainingItem(SL_name);
 
-	  // output the new fit structure;
-	  double energy, fenergy;
+          // output the new fit structure;
+          double energy, fenergy;
 
-	  energy = GetResultFromAFLOW();
+          energy = GetResultFromAFLOW();
 
-	  fenergy = energy - (1.0-sl1.StoichB()) * energy_A
-	    - sl1.StoichB() * energy_B;
+          fenergy = energy - (1.0-sl1.StoichB()) * energy_A
+            - sl1.StoichB() * energy_B;
 
-	  ofstream fout;
-	  fout.open(_FITSTRUCTUREFILE.c_str(), ios::app);
+          ofstream fout;
+          fout.open(_FITSTRUCTUREFILE.c_str(), ios::app);
 
-	  fout.precision(8);
-	  fout.setf(ios_base::fixed, ios_base::floatfield);
+          fout.precision(8);
+          fout.setf(ios_base::fixed, ios_base::floatfield);
 
-	  fout
-	    << "(" << AlloyName << ") "
-	    << setw(6)
-	    << SL_name
-	    << setw(12)
-	    << sl1.StoichB()
-	    << setw(12)
-	    << fenergy
-	    << endl;
-	  fout.close();
+          fout
+            << "(" << AlloyName << ") "
+            << setw(6)
+            << SL_name
+            << setw(12)
+            << sl1.StoichB()
+            << setw(12)
+            << fenergy
+            << endl;
+          fout.close();
 
-	  cal_eci = true;
-	}
-    
+          cal_eci = true;
+        }
+
       }
 
       ++cal_count;
@@ -551,7 +551,7 @@ namespace pflow {
       init::ErrorOption(cout,options,"pflow::SQS",aurostd::liststring2string("aflow --sqs=structure_type,atom_num,neighbour_num,sl_num_min,sl_num_max,A,B | --special-quasirandom-structure=...","aflow --sqs=structure_type n1 n2 < POSCAR | --special-quasirandom-structure=..."));
       exit(0);
     } 
-    
+
     string structure_type;
     structure_type = tokens.at(0);
     for (uint i = 0; i < structure_type.size(); i++) {
@@ -568,7 +568,7 @@ namespace pflow {
 
     if((tokens.size() != 3) && (tokens.size() != 7)) {
       cerr << XHOST.sPID << "pflow::SQSMain: Incorrect argument numbers."<< endl
-	   <<"Please use aflow --help to see the correct arguments \n";
+        <<"Please use aflow --help to see the correct arguments \n";
       exit(_EXIT_FAIL);
     }
 
@@ -580,7 +580,7 @@ namespace pflow {
 
     // read the clusters
     ceallclusters allcluster(structure_type);
-    
+
     string filename;
     filename = structure_type+_FILENAME;
 
@@ -603,17 +603,17 @@ namespace pflow {
 
       vector<_ceatom> atom_species;
       for (uint i=0; i<a.species.size(); i++) { // only for binary alloy
-	_ceatom species_tmp;
-	species_tmp.name = a.species.at(i);
+        _ceatom species_tmp;
+        species_tmp.name = a.species.at(i);
 
-	for (uint j=1; j<vatom_symbol.size(); j++) {
-	  if(species_tmp.name==vatom_symbol.at(j)) {
-	    species_tmp.volume = vatom_volume.at(j);
-	    break;
-	  }
-	}
+        for (uint j=1; j<vatom_symbol.size(); j++) {
+          if(species_tmp.name==vatom_symbol.at(j)) {
+            species_tmp.volume = vatom_volume.at(j);
+            break;
+          }
+        }
 
-	atom_species.push_back(species_tmp);
+        atom_species.push_back(species_tmp);
       }
 
       ceSL SLtmp;
@@ -622,8 +622,8 @@ namespace pflow {
       //SLtmp = ceSL(str_type);
 
       if(a.species.size() > 2) {
-	cerr << XHOST.sPID << "pflow::SQS: only binary alloy is implemented\n";
-	exit(_EXIT_FAIL);
+        cerr << XHOST.sPID << "pflow::SQS: only binary alloy is implemented\n";
+        exit(_EXIT_FAIL);
       }
 
       SLtmp.SetStrCluster(allcluster);
@@ -631,10 +631,10 @@ namespace pflow {
       SLtmp.GetAllECICorrelation();
 
       cout << setw(20)
-	   << "weight "
-	   << setw(20)
-	   << SLtmp.IsSQS(site_num, NNNum)
-	   << endl;
+        << "weight "
+        << setw(20)
+        << SLtmp.IsSQS(site_num, NNNum)
+        << endl;
       SLtmp.OutputSQS(cout);
       SLtmp.PrintStructure(cout, atom_species);
 
@@ -646,17 +646,17 @@ namespace pflow {
 
       vector<_ceatom> atom_species;
       for (uint i=7; i<9; i++) { // only for binary alloy
-	_ceatom species_tmp;
-	species_tmp.name = tokens.at(i-2);
+        _ceatom species_tmp;
+        species_tmp.name = tokens.at(i-2);
 
-	for (uint j=1; j<vatom_symbol.size(); j++) {
-	  if(species_tmp.name==vatom_symbol.at(j)) {
-	    species_tmp.volume = vatom_volume.at(j);
-	    break;
-	  }
-	}
+        for (uint j=1; j<vatom_symbol.size(); j++) {
+          if(species_tmp.name==vatom_symbol.at(j)) {
+            species_tmp.volume = vatom_volume.at(j);
+            break;
+          }
+        }
 
-	atom_species.push_back(species_tmp);
+        atom_species.push_back(species_tmp);
       }
 
       ifstream mySLfilein;
@@ -665,8 +665,8 @@ namespace pflow {
 
       mySLfilein.open(_SLFILENAME.c_str());
       ACESLPropertiesSQS_Readin_Corfile(mySLfilein, structure_type,  allcluster,
-					ECIcluster, site_num, NNNum,
-					min_SLcell_nr, max_SLcell_nr, atom_species);
+          ECIcluster, site_num, NNNum,
+          min_SLcell_nr, max_SLcell_nr, atom_species);
       mySLfilein.close();
 
     }
@@ -676,7 +676,7 @@ namespace pflow {
 
 namespace pflow {
   void Superlattice(string options) {
-   bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XHOST.sPID << "pflow::Superlattice: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -684,7 +684,7 @@ namespace pflow {
       init::ErrorOption(cout,options,"pflow::Superlattice",aurostd::liststring2string("aflow --superlattice=structure_type,n_min,n_max < POSCAR","--superlattice=VASP,structure_type,A,B < superlattice_name"));
       exit(0);
     }      
-    
+
     // calculate all superlattices with atom number in a unit cell
     // from a given range
     // SL are stored in files
@@ -709,7 +709,7 @@ namespace pflow {
       structure_type = tokens.at(0);
       cout << structure_type << endl;
       for (uint i = 0; i < structure_type.size(); i++) {
-	structure_type[i] = tolower(structure_type[i]);
+        structure_type[i] = tolower(structure_type[i]);
       }
 
     }
@@ -722,17 +722,17 @@ namespace pflow {
     if(tokens.at(0)=="VASP") {
       vector<_ceatom> atom_species;
       for (uint i=3; i<5; i++) { // only for binary alloy
-	_ceatom species_tmp;
-	species_tmp.name = tokens.at(i-2);
+        _ceatom species_tmp;
+        species_tmp.name = tokens.at(i-2);
 
-	for (uint j=1; j<vatom_symbol.size(); j++) {
-	  if(species_tmp.name==vatom_symbol.at(j)) {
-	    species_tmp.volume = vatom_volume.at(j);
-	    break;
-	  }
-	}
+        for (uint j=1; j<vatom_symbol.size(); j++) {
+          if(species_tmp.name==vatom_symbol.at(j)) {
+            species_tmp.volume = vatom_volume.at(j);
+            break;
+          }
+        }
 
-	atom_species.push_back(species_tmp);
+        atom_species.push_back(species_tmp);
       }
 
       ceSL sl1;
@@ -753,14 +753,14 @@ namespace pflow {
 
       if(!myfile.is_open()) {
 
-	cerr << "The cluster data file is missing\n"
-	     << "Please use the command\n"
-	     << "    aflow --cluster=structure_type,minimun_site_num,maximun_site_num,minimum_nearest_neighbour,maximun_nearest_neighbour \n"
-	     << "to generate it\n";
-	exit(_EXIT_NO_INPUTFILE);
+        cerr << "The cluster data file is missing\n"
+          << "Please use the command\n"
+          << "    aflow --cluster=structure_type,minimun_site_num,maximun_site_num,minimum_nearest_neighbour,maximun_nearest_neighbour \n"
+          << "to generate it\n";
+        exit(_EXIT_NO_INPUTFILE);
 
       } else {
-	myfile.close();
+        myfile.close();
       }
 
       // read the clusters
@@ -799,12 +799,12 @@ namespace pflow {
       exit(0);
     } 
     // generate the clusters
-    
+
     string structure_type;
-    
+
     structure_type = tokens.at(0);
     //    cerr << structure_type << endl;exit(0);
-    
+
     for (uint i = 0; i < structure_type.size(); i++) {
       structure_type[i] = tolower(structure_type[i]);
     }
@@ -812,12 +812,12 @@ namespace pflow {
     if(!ACEFlag) {
       exit(_EXIT_NOSTRUCTURE);
     }
-    
+
     ceallclusters allcluster(structure_type);
-    
+
     string open_opt;
     open_opt = "new";
-    
+
     string filename;
     filename = structure_type+_FILENAME;
 
@@ -851,22 +851,22 @@ namespace pflow {
 
     // generate script file to get gifs of each steps
     string movieScript = "\
-        save orientation; load \"\" {444 666 1} ; restore orientation;\n \
-        unitcell on; display cell=555; center visible; zoom 280;\n \
-        color background [xFFFFFF]\n \
-        /* \n \
-         *   add any other rendering commands \n \
-         *     */ \n \
-        for (var i=0; i<36; i=i+1) \n \
-            write image 1000 1000 @{\"" + cif_tmp + "_movie\" + (\"0000\" + i)[-3][0] + \".gif\"} \n \
-                    /* 200 and 200 are width and height */ \n \
-                rotate axisangle {1 1 0} 10 \n \
-                /* axis is defined by X Y Z lengths between braces; this one is at \n \
-                 *  * 45 degrees \n \
-                 *   and 10 (degrees) is angle of rotation, so the 36-loop gives \n \
-                 *    a full turn \n \
-                 *     */ \n \
-        end for \n";
+                          save orientation; load \"\" {444 666 1} ; restore orientation;\n \
+                          unitcell on; display cell=555; center visible; zoom 280;\n \
+                          color background [xFFFFFF]\n \
+                          /* \n \
+                           *   add any other rendering commands \n \
+                           *     */ \n \
+                          for (var i=0; i<36; i=i+1) \n \
+                            write image 1000 1000 @{\"" + cif_tmp + "_movie\" + (\"0000\" + i)[-3][0] + \".gif\"} \n \
+                              /* 200 and 200 are width and height */ \n \
+                              rotate axisangle {1 1 0} 10 \n \
+                              /* axis is defined by X Y Z lengths between braces; this one is at \n \
+                               *  * 45 degrees \n \
+                               *   and 10 (degrees) is angle of rotation, so the 36-loop gives \n \
+                               *    a full turn \n \
+                               *     */ \n \
+                              end for \n";
 
     ofstream FoutScript;
     FoutScript.open(jmol_script_tmp.c_str());

@@ -74,7 +74,7 @@ bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //FCC/Si1_ICSD_150530
   system="ICSD_WEB/FCC/Si1_ICSD_150530";
-  
+
   path=AFLOWLIB_SERVER_DEFAULT+"/AFLOWDATA/"+system;
   query=path+"/?files";
   message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -310,11 +310,11 @@ int main(int _argc,char **_argv) {
     std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
     if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
     std::vector<string> cmds;
-    
+
     // MACHINE
     init::InitMachine(FALSE,argv,cmds,cerr);    
     if(LDEBUG || XHOST.DEBUG) cerr << "AFLOW-MAIN [3]" << endl;
-    
+
     // aurostd::TmpDirectoryCreate("test");
     // cerr << args2flag(argv,"--aaa|--bbb |--ccc") << endl; exit(0);
     // CHECK USERS MACHINES - DEBUG
@@ -370,40 +370,40 @@ int main(int _argc,char **_argv) {
       oss.basic_ios<char>::rdbuf(std::cout.rdbuf());      
       oss << "COUT DEFAULT" << std::endl;
       if(1) { // somebody chose a file
-	// FILE PRE
-	std::ofstream ofs_pre("friscosity_pre.txt", std::ofstream::out);
-	oss.copyfmt(ofs_pre);                             
-	oss.clear(ofs_pre.rdstate());                     
-	oss.basic_ios<char>::rdbuf(ofs_pre.rdbuf());
+        // FILE PRE
+        std::ofstream ofs_pre("friscosity_pre.txt", std::ofstream::out);
+        oss.copyfmt(ofs_pre);                             
+        oss.clear(ofs_pre.rdstate());                     
+        oss.basic_ios<char>::rdbuf(ofs_pre.rdbuf());
       }
       oss << "FRISCOSITY_PRE" << std::endl;
       if(1) { // put it back on COUT
-	// COUT
-	oss.copyfmt(std::cout);                             
-	oss.clear(std::cout.rdstate());                     
-	oss.basic_ios<char>::rdbuf(std::cout.rdbuf());
+        // COUT
+        oss.copyfmt(std::cout);                             
+        oss.clear(std::cout.rdstate());                     
+        oss.basic_ios<char>::rdbuf(std::cout.rdbuf());
       }
       oss << "COUT" << std::endl;
       if(1) { // try CERR
-	// CERR
-	oss.copyfmt(std::cerr);                             
-	oss.clear(std::cerr.rdstate());                     
-	oss.basic_ios<char>::rdbuf(std::cerr.rdbuf());
+        // CERR
+        oss.copyfmt(std::cerr);                             
+        oss.clear(std::cerr.rdstate());                     
+        oss.basic_ios<char>::rdbuf(std::cerr.rdbuf());
       }
       oss << "CERR" << std::endl;
       if(1) { // switch to file 
-	// FILE POST
-	std::ofstream ofs_post("friscosity_post.txt", std::ofstream::out);
-	oss.copyfmt(ofs_post);                             
-	oss.clear(ofs_post.rdstate());                     
-	oss.basic_ios<char>::rdbuf(ofs_post.rdbuf());
+        // FILE POST
+        std::ofstream ofs_post("friscosity_post.txt", std::ofstream::out);
+        oss.copyfmt(ofs_post);                             
+        oss.clear(ofs_post.rdstate());                     
+        oss.basic_ios<char>::rdbuf(ofs_post.rdbuf());
       }
       oss << "FRISCOSITY_POST" << std::endl;
-  
+
       exit(0);
     }
 
-    
+
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO20190911
       string soliloquy = XHOST.sPID + "test_xmatrix()::";
       bool LDEBUG=TRUE;// TRUE;
@@ -472,7 +472,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
-      
+
       if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - aflow.cpp:main: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl;exit(0);}
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
@@ -584,7 +584,7 @@ int main(int _argc,char **_argv) {
       cout << b64String << endl;
       exit(0);
     }
-    
+
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
       XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
@@ -608,19 +608,19 @@ int main(int _argc,char **_argv) {
       XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
       vector<string> vfile(aurostd::args2vectorstring(argv,"--FILE|--file|--F|--f","./"));
       for(uint ifile=0;ifile<vfile.size();ifile++) {
-	cerr << "PROCESSING = " << vfile.at(ifile) << endl;
-	xPOTCAR xPOT(vfile.at(ifile));
+        cerr << "PROCESSING = " << vfile.at(ifile) << endl;
+        xPOTCAR xPOT(vfile.at(ifile));
       }
       exit(0);
     }
-   if(!Arun && aurostd::args2flag(argv,cmds,"--scrub=OUTCAR")) { 
+    if(!Arun && aurostd::args2flag(argv,cmds,"--scrub=OUTCAR")) { 
       XHOST.DEBUG=FALSE;
       XHOST.PSEUDOPOTENTIAL_GENERATOR=FALSE;
       vector<string> vfile(aurostd::args2vectorstring(argv,"--FILE|--file|--F|--f","./"));
       for(uint ifile=0;ifile<vfile.size();ifile++) {
-	cerr << "PROCESSING = " << vfile.at(ifile) << endl;
-	xOUTCAR xOUT(vfile.at(ifile));
-	// cout << xOUT << endl;
+        cerr << "PROCESSING = " << vfile.at(ifile) << endl;
+        xOUTCAR xOUT(vfile.at(ifile));
+        // cout << xOUT << endl;
       }
       exit(0);
     }

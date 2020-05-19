@@ -100,7 +100,7 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
     string function = "apl::DOSCalculator::initialize()";
     string message = "";

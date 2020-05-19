@@ -1462,7 +1462,7 @@ namespace KBIN {
                     // }
                   }
                 }
-	      }
+              }
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
@@ -3747,7 +3747,7 @@ namespace KBIN {
 
     for(uint iext=0;iext<XHOST.vext.size();iext++) { 
       if(aurostd::FileExist(xvasp.Directory+"/core"+XHOST.vext.at(iext)))
-	aurostd::execute("rm -f "+xvasp.Directory+"/core"+XHOST.vext.at(iext));
+        aurostd::execute("rm -f "+xvasp.Directory+"/core"+XHOST.vext.at(iext));
     }
     if(!xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED") && aurostd::FileExist(xvasp.Directory+"/WAVECAR")) aurostd::RemoveFile(xvasp.Directory+"/WAVECAR");
     if(!xvasp.aopts.flag("FLAG::WAVEDER_PRESERVED") && aurostd::FileExist(xvasp.Directory+"/WAVEDER")) aurostd::RemoveFile(xvasp.Directory+"/WAVEDER");
@@ -3827,7 +3827,7 @@ namespace KBIN {
 
 namespace KBIN {
   void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION
-     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
+    for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
       aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/"+xfile+XHOST.vext.at(iext)));
     }
     aurostd::CopyFile(xvasp.Directory+"/"+xfile+".relax"+aurostd::utype2string<int>(relax_number),xvasp.Directory+"/"+xfile);

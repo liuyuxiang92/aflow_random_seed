@@ -305,7 +305,7 @@ class _XHOST {
     ostringstream ostrTID; // aflow_init.cpp  TID in ostringstream...
     string sPID;           // aflow_init.cpp  [PID=12345678]
     bool showPID;          // aflow_init.cpp  check if --showPID
-     // machinery
+    // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CT20181212
@@ -2996,7 +2996,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
     bool initialize(const string& fileIN, bool=TRUE);  //ME20200427
-    
+
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
     ~xOUTCAR();                                                   // kill everything
     const xOUTCAR& operator=(const xOUTCAR &b);                   // copy
@@ -3139,7 +3139,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
     //int spin;  //CO20171006 - camilo garbage
     friend ostream& operator<<(ostream&, const xOUTCAR&);  //ME20190623
- private:                       //
+  private:                       //
     void free();                 // free space
     void copy(const xOUTCAR& b); //
 };
@@ -3161,7 +3161,7 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     ~xDOSCAR();                                                   // kill everything
     const xDOSCAR& operator=(const xDOSCAR &b);                   // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3228,12 +3228,12 @@ class xEIGENVAL : public xStream { //CO20200404 - xStream integration for loggin
     xEIGENVAL(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
-    
+
     xEIGENVAL(const xEIGENVAL& b);                                // constructor copy
     ~xEIGENVAL();                                                 // kill everything
     const xEIGENVAL& operator=(const xEIGENVAL &b);               // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3269,14 +3269,14 @@ class xPOTCAR : public xStream { //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
-    
+
     ~xPOTCAR();                                                   // kill everything
     xPOTCAR(const xPOTCAR& b);                                    // constructor copy
     const xPOTCAR& operator=(const xPOTCAR &b);                   // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
-    
+
     // CONTENT
     string content;vector<string> vcontent;                       // the content and the lines
     string filename;                                              // the filename - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
@@ -3447,12 +3447,12 @@ class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integratio
     xQMVASP(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
-    
+
     ~xQMVASP();                                                    // kill everything
     xQMVASP(const xQMVASP& b);                                     // constructor copy
     const xQMVASP& operator=(const xQMVASP &b);                    // copy
     void clear(void);                                              // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3601,7 +3601,7 @@ namespace plotter {
   void PLOT_DOS(aurostd::xoption&,stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ostream& oss=cout);  //CO20191110  //CO20200404
   void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110  //CO20200404
-  
+
   void PLOT_PDOS(aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void PLOT_PDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
   void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&,ostream& oss=cout); //CO20191110 //CO20200404
@@ -3610,7 +3610,7 @@ namespace plotter {
   void PLOT_PDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ostream& oss=cout);  //CO20191110 //CO20200404
   void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110 //CO20200404
-  
+
   void PLOT_BAND(aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void PLOT_BAND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
   void PLOT_BAND(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404

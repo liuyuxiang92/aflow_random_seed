@@ -5970,7 +5970,7 @@ namespace chull {
         (!m_cflags.flag("CHULL::SKIP_THERMO_POST_PROCESSING")) &&
         TRUE); //(1&&!(m_cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
     if(!perform_thermo_post_processing){return;}
-    
+
     message << "Performing thermodynamics post-processing";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -7661,7 +7661,7 @@ namespace chull {
       if(i==1){valignments_compoundname_thermopropstable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       if(LDEBUG) {cerr << soliloquy << " " << valignments_compoundname_thermopropstable_string.back() << endl;}
     }
-    
+
     //for 1 column tables (left align)
     uint n_cols_onecol_left=1;
     vector<uint> valignments_onecol_lefttable_uint;
@@ -10148,7 +10148,7 @@ namespace chull {
               main_TEX_ss << " \\\\[0.05cm]" << endl;  //0.1cm
               main_TEX_ss << "\\end{longtable}" << endl;
               main_TEX_ss << "\\vspace{-23pt}" << endl;
-              
+
               //main table
               main_TEX_ss << "{" << pdftable_font_sizes << endl;
               //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]main_TEX_ss << "\\begin{longtabu}{|" << aurostd::joinWDelimiter(valignments,"|") << "|}" << endl;

@@ -37,14 +37,14 @@ void AConvaspBandgap(vector<string>& argv) {
   string directory,stmp,tag="";
   stringstream straus;
   bool found=FALSE;
-  
+
   directory=argv.at(2); //directory
   //cerr << "directory: " << directory << endl;
   //OUTCAR.bands
-  
+
   string file_tmp=aurostd::TmpFileCreate("AConvaspBandgap");
   aurostd::RemoveFile(file_tmp);
-  
+
   if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - AConvaspBandgap: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
   // OUTCAR.bands
@@ -60,8 +60,8 @@ void AConvaspBandgap(vector<string>& argv) {
   aurostd::file2stringstream(file_tmp,straus);
   straus >> stmp >> stmp >> Efermi;
   aurostd::RemoveFile(file_tmp);
-  
-   // EIGENVAL.bands
+
+  // EIGENVAL.bands
   found=FALSE;
   for(uint iext=0;iext<XHOST.vext.size();iext++) {
     if(!found && aurostd::FileExist(directory+"/EIGENVAL.bands"+XHOST.vext.at(iext))) {
@@ -93,7 +93,7 @@ void AConvaspBandgaps(istream& bandsdir, ostream& oss) {
 
 void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
   // tmp safe, checked SC,JX 0512
-  //  void AConvaspBandgaps(istream& bandsdir) {  //JX
+  //  void AConvaspBandgaps(istream& bandsdir)  //JX
 
   //Calculate band gap from bands run.
   //bandsdir contains directories of bands run, one directory per line
@@ -114,21 +114,21 @@ void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
   bool found=FALSE;
 
   if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - AConvaspBandgaps: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
-  
+
   while(bandsdir.good()) {
     bandsdir >> directory; //directory
     //cerr << "directory: " << directory << endl;
     //OUTCAR.bands
     //Getting the fermi energy from OUTCAR.bands
-    
+
     string file_tmp=aurostd::TmpFileCreate("AConvaspBandgap");
-    
+
     // OUTCAR.bands
     found=FALSE;
     for(uint iext=0;iext<XHOST.vext.size();iext++) {
       if(!found && aurostd::FileExist(directory+"/OUTCAR.bands"+XHOST.vext.at(iext))) {
-	found=TRUE;
-	aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.bands"+XHOST.vext.at(iext)+" | grep E-fermi > "+file_tmp);
+        found=TRUE;
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.bands"+XHOST.vext.at(iext)+" | grep E-fermi > "+file_tmp);
       }
     }
     if(!found) { cerr << "ERROR - AConvaspBandgaps: OUTCAR.bands[.EXT] not found in the directory, aborting." << endl; exit(0); }
@@ -136,13 +136,13 @@ void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
     aurostd::file2stringstream(file_tmp,straus);
     straus >> stmp >> stmp >> Efermi;
     aurostd::RemoveFile(file_tmp);
-    
+
     // EIGENVAL.bands
     found=FALSE;
     for(uint iext=0;iext<XHOST.vext.size();iext++) {
       if(!found && aurostd::FileExist(directory+"/EIGENVAL.bands"+XHOST.vext.at(iext))) {
-	found=TRUE;
-	aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > "+file_tmp);
+        found=TRUE;
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > "+file_tmp);
       }
     }
     if(!found) { cerr << "ERROR - AConvaspBandgap: EIGENVAL.bands[.EXT] not found in the directory, aborting." << endl; exit(0); }
@@ -222,68 +222,66 @@ void AConvaspBandgapListFromDOS(istream& doscar) {
 // ***************************************************************************
 namespace pflow {
   void ICSD(vector<string> argv, istream& input) {
-    /*
-      Output to stdout in "ICSD-format" (the NIST's Inorganic Crystal Structure Database)
-      all compounds containing particular elements according to the options:
+    //   Output to stdout in "ICSD-format" (the NIST's Inorganic Crystal Structure Database)
+    //   all compounds containing particular elements according to the options:
 
-      --icsd Pb              : extract compounds containing Pb
-      --icsd Pb Sn Se        : extract compounds containing Pb, Sn, and Se
-      we can also substitute elements with their atomic number
-      --icsd_alllessthan Ra  : all elements in the compound MUST have Z<Z_Ra
-      --icsd_allmorethan Ar
-      --icsd_id 26675        : extract compound with icsd entry ID number 26675
-      --icsd_morethan Co     : all compounds containing element with atomic number Z>Z_Co
-      --icsd_morethan 27     : all compounds containing element with atomic number Z>27
-      --icsd_lessthan z1     : ...
-      --icsd_lessthan z1 --icsd_morethan z2 : ..
+    //   --icsd Pb              : extract compounds containing Pb
+    //   --icsd Pb Sn Se        : extract compounds containing Pb, Sn, and Se
+    //   we can also substitute elements with their atomic number
+    //   --icsd_alllessthan Ra  : all elements in the compound MUST have Z<Z_Ra
+    //   --icsd_allmorethan Ar
+    //   --icsd_id 26675        : extract compound with icsd entry ID number 26675
+    //   --icsd_morethan Co     : all compounds containing element with atomic number Z>Z_Co
+    //   --icsd_morethan 27     : all compounds containing element with atomic number Z>27
+    //   --icsd_lessthan z1     : ...
+    //   --icsd_lessthan z1 --icsd_morethan z2 : ..
 
-      --icsd_densmorethan 4.5   : all compounds with density > 4.5
-      --icsd_sg 62              : all compounds with SG number 62
-      --icsd_sglessthan 62      : all compounds with SG number < 62
-      --icsd_cubic              : all compounds that belong to cubic system
+    //   --icsd_densmorethan 4.5   : all compounds with density > 4.5
+    //   --icsd_sg 62              : all compounds with SG number 62
+    //   --icsd_sglessthan 62      : all compounds with SG number < 62
+    //   --icsd_cubic              : all compounds that belong to cubic system
 
-      aflow --icsd_tri < input.icsd \n		\
-      aflow --icsd_mcl < input.icsd \n		\
-      aflow --icsd_mclc < input.icsd \n	\
-      aflow --icsd_orc < input.icsd \n		\
-      aflow --icsd_orcc < input.icsd \n	\
-      aflow --icsd_orcf < input.icsd \n	\
-      aflow --icsd_orci < input.icsd \n	\
-      aflow --icsd_tet < input.icsd \n		\
-      aflow --icsd_bct < input.icsd \n		\
-      aflow --icsd_rhl < input.icsd \n		\
-      aflow --icsd_hex < input.icsd \n		\
-      aflow --icsd_cub < input.icsd \n		\
-      aflow --icsd_fcc < input.icsd \n		\
-      aflow --icsd_bcc < input.icsd \n		\
+    //   aflow --icsd_tri < input.icsd \n		
+    //   aflow --icsd_mcl < input.icsd \n		
+    //   aflow --icsd_mclc < input.icsd \n	
+    //   aflow --icsd_orc < input.icsd \n		
+    //   aflow --icsd_orcc < input.icsd \n	
+    //   aflow --icsd_orcf < input.icsd \n	
+    //   aflow --icsd_orci < input.icsd \n	
+    //   aflow --icsd_tet < input.icsd \n		
+    //   aflow --icsd_bct < input.icsd \n		
+    //   aflow --icsd_rhl < input.icsd \n		
+    //   aflow --icsd_hex < input.icsd \n		
+    //   aflow --icsd_cub < input.icsd \n		
+    //   aflow --icsd_fcc < input.icsd \n		
+    //   aflow --icsd_bcc < input.icsd \n		
 
-      --icsd_basislessthan #basis : all compounds with number of basis atoms in PRIMITIVE cell < #basis
-      --icsd_basismorethan #basis : all compounds with number of basis atoms in PRIMITIVE cell > #basis
-      --icsd_n_ary #species       : (#species=1: unary, #species=2: binary, so on)
-      --icsd_nopartialocc   : discard compounds with partial occupancies
-      --icsd_nobrokenbasis  : select only compounds with complete basis is chosen (some times there is a broken basis, meaning
-      that some elements are missing from the basis in the database)
-      --icsd_unique         : discard redundant compounds having the same chemical formula AND SG#, the first
-      compound with complete basis is chosen (some times there is a broken basis, meaning
-      that some elements are missing from the basis in the database)
+    //   --icsd_basislessthan #basis : all compounds with number of basis atoms in PRIMITIVE cell < #basis
+    //   --icsd_basismorethan #basis : all compounds with number of basis atoms in PRIMITIVE cell > #basis
+    //   --icsd_n_ary #species       : (#species=1: unary, #species=2: binary, so on)
+    //   --icsd_nopartialocc   : discard compounds with partial occupancies
+    //   --icsd_nobrokenbasis  : select only compounds with complete basis is chosen (some times there is a broken basis, meaning
+    //   that some elements are missing from the basis in the database)
+    //   --icsd_unique         : discard redundant compounds having the same chemical formula AND SG#, the first
+    //   compound with complete basis is chosen (some times there is a broken basis, meaning
+    //   that some elements are missing from the basis in the database)
 
-      --icsd_chem  MgB4     : extract all MgB4 structures
-      --icsd_makelabel	  : make label from icsd format
-      --icsd_remove_and A B : remove compounds containing A AND B elements
-      --icsd_remove_or A B  : remove compounds containing A OR B elements
-      --icsd_removemetals   : remove compounds composed ENTIRELY by metallic elements only.
-      --icsd_proto 1 2 7    : all compounds with prototype AB2C7
+    //   --icsd_chem  MgB4     : extract all MgB4 structures
+    //   --icsd_makelabel	  : make label from icsd format
+    //   --icsd_remove_and A B : remove compounds containing A AND B elements
+    //   --icsd_remove_or A B  : remove compounds containing A OR B elements
+    //   --icsd_removemetals   : remove compounds composed ENTIRELY by metallic elements only.
+    //   --icsd_proto 1 2 7    : all compounds with prototype AB2C7
 
-      The input is from standard istream input in "ICSD-format". Note that the heaviest
-      element supported in this version is Thorium (Z=90).
+    //   The input is from standard istream input in "ICSD-format". Note that the heaviest
+    //   element supported in this version is Thorium (Z=90).
 
-    */
     //  bool  ifounbd,ifound1, ifound2, ifound3,ifound4,
     bool iwrite,iread,ifoundstart,ifoundend,AtomLineFound,
-      ALLLESSTHAN,ALLMORETHAN,
-      ICSD,ICSD_ID,ICSD_LESSTHAN,ICSD_MORETHAN,DENSLESSTHAN,DENSMORETHAN,SGLESSTHAN,SGMORETHAN,
-      SPACEGROUP,TRICLINIC,MONOCLINIC,ORTHORHOMBIC,TETRAGONAL,RHOMBOHEDRAL,HEXAGONAL,CUBIC,
-      UNIQUE,N_ARY,NOBROKENBASIS,BASISLT,BASISGT,CHEM,PROTO,NOPARTIALOCC,ICSD_REMOVE_AND,ICSD_REMOVE_OR,REMOVEMETALS;
+         ALLLESSTHAN,ALLMORETHAN,
+         ICSD,ICSD_ID,ICSD_LESSTHAN,ICSD_MORETHAN,DENSLESSTHAN,DENSMORETHAN,SGLESSTHAN,SGMORETHAN,
+         SPACEGROUP,TRICLINIC,MONOCLINIC,ORTHORHOMBIC,TETRAGONAL,RHOMBOHEDRAL,HEXAGONAL,CUBIC,
+         UNIQUE,N_ARY,NOBROKENBASIS,BASISLT,BASISGT,CHEM,PROTO,NOPARTIALOCC,ICSD_REMOVE_AND,ICSD_REMOVE_OR,REMOVEMETALS;
     bool MAKELABEL;
     bool TRI,MCL,MCLC,ORC,ORCC,ORCF,ORCI,  TET,BCT,RHL,ICSDHEX,CUB,FCC,BCC;
     uint iargv,Zi,zmin,zmax,SGmin,SGmax,SGref,SGnumber;
@@ -321,7 +319,7 @@ namespace pflow {
     SPACEGROUP=TRICLINIC=MONOCLINIC=ORTHORHOMBIC=TETRAGONAL=RHOMBOHEDRAL=HEXAGONAL=CUBIC=false;
     TRI=MCL=MCLC=ORC=ORCC=ORCF=ORCI=TET=BCT=RHL=ICSDHEX=CUB=FCC=BCC=false;
     MAKELABEL=false;
-  
+
     SGmin=231; SGmax=SGref=SGnumber=0;
     SGunique.clear(); ChemUnique.clear(); Znameref.clear();
     xpos.clear();ypos.clear();vsof.clear();
@@ -373,27 +371,27 @@ namespace pflow {
       if(sdata=="--icsd_remove_or") {ICSD_REMOVE_OR=true;iargv=i+1;}
       if(sdata=="--icsd_removemetals") {REMOVEMETALS=true;}
     }
-  
+
     //----------Preparation---------------
     if(ICSD || ICSD_REMOVE_AND || ICSD_REMOVE_OR) {
       Zref.clear();iwritelist.clear();
       for(i=iargv;i<(int) argv.size();i++) {
-	sdata=argv.at(i);
-	if(sdata[0]<'A') Zref.push_back(aurostd::string2utype<uint>(sdata));
-	else Zref.push_back(GetAtomNumber(sdata));
+        sdata=argv.at(i);
+        if(sdata[0]<'A') Zref.push_back(aurostd::string2utype<uint>(sdata));
+        else Zref.push_back(GetAtomNumber(sdata));
       }    
       //sorting
       for(i=0;i<((int) Zref.size())-1;i++) {
-	for(j=i+1;j<(int) Zref.size();j++) {
-	  if(Zref[j]<Zref[i]) {Zi=Zref[i]; Zref[i]=Zref[j]; Zref[j]=Zi;}
-	}
+        for(j=i+1;j<(int) Zref.size();j++) {
+          if(Zref[j]<Zref[i]) {Zi=Zref[i]; Zref[i]=Zref[j]; Zref[j]=Zi;}
+        }
       }
       iwritelist.resize((int)Zref.size());
     }
     if(ICSD_ID) {
       IDref.clear();
       for(i=iargv;i<(int) argv.size();i++) {
-	IDref.push_back(argv.at(i));
+        IDref.push_back(argv.at(i));
       }
     }
     if(CHEM) {
@@ -406,13 +404,13 @@ namespace pflow {
       //sorting based on ascending Z
       Zi=0; ftmp=0.0; sword="";
       for(i=0;i<(int)ChemZRef.size()-1;i++) {
-	for(j=i+1;j<(int)ChemZRef.size();j++) {
-	  if(ChemZRef[j]<ChemZRef[i]) {
-	    Zi=ChemZRef[i];ChemZRef[i]=ChemZRef[j];ChemZRef[j]=Zi;
-	    ftmp=ChemConcRef[i];ChemConcRef[i]=ChemConcRef[j];ChemConcRef[j]=ftmp;
-	    stmp=ChemNameRef[i];ChemNameRef[i]=ChemNameRef[j];ChemNameRef[j]=stmp;
-	  }
-	}
+        for(j=i+1;j<(int)ChemZRef.size();j++) {
+          if(ChemZRef[j]<ChemZRef[i]) {
+            Zi=ChemZRef[i];ChemZRef[i]=ChemZRef[j];ChemZRef[j]=Zi;
+            ftmp=ChemConcRef[i];ChemConcRef[i]=ChemConcRef[j];ChemConcRef[j]=ftmp;
+            stmp=ChemNameRef[i];ChemNameRef[i]=ChemNameRef[j];ChemNameRef[j]=stmp;
+          }
+        }
       }
     }
     if(PROTO) {
@@ -491,333 +489,333 @@ namespace pflow {
 
       if(sline.length()>4) sword=sline.substr(0,5);
       if(sword=="*data") {
-	ifoundstart=true; ifoundend=false; sbuf.clear();
+        ifoundstart=true; ifoundend=false; sbuf.clear();
       }
       sbuf.push_back(sline);
       if(sline.length()>3) sword=sline.substr(0,4);
       if(sword=="*end") {
-	ifoundend=true;
+        ifoundend=true;
       }
       if(ifoundstart && ifoundend) {//valid block of data found
-	AtomLineFound=FALSE;
-	iscan=iscan+1;
-	xpos.clear(); ypos.clear(); zpos.clear();
-	vsof.clear(); foundbasis.clear();
-	Zcount.clear(); Znumber.clear(); Zname.clear(); Zconc.clear(); WyckLabel.clear();
-	//extract the key words data
-	for(iline=0;iline<(int)sbuf.size();iline++) {
-	  //----------Coll Code---------
-	  sline=sbuf[iline];
-	  if(sline.length()>8) sword=sline.substr(0,9);
-	  if(sword=="Coll Code") {
-	    sICSDid=sline.substr(9,sline.length());
-	    sICSDid=RemoveCharFromString(sICSDid,' ');
-	    sICSDid=RemoveCharFromString(sICSDid,'\t');
-	    sICSDid=RemoveCharFromString(sICSDid,'\n');
-	    //	  ICSDid=aurostd::string2utype<int>(sICSDid);
-	  }
-	  //----------Rec Date----------
-	  //----------Mod Date----------
-	  //----------Chem Name---------
-	  //----------Structured--------
-	  //----------Sum---------------
-	  if(sline.length()>3) sword=sline.substr(0,4);
-	  if(sword=="Sum ") {
-	    ChemFormula=sline.substr(5,sline.length());
-	    ChemFormula=RemoveCharFromString(ChemFormula,' ');
-	    ChemFormula=RemoveCharFromString(ChemFormula,'\t');
-	    ChemFormula=RemoveCharFromString(ChemFormula,'\n');
-	    ParseChemicalFormula(ChemFormula,Zname,Zconc);//e.g. sline=MgB2.3 -> ChemNameRef=["Mg","B"] and ChemConcRef=[1,2.3]
-	    Nspec=Zname.size();Znumber.resize(Nspec);
-	    for(i=0;i<Nspec;i++) Znumber[i]=GetAtomNumber(Zname[i]);
-	    //sorting ascending
-	    for(i=0;i<Nspec-1;i++) {
-	      for(j=i+1;j<Nspec;j++) {
-		if(Znumber[j]<Znumber[i]) {
-		  Zi=Znumber[i];Znumber[i]=Znumber[j];Znumber[j]=Zi;
-		  stmp=Zname[i];Zname[i]=Zname[j];Zname[j]=stmp;
-		  ftmp=Zconc[i];Zconc[i]=Zconc[j];Zconc[j]=ftmp;
-		}
-	      }
-	    }
-	  }
-	  //----------ANX---------------
-	  //----------D(calc)-----------
-	  if(sline.length()>6) sword=sline.substr(0,7);
-	  if(sword=="D(calc)") {
-	    ssub=sline.substr(7,sline.length());
-	    Dcalc=aurostd::string2utype<float>(ssub);
-	  }
-	  //----------Title-------------
-	  //----------Author(s)---------
-	  //----------Reference---------
-	  //----------Unit Cell---------
-	  //----------Vol---------------
-	  if(sline.length()>2) sword=sline.substr(0,3);
-	  if(sword=="Vol") {
-	    Vol=aurostd::string2utype<float>(sline.substr(3,sline.length()));
-	  }
-	  //----------Z-----------------
-	  if(sline.length()>1) sword=sline.substr(0,2);
-	  if(sword=="Z ") {
-	    Zformula=aurostd::string2utype<int>(sline.substr(2,sline.length()));
-	  }
-	  //----------Space Group-------
-	  if(sline.length()>10) sword=sline.substr(0,11);
-	  if(sword=="Space Group") {
-	    SG=sline.substr(12,sline.length());
-	    SG=RemoveCharFromString(SG,' ');
-	    SG=RemoveCharFromString(SG,'\t');
-	    SG=RemoveCharFromString(SG,'\n');
-	  }
-	  //----------SG Number---------
-	  if(sline.length()>8) sword=sline.substr(0,9);
-	  if(sword=="SG Number") {
-	    ssub=sline.substr(9,sline.length());
-	    SGnumber=aurostd::string2utype<uint>(ssub);
-	  }
-	  //----------Cryst Sys---------
-	  //----------Pearson-----------
-	  if(sline.length()>6) sword=sline.substr(0,7);
-	  if(sword=="Pearson") {
-	    Pearson=sline.substr(8,sline.length());
-	    Pearson=RemoveCharFromString(Pearson,' ');
-	    Pearson=RemoveCharFromString(Pearson,'\t');
-	    Pearson=RemoveCharFromString(Pearson,'\n');
-	  }
-	  //----------Wyckoff-----------
-	  //----------R Value-----------
-	  //----------Red Cell----------
-	  if(sline.length()>7) sword=sline.substr(0,8);
-	  if(sword=="Red Cell") {
-	    for(i=(int)sline.length();i>0;i--) {
-	      if(sline[i]==' ' || sline[i]=='\t') break;
-	    }
-	    Volred=aurostd::string2utype<float>(sline.substr(i,sline.length()));
-	  }
-	  //----------Trans Red---------
-	  //----------Comments----------
-	  //----------Atom--------------
-	  if(sline.length()>4) sword=sline.substr(0,5);
-	  //icsd 2010 version
-	  //if(sword=="Atom") {
-	  //icsd 2011 version
-	  if(sword=="Atom " && !AtomLineFound) {
-	    AtomLineFound=TRUE;
-	    iread=TRUE;
-	    Zcount.resize(Nspec);foundbasis.resize(Nspec);
-	    for(j=0;j<Nspec;j++) {Zcount[j]=0;foundbasis[j]=false;}//clearing Zcount and foundbasis
-	    while(iread) {//processing one wyckoff entry
-	      iread=false;
-	      iline=iline+1;
-	      sline=sbuf[iline];
-	      ssub=StringCropAt(sline,1);
-	      for(j=0;j<Nspec;j++) {
-		if(ssub==Zname[j]) {//if it is atom name
-		  foundbasis[j]=true;//basis is found
-		  iread=TRUE;
-		  WyckLabel.push_back(ssub);
-		  Zcount[j]=Zcount[j]+1;
-		  ssub=StringCropAt(sline,9);
-		  ssub=RemoveStringFromTo(ssub,'(',')');
-		  //ssub=RemoveCharFromString(ssub,'(');
-		  //ssub=RemoveCharFromString(ssub,')');
-		  vsof.push_back(atof(ssub.data()));//save sof
-		}//if Zname
-	      }//for i<Nspec
-	    }//iread
-	    iline=iline-1;
-	  }//Atom
-	}//iline
-	title=ChemFormula+"_ICSD_"+sICSDid;
-	if((iscan%50)==49) cerr << endl;
-	cerr << ".";// << title << endl;
-	//-------START SCREENING--------------------------------------
-	iwrite=false;
-	if(ALLLESSTHAN || ALLMORETHAN) {
-	  iwrite=true;
-	  for(i=0;i<Nspec;i++) {
-	    Zi=GetAtomNumber(Zname[i]);
-	    if(ALLLESSTHAN && !ALLMORETHAN)
-	      if(Zi>=zmax || Zi==0) iwrite=false;
-	    if(!ALLLESSTHAN && ALLMORETHAN)
-	      if(Zi<=zmin) iwrite=false;
-	    if(ALLLESSTHAN && ALLMORETHAN)
-	      if(Zi<=zmin && Zi>=zmax) iwrite=false;
-	  }
-	} //if alllessthan allmorethan
-	if(ICSD_LESSTHAN || ICSD_MORETHAN) {
-	  iwrite=false;
-	  for(i=0;i<Nspec;i++) {
-	    Zi=GetAtomNumber(Zname[i]);
-	    if(ICSD_LESSTHAN && !ICSD_MORETHAN)
-	      if(Zi<zmax) iwrite=TRUE;
-	    if(!ICSD_LESSTHAN && ICSD_MORETHAN)
-	      if(Zi>zmin) iwrite=TRUE;
-	    if(ICSD_LESSTHAN && ICSD_MORETHAN)
-	      if(Zi>zmin && Zi<zmax) iwrite=TRUE;
-	  }//i<Nspec
-	}//LESSTHAN or MORETHAN
-	if(BASISLT || BASISGT) {
-	  Nbasis=0.0;
-	  for(j=0;j<(int) Zconc.size();j++) Nbasis=Nbasis+Zconc[j];
-	  Nbasis=Nbasis*Zformula/(floor(Vol/Volred+0.5));//number of atoms in the primitive cell
-	  if(BASISLT && !BASISGT) {if(Nbasis<Nbasismax) iwrite=true;else iwrite=false;}
-	  if(BASISGT && !BASISLT) {if(Nbasis>Nbasismin) iwrite=true;else iwrite=false;}
-	  if(BASISLT && BASISGT) {if(Nbasis>Nbasismin && Nbasis<Nbasismax) iwrite=true;else iwrite=false;}
-	}//BASISLT or BASISGT
-	if(CHEM) {
-	  iwrite=false;
-	  if((int)ChemConcRef.size()==Nspec) {
-	    iwrite=true;
-	    for(i=0;i<Nspec;i++) {
-	      if( (aurostd::abs(Zconc[i]-ChemConcRef[i])>TINY6) || (Znumber[i]!=ChemZRef[i])) iwrite=false;
-	    }
-	  }//if same number of species
-	}//CHEM	
-	if(DENSLESSTHAN || DENSMORETHAN) {
-	  iwrite=false;
-	  if(DENSMORETHAN && !DENSLESSTHAN) {if(Dcalc>Dmin) iwrite=true;}
-	  if(!DENSMORETHAN && DENSLESSTHAN) {if(Dcalc<Dmax) iwrite=true;}
-	  if(DENSMORETHAN && DENSLESSTHAN) {if(Dcalc>Dmin && Dcalc<Dmax) iwrite=true;}
-	}
-	if(ICSD) {
-	  Ztotest.clear();
-	  for(i=0;i<Nspec;i++) Ztotest.push_back(GetAtomNumber(Zname[i]));
-	  iwrite=true;
-	  for(i=0;i<(int)Ztotest.size();i++) {
-	    iwritelist[i]=false;
-	    for(j=0;j<Nspec;j++) {
-	      if(Ztotest[i]==Zref[j]) iwritelist[i]=true;
-	    }
-	    if(iwritelist[i]==false) iwrite=false;
-	  }
-	  
-	}//if ICSD
-	if(ICSD_ID) {
-	  iwrite=false;
-	  for(i=0;i<(int)IDref.size();i++) {
-	    if(sICSDid==IDref[i]) iwrite=true;
-	  }
-	}
-	if(N_ARY) {
-	  if(Nspec==Nspecref) iwrite=true;
-	  else iwrite=false;
-	}
-	if(NOBROKENBASIS) {
-	  iwrite=true;
-	  for(j=0;j<(int) foundbasis.size();j++) {
-	    if(foundbasis[j]==false) iwrite=false; //basis not found
-	  }
-	}
-	if(NOPARTIALOCC) {
-	  iwrite=true;
-	  for(j=0;j<(int) vsof.size();j++) {
-	    if(!(abs(vsof[j]-1.00)<1e-3)) {
-	      iwrite=false;//if partial occupancy is detected
-	    }
-	  }
-	}
-	if(ICSD_REMOVE_AND) {
-	  for(i=0;i<(int)Zref.size();i++) {
-	    iwritelist[i]=true;
-	    for(j=0;j<Nspec;j++)
-	      if(GetAtomNumber(Zname[j])==Zref[i]) iwritelist[i]=false;
-	  }
-	  iwrite=false;
-	  for(i=0;i<(int)Zref.size();i++) {
-	    if(iwritelist[i]) iwrite=true;
-	  }
-	}	
-	if(ICSD_REMOVE_OR) {
-	  iwrite=true;
-	  for(i=0;i<(int)Zref.size();i++) {
-	    for(j=0;j<Nspec;j++)
-	      if(GetAtomNumber(Zname[j])==Zref[i]) iwrite=false;
-	  }
-	}
-	if(REMOVEMETALS) {
-	  iwrite=false;
-	  for(i=0;i<(int)Zname.size();i++)
-	    if(!IsMetal(Zname[i])) iwrite=true;
-	}
-	if(PROTO) {
-	  iwrite=false;
-	  Zconc=SortFloat(Zconc,1);
-	  if(Zconc.size()==ChemConcRef.size()) {
-	    iwrite=true;
-	    for(i=0;i<(int)ChemConcRef.size();i++) {
-	      if( aurostd::abs(Zconc[i]-ChemConcRef[i]) > TINY6 ) iwrite=false;
-	    }
-	  }
-	}//PROTO
-	if(SPACEGROUP) {
-	  iwrite=false;
-	  if(TRICLINIC) {if(SGnumber>0 && SGnumber<3) iwrite=true;}
-	  if(MONOCLINIC) {if(SGnumber>2 && SGnumber<16) iwrite=true;}
-	  if(ORTHORHOMBIC) {if(SGnumber>15 && SGnumber<75) iwrite=true;}
-	  if(TETRAGONAL) {if(SGnumber>74 && SGnumber<143) iwrite=true;}
-	  if(RHOMBOHEDRAL) {if(SGnumber>142 && SGnumber<168) iwrite=true;}
-	  if(HEXAGONAL) {if(SGnumber>167 && SGnumber<195) iwrite=true;}
-	  if(CUBIC) {if(SGnumber>194 && SGnumber<231) iwrite=true;}
-	  if(SGnumber==SGref) iwrite=true;
-	  if(SGLESSTHAN && !SGMORETHAN) {if(SGnumber<SGmax) iwrite=true;}
-	  if(!SGLESSTHAN && SGMORETHAN) {if(SGnumber>SGmin) iwrite=true;}
-	  if(SGLESSTHAN && SGMORETHAN) {if(SGnumber>SGmin && SGnumber<SGmax) iwrite=true;}
-	
-	  cerr << "DEBUG: calling LATTICE::SpaceGroup2Lattice from pflow::ICSD_" << endl;
-	  if(TRI) {if("TRI"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(MCL) {if("MCL"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(MCLC) {if("MCLC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(ORC) {if("ORC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(ORCC) {if("ORCC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(ORCF) {if("ORCF"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(ORCI) {if("ORCI"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(TET) {if("TET"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(BCT) {if("BCT"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(RHL) {if("RHL"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(ICSDHEX) {if("HEX"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(CUB) {if("CUB"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(FCC) {if("FCC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	  if(BCC) {if("BCC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
-	}//if SPACEGROUP
-	if(UNIQUE) {
-	  iwrite=true;
-	  for(j=0;j<(int) foundbasis.size();j++) {
-	    if(foundbasis[j]==false) iwrite=false; //basis not found
-	  }
-	  if(SGunique.size()>0) {
-	    for(i=0;i<(int)SGunique.size();i++) {
-	      if(SGnumber==SGunique[i] && ChemFormula==ChemUnique[i]) iwrite=false;
-	    }
-	  }
-	  if(iwrite) {
-	    SGunique.push_back(SGnumber);ChemUnique.push_back(ChemFormula);
-	  }
-	}//if UNIQUE
+        AtomLineFound=FALSE;
+        iscan=iscan+1;
+        xpos.clear(); ypos.clear(); zpos.clear();
+        vsof.clear(); foundbasis.clear();
+        Zcount.clear(); Znumber.clear(); Zname.clear(); Zconc.clear(); WyckLabel.clear();
+        //extract the key words data
+        for(iline=0;iline<(int)sbuf.size();iline++) {
+          //----------Coll Code---------
+          sline=sbuf[iline];
+          if(sline.length()>8) sword=sline.substr(0,9);
+          if(sword=="Coll Code") {
+            sICSDid=sline.substr(9,sline.length());
+            sICSDid=RemoveCharFromString(sICSDid,' ');
+            sICSDid=RemoveCharFromString(sICSDid,'\t');
+            sICSDid=RemoveCharFromString(sICSDid,'\n');
+            //	  ICSDid=aurostd::string2utype<int>(sICSDid);
+          }
+          //----------Rec Date----------
+          //----------Mod Date----------
+          //----------Chem Name---------
+          //----------Structured--------
+          //----------Sum---------------
+          if(sline.length()>3) sword=sline.substr(0,4);
+          if(sword=="Sum ") {
+            ChemFormula=sline.substr(5,sline.length());
+            ChemFormula=RemoveCharFromString(ChemFormula,' ');
+            ChemFormula=RemoveCharFromString(ChemFormula,'\t');
+            ChemFormula=RemoveCharFromString(ChemFormula,'\n');
+            ParseChemicalFormula(ChemFormula,Zname,Zconc);//e.g. sline=MgB2.3 -> ChemNameRef=["Mg","B"] and ChemConcRef=[1,2.3]
+            Nspec=Zname.size();Znumber.resize(Nspec);
+            for(i=0;i<Nspec;i++) Znumber[i]=GetAtomNumber(Zname[i]);
+            //sorting ascending
+            for(i=0;i<Nspec-1;i++) {
+              for(j=i+1;j<Nspec;j++) {
+                if(Znumber[j]<Znumber[i]) {
+                  Zi=Znumber[i];Znumber[i]=Znumber[j];Znumber[j]=Zi;
+                  stmp=Zname[i];Zname[i]=Zname[j];Zname[j]=stmp;
+                  ftmp=Zconc[i];Zconc[i]=Zconc[j];Zconc[j]=ftmp;
+                }
+              }
+            }
+          }
+          //----------ANX---------------
+          //----------D(calc)-----------
+          if(sline.length()>6) sword=sline.substr(0,7);
+          if(sword=="D(calc)") {
+            ssub=sline.substr(7,sline.length());
+            Dcalc=aurostd::string2utype<float>(ssub);
+          }
+          //----------Title-------------
+          //----------Author(s)---------
+          //----------Reference---------
+          //----------Unit Cell---------
+          //----------Vol---------------
+          if(sline.length()>2) sword=sline.substr(0,3);
+          if(sword=="Vol") {
+            Vol=aurostd::string2utype<float>(sline.substr(3,sline.length()));
+          }
+          //----------Z-----------------
+          if(sline.length()>1) sword=sline.substr(0,2);
+          if(sword=="Z ") {
+            Zformula=aurostd::string2utype<int>(sline.substr(2,sline.length()));
+          }
+          //----------Space Group-------
+          if(sline.length()>10) sword=sline.substr(0,11);
+          if(sword=="Space Group") {
+            SG=sline.substr(12,sline.length());
+            SG=RemoveCharFromString(SG,' ');
+            SG=RemoveCharFromString(SG,'\t');
+            SG=RemoveCharFromString(SG,'\n');
+          }
+          //----------SG Number---------
+          if(sline.length()>8) sword=sline.substr(0,9);
+          if(sword=="SG Number") {
+            ssub=sline.substr(9,sline.length());
+            SGnumber=aurostd::string2utype<uint>(ssub);
+          }
+          //----------Cryst Sys---------
+          //----------Pearson-----------
+          if(sline.length()>6) sword=sline.substr(0,7);
+          if(sword=="Pearson") {
+            Pearson=sline.substr(8,sline.length());
+            Pearson=RemoveCharFromString(Pearson,' ');
+            Pearson=RemoveCharFromString(Pearson,'\t');
+            Pearson=RemoveCharFromString(Pearson,'\n');
+          }
+          //----------Wyckoff-----------
+          //----------R Value-----------
+          //----------Red Cell----------
+          if(sline.length()>7) sword=sline.substr(0,8);
+          if(sword=="Red Cell") {
+            for(i=(int)sline.length();i>0;i--) {
+              if(sline[i]==' ' || sline[i]=='\t') break;
+            }
+            Volred=aurostd::string2utype<float>(sline.substr(i,sline.length()));
+          }
+          //----------Trans Red---------
+          //----------Comments----------
+          //----------Atom--------------
+          if(sline.length()>4) sword=sline.substr(0,5);
+          //icsd 2010 version
+          //if(sword=="Atom")
+          //icsd 2011 version
+          if(sword=="Atom " && !AtomLineFound) {
+            AtomLineFound=TRUE;
+            iread=TRUE;
+            Zcount.resize(Nspec);foundbasis.resize(Nspec);
+            for(j=0;j<Nspec;j++) {Zcount[j]=0;foundbasis[j]=false;}//clearing Zcount and foundbasis
+            while(iread) {//processing one wyckoff entry
+              iread=false;
+              iline=iline+1;
+              sline=sbuf[iline];
+              ssub=StringCropAt(sline,1);
+              for(j=0;j<Nspec;j++) {
+                if(ssub==Zname[j]) {//if it is atom name
+                  foundbasis[j]=true;//basis is found
+                  iread=TRUE;
+                  WyckLabel.push_back(ssub);
+                  Zcount[j]=Zcount[j]+1;
+                  ssub=StringCropAt(sline,9);
+                  ssub=RemoveStringFromTo(ssub,'(',')');
+                  //ssub=RemoveCharFromString(ssub,'(');
+                  //ssub=RemoveCharFromString(ssub,')');
+                  vsof.push_back(atof(ssub.data()));//save sof
+                }//if Zname
+              }//for i<Nspec
+            }//iread
+            iline=iline-1;
+          }//Atom
+        }//iline
+        title=ChemFormula+"_ICSD_"+sICSDid;
+        if((iscan%50)==49) cerr << endl;
+        cerr << ".";// << title << endl;
+        //-------START SCREENING--------------------------------------
+        iwrite=false;
+        if(ALLLESSTHAN || ALLMORETHAN) {
+          iwrite=true;
+          for(i=0;i<Nspec;i++) {
+            Zi=GetAtomNumber(Zname[i]);
+            if(ALLLESSTHAN && !ALLMORETHAN)
+              if(Zi>=zmax || Zi==0) iwrite=false;
+            if(!ALLLESSTHAN && ALLMORETHAN)
+              if(Zi<=zmin) iwrite=false;
+            if(ALLLESSTHAN && ALLMORETHAN)
+              if(Zi<=zmin && Zi>=zmax) iwrite=false;
+          }
+        } //if alllessthan allmorethan
+        if(ICSD_LESSTHAN || ICSD_MORETHAN) {
+          iwrite=false;
+          for(i=0;i<Nspec;i++) {
+            Zi=GetAtomNumber(Zname[i]);
+            if(ICSD_LESSTHAN && !ICSD_MORETHAN)
+              if(Zi<zmax) iwrite=TRUE;
+            if(!ICSD_LESSTHAN && ICSD_MORETHAN)
+              if(Zi>zmin) iwrite=TRUE;
+            if(ICSD_LESSTHAN && ICSD_MORETHAN)
+              if(Zi>zmin && Zi<zmax) iwrite=TRUE;
+          }//i<Nspec
+        }//LESSTHAN or MORETHAN
+        if(BASISLT || BASISGT) {
+          Nbasis=0.0;
+          for(j=0;j<(int) Zconc.size();j++) Nbasis=Nbasis+Zconc[j];
+          Nbasis=Nbasis*Zformula/(floor(Vol/Volred+0.5));//number of atoms in the primitive cell
+          if(BASISLT && !BASISGT) {if(Nbasis<Nbasismax) iwrite=true;else iwrite=false;}
+          if(BASISGT && !BASISLT) {if(Nbasis>Nbasismin) iwrite=true;else iwrite=false;}
+          if(BASISLT && BASISGT) {if(Nbasis>Nbasismin && Nbasis<Nbasismax) iwrite=true;else iwrite=false;}
+        }//BASISLT or BASISGT
+        if(CHEM) {
+          iwrite=false;
+          if((int)ChemConcRef.size()==Nspec) {
+            iwrite=true;
+            for(i=0;i<Nspec;i++) {
+              if( (aurostd::abs(Zconc[i]-ChemConcRef[i])>TINY6) || (Znumber[i]!=ChemZRef[i])) iwrite=false;
+            }
+          }//if same number of species
+        }//CHEM	
+        if(DENSLESSTHAN || DENSMORETHAN) {
+          iwrite=false;
+          if(DENSMORETHAN && !DENSLESSTHAN) {if(Dcalc>Dmin) iwrite=true;}
+          if(!DENSMORETHAN && DENSLESSTHAN) {if(Dcalc<Dmax) iwrite=true;}
+          if(DENSMORETHAN && DENSLESSTHAN) {if(Dcalc>Dmin && Dcalc<Dmax) iwrite=true;}
+        }
+        if(ICSD) {
+          Ztotest.clear();
+          for(i=0;i<Nspec;i++) Ztotest.push_back(GetAtomNumber(Zname[i]));
+          iwrite=true;
+          for(i=0;i<(int)Ztotest.size();i++) {
+            iwritelist[i]=false;
+            for(j=0;j<Nspec;j++) {
+              if(Ztotest[i]==Zref[j]) iwritelist[i]=true;
+            }
+            if(iwritelist[i]==false) iwrite=false;
+          }
 
-	//---------------------OUTPUT---------------------------------------------
-	if(MAKELABEL) {	  
-	  iwrite=false;
-	  //ascending sorting of elements in the compound
-	  for(j=0;j<(int)Zname.size()-1;j++) {
-	    for(i=j+1;i<(int)Zname.size();i++) {
-	      if(Zname[i]<Zname[j]) {//swap
-		stmp=Zname[j];Zname[j]=Zname[i];Zname[i]=stmp;
-		ftmp=Zconc[j];Zconc[j]=Zconc[i];Zconc[i]=ftmp;
-	      }
-	    }
-	  }
-	  for(j=0;j<(int)Zname.size();j++) cout << Zname[j] << Zconc[j];
-	  cout << "_ICSD_" << sICSDid << endl;
-	}//if makelabel
+        }//if ICSD
+        if(ICSD_ID) {
+          iwrite=false;
+          for(i=0;i<(int)IDref.size();i++) {
+            if(sICSDid==IDref[i]) iwrite=true;
+          }
+        }
+        if(N_ARY) {
+          if(Nspec==Nspecref) iwrite=true;
+          else iwrite=false;
+        }
+        if(NOBROKENBASIS) {
+          iwrite=true;
+          for(j=0;j<(int) foundbasis.size();j++) {
+            if(foundbasis[j]==false) iwrite=false; //basis not found
+          }
+        }
+        if(NOPARTIALOCC) {
+          iwrite=true;
+          for(j=0;j<(int) vsof.size();j++) {
+            if(!(abs(vsof[j]-1.00)<1e-3)) {
+              iwrite=false;//if partial occupancy is detected
+            }
+          }
+        }
+        if(ICSD_REMOVE_AND) {
+          for(i=0;i<(int)Zref.size();i++) {
+            iwritelist[i]=true;
+            for(j=0;j<Nspec;j++)
+              if(GetAtomNumber(Zname[j])==Zref[i]) iwritelist[i]=false;
+          }
+          iwrite=false;
+          for(i=0;i<(int)Zref.size();i++) {
+            if(iwritelist[i]) iwrite=true;
+          }
+        }	
+        if(ICSD_REMOVE_OR) {
+          iwrite=true;
+          for(i=0;i<(int)Zref.size();i++) {
+            for(j=0;j<Nspec;j++)
+              if(GetAtomNumber(Zname[j])==Zref[i]) iwrite=false;
+          }
+        }
+        if(REMOVEMETALS) {
+          iwrite=false;
+          for(i=0;i<(int)Zname.size();i++)
+            if(!IsMetal(Zname[i])) iwrite=true;
+        }
+        if(PROTO) {
+          iwrite=false;
+          Zconc=SortFloat(Zconc,1);
+          if(Zconc.size()==ChemConcRef.size()) {
+            iwrite=true;
+            for(i=0;i<(int)ChemConcRef.size();i++) {
+              if( aurostd::abs(Zconc[i]-ChemConcRef[i]) > TINY6 ) iwrite=false;
+            }
+          }
+        }//PROTO
+        if(SPACEGROUP) {
+          iwrite=false;
+          if(TRICLINIC) {if(SGnumber>0 && SGnumber<3) iwrite=true;}
+          if(MONOCLINIC) {if(SGnumber>2 && SGnumber<16) iwrite=true;}
+          if(ORTHORHOMBIC) {if(SGnumber>15 && SGnumber<75) iwrite=true;}
+          if(TETRAGONAL) {if(SGnumber>74 && SGnumber<143) iwrite=true;}
+          if(RHOMBOHEDRAL) {if(SGnumber>142 && SGnumber<168) iwrite=true;}
+          if(HEXAGONAL) {if(SGnumber>167 && SGnumber<195) iwrite=true;}
+          if(CUBIC) {if(SGnumber>194 && SGnumber<231) iwrite=true;}
+          if(SGnumber==SGref) iwrite=true;
+          if(SGLESSTHAN && !SGMORETHAN) {if(SGnumber<SGmax) iwrite=true;}
+          if(!SGLESSTHAN && SGMORETHAN) {if(SGnumber>SGmin) iwrite=true;}
+          if(SGLESSTHAN && SGMORETHAN) {if(SGnumber>SGmin && SGnumber<SGmax) iwrite=true;}
 
-	if(iwrite) {
-	  for(i=0;i<(int)sbuf.size();i++) cout << sbuf[i] << endl;
-	}
-	//clearing for the next block of data
-	ifoundstart=ifoundend=false;
-	sword="";sline="";
+          cerr << "DEBUG: calling LATTICE::SpaceGroup2Lattice from pflow::ICSD_" << endl;
+          if(TRI) {if("TRI"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(MCL) {if("MCL"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(MCLC) {if("MCLC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(ORC) {if("ORC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(ORCC) {if("ORCC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(ORCF) {if("ORCF"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(ORCI) {if("ORCI"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(TET) {if("TET"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(BCT) {if("BCT"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(RHL) {if("RHL"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(ICSDHEX) {if("HEX"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(CUB) {if("CUB"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(FCC) {if("FCC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+          if(BCC) {if("BCC"==LATTICE::SpaceGroup2Lattice((uint)SGnumber)) iwrite=true;}
+        }//if SPACEGROUP
+        if(UNIQUE) {
+          iwrite=true;
+          for(j=0;j<(int) foundbasis.size();j++) {
+            if(foundbasis[j]==false) iwrite=false; //basis not found
+          }
+          if(SGunique.size()>0) {
+            for(i=0;i<(int)SGunique.size();i++) {
+              if(SGnumber==SGunique[i] && ChemFormula==ChemUnique[i]) iwrite=false;
+            }
+          }
+          if(iwrite) {
+            SGunique.push_back(SGnumber);ChemUnique.push_back(ChemFormula);
+          }
+        }//if UNIQUE
+
+        //---------------------OUTPUT---------------------------------------------
+        if(MAKELABEL) {	  
+          iwrite=false;
+          //ascending sorting of elements in the compound
+          for(j=0;j<(int)Zname.size()-1;j++) {
+            for(i=j+1;i<(int)Zname.size();i++) {
+              if(Zname[i]<Zname[j]) {//swap
+                stmp=Zname[j];Zname[j]=Zname[i];Zname[i]=stmp;
+                ftmp=Zconc[j];Zconc[j]=Zconc[i];Zconc[i]=ftmp;
+              }
+            }
+          }
+          for(j=0;j<(int)Zname.size();j++) cout << Zname[j] << Zconc[j];
+          cout << "_ICSD_" << sICSDid << endl;
+        }//if makelabel
+
+        if(iwrite) {
+          for(i=0;i<(int)sbuf.size();i++) cout << sbuf[i] << endl;
+        }
+        //clearing for the next block of data
+        ifoundstart=ifoundend=false;
+        sword="";sline="";
       }//one valid block of data
     }//while reading input
     cerr << endl;
@@ -830,33 +828,31 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void ICSD_CheckRaw(vector<string> argv) {
-    /*
-      Synopsis:
-      aflow --icsd_check_raw > output.dat
-      same as --icsd_check_raw 0
-      aflow --icsd_check_raw 0 > output.dat
-      generate a new list of RAW dirs and LIB dirs
-      aflow --icsd_check_raw 1 > output.dat
-      use the list of RAW and LIB dirs that have been compiled in aflow
-      i.e. XHOST.vGlobal.at(X) (ICSD_LIB);  // aflow_data_calculated.cpp
-      XHOST.vGlobal.at(X) (ICSD_RAW);  // aflow_data_calculated.cpp
-      This routine checks the validity of the init::AFLOW_Projects_Directories("ICSD")/RAW/ dirs and files
-      with respect to init::AFLOW_Projects_Directories("ICSD")/LIB/
-	
-      output.dat will contain:
-      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  OK
-      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  OK
-      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  ERROR file1 file2 ...
-      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  NotInLIB
-      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  NotInLIB
-      init::AFLOW_Projects_Directories("ICSD")/LIB/../../  NotInRAW
-      init::AFLOW_Projects_Directories("ICSD")/LIB/../../  NotInRAW
-      and so on
-      the MISSING lines mean that the structures are in LIB but not in RAW	
-    */
-    
+    //Synopsis:
+    //aflow --icsd_check_raw > output.dat
+    //same as --icsd_check_raw 0
+    //aflow --icsd_check_raw 0 > output.dat
+    //generate a new list of RAW dirs and LIB dirs
+    //aflow --icsd_check_raw 1 > output.dat
+    //use the list of RAW and LIB dirs that have been compiled in aflow
+    //i.e. XHOST.vGlobal.at(X) (ICSD_LIB);  // aflow_data_calculated.cpp
+    //XHOST.vGlobal.at(X) (ICSD_RAW);  // aflow_data_calculated.cpp
+    //This routine checks the validity of the init::AFLOW_Projects_Directories("ICSD")/RAW/ dirs and files
+    //with respect to init::AFLOW_Projects_Directories("ICSD")/LIB/
+
+    //output.dat will contain:
+    //init::AFLOW_Projects_Directories("ICSD")/RAW/../../  OK
+    //init::AFLOW_Projects_Directories("ICSD")/RAW/../../  OK
+    //init::AFLOW_Projects_Directories("ICSD")/RAW/../../  ERROR file1 file2 ...
+    //init::AFLOW_Projects_Directories("ICSD")/RAW/../../  NotInLIB
+    //init::AFLOW_Projects_Directories("ICSD")/RAW/../../  NotInLIB
+    //init::AFLOW_Projects_Directories("ICSD")/LIB/../../  NotInRAW
+    //init::AFLOW_Projects_Directories("ICSD")/LIB/../../  NotInRAW
+    //and so on
+    //the MISSING lines mean that the structures are in LIB but not in RAW	
+
     if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - pflow::ICSD_CheckRaw: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
-    
+
     vector<string> LIBlist,RAWlist,LIBnotRAW,RAWnotLIB,LIBRAW;
     string stmp;
     bool inew=true; //whether I generate an update list of LIB and RAW
@@ -873,12 +869,12 @@ namespace pflow {
       //write LIB
       oftmp.open("wLIBlist.tmp");
       for(uint i=0;i<XHOST_Library_CALCULATED_ICSD_LIB.size();i++)
-	oftmp << XHOST_Library_CALCULATED_ICSD_LIB.at(i) << endl;
+        oftmp << XHOST_Library_CALCULATED_ICSD_LIB.at(i) << endl;
       oftmp.close();
       //write RAW
       oftmp.open("wRAWlist.tmp");
       for(uint i=0;i<XHOST_Library_CALCULATED_ICSD_RAW.size();i++)
-	oftmp << XHOST_Library_CALCULATED_ICSD_RAW.at(i) << endl;
+        oftmp << XHOST_Library_CALCULATED_ICSD_RAW.at(i) << endl;
       oftmp.close();		
     }
     aurostd::execute("subst \""+init::AFLOW_Projects_Directories("ICSD")+"/LIB/\" \"\" wLIBlist.tmp");
@@ -915,7 +911,7 @@ namespace pflow {
       stmp = LIBlist.at(i);
       ifound = false;
       for(j=0;j<Nraw;j++) {
-	if(RAWlist[j]==stmp) {ifound=true; break;}
+        if(RAWlist[j]==stmp) {ifound=true; break;}
       }
       if(ifound) LIBRAW.push_back(stmp);
       else LIBnotRAW.push_back(stmp);
@@ -928,7 +924,7 @@ namespace pflow {
       stmp = RAWlist.at(i);
       ifound = false;
       for(j=0;j<Nlib;j++) {
-	if(LIBlist[j]==stmp) {ifound=true; break;}
+        if(LIBlist[j]==stmp) {ifound=true; break;}
       }
       if(!ifound) RAWnotLIB.push_back(stmp);
     }
@@ -937,7 +933,7 @@ namespace pflow {
     for(i=0;i<Nlibnotraw;i++) cout << init::AFLOW_Projects_Directories("ICSD") << "LIB/" << LIBnotRAW.at(i) << " NotInRaw" << endl;
     //output RAWnotLIB
     for(i=0;i<Nrawnotlib;i++) cout << init::AFLOW_Projects_Directories("ICSD") << "RAW/" << RAWnotLIB.at(i) << " NotInLib" << endl;	
-	
+
     // processing LIBRAW
     int itmp=0;
     string directory_RAW,directory_LIB;
@@ -956,11 +952,11 @@ namespace pflow {
       if(ifound) ifound = (aurostd::FileExist(directory_LIB+"/KPOINTS.bands") || aurostd::EFileExist(directory_LIB+"/KPOINTS.bands"));
       if(ifound) ifound = (aurostd::FileExist(directory_LIB+"/DOSCAR.bands") || aurostd::EFileExist(directory_LIB+"/DOSCAR.bands"));
       if(!ifound) { cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "POSCAR.bands[.EXT], KPOINTS.bands[.EXT], DOSCAR.static[.EXT] in directory_LIB=" << directory_LIB << " do not exist " << endl; continue; }
-    
+
       // 2. diff POSCAR.bands
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/POSCAR.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/POSCAR.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/POSCAR.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/POSCAR.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
+        if(aurostd::FileExist(directory_LIB+"/POSCAR.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/POSCAR.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
+        if(aurostd::FileExist(directory_RAW+"/POSCAR.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/POSCAR.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
       iftmp.open("wDIFF.tmp");
@@ -971,23 +967,8 @@ namespace pflow {
 
       // 3. diff KPOINTS.bands
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/KPOINTS.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/KPOINTS.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/KPOINTS.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/KPOINTS.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
-      }
-      aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
-     iftmp.open("wDIFF.tmp");
-      iftmp >> itmp;
-      if(itmp>0) ifound=false;
-      iftmp.close();
-      if(!ifound) {
-	cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "KPOINTS.bands" << endl;
-	continue;
-      }
-      /*
-      // 4. diff EIGENVAL.bands
-      for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
+        if(aurostd::FileExist(directory_LIB+"/KPOINTS.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/KPOINTS.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
+        if(aurostd::FileExist(directory_RAW+"/KPOINTS.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/KPOINTS.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
       iftmp.open("wDIFF.tmp");
@@ -995,15 +976,28 @@ namespace pflow {
       if(itmp>0) ifound=false;
       iftmp.close();
       if(!ifound) {
-      cout << directory_RAW << " ERROR " << "EIGENVAL.bands" << endl;
-      continue;
+        cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "KPOINTS.bands" << endl;
+        continue;
       }
-      */
+      //// 4. diff EIGENVAL.bands
+      //for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      //if(aurostd::FileExist(directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > wLIB.tmp");
+      //if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/EIGENVAL.bands"+XHOST.vext.at(iext)+" > wRAW.tmp");
+      //}
+      //aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
+      //iftmp.open("wDIFF.tmp");
+      //iftmp >> itmp;
+      //if(itmp>0) ifound=false;
+      //iftmp.close();
+      //if(!ifound) {
+      //cout << directory_RAW << " ERROR " << "EIGENVAL.bands" << endl;
+      //continue;
+      //}
 
       // 5. diff DOSCAR.static
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	if(aurostd::FileExist(directory_LIB+"/DOSCAR.static"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/DOSCAR.static"+XHOST.vext.at(iext)+" > wLIB.tmp");
-    	if(aurostd::FileExist(directory_RAW+"/DOSCAR.static"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/DOSCAR.static"+XHOST.vext.at(iext)+" > wRAW.tmp");
+        if(aurostd::FileExist(directory_LIB+"/DOSCAR.static"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_LIB+"/DOSCAR.static"+XHOST.vext.at(iext)+" > wLIB.tmp");
+        if(aurostd::FileExist(directory_RAW+"/DOSCAR.static"+XHOST.vext.at(iext))) aurostd::execute(XHOST.vcat.at(iext)+" "+directory_RAW+"/DOSCAR.static"+XHOST.vext.at(iext)+" > wRAW.tmp");
       }
       aurostd::execute("diff -w -B wLIB.tmp wRAW.tmp | wc -l > wDIFF.tmp");      
 
@@ -1012,8 +1006,8 @@ namespace pflow {
       if(itmp>0) ifound=false;
       iftmp.close();
       if(!ifound) {
-	cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "DOSCAR.static.EXT" << endl;
-	continue;
+        cout << directory_RAW << "ERROR - pflow::ICSD_CheckRaw: " << "DOSCAR.static.EXT" << endl;
+        continue;
       }
       cout << directory_RAW << " OK" << endl;
     }
@@ -1028,11 +1022,9 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void ICSD_2POSCAR(istream& input) {
-    /*
-      Synopsis:	
-      aflow --icsd2poscar < input.icsd
-      Generate POSCAR from icsd library stored in input.icsd
-    */
+    //Synopsis:	
+    //aflow --icsd2poscar < input.icsd
+    //Generate POSCAR from icsd library stored in input.icsd
     string sword="";
     input >> sword;
     cerr << "**** Not Implemented Yet ****" << endl;
@@ -1044,20 +1036,18 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void ICSD_2PROTO(istream& input) {
-    /*
-      Synopsis:
-      --icsd2proto < input.icsd
-      Write output to stdout  (prototype-format) from stdin ICSD-format
-      In addition, it writes some information for each structure to the file "proto.label"
-    */
+    //Synopsis:
+    //--icsd2proto < input.icsd
+    //Write output to stdout  (prototype-format) from stdin ICSD-format
+    //In addition, it writes some information for each structure to the file "proto.label"
 
     bool ifound,iread,iwrite,AtomLineFound=false,icontinue=true;
     int j,k,
-      ICSDid=0,SGnumber=0,Ncompounds=0,Nspec=0,CellChoice=1;
+        ICSDid=0,SGnumber=0,Ncompounds=0,Nspec=0,CellChoice=1;
     float ftmp,Dcalc=0.0;
     string cstmp,stmp;
     string sline,sword,ssub,
-      title,sdir,sICSDid,CompoundName,StructuredName,scommand,Pearson,SG;
+           title,sdir,sICSDid,CompoundName,StructuredName,scommand,Pearson,SG;
     string::iterator siter;
     size_t ssize_t;
     vector<int> Zcount;
@@ -1074,283 +1064,283 @@ namespace pflow {
 
       if(sline.length()>4) sword=sline.substr(0,5);
       if(sword=="*data") {
-	Ncompounds++;title="";
+        Ncompounds++;title="";
       }
 
       if(sline.length()>8) sword=sline.substr(0,9);
       if(sword=="Coll Code") {
-	ICSDid=atoi((sline.substr(9,sline.length())).data());
-	cstmp=aurostd::utype2string(ICSDid);
-	sICSDid=cstmp;
-	title="ICSD_"+sICSDid;
-	cerr << "processing " << title << endl;
+        ICSDid=atoi((sline.substr(9,sline.length())).data());
+        cstmp=aurostd::utype2string(ICSDid);
+        sICSDid=cstmp;
+        title="ICSD_"+sICSDid;
+        cerr << "processing " << title << endl;
       }
 
       if(sline.length()>9) sword=sline.substr(0,10);
       if(sword=="Structured") {
-	StructuredName=sline.substr(11,sline.length());
-	StructuredName=RemoveCharFromString(StructuredName,' ');
-	StructuredName=RemoveCharFromString(StructuredName,'\t');
-	StructuredName=RemoveCharFromString(StructuredName,'\n');
+        StructuredName=sline.substr(11,sline.length());
+        StructuredName=RemoveCharFromString(StructuredName,' ');
+        StructuredName=RemoveCharFromString(StructuredName,'\t');
+        StructuredName=RemoveCharFromString(StructuredName,'\n');
       }
 
       if(sline.length()>3) sword=sline.substr(0,4);
       if(sword=="Sum ") {
-	ssub=sline.substr(5,sline.length());
-	for(j=0;j<(int) ssub.length();j++) {
-	  if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
-	    ssub=ssub.substr(j+1,ssub.length());
-	    break;
-	  }
-	}
-	CompoundName=RemoveCharFromString(ssub,' ');
-	CompoundName=RemoveCharFromString(CompoundName,'\t');
-	CompoundName=RemoveCharFromString(CompoundName,'\n');
-	title=title+", "+CompoundName;
+        ssub=sline.substr(5,sline.length());
+        for(j=0;j<(int) ssub.length();j++) {
+          if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
+            ssub=ssub.substr(j+1,ssub.length());
+            break;
+          }
+        }
+        CompoundName=RemoveCharFromString(ssub,' ');
+        CompoundName=RemoveCharFromString(CompoundName,'\t');
+        CompoundName=RemoveCharFromString(CompoundName,'\n');
+        title=title+", "+CompoundName;
 
-	//getting Nspec && Zname[]
-	Nspec=0; ifound=false;
-	for(j=0;j<(int) ssub.length();j++) {
-	  if(ssub[j]==' ' && j!=0) {
-	    ifound=TRUE;
-	    sword=ssub.substr(0,j);
-	    ssub=ssub.substr(j+1,ssub.length());
-	    j=0;
-	  }
-	  else if(j==(int) ssub.length()-1 && ssub!="") {
-	    ifound=TRUE;
-	    sword=ssub;
-	  }
-	  if(ifound) {
-	    Nspec++;
-	    for(k=0;k<(int) sword.length();k++) {
-	      if(sword[k]<'A' || sword[k]>'z') {
-		Zname.push_back(sword.substr(0,k));
-		Zconc.push_back(atof((sword.substr(k,sword.length())).data()));
-		break;
-	      }
-	    }
-	    ifound=false;
-	  }//if ifound
-	}//for j=0:ssub.length()
+        //getting Nspec && Zname[]
+        Nspec=0; ifound=false;
+        for(j=0;j<(int) ssub.length();j++) {
+          if(ssub[j]==' ' && j!=0) {
+            ifound=TRUE;
+            sword=ssub.substr(0,j);
+            ssub=ssub.substr(j+1,ssub.length());
+            j=0;
+          }
+          else if(j==(int) ssub.length()-1 && ssub!="") {
+            ifound=TRUE;
+            sword=ssub;
+          }
+          if(ifound) {
+            Nspec++;
+            for(k=0;k<(int) sword.length();k++) {
+              if(sword[k]<'A' || sword[k]>'z') {
+                Zname.push_back(sword.substr(0,k));
+                Zconc.push_back(atof((sword.substr(k,sword.length())).data()));
+                break;
+              }
+            }
+            ifound=false;
+          }//if ifound
+        }//for j=0:ssub.length()
 
-	//ascending sorting of elements in the compound
-	for(j=0;j<(int)Zname.size()-1;j++) {
-	  for(k=j+1;k<(int)Zname.size();k++) {
-	    if(Zname[k]<Zname[j]) {//swap
-	      stmp=Zname[j];
-	      Zname[j]=Zname[k];
-	      Zname[k]=stmp;
-	      ftmp=Zconc[j];
-	      Zconc[j]=Zconc[k];
-	      Zconc[k]=ftmp;
-	    }
-	  }
-	}
+        //ascending sorting of elements in the compound
+        for(j=0;j<(int)Zname.size()-1;j++) {
+          for(k=j+1;k<(int)Zname.size();k++) {
+            if(Zname[k]<Zname[j]) {//swap
+              stmp=Zname[j];
+              Zname[j]=Zname[k];
+              Zname[k]=stmp;
+              ftmp=Zconc[j];
+              Zconc[j]=Zconc[k];
+              Zconc[k]=ftmp;
+            }
+          }
+        }
       }//"Sum "
       Zcount.resize(Nspec);
 
       //----------D(calc)-----------                                                                                                        
       if(sline.length()>6) sword=sline.substr(0,7);
       if(sword=="D(calc)") {
-	ssub=sline.substr(7,sline.length());
-	Dcalc=aurostd::string2utype<float>(ssub);
+        ssub=sline.substr(7,sline.length());
+        Dcalc=aurostd::string2utype<float>(ssub);
       }
 
       //Unit Cell
       if(sline.length()>8) sword=sline.substr(0,9);
       if(sword=="Unit Cell") {
-	ssub=sline.substr(10,sline.length());
-	for(j=0;j<(int) ssub.length();j++) {
-	  if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
-	    ssub=ssub.substr(j+1,ssub.length());
-	    break;
-	  }
-	}
-	ssub=RemoveStringFromTo(ssub,'(',')');
-	//ssub=RemoveCharFromString(ssub,'(');
-	//ssub=RemoveCharFromString(ssub,')');
+        ssub=sline.substr(10,sline.length());
+        for(j=0;j<(int) ssub.length();j++) {
+          if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
+            ssub=ssub.substr(j+1,ssub.length());
+            break;
+          }
+        }
+        ssub=RemoveStringFromTo(ssub,'(',')');
+        //ssub=RemoveCharFromString(ssub,'(');
+        //ssub=RemoveCharFromString(ssub,')');
 
-	k=0;
-	for(j=0;j<(int) ssub.length();j++) {
-	  if(ssub[j]==' ') {
-	    unitcell[k++]=atof((ssub.substr(0,j)).data());
-	    ssub=ssub.substr(j+1,ssub.length());
-	    j=0;
-	  }
-	  else if(j==(int) ssub.length()-1 && ssub!="")
-	    unitcell[k++]=atof(ssub.data());
-	}
+        k=0;
+        for(j=0;j<(int) ssub.length();j++) {
+          if(ssub[j]==' ') {
+            unitcell[k++]=atof((ssub.substr(0,j)).data());
+            ssub=ssub.substr(j+1,ssub.length());
+            j=0;
+          }
+          else if(j==(int) ssub.length()-1 && ssub!="")
+            unitcell[k++]=atof(ssub.data());
+        }
       }//Unit Cell
 
       if(sline.length()>8) sword=sline.substr(0,9);
       if(sword=="SG Number") {
-	SGnumber=atoi((sline.substr(9,sline.length())).data());      
+        SGnumber=atoi((sline.substr(9,sline.length())).data());      
       }
-    
+
       if(sline.length()>6) sword=sline.substr(0,7);
       if(sword=="Pearson") {
-	Pearson=sline.substr(8,sline.length());
-	Pearson=RemoveCharFromString(Pearson,' ');
-	Pearson=RemoveCharFromString(Pearson,'\t');
-	Pearson=RemoveCharFromString(Pearson,'\n');
+        Pearson=sline.substr(8,sline.length());
+        Pearson=RemoveCharFromString(Pearson,' ');
+        Pearson=RemoveCharFromString(Pearson,'\t');
+        Pearson=RemoveCharFromString(Pearson,'\n');
       }
-    
+
       if(sline.length()>10) sword=sline.substr(0,11);
       if(sword=="Space Group") {
-	SG=sline.substr(12,sline.length());
-	SG=RemoveCharFromString(SG,' ');
-	SG=RemoveCharFromString(SG,'\t');
-	SG=RemoveCharFromString(SG,'\n');
+        SG=sline.substr(12,sline.length());
+        SG=RemoveCharFromString(SG,' ');
+        SG=RemoveCharFromString(SG,'\t');
+        SG=RemoveCharFromString(SG,'\n');
       }
 
       //cell choice
       if(sline.length()>7) sword=sline.substr(0,8);
       if(sword=="Comments") {
-	ssub=sline;j=0;icontinue=true;
-	while(icontinue && j<1000) {
-	  j++;
-	  getline(input,sline);sline=sline+'\n';
-	  if(sline.length()>4) sword=sline.substr(0,5);
-	  if(sword=="Atom ") icontinue=false;
-	  else ssub=ssub+sline;
-	}
-	ssub=RemoveCharFromString(ssub,' ');
-	ssub=RemoveCharFromString(ssub,'\t');
-	ssub=RemoveCharFromString(ssub,'\n');
-	ssize_t=ssub.find("cellchoice");
-	if(ssize_t!=ssub.npos) {sword=ssub.at(ssize_t+10); CellChoice=atoi(sword.data());}
-	else CellChoice=100;
+        ssub=sline;j=0;icontinue=true;
+        while(icontinue && j<1000) {
+          j++;
+          getline(input,sline);sline=sline+'\n';
+          if(sline.length()>4) sword=sline.substr(0,5);
+          if(sword=="Atom ") icontinue=false;
+          else ssub=ssub+sline;
+        }
+        ssub=RemoveCharFromString(ssub,' ');
+        ssub=RemoveCharFromString(ssub,'\t');
+        ssub=RemoveCharFromString(ssub,'\n');
+        ssize_t=ssub.find("cellchoice");
+        if(ssize_t!=ssub.npos) {sword=ssub.at(ssize_t+10); CellChoice=atoi(sword.data());}
+        else CellChoice=100;
       }
 
       //position of atoms
       if(sline.length()>4) sword=sline.substr(0,5);
       if(sword=="Atom " && !AtomLineFound) {
-	AtomLineFound=TRUE;
-	iread=TRUE;
-	for(j=0;j<Nspec;j++) Zcount[j]=0;//clearing Zcount
-	while(iread) {//processing one wyckoff entry
-	  iread=false;
-	  input >> sline;//atom name
-	  for(j=0;j<Nspec;j++) {
-	    if(sline==Zname[j]) {//if it is atom name
-	      iread=TRUE;
-	      WyckLabel.push_back(sline);
-	      Zcount[j]=Zcount[j]+1;
-	      input >> sline >> sline >> sline >> sline;//discarded
-	      input >> sline;//x
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      xpos.push_back(atof(sline.data()));//save x
-	      input >> sline;//y
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      ypos.push_back(atof(sline.data()));//save y
-	      input >> sline;//z
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      zpos.push_back(atof(sline.data()));//save z
-	      input >> sline;//sof
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      pocc.push_back(atof(sline.data()));//save occupancy number
-	      getline(input,sline);//discard the rest of the line
-	      sline="";
-	    }//if Zname
-	  }//Nspec
-	}//iread
-	//ascending sorting according to elements name
-	//note that this is nore needed because it is taken care of in the outputting block
+        AtomLineFound=TRUE;
+        iread=TRUE;
+        for(j=0;j<Nspec;j++) Zcount[j]=0;//clearing Zcount
+        while(iread) {//processing one wyckoff entry
+          iread=false;
+          input >> sline;//atom name
+          for(j=0;j<Nspec;j++) {
+            if(sline==Zname[j]) {//if it is atom name
+              iread=TRUE;
+              WyckLabel.push_back(sline);
+              Zcount[j]=Zcount[j]+1;
+              input >> sline >> sline >> sline >> sline;//discarded
+              input >> sline;//x
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              xpos.push_back(atof(sline.data()));//save x
+              input >> sline;//y
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              ypos.push_back(atof(sline.data()));//save y
+              input >> sline;//z
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              zpos.push_back(atof(sline.data()));//save z
+              input >> sline;//sof
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              pocc.push_back(atof(sline.data()));//save occupancy number
+              getline(input,sline);//discard the rest of the line
+              sline="";
+            }//if Zname
+          }//Nspec
+        }//iread
+        //ascending sorting according to elements name
+        //note that this is nore needed because it is taken care of in the outputting block
       }//atom
 
       if(sline.length()>3) sword=sline.substr(0,4);
       if(sword=="*end") {
-	AtomLineFound=FALSE;
-	iwrite=true;
-	/*
-	//any partial occupation?
-	POF=false;
-	for(j=0;j<(int) pocc.size();j++) {
-	if(pocc[j]<1.00) POF=true;
-	}
-	//outputting prototype library
-	iwrite=false; iwarning=false;
-	if(POF) {//partial occupation detected
-	iwrite=false;
-	cerr << "  Partial occupation deteced, skipping (not written)." << endl;
-	}
-	else {//no partial occupation
-	iwrite=true;
-	}
-	*/
-	if(iwrite) {
-	  for(j=0;j<Nspec;j++) fout << Zname[j] << Zconc[j];
-	  fout << "_ICSD_" << ICSDid << " "
-	       << StructuredName
-	       << " Pearson " << Pearson
-	       << " SG " << SGnumber << " " << SG
-	       << " rhomass " << Dcalc << endl;
+        AtomLineFound=FALSE;
+        iwrite=true;
+        /*
+        //any partial occupation?
+        POF=false;
+        for(j=0;j<(int) pocc.size();j++) {
+        if(pocc[j]<1.00) POF=true;
+        }
+        //outputting prototype library
+        iwrite=false; iwarning=false;
+        if(POF) {//partial occupation detected
+        iwrite=false;
+        cerr << "  Partial occupation deteced, skipping (not written)." << endl;
+        }
+        else {//no partial occupation
+        iwrite=true;
+        }
+        */
+        if(iwrite) {
+          for(j=0;j<Nspec;j++) fout << Zname[j] << Zconc[j];
+          fout << "_ICSD_" << ICSDid << " "
+            << StructuredName
+            << " Pearson " << Pearson
+            << " SG " << SGnumber << " " << SG
+            << " rhomass " << Dcalc << endl;
 
-	  cout << "// ***************************************************************************" << endl
-	       << "// ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << " ICSD_" << ICSDid << " ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << "_ICSD_" << ICSDid << endl
-	       << "// ***************************************************************************" << endl;
-	
-	  cout << "// "; for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << " " << Pearson << " " << SG << " " << StructuredName << " " << SGnumber << " ICSD_" << ICSDid << " ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << "_ICSD_" << ICSDid << endl;
+          cout << "// ***************************************************************************" << endl
+            << "// ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << " ICSD_" << ICSDid << " ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << "_ICSD_" << ICSDid << endl
+            << "// ***************************************************************************" << endl;
 
-	  cout << "STRUCTURE ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << " ICSD_" << ICSDid << " ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << "_ICSD_" << ICSDid << endl;
+          cout << "// "; for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << " " << Pearson << " " << SG << " " << StructuredName << " " << SGnumber << " ICSD_" << ICSDid << " ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << "_ICSD_" << ICSDid << endl;
 
-	  cout << "PROTOTYPE "; for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << " [";for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];cout << "]"
-	       << " " << Pearson << " " << SG << " " << StructuredName << " " << SGnumber << " ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << "_ICSD_" << ICSDid << " ICSD_" << ICSDid << " " << endl;
-	
-	  cout << "INFO ICSD_" << ICSDid << " ";
-	  for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
-	  cout << "_ICSD_" << ICSDid << endl;
+          cout << "STRUCTURE ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << " ICSD_" << ICSDid << " ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << "_ICSD_" << ICSDid << endl;
 
-	  cout << "MODE WYC_ICSD PRIM CONVENTIONAL POCC" << endl;
-	  for(j=0;j<6;j++) cout << " " << unitcell[j];
-	  cout << " " << SGnumber << " ";
-	  if(CellChoice!=100) cout << CellChoice;
-	  cout << endl;
+          cout << "PROTOTYPE "; for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << " [";for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];cout << "]"
+            << " " << Pearson << " " << SG << " " << StructuredName << " " << SGnumber << " ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << "_ICSD_" << ICSDid << " ICSD_" << ICSDid << " " << endl;
 
-	  for(j=0;j<Nspec;j++) {
-	    for(k=0;k<(int) xpos.size();k++) {
-	      if(WyckLabel[k]==Zname[j]) {
-		cout << " " << setw(10) << xpos[k]
-		     << " " << setw(10) << ypos[k]
-		     << " " << setw(10) << zpos[k]
-		     << " " << setw(4) << WyckLabel[k];
-		if(pocc[k]<1.0)
-		  cout << "  " << pocc[k];
-		else
-		  cout << "  -";
-		cout << endl;
-	      }
-	    }
-	  }
-	}//iwrite
+          cout << "INFO ICSD_" << ICSDid << " ";
+          for(j=0;j<Nspec;j++) cout << Zname[j] << Zconc[j];
+          cout << "_ICSD_" << ICSDid << endl;
 
-	//clearing vectors for the next compounds
-	xpos.clear(); ypos.clear(); zpos.clear(); pocc.clear();
-	Zcount.clear(); Zname.clear(); Zconc.clear(); WyckLabel.clear();
-	sword="";
+          cout << "MODE WYC_ICSD PRIM CONVENTIONAL POCC" << endl;
+          for(j=0;j<6;j++) cout << " " << unitcell[j];
+          cout << " " << SGnumber << " ";
+          if(CellChoice!=100) cout << CellChoice;
+          cout << endl;
+
+          for(j=0;j<Nspec;j++) {
+            for(k=0;k<(int) xpos.size();k++) {
+              if(WyckLabel[k]==Zname[j]) {
+                cout << " " << setw(10) << xpos[k]
+                  << " " << setw(10) << ypos[k]
+                  << " " << setw(10) << zpos[k]
+                  << " " << setw(4) << WyckLabel[k];
+                if(pocc[k]<1.0)
+                  cout << "  " << pocc[k];
+                else
+                  cout << "  -";
+                cout << endl;
+              }
+            }
+          }
+        }//iwrite
+
+        //clearing vectors for the next compounds
+        xpos.clear(); ypos.clear(); zpos.clear(); pocc.clear();
+        Zcount.clear(); Zname.clear(); Zconc.clear(); WyckLabel.clear();
+        sword="";
       }//"*end"
     }//input.eof
     fout.close();
@@ -1362,29 +1352,27 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void ICSD_2WYCK(istream& input,bool SOF) {
-    /*
-      Write output to file WYCKCAR  (WYCKCAR-format) from stdin ICSD-format
-      aflow --icsd2wyck < input.icsd
-      If the input contains multiple compounds, a subfolder will
-      be created for each compound using the following folder name template:
-      CompoundFormula_ICSD_ICSDid/
-      The ICSDid is the compound id in the original ICSD database. Only compounds
-      with elements having full occupation (sof=1) will be processed.
+    //   Write output to file WYCKCAR  (WYCKCAR-format) from stdin ICSD-format
+    //   aflow --icsd2wyck < input.icsd
+    //   If the input contains multiple compounds, a subfolder will
+    //   be created for each compound using the following folder name template:
+    //   CompoundFormula_ICSD_ICSDid/
+    //   The ICSDid is the compound id in the original ICSD database. Only compounds
+    //   with elements having full occupation (sof=1) will be processed.
 
-      aflow --icsd2wyck --sof < input.icsd
-      All compounds will be processed. If partial occupation is detected, the sof
-      will be written as part of the label of the element and WARNING will be
-      written in the title and cerr.
+    //   aflow --icsd2wyck --sof < input.icsd
+    //   All compounds will be processed. If partial occupation is detected, the sof
+    //   will be written as part of the label of the element and WARNING will be
+    //   written in the title and cerr.
 
-      2009, wahyu@alumni.duke.edu
-    */
+    //   2009, wahyu@alumni.duke.edu
 
     bool ifound,iread,iwrite,iwarning,POF,AtomLineFound=false;
     int j,k,ICSDid=0,SGnumber=0,Ncompounds=0,Nspec=0;
     int itmp=0; if(itmp) {;} // dummy load
     string cstmp;
     string sline,sword,ssub,
-      title,sdir,sICSDid,CompoundName,scommand;
+           title,sdir,sICSDid,CompoundName,scommand;
     string::iterator siter;
     vector<int> Zcount;
     vector<float> Zconc,unitcell(6),xpos,ypos,zpos,pocc;
@@ -1398,196 +1386,196 @@ namespace pflow {
 
       if(sline.length()>4) sword=sline.substr(0,5);
       if(sword=="*data") {
-	Ncompounds++;title="";
+        Ncompounds++;title="";
       }
 
       if(sline.length()>8) sword=sline.substr(0,9);
       if(sword=="Coll Code") {
-	ICSDid=atoi((sline.substr(9,sline.length())).data());
-	cstmp=aurostd::utype2string(ICSDid);
-	sICSDid=cstmp;
-	title="ICSD_"+sICSDid;
-	cerr << "processing " << title << endl;
+        ICSDid=atoi((sline.substr(9,sline.length())).data());
+        cstmp=aurostd::utype2string(ICSDid);
+        sICSDid=cstmp;
+        title="ICSD_"+sICSDid;
+        cerr << "processing " << title << endl;
       }
 
       if(sline.length()>3) sword=sline.substr(0,4);
       if(sword=="Sum ") {
-	ssub=sline.substr(5,sline.length());
-	for(j=0;j<(int) ssub.length();j++) {
-	  if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
-	    ssub=ssub.substr(j+1,ssub.length());
-	    break;
-	  }
-	}
-	CompoundName=ssub;
-	CompoundName=RemoveCharFromString(CompoundName,' ');
-	CompoundName=RemoveCharFromString(CompoundName,'\n');
-	title=title+", "+CompoundName;
+        ssub=sline.substr(5,sline.length());
+        for(j=0;j<(int) ssub.length();j++) {
+          if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
+            ssub=ssub.substr(j+1,ssub.length());
+            break;
+          }
+        }
+        CompoundName=ssub;
+        CompoundName=RemoveCharFromString(CompoundName,' ');
+        CompoundName=RemoveCharFromString(CompoundName,'\n');
+        title=title+", "+CompoundName;
 
-	//getting Nspec && Zname[]
-	Nspec=0; ifound=false;
-	for(j=0;j<(int) ssub.length();j++) {
-	  if(ssub[j]==' ' && j!=0) {
-	    ifound=TRUE;
-	    sword=ssub.substr(0,j);
-	    ssub=ssub.substr(j+1,ssub.length());
-	    j=0;
-	  }
-	  else if(j==(int) ssub.length()-1 && ssub!="") {
-	    ifound=TRUE;
-	    sword=ssub;
-	  }
-	  if(ifound) {
-	    Nspec++;
-	    for(k=0;k<(int) sword.length();k++) {
-	      if(sword[k]<'A' || sword[k]>'z') {
-		Zname.push_back(sword.substr(0,k));
-		Zconc.push_back(atof((sword.substr(k,sword.length())).data()));
-		break;
-	      }
-	    }
-	    ifound=false;
-	  }//if ifound
-	}//for j=0:ssub.length()
+        //getting Nspec && Zname[]
+        Nspec=0; ifound=false;
+        for(j=0;j<(int) ssub.length();j++) {
+          if(ssub[j]==' ' && j!=0) {
+            ifound=TRUE;
+            sword=ssub.substr(0,j);
+            ssub=ssub.substr(j+1,ssub.length());
+            j=0;
+          }
+          else if(j==(int) ssub.length()-1 && ssub!="") {
+            ifound=TRUE;
+            sword=ssub;
+          }
+          if(ifound) {
+            Nspec++;
+            for(k=0;k<(int) sword.length();k++) {
+              if(sword[k]<'A' || sword[k]>'z') {
+                Zname.push_back(sword.substr(0,k));
+                Zconc.push_back(atof((sword.substr(k,sword.length())).data()));
+                break;
+              }
+            }
+            ifound=false;
+          }//if ifound
+        }//for j=0:ssub.length()
       }//"Sum "
       Zcount.resize(Nspec);
 
       //Unit Cell
       if(sline.length()>8) sword=sline.substr(0,9);
       if(sword=="Unit Cell") {
-	ssub=sline.substr(10,sline.length());
-	for(j=0;j<(int) ssub.length();j++) {
-	  if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
-	    ssub=ssub.substr(j+1,ssub.length());
-	    break;
-	  }
-	}
-	ssub=RemoveStringFromTo(ssub,'(',')');
-	//ssub=RemoveCharFromString(ssub,'(');
-	//ssub=RemoveCharFromString(ssub,')');
+        ssub=sline.substr(10,sline.length());
+        for(j=0;j<(int) ssub.length();j++) {
+          if((ssub[j]==' ' || ssub[j]=='\t') && ssub[j+1]!=' ' && ssub[j+1]!='\t') {
+            ssub=ssub.substr(j+1,ssub.length());
+            break;
+          }
+        }
+        ssub=RemoveStringFromTo(ssub,'(',')');
+        //ssub=RemoveCharFromString(ssub,'(');
+        //ssub=RemoveCharFromString(ssub,')');
 
-	k=0;
-	for(j=0;j<(int) ssub.length();j++) {
-	  if(ssub[j]==' ') {
-	    unitcell[k++]=atof((ssub.substr(0,j)).data());
-	    ssub=ssub.substr(j+1,ssub.length());
-	    j=0;
-	  }
-	  else if(j==(int) ssub.length()-1 && ssub!="")
-	    unitcell[k++]=atof(ssub.data());
-	}
+        k=0;
+        for(j=0;j<(int) ssub.length();j++) {
+          if(ssub[j]==' ') {
+            unitcell[k++]=atof((ssub.substr(0,j)).data());
+            ssub=ssub.substr(j+1,ssub.length());
+            j=0;
+          }
+          else if(j==(int) ssub.length()-1 && ssub!="")
+            unitcell[k++]=atof(ssub.data());
+        }
       }//Unit Cell
 
       if(sline.length()>8) sword=sline.substr(0,9);
       if(sword=="SG Number") {
-	SGnumber=atoi((sline.substr(9,sline.length())).data());      
+        SGnumber=atoi((sline.substr(9,sline.length())).data());      
       }
 
       //position of atoms
       if(sline.length()>4) sword=sline.substr(0,5);
       if(sword=="Atom " && !AtomLineFound) {
-	AtomLineFound=TRUE;
-	iread=TRUE;
-	for(j=0;j<Nspec;j++) Zcount[j]=0;//clearing Zcount
-	while(iread) {//processing one wyckoff entry
-	  iread=false;
-	  input >> sline;//atom name
-	  for(j=0;j<Nspec;j++) {
-	    if(sline==Zname[j]) {//if it is atom name
-	      iread=TRUE;
-	      WyckLabel.push_back(sline);
-	      Zcount[j]=Zcount[j]+1;
-	      input >> sline >> sline >> sline >> sline;//discarded
-	      input >> sline;//x
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      xpos.push_back(atof(sline.data()));//save x
-	      input >> sline;//y
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      ypos.push_back(atof(sline.data()));//save y
-	      input >> sline;//z
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      zpos.push_back(atof(sline.data()));//save z
-	      input >> sline;//sof
-	      sline=RemoveStringFromTo(sline,'(',')');
-	      //sline=RemoveCharFromString(sline,'(');
-	      //sline=RemoveCharFromString(sline,')');
-	      pocc.push_back(atof(sline.data()));//save sof
-	      getline(input,sline);//discard the rest of the line
-	      sline="";
-	    }//if Zname
-	  }//Nspec
-	}//iread
+        AtomLineFound=TRUE;
+        iread=TRUE;
+        for(j=0;j<Nspec;j++) Zcount[j]=0;//clearing Zcount
+        while(iread) {//processing one wyckoff entry
+          iread=false;
+          input >> sline;//atom name
+          for(j=0;j<Nspec;j++) {
+            if(sline==Zname[j]) {//if it is atom name
+              iread=TRUE;
+              WyckLabel.push_back(sline);
+              Zcount[j]=Zcount[j]+1;
+              input >> sline >> sline >> sline >> sline;//discarded
+              input >> sline;//x
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              xpos.push_back(atof(sline.data()));//save x
+              input >> sline;//y
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              ypos.push_back(atof(sline.data()));//save y
+              input >> sline;//z
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              zpos.push_back(atof(sline.data()));//save z
+              input >> sline;//sof
+              sline=RemoveStringFromTo(sline,'(',')');
+              //sline=RemoveCharFromString(sline,'(');
+              //sline=RemoveCharFromString(sline,')');
+              pocc.push_back(atof(sline.data()));//save sof
+              getline(input,sline);//discard the rest of the line
+              sline="";
+            }//if Zname
+          }//Nspec
+        }//iread
       }//atom
 
       if(sline.length()>3) sword=sline.substr(0,4);
       if(sword=="*end") {
-	AtomLineFound=false;
-	//any partial occupation?
-	POF=false;
-	for(j=0;j<(int) pocc.size();j++) {
-	  if(pocc[j]<1.00) POF=true;
-	}
-	//writing WYCKCAR
-	iwrite=false; iwarning=false;
-	if(POF) {//partial occupation detected
-	  iwarning=true;
-	  if(SOF) iwrite=true;
-	  else {iwrite=false; cerr << "  Partial occupation deteced, skipping (not written)." << endl;}
-	}
-	else {//no partial occupation
-	  iwarning=false;iwrite=true;
-	}
-	if(iwrite) {
-	  fout.open("WYCKCAR");
-	  if(iwarning) {
-	    cerr << "  WARNING: partial occupation detected but written." << endl;
-	    fout << "WARNING(partial occup.) ";
-	  }
-	  fout << title << endl;
-	  fout << " 1.0000" << endl;
-	  for(j=0;j<6;j++) fout << " " << unitcell[j];
-	  fout << " " << SGnumber << endl;
-	  for(j=0;j<Nspec;j++) fout << " " << Zcount[j];
-	  fout << "\nDirect" << endl;
-	  itmp=0;
-	  for(j=0;j<Nspec;j++) {
-	    for(k=0;k<(int) xpos.size();k++) {
-	      if(WyckLabel[k]==Zname[j]) {
-		fout << " " << setw(10) << xpos[k]
-		     << " " << setw(10) << ypos[k]
-		     << " " << setw(10) << zpos[k]
-		     << " " << WyckLabel[k];
-		if(iwarning) fout << "_sof_" << pocc[k];
-		fout << endl;
-	      }
-	    }
-	  }
-	  fout.close();
-        
-	  //saving in subdirectory
-	  sdir=CompoundName+"_ICSD_"+sICSDid+"/";
-	  scommand="mkdir "+sdir;
-	  if(stat(sdir.data(),&st)!=0) system(scommand.data()); //create subdirectory if it does not exist
-	  scommand="cp WYCKCAR "+sdir;
-	  system(scommand.data());
-	}//iwrite
+        AtomLineFound=false;
+        //any partial occupation?
+        POF=false;
+        for(j=0;j<(int) pocc.size();j++) {
+          if(pocc[j]<1.00) POF=true;
+        }
+        //writing WYCKCAR
+        iwrite=false; iwarning=false;
+        if(POF) {//partial occupation detected
+          iwarning=true;
+          if(SOF) iwrite=true;
+          else {iwrite=false; cerr << "  Partial occupation deteced, skipping (not written)." << endl;}
+        }
+        else {//no partial occupation
+          iwarning=false;iwrite=true;
+        }
+        if(iwrite) {
+          fout.open("WYCKCAR");
+          if(iwarning) {
+            cerr << "  WARNING: partial occupation detected but written." << endl;
+            fout << "WARNING(partial occup.) ";
+          }
+          fout << title << endl;
+          fout << " 1.0000" << endl;
+          for(j=0;j<6;j++) fout << " " << unitcell[j];
+          fout << " " << SGnumber << endl;
+          for(j=0;j<Nspec;j++) fout << " " << Zcount[j];
+          fout << "\nDirect" << endl;
+          itmp=0;
+          for(j=0;j<Nspec;j++) {
+            for(k=0;k<(int) xpos.size();k++) {
+              if(WyckLabel[k]==Zname[j]) {
+                fout << " " << setw(10) << xpos[k]
+                  << " " << setw(10) << ypos[k]
+                  << " " << setw(10) << zpos[k]
+                  << " " << WyckLabel[k];
+                if(iwarning) fout << "_sof_" << pocc[k];
+                fout << endl;
+              }
+            }
+          }
+          fout.close();
 
-	//clearing vectors for the next compounds
-	xpos.clear(); ypos.clear(); zpos.clear(); pocc.clear();
-	Zcount.clear(); Zname.clear(); Zconc.clear(); WyckLabel.clear();
-	sword="";
+          //saving in subdirectory
+          sdir=CompoundName+"_ICSD_"+sICSDid+"/";
+          scommand="mkdir "+sdir;
+          if(stat(sdir.data(),&st)!=0) system(scommand.data()); //create subdirectory if it does not exist
+          scommand="cp WYCKCAR "+sdir;
+          system(scommand.data());
+        }//iwrite
+
+        //clearing vectors for the next compounds
+        xpos.clear(); ypos.clear(); zpos.clear(); pocc.clear();
+        Zcount.clear(); Zname.clear(); Zconc.clear(); WyckLabel.clear();
+        sword="";
       }//"*end"
     }//input.eof
     if(iwrite) {
       if(Ncompounds==1) {
-	scommand="cp "+sdir+"WYCKCAR . && rm -rf "+sdir;
-	system(scommand.data());
+        scommand="cp "+sdir+"WYCKCAR . && rm -rf "+sdir;
+        system(scommand.data());
       }
       if(Ncompounds>1) system("rm -f WYCKCAR");//clean up
     }
@@ -1599,9 +1587,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void ICSD_ListMetals() {
-    /*
-      Print out to stdout a list of metalic elements.
-    */
+    //   Print out to stdout a list of metalic elements.
     vector<string> M;
     M=GetMetalsList(true);
   }
@@ -1611,10 +1597,8 @@ namespace pflow {
 // GetMetalsList
 // ***************************************************************************
 vector<string> GetMetalsList(bool v) {
-  /*
-    Return a vector<string> of a list of metalic elements. If v=true, it will
-    also print it out to stdout
-  */
+  //   Return a vector<string> of a list of metalic elements. If v=true, it will
+  //   also print it out to stdout
   int i,j;
   vector<string> vmetal;
   vmetal.clear();
@@ -1754,9 +1738,9 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
       getline(ein,stmp);//kpoint coordinate
       ib=-1;
       for(i=0;i<Nbands;i++) {
-	ein >> ftmp >> ftmp;
-	ib=ib+1;
-	data[ik][ib]=ftmp;
+        ein >> ftmp >> ftmp;
+        ib=ib+1;
+        data[ik][ib]=ftmp;
       }
       getline(ein,stmp);
     }
@@ -1767,12 +1751,12 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
       getline(ein,stmp);//kpoint coordinate
       ib=-1;
       for(i=0;i<Nbands;i++) {
-	ein >> ftmp;
-	ein >> ftmp;//up
-	ib=ib+1;
-	data[ik][ib]=ftmp;
-	ein >> ftmp;//down
-	data[ik][ib+Nbands]=ftmp;
+        ein >> ftmp;
+        ein >> ftmp;//up
+        ib=ib+1;
+        data[ik][ib]=ftmp;
+        ein >> ftmp;//down
+        data[ik][ib+Nbands]=ftmp;
       }
       getline(ein,stmp);
     }
@@ -1789,7 +1773,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
   //KY FIXES THIS BUG
   bool FLAG_HALF_BANDS_UP = false;
   bool FLAG_HALF_BANDS_DN = false;
-  
+
   ivbup=0;icbup=0;
   ivbdw=0;icbdw=0;
   vbmup=Efermi; cbmup=Efermi; //initialization
@@ -1812,7 +1796,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
   //KY FIXES THIS BUG
   //This includes the case:  vbmdw == cbmdwa && vbmdw == Efermi
   if(((vbmup-Efermi)<1E-8 && (cbmup-Efermi)<1E-8)||
-     ((vbmup-Efermi)>1E-8 && (cbmup-Efermi)>1E-8)) {
+      ((vbmup-Efermi)>1E-8 && (cbmup-Efermi)>1E-8)) {
     FLAG_HALF_BANDS_UP = true;
   }
 
@@ -1825,17 +1809,17 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
       for(i=0;i<Nk;i++) vband[i]=data[i][ib+1+Nbands];
       cbmtestdw=min(vband);
       if(vbmtestdw<Efermi && cbmtestdw>Efermi) {
-	vbmdw=vbmtestdw;
-	cbmdw=cbmtestdw;
-	ivbdw=ib;icbdw=ib+1;
-	break;
+        vbmdw=vbmtestdw;
+        cbmdw=cbmtestdw;
+        ivbdw=ib;icbdw=ib+1;
+        break;
       }
     }
     //if vbmdw and cmbdw are both above or below Efermi
     //KY FIXES THIS BUG
     //This includes the case:  vbmdw == cbmdwa && vbmdw == Efermi
     if(((vbmdw-Efermi)<1E-8 && (cbmdw-Efermi)<1E-8)||
-       ((vbmdw-Efermi)>1E-8 && (cbmdw-Efermi)>1E-8)) {
+        ((vbmdw-Efermi)>1E-8 && (cbmdw-Efermi)>1E-8)) {
       FLAG_HALF_BANDS_DN = true;
     }
   }
@@ -1893,9 +1877,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
 // GetBandgapFromDOS
 // ***************************************************************************
 float GetBandgapFromDOS(ifstream& dos) {
-  /*
-    Return band gap calculated from DOSCAR file.
-  */
+  //   Return band gap calculated from DOSCAR file.
   bool isMetal=false;
   int i,iclosest,Ngrids;
   float Emin,Emax,EF,bandgap,Ec,Ev,tol,delE,Etmp,Dtmp,delEE,Egrid;
@@ -1924,7 +1906,7 @@ float GetBandgapFromDOS(ifstream& dos) {
       Dtmp=D[i];Etmp=E[i];
       if(Dtmp<tol) delEE=aurostd::abs(EF-Etmp);
       if(delEE<delE) {
-	iclosest=i; delE=delEE;
+        iclosest=i; delE=delEE;
       }
     }
     //    cerr << "iclosest E: " << iclosest << " " << E[iclosest] << endl;
@@ -1947,9 +1929,7 @@ float GetBandgapFromDOS(ifstream& dos) {
 // GetBandgapFromDOS
 // ***************************************************************************
 float GetBandgapFromDOS(istream& dos) {
-  /*
-    Return band gap calculated from DOSCAR as input stream.
-  */
+  //   Return band gap calculated from DOSCAR as input stream.
   bool isMetal=false;
   int i,iclosest,Ngrids;
   float Emin,Emax,EF,bandgap,Ec,Ev,tol,delE,Etmp,Dtmp,delEE,Egrid;
@@ -2000,9 +1980,7 @@ float GetBandgapFromDOS(istream& dos) {
 // IsMetal
 // ***************************************************************************
 bool IsMetal(const string s) {
-  /*
-    Check if an element name in string s is a metal.
-  */
+  //   Check if an element name in string s is a metal.
   bool ibool=false;
   vector<string> vmetal;
   vmetal=GetMetalsList(false);
@@ -2014,12 +1992,10 @@ bool IsMetal(const string s) {
 // ParseChemicalFormula
 // ***************************************************************************
 void ParseChemicalFormula(string Formula,vector<string>& Zname,vector<float>& Zconc) {
-  /*
-    Parsing elements' name and concentration from a chemical formula
-    example:
-    Formula is MgB2
-    output: Zname=[Mg,B], Zconc=[1,2].
-  */
+  //   Parsing elements' name and concentration from a chemical formula
+  //   example:
+  //    Formula is MgB2
+  //    output: Zname=[Mg,B], Zconc=[1,2].
   int i,j,k,n,p;
   vector<string> sbuf;
   vector<int> CapPos;
@@ -2091,12 +2067,10 @@ string RemoveStringFromTo(const string s, char cstart, char cstop) {
 // StringCrop
 // ***************************************************************************
 int StringCrop(string str,vector<string>& vstr) {
-  /*
-    given for example a string str=" this is an example 1 2 3 4"
-    return the number of words using white characters as separators,
-    and put the words in the vector<string> vstr
-    ignore any leading white characters.
-  */
+  //   given for example a string str=" this is an example 1 2 3 4"
+  //   return the number of words using white characters as separators,
+  //   and put the words in the vector<string> vstr
+  //   ignore any leading white characters.
   string s,stmp;
   int i,Ns,Nw;
   //preadd and postadd a space and replacing any white character with space character
@@ -2128,13 +2102,11 @@ int StringCrop(string str,vector<string>& vstr) {
 // StringCropAt
 // ***************************************************************************
 string StringCropAt(const string input,int icrop) {
-  /*
-    Crop a word frong a string.
-    given for example a string: "this is an example 1 2 3 4"
-    icrop=1 : returns "this"
-    icrop=2 : returns "is"
-    and so on.
-  */
+  //   Crop a word frong a string.
+  //   given for example a string: "this is an example 1 2 3 4"
+  //   icrop=1 : returns "this"
+  //   icrop=2 : returns "is"
+  //   and so on.
   bool istartfound=false,istopfound=false;
   int i=0,istart=0,ilong=0,iicrop=0;
 
@@ -2147,32 +2119,32 @@ string StringCropAt(const string input,int icrop) {
     //finding the istart to crop
     for(i=0;i<(int)input.size();i++) {
       if(i==0) {
-	if(input[i]!=' ' && input[i]!='\t' && input[i]!='\n') {
-	  istart=i; iicrop++;
-	}
+        if(input[i]!=' ' && input[i]!='\t' && input[i]!='\n') {
+          istart=i; iicrop++;
+        }
       }
       else {
-	if( (input[i]!=' ' && input[i]!='\t' && input[i]!='\n') &&
-	    (input[i-1]==' ' || input[i-1]=='\t' || input[i-1]=='\n') ) {
-	  istart=i; iicrop++;
-	}
+        if( (input[i]!=' ' && input[i]!='\t' && input[i]!='\n') &&
+            (input[i-1]==' ' || input[i-1]=='\t' || input[i-1]=='\n') ) {
+          istart=i; iicrop++;
+        }
       }
       if(iicrop==icrop) {i=(int)input.size();}
     }
     if(iicrop==icrop) {
       //finding the length of the word to crop
       for(i=istart;i<(int)input.size();i++) {
-	if(i==(int)input.size()-1) {
-	  if(input[i]!=' ' && input[i]!='\t' && input[i]!='\n') {
-	    ilong=i+1-istart;istopfound=true;i=(int)input.size();
-	  }
-	}
-	else {
-	  if( (input[i]!=' ' && input[i]!='\t' && input[i]!='\n') &&
-	      (input[i+1]==' ' || input[i+1]=='\t' || input[i+1]=='\n') ) {
-	    ilong=i+1-istart;istopfound=true;i=(int)input.size();
-	  }
-	}
+        if(i==(int)input.size()-1) {
+          if(input[i]!=' ' && input[i]!='\t' && input[i]!='\n') {
+            ilong=i+1-istart;istopfound=true;i=(int)input.size();
+          }
+        }
+        else {
+          if( (input[i]!=' ' && input[i]!='\t' && input[i]!='\n') &&
+              (input[i+1]==' ' || input[i+1]=='\t' || input[i+1]=='\n') ) {
+            ilong=i+1-istart;istopfound=true;i=(int)input.size();
+          }
+        }
       }//for
       if(istopfound) return(input.substr(istart,ilong));
     }//iicrop==icrop
@@ -2183,26 +2155,24 @@ string StringCropAt(const string input,int icrop) {
 // SortFloat
 // ***************************************************************************
 vector<float> SortFloat(vector<float> va, int mode) {
-  /*
-    Sort vector<float>.
-    mode = 1 (ascending)
-    mode = -1 (descending)
-    
-  */
-  
+  //   Sort vector<float>.
+  //   mode = 1 (ascending)
+  //   mode = -1 (descending)
+
+
   int i,j;
   float ftmp;
   vector<float> vb;
   vb=va;
-  
+
   //sorting descending
   if(mode==-1) {
     ftmp=0.0;
     for(i=0;i<(int)vb.size()-1;i++) {
       for(j=i+1;j<(int)vb.size();j++) {
-	if(vb[j]>vb[i]) {
-	  ftmp=vb[i];vb[i]=vb[j];vb[j]=ftmp;
-	}
+        if(vb[j]>vb[i]) {
+          ftmp=vb[i];vb[i]=vb[j];vb[j]=ftmp;
+        }
       }
     }
   }
@@ -2211,9 +2181,9 @@ vector<float> SortFloat(vector<float> va, int mode) {
     ftmp=0.0;
     for(i=0;i<(int)vb.size()-1;i++) {
       for(j=i+1;j<(int)vb.size();j++) {
-	if(vb[j]<vb[i]) {
-	  ftmp=vb[i];vb[i]=vb[j];vb[j]=ftmp;
-	}
+        if(vb[j]<vb[i]) {
+          ftmp=vb[i];vb[i]=vb[j];vb[j]=ftmp;
+        }
       }
     }
   }

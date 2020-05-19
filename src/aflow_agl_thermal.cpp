@@ -56,8 +56,8 @@ namespace AGL_functions {
     // If in static part of algorithm (before temperature loop), then calculates static pressures
     if(firsttime) {
       for (uint i = 0; i < xdata_to_fit.size(); i++) {
-	aglerror = polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, plnv, 1);
-	press_stat.at(i) = -xdata_to_fit.at(i) * plnv / (3.0 * AGL_data.volumeinput.at(i));
+        aglerror = polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, plnv, 1);
+        press_stat.at(i) = -xdata_to_fit.at(i) * plnv / (3.0 * AGL_data.volumeinput.at(i));
       }
       return aglerror;
     }
@@ -76,84 +76,84 @@ namespace AGL_functions {
     while ((!converged || (iloops < mloops)) && (iloops < AGL_data.maxloops)) {
       iloops = iloops + 1;
       for (uint i = 0; i < ydata_to_fit.size(); i++) {
-	thermal_properties (AGL_data.tdebye.at(i), Temperature, DebyeIntegral, DebyeIntegralerror, UIntEnergy, Cvt, F_Helmholtz, S_Entropy, AGL_data, FileMESSAGE);
-	ydata_to_fit.at(i) = AGL_data.energyinput.at(i) + F_Helmholtz;
+        thermal_properties (AGL_data.tdebye.at(i), Temperature, DebyeIntegral, DebyeIntegralerror, UIntEnergy, Cvt, F_Helmholtz, S_Entropy, AGL_data, FileMESSAGE);
+        ydata_to_fit.at(i) = AGL_data.energyinput.at(i) + F_Helmholtz;
       }
       if(AGL_data.fittype == 0) {
-	ierr = AGL_functions::bracket_minimum (imin, ydata_to_fit, FileMESSAGE);
+        ierr = AGL_functions::bracket_minimum (imin, ydata_to_fit, FileMESSAGE);
       } else {
-	ierr = AGL_functions::bracket_minimum_global (imin, ydata_to_fit, FileMESSAGE);
+        ierr = AGL_functions::bracket_minimum_global (imin, ydata_to_fit, FileMESSAGE);
       }
       if(ierr != 0) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_WARNING_ + "self_consistent_debye: T = " << Temperature << ", minimum point = " << imin << ", trial point = " << itry << ", total points = " << ydata_to_fit.size() << endl;
-	aus << _AGLSTR_WARNING_ + "self_consistent_debye: Helmholtz energy points to fit = ";
-	for(uint i = 0; i < ydata_to_fit.size(); i++) {
-	  aus << ydata_to_fit.at(i) << "\t";
-	}
-	aus << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
-	return 1;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_WARNING_ + "self_consistent_debye: T = " << Temperature << ", minimum point = " << imin << ", trial point = " << itry << ", total points = " << ydata_to_fit.size() << endl;
+        aus << _AGLSTR_WARNING_ + "self_consistent_debye: Helmholtz energy points to fit = ";
+        for(uint i = 0; i < ydata_to_fit.size(); i++) {
+          aus << ydata_to_fit.at(i) << "\t";
+        }
+        aus << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
+        return 1;
       }
       aglerror = polynomial_fit_weight_ave (imin, polynomialcoeffs, polynomialerror, xdata_to_fit, ydata_to_fit, AGL_data, FileMESSAGE);
       if(aglerror != 0) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_WARNING_ + "No polynomial fit found with a minimum within bounds of input data" << endl;
-	aus << _AGLSTR_WARNING_ + "self_consistent_debye: T = " << Temperature << ", minimum point = " << imin << ", trial point = " << itry << ", total points = " << ydata_to_fit.size() << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
-	return 1;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_WARNING_ + "No polynomial fit found with a minimum within bounds of input data" << endl;
+        aus << _AGLSTR_WARNING_ + "self_consistent_debye: T = " << Temperature << ", minimum point = " << imin << ", trial point = " << itry << ", total points = " << ydata_to_fit.size() << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
+        return 1;
       }
       // Calculate the new set of debye temperatures and its convergence
       converged = true;
       theta0 = AGL_data.tdebye.at(0);
       if((AGL_data.volumeinput.size() != xdata_to_fit.size()) || (AGL_data.tdebye.size() != xdata_to_fit.size())) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "Vectors are different size" << endl;
-	aus << _AGLSTR_ERROR_ + "AGL_data.volumeinput.size() = " << AGL_data.volumeinput.size() << endl;
-	aus << _AGLSTR_ERROR_ + "AGL_data.tdebye.size() = " << AGL_data.tdebye.size() << endl;
-	aus << _AGLSTR_ERROR_ + "xdata_to_fit.size() = " << xdata_to_fit.size() << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	return 3;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_ERROR_ + "Vectors are different size" << endl;
+        aus << _AGLSTR_ERROR_ + "AGL_data.volumeinput.size() = " << AGL_data.volumeinput.size() << endl;
+        aus << _AGLSTR_ERROR_ + "AGL_data.tdebye.size() = " << AGL_data.tdebye.size() << endl;
+        aus << _AGLSTR_ERROR_ + "xdata_to_fit.size() = " << xdata_to_fit.size() << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        return 3;
       }
       for (uint i=0; i < xdata_to_fit.size(); i++) {
-	aglerror = AGL_functions::thermal_properties (AGL_data.tdebye.at(i), Temperature, DebyeIntegral, DebyeIntegralerror, UIntEnergy, Cvt, F_Helmholtz, S_Entropy, AGL_data, FileMESSAGE);
-	aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, dFdx, 1);
-	aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, d2Fdx2, 2);
-	pressure_F = -xdata_to_fit.at(i) * dFdx / (3.0 * AGL_data.volumeinput.at(i));
-	bulkmodT = -xdata_to_fit.at(i) / (9.0 * AGL_data.volumeinput.at(i)) * (2.0 * dFdx - xdata_to_fit.at(i) * d2Fdx2);
-	mie_gruneisen = (pressure_F - press_stat.at(i)) * AGL_data.volumeinput.at(i) / UIntEnergy;
-	bulkmodstV = AGL_data.volumeinput.at(i) * bulkmodT + Temperature * mie_gruneisen * mie_gruneisen * Cvt;
-	if(bulkmodstV < 0.0) {
-	  if(i <= imin) {
-	    aurostd::StringstreamClean(aus);
-	    aus << _AGLSTR_WARNING_ + "self_consistent_debye: Bstatic < 0 for equilibrium V!" << endl;
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
-	  }
-	  if(i > 0) {
-	    theta = AGL_data.tdebye.at(i) / theta0 * AGL_data.tdebye.at(i-1);
-	  }
-	  delta_theta = 0.0;
-	} else {
-	  // OBSOLETE theta = pow((6.0 * pi * pi * AGL_data.natoms / AGL_data.volumeinput.at(i)), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(bulkmodstV / AGL_data.cellmass);
-	  // OBSOLETE theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms * sqrt(AGL_data.volumeinput.at(i))), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(bulkmodstV / AGL_data.volumeinput.at(i)) / AGL_data.cellmass)  * eV_Ang3_to_amu_Ang_s);
-	  theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms / AGL_data.volumeinput.at(i)), third) * AGL_data.poissonratiofunction * sqrt((bulkmodstV / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
-	  delta_theta = theta - AGL_data.tdebye.at(i);
-	  if(i > 0) {
-	    if(theta > AGL_data.tdebye.at(i-1)) {
-	      theta = AGL_data.tdebye.at(i)/theta0 * AGL_data.tdebye.at(i-1);
-	      aurostd::StringstreamClean(aus);
-	      aus << _AGLSTR_WARNING_ + "self_consistent_debye: Warning! gamma < 0, i = " << i << ", T = " << Temperature << endl;
-	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      delta_theta = 0.0;
-	    }
-	  }
-	}
-	theta0 = AGL_data.tdebye.at(i);
-	AGL_data.tdebye.at(i) = theta;
-	if((AGL_data.volumeinput.at(i) - AGL_data.volumeinput.at(imin) < AGL_data.volumeinput.at(imin) * 0.1) && (i >= 3 && i >= (AGL_data.volumeinput.size()/10))) {
-	  converged = converged && (aurostd::abs(delta_theta) < eps);
-	}
+        aglerror = AGL_functions::thermal_properties (AGL_data.tdebye.at(i), Temperature, DebyeIntegral, DebyeIntegralerror, UIntEnergy, Cvt, F_Helmholtz, S_Entropy, AGL_data, FileMESSAGE);
+        aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, dFdx, 1);
+        aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, d2Fdx2, 2);
+        pressure_F = -xdata_to_fit.at(i) * dFdx / (3.0 * AGL_data.volumeinput.at(i));
+        bulkmodT = -xdata_to_fit.at(i) / (9.0 * AGL_data.volumeinput.at(i)) * (2.0 * dFdx - xdata_to_fit.at(i) * d2Fdx2);
+        mie_gruneisen = (pressure_F - press_stat.at(i)) * AGL_data.volumeinput.at(i) / UIntEnergy;
+        bulkmodstV = AGL_data.volumeinput.at(i) * bulkmodT + Temperature * mie_gruneisen * mie_gruneisen * Cvt;
+        if(bulkmodstV < 0.0) {
+          if(i <= imin) {
+            aurostd::StringstreamClean(aus);
+            aus << _AGLSTR_WARNING_ + "self_consistent_debye: Bstatic < 0 for equilibrium V!" << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            return aglerror;
+          }
+          if(i > 0) {
+            theta = AGL_data.tdebye.at(i) / theta0 * AGL_data.tdebye.at(i-1);
+          }
+          delta_theta = 0.0;
+        } else {
+          // OBSOLETE theta = pow((6.0 * pi * pi * AGL_data.natoms / AGL_data.volumeinput.at(i)), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(bulkmodstV / AGL_data.cellmass);
+          // OBSOLETE theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms * sqrt(AGL_data.volumeinput.at(i))), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(bulkmodstV / AGL_data.volumeinput.at(i)) / AGL_data.cellmass)  * eV_Ang3_to_amu_Ang_s);
+          theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms / AGL_data.volumeinput.at(i)), third) * AGL_data.poissonratiofunction * sqrt((bulkmodstV / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
+          delta_theta = theta - AGL_data.tdebye.at(i);
+          if(i > 0) {
+            if(theta > AGL_data.tdebye.at(i-1)) {
+              theta = AGL_data.tdebye.at(i)/theta0 * AGL_data.tdebye.at(i-1);
+              aurostd::StringstreamClean(aus);
+              aus << _AGLSTR_WARNING_ + "self_consistent_debye: Warning! gamma < 0, i = " << i << ", T = " << Temperature << endl;
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              delta_theta = 0.0;
+            }
+          }
+        }
+        theta0 = AGL_data.tdebye.at(i);
+        AGL_data.tdebye.at(i) = theta;
+        if((AGL_data.volumeinput.at(i) - AGL_data.volumeinput.at(imin) < AGL_data.volumeinput.at(imin) * 0.1) && (i >= 3 && i >= (AGL_data.volumeinput.size()/10))) {
+          converged = converged && (aurostd::abs(delta_theta) < eps);
+        }
       }	
     }
 
@@ -164,7 +164,7 @@ namespace AGL_functions {
       aus << _AGLSTR_WARNING_ + "self_consistent_debye: Number of convergence loops = " << iloops << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
     }
-  
+
     if(!converged) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "self_consistent_debye: Warning! convergence not achieved" << endl;
@@ -216,12 +216,12 @@ namespace AGL_functions {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "AGL_data.volumeinput = ";
       for (uint i = 0; i < AGL_data.volumeinput.size(); i++) {
-	aus << AGL_data.volumeinput.at(i) << "\t";
+        aus << AGL_data.volumeinput.at(i) << "\t";
       }
       aus << endl;
       aus << _AGLSTR_MESSAGE_ + "AGL_data.tdebye = ";
       for (uint i = 0; i < AGL_data.tdebye.size(); i++) {
-	aus << AGL_data.tdebye.at(i) << "\t";
+        aus << AGL_data.tdebye.at(i) << "\t";
       }
       aus << endl;      
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -239,17 +239,17 @@ namespace AGL_functions {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "xdata = ";
       for (uint i = 0; i < xdata.size(); i++) {
-	aus << xdata.at(i) << "\t";
+        aus << xdata.at(i) << "\t";
       }
       aus << endl;
       aus << _AGLSTR_MESSAGE_ + "ydata = ";
       for (uint i = 0; i < ydata.size(); i++) {
-	aus << ydata.at(i) << "\t";
+        aus << ydata.at(i) << "\t";
       }
       aus << endl;      
       aus << _AGLSTR_MESSAGE_ + "weight = ";
       for (uint i = 0; i < weight.size(); i++) {
-	aus << weight.at(i) << "\t";
+        aus << weight.at(i) << "\t";
       }
       aus << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -270,27 +270,27 @@ namespace AGL_functions {
       // Increasing the number of parameters until the limit is reached
       npolycoeffworkmax = min (ndataiterfit - limit - 1, AGL_data.maxpolycoeffs);
       for (npolycoeffwork = npolycoeffworkmin; npolycoeffwork <= npolycoeffworkmax; npolycoeffwork++) {
-	nfit = nfit + 1;
-	polycoeffwork.resize(npolycoeffwork+1);
-	pferr = AGL_functions::polynom_fit (last_entry_tofit, first_entry_tofit, xdata, ydata, weight, rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
-	if(pferr != 0) {
-	  return 2;
-	}
-	// Check if number of fitted polynomials exceeds maximum number allowed
-	// Discard excess fitted polynomials
-	if(nfit > AGL_data.maxfit) {
-	  nfit = AGL_data.maxfit;
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_WARNING_ + "debye_polynom_fit: maximum number of fits exceeded" << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	}
-	// Save fit parameters
-	else {
-	  npolynomialcoeffs = max (npolynomialcoeffs,npolycoeffwork);
-	  npolycoeffworkfit.at(nfit) = npolycoeffwork;
-	  ndatafit.at(nfit) = ndataiterfit;
-	  rmsmin = min(rmsmin, rms * npolycoeffwork / ndataiterfit);
-	}
+        nfit = nfit + 1;
+        polycoeffwork.resize(npolycoeffwork+1);
+        pferr = AGL_functions::polynom_fit (last_entry_tofit, first_entry_tofit, xdata, ydata, weight, rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
+        if(pferr != 0) {
+          return 2;
+        }
+        // Check if number of fitted polynomials exceeds maximum number allowed
+        // Discard excess fitted polynomials
+        if(nfit > AGL_data.maxfit) {
+          nfit = AGL_data.maxfit;
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_WARNING_ + "debye_polynom_fit: maximum number of fits exceeded" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+        // Save fit parameters
+        else {
+          npolynomialcoeffs = max (npolynomialcoeffs,npolycoeffwork);
+          npolycoeffworkfit.at(nfit) = npolycoeffwork;
+          ndatafit.at(nfit) = ndataiterfit;
+          rmsmin = min(rmsmin, rms * npolycoeffwork / ndataiterfit);
+        }
       }
       last_entry_tofit = last_entry_tofit + 1;
       first_entry_tofit = first_entry_tofit - 1;
@@ -317,12 +317,12 @@ namespace AGL_functions {
       first_entry_tofit = AGL_data.volumeinput.size() - last_entry_tofit - 1;
       pferr = AGL_functions::polynom_fit (last_entry_tofit, first_entry_tofit, xdata, ydata, weight, rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
       if(pferr != 0) {
-	return 2;
+        return 2;
       }
       weight_rms = rms * npolycoeffwork / (rmsmin * ndataiterfit);
       weight_rms_gaussian = exp(-weight_rms * weight_rms);
       for (int i = 0; i <= npolycoeffwork; i++) {
-	polynomialcoeffs.at(i) = polynomialcoeffs.at(i) + weight_rms_gaussian * polycoeffwork.at(i);
+        polynomialcoeffs.at(i) = polynomialcoeffs.at(i) + weight_rms_gaussian * polycoeffwork.at(i);
       }
       weight_norm = weight_norm + weight_rms_gaussian;
     }
@@ -433,15 +433,15 @@ namespace AGL_functions {
       nl = 5;
       DebyeIntegralerror = aurostd::abs(DebyeIntegral - debye_int_prev);
       while ((nl <= maxnl) && (DebyeIntegralerror >= eps)) {
-	AGL_functions::gauss_legendre (cero, yval, xpoints, weight, nl, AGL_data, FileMESSAGE);
-	sumdebyeint = 0.0;
-	for (i = 0; i < nl; i++) {
-	  sumdebyeint = sumdebyeint + weight.at(i) * debye_function (xpoints.at(i));
-	}
-	DebyeIntegral = sumdebyeint * (3.0 / pow(yval, 3.0));
-	DebyeIntegralerror = aurostd::abs(DebyeIntegral - debye_int_prev);
-	debye_int_prev = DebyeIntegral;
-	nl = nl + 5;
+        AGL_functions::gauss_legendre (cero, yval, xpoints, weight, nl, AGL_data, FileMESSAGE);
+        sumdebyeint = 0.0;
+        for (i = 0; i < nl; i++) {
+          sumdebyeint = sumdebyeint + weight.at(i) * debye_function (xpoints.at(i));
+        }
+        DebyeIntegral = sumdebyeint * (3.0 / pow(yval, 3.0));
+        DebyeIntegralerror = aurostd::abs(DebyeIntegral - debye_int_prev);
+        debye_int_prev = DebyeIntegral;
+        nl = nl + 5;
       }
     }
 
@@ -476,7 +476,7 @@ namespace AGL_functions {
 
     // OBSOLETE double hbar = PLANKSCONSTANT_h / (2 * pi);
     double hbar = PLANCKSCONSTANT_hbar;
-  
+
     // OBSOLETE kth = kboltz * acousticthetaD / hbar;
     kth = KBOLTZ * acousticthetaD / hbar;
     kths = kth * kth;
@@ -488,9 +488,9 @@ namespace AGL_functions {
     kappaT.resize(temperature.size());
     for(uint i = 0; i < temperature.size(); i++) {
       if(aurostd::abs(temperature.at(i)) < tol) {
-	kappaT.at(i) = 0.0;
+        kappaT.at(i) = 0.0;
       } else {
-	kappaT.at(i) =  kappaD * acousticthetaD / temperature.at(i);
+        kappaT.at(i) =  kappaD * acousticthetaD / temperature.at(i);
       }
     }
     return 0;
@@ -507,7 +507,7 @@ namespace AGL_functions {
     // OBSOLETE double hbar = 1.05459e-34;
     double kth, kths, vDcr;
     double tol = 1e-12;
-  
+
     // OBSOLETE kth = kboltz * acousticthetaD / hbar;
 
     // OBSOLETE double hbar = PLANKSCONSTANT_h / (2 * pi);
@@ -519,12 +519,12 @@ namespace AGL_functions {
     kappaTV.resize(temperature.size());
     for(uint i = 0; i < temperature.size(); i++) {
       if(aurostd::abs(temperature.at(i)) < tol) {
-	kappaTV.at(i) = 0.0;
+        kappaTV.at(i) = 0.0;
       } else {
-	// OBSOLETE vDcr = (pow(volumeq.at(i).at(0), third) / angstrom2bohr) * 1e-10;
-	vDcr = (pow(volumeq.at(i).at(0), third)) * 1e-10;
-	// OBSOLETE kappaTV.at(i) =  gammafunc * kths * kboltz * vDcr * avmass * acousticthetaD / (hbar * gammaD * gammaD *  temperature.at(i));
-	kappaTV.at(i) =  gammafunc * kths * KBOLTZ * vDcr * avmass * acousticthetaD / (hbar * gammaD * gammaD *  temperature.at(i));
+        // OBSOLETE vDcr = (pow(volumeq.at(i).at(0), third) / angstrom2bohr) * 1e-10;
+        vDcr = (pow(volumeq.at(i).at(0), third)) * 1e-10;
+        // OBSOLETE kappaTV.at(i) =  gammafunc * kths * kboltz * vDcr * avmass * acousticthetaD / (hbar * gammaD * gammaD *  temperature.at(i));
+        kappaTV.at(i) =  gammafunc * kths * KBOLTZ * vDcr * avmass * acousticthetaD / (hbar * gammaD * gammaD *  temperature.at(i));
       }
     }
     return 0;

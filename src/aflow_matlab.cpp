@@ -214,25 +214,25 @@ bool KBIN_MATLAB_Extract(string AflowIn,ifstream &FileAFLOWIN,ofstream &FileMESS
     }
     if(!kflags.AFLOW_MATLAB_FILE_COMMAND && (kflags.AFLOW_MATLAB_FILE_FILE || !kflags.AFLOW_MATLAB_FILE_FILE)) {
       if(kflags.AFLOW_MATLAB_FILE_FILE) {
-	file=aurostd::substring2string(AflowIn,"[AFLOW_MATLAB_FILE]FILE=",TRUE);
-	aus << "00000  MESSAGE aflow.m   generation from file=" << file << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
+        file=aurostd::substring2string(AflowIn,"[AFLOW_MATLAB_FILE]FILE=",TRUE);
+        aus << "00000  MESSAGE aflow.m   generation from file=" << file << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
       } else {
-	file=DEFAULT_VASP_EXTERNAL_INCAR;
-	aus << "00000  MESSAGE aflow.m   generation from DEFAULT file=" << DEFAULT_VASP_EXTERNAL_INCAR << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
+        file=DEFAULT_VASP_EXTERNAL_INCAR;
+        aus << "00000  MESSAGE aflow.m   generation from DEFAULT file=" << DEFAULT_VASP_EXTERNAL_INCAR << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
       }
       if(!aurostd::FileExist(file)) {
-	aus << "EEEEE  ERROR aflow.m file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
-	Krun=FALSE;
-	return Krun;
+        aus << "EEEEE  ERROR aflow.m file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
+        Krun=FALSE;
+        return Krun;
       }
       if(aurostd::FileEmpty(file)) {
-	aus << "EEEEE  ERROR aflow.m file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
-	Krun=FALSE;
-	return Krun;
+        aus << "EEEEE  ERROR aflow.m file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
+        Krun=FALSE;
+        return Krun;
       }
       aflowm.clear();aflowm.str(std::string());
       aflowm << aurostd::file2string(file);
@@ -246,16 +246,16 @@ bool KBIN_MATLAB_Extract(string AflowIn,ifstream &FileAFLOWIN,ofstream &FileMESS
       aurostd::execute(file);                           // create temp
       file="./_aflow_AFLOWM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";            // file name //CO20200502 - threadID
       if(!aurostd::FileExist(file)) {  // could not write (directory protected)
-	aus << "EEEEE  ERROR aflow.m file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
-	Krun=FALSE;
-	return Krun;
+        aus << "EEEEE  ERROR aflow.m file=" << file << " does not exist! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
+        Krun=FALSE;
+        return Krun;
       }
       if(aurostd::FileEmpty(file)) {  // contains nothing good
-	aus << "EEEEE  ERROR aflow.m file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
-	Krun=FALSE;
-	return Krun;
+        aus << "EEEEE  ERROR aflow.m file=" << file << " is empty! " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
+        Krun=FALSE;
+        return Krun;
       }
       aflowm.clear();aflowm.str(std::string());
       aflowm << aurostd::file2string(file);
@@ -332,7 +332,7 @@ bool KBIN_MATLAB_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags
   }
   aflags.QUIET=FALSE;
   kflags=KBIN_MATLAB_Get_Matlabflags_from_AflowIN(AflowIn);
-  
+
   // ***************************************************************************
   // Get the KBIN_BIN name
   aurostd::StringstreamClean(aus);
@@ -363,7 +363,7 @@ bool KBIN_MATLAB_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags
       // ***************************************************************************
       // PRESCRIPT
       if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
-	KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
+        KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
       // ***************************************************************************
       // RUN
       aus << "AAAAA  MATLAB RUN - " <<  aflags.Directory << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
@@ -372,7 +372,7 @@ bool KBIN_MATLAB_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags
       // ***************************************************************************
       // POSTSCRIPT
       if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
-	KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
+        KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
       // ***************************************************************************
     }
   }

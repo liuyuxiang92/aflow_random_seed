@@ -699,7 +699,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"INTPOL","--intpol=","");
 
   vpflow.flag("INWS",aurostd::args2flag(argv,cmds,"--inwignerseitz|--inws"));
-  
+
   //DX20200131 - add isopointal prototype function - START
   vpflow.flag("ISOPOINTAL_PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--isopointal_prototypes|--get_isopointal_prototypes"));
   if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {
@@ -1141,9 +1141,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // PSEUDOPOTENTIAL CHECK
   vpflow.args2addattachedscheme(argv,cmds,"PSEUDOPOTENTIALS_CHECK","--pseudopotentials_check=|--pp_check|--ppk=","");
   if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {
-     vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
-  
+
   // MOVE ON
   vpflow.flag("QE",aurostd::args2flag(argv,cmds,"--qe") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ABCCAR",aurostd::args2flag(argv,cmds,"--abccar") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20190123 - moved ABCCAR to here
@@ -1920,7 +1920,7 @@ namespace pflow {
       if(vpflow.flag("PRIM2")) {cout << pflow::PRIM(cin,2); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM3")) {cout << pflow::PRIM(cin,3); _PROGRAMRUN=true;}
       if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {pflow::PSEUDOPOTENTIALS_CHECK(vpflow,vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),cout); _PROGRAMRUN=true;} 
- 
+
       // Q
       if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("QDEL")) {sflow::QDEL(vpflow.getattachedscheme("QDEL")); _PROGRAMRUN=true;} // NEW
@@ -3602,7 +3602,7 @@ namespace pflow {
 // pflow::BZDirectionsSTRUCTURE
 // ***************************************************************************
 namespace pflow {
-  //DX20181101 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input) {
+  //DX20181101 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input)
   string BZDirectionsSTRUCTURE(istream& input, aurostd::xoption& vpflow) {
 
     xstructure a(input,IOAFLOW_AUTO);
@@ -3777,18 +3777,18 @@ namespace pflow {
       cout << ">>> Testing Integer INDENTICAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer INDENTICAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_int_xv_a, test_int_xv_a, _tol_int) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_int_xv_a, test_int_xv_a, _tol_int) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_int_xv_a, test_int_xv_b, _tol_int)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_int_xv_a, test_int_xv_b, _tol_int)) << endl;
     }
 
     if(identical(test_float_xv_a, test_float_xv_a, _tol_float) &&
@@ -3796,18 +3796,18 @@ namespace pflow {
       cout << ">>> Testing Float INDENTICAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float INDENTICAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_float_xv_a, test_float_xv_a, _tol_float) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_float_xv_a, test_float_xv_a, _tol_float) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_float_xv_a, test_float_xv_b, _tol_float)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_float_xv_a, test_float_xv_b, _tol_float)) << endl;
     }
 
     if(identical(test_double_xv_a, test_double_xv_a, _tol_double) &&
@@ -3815,18 +3815,18 @@ namespace pflow {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_double_xv_a, test_double_xv_a, _tol_double) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_double_xv_a, test_double_xv_a, _tol_double) << endl;
       cout << "2) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_double_xv_a, test_double_xv_b, _tol_double)) << endl;
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_double_xv_a, test_double_xv_b, _tol_double)) << endl;
     }
 
     // template<class utype> bool
@@ -3836,18 +3836,18 @@ namespace pflow {
       cout << ">>> Testing Integer INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_int_xv_a, test_int_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_int_xv_a, test_int_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_int_xv_a, test_int_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_int_xv_a, test_int_xv_b)) << endl;
     }
 
     if(identical(test_float_xv_a, test_float_xv_a) &&
@@ -3855,18 +3855,18 @@ namespace pflow {
       cout << ">>> Testing Float INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_float_xv_a, test_float_xv_a) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_float_xv_a, test_float_xv_a) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_float_xv_a, test_float_xv_b)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_float_xv_a, test_float_xv_b)) << endl;
     }
 
     if(identical(test_double_xv_a, test_double_xv_a) &&
@@ -3874,18 +3874,18 @@ namespace pflow {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_double_xv_a, test_double_xv_a) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_double_xv_a, test_double_xv_a) << endl;
       cout << "2) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_double_xv_a, test_double_xv_b)) << endl;
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_double_xv_a, test_double_xv_b)) << endl;
     }
 
     // template<class utype> bool
@@ -3895,18 +3895,18 @@ namespace pflow {
       cout << ">>> Testing Integer == with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer == with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_int_xv_a, test_int_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_int_xv_a, test_int_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_int_xv_a, test_int_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_int_xv_a, test_int_xv_b)) << endl;
     }
 
     if((test_float_xv_a == test_float_xv_a) &&
@@ -3914,18 +3914,18 @@ namespace pflow {
       cout << ">>> Testing Float == with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float == with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << (test_float_xv_a == test_float_xv_a) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << (test_float_xv_a == test_float_xv_a) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! (test_float_xv_a == test_float_xv_b)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! (test_float_xv_a == test_float_xv_b)) << endl;
     }
 
     if(identical(test_double_xv_a, test_double_xv_a) &&
@@ -3933,18 +3933,18 @@ namespace pflow {
       cout << ">>> Testing Double == with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double == with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << (test_double_xv_a == test_double_xv_a) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << (test_double_xv_a == test_double_xv_a) << endl;
       cout << "2) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! (test_double_xv_a == test_double_xv_b)) << endl;
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! (test_double_xv_a == test_double_xv_b)) << endl;
     }
 
     // template<class utype> bool
@@ -3954,18 +3954,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISDIFFERENT with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISDIFFERENT with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_int_xv_a, test_int_xv_a, _tol_int) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_int_xv_a, test_int_xv_a, _tol_int) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_int_xv_a, test_int_xv_b, _tol_int)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_int_xv_a, test_int_xv_b, _tol_int)) << endl;
     }
 
     if(! isdifferent(test_float_xv_a, test_float_xv_a, _tol_float) &&
@@ -3973,18 +3973,18 @@ namespace pflow {
       cout << ">>> Testing Float ISDIFFERENT with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISDIFFERENT with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_float_xv_a, test_float_xv_a, _tol_float) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_float_xv_a, test_float_xv_a, _tol_float) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << (isdifferent(test_float_xv_a, test_float_xv_b, _tol_float)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << (isdifferent(test_float_xv_a, test_float_xv_b, _tol_float)) << endl;
     }
 
     if(! isdifferent(test_double_xv_a, test_double_xv_a, _tol_double) &&
@@ -3992,18 +3992,18 @@ namespace pflow {
       cout << ">>> Testing Double ISDIFFERENT with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISDIFFERENT with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_double_xv_a, test_double_xv_a, _tol_double) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_double_xv_a, test_double_xv_a, _tol_double) << endl;
       cout << "2) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_double_xv_a, test_double_xv_b, _tol_double)) << endl;
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_double_xv_a, test_double_xv_b, _tol_double)) << endl;
     }
 
     // template<class utype> bool
@@ -4013,18 +4013,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISDIFFERENT xvector with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISDIFFERENT xvector with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_int_xv_a, test_int_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_int_xv_a, test_int_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_int_xv_a, test_int_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_int_xv_a, test_int_xv_b)) << endl;
     }
 
     if(! isdifferent(test_float_xv_a, test_float_xv_a) &&
@@ -4032,18 +4032,18 @@ namespace pflow {
       cout << ">>> Testing Float ISDIFFERENT with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISDIFFERENT with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_float_xv_a, test_float_xv_a) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_float_xv_a, test_float_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << (isdifferent(test_float_xv_a, test_float_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << (isdifferent(test_float_xv_a, test_float_xv_b)) << endl;
     }
 
     if(! isdifferent(test_double_xv_a, test_double_xv_a) &&
@@ -4051,18 +4051,18 @@ namespace pflow {
       cout << ">>> Testing Double ISDIFFERENT with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISDIFFERENT with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_double_xv_a, test_double_xv_a) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_double_xv_a, test_double_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_double_xv_a, test_double_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_double_xv_a, test_double_xv_b)) << endl;
     }
 
     // template<class utype> bool
@@ -4072,18 +4072,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISEQUAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISEQUAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_int_xv_a, test_int_xv_a, _tol_int) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_int_xv_a, test_int_xv_a, _tol_int) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_int_xv_a, test_int_xv_b, _tol_int)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_int_xv_a, test_int_xv_b, _tol_int)) << endl;
     }
 
     if(aurostd::isequal(test_float_xv_a, test_float_xv_a, _tol_float) &&
@@ -4091,18 +4091,18 @@ namespace pflow {
       cout << ">>> Testing Float ISEQUAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISEQUAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_float_xv_a, test_float_xv_a, _tol_float) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_float_xv_a, test_float_xv_a, _tol_float) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_float_xv_a, test_float_xv_b, _tol_float)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_float_xv_a, test_float_xv_b, _tol_float)) << endl;
     }
 
     if(aurostd::isequal(test_double_xv_a, test_double_xv_a, _tol_double) &&
@@ -4110,18 +4110,18 @@ namespace pflow {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_double_xv_a, test_double_xv_a, _tol_double) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_double_xv_a, test_double_xv_a, _tol_double) << endl;
       cout << "2) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_double_xv_a, test_double_xv_b, _tol_double)) << endl;
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_double_xv_a, test_double_xv_b, _tol_double)) << endl;
     }
 
     // template<class utype> bool
@@ -4131,18 +4131,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_int_xv_a, test_int_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_int_xv_a, test_int_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_int_xv_a, test_int_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_int_xv_a, test_int_xv_b)) << endl;
     }
 
     if(aurostd::isequal(test_float_xv_a, test_float_xv_a) &&
@@ -4150,18 +4150,18 @@ namespace pflow {
       cout << ">>> Testing Float ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_float_xv_a, test_float_xv_a) << endl;
+        << " 1) \n"
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_float_xv_a, test_float_xv_a) << endl;
       cout << "2) \n"
-         << test_float_xv_a << endl
-         << " and \n"
-         << test_float_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_float_xv_a, test_float_xv_b)) << endl;
+        << test_float_xv_a << endl
+        << " and \n"
+        << test_float_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_float_xv_a, test_float_xv_b)) << endl;
     }
 
     if(aurostd::isequal(test_double_xv_a, test_double_xv_a) &&
@@ -4169,18 +4169,18 @@ namespace pflow {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_double_xv_a, test_double_xv_a) << endl;
+        << " 1) \n"
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_double_xv_a, test_double_xv_a) << endl;
       cout << "2) \n"
-         << test_double_xv_a << endl
-         << " and \n"
-         << test_double_xv_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_double_xv_a, test_double_xv_b)) << endl;
+        << test_double_xv_a << endl
+        << " and \n"
+        << test_double_xv_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_double_xv_a, test_double_xv_b)) << endl;
     }
 
     // template<class utype> bool
@@ -4190,18 +4190,18 @@ namespace pflow {
       cout << ">>> Testing Integer != with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer != with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << (test_int_xv_a != test_int_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << (test_int_xv_a != test_int_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << ((test_int_xv_a != test_int_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << ((test_int_xv_a != test_int_xv_b)) << endl;
     }
 
     if(! (test_float_xv_a != test_float_xv_a) &&
@@ -4209,18 +4209,18 @@ namespace pflow {
       cout << ">>> Testing Float != with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float != with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << (test_float_xv_a != test_float_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << (test_float_xv_a != test_float_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << ((test_float_xv_a != test_float_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << ((test_float_xv_a != test_float_xv_b)) << endl;
     }
 
     if(! (test_double_xv_a != test_double_xv_a) &&
@@ -4228,18 +4228,18 @@ namespace pflow {
       cout << ">>> Testing Double != with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double != with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_a   << endl
-         << " are different? "
-         << std::boolalpha << (test_double_xv_a != test_double_xv_a) << endl;
+        << " 1) \n"
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_a   << endl
+        << " are different? "
+        << std::boolalpha << (test_double_xv_a != test_double_xv_a) << endl;
       cout << "2) \n"
-         << test_int_xv_a << endl
-         << " and \n"
-         << test_int_xv_b   << endl
-         << " are not different? "
-         << std::boolalpha << ((test_double_xv_a != test_double_xv_b)) << endl;
+        << test_int_xv_a << endl
+        << " and \n"
+        << test_int_xv_b   << endl
+        << " are not different? "
+        << std::boolalpha << ((test_double_xv_a != test_double_xv_b)) << endl;
     }
 
     const int test_xm_size = 3;
@@ -4278,18 +4278,18 @@ namespace pflow {
       cout << ">>> Testing Integer INDENTICAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer INDENTICAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_int_xm_a, test_int_xm_a, _tol_int) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_int_xm_a, test_int_xm_a, _tol_int) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_int_xm_a, test_int_xm_b, _tol_int)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_int_xm_a, test_int_xm_b, _tol_int)) << endl;
     }
 
     if(identical(test_float_xm_a, test_float_xm_a, _tol_float) &&
@@ -4297,18 +4297,18 @@ namespace pflow {
       cout << ">>> Testing Float INDENTICAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float INDENTICAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_float_xm_a, test_float_xm_a, _tol_float) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_float_xm_a, test_float_xm_a, _tol_float) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_float_xm_a, test_float_xm_b, _tol_float)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_float_xm_a, test_float_xm_b, _tol_float)) << endl;
     }
 
     if(identical(test_double_xm_a, test_double_xm_a, _tol_double) &&
@@ -4316,18 +4316,18 @@ namespace pflow {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_double_xm_a, test_double_xm_a, _tol_double) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_double_xm_a, test_double_xm_a, _tol_double) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_double_xm_a, test_double_xm_b, _tol_double)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_double_xm_a, test_double_xm_b, _tol_double)) << endl;
     }
 
     // template<class utype> bool
@@ -4337,18 +4337,18 @@ namespace pflow {
       cout << ">>> Testing Integer INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_int_xm_a, test_int_xm_a) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_int_xm_a, test_int_xm_a) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_int_xm_a, test_int_xm_b)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_int_xm_a, test_int_xm_b)) << endl;
     }
 
     bool pass, pass1;
@@ -4360,18 +4360,18 @@ namespace pflow {
       cout << ">>> Testing Float INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_float_xm_a, test_float_xm_a) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_float_xm_a, test_float_xm_a) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_float_xm_a, test_float_xm_b)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_float_xm_a, test_float_xm_b)) << endl;
     }
 
     if(identical(test_double_xm_a, test_double_xm_a) &&
@@ -4379,18 +4379,18 @@ namespace pflow {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double INDENTICAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_double_xm_a, test_double_xm_a) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_double_xm_a, test_double_xm_a) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_double_xm_a, test_double_xm_b)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_double_xm_a, test_double_xm_b)) << endl;
     }
 
     // template<class utype> bool
@@ -4400,18 +4400,18 @@ namespace pflow {
       cout << ">>> Testing Integer == with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer == with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << identical(test_int_xm_a, test_int_xm_a) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << identical(test_int_xm_a, test_int_xm_a) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! identical(test_int_xm_a, test_int_xm_b)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! identical(test_int_xm_a, test_int_xm_b)) << endl;
     }
 
     if((test_float_xm_a == test_float_xm_a) &&
@@ -4419,18 +4419,18 @@ namespace pflow {
       cout << ">>> Testing Float == with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float == with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << (test_float_xm_a == test_float_xm_a) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << (test_float_xm_a == test_float_xm_a) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! (test_float_xm_a == test_float_xm_b)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! (test_float_xm_a == test_float_xm_b)) << endl;
     }
 
     if(identical(test_double_xm_a, test_double_xm_a) &&
@@ -4438,18 +4438,18 @@ namespace pflow {
       cout << ">>> Testing Double == with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double == with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << (test_double_xm_a == test_double_xm_a) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << (test_double_xm_a == test_double_xm_a) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (! (test_double_xm_a == test_double_xm_b)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (! (test_double_xm_a == test_double_xm_b)) << endl;
     }
 
     // template<class utype> bool
@@ -4459,18 +4459,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISDIFFERENT with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISDIFFERENT with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_int_xm_a, test_int_xm_a, _tol_int) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_int_xm_a, test_int_xm_a, _tol_int) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_int_xm_a, test_int_xm_b, _tol_int)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_int_xm_a, test_int_xm_b, _tol_int)) << endl;
     }
 
     if(! isdifferent(test_float_xm_a, test_float_xm_a, _tol_float) &&
@@ -4478,18 +4478,18 @@ namespace pflow {
       cout << ">>> Testing Float ISDIFFERENT with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISDIFFERENT with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_float_xm_a, test_float_xm_a, _tol_float) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_float_xm_a, test_float_xm_a, _tol_float) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << (isdifferent(test_float_xm_a, test_float_xm_b, _tol_float)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << (isdifferent(test_float_xm_a, test_float_xm_b, _tol_float)) << endl;
     }
 
     if(! isdifferent(test_double_xm_a, test_double_xm_a, _tol_double) &&
@@ -4497,18 +4497,18 @@ namespace pflow {
       cout << ">>> Testing Double ISDIFFERENT with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISDIFFERENT with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_double_xm_a, test_double_xm_a, _tol_double) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_double_xm_a, test_double_xm_a, _tol_double) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_double_xm_a, test_double_xm_b, _tol_double)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_double_xm_a, test_double_xm_b, _tol_double)) << endl;
     }
 
     // template<class utype> bool
@@ -4518,18 +4518,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISDIFFERENT xvector with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISDIFFERENT xvector with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_int_xm_a, test_int_xm_a) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_int_xm_a, test_int_xm_a) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_int_xm_a, test_int_xm_b)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_int_xm_a, test_int_xm_b)) << endl;
     }
 
     if(! isdifferent(test_float_xm_a, test_float_xm_a) &&
@@ -4537,18 +4537,18 @@ namespace pflow {
       cout << ">>> Testing Float ISDIFFERENT with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISDIFFERENT with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_float_xm_a, test_float_xm_a) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_float_xm_a, test_float_xm_a) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << (isdifferent(test_float_xm_a, test_float_xm_b)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << (isdifferent(test_float_xm_a, test_float_xm_b)) << endl;
     }
 
     if(! isdifferent(test_double_xm_a, test_double_xm_a) &&
@@ -4556,18 +4556,18 @@ namespace pflow {
       cout << ">>> Testing Double ISDIFFERENT with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISDIFFERENT with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << isdifferent(test_double_xm_a, test_double_xm_a) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << isdifferent(test_double_xm_a, test_double_xm_a) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << (! isdifferent(test_double_xm_a, test_double_xm_b)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << (! isdifferent(test_double_xm_a, test_double_xm_b)) << endl;
     }
 
     // template<class utype> bool
@@ -4577,18 +4577,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISEQUAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISEQUAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_int_xm_a, test_int_xm_a, _tol_int) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_int_xm_a, test_int_xm_a, _tol_int) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_int_xm_a, test_int_xm_b, _tol_int)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_int_xm_a, test_int_xm_b, _tol_int)) << endl;
     }
 
     if(aurostd::isequal(test_float_xm_a, test_float_xm_a, _tol_float) &&
@@ -4596,18 +4596,18 @@ namespace pflow {
       cout << ">>> Testing Float ISEQUAL with given tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISEQUAL with given tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_float_xm_a, test_float_xm_a, _tol_float) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_float_xm_a, test_float_xm_a, _tol_float) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_float_xm_a, test_float_xm_b, _tol_float)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_float_xm_a, test_float_xm_b, _tol_float)) << endl;
     }
 
     if(aurostd::isequal(test_double_xm_a, test_double_xm_a, _tol_double) &&
@@ -4615,18 +4615,18 @@ namespace pflow {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_double_xm_a, test_double_xm_a, _tol_double) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_double_xm_a, test_double_xm_a, _tol_double) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_double_xm_a, test_double_xm_b, _tol_double)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_double_xm_a, test_double_xm_b, _tol_double)) << endl;
     }
 
     // template<class utype> bool
@@ -4636,18 +4636,18 @@ namespace pflow {
       cout << ">>> Testing Integer ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_int_xm_a, test_int_xm_a) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_int_xm_a, test_int_xm_a) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_int_xm_a, test_int_xm_b)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_int_xm_a, test_int_xm_b)) << endl;
     }
 
     if(aurostd::isequal(test_float_xm_a, test_float_xm_a) &&
@@ -4655,18 +4655,18 @@ namespace pflow {
       cout << ">>> Testing Float ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_float_xm_a, test_float_xm_a) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_float_xm_a, test_float_xm_a) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_float_xm_a, test_float_xm_b)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_float_xm_a, test_float_xm_b)) << endl;
     }
 
     if(aurostd::isequal(test_double_xm_a, test_double_xm_a) &&
@@ -4674,18 +4674,18 @@ namespace pflow {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double ISEQUAL with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are identical? "
-         << std::boolalpha << aurostd::isequal(test_double_xm_a, test_double_xm_a) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are identical? "
+        << std::boolalpha << aurostd::isequal(test_double_xm_a, test_double_xm_a) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not identical? "
-         << std::boolalpha << (!aurostd::isequal(test_double_xm_a, test_double_xm_b)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not identical? "
+        << std::boolalpha << (!aurostd::isequal(test_double_xm_a, test_double_xm_b)) << endl;
     }
 
     // template<class utype> bool
@@ -4695,18 +4695,18 @@ namespace pflow {
       cout << ">>> Testing Integer != with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Integer != with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << (test_int_xm_a != test_int_xm_a) << endl;
+        << " 1) \n"
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << (test_int_xm_a != test_int_xm_a) << endl;
       cout << "2) \n"
-         << test_int_xm_a << endl
-         << " and \n"
-         << test_int_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << ((test_int_xm_a != test_int_xm_b)) << endl;
+        << test_int_xm_a << endl
+        << " and \n"
+        << test_int_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << ((test_int_xm_a != test_int_xm_b)) << endl;
     }
 
     if(! (test_float_xm_a != test_float_xm_a) &&
@@ -4714,18 +4714,18 @@ namespace pflow {
       cout << ">>> Testing Float != with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Float != with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << (test_float_xm_a != test_float_xm_a) << endl;
+        << " 1) \n"
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << (test_float_xm_a != test_float_xm_a) << endl;
       cout << "2) \n"
-         << test_float_xm_a << endl
-         << " and \n"
-         << test_float_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << ((test_float_xm_a != test_float_xm_b)) << endl;
+        << test_float_xm_a << endl
+        << " and \n"
+        << test_float_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << ((test_float_xm_a != test_float_xm_b)) << endl;
     }
 
     if(! (test_double_xm_a != test_double_xm_a) &&
@@ -4733,18 +4733,18 @@ namespace pflow {
       cout << ">>> Testing Double != with default tolerance:  PASS\n";
     } else {
       cout << ">>> Testing Double != with default tolerance:  ***FAIL***!\n"
-         << " 1) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_a   << endl
-         << " are different? "
-         << std::boolalpha << (test_double_xm_a != test_double_xm_a) << endl;
+        << " 1) \n"
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_a   << endl
+        << " are different? "
+        << std::boolalpha << (test_double_xm_a != test_double_xm_a) << endl;
       cout << "2) \n"
-         << test_double_xm_a << endl
-         << " and \n"
-         << test_double_xm_b   << endl
-         << " are not different? "
-         << std::boolalpha << ((test_double_xm_a != test_double_xm_b)) << endl;
+        << test_double_xm_a << endl
+        << " and \n"
+        << test_double_xm_b   << endl
+        << " are not different? "
+        << std::boolalpha << ((test_double_xm_a != test_double_xm_b)) << endl;
     }
   }
 } // namespace pflow
@@ -5418,7 +5418,7 @@ namespace pflow {
 // pflow::DATA
 // ***************************************************************************
 namespace pflow {
-  //void DATA(string smode,istream& input) {
+  //void DATA(string smode,istream& input)
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XHOST.sPID + "pflow::DATA()";
@@ -5800,7 +5800,7 @@ namespace pflow {
 // pflow::EQUIVALENT
 // ***************************************************************************
 namespace pflow {
-  //DX20170818 [OBSOLETE] xstructure EQUIVALENT(_aflags &aflags,istream& input) {
+  //DX20170818 [OBSOLETE] xstructure EQUIVALENT(_aflags &aflags,istream& input)
   string EQUIVALENT(_aflags &aflags,istream& input, aurostd::xoption& vpflow) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XHOST.sPID << "pflow::EQUIVALENT: BEGIN" << endl;
@@ -6777,13 +6777,13 @@ namespace pflow {
     }
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+XHOST.vext.at(iext)) ||
-	 aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+XHOST.vext.at(iext))) tocompress=TRUE;
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+XHOST.vext.at(iext)) ||
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+XHOST.vext.at(iext)) ||
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+XHOST.vext.at(iext)) ||
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+XHOST.vext.at(iext)) ||
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+XHOST.vext.at(iext)) ||
+          aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+XHOST.vext.at(iext))) tocompress=TRUE;
     }
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       // txt
@@ -7513,7 +7513,7 @@ namespace pflow {	//DF20190329
     if(!vpflow.flag("GFA::AE_FILE")) {
       AE_file_read = "none";
       cout << endl << "No AE input file? That's ok, will calculate the atomic environments." << endl
-         << "alternatively, set --ae_file= to specify a file of atomic environments to read; e.g.: --ae_file=All_atomic_environments_read.dat" << endl;
+        << "alternatively, set --ae_file= to specify a file of atomic environments to read; e.g.: --ae_file=All_atomic_environments_read.dat" << endl;
     }
     else if(!aurostd::FileExist(AE_file_read)){
       cout << endl << "Can't find " << AE_file_read << ". Will calculate all atomic environments." << endl;
@@ -8002,7 +8002,7 @@ namespace pflow {
     string rasFILE="ras."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
     ras.open(rasFILE.c_str(),std::ios::out);
     ras << "background " << COLOR << endl
-       << "wireframe " << 0.05 << endl; //radius of bond in angstroms
+      << "wireframe " << 0.05 << endl; //radius of bond in angstroms
     //anymore? (http://jmol.sourceforge.net/docs/JmolUserGuide/ch04.html)
     ras.close();
 
@@ -8227,9 +8227,9 @@ namespace pflow {
       }
       //	oss << kintro << "KPOINTS   = [" << str.kpoints_k1 << "," << str.kpoints_k2 << "," << str.kpoints_k3 << "]" << endl;
       oss << kintro << "DKGRID    = ["
-         << modulus(str.klattice(1))/str.kpoints_k1 << ","
-         << modulus(str.klattice(2))/str.kpoints_k2 << ","
-         << modulus(str.klattice(3))/str.kpoints_k3 << "]" << endl;
+        << modulus(str.klattice(1))/str.kpoints_k1 << ","
+        << modulus(str.klattice(2))/str.kpoints_k2 << ","
+        << modulus(str.klattice(3))/str.kpoints_k3 << "]" << endl;
       oss << kintro << "KPPRA     = " << str.kpoints_kppra << " (found) " << endl;
       // oss << kintro << "next line for automatic scripting (with cat POSCAR | aflow --kpoints | grep -i AUTO | sed \"s/AUTO//g\")" << endl;
       oss << kintro << "KPOINTS   = " << str.kpoints_k1 << " " << str.kpoints_k2 << " " << str.kpoints_k3 << endl;
@@ -8264,9 +8264,9 @@ namespace pflow {
       KPPRA_DELTA(str,DK);
       //	oss << kintro << "KPOINTS   = [" << str.kpoints_k1 << "," << str.kpoints_k2 << "," << str.kpoints_k3 << "]" << endl;
       oss << kintro << "DKGRID    = ["
-         << modulus(str.klattice(1))/str.kpoints_k1 << ","
-         << modulus(str.klattice(2))/str.kpoints_k2 << ","
-         << modulus(str.klattice(3))/str.kpoints_k3 << "]" << endl;
+        << modulus(str.klattice(1))/str.kpoints_k1 << ","
+        << modulus(str.klattice(2))/str.kpoints_k2 << ","
+        << modulus(str.klattice(3))/str.kpoints_k3 << "]" << endl;
       oss << kintro << "KPPRA     = " << str.kpoints_kppra << " (found) " << endl;
       // oss << kintro << "next line for automatic scripting (with cat POSCAR | aflow --kpoints | grep -i AUTO | sed \"s/AUTO//g\")" << endl;
       oss << kintro << "KPOINTS   = " << str.kpoints_k1 << " " << str.kpoints_k2 << " " << str.kpoints_k3 << endl;
@@ -9736,7 +9736,7 @@ namespace pflow {
   // let's you know if input (or elements) belongs on hull of velements
   // if sort_elements==True, will sort(elements) first before matching with velements, 
   // sorting is generally NOT preferred as it would match unsorted compounds from database (NOT good)
- 
+
   // vector
   bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
@@ -9803,7 +9803,7 @@ namespace pflow {
     return true;
   }
 
- 
+
 }  // namespace pflow
 
 
@@ -9870,7 +9870,7 @@ namespace pflow {
          !aurostd::EWithinList(files,"CONTCAR.relax2",efile) &&
          !aurostd::EWithinList(files,"CONTCAR.relax",efile) &&
          TRUE)
-        ) {
+      ) {
       message << "path=" << path << " missing structure files. Ignoring entry";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
@@ -11715,18 +11715,18 @@ bool AlphabetizePrototypeLabelSpecies(deque<string> &species,deque<string> &spec
   if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: label=" << label << endl;
   for(uint i=0;i<nspeciesHTQC;i++)
     if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: BEFORE species.at(" << i << ")=" 
-       << species.at(i) << " species_pp.at(" << i << ")=" << species_pp.at(i) 
-         << " vvolume.at(" << i << ")=" << vvolume.at(i) 
-         << " vmass.at(" << i << ")=" << vmass.at(i) << endl;
+      << species.at(i) << " species_pp.at(" << i << ")=" << species_pp.at(i) 
+        << " vvolume.at(" << i << ")=" << vvolume.at(i) 
+        << " vmass.at(" << i << ")=" << vmass.at(i) << endl;
   for(uint i=0;i<nspeciesHTQC;i++) species.at(i)=rnd_species.at(i);
   for(uint i=0;i<nspeciesHTQC;i++) species_pp.at(i)=rnd_species_pp.at(i);
   for(uint i=0;i<nspeciesHTQC;i++) vvolume.at(i)=rnd_vvolume.at(i);
   for(uint i=0;i<nspeciesHTQC;i++) vmass.at(i)=rnd_vmass.at(i);
   for(uint i=0;i<nspeciesHTQC;i++)
     if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: AFTER species.at(" << i << ")=" 
-       << species.at(i) << " species_pp.at(" << i << ")=" 
-         << species_pp.at(i) << " vvolume.at(" << i << ")="
-         << vvolume.at(i) << " vmass.at(" << i << ")=" << vmass.at(i) << endl;
+      << species.at(i) << " species_pp.at(" << i << ")=" 
+        << species_pp.at(i) << " vvolume.at(" << i << ")="
+        << vvolume.at(i) << " vmass.at(" << i << ")=" << vmass.at(i) << endl;
   if(LDEBUG) {cerr << "AlphabetizePrototypeLabelSpecies: EXIT" << endl;  exit(0);}
   return TRUE;
 }
@@ -13292,9 +13292,9 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " CHECK USAGE" << endl; 
     if(vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") || file=="") {
       init::ErrorOption(cout,vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),"pflow::PSEUDOPOTENTIALS_CHECK",
-     			aurostd::liststring2string("aflow [options] --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=",
-     						   "       options:",
-     						   "                --usage"));
+          aurostd::liststring2string("aflow [options] --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=",
+            "       options:",
+            "                --usage"));
       exit(0);
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PSEUDOPOTENTIALS_CHECK::USAGE\")=" << vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") << endl;
@@ -13306,7 +13306,7 @@ namespace pflow {
       xPOTCAR xPOT(file);
       oss << xPOT << endl;
     }
-   if(aurostd::substring2bool(file,"OUTCAR")) {
+    if(aurostd::substring2bool(file,"OUTCAR")) {
       XHOST.DEBUG=FALSE;
       XHOST.PSEUDOPOTENTIAL_GENERATOR=FALSE;
       xOUTCAR xOUT(file);
@@ -13323,7 +13323,7 @@ namespace pflow {
       oss << " species_pp_version.size()=" << xOUT.species_pp_version.size() << ": "; for(uint i=0;i<xOUT.species_pp_version.size();i++) { oss << xOUT.species_pp_version.at(i) << " "; } oss << endl;
       oss << " species_pp_AUID.size()=" << xOUT.species_pp_AUID.size() << ": "; for(uint i=0;i<xOUT.species_pp_AUID.size();i++) { oss << xOUT.species_pp_AUID.at(i) << " "; } oss << endl;
       oss << " species_pp_AUID_collisions.size()=" << xOUT.species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<xOUT.species_pp_AUID_collisions.size();i++) { oss << xOUT.species_pp_AUID_collisions.at(i) << " "; } oss << endl;
-   }
+    }
     //
     if(LDEBUG) cerr << soliloquy << " END" << endl;				      
     return TRUE;
@@ -13373,7 +13373,7 @@ namespace pflow {
     aurostd::string2tokens("CONTCAR,OUTCAR,INCAR,vasprun.xml",vCARs,","); //look in aflow_kvasp, KBIN::VASP_Analyze()
 
     //organize zip formats, e.g., bzip2, xz
-    
+
     bool look_static=vpflow.flag("QMVASP::STATIC");
     bool found_run=false; //i.e., found COMPLETE run, all files must be .static or all .relax2, no mix match
     bool found_CAR=true;
@@ -13599,8 +13599,8 @@ namespace pflow {
     if(Ntypes<1) {Z_flag=false; Ntypes=a.num_each_type.size();}
     if((int) a.num_each_type.size()!=Ntypes) {
       cerr << "STOP: inconsistency in number of types in POSCAR and --z" << endl
-         << "a.num_each_type.size() = " << a.num_each_type.size() << endl
-         << "Ntypes = " << Ntypes << endl;
+        << "a.num_each_type.size() = " << a.num_each_type.size() << endl
+        << "Ntypes = " << Ntypes << endl;
       abort();
     }
     if(!Z_flag)

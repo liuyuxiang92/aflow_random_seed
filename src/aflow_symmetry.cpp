@@ -2844,7 +2844,7 @@ namespace SYM {
 
 namespace SYM {  
   bool CalculatePointGroupKPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_, string format) {
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=(DEBUG_SYMMETRY || LDEBUG);    
     string function_name = "SYM::CalculatePointGroupKPatterson()";
@@ -2852,7 +2852,7 @@ namespace SYM {
     ostringstream aus;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    
+
     // ---------------------------------------------------------------------------
     // obtain the structure tolerance
     a.sym_eps=_eps_; 
@@ -2882,9 +2882,9 @@ namespace SYM {
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       // NEED FACTOR GROUP
     if(a.pgroup_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP CRYSTAL
     if(a.pgroupk_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP KCRYSTAL
-      
+
     xmatrix<double> inversion_symmetry_matrix = -aurostd::identity((double)0,3);
-      
+
     // ---------------------------------------------------------------------------
     // check if pgroup_xtal contains inversion symmetry already
     if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [2a] Check if pgroup_xtal contains inverison symmetry (i.e., centrosymmetric) " << endl;
@@ -2927,12 +2927,12 @@ namespace SYM {
       if(calculation_mode==1){
         if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [3b] calculation_mode: add inversion symmetry to pgroup_xtal (fast, default) " << endl;
         std::vector<_sym_op> pgroupk_Patterson;                             // rotations/inversions operations
-        
+
         // ---------------------------------------------------------------------------
         // create Uc and Uf versions of inverse
         xmatrix<double> Uc_inv=inversion_symmetry_matrix;
         xmatrix<double> Uf_inv=inverse(trasp(a.klattice))*Uc_inv*trasp(a.klattice); // i.e., c2f*Uc_inv*f2c for klattice
-        
+
         for(uint ip=0;ip<a.pgroupk_xtal.size();ip++) {
           Uf=a.pgroupk_xtal[ip].Uf;Uc=a.pgroupk_xtal[ip].Uc;
           bool sym_found=FALSE;
@@ -2984,7 +2984,7 @@ namespace SYM {
     string pgname = "";  
     string operations = "";
     bool point_group_valid = PointGroupMap(a, pgname, operations, _PGROUPK_PATTERSON_);
-      
+
     // ---------------------------------------------------------------------------
     // check Patterson point group label against Laue label (should be the same)
     string Laue_symbol = GetLaueLabel(a.point_group_Hermann_Mauguin);

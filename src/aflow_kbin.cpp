@@ -110,43 +110,43 @@ namespace aurostd {
       vector<string> vLibrary;
       if(library==XHOST_LIBRARY_LIB0) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB0" << endl;
-	tokens=XHOST_Library_CALCULATED_LIB0_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB0_RAW;
       }
       if(library==XHOST_LIBRARY_LIB1) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB1" << endl;
-	tokens=XHOST_Library_CALCULATED_LIB1_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB1_RAW;
       }
       if(library==XHOST_LIBRARY_LIB2) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB2" << endl;
-	tokens=XHOST_Library_CALCULATED_LIB2_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB2_RAW;
       }
       if(library==XHOST_LIBRARY_LIB3) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB3" << endl;
-	tokens=XHOST_Library_CALCULATED_LIB3_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB3_RAW;
       }
       if(library==XHOST_LIBRARY_LIB4) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB4" << endl;
- 	tokens=XHOST_Library_CALCULATED_LIB4_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB4_RAW;
       }
       if(library==XHOST_LIBRARY_LIB5) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB5" << endl;
-	tokens=XHOST_Library_CALCULATED_LIB5_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB5_RAW;
       }
       if(library==XHOST_LIBRARY_LIB6) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB6" << endl;
- 	tokens=XHOST_Library_CALCULATED_LIB6_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB6_RAW;
       }
       if(library==XHOST_LIBRARY_LIB7) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB7" << endl;
- 	tokens=XHOST_Library_CALCULATED_LIB7_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB7_RAW;
       }
       if(library==XHOST_LIBRARY_LIB8) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB8" << endl;
- 	tokens=XHOST_Library_CALCULATED_LIB8_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB8_RAW;
       }
       if(library==XHOST_LIBRARY_LIB9) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB9" << endl;
-	tokens=XHOST_Library_CALCULATED_LIB9_RAW;
+        tokens=XHOST_Library_CALCULATED_LIB9_RAW;
       }
       for(uint i=0;i<tokens.size();i++) {
         if(aurostd::substring2bool(tokens.at(i),"/")) {
@@ -1522,12 +1522,12 @@ namespace KBIN {
           }
           // ---------------------------------------------------------
           // parameters for APL
-	  // if(LDEBUG) cout << XHOST.sPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
+          // if(LDEBUG) cout << XHOST.sPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
           if(!(kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA)){ //mutually exclusive
             kflags.KBIN_PHONONS_CALCULATION_APL  = aurostd::substring2bool(AflowIn,"[AFLOW_APL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_PHONONS]CALC",TRUE);
           }
-	  // if(LDEBUG) cout << XHOST.sPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
-           // ---------------------------------------------------------
+          // if(LDEBUG) cout << XHOST.sPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
+          // ---------------------------------------------------------
           // parameters for AGL (Debye Model)
           //Cormac created CALCSTRAINORIGIN, so we need to check [AFLOW_AEL]CALC vs. [AFLOW_AEL]CALCSTRAINORIGIN
           //kflags.KBIN_PHONONS_CALCULATION_AGL  = aurostd::substring2bool(AflowIn,"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_GIBBS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_GIBBS]CALC",TRUE);
@@ -1709,9 +1709,9 @@ namespace KBIN {
             // ***************************************************************************
             // COMPRESS
             if(Krun && kflags.KZIP_COMPRESS) {
-	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
-	    }
-	  }
+              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+            }
+          }
           // ************************************************************************************************************************************
           // MATLAB MODE
           if(kflags.AFLOW_MODE_MATLAB) {
@@ -1730,7 +1730,7 @@ namespace KBIN {
             // ***************************************************************************
             // COMPRESS
             if(Krun && kflags.KZIP_COMPRESS)
-	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
             Krun=FALSE;
           }
           // ************************************************************************************************************************************
@@ -1779,7 +1779,7 @@ namespace KBIN {
             // ***************************************************************************
             // COMPRESS
             if(Krun && kflags.KZIP_COMPRESS)
-	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
           }
           // ************************************************************************************************************************************
           // MPI SWTICHES
@@ -1835,15 +1835,15 @@ namespace KBIN {
                 aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
                 aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL");
               Krun=(Krun && KBIN::VASP_Directory(FileLOCK,aflags,kflags));
-	    }
+            }
             // ***************************************************************************
             // COMPRESS	    
             if(Krun && kflags.KZIP_COMPRESS) {
-	      // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
-	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
- 	      // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
-	      // exit(0);
-	    }
+              // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
+              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+              // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
+              // exit(0);
+            }
           }
           // ************************************************************************************************************************************
           // MATLAB MODE
@@ -2087,8 +2087,8 @@ namespace KBIN {
 
         //DX+CO END
         // now DECOMPRESS _AFLOWIN_.EXT if a mistake was made
-	for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-	  ifstream FileCHECK;string FileNameCHECK;
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          ifstream FileCHECK;string FileNameCHECK;
           FileNameCHECK=directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext);                    // _AFLOWIN_.EXT
           FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);                         // _AFLOWIN_.EXT
           FileCHECK.clear();FileCHECK.close();                                        // _AFLOWIN_.EXT
@@ -2117,7 +2117,7 @@ namespace KBIN {
 
     vector<string> vcheck1;aurostd::string2tokens(string("OUTCAR.static,OUTCAR.relax2,OUTCAR.relax1"),vcheck1,",");
     vector<string> vcheck2;aurostd::string2tokens(string("OUTCAR,OUTCAR,OUTCAR"),vcheck2,",");
-    
+
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       vcheck1.push_back("OUTCAR.relax1"+XHOST.vext.at(iext));
     }
