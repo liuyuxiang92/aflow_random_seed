@@ -353,7 +353,7 @@ namespace apl {
           string name = "-";
           std::map<double, string>::iterator iter = labelMap.begin();
           for (; iter != labelMap.end(); iter++)
-            if (aurostd::abs(iter->first - x) < _AFLOW_APL_EPS_) break;
+            if (aurostd::abs(iter->first - x) < _ZERO_TOL_LOOSE_) break;
           if (iter != labelMap.end())
             name = iter->second;
           outfile << "# <exact>     " << x << " "
@@ -446,8 +446,8 @@ namespace apl {
               ((double)j) * lattice(2) +
               ((double)k) * lattice(3));
           xcomplex<double> p = exp(iONE * scalar_product(qpoint, L));
-          if ((aurostd::abs(p.imag()) < _AFLOW_APL_EPS_) &&
-              (aurostd::abs(p.real() - 1.0) < _AFLOW_APL_EPS_)) {
+          if ((aurostd::abs(p.imag()) < _ZERO_TOL_LOOSE_) &&
+              (aurostd::abs(p.real() - 1.0) < _ZERO_TOL_LOOSE_)) {
             isExact = true;
             break;
           }
@@ -773,7 +773,7 @@ namespace apl {
       endPoint = _points[0];
       for(uint i = 0; i < _points.size(); i+=2) {
         startPoint = _points[i];
-        //if( aurostd::modulus( startPoint - endPoint ) > _AFLOW_APL_EPS_ )
+        //if( aurostd::modulus( startPoint - endPoint ) > _ZERO_TOL_LOOSE_ )
         //    _path.push_back(endPoint);
         _path.push_back(startPoint);
         endPoint = _points[i+1];

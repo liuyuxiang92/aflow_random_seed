@@ -20,6 +20,7 @@
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX
+#define _ZERO_TOL_LOOSE_ 1e-6  //ME20200519 - tolerance for float precision
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
 #define _XPROTO_ZERO_VOL_ 1.0e-6  //CO20190218
 

@@ -6,8 +6,8 @@ namespace apl {
 #ifndef QH_OP_H
 #define QH_OP_H
 
-#define _iszero(a) (std::abs(a) < _AFLOW_APL_EPS_) ? true : false
-#define _isequal(a, b) (std::abs(a - b) < _AFLOW_APL_EPS_) ? true : false
+#define _iszero(a) (std::abs(a) < _ZERO_TOL_LOOSE_) ? true : false
+#define _isequal(a, b) (std::abs(a - b) < _ZERO_TOL_LOOSE_) ? true : false
 
 #define APL_DBL_EPSILON 2.2204460492503131e-16
 #define APL_DBL_MIN 2.2250738585072014e-308

@@ -582,7 +582,7 @@ namespace apl {
       xvector<xcomplex<double> > eigenvec(3), eigenvec_conj(3);
       xcomplex<double> prod;
       for (uint br = 0; br < nbranches; br++) {
-        if (omega[br + 1] > _AFLOW_APL_EPS_) {
+        if (omega[br + 1] > _ZERO_TOL_LOOSE_) {
           eigenvec = eigenvectors.getcol(br + 1);
           eigenvec_conj = conj(eigenvec);
           for (uint i = 1; i < 4; i++) {
@@ -839,8 +839,8 @@ namespace apl {
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
-    if (aurostd::modulus(q) < _AFLOW_APL_EPS_) {
-      q(1) = _AFLOW_APL_EPS_ * 1.001;
+    if (aurostd::modulus(q) < _ZERO_TOL_LOOSE_) {
+      q(1) = _ZERO_TOL_LOOSE_ * 1.001;
     }
 
     uint pcAtomsSize = pc.atoms.size();
@@ -849,7 +849,7 @@ namespace apl {
     uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches);
 
-    if (aurostd::modulus(q) > _AFLOW_APL_EPS_) {
+    if (aurostd::modulus(q) > _ZERO_TOL_LOOSE_) {
       if (calc_derivative) {  // reset derivative
         derivative.clear();
         xmatrix<xcomplex<double> > mat(_nBranches, _nBranches, 1, 1);
@@ -987,7 +987,7 @@ namespace apl {
 
             geg = scalar_product(g, _dielectricTensor * g);
 
-            if (aurostd::abs(geg) > _AFLOW_APL_EPS_ && geg / lambda2 / 4.0 < gmax) {
+            if (aurostd::abs(geg) > _ZERO_TOL_LOOSE_ && geg / lambda2 / 4.0 < gmax) {
               double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
               for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
@@ -1029,7 +1029,7 @@ namespace apl {
     //      //xvector<double> rf = _supercell.getFPositionItsNearestImage(rc,zero,pc.lattice);
     //      //rc = F2C(pc.lattice,rf);
 
-    //      if( aurostd::modulus(rc) < _AFLOW_APL_EPS_ ) continue;
+    //      if( aurostd::modulus(rc) < _ZERO_TOL_LOOSE_ ) continue;
 
     //      //
     //      xvector<double> delta = _inverseDielectricTensor * rc;
@@ -1079,7 +1079,7 @@ namespace apl {
         xvector<double> rc = SYM::minimizeDistanceCartesianMethod(sc.atoms[isc2].cpos, sc.atoms[isc1].cpos, sc.lattice);
         xvector<double> rf = F2C(sc.lattice, rc);
 
-        if (aurostd::modulus(rc) < _AFLOW_APL_EPS_) continue;
+        if (aurostd::modulus(rc) < _ZERO_TOL_LOOSE_) continue;
 
         //
         xvector<double> delta = _inverseDielectricTensor * rc;

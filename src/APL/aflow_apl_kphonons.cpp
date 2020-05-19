@@ -526,7 +526,6 @@ namespace KBIN {
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
       }
       message << "Forces from the undistored state will " << (aplopts.flag("ZEROSTATE")?"":"NOT ") << "be used." << std::endl;
-      //logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  //OBSOLETE ME20200507
     }
 
     message << "Polar corrections will " << (aplopts.flag("POLAR")?"":"NOT ") << "be employed." << std::endl;
@@ -1022,48 +1021,6 @@ namespace KBIN {
     }
     //PN QUASI-HARMONIC END
 
-
-    //ME20181026 - OBSOLETE until it's properly documented
-    //    // Get the users maximum shell which will be included into calculation
-    //    //CO, not sure how maxshell works here (F option), need to investigate further and add to README
-    //    // also seems USER_WANTS_FULL_SHELL applies for both MAX and MIN shell settings, should one take precedence? should they be separate flags?
-    //    if(!found_supercell){
-    //      USER_MAXSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MAXSHELL=" + "|" + _ASTROPT_QHA_ + "MAXSHELL=" + "|" + _ASTROPT_AAPL_ + "MAXSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MAXSHELL="), USER_MAXSHELL_OPTION.option, USER_MAXSHELL_OPTION.xscheme); //CO20170601
-    //      test = USER_MAXSHELL_OPTION.content_string;
-    //      if (test[test.size() - 1] == 'f' || test[test.size() - 1] == 'F') {
-    //        USER_MAXSHELL = aurostd::string2utype<int>(test.substr(0, test.size() - 1));
-    //        USER_WANTS_FULL_SHELL = true;
-    //      } else {
-    //        USER_MAXSHELL = USER_MAXSHELL_OPTION.content_int;
-    //        USER_WANTS_FULL_SHELL = false;
-    //      }
-    //      if(USER_MAXSHELL_OPTION.isentry){
-    //        logger << (USER_MAXSHELL_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "MAXSHELL=" << USER_MAXSHELL << (USER_WANTS_FULL_SHELL ? " (FULL)" : "") << "." << apl::endl;
-    //        logger << "Supercell will be built with at most " << USER_MAXSHELL << " shells." << apl::endl;
-    //        found_supercell = true;
-    //      }
-    //    }
-    //
-    //ME20181026 - F option OBSOLETE until it's properly documented
-    //    // Get the users minimum shell which will be included into calculation
-    //    //CO, not sure how minshell works here (F option), need to investigate further and add to README
-    //    if(!found_supercell){
-    //      USER_MINSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MINSHELL=" + "|" + _ASTROPT_QHA_ + "MINSHELL=" + "|" + _ASTROPT_AAPL_ + "MINSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MINSHELL="), USER_MINSHELL_OPTION.option, USER_MINSHELL_OPTION.xscheme); //CO20170601
-    //      test = USER_MINSHELL_OPTION.content_string;
-    //      if (test[test.size() - 1] == 'f' || test[test.size() - 1] == 'F') {
-    //        USER_MINSHELL = aurostd::string2utype<int>(test.substr(0, test.size() - 1));
-    //        USER_WANTS_FULL_SHELL = true;
-    //      } else {
-    //        USER_MINSHELL = USER_MINSHELL_OPTION.content_int;
-    //        USER_WANTS_FULL_SHELL = false;
-    //      }
-    //      if(USER_MINSHELL_OPTION.isentry){
-    //        logger << (USER_MINSHELL_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "MINSHELL=" << USER_MINSHELL << (USER_WANTS_FULL_SHELL ? " (FULL)" : "") << "." << apl::endl;
-    //        logger << "Supercell will be built with at least " << USER_MINSHELL << " shells." << apl::endl;
-    //        found_supercell = true;
-    //      }
-    //    }
-
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
     //                          PREPARE CALCULATIONS                           //
@@ -1364,47 +1321,12 @@ namespace KBIN {
     //ME201901029 BEGIN
     stagebreak = (stagebreak || aapl_stagebreak);
 
-    // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
-    // ME20200507 - This feature is not ready yet. The speed-ups
-    // are not reliable enough and it makes the workflow too complicated.
-    // Revisit when the concept is more solid.
-    //[OBSOLETE] if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
-    //[OBSOLETE]   // Find ZEROSTATE directory
-    //[OBSOLETE]   vector<string> directory;
-    //[OBSOLETE]   aurostd::DirectoryLS(aflags.Directory, directory);
-    //[OBSOLETE]   uint ndir = directory.size();
-    //[OBSOLETE]   uint d = 0;
-    //[OBSOLETE]   for (d = 0; d < ndir; d++) {
-    //[OBSOLETE]     if (aurostd::IsDirectory(aflags.Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
-    //[OBSOLETE]       break;
-    //[OBSOLETE]     }
-    //[OBSOLETE]   }
-    //[OBSOLETE]   if (d == ndir) {
-    //[OBSOLETE]     message << "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-    //[OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
-    //[OBSOLETE]     USER_ZEROSTATE_CHGCAR = false;
-    //[OBSOLETE]   } else {
-    //[OBSOLETE]     string chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
-    //[OBSOLETE]     if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
-    //[OBSOLETE]     if (!aurostd::FileExist(chgcar_file)) {
-    //[OBSOLETE]       logger << "Executing ZEROSTATE directory." << apl::endl;
-    //[OBSOLETE]       stringstream cmd;
-    //[OBSOLETE]       cmd << "aflow --use_aflow.in=" << _AFLOWIN_
-    //[OBSOLETE]         << " --use_LOCK=" << _AFLOWLOCK_
-    //[OBSOLETE]         << " --quiet -D ./" << directory[d];
-    //[OBSOLETE]       aurostd::execute(cmd.str());
-    //[OBSOLETE]       logger << "Finished executing ZEROSTATE directory." << apl::endl;
-    //[OBSOLETE]     }
-    //[OBSOLETE]   }
-    //[OBSOLETE] }
-
     // At least one calculation has not finished - return
     if (stagebreak) {
       message << "Stopped. Waiting for required calculations...";  //CO20181226
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_NOTICE_);
       return;
     }
-    //ME201901029 END
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -1867,7 +1789,7 @@ namespace KBIN {
           const vector<double>& idos = dosc.getIDOS();
           uint i = 0;
           for (i = 0; i < freqs.size(); i++) {
-            if (freqs[i] > -_AFLOW_APL_EPS_) break;
+            if (freqs[i] > -_ZERO_TOL_LOOSE_) break;
           }
           if (i > 0) {
             double idos_percent = 100.0 * idos[i - 1]/idos.back();

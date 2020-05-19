@@ -383,7 +383,7 @@ namespace apl
   //get vibrational energies for proper file indix
   double QHAEOS::VibrationEnergy(double temperature_in_kelvins, uint dir_index)
   {
-    if( temperature_in_kelvins < _AFLOW_APL_EPS_ ) return _zpe[dir_index];
+    if( temperature_in_kelvins < _ZERO_TOL_LOOSE_ ) return _zpe[dir_index];
 
     double steps=_pdos[dir_index][1][0]-_pdos[dir_index][0][0];
     double f = 0.0;

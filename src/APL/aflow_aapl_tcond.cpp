@@ -349,7 +349,7 @@ namespace apl {
     for (int iq = 0; iq < nIQPs; iq++) {
       q = _qm->getIbzqpts()[iq];
       for (int br = 0; br < nBranches; br++) {
-        if (freq[q][br] > _AFLOW_APL_EPS_) {
+        if (freq[q][br] > _ZERO_TOL_LOOSE_) {
           g_mode.re = 0.0;
           g_mode.im = 0.0;
 
@@ -380,7 +380,7 @@ namespace apl {
             }
           }
           g_mode *= -10.0 * au2nmTHz/(6.0 * std::pow(freq[q][br], 2));
-          if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
+          if (g_mode.im > _ZERO_TOL_LOOSE_) {  // _ZERO_TOL_ is too tight
             stringstream message;
             message << "Grueneisen parameter at mode " << iq << ", " << br << " is not real (" << g_mode.re << ", " << g_mode.im << ").";
             pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS(), _LOGGER_WARNING_);
@@ -406,7 +406,7 @@ namespace apl {
     for (int q = 0; q < nQPs; q++) {
       iq = _qm->getIbzqpt(q);
       for (int br = 0; br < nBranches; br++) {
-        if (freq[q][br] > _AFLOW_APL_EPS_) {
+        if (freq[q][br] > _ZERO_TOL_LOOSE_) {
           c = prefactor * occ[q][br] * (1.0 + occ[q][br]) * std::pow(freq[q][br], 2);
           c_tot += c;
           g_tot += grueneisen_mode[iq][br] * c;
@@ -661,7 +661,7 @@ namespace apl {
             // contribute to the thermal conductivity tensor (they do contribute
             // to the scattering phase space though).
             for (j = 0; j < 3; j++) {
-              if (freq[qpts[j]][branches[br][j]] < _AFLOW_APL_EPS_) break;
+              if (freq[qpts[j]][branches[br][j]] < _ZERO_TOL_LOOSE_) break;
             }
             calc = (j == 3);
           }
@@ -1151,7 +1151,7 @@ namespace apl {
     for (int q = 0; q < nQPs; q++) {
       for (int br = 0; br < nBranches; br++) {
         bool include = true;
-        if (freq[q][br] < _AFLOW_APL_EPS_) {
+        if (freq[q][br] < _ZERO_TOL_LOOSE_) {
           include = false;
         } else if (cumulative) {  // Only include processes below a certain mean free path if cumulative
           double mfpath = scalar_product(mfd[q][br], gvel[q][br])/aurostd::modulus(gvel[q][br]);

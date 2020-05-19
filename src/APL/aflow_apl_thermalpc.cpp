@@ -209,7 +209,7 @@ namespace apl {
     double zpe = 0.0;
     double stepDOS = getStepDOS(_freqs_0K);
     for (uint i = 0; i < _freqs_0K.size(); i++) {
-      if (_freqs_0K[i] < _AFLOW_APL_EPS_) continue;
+      if (_freqs_0K[i] < _ZERO_TOL_LOOSE_) continue;
       zpe += _freqs_0K[i] * THz2Hz * _dos_0K[i];
     }
     zpe *= 0.5 * 1000 * PLANCKSCONSTANTEV_h * stepDOS;  // Convert to meV
@@ -227,14 +227,14 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return getScalingFactor(unit) * U0; //AS20200508
+    if (T < _ZERO_TOL_LOOSE_) return getScalingFactor(unit) * U0; //AS20200508
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
 
     double E = 0.0, hni = 0;
     for (uint i = 0; i < freq.size(); i++) {
-      if (freq[i] < _AFLOW_APL_EPS_) continue;
+      if (freq[i] < _ZERO_TOL_LOOSE_) continue;
       hni = PLANCKSCONSTANTEV_h * freq[i] * THz2Hz;  // h * freq in eV
       E += dos[i] * hni / (exp(beta * hni) - 1.0);
     }
@@ -255,14 +255,14 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return getScalingFactor(unit) * U0; //AS20200508
+    if (T < _ZERO_TOL_LOOSE_) return getScalingFactor(unit) * U0; //AS20200508
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
 
     double F = 0.0, hni = 0.0;
     for (uint i = 0; i < freq.size(); i++) {
-      if (freq[i] < _AFLOW_APL_EPS_) continue;
+      if (freq[i] < _ZERO_TOL_LOOSE_) continue;
       hni = PLANCKSCONSTANTEV_h * freq[i] * THz2Hz;  // h * freq in eV
       F += dos[i] * aurostd::ln(1.0 - exp(-beta * hni)) / beta;
     }
@@ -284,7 +284,7 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _ZERO_TOL_LOOSE_) return 0.0;
 
     double E = getInternalEnergy(T, freq, dos);
     double F = getVibrationalFreeEnergy(T, freq, dos);
@@ -294,7 +294,7 @@ namespace apl {
 
   double ThermalPropertiesCalculator::getVibrationalEntropy(double T, double E,
       double F, ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _ZERO_TOL_LOOSE_) return 0.0;
 
     double S = (E - F)/T;
     return getScalingFactor(unit) * S;
@@ -311,14 +311,14 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _ZERO_TOL_LOOSE_) return 0.0;
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
 
     double cv = 0.0, bhni = 0.0, ebhni = 0.0;
     for (uint i = 0; i < freq.size(); i++) {
-      if (freq[i] < _AFLOW_APL_EPS_) continue;
+      if (freq[i] < _ZERO_TOL_LOOSE_) continue;
       bhni = beta * PLANCKSCONSTANTEV_h * freq[i] * THz2Hz;  // h * freq/(kB * T)
       ebhni = exp(bhni);
       cv += dos[i] * (KBOLTZEV * bhni * bhni / ((1.0 - 1.0 / ebhni) * (ebhni - 1.0)));

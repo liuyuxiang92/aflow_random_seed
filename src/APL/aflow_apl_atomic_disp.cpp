@@ -208,7 +208,7 @@ namespace apl {
     double prefactor = (PLANCKSCONSTANT_hbar * Hz2THz * std::pow(1e10, 2)/(2 * PI * (double) _qpoints.size()));
     for (uint q = 0; q < nq; q++) {
       for (uint br = 0; br < nbranches; br++) {
-        if (_frequencies[q][br] > _AFLOW_APL_EPS_) {
+        if (_frequencies[q][br] > _ZERO_TOL_LOOSE_) {
           for (uint at = 0; at < natoms; at++) {
             outer[at] = aurostd::outer_product(_eigenvectors[q][br][at], conj(_eigenvectors[q][br][at]));
           }
@@ -284,7 +284,7 @@ namespace apl {
   // Calculates the phonon numbers for a specific frequency and temperature
   // using Bose-Einstein statistics.
   double AtomicDisplacements::getOccupationNumber(double T, double f) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _ZERO_TOL_LOOSE_) return 0.0;
     else return (1.0/(exp(BEfactor_h_THz * f/T) - 1));
   }
 
@@ -519,7 +519,7 @@ namespace apl {
     double amplitude = 0.0;
     if (amplitude_str.empty()) amplitude = DEFAULT_APL_ADISP_AMPLITUDE;
     else amplitude = aurostd::string2utype<double>(amplitude_str);
-    if (amplitude < _AFLOW_APL_EPS_) {
+    if (amplitude < _ZERO_TOL_LOOSE_) {
       message = "Amplitude must be positive.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }

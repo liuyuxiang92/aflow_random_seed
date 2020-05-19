@@ -9,10 +9,6 @@
 #ifndef _AFLOW_APL_H_
 #define _AFLOW_APL_H_
 
-// Almost generally used precision in the whole apl, however, somewhere it is
-// hard coded based on the tests and it work much better...
-#define _AFLOW_APL_EPS_ 1E-6
-
 // ME20200516 - Tolerance for what is consindered to be a different coordination shell
 #define _APL_SHELL_TOL_ 0.1
 
@@ -30,484 +26,33 @@
 
 // ***************************************************************************
 
+// Interface
 namespace apl {
-  class Logger;
-  // Templates used for the definition of the one parameter manipulation
-  // functions of Logger's streams
-  template <class T>
-    class LMANIP;
-  template <class T>
-    Logger& operator<<(Logger&, const LMANIP<T>&);
-  template <class T>
-    class LMANIP {
-      public:
-        LMANIP(Logger& (*a)(Logger&, T), T v) {
-          _action = a;
-          _value = v;
-        }
-        friend Logger& operator<<<>(Logger&, const LMANIP<T>&);
 
-      private:
-        Logger& (*_action)(Logger&, T);
-        T _value;
-    };
-  template <class T>
-    Logger& operator<<(Logger& s, const LMANIP<T>& m) {
-      return (*m._action)(s, m._value);
-    }
-  // Function without parameter...
-  typedef Logger& (*MyStreamManipulator)(Logger&);
-  // this is the type of std::cout
-  typedef std::basic_ostream<char, std::char_traits<char> > CoutType;
-  // this is the function signature of std::endl
-  typedef CoutType& (*StandardEndLine)(CoutType&);
-  //
-  class Logger {
-    private:
-      ofstream* _os;
-      std::string _barCode;
-      std::string _typeofMessage;
-      std::string _moduleName;
-      _aflags _aflowFlags;
-      stringstream _ss;
-      int _progressBarLastPercent;
-      double _progressBarPercent;  //ME20180831
-      bool _isQuiet;
+  void validateParametersAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersSupercellAPL(xoption&);
+  void validateParametersDispersionsAPL(xoption&);
+  void validateParametersDosAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersAAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
+  void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
+  bool filesExistPhonons(_xinput&);
+  bool outfileFoundAnywherePhonons(vector<_xinput>&);
+  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, ostream&, bool=false);  // ME20191029
+  bool readForcesFromDirectory(_xinput&);  // ME20200219
+  void subtractZeroStateForces(vector<_xinput>&, bool);
+  void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME20190114
 
-    public:
-      Logger();
-      Logger(std::ofstream&, const _aflags&);
-      void initialize(std::ofstream&, const _aflags&);
-      Logger(Logger&);
-      ~Logger();
-      ofstream& getOutputStream();
-      void initProgressBar(const char*);
-      void initProgressBar(const string&);
-      void updateProgressBar(double);  //ME20180831
-      void updateProgressBar(int, int);
-      void finishProgressBar();
-      void setTypeOfMessage(const string&);
-      void setBarCode(const string&);
-      void setBarCode(const char&);
-      void setModuleName(const string&);
-      void setQuietMode(bool);
-      Logger& operator=(Logger&);
-      Logger& operator<<(const string& s);
-      Logger& operator<<(const int& s);
-      Logger& operator<<(const uint& s);
-      Logger& operator<<(const double& s);
-      // Manipulation functions without parameter
-      Logger& operator<<(StandardEndLine);
-      Logger& operator<<(MyStreamManipulator);
-      void endl();
-      friend Logger& endl(Logger&);
-      friend Logger& message(Logger&);
-      friend Logger& notice(Logger&);
-      friend Logger& warning(Logger&);
-      friend Logger& error(Logger&);
-      friend Logger& quiet(Logger&);
-      // Manipulation functions with one parameter
-      friend Logger& setwidth(Logger&, int);
-      friend Logger& setformat(Logger&, const char*);
-  };
-  // Friend functions without parameters
-  Logger& endl(Logger&);
-  Logger& message(Logger&);
-  Logger& notice(Logger&);
-  Logger& warning(Logger&);
-  Logger& error(Logger&);
-  Logger& quiet(Logger&);
-  // Friend functions with one parameter
-  Logger& setwidth(Logger&, int);
-  LMANIP<int> sw(int);
-  Logger& setformat(Logger&, const char*);
-  LMANIP<const char*> sf(const char*);
-}  // namespace APL
-
-// ***************************************************************************
-// BEGIN ME: Anharmonic Force Constants (AAPL)
-// ***************************************************************************
-
-namespace apl {
-  // _cluster holds a single cluster
-  struct _cluster {
-    vector<int> atoms;  // List of atoms inside the cluster
-    int fgroup;  // Index pointing to the factor group that transforms the cluster into another cluster
-    int permutation;  // Index pointing to the permutation that transforms the cluster into another cluster
-  };
-
-  // _ineq_distortions contains a list of inequivalent distortion and its equivalent
-  // distortions for a given set of atoms
-  struct _ineq_distortions {
-    vector<int> atoms;  // A list of atoms involved in the distortions
-    vector<int> clusters;  // A list of cluster sets that use these distortions for their force constant calculations
-    vector<vector<vector<int> > > distortions; // Map of distortions. The distortions vectors need to be defined elsewhere. 
-    vector<vector<int> > rotations;  // The factor group that holds the rotation to transform the distortions
-    vector<vector<vector<int> > > transformation_maps;  // A map containing the transformation of the atoms for each distortion
-  };
-
-  // _linearCombinations is a structure to store linear combinations.
-  struct _linearCombinations {
-    vector<vector<int> > indices;  // Cartesian indices of each linear combination
-    vector<vector<double> > coefficients;  // Coefficients of each linear combination
-    vector<int> independent;  // The linearly independent values
-    vector<int> dependent;  // The linearly dependent values
-    // indep2depMap maps the independent coefficients to the coefficients that
-    // depend on them. This is used for the IFC correction method.
-    vector<vector<int> > indep2depMap;
-  };
-
-  class Supercell;  // Forward declaration
-  class ClusterSet : public xStream {
-    // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
-    public:
-      ClusterSet(ostream& oss=std::cout);
-      ClusterSet(ofstream&, ostream& oss=std::cout);
-      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
-      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
-      ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-      ~ClusterSet();  // Destructor
-      const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear();
-      void initialize(const Supercell&, int, int, double);
-      void readClusterSetFromFile(const string&);
-
-      vector<_cluster> clusters;
-      vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
-      double cutoff;  // Cutoff radius in Angstroms
-      string directory;  // Directory for logging
-      vector<xvector<double> > distortion_vectors;  // List of distortion vectors
-      vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
-      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
-      vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
-      vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
-      int nifcs;  // Number of force constants for each set of atoms.
-      int order;  // Order of the cluster, i.e. the order of the force constant to be calculated.
-      xstructure pcell;  // Structure of the primitive cell.
-      vector<int> pc2scMap;  // Atom map from the primitive cell to the supercell.
-      vector<vector<int> > permutations;  // List of possible permutations for the cluster
-      xstructure scell;  // Structure of the supercell.
-      vector<int> sc2pcMap;  // Atom map from the supercell to the primitive cell.
-      xvector<int> sc_dim;  // Dimensions of the supercell.
-      vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
-
-      const _cluster& getCluster(const int& i) const;  //ME20190520
-      void build();
-      void buildDistortions();
-      void writeClusterSetToFile(const string&);
-
-    private:
-      void free();
-      void copy(const ClusterSet&);
-
-      double getMaxRad(const xstructure&, int);
-      void buildShells();
-      vector<_cluster> buildClusters();
-      vector<vector<int> > getSymmetryMap();
-      vector<vector<int> > getPermutations(int);
-
-      // Clusters
-      void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
-      int getNumUniqueAtoms(const vector<int>&);
-      vector<int> getComposition(const vector<int>&);
-      bool sameComposition(const vector<int>&, const vector<int>&);
-      int equivalenceCluster(const vector<int>&, const vector<int>&,
-          const vector<vector<int> >&, const vector<vector<int> >&);
-      vector<int> translateToPcell(const vector<int>&, int);
-      int comparePermutations(const vector<int>&, const vector<int>&);
-      bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
-      void getSymOp(_cluster&, const vector<int>&);
-
-      // Distortions
-      vector<xvector<double> > getCartesianDistortionVectors();
-      vector<_ineq_distortions> initializeIneqDists();
-      int sameDistortions(const _cluster&, const vector<_ineq_distortions>&);
-      vector<vector<int> > getTestDistortions(const vector<int>&);
-      void getInequivalentDistortions(const vector<vector<int> >&, _ineq_distortions&);
-      void appendDistortion(_ineq_distortions&, vector<int>,
-          const int& eq=-1, const int& fg=-1);
-      bool allZeroDistortions(const vector<int>&, const vector<int>&);
-      bool allAtomsMatch(const int&, const vector<int>&);
-      int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
-          const vector<vector<vector<int> > >&, const vector<int>&);
-      vector<int> getTransformationMap(const int&, const int&);
-      vector<_ineq_distortions> getHigherOrderDistortions();
-
-      // Linear Combinations
-      vector<_linearCombinations> getLinearCombinations();
-      vector<vector<int> > getInvariantSymOps(const _cluster&);
-      vector<vector<double> > buildCoefficientMatrix(const vector<vector<int> >&);
-      vector<vector<double> > getRREF(vector<vector<double> >);
-
-      // File I/O
-      string writeParameters();
-      string writeInequivalentClusters();
-      string writeClusters(const vector<_cluster>&);
-      string writeLinearCombinations(const _linearCombinations&);
-      string writeInequivalentDistortions();
-      string writeIneqDist(const _ineq_distortions&);
-      string writeHigherOrderDistortions();
-
-      bool checkCompatibility(uint&, const vector<string>&);
-      void readInequivalentClusters(uint&, const vector<string>&);
-      vector<_cluster> readClusters(uint&, const vector<string>&);
-      _linearCombinations readLinearCombinations(uint&, const vector<string>&);
-      void readInequivalentDistortions(uint&, const vector<string>&);
-      _ineq_distortions readIneqDist(uint&, const vector<string>&);
-      void readHigherOrderDistortions(uint&, const vector<string>&);
-  };
-
-  class AnharmonicIFCs : public xStream {
-    // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
-    public:
-      AnharmonicIFCs(ostream& oss=std::cout);
-      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
-      AnharmonicIFCs(const AnharmonicIFCs&);
-      const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
-      ~AnharmonicIFCs();
-      void clear();
-      void initialize(const Supercell&, int, const aurostd::xoption&);
-
-      void setOptions(double, int, double, double, bool);
-      const string& getDirectory() const;
-      void setDirectory(const string&);
-      int getOrder() const;
-
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
-      bool calculateForceConstants();
-      const vector<vector<double> >& getForceConstants() const;
-      vector<vector<int> > getClusters() const;
-      void writeIFCsToFile(const string&);
-
-    private:
-      ClusterSet clst;
-
-      vector<_xinput> xInputs;
-      bool _useZeroStateForces;
-      bool initialized;
-      string directory;
-      vector<vector<int> > cart_indices;  // A list of all Cartesian indices
-      double distortion_magnitude;  // The magnitude of the distortions in Angstroms
-      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
-      int max_iter;  // Number of iterations for the sum rules
-      double mixing_coefficient;  // The mixing coefficient for the SCF procedure
-      int order;  // The order of the IFCs
-      double sumrule_threshold;  // Convergence threshold for the sum rules
-
-      void free();
-      void copy(const AnharmonicIFCs&);
-
-      string buildRunName(const vector<int>&, const vector<int>&, int, int);
-      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
-
-      vector<vector<int> > getCartesianIndices();
-
-      vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
-      vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
-      int getTransformedAtom(const vector<int>&, const int&);
-      void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
-      vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
-          const vector<vector<vector<xvector<double> > > >&);
-      double finiteDifference(const vector<vector<xvector<double> > >&, int,
-          const vector<int>&, const vector<int>&);
-
-      // Symmetrization Functions
-      vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
-      typedef vector<std::pair<vector<int>, vector<double> > > tform;
-      typedef vector<vector<vector<vector<int> > > > v4int;
-      void getTensorTransformations(v4int&, vector<vector<tform> >&);
-      vector<vector<int> > getReducedClusters();
-      void applyLinCombs(vector<vector<double> >&);
-      void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
-      void applyPermutations(vector<int>, vector<vector<double> >&);
-      void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
-          vector<vector<double> >&, vector<vector<double> >&);
-      void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
-          const vector<vector<double> >&,
-          const vector<vector<int> >&, const v4int&);
-      vector<double> getCorrectionTerms(const int&,
-          const vector<vector<int> >&,
-          const vector<vector<double> >&,
-          const vector<vector<double> >&,
-          const vector<vector<double> >&);
-      uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
-
-      // File I/O
-      string writeParameters();
-      string writeIFCs();
-      bool checkCompatibility(uint&, const vector<string>&);
-      vector<vector<double> > readIFCs(uint&, const vector<string>&);
-  };
-
-}  //namespace apl
-// ***************************************************************************
-// END ME: Anharmonic Force Constants (AAPL)
-// ***************************************************************************
-
-// ***************************************************************************
-// Linear and nonlinear fitting functions, this functions compute fitting parameters correctly
-//although chi-square matrix is not computing correctly [PN]
-#define FIT_LIMIT 0.001
-namespace apl {
-  class aflowFITTING {
-    public:
-      aflowFITTING() {}
-      ~aflowFITTING() { clear(); }
-      void clear() {}
-
-    private:
-      double chisq_quadratic;
-      double chisq_birch_murnaghan;
-      uint Iteration_birch_murnaghan;
-      double alamda_birch_murnaghan;
-      vector<double> Uncertainties_birch_murnaghan;
-      //user defined fitting functions
-      void funcs(double x, xvector<double>& afunc);
-      void birch_murnaghan_function(double x,
-          const xvector<double> a,
-          double* y,
-          xvector<double>& dyda);
-
-      //linear leatsquare fitting function
-      template <class utype>
-        bool lfit(xvector<utype>& x,
-            xvector<utype>& y,
-            xvector<utype>& sig,
-            xvector<utype>& a,
-            xvector<int>& ia,
-            xmatrix<utype>& covar,
-            utype& chisq,
-            void (aflowFITTING::*funcs)(utype, xvector<utype>&));
-
-      //nonlinear leatsquare fitting function
-      bool mrqmin(xvector<double> x,
-          xvector<double> y,
-          xvector<double>& sig,
-          xvector<double>& a,
-          xvector<int>& ia,
-          xmatrix<double>& covar,
-          xmatrix<double>& alpha,
-          double& chisq,
-          void (aflowFITTING::*birch_murnaghan_function)(double, xvector<double>, double*, xvector<double>&),
-          double* alamda);
-
-      template <class utype>
-        void covsrt(xmatrix<utype>& covar, xvector<int>& ia, int& mfit);
-      template <class utype>
-        bool gaussj(xmatrix<utype>& a, int& n, xmatrix<utype>& b, int m);
-
-      void mrqcof(xvector<double> x,
-          xvector<double> y,
-          xvector<double>& sig,
-          xvector<double>& a,
-          xvector<int>& ia,
-          xmatrix<double>& alpha,
-          xvector<double>& beta,
-          double& chisq,
-          void (aflowFITTING::*birch_murnaghan_function)(double, xvector<double>, double*, xvector<double>&));
-
-    public:
-      bool
-        quadraticfit(xvector<double> energy, xvector<double> volume, xvector<double>& params);
-      bool
-        birch_murnaghan_fitting(xvector<double> energy, xvector<double> volume, xvector<double> guess, xvector<double>& params);
-      double get_chisq_quadratic() { return chisq_quadratic; }
-      double get_chisq_birch_murnaghan() { return chisq_birch_murnaghan; }
-      uint getIteration_birch_murnaghan() { return Iteration_birch_murnaghan; }
-      double getalamda_birch_murnaghan() { return alamda_birch_murnaghan; }
-      vector<double> getUncertainties_birch_murnaghan() { return Uncertainties_birch_murnaghan; }
-  };
 }
+
 // ***************************************************************************
+// BEGIN: Supplemental classes for APL, AAPL, and QHA
+// ***************************************************************************
+
+// Supercell definition has to come before PhononCalculator,
+// ForceConstantCalculator, ClusterSet, and AnharmonicIFCs
 namespace apl {
-#ifndef EIGEN_H
-#define EIGEN_H
-  //Functions in this class calculate eigenvalues and eigenvectors of complex symmetrix
-  //nxn matrices and can sort them according to following options
-  //eval and evec SORTING OPTIONS
-  // [ 1. [APL_MV_EIGEN_SORT_VAL_ASC]  => ascending order   ]
-  // [ 2. [APL_MV_EIGEN_SORT_VAL_DESC] => descending order ]
-  // [ 3. [APL_MV_EIGEN_SORT_ABS_ASC]  => absolute ascending order ]
-  // [ 4. [APL_MV_EIGEN_SORT_ABS_DESC] => absolute descending order]
-  //Compute Eigenvalues and Eigenvectors for (nxn) Complex Hermitian matrices
-  class aplEigensystems : public MVops {
-    public:
-      aplEigensystems() {}
-      ~aplEigensystems() {}
-      void clear() { } //this->clear(); //CO20200106 - patching for auto-indenting
-      void eigen_calculation(const aurostd::xmatrix<xcomplex<double> >& M, aurostd::xvector<double>& eval, aurostd::xmatrix<xcomplex<double> >& evec);
-      void eigen_calculation(const xmatrix<xcomplex<double> >& M, xvector<double>& eval, xmatrix<xcomplex<double> >& evec, apl_eigen_sort_t t);
-  };
-#endif
-}
-// ***************************************************************************
-namespace apl {
-  //The functions in this class are used to perform linear and nonlinear fittings//
-  //User defined functions can be used to perform fitting//
-  //Both Levenberg-Marquardt and unscaled Levenberg-Marquardt algorithms can be performed
-  //either with keyword "APL_multifit_fdfsolver_lmsder" or "APL_multifit_fdfsolver_lmder" //
-#ifndef FIT_H
-#define FIT_H
-#define spread 1e-6               //accuracy of data fitting
-#define allowed_fit_error 100.00  // if spread is small then allowed_fit_error is relatively take high value
-#define Absolute_Error 1E-6
-#define Relative_Error 1E-6
-#define APL_multifit_fdfsolver_lmsder  //This is a robust and efficient version of the Levenberg-Marquardt algorithm
-#undef APL_multifit_fdfsolver_lmder    //This is an unscaled version of the Levenberg-Marquardt algorithm
 
-  class md_lsquares : public MVops {
-    // multi-parameter linear regression
-    // multidimensional nonlinear least-squares fitting
-    public:
-      md_lsquares() {}
-      ~md_lsquares() {}
-
-      //user define data sets
-      vector<double> Xdata;  //usder defined input data
-      vector<double> Ydata;  //usder defined input data
-      //guess values calculated automatically
-      vector<double> guess;  // guess values for nonlinear fitting, It will calculate automatically.
-      //error managments
-      bool data_read_error;   //return true if Xdata.size and Ydata.size are same
-      int nl_success_status;  //return error message interms of int numbers
-      string nl_err_msg;      //return type of error mesages
-
-      //lfit output
-      double luncertanity_V0;  //uncertainties linear fit(Quadratic function) in Volume
-      double luncertanity_E0;  //uncertainties linear fit(Quadratic function) in Energies
-      double luncertanity_B0;  //uncertainties linear fit(Quadratic function) in Bulk Modulus
-      double lchisq;           //linear fit chisquare
-      double leqmV0;           //Equilibrium Volume from linear fit (Quadratic function)
-      double leqmE0;           //Equilibrium Energy from linear fit (Quadratic function)
-      double leqmB0;           //Equilibrium Bulk Modulus from linear fit (Quadratic function)
-      //nlfit output
-      double uncertanity_V0;   //uncertainties non linear fit(Birch Murnaghan Function) in Volume
-      double uncertanity_E0;   //uncertainties non linear fit(Birch Murnaghan Function) in Energy
-      double uncertanity_B0;   //uncertainties non linear fit(Birch Murnaghan Function) in Bulk Modulus
-      double uncertanity_Bp;   //uncertainties non linear fit(Birch Murnaghan Function) in Pressure derivatives Bulk Modulus
-      double uncertanity_Bpp;  //uncertainties non linear fit(Birch Murnaghan Function) in Pressure derivatives Bp
-      double chisq_dof;        //chi square per degrees of freedom
-      double nleqmV0;          //Equilibrium Volume from nonlinear fit (Birch Murnaghan Function)
-      double nleqmE0;          //Equilibrium Energy from nonlinear fit (Birch Murnaghan Function)
-      double nleqmB0;          //Equilibrium Bulk Modulus from nonlinear fit (Birch Murnaghan Function)
-      double nleqmBp;          //Equilibrium Pressure derivatives Bulk Modulus from nonlinear fit (Birch Murnaghan Function)
-      double nleqmBpp;         //Equilibrium Pressure derivatives Bp from nonlinear fit (Birch Murnaghan Function)
-      string fdfsolver_name;   //return nonlinear method name
-      //fitting functions
-      void cubic_polynomial_fit();                                            //cubic linear function fitting
-      void birch_murnaghan_fit();                                             //Birch-Murnaghan nonlinear function fitting
-      void birch_murnaghan_4th_order_fit(const xvector<double>& user_guess);  //Birch-Murnaghan 4th order nonlinear function fitting
-      void birch_murnaghan_3rd_order_fit(const xvector<double>& user_guess);  //Birch-Murnaghan 3rd order nonlinear function fitting
-      void clear();
-  };
-#endif
-}
-// ***************************************************************************
-// ***************************************************************************
-// Engine core for phonon calculation
-// ***************************************************************************
-
-namespace apl {
   class Supercell : public xStream {
     private:
       xstructure _inStructure;
@@ -612,283 +157,12 @@ namespace apl {
       // **** END  JJPR *****
       string _directory;  // for the logger
   };
-}  // namespace apl
-
-// ***************************************************************************
-
-namespace apl {
-  enum IPCFreqFlags {
-    NONE = 0L,
-    ALLOW_NEGATIVE = 1L << 1,
-    OMEGA = 1L << 2,
-    RAW = 1L << 3,  // eV/A/A/atomic_mass_unit
-    HERTZ = 1L << 4,
-    THZ = 1L << 5,
-    RECIPROCAL_CM = 1L << 6,
-    MEV = 1L << 7
-  };
-  inline IPCFreqFlags operator&(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
-    return IPCFreqFlags(static_cast<int>(__a) & static_cast<int>(__b));
-  }
-  inline IPCFreqFlags operator|(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
-    return IPCFreqFlags(static_cast<int>(__a) | static_cast<int>(__b));
-  }
-  inline IPCFreqFlags operator|=(IPCFreqFlags& __a, const IPCFreqFlags& __b) {
-    return (__a = (__a | __b));
-  }
-  // //////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl
 
 // ***************************************************************************
-
-#define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME20190108
-#define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME20190108
-//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME20190108  // OBSOLETE ME20200213 - the calculation does not use force fields
-//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME20190108  // OBSOLETE ME20200213
-#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME20200213
-#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME20200213
-
-// Interface
-namespace apl {
-
-  void validateParametersAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
-  void validateParametersSupercellAPL(xoption&);
-  void validateParametersDispersionsAPL(xoption&);
-  void validateParametersDosAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
-  void validateParametersAAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
-  bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
-  void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
-  bool filesExistPhonons(_xinput&);
-  bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, ostream&, bool=false);  // ME20191029
-  bool readForcesFromDirectory(_xinput&);  // ME20200219
-  void subtractZeroStateForces(vector<_xinput>&, bool);
-  void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME20190114
-
-}
-
-namespace apl {
-  class ForceConstantCalculator : public xStream {
-    protected:
-      Supercell* _supercell;
-    private:
-      bool _sc_set;
-      bool _initialized;
-
-      vector<_xinput> xInputs;
-      string _method;
-
-      // Calculate forces at no distortion - since for some structure
-      // (not well relaxed, or with other problems) these forces have to be
-      // known and substracted from the calculated forces with distortion
-      bool _calculateZeroStateForces;
-
-      // For each atom of supercell, there is a full force field
-      vector<vector<xmatrix<double> > > _forceConstantMatrices;
-      // Stuff for polar materials
-      bool _isPolarMaterial;
-      // For each atom there is a matrix 3x3 of Born effective charge
-      vector<xmatrix<double> > _bornEffectiveChargeTensor;
-      // Dielectric tensor
-      xmatrix<double> _dielectricTensor;
-
-      void free();
-      void copy(const ForceConstantCalculator&);
-
-      // Force constants
-      bool runVASPCalculationsDM(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-      bool runVASPCalculationsLR(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-      bool calculateForceConstants(); // ME20200211
-      bool calculateForceConstantsDM();
-      bool readForceConstantsFromVasprun(_xinput&);
-      void symmetrizeForceConstantMatrices();
-      void correctSumRules();
-
-      //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
-      //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
-
-      // Direct method
-      bool AUTO_GENERATE_PLUS_MINUS;
-      bool USER_GENERATE_PLUS_MINUS;
-      bool GENERATE_ONLY_XYZ;
-      bool DISTORTION_SYMMETRIZE; //CO20190108
-      double DISTORTION_MAGNITUDE;
-      bool DISTORTION_INEQUIVONLY; //CO20190108
-      // For each inequivalent atom, there is a set of unique distortions
-      vector<vector<xvector<double> > > _uniqueDistortions;
-      // For each inequivalent atom and unique distortion, there is a field
-      // of forces (for each atom of the supercell)
-      vector<vector<vector<xvector<double> > > > _uniqueForces;
-      vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
-
-      void estimateUniqueDistortions(const xstructure&,
-          vector<vector<xvector<double> > >&);
-      void testDistortion(const xvector<double>&, const vector<_sym_op>&,
-          vector<xvector<double> >&,
-          vector<xvector<double> >&,
-          bool integrate_equivalent_distortions=true);  //CO20190114
-      bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
-      bool calculateForceFields();  // ME20190412  //ME20191029
-      void completeForceFields();
-      void projectToCartesianDirections();
-      void buildForceConstantMatrices();
-
-      // Born charges + dielectric tensor
-      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
-      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
-      void readBornEffectiveChargesFromAIMSOUT(void);
-      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
-      void symmetrizeBornEffectiveChargeTensors(void);
-      void readDielectricTensorFromAIMSOUT(void);
-      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
-
-    public:
-      ForceConstantCalculator(ostream& oss=std::cout);
-      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
-      ForceConstantCalculator(Supercell&, const aurostd::xoption&, ofstream&, ostream& os=std::cout);
-      ForceConstantCalculator(const ForceConstantCalculator&);
-      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
-      ~ForceConstantCalculator();
-      void clear(Supercell&);
-      void initialize(const aurostd::xoption&);
-
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-
-      bool run();  // ME20191029
-      void hibernate();
-
-      const vector<vector<xmatrix<double> > >& getForceConstants() const;
-      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
-      const xmatrix<double>& getDielectricTensor() const;
-      bool isPolarMaterial() const;
-
-      string _directory;
-
-      void writeHarmonicIFCs(const string&);
-      void writeBornChargesDielectricTensor(const string&);
-      void writeDYNMAT(const string&);
-      void saveState(const string&);  // ME20200112
-      void readFromStateFile(const string&);  // ME20200112
-  };
-}
-
-//PN START
-// ***************************************************************************
-//QHA-APL MACROS START PN
-#define _AFLOW_QHA_PHONS_DIRECTORY_PREFIX_  string("ARUN.APL_PHONON_")
-#define _EOS_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_STATIC_")
-#define MIN_FREQ_TRESHOLD -0.1//in AMU
-#define RAW2Hz 15.6333046177
-#define AMU2Kg 1.66053904 
-//#define MIN_EIGEN_TRESHOLD -1.0e-2// eigenvalue treshold in AMU
-
-#define _GP_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_PHONON_")
-#define _EOS_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_STATIC_")
-#define _PH_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_PHONON_")
-#define _aflowinpad_ 54
-#define Set_QHA_Precision 15
-//QHA-APL MACROS END PN
-
-// ***************************************************************************
-namespace apl {
-  class QHA_AFLOWIN_CREATOR : public ForceConstantCalculator
-  {
-    private:
-      ofstream _log;
-      string _logfile;
-      bool _is_gp_on, _is_gp_A_on, _is_gp_B_on, _is_gp_C_on;
-      bool _is_sc_gp_on, _is_sc_gp_A_on,  _is_sc_gp_B_on,  _is_sc_gp_C_on;
-      bool _is_eos, _is_eos_A, _is_eos_B, _is_eos_C;
-      bool _is_edos_accurate_on;
-      double _gp_vol_distortion;
-      double _scqha_vol_distortion;
-
-      vector<string> _scqha_dir_names;
-      vector<string> _gp_dir_names;
-      vector<string> _ph_dir_names;
-      vector<string> _eos_dir_names;
-      vector<double> _gp_volumes;
-      vector<double> _scqha_volumes;
-      vector<double> _eos_volumes;
-      vector<double> _ph_volumes;
-
-      int _zero_index, _lattice_index;
-      string _pstress;
-
-      double _EOS_VOL_START, _EOS_VOL_END, _EOS_VOL_INC;
-      int _NEDOS;
-      string _EOS_KSCHEME;
-      string _EOS_STATIC_KSCHEME;
-      int _EOS_STATIC_KPPRA;
-      string _PSTRESS;  // ME20200220
-
-    public:
-      QHA_AFLOWIN_CREATOR(Supercell& sc, ofstream& mf, ostream& os=std::cout);
-      ~QHA_AFLOWIN_CREATOR();
-      void clear();
-    public:
-      //
-      void run_qha(const _xinput&, const _kflags&, const _xflags&);
-      //
-      void close_log();
-      //functions to set user define keys 
-      void setGP(bool, bool, bool, bool);
-      void setSCGP(bool, bool, bool, bool);
-      void setEOS(bool b);
-      void setGP_VOL_DISTORTION(double d);
-      void setSCGP_VOL_DISTORTION(double b);
-      void setEOS_distortion_range(double a, double b, double c);
-      void setEOS_NEDOS(int s);
-      void setEOS_STATIC_KPPRA(int s);
-      void setEOS_STATIC_KSCHEME(string s);
-      void set_edos_accurate(bool b);
-      //interface functions
-      vector<string> get_scqha_dir_names();
-      vector<string> get_gp_dir_names();
-      vector<string> get_ph_dir_names();
-      vector<string> get_eos_dir_names();
-      vector<double> get_gp_volumes();
-      vector<double> get_scqha_volumes();
-      vector<double> get_eos_volumes();
-      double get_scqha_vol_distortion();
-      int get_zero_index();
-    private:
-      template <typename T> string NumToStr ( T Number );
-      //create AFLOWIN for Gruneisen parameter
-      //[phonon_option] 0->gp   || 1->sc-gp   || 2-> eos-phonon   || 3->eos-static 
-      //[phonon_option] 4->gp_X || 5->sc-gp_X || 6-> eos-phonon_X || 7->eos-static-X
-      void create_aflowin_phonon(const double distortion, const int phonon_option, const _xinput&, const _kflags&, const _xflags&);
-      //
-      void create_aflowin_phonon_X(const double distortion, const int phonon_option, const _xinput&, const _kflags&, const _xflags&);
-      //
-      void write_aflowin_phonon(const _xvasp& xvasp_input, const int phonon_option);
-      void write_phonon_OUTPUT(const _xinput& xinput, const int phonon_option);
-      //
-      void write_static_AFLOWIN(const _xvasp& xvasp_input, const _kflags&, const _xflags&);
-      void write_static_OUTPUT(const _xinput& xinput, const _kflags&, const _xflags&);
-
-      void get_pstress();
-      //
-      void create_aflowin_zero_state(_xinput& xinput);
-      void writeZEROOUTPUT(const _xinput& xinput);
-      //
-      void correcting_scqha_vol_distortion();
-      //
-      void create_aflowin_scqha_phonon(const _xvasp& xvasp_input);
-      void writeSCQHAOUTPUT(const _xinput& xinput);
-      //
-      void create_aflowin_static_zero(const _xinput&, const _kflags&, const _xflags&);
-      void create_aflowin_static_zero_X(const _xinput&, const _kflags&, const _xflags&);
-      //
-      string get_phonon_runname(const double i, const double distortion);
-      string get_phonon_runname(const double i);
-      string get_static_runname(const double i);
-  };
-}
-// ***************************************************************************
-
 // QMesh definition has to come before PhononCalculator
+
 namespace apl {
 
   struct _qpoint {
@@ -1018,9 +292,394 @@ namespace apl {
       void findMostCompactTetrahedra(vector<vector<xvector<int> > >&);
       void generateAllTetrahedra(const vector<vector<xvector<int> > >&);
   };
+
 }  // namespace apl
 
+// ***************************************************************************
+// END: Supplemental classes for APL, AAPL, and QHA
+// ***************************************************************************
+
+// ***************************************************************************
+// BEGIN: Force constant calculators
+// ***************************************************************************
+// These class definitions have to come before PhononCalculator and
+// TCONDCalculator.
+
+// ***************************************************************************
+
+#define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME20190108
+#define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME20190108
+//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME20190108  // OBSOLETE ME20200213 - the calculation does not use force fields
+//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME20190108  // OBSOLETE ME20200213
+#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME20200213
+#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME20200213
+
 namespace apl {
+
+  // ForceConstantCalculator has to come before PhononCalculator
+  class ForceConstantCalculator : public xStream {
+    protected:
+      Supercell* _supercell;
+    private:
+      bool _sc_set;
+      bool _initialized;
+
+      vector<_xinput> xInputs;
+      string _method;
+
+      // Calculate forces at no distortion - since for some structure
+      // (not well relaxed, or with other problems) these forces have to be
+      // known and substracted from the calculated forces with distortion
+      bool _calculateZeroStateForces;
+
+      // For each atom of supercell, there is a full force field
+      vector<vector<xmatrix<double> > > _forceConstantMatrices;
+      // Stuff for polar materials
+      bool _isPolarMaterial;
+      // For each atom there is a matrix 3x3 of Born effective charge
+      vector<xmatrix<double> > _bornEffectiveChargeTensor;
+      // Dielectric tensor
+      xmatrix<double> _dielectricTensor;
+
+      void free();
+      void copy(const ForceConstantCalculator&);
+
+      // Force constants
+      bool runVASPCalculationsDM(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+      bool runVASPCalculationsLR(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+      bool calculateForceConstants(); // ME20200211
+      bool calculateForceConstantsDM();
+      bool readForceConstantsFromVasprun(_xinput&);
+      void symmetrizeForceConstantMatrices();
+      void correctSumRules();
+
+      //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
+      //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
+
+      // Direct method
+      bool AUTO_GENERATE_PLUS_MINUS;
+      bool USER_GENERATE_PLUS_MINUS;
+      bool GENERATE_ONLY_XYZ;
+      bool DISTORTION_SYMMETRIZE; //CO20190108
+      double DISTORTION_MAGNITUDE;
+      bool DISTORTION_INEQUIVONLY; //CO20190108
+      // For each inequivalent atom, there is a set of unique distortions
+      vector<vector<xvector<double> > > _uniqueDistortions;
+      // For each inequivalent atom and unique distortion, there is a field
+      // of forces (for each atom of the supercell)
+      vector<vector<vector<xvector<double> > > > _uniqueForces;
+      vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
+
+      void estimateUniqueDistortions(const xstructure&,
+          vector<vector<xvector<double> > >&);
+      void testDistortion(const xvector<double>&, const vector<_sym_op>&,
+          vector<xvector<double> >&,
+          vector<xvector<double> >&,
+          bool integrate_equivalent_distortions=true);  //CO20190114
+      bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
+      bool calculateForceFields();  // ME20190412  //ME20191029
+      void completeForceFields();
+      void projectToCartesianDirections();
+      void buildForceConstantMatrices();
+
+      // Born charges + dielectric tensor
+      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
+      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
+      void readBornEffectiveChargesFromAIMSOUT(void);
+      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
+      void symmetrizeBornEffectiveChargeTensors(void);
+      void readDielectricTensorFromAIMSOUT(void);
+      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
+
+    public:
+      ForceConstantCalculator(ostream& oss=std::cout);
+      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(Supercell&, const aurostd::xoption&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(const ForceConstantCalculator&);
+      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
+      ~ForceConstantCalculator();
+      void clear(Supercell&);
+      void initialize(const aurostd::xoption&);
+
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+
+      bool run();  // ME20191029
+      void hibernate();
+
+      const vector<vector<xmatrix<double> > >& getForceConstants() const;
+      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
+      const xmatrix<double>& getDielectricTensor() const;
+      bool isPolarMaterial() const;
+
+      string _directory;
+
+      void writeHarmonicIFCs(const string&);
+      void writeBornChargesDielectricTensor(const string&);
+      void writeDYNMAT(const string&);
+      void saveState(const string&);  // ME20200112
+      void readFromStateFile(const string&);  // ME20200112
+  };
+}
+
+namespace apl {
+
+  // _cluster holds a single cluster
+  struct _cluster {
+    vector<int> atoms;  // List of atoms inside the cluster
+    int fgroup;  // Index pointing to the factor group that transforms the cluster into another cluster
+    int permutation;  // Index pointing to the permutation that transforms the cluster into another cluster
+  };
+
+  // _ineq_distortions contains a list of inequivalent distortion and its equivalent
+  // distortions for a given set of atoms
+  struct _ineq_distortions {
+    vector<int> atoms;  // A list of atoms involved in the distortions
+    vector<int> clusters;  // A list of cluster sets that use these distortions for their force constant calculations
+    vector<vector<vector<int> > > distortions; // Map of distortions. The distortions vectors need to be defined elsewhere. 
+    vector<vector<int> > rotations;  // The factor group that holds the rotation to transform the distortions
+    vector<vector<vector<int> > > transformation_maps;  // A map containing the transformation of the atoms for each distortion
+  };
+
+  // _linearCombinations is a structure to store linear combinations.
+  struct _linearCombinations {
+    vector<vector<int> > indices;  // Cartesian indices of each linear combination
+    vector<vector<double> > coefficients;  // Coefficients of each linear combination
+    vector<int> independent;  // The linearly independent values
+    vector<int> dependent;  // The linearly dependent values
+    // indep2depMap maps the independent coefficients to the coefficients that
+    // depend on them. This is used for the IFC correction method.
+    vector<vector<int> > indep2depMap;
+  };
+
+  class Supercell;  // Forward declaration
+  class ClusterSet : public xStream {
+    // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
+    public:
+      ClusterSet(ostream& oss=std::cout);
+      ClusterSet(ofstream&, ostream& oss=std::cout);
+      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
+      ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
+      ~ClusterSet();  // Destructor
+      const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
+      void clear();
+      void initialize(const Supercell&, int, int, double);
+      void readClusterSetFromFile(const string&);
+
+      vector<_cluster> clusters;
+      vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
+      double cutoff;  // Cutoff radius in Angstroms
+      string directory;  // Directory for logging
+      vector<xvector<double> > distortion_vectors;  // List of distortion vectors
+      vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
+      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
+      vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
+      vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
+      int nifcs;  // Number of force constants for each set of atoms.
+      int order;  // Order of the cluster, i.e. the order of the force constant to be calculated.
+      xstructure pcell;  // Structure of the primitive cell.
+      vector<int> pc2scMap;  // Atom map from the primitive cell to the supercell.
+      vector<vector<int> > permutations;  // List of possible permutations for the cluster
+      xstructure scell;  // Structure of the supercell.
+      vector<int> sc2pcMap;  // Atom map from the supercell to the primitive cell.
+      xvector<int> sc_dim;  // Dimensions of the supercell.
+      vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
+
+      const _cluster& getCluster(const int& i) const;  //ME20190520
+      void build();
+      void buildDistortions();
+      void writeClusterSetToFile(const string&);
+
+    private:
+      void free();
+      void copy(const ClusterSet&);
+
+      double getMaxRad(const xstructure&, int);
+      void buildShells();
+      vector<_cluster> buildClusters();
+      vector<vector<int> > getSymmetryMap();
+      vector<vector<int> > getPermutations(int);
+
+      // Clusters
+      void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
+      int getNumUniqueAtoms(const vector<int>&);
+      vector<int> getComposition(const vector<int>&);
+      bool sameComposition(const vector<int>&, const vector<int>&);
+      int equivalenceCluster(const vector<int>&, const vector<int>&,
+          const vector<vector<int> >&, const vector<vector<int> >&);
+      vector<int> translateToPcell(const vector<int>&, int);
+      int comparePermutations(const vector<int>&, const vector<int>&);
+      bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
+      void getSymOp(_cluster&, const vector<int>&);
+
+      // Distortions
+      vector<xvector<double> > getCartesianDistortionVectors();
+      vector<_ineq_distortions> initializeIneqDists();
+      int sameDistortions(const _cluster&, const vector<_ineq_distortions>&);
+      vector<vector<int> > getTestDistortions(const vector<int>&);
+      void getInequivalentDistortions(const vector<vector<int> >&, _ineq_distortions&);
+      void appendDistortion(_ineq_distortions&, vector<int>,
+          const int& eq=-1, const int& fg=-1);
+      bool allZeroDistortions(const vector<int>&, const vector<int>&);
+      bool allAtomsMatch(const int&, const vector<int>&);
+      int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
+          const vector<vector<vector<int> > >&, const vector<int>&);
+      vector<int> getTransformationMap(const int&, const int&);
+      vector<_ineq_distortions> getHigherOrderDistortions();
+
+      // Linear Combinations
+      vector<_linearCombinations> getLinearCombinations();
+      vector<vector<int> > getInvariantSymOps(const _cluster&);
+      vector<vector<double> > buildCoefficientMatrix(const vector<vector<int> >&);
+      vector<vector<double> > getRREF(vector<vector<double> >);
+
+      // File I/O
+      string writeParameters();
+      string writeInequivalentClusters();
+      string writeClusters(const vector<_cluster>&);
+      string writeLinearCombinations(const _linearCombinations&);
+      string writeInequivalentDistortions();
+      string writeIneqDist(const _ineq_distortions&);
+      string writeHigherOrderDistortions();
+
+      bool checkCompatibility(uint&, const vector<string>&);
+      void readInequivalentClusters(uint&, const vector<string>&);
+      vector<_cluster> readClusters(uint&, const vector<string>&);
+      _linearCombinations readLinearCombinations(uint&, const vector<string>&);
+      void readInequivalentDistortions(uint&, const vector<string>&);
+      _ineq_distortions readIneqDist(uint&, const vector<string>&);
+      void readHigherOrderDistortions(uint&, const vector<string>&);
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class AnharmonicIFCs : public xStream {
+    // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
+    public:
+      AnharmonicIFCs(ostream& oss=std::cout);
+      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
+      AnharmonicIFCs(const AnharmonicIFCs&);
+      const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
+      ~AnharmonicIFCs();
+      void clear();
+      void initialize(const Supercell&, int, const aurostd::xoption&);
+
+      void setOptions(double, int, double, double, bool);
+      const string& getDirectory() const;
+      void setDirectory(const string&);
+      int getOrder() const;
+
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
+      bool calculateForceConstants();
+      const vector<vector<double> >& getForceConstants() const;
+      vector<vector<int> > getClusters() const;
+      void writeIFCsToFile(const string&);
+
+    private:
+      ClusterSet clst;
+
+      vector<_xinput> xInputs;
+      bool _useZeroStateForces;
+      bool initialized;
+      string directory;
+      vector<vector<int> > cart_indices;  // A list of all Cartesian indices
+      double distortion_magnitude;  // The magnitude of the distortions in Angstroms
+      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
+      int max_iter;  // Number of iterations for the sum rules
+      double mixing_coefficient;  // The mixing coefficient for the SCF procedure
+      int order;  // The order of the IFCs
+      double sumrule_threshold;  // Convergence threshold for the sum rules
+
+      void free();
+      void copy(const AnharmonicIFCs&);
+
+      string buildRunName(const vector<int>&, const vector<int>&, int, int);
+      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
+
+      vector<vector<int> > getCartesianIndices();
+
+      vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
+      vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
+      int getTransformedAtom(const vector<int>&, const int&);
+      void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
+      vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
+          const vector<vector<vector<xvector<double> > > >&);
+      double finiteDifference(const vector<vector<xvector<double> > >&, int,
+          const vector<int>&, const vector<int>&);
+
+      // Symmetrization Functions
+      vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
+      typedef vector<std::pair<vector<int>, vector<double> > > tform;
+      typedef vector<vector<vector<vector<int> > > > v4int;
+      void getTensorTransformations(v4int&, vector<vector<tform> >&);
+      vector<vector<int> > getReducedClusters();
+      void applyLinCombs(vector<vector<double> >&);
+      void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
+      void applyPermutations(vector<int>, vector<vector<double> >&);
+      void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
+          vector<vector<double> >&, vector<vector<double> >&);
+      void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
+          const vector<vector<double> >&,
+          const vector<vector<int> >&, const v4int&);
+      vector<double> getCorrectionTerms(const int&,
+          const vector<vector<int> >&,
+          const vector<vector<double> >&,
+          const vector<vector<double> >&,
+          const vector<vector<double> >&);
+      uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
+
+      // File I/O
+      string writeParameters();
+      string writeIFCs();
+      bool checkCompatibility(uint&, const vector<string>&);
+      vector<vector<double> > readIFCs(uint&, const vector<string>&);
+  };
+
+}  //namespace apl
+
+
+// ***************************************************************************
+// END: Force constant calculators
+// ***************************************************************************
+
+// ***************************************************************************
+// BEGIN: Automatic Phonon Library (APL)
+// ***************************************************************************
+
+// ***************************************************************************
+
+namespace apl {
+
+  enum IPCFreqFlags {
+    NONE = 0L,
+    ALLOW_NEGATIVE = 1L << 1,
+    OMEGA = 1L << 2,
+    RAW = 1L << 3,  // eV/A/A/atomic_mass_unit
+    HERTZ = 1L << 4,
+    THZ = 1L << 5,
+    RECIPROCAL_CM = 1L << 6,
+    MEV = 1L << 7
+  };
+  inline IPCFreqFlags operator&(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
+    return IPCFreqFlags(static_cast<int>(__a) & static_cast<int>(__b));
+  }
+  inline IPCFreqFlags operator|(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
+    return IPCFreqFlags(static_cast<int>(__a) | static_cast<int>(__b));
+  }
+  inline IPCFreqFlags operator|=(IPCFreqFlags& __a, const IPCFreqFlags& __b) {
+    return (__a = (__a | __b));
+  }
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
   class PhononCalculator : public xStream {
     private:
       // USER PARAMETERS
@@ -1127,14 +786,11 @@ namespace apl {
       void writeGroupVelocitiesToFile(const string&, const vector<vector<xvector<double> > >&);
       void writeGroupVelocitiesToFile(const string&, const vector<vector<xvector<double> > >&, const vector<vector<double> >&, const string& unit="THz");
   };
+
 }  // namespace apl
 
-
-// ***************************************************************************
-// Supplementary classes for calculation of dispersion curves and density of states
-// ***************************************************************************
-
 namespace apl {
+
   class PathBuilder {
     public:
       enum StoreEnumType { RECIPROCAL_LATTICE,
@@ -1195,6 +851,7 @@ namespace apl {
 // ***************************************************************************
 
 namespace apl {
+
   class PhononDispersionCalculator {
     private:
       PhononCalculator* _pc;
@@ -1233,40 +890,17 @@ namespace apl {
       //[OBSOLETE PN20180705]std::vector<double> get_path() { return path; }                   //[PN]
       //[OBSOLETE PN20180705]std::vector<int> get_path_segment() { return path_segment; }      //[PN]
   };
+
 }  // namespace apl
 
 // ***************************************************************************
-namespace apl { //PN20180705
-  class PhononHSQpoints {
-    private:
-      Logger& _logger;
-      vector< xvector<double> > _qpoints;
-      vector<double> _path;
-      vector<int> _path_segment;
-      vector<xvector<double> >_hs_kpoints;
-    private:
-      template<typename T>
-        std::vector<T> split(const std::string& line);
-    public:
-      PhononHSQpoints(Logger&);
-      ~PhononHSQpoints();
-      void clear();
-      void read_qpointfile(const string&);
-      //interface functions
-      vector<xvector<double> > get_qpoints();
-      vector<xvector<double> > get_hs_kpoints();
-      vector<double> get_path();
-      vector<int> get_path_segment();
-  };
-} // namespace apl
 
-// ***************************************************************************
 namespace apl {
 
 #define MIN_FREQ_TRESHOLD -0.1  //in AMU
 #define RAW2Hz 15.6333046177
 #define AMU2Kg 1.66053904
-#define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue treshold in AMU
+#define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue threshold in AMU
   class DOSCalculator  //ME20190424
   { //CO20200106 - patching for auto-indenting
     protected:
@@ -1322,11 +956,13 @@ namespace apl {
     private:
       void free();
   };
+
 }  // namespace apl
 
 // ***************************************************************************
 
 namespace apl {
+
   enum ThermalPropertiesUnits { eV,
     meV,
     ueV,
@@ -1389,7 +1025,65 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// BEGIN ME: Lattice Thermal Conductivity (AAPL)
+
+namespace apl {
+
+  class AtomicDisplacements {
+    protected:
+      PhononCalculator* _pc;
+      bool _pc_set;
+
+    private:
+      void free();
+      void copy(const AtomicDisplacements&);
+
+      vector<vector<vector<xvector<xcomplex<double> > > > > _eigenvectors;
+      vector<vector<double> > _frequencies;
+      vector<vector<xmatrix<xcomplex<double> > > > _displacement_matrices;
+      vector<vector<vector<xvector<xcomplex<double> > > > > _displacement_modes;
+      vector<_qpoint> _qpoints;
+      vector<double> _temperatures;
+
+      void calculateEigenvectors();
+      void calculateEigenvectorsInThread(int, int);
+      void calculateMeanSquareDisplacementMatrices();
+      void calculateModeDisplacements();
+      double getOccupationNumber(double, double);
+
+    public:
+      AtomicDisplacements();
+      AtomicDisplacements(PhononCalculator&);
+      AtomicDisplacements(const AtomicDisplacements&);
+      AtomicDisplacements& operator=(const AtomicDisplacements&);
+      ~AtomicDisplacements();
+      void clear(PhononCalculator&);
+
+      void calculateMeanSquareDisplacements(double, double, double);
+      void calculateModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
+
+      const vector<double>& getTemperatures() const;
+      const vector<vector<xmatrix<xcomplex<double> > > >& getDisplacementMatrices() const;
+      vector<vector<xvector<double> > > getDisplacementVectors() const;
+      const vector<vector<vector<xvector<xcomplex<double> > > > >& getModeDisplacements() const;
+
+      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, int, int, int);
+      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&, double);
+
+      void writeMeanSquareDisplacementsToFile(string);
+      void writeSceneFileXcrysden(string, const xstructure&, const vector<vector<vector<double> > >&, int);
+      void writeSceneFileVsim(string, const xstructure&, const vector<vector<vector<xvector<xcomplex<double> > > > >&);
+  };
+
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss=std::cout);
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
+}
+
+// ***************************************************************************
+// END: Automatic Phonon Library (APL)
+// ***************************************************************************
+
+// ***************************************************************************
+// BEGIN ME: Automatic Anharmonic Phonon Library (AAPL)
 // ***************************************************************************
 
 namespace apl {
@@ -1485,68 +1179,19 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// END ME: Lattice Thermal Conductivity (AAPL)
+// END ME: Automatic Anharmonic Phonon Library (AAPL)
 // ***************************************************************************
 
 // ***************************************************************************
-namespace apl {
-
-  class AtomicDisplacements {
-    protected:
-      PhononCalculator* _pc;
-      bool _pc_set;
-
-    private:
-      void free();
-      void copy(const AtomicDisplacements&);
-
-      vector<vector<vector<xvector<xcomplex<double> > > > > _eigenvectors;
-      vector<vector<double> > _frequencies;
-      vector<vector<xmatrix<xcomplex<double> > > > _displacement_matrices;
-      vector<vector<vector<xvector<xcomplex<double> > > > > _displacement_modes;
-      vector<_qpoint> _qpoints;
-      vector<double> _temperatures;
-
-      void calculateEigenvectors();
-      void calculateEigenvectorsInThread(int, int);
-      void calculateMeanSquareDisplacementMatrices();
-      void calculateModeDisplacements();
-      double getOccupationNumber(double, double);
-
-    public:
-      AtomicDisplacements();
-      AtomicDisplacements(PhononCalculator&);
-      AtomicDisplacements(const AtomicDisplacements&);
-      AtomicDisplacements& operator=(const AtomicDisplacements&);
-      ~AtomicDisplacements();
-      void clear(PhononCalculator&);
-
-      void calculateMeanSquareDisplacements(double, double, double);
-      void calculateModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
-
-      const vector<double>& getTemperatures() const;
-      const vector<vector<xmatrix<xcomplex<double> > > >& getDisplacementMatrices() const;
-      vector<vector<xvector<double> > > getDisplacementVectors() const;
-      const vector<vector<vector<xvector<xcomplex<double> > > > >& getModeDisplacements() const;
-
-      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, int, int, int);
-      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&, double);
-
-      void writeMeanSquareDisplacementsToFile(string);
-      void writeSceneFileXcrysden(string, const xstructure&, const vector<vector<vector<double> > >&, int);
-      void writeSceneFileVsim(string, const xstructure&, const vector<vector<vector<xvector<xcomplex<double> > > > >&);
-  };
-
-  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss=std::cout);
-  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
-}
+// BEGIN AS: Quasi-Harmonic Approximation (QHA)
 // ***************************************************************************
+
 //AS20200513 BEGIN
 #define QHA_ARUN_MODE "QHA" // used in filename
 
 namespace apl
 {
-  /// Fit to a nonlinear model using Levenberg-Marquardt algorithm.
+  /// Fit to a nonlinear model using the Levenberg-Marquardt algorithm.
   ///
   /// The implementation here is based on the ideas from Numerical Recipes and
   /// K. Madsen et al. Methods For Non-linear Least Squares Problems
@@ -1711,6 +1356,409 @@ namespace apl
   };
 }
 //AS20200513 END
+
+// ***************************************************************************
+// END AS: Quasi-Harmonic Approximation (QHA)
+// ***************************************************************************
+
+// ***************************************************************************
+// THE CLASSES BELOW WILL BE OBSOLETE AS SOON AS QHAN REPLACES QHA
+// ***************************************************************************
+
+namespace apl {
+  class Logger;
+  // Templates used for the definition of the one parameter manipulation
+  // functions of Logger's streams
+  template <class T>
+    class LMANIP;
+  template <class T>
+    Logger& operator<<(Logger&, const LMANIP<T>&);
+  template <class T>
+    class LMANIP {
+      public:
+        LMANIP(Logger& (*a)(Logger&, T), T v) {
+          _action = a;
+          _value = v;
+        }
+        friend Logger& operator<<<>(Logger&, const LMANIP<T>&);
+
+      private:
+        Logger& (*_action)(Logger&, T);
+        T _value;
+    };
+  template <class T>
+    Logger& operator<<(Logger& s, const LMANIP<T>& m) {
+      return (*m._action)(s, m._value);
+    }
+  // Function without parameter...
+  typedef Logger& (*MyStreamManipulator)(Logger&);
+  // this is the type of std::cout
+  typedef std::basic_ostream<char, std::char_traits<char> > CoutType;
+  // this is the function signature of std::endl
+  typedef CoutType& (*StandardEndLine)(CoutType&);
+  //
+  class Logger {
+    private:
+      ofstream* _os;
+      std::string _barCode;
+      std::string _typeofMessage;
+      std::string _moduleName;
+      _aflags _aflowFlags;
+      stringstream _ss;
+      int _progressBarLastPercent;
+      double _progressBarPercent;  //ME20180831
+      bool _isQuiet;
+
+    public:
+      Logger();
+      Logger(std::ofstream&, const _aflags&);
+      void initialize(std::ofstream&, const _aflags&);
+      Logger(Logger&);
+      ~Logger();
+      ofstream& getOutputStream();
+      void initProgressBar(const char*);
+      void initProgressBar(const string&);
+      void updateProgressBar(double);  //ME20180831
+      void updateProgressBar(int, int);
+      void finishProgressBar();
+      void setTypeOfMessage(const string&);
+      void setBarCode(const string&);
+      void setBarCode(const char&);
+      void setModuleName(const string&);
+      void setQuietMode(bool);
+      Logger& operator=(Logger&);
+      Logger& operator<<(const string& s);
+      Logger& operator<<(const int& s);
+      Logger& operator<<(const uint& s);
+      Logger& operator<<(const double& s);
+      // Manipulation functions without parameter
+      Logger& operator<<(StandardEndLine);
+      Logger& operator<<(MyStreamManipulator);
+      void endl();
+      friend Logger& endl(Logger&);
+      friend Logger& message(Logger&);
+      friend Logger& notice(Logger&);
+      friend Logger& warning(Logger&);
+      friend Logger& error(Logger&);
+      friend Logger& quiet(Logger&);
+      // Manipulation functions with one parameter
+      friend Logger& setwidth(Logger&, int);
+      friend Logger& setformat(Logger&, const char*);
+  };
+  // Friend functions without parameters
+  Logger& endl(Logger&);
+  Logger& message(Logger&);
+  Logger& notice(Logger&);
+  Logger& warning(Logger&);
+  Logger& error(Logger&);
+  Logger& quiet(Logger&);
+  // Friend functions with one parameter
+  Logger& setwidth(Logger&, int);
+  LMANIP<int> sw(int);
+  Logger& setformat(Logger&, const char*);
+  LMANIP<const char*> sf(const char*);
+}  // namespace APL
+
+
+// ***************************************************************************
+// Linear and nonlinear fitting functions, this functions compute fitting parameters correctly
+//although chi-square matrix is not computing correctly [PN]
+#define FIT_LIMIT 0.001
+namespace apl {
+  class aflowFITTING {
+    public:
+      aflowFITTING() {}
+      ~aflowFITTING() { clear(); }
+      void clear() {}
+
+    private:
+      double chisq_quadratic;
+      double chisq_birch_murnaghan;
+      uint Iteration_birch_murnaghan;
+      double alamda_birch_murnaghan;
+      vector<double> Uncertainties_birch_murnaghan;
+      //user defined fitting functions
+      void funcs(double x, xvector<double>& afunc);
+      void birch_murnaghan_function(double x,
+          const xvector<double> a,
+          double* y,
+          xvector<double>& dyda);
+
+      //linear leatsquare fitting function
+      template <class utype>
+        bool lfit(xvector<utype>& x,
+            xvector<utype>& y,
+            xvector<utype>& sig,
+            xvector<utype>& a,
+            xvector<int>& ia,
+            xmatrix<utype>& covar,
+            utype& chisq,
+            void (aflowFITTING::*funcs)(utype, xvector<utype>&));
+
+      //nonlinear leatsquare fitting function
+      bool mrqmin(xvector<double> x,
+          xvector<double> y,
+          xvector<double>& sig,
+          xvector<double>& a,
+          xvector<int>& ia,
+          xmatrix<double>& covar,
+          xmatrix<double>& alpha,
+          double& chisq,
+          void (aflowFITTING::*birch_murnaghan_function)(double, xvector<double>, double*, xvector<double>&),
+          double* alamda);
+
+      template <class utype>
+        void covsrt(xmatrix<utype>& covar, xvector<int>& ia, int& mfit);
+      template <class utype>
+        bool gaussj(xmatrix<utype>& a, int& n, xmatrix<utype>& b, int m);
+
+      void mrqcof(xvector<double> x,
+          xvector<double> y,
+          xvector<double>& sig,
+          xvector<double>& a,
+          xvector<int>& ia,
+          xmatrix<double>& alpha,
+          xvector<double>& beta,
+          double& chisq,
+          void (aflowFITTING::*birch_murnaghan_function)(double, xvector<double>, double*, xvector<double>&));
+
+    public:
+      bool
+        quadraticfit(xvector<double> energy, xvector<double> volume, xvector<double>& params);
+      bool
+        birch_murnaghan_fitting(xvector<double> energy, xvector<double> volume, xvector<double> guess, xvector<double>& params);
+      double get_chisq_quadratic() { return chisq_quadratic; }
+      double get_chisq_birch_murnaghan() { return chisq_birch_murnaghan; }
+      uint getIteration_birch_murnaghan() { return Iteration_birch_murnaghan; }
+      double getalamda_birch_murnaghan() { return alamda_birch_murnaghan; }
+      vector<double> getUncertainties_birch_murnaghan() { return Uncertainties_birch_murnaghan; }
+  };
+}
+// ***************************************************************************
+namespace apl {
+#ifndef EIGEN_H
+#define EIGEN_H
+  //Functions in this class calculate eigenvalues and eigenvectors of complex symmetrix
+  //nxn matrices and can sort them according to following options
+  //eval and evec SORTING OPTIONS
+  // [ 1. [APL_MV_EIGEN_SORT_VAL_ASC]  => ascending order   ]
+  // [ 2. [APL_MV_EIGEN_SORT_VAL_DESC] => descending order ]
+  // [ 3. [APL_MV_EIGEN_SORT_ABS_ASC]  => absolute ascending order ]
+  // [ 4. [APL_MV_EIGEN_SORT_ABS_DESC] => absolute descending order]
+  //Compute Eigenvalues and Eigenvectors for (nxn) Complex Hermitian matrices
+  class aplEigensystems : public MVops {
+    public:
+      aplEigensystems() {}
+      ~aplEigensystems() {}
+      void clear() { } //this->clear(); //CO20200106 - patching for auto-indenting
+      void eigen_calculation(const aurostd::xmatrix<xcomplex<double> >& M, aurostd::xvector<double>& eval, aurostd::xmatrix<xcomplex<double> >& evec);
+      void eigen_calculation(const xmatrix<xcomplex<double> >& M, xvector<double>& eval, xmatrix<xcomplex<double> >& evec, apl_eigen_sort_t t);
+  };
+#endif
+}
+// ***************************************************************************
+namespace apl {
+  //The functions in this class are used to perform linear and nonlinear fittings//
+  //User defined functions can be used to perform fitting//
+  //Both Levenberg-Marquardt and unscaled Levenberg-Marquardt algorithms can be performed
+  //either with keyword "APL_multifit_fdfsolver_lmsder" or "APL_multifit_fdfsolver_lmder" //
+#ifndef FIT_H
+#define FIT_H
+#define spread 1e-6               //accuracy of data fitting
+#define allowed_fit_error 100.00  // if spread is small then allowed_fit_error is relatively take high value
+#define Absolute_Error 1E-6
+#define Relative_Error 1E-6
+#define APL_multifit_fdfsolver_lmsder  //This is a robust and efficient version of the Levenberg-Marquardt algorithm
+#undef APL_multifit_fdfsolver_lmder    //This is an unscaled version of the Levenberg-Marquardt algorithm
+
+  class md_lsquares : public MVops {
+    // multi-parameter linear regression
+    // multidimensional nonlinear least-squares fitting
+    public:
+      md_lsquares() {}
+      ~md_lsquares() {}
+
+      //user define data sets
+      vector<double> Xdata;  //usder defined input data
+      vector<double> Ydata;  //usder defined input data
+      //guess values calculated automatically
+      vector<double> guess;  // guess values for nonlinear fitting, It will calculate automatically.
+      //error managments
+      bool data_read_error;   //return true if Xdata.size and Ydata.size are same
+      int nl_success_status;  //return error message interms of int numbers
+      string nl_err_msg;      //return type of error mesages
+
+      //lfit output
+      double luncertanity_V0;  //uncertainties linear fit(Quadratic function) in Volume
+      double luncertanity_E0;  //uncertainties linear fit(Quadratic function) in Energies
+      double luncertanity_B0;  //uncertainties linear fit(Quadratic function) in Bulk Modulus
+      double lchisq;           //linear fit chisquare
+      double leqmV0;           //Equilibrium Volume from linear fit (Quadratic function)
+      double leqmE0;           //Equilibrium Energy from linear fit (Quadratic function)
+      double leqmB0;           //Equilibrium Bulk Modulus from linear fit (Quadratic function)
+      //nlfit output
+      double uncertanity_V0;   //uncertainties non linear fit(Birch Murnaghan Function) in Volume
+      double uncertanity_E0;   //uncertainties non linear fit(Birch Murnaghan Function) in Energy
+      double uncertanity_B0;   //uncertainties non linear fit(Birch Murnaghan Function) in Bulk Modulus
+      double uncertanity_Bp;   //uncertainties non linear fit(Birch Murnaghan Function) in Pressure derivatives Bulk Modulus
+      double uncertanity_Bpp;  //uncertainties non linear fit(Birch Murnaghan Function) in Pressure derivatives Bp
+      double chisq_dof;        //chi square per degrees of freedom
+      double nleqmV0;          //Equilibrium Volume from nonlinear fit (Birch Murnaghan Function)
+      double nleqmE0;          //Equilibrium Energy from nonlinear fit (Birch Murnaghan Function)
+      double nleqmB0;          //Equilibrium Bulk Modulus from nonlinear fit (Birch Murnaghan Function)
+      double nleqmBp;          //Equilibrium Pressure derivatives Bulk Modulus from nonlinear fit (Birch Murnaghan Function)
+      double nleqmBpp;         //Equilibrium Pressure derivatives Bp from nonlinear fit (Birch Murnaghan Function)
+      string fdfsolver_name;   //return nonlinear method name
+      //fitting functions
+      void cubic_polynomial_fit();                                            //cubic linear function fitting
+      void birch_murnaghan_fit();                                             //Birch-Murnaghan nonlinear function fitting
+      void birch_murnaghan_4th_order_fit(const xvector<double>& user_guess);  //Birch-Murnaghan 4th order nonlinear function fitting
+      void birch_murnaghan_3rd_order_fit(const xvector<double>& user_guess);  //Birch-Murnaghan 3rd order nonlinear function fitting
+      void clear();
+  };
+#endif
+}
+// ***************************************************************************
+//PN START
+// ***************************************************************************
+//QHA-APL MACROS START PN
+#define _AFLOW_QHA_PHONS_DIRECTORY_PREFIX_  string("ARUN.APL_PHONON_")
+#define _EOS_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_STATIC_")
+#define MIN_FREQ_TRESHOLD -0.1//in AMU
+#define RAW2Hz 15.6333046177
+#define AMU2Kg 1.66053904 
+//#define MIN_EIGEN_TRESHOLD -1.0e-2// eigenvalue treshold in AMU
+
+#define _GP_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_PHONON_")
+#define _EOS_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_STATIC_")
+#define _PH_AFLOW_DIRECTORY_PREFIX_ string("ARUN.APL_PHONON_")
+#define _aflowinpad_ 54
+#define Set_QHA_Precision 15
+//QHA-APL MACROS END PN
+
+// ***************************************************************************
+namespace apl {
+  class QHA_AFLOWIN_CREATOR : public ForceConstantCalculator
+  {
+    private:
+      ofstream _log;
+      string _logfile;
+      bool _is_gp_on, _is_gp_A_on, _is_gp_B_on, _is_gp_C_on;
+      bool _is_sc_gp_on, _is_sc_gp_A_on,  _is_sc_gp_B_on,  _is_sc_gp_C_on;
+      bool _is_eos, _is_eos_A, _is_eos_B, _is_eos_C;
+      bool _is_edos_accurate_on;
+      double _gp_vol_distortion;
+      double _scqha_vol_distortion;
+
+      vector<string> _scqha_dir_names;
+      vector<string> _gp_dir_names;
+      vector<string> _ph_dir_names;
+      vector<string> _eos_dir_names;
+      vector<double> _gp_volumes;
+      vector<double> _scqha_volumes;
+      vector<double> _eos_volumes;
+      vector<double> _ph_volumes;
+
+      int _zero_index, _lattice_index;
+      string _pstress;
+
+      double _EOS_VOL_START, _EOS_VOL_END, _EOS_VOL_INC;
+      int _NEDOS;
+      string _EOS_KSCHEME;
+      string _EOS_STATIC_KSCHEME;
+      int _EOS_STATIC_KPPRA;
+      string _PSTRESS;  // ME20200220
+
+    public:
+      QHA_AFLOWIN_CREATOR(Supercell& sc, ofstream& mf, ostream& os=std::cout);
+      ~QHA_AFLOWIN_CREATOR();
+      void clear();
+    public:
+      //
+      void run_qha(const _xinput&, const _kflags&, const _xflags&);
+      //
+      void close_log();
+      //functions to set user define keys 
+      void setGP(bool, bool, bool, bool);
+      void setSCGP(bool, bool, bool, bool);
+      void setEOS(bool b);
+      void setGP_VOL_DISTORTION(double d);
+      void setSCGP_VOL_DISTORTION(double b);
+      void setEOS_distortion_range(double a, double b, double c);
+      void setEOS_NEDOS(int s);
+      void setEOS_STATIC_KPPRA(int s);
+      void setEOS_STATIC_KSCHEME(string s);
+      void set_edos_accurate(bool b);
+      //interface functions
+      vector<string> get_scqha_dir_names();
+      vector<string> get_gp_dir_names();
+      vector<string> get_ph_dir_names();
+      vector<string> get_eos_dir_names();
+      vector<double> get_gp_volumes();
+      vector<double> get_scqha_volumes();
+      vector<double> get_eos_volumes();
+      double get_scqha_vol_distortion();
+      int get_zero_index();
+    private:
+      template <typename T> string NumToStr ( T Number );
+      //create AFLOWIN for Gruneisen parameter
+      //[phonon_option] 0->gp   || 1->sc-gp   || 2-> eos-phonon   || 3->eos-static 
+      //[phonon_option] 4->gp_X || 5->sc-gp_X || 6-> eos-phonon_X || 7->eos-static-X
+      void create_aflowin_phonon(const double distortion, const int phonon_option, const _xinput&, const _kflags&, const _xflags&);
+      //
+      void create_aflowin_phonon_X(const double distortion, const int phonon_option, const _xinput&, const _kflags&, const _xflags&);
+      //
+      void write_aflowin_phonon(const _xvasp& xvasp_input, const int phonon_option);
+      void write_phonon_OUTPUT(const _xinput& xinput, const int phonon_option);
+      //
+      void write_static_AFLOWIN(const _xvasp& xvasp_input, const _kflags&, const _xflags&);
+      void write_static_OUTPUT(const _xinput& xinput, const _kflags&, const _xflags&);
+
+      void get_pstress();
+      //
+      void create_aflowin_zero_state(_xinput& xinput);
+      void writeZEROOUTPUT(const _xinput& xinput);
+      //
+      void correcting_scqha_vol_distortion();
+      //
+      void create_aflowin_scqha_phonon(const _xvasp& xvasp_input);
+      void writeSCQHAOUTPUT(const _xinput& xinput);
+      //
+      void create_aflowin_static_zero(const _xinput&, const _kflags&, const _xflags&);
+      void create_aflowin_static_zero_X(const _xinput&, const _kflags&, const _xflags&);
+      //
+      string get_phonon_runname(const double i, const double distortion);
+      string get_phonon_runname(const double i);
+      string get_static_runname(const double i);
+  };
+}
+
+// ***************************************************************************
+namespace apl { //PN20180705
+  class PhononHSQpoints {
+    private:
+      Logger& _logger;
+      vector< xvector<double> > _qpoints;
+      vector<double> _path;
+      vector<int> _path_segment;
+      vector<xvector<double> >_hs_kpoints;
+    private:
+      template<typename T>
+        std::vector<T> split(const std::string& line);
+    public:
+      PhononHSQpoints(Logger&);
+      ~PhononHSQpoints();
+      void clear();
+      void read_qpointfile(const string&);
+      //interface functions
+      vector<xvector<double> > get_qpoints();
+      vector<xvector<double> > get_hs_kpoints();
+      vector<double> get_path();
+      vector<int> get_path_segment();
+  };
+} // namespace apl
+
+// ***************************************************************************
 // ***************************************************************************
 namespace apl
 {
