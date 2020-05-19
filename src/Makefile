@@ -363,9 +363,9 @@ aflow_data_calculated.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "\";" >> $@ ; fi
 	# done
-	if [ -f $@ ]; then GUARD_CHECK=$$(grep '_AFLOW_DATA_CALCULATED_CPP_' $@); if [ -z "$$GUARD_CHECK" ]; then mv $@ $@_tmp; echo "#ifndef _AFLOW_DATA_CALCULATED_CPP_" >> $@; echo "#define _AFLOW_DATA_CALCULATED_CPP_" >> $@; cat $@_tmp >> $@ && rm -f $@_tmp; echo "#endif  //  _AFLOW_DATA_CALCULATED_CPP_" >> $@; fi; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
+	if [ -f $@ ]; then GUARD_CHECK=$$(grep '_AFLOW_DATA_CALCULATED_CPP_' $@); if [ -z "$$GUARD_CHECK" ]; then mv $@ $@_tmp; echo "#ifndef _AFLOW_DATA_CALCULATED_CPP_" >> $@; echo "#define _AFLOW_DATA_CALCULATED_CPP_" >> $@; cat $@_tmp >> $@ && rm -f $@_tmp; echo "#endif  //  _AFLOW_DATA_CALCULATED_CPP_" >> $@; fi; fi
 	if [ ! -f $@ ]; then exit 1; fi
 	touch $@
 aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT README_LIBRARY_HTQC_BORIDES.TXT README_LIBRARY_HTQC_CARBIDES.TXT Makefile
@@ -470,9 +470,9 @@ aflow_data_stokes.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz ]; then echo "std::string FROZSL_phvaspsetup_POSCAR=\"\\" >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz ]; then xzcat $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz | perl -p -e 's/\#/_ASCII_23_/g' | perl -p -e 's/\"/_ASCII_22_/g' | perl -p -e 's/\\/_ASCII_5C_/g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz ]; then echo "\";" >> $@ ; fi
-	if [ -f $@ ]; then GUARD_CHECK=$$(grep '_AFLOW_DATA_STOKES_CPP_' $@); if [ -z "$$GUARD_CHECK" ]; then mv $@ $@_tmp; echo "#ifndef _AFLOW_DATA_STOKES_CPP_" >> $@; echo "#define _AFLOW_DATA_STOKES_CPP_" >> $@; cat $@_tmp >> $@ && rm -f $@_tmp; echo "#endif  //  _AFLOW_DATA_STOKES_CPP_" >> $@; fi; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
+	if [ -f $@ ]; then GUARD_CHECK=$$(grep '_AFLOW_DATA_STOKES_CPP_' $@); if [ -z "$$GUARD_CHECK" ]; then mv $@ $@_tmp; echo "#ifndef _AFLOW_DATA_STOKES_CPP_" >> $@; echo "#define _AFLOW_DATA_STOKES_CPP_" >> $@; cat $@_tmp >> $@ && rm -f $@_tmp; echo "#endif  //  _AFLOW_DATA_STOKES_CPP_" >> $@; fi; fi
 	if [ ! -f $@ ]; then exit 1; fi
 	touch $@
 aflow_data_nist.cpp: Makefile 
@@ -491,9 +491,9 @@ aflow_data_nist.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz ]; then echo "std::string ICSD_List_txt=\"\\" >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz ]; then xzcat $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> $@ ; fi
 	if [ -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz ]; then echo "\";" >> $@ ; fi
-	if [ -f $@ ]; then GUARD_CHECK=$$(grep '_AFLOW_DATA_NIST_CPP_' $@); if [ -z "$$GUARD_CHECK" ]; then mv $@ $@_tmp; echo "#ifndef _AFLOW_DATA_NIST_CPP_" >> $@; echo "#define _AFLOW_DATA_NIST_CPP_" >> $@; cat $@_tmp >> $@ && rm -f $@_tmp; echo "#endif  //  _AFLOW_DATA_NIST_CPP_" >> $@; fi; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
 	-if [ ! -f $@ ]; then rm -rf $@.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/$@.xz && xz -dv $@.xz ; fi
+	if [ -f $@ ]; then GUARD_CHECK=$$(grep '_AFLOW_DATA_NIST_CPP_' $@); if [ -z "$$GUARD_CHECK" ]; then mv $@ $@_tmp; echo "#ifndef _AFLOW_DATA_NIST_CPP_" >> $@; echo "#define _AFLOW_DATA_NIST_CPP_" >> $@; cat $@_tmp >> $@ && rm -f $@_tmp; echo "#endif  //  _AFLOW_DATA_NIST_CPP_" >> $@; fi; fi
 	if [ ! -f $@ ]; then exit 1; fi
 	touch $@
 aflow_data_aflow_potcars.cpp: Makefile 
