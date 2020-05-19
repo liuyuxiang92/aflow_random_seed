@@ -71,9 +71,12 @@ namespace aurostd {
   string get_datetime(void) { return utype2string(get_date())+"_"+get_time();}
   string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215
     stringstream misc_ss;
-    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day(),h=get_hour(),m=get_min(),s=get_sec();
+    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day();
     misc_ss << y << date_delim << (b<10?"0":"") << b << date_delim << (d<10?"0":"") << d;
-    if(include_time){misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << ":" << (s<10?"0":"") << s;}
+    if(include_time){
+      int h=get_hour(),m=get_min(),s=get_sec();
+      misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << time_delim << (s<10?"0":"") << s;
+    }
     return misc_ss.str();
   }
   bool beep(uint freq,uint duration) {
@@ -82,17 +85,52 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// get threadID
+namespace aurostd {
+  unsigned long long int getTID(void){ //CO20200502 - threadID
+    //for mac these numbers can be QUITE large, so better to be safe and return unsigned long long int
+    //see here: http://elliotth.blogspot.com/2012/04/gettid-on-mac-os.html
+    //also for macs: pid!=tid
+#ifdef _MACOSX_
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+    uint64_t tid64;
+    pthread_threadid_np(NULL, &tid64);
+    pid_t tid = (pid_t)tid64;
+    return (unsigned long long int)tid;
+#else
+    //////////////////////////////////////////////////////////
+#ifdef __GLIBC__
+#include <sys/syscall.h>  //CO20200502 - need for gettid()
+    pid_t tid = syscall(__NR_gettid);
+    return (unsigned long long int)tid;
+#else //ONLY if _MACOSX_ AND not __GLIBC__
+    return (unsigned long long int)getpid();
+#endif
+    //////////////////////////////////////////////////////////
+#endif  //END _MACOSX_
+#else //if NOT _MACOSX_
+    //////////////////////////////////////////////////////////
+#ifdef __GLIBC__
+    return (unsigned long long int)gettid();
+#else //for example CYGWIN
+    return (unsigned long long int)getpid();
+#endif
+    //////////////////////////////////////////////////////////
+#endif
+  }
+}
+
+// ***************************************************************************
 // FILES creation/destruction
 namespace aurostd {
   string TmpFileCreate(string identifier) {
-    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp";
+    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
     // cerr << str << endl;
     return str;
   }
-  string TmpFileCreate(void) {
-    return TmpFileCreate("");}
+  string TmpFileCreate(void) {return TmpFileCreate("");}
   string TmpDirectoryCreate(string identifier) {
-    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";
+    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
     DirectoryMake(dir);
     return dir;}
   string TmpDirectoryCreate(void) {
@@ -1915,7 +1953,7 @@ namespace aurostd {
   // ***************************************************************************
   // aurostd::ZIP2ZIP aurostd::BZ2XZ aurostd::GZ2XZ
   // ***************************************************************************
-  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE) {  // "" compliant April/2019 SC
+  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE,const string& message) {  // "" compliant April/2019 SC
     string from_cmd="bzip2",from_ext="bz2";
     string to_cmd="xz",to_ext="xz";
     string dir=aurostd::CleanFileName(_dir);
@@ -1929,17 +1967,17 @@ namespace aurostd {
     if((from=="tbz") && (to=="xz")) { from_cmd="bzip",from_ext="tbz";to_cmd="xz",to_ext="xz"; } 
     if((from=="tgz") && (to=="xz")) { from_cmd="gzip",from_ext="tgz";to_cmd="xz",to_ext="xz"; } 
 
-    if(VERBOSE) { cout << "aurostd::ZIP2ZIP: BEGIN - dir=" << dir << endl; }
+    if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: BEGIN - dir=" << dir << endl; }
     vector<string> vfile;
     //    cerr << string("ls \""+dir+"\"/* | grep "+from_ext) << endl;
     aurostd::string2vectorstring(aurostd::execute2string("ls \""+dir+"\"/* | grep "+from_ext),vfile);
 
     for(uint ifile=0;ifile<vfile.size();ifile++) {
-      if(VERBOSE) { cout << "aurostd::ZIP2ZIP: vfile.at(ifile)=" << vfile.at(ifile) << endl;}
+      if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: vfile.at(ifile)=" << vfile.at(ifile) << endl;}
       aurostd::StringSubst(vfile.at(ifile),"."+from_ext,"");
       if(aurostd::FileExist(vfile.at(ifile)+"."+from_ext)) {
         // PATCH to be removed	if(VERBOSE)
-        { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" vfile.at(" << ifile << ")=" << vfile.at(ifile) << " "; cout.flush(); }
+        { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" vfile.at(" << ifile << ")=" << vfile.at(ifile) << " "; cout.flush(); }
         aurostd::UncompressFile(vfile.at(ifile)+"."+from_ext);
         // PATCH to be removedif(VERBOSE)
         { cout << "[" << from_ext << "]"; cout.flush(); }
@@ -1952,41 +1990,41 @@ namespace aurostd {
     }
     if(aurostd::FileExist(dir+"/aflow.in"))
       if(aurostd::substring_present_file_FAST(dir+"/aflow.in",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/aflow.in" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/aflow.in" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/agl_aflow.in"))
       if(aurostd::substring_present_file_FAST(dir+"/agl_aflow.in",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/agl_aflow.in" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/agl_aflow.in" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/agl_aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/ael_aflow.in"))
       if(aurostd::substring_present_file_FAST(dir+"/ael_aflow.in",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/ael_aflow.in" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/ael_aflow.in" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/ael_aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/LOCK"))
       if(aurostd::substring_present_file_FAST(dir+"/LOCK",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LOCK" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LOCK" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/LOCK\"*");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
     if(aurostd::FileExist(dir+"/LLOCK"))
       if(aurostd::substring_present_file_FAST(dir+"/LLOCK",from_cmd)) {
-        if(VERBOSE) { cout << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LLOCK" << " " << endl; cout.flush(); }
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LLOCK" << " " << endl; cout.flush(); }
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"\"/LLOCK\"*");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
 
-    if(VERBOSE) { cout << "aurostd::ZIP2ZIP: END   - dir=" << dir << endl; }
+    if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: END   - dir=" << dir << endl; }
     return TRUE;
   }
 
-  bool BZ2XZ(string dir,bool VERBOSE) { return ZIP2ZIP(dir,"bz2","xz",VERBOSE); }
-  bool GZ2XZ(string dir,bool VERBOSE) { return ZIP2ZIP(dir,"gz","xz",VERBOSE); }
+  bool BZ2XZ(string dir,bool VERBOSE,const string& message) { return ZIP2ZIP(dir,"bz2","xz",VERBOSE,message); }
+  bool GZ2XZ(string dir,bool VERBOSE,const string& message) { return ZIP2ZIP(dir,"gz","xz",VERBOSE,message); }
 
   // ***************************************************************************
   // Function FileExist
@@ -3528,7 +3566,7 @@ namespace aurostd {
   uint efile2vectorstring(string FileNameIN,vector<string>& vline) {
     return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
-  
+
   bool vectorstring2file(const vector<string>& vline,string FileNameOUT) {
     string file=aurostd::CleanFileName(FileNameOUT);
     ofstream FileOUT;
@@ -4094,7 +4132,7 @@ namespace aurostd {
     aurostd::execute("mv \""+file+"\" \""+destination+"\"");
     return TRUE;
   }
-  
+
   //***************************************************************************//
   // aurostd::file2md5sum
   //***************************************************************************//
@@ -4107,7 +4145,7 @@ namespace aurostd {
     }
     return "";
   }
-  
+
   //***************************************************************************//
   // aurostd::file2auid
   //***************************************************************************//
@@ -4115,13 +4153,13 @@ namespace aurostd {
   string file2auid(const string& file) { //SC20200326
     vector<string> vtokens;
     if(aurostd::FileExist(file)) {
-    uint64_t crc=0;
-    crc=aurostd::crc64(crc,aurostd::efile2string(file)); // DONT TOUCH THIS
-    return aurostd::crc2string(crc);
+      uint64_t crc=0;
+      crc=aurostd::crc64(crc,aurostd::efile2string(file)); // DONT TOUCH THIS
+      return aurostd::crc2string(crc);
     }
     return "";
   }
-  
+
   // ***************************************************************************
   // Function IsDirectory
   // ***************************************************************************
@@ -5421,7 +5459,7 @@ namespace aurostd {
 
     double numerator = aurostd::string2utype<double>(tokens[0]);
     double denominator = aurostd::string2utype<double>(tokens[1]);
-    
+
     // --------------------------------------------------------------------------
     // protect against division by zero
     if(aurostd::isequal(denominator,_ZERO_TOL_)){
@@ -6649,7 +6687,7 @@ namespace aurostd {
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
-  // [OBSOLETE]  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {  // USE OVERLOADING
+  // [OBSOLETE]  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT)  // USE OVERLOADING
   deque<string> vecDouble2vecString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) { //SC20200330
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
@@ -6660,7 +6698,7 @@ namespace aurostd {
     return vout;
   }
 }
- 
+
 namespace aurostd {
   //***************************************************************************//
   // aurostd::wrapVecEntries(vector<string>& vin,string wrap)

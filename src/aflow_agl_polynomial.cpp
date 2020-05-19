@@ -98,34 +98,34 @@ namespace AGL_functions {
       // Increase the number of parameters until limit is reached:
       npolycoeffworkmax = min (ndataiterfit-nlimit-1, AGL_data.maxpolycoeffs);
       for (npolycoeffwork = npolycoeffworkmin; npolycoeffwork <= npolycoeffworkmax; npolycoeffwork++) {
-	nfit = nfit + 1;
-	polycoeffwork.resize(npolycoeffwork+1);
-	pferr = AGL_functions::polynom_fit (first_entry_tofit, last_entry_tofit, xdata_to_fit, ydata_to_fit, weight, AGL_data.rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
-	if(pferr != 0) {
-	  return 2;
-	}
-	// Discard polynomial fits that don't give a minimum inside the bracket around the input data minimum
-	aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin-1), polycoeffwork, plnvm, 1);
-	aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin+1), polycoeffwork, plnvp, 1);
-	deriv_prod = plnvm * plnvp;
-	if(deriv_prod >= 0.0) {
-	  nfit = nfit - 1;
-	}
-	// Check that the number of fitted polynomials does not exceed the maximum number requested
-	// Discard fitted polynomials which exceed the maximum number allowed
-	else if(nfit > (AGL_data.maxfit - 1)) {
-	  nfit = AGL_data.maxfit - 1;
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_WARNING_ + "polynomial_fit_weight_ave: Warning! maximum number of fits exceeded" << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	}
-	// Save parameters obtained from fitting procedure
-	else {
-	  npolynomialcoeffs = max (npolynomialcoeffs, npolycoeffwork);
-	  npolycoeffworkfit.at(nfit) = npolycoeffwork;
-	  ndatafit.at(nfit) = ndataiterfit;
-	  rmsmin = min(rmsmin, AGL_data.rms * npolycoeffwork / ndataiterfit);
-	}
+        nfit = nfit + 1;
+        polycoeffwork.resize(npolycoeffwork+1);
+        pferr = AGL_functions::polynom_fit (first_entry_tofit, last_entry_tofit, xdata_to_fit, ydata_to_fit, weight, AGL_data.rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
+        if(pferr != 0) {
+          return 2;
+        }
+        // Discard polynomial fits that don't give a minimum inside the bracket around the input data minimum
+        aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin-1), polycoeffwork, plnvm, 1);
+        aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin+1), polycoeffwork, plnvp, 1);
+        deriv_prod = plnvm * plnvp;
+        if(deriv_prod >= 0.0) {
+          nfit = nfit - 1;
+        }
+        // Check that the number of fitted polynomials does not exceed the maximum number requested
+        // Discard fitted polynomials which exceed the maximum number allowed
+        else if(nfit > (AGL_data.maxfit - 1)) {
+          nfit = AGL_data.maxfit - 1;
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_WARNING_ + "polynomial_fit_weight_ave: Warning! maximum number of fits exceeded" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+        // Save parameters obtained from fitting procedure
+        else {
+          npolynomialcoeffs = max (npolynomialcoeffs, npolycoeffwork);
+          npolycoeffworkfit.at(nfit) = npolycoeffwork;
+          ndatafit.at(nfit) = ndataiterfit;
+          rmsmin = min(rmsmin, AGL_data.rms * npolycoeffwork / ndataiterfit);
+        }
       }
       first_entry_tofit = first_entry_tofit + 1;
       last_entry_tofit = last_entry_tofit - 1;
@@ -158,17 +158,17 @@ namespace AGL_functions {
       last_entry_tofit = ydata_to_fit.size() - first_entry_tofit - 1;
       pferr = AGL_functions::polynom_fit (first_entry_tofit, last_entry_tofit, xdata_to_fit, ydata_to_fit, weight, AGL_data.rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
       if(pferr != 0) {
-	return 2;
+        return 2;
       }
       // OBSOLETE weight_rms = AGL_data.rms * (npolycoeffwork + 1) / (rmsmin * (ndataiterfit+1));
       weight_rms = (AGL_data.rms * npolycoeffwork) / (rmsmin * ndataiterfit);
       weight_rms_gaussian = exp(-weight_rms * weight_rms);
       for (int i = 0; i <= npolycoeffwork; i++) {
-	polynomialcoeffs.at(i) = polynomialcoeffs.at(i) + weight_rms_gaussian * polycoeffwork.at(i);
-	polynomialerrors.at(2*i) = polynomialerrors.at(2*i) + weight_rms_gaussian * polycoeffwork.at(i) * polycoeffwork.at(i);
-	for (int j = 0; j < i; j++) {
-	  polynomialerrors.at(i+j) = polynomialerrors.at(i+j) + 2.0 * weight_rms_gaussian * polycoeffwork.at(j) * polycoeffwork.at(i);
-	}
+        polynomialcoeffs.at(i) = polynomialcoeffs.at(i) + weight_rms_gaussian * polycoeffwork.at(i);
+        polynomialerrors.at(2*i) = polynomialerrors.at(2*i) + weight_rms_gaussian * polycoeffwork.at(i) * polycoeffwork.at(i);
+        for (int j = 0; j < i; j++) {
+          polynomialerrors.at(i+j) = polynomialerrors.at(i+j) + 2.0 * weight_rms_gaussian * polycoeffwork.at(j) * polycoeffwork.at(i);
+        }
       }
       weight_norm = weight_norm + weight_rms_gaussian;
     }
@@ -271,7 +271,7 @@ namespace AGL_functions {
     for (uint i = 0; i < weight.size(); i++) {
       weight.at(i) = 1.0;
     }
-  
+
     // OBSOLETE polycoeffwork.resize(AGL_data.maxpolycoeffs+1);
     // OBSOLETE for (int i = 0; i <= AGL_data.maxpolycoeffs; i++) {
     // OBSOLETE   polycoeffwork.at(i) = 0.0;
@@ -279,7 +279,7 @@ namespace AGL_functions {
 
     ofilefittss << "# Raw fitts" << endl;
     ofilefittss << endl;
-    
+
     // Fitting algorithm first loops over different order polynomials
     nfit = 0;
     int npolynomialcoeffs = 0;
@@ -304,77 +304,77 @@ namespace AGL_functions {
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: npolycoeffworkmax = " << npolycoeffworkmax << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       for (npolycoeffwork = npolycoeffworkmin; npolycoeffwork <= npolycoeffworkmax; npolycoeffwork++) {
-	nfit = nfit + 1;
-	ofilefittss << "npolycoeffwork = " << npolycoeffwork << ", nfit = " << nfit << endl;
-	polycoeffwork.resize(npolycoeffwork+1);
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: AGL_data.rms = " << AGL_data.rms << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: npolycoeffwork = " << npolycoeffwork << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: nfit = " << nfit << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: first_entry_tofit = " << first_entry_tofit << ", last_entry_tofit = " << last_entry_tofit << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: xdata_to_fit = ";
-	for (uint ij = 0; ij < xdata_to_fit.size(); ij++) {
-	  aus << xdata_to_fit.at(ij) << "\t";
-	}
-	aus << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: ydata_to_fit = ";
-	for (uint ij = 0; ij < ydata_to_fit.size(); ij++) {
-	  aus << ydata_to_fit.at(ij) << "\t";
-	}
-	aus << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: weight = ";
-	for (uint ij = 0; ij < weight.size(); ij++) {
-	  aus << weight.at(ij) << "\t";
-	}
-	aus << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	pferr = AGL_functions::polynom_fit (first_entry_tofit, last_entry_tofit, xdata_to_fit, ydata_to_fit, weight, AGL_data.rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: AGL_data.rms = " << AGL_data.rms << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: npolycoeffwork = " << npolycoeffwork << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: polycoeffwork = ";
-	for (uint ij = 0; ij < polycoeffwork.size(); ij++) {
-	  aus << polycoeffwork.at(ij) << "\t";
-	}
-	aus << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: nfit = " << nfit << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: first_entry_tofit = " << first_entry_tofit << ", last_entry_tofit = " << last_entry_tofit << endl;
-	aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: pferr = " << pferr << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	for (int ij = 0; ij < npolycoeffwork; ij++) {
-	  ofilefittss << "polycoeffwork[" << ij << "] = " << polycoeffwork.at(ij) << endl;
-	}
-	if(pferr != 0) {
-	  return 2;
-	}
-	// Discard polynomials fits that don't give a minimum inside the bracket around the input data minimum
-	aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin-1), polycoeffwork, plnvm, 1);
-	aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin+1), polycoeffwork, plnvp, 1);
-	deriv_prod = plnvm * plnvp;
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_MESSAGE_ + "Product of derivatives on either side of expected minimum = " << deriv_prod << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	if(deriv_prod >= 0.0) {
-	  nfit = nfit - 1;
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_WARNING_ + "polynomial_fit_weight_ave_debug: no minimum in input bracket: removing fit" << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	}
+        nfit = nfit + 1;
+        ofilefittss << "npolycoeffwork = " << npolycoeffwork << ", nfit = " << nfit << endl;
+        polycoeffwork.resize(npolycoeffwork+1);
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: AGL_data.rms = " << AGL_data.rms << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: npolycoeffwork = " << npolycoeffwork << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: nfit = " << nfit << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: first_entry_tofit = " << first_entry_tofit << ", last_entry_tofit = " << last_entry_tofit << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: xdata_to_fit = ";
+        for (uint ij = 0; ij < xdata_to_fit.size(); ij++) {
+          aus << xdata_to_fit.at(ij) << "\t";
+        }
+        aus << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: ydata_to_fit = ";
+        for (uint ij = 0; ij < ydata_to_fit.size(); ij++) {
+          aus << ydata_to_fit.at(ij) << "\t";
+        }
+        aus << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: weight = ";
+        for (uint ij = 0; ij < weight.size(); ij++) {
+          aus << weight.at(ij) << "\t";
+        }
+        aus << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        pferr = AGL_functions::polynom_fit (first_entry_tofit, last_entry_tofit, xdata_to_fit, ydata_to_fit, weight, AGL_data.rms, npolycoeffwork, polycoeffwork, AGL_data.gaussxm_debug, FileMESSAGE);
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: AGL_data.rms = " << AGL_data.rms << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: npolycoeffwork = " << npolycoeffwork << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: polycoeffwork = ";
+        for (uint ij = 0; ij < polycoeffwork.size(); ij++) {
+          aus << polycoeffwork.at(ij) << "\t";
+        }
+        aus << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: nfit = " << nfit << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: first_entry_tofit = " << first_entry_tofit << ", last_entry_tofit = " << last_entry_tofit << endl;
+        aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: pferr = " << pferr << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        for (int ij = 0; ij < npolycoeffwork; ij++) {
+          ofilefittss << "polycoeffwork[" << ij << "] = " << polycoeffwork.at(ij) << endl;
+        }
+        if(pferr != 0) {
+          return 2;
+        }
+        // Discard polynomials fits that don't give a minimum inside the bracket around the input data minimum
+        aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin-1), polycoeffwork, plnvm, 1);
+        aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(imin+1), polycoeffwork, plnvp, 1);
+        deriv_prod = plnvm * plnvp;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_MESSAGE_ + "Product of derivatives on either side of expected minimum = " << deriv_prod << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        if(deriv_prod >= 0.0) {
+          nfit = nfit - 1;
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_WARNING_ + "polynomial_fit_weight_ave_debug: no minimum in input bracket: removing fit" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
         // Check that the number of fitted polynomials does not exceed the maximum number requested
         // Discard fitted polynomials which exceed the maximum number allowed
-	else if(nfit > AGL_data.maxfit) {
-	  nfit = AGL_data.maxfit;
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_WARNING_ + "polynomial_fit_weight_ave_debug: Warning! maximum number of fits exceeded" << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	}
-	// Save fitted parameters
-	else {
-	  npolynomialcoeffs = max (npolynomialcoeffs,npolycoeffwork);
-	  npolycoeffworkfit.at(nfit) = npolycoeffwork;
-	  ndatafit.at(nfit) = ndataiterfit;
-	  rmsmin = min(rmsmin,AGL_data.rms*npolycoeffwork/ndataiterfit);
-	}
+        else if(nfit > AGL_data.maxfit) {
+          nfit = AGL_data.maxfit;
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_WARNING_ + "polynomial_fit_weight_ave_debug: Warning! maximum number of fits exceeded" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+        // Save fitted parameters
+        else {
+          npolynomialcoeffs = max (npolynomialcoeffs,npolycoeffwork);
+          npolycoeffworkfit.at(nfit) = npolycoeffwork;
+          ndatafit.at(nfit) = ndataiterfit;
+          rmsmin = min(rmsmin,AGL_data.rms*npolycoeffwork/ndataiterfit);
+        }
       }
       first_entry_tofit = first_entry_tofit + 1;
       last_entry_tofit = last_entry_tofit - 1;
@@ -418,17 +418,17 @@ namespace AGL_functions {
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: first_entry_tofit = " << first_entry_tofit << ", last_entry_tofit = " << last_entry_tofit << endl;
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: xdata_to_fit = ";
       for (uint ij = 0; ij < xdata_to_fit.size(); ij++) {
-	aus << xdata_to_fit.at(ij) << "\t";
+        aus << xdata_to_fit.at(ij) << "\t";
       }
       aus << endl;
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: ydata_to_fit = ";
       for (uint ij = 0; ij < ydata_to_fit.size(); ij++) {
-	aus << ydata_to_fit.at(ij) << "\t";
+        aus << ydata_to_fit.at(ij) << "\t";
       }
       aus << endl;
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: weight = ";
       for (uint ij = 0; ij < weight.size(); ij++) {
-	aus << weight.at(ij) << "\t";
+        aus << weight.at(ij) << "\t";
       }
       aus << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -438,22 +438,22 @@ namespace AGL_functions {
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: npolycoeffwork = " << npolycoeffwork << endl;
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: polycoeffwork = ";
       for (uint ij = 0; ij < polycoeffwork.size(); ij++) {
-	aus << polycoeffwork.at(ij) << "\t";
+        aus << polycoeffwork.at(ij) << "\t";
       }
       aus << endl;
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: ifit = " << ifit << endl;
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: first_entry_tofit = " << first_entry_tofit << ", last_entry_tofit = " << last_entry_tofit << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       for (int ij = 0; ij < npolycoeffwork; ij++) {
-	ofilefittss << "polycoeffwork[" << ij << "] = " << polycoeffwork.at(ij) << endl;
-	ofilermsss << ifit << "\t" << AGL_data.rms << endl; 
-	for (uint i = 0; i < ydata_to_fit.size(); i++) {
-	  aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, plnvf, 0); 
-	  allfits.at(ifit-1).at(i) = plnvf;
-	}
+        ofilefittss << "polycoeffwork[" << ij << "] = " << polycoeffwork.at(ij) << endl;
+        ofilermsss << ifit << "\t" << AGL_data.rms << endl; 
+        for (uint i = 0; i < ydata_to_fit.size(); i++) {
+          aglerror = AGL_functions::polynom_eval (xdata_to_fit.at(i), polynomialcoeffs, plnvf, 0); 
+          allfits.at(ifit-1).at(i) = plnvf;
+        }
       }
       if(pferr != 0) {
-	return 2;
+        return 2;
       }
       // OBSOLETE weight_rms = AGL_data.rms*(npolycoeffwork+1)/(rmsmin*(ndataiterfit+1));
       weight_rms = (AGL_data.rms * npolycoeffwork)/(rmsmin * ndataiterfit);
@@ -469,11 +469,11 @@ namespace AGL_functions {
       aus << _AGLSTR_MESSAGE_ + "polynomial_fit_weight_ave_debug: weight_norm = " << weight_norm << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       for (int i = 0; i <= npolycoeffwork; i++) {
-	polynomialcoeffs.at(i) = polynomialcoeffs.at(i) + weight_rms_gaussian * polycoeffwork.at(i);
-	polynomialerrors.at(2*i) = polynomialerrors.at(2*i) + weight_rms_gaussian * polycoeffwork.at(i) * polycoeffwork.at(i);
-	for (int j = 0; j < i; j++) {
-	  polynomialerrors.at(i+j) = polynomialerrors.at(i+j) + 2.0 * weight_rms_gaussian * polycoeffwork.at(j) * polycoeffwork.at(i);
-	}
+        polynomialcoeffs.at(i) = polynomialcoeffs.at(i) + weight_rms_gaussian * polycoeffwork.at(i);
+        polynomialerrors.at(2*i) = polynomialerrors.at(2*i) + weight_rms_gaussian * polycoeffwork.at(i) * polycoeffwork.at(i);
+        for (int j = 0; j < i; j++) {
+          polynomialerrors.at(i+j) = polynomialerrors.at(i+j) + 2.0 * weight_rms_gaussian * polycoeffwork.at(j) * polycoeffwork.at(i);
+        }
       }
       weight_norm = weight_norm + weight_rms_gaussian;
       aurostd::StringstreamClean(aus);
@@ -510,7 +510,7 @@ namespace AGL_functions {
     for (uint i = 0; i < xdata_to_fit.size(); i++) {
       ofileplotafitss << xdata_to_fit.at(i);
       for (ifit = 1; ifit <= nfit; ifit++) {
-	ofileplotafitss << "\t" << allfits.at(ifit-1).at(i);
+        ofileplotafitss << "\t" << allfits.at(ifit-1).at(i);
       }
       ofileplotafitss << endl;
     }
@@ -621,11 +621,11 @@ namespace AGL_functions {
     // Search for a minimum pattern
     while (imin > 0 && imin < (ydata_to_fit.size()-1)) {
       if(ydata_to_fit.at(imin) > ydata_to_fit.at(imin+istep)) {
-	imin = imin + istep;
+        imin = imin + istep;
       }
       // Minimum pattern found
       else {
-	return 0;
+        return 0;
       }
     }
     // No minimum pattern
@@ -654,8 +654,8 @@ namespace AGL_functions {
     funcmin = ydata_to_fit.at(imin);
     for (uint istep = 1; istep < ydata_to_fit.size(); istep++) {
       if(ydata_to_fit.at(istep) < funcmin) {
-	imin = istep;
-	funcmin = ydata_to_fit.at(imin);
+        imin = istep;
+        funcmin = ydata_to_fit.at(imin);
       }
     }
     // imin outside limits
@@ -695,8 +695,8 @@ namespace AGL_functions {
     funcmin = y.at(imin);
     for (uint istep = 1; istep < x.size(); istep++) {
       if(y.at(istep) < funcmin) {
-	imin = istep;
-	funcmin = y.at(imin);
+        imin = istep;
+        funcmin = y.at(imin);
       }
     }
     // imin outside limits
@@ -745,7 +745,7 @@ namespace AGL_functions {
       return false;
     }
   }
-  
+
 
   uint polynom_minimum (double& xinitial, double& xmin, double& xmax, vector<double>& polynomialcoeffs, double& pxmin, ofstream& FileMESSAGE) {
     double x, x_0, x_a, x_b, dx, tol;
@@ -776,7 +776,7 @@ namespace AGL_functions {
       aus << _AGLSTR_WARNING_ + "polynom_minimum: polynomialcoeffs.size() = " << polynomialcoeffs.size() << endl;
       aus << _AGLSTR_WARNING_ + "polynom_minimum: polynomialcoeffs = ";
       for (uint i = 0; i < polynomialcoeffs.size(); i++) {
-	aus << polynomialcoeffs.at(i) << "\t";
+        aus << polynomialcoeffs.at(i) << "\t";
       }
       aus << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -785,34 +785,34 @@ namespace AGL_functions {
       // Errors are checked in reverse order of severity (i.e. most severe error is checked last)
       // This sets pmerr signal to most severe error warning so this can be corrected first (if possible)
       if(!(AGL_functions::zero_bracketed_check(f_a, f_b))) {
-	if(f_a > 0.0 && f_b > 0.0) {
-	  aus << _AGLSTR_WARNING_ + "polynom_minimum: f(x_a) and f(x_b) are both greater than 0" << endl;
-	  if(f_a > f_b) {
-	    pmerr = 1;
-	  } else {
-	    pmerr = 2;
-	  }
-	} else if(f_a < 0.0 && f_b < 0.0) {
-	  aus << _AGLSTR_WARNING_ + "polynom_minimum: f(x_a) and f(x_b) are both less than 0" << endl;
-	  if(f_a > f_b) {
-	    pmerr = 2;
-	  } else {
-	    pmerr = 1;
-	  }
-	}
+        if(f_a > 0.0 && f_b > 0.0) {
+          aus << _AGLSTR_WARNING_ + "polynom_minimum: f(x_a) and f(x_b) are both greater than 0" << endl;
+          if(f_a > f_b) {
+            pmerr = 1;
+          } else {
+            pmerr = 2;
+          }
+        } else if(f_a < 0.0 && f_b < 0.0) {
+          aus << _AGLSTR_WARNING_ + "polynom_minimum: f(x_a) and f(x_b) are both less than 0" << endl;
+          if(f_a > f_b) {
+            pmerr = 2;
+          } else {
+            pmerr = 1;
+          }
+        }
       }
       if(!(AGL_functions::val_bracketed_check(x - x_a, x - x_b))) {
-	if(x_a > x) {
-	  aus << _AGLSTR_WARNING_ + "polynom_minimum: x_a > x" << endl;
-	  pmerr = 3;
-	} else if(x_b < x) {
-	  aus << _AGLSTR_WARNING_ + "polynom_minimum: x_b < x" << endl;
-	  pmerr = 4;
-	}
+        if(x_a > x) {
+          aus << _AGLSTR_WARNING_ + "polynom_minimum: x_a > x" << endl;
+          pmerr = 3;
+        } else if(x_b < x) {
+          aus << _AGLSTR_WARNING_ + "polynom_minimum: x_b < x" << endl;
+          pmerr = 4;
+        }
       }
       if(x_a > x_b) {
-      	aus << _AGLSTR_WARNING_ + "polynom_minimum: x_a > x_b" << endl;
-	pmerr = 5;
+        aus << _AGLSTR_WARNING_ + "polynom_minimum: x_a > x_b" << endl;
+        pmerr = 5;
       }	
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       pxmin = x;
@@ -821,28 +821,28 @@ namespace AGL_functions {
     while (aurostd::abs(x_b - x_a) > tol && aurostd::abs(dx) > tol) {
       // Reset bracket range to previous root estimate on one side
       if(zero_bracketed_check(f_a, f_x)) {
-	x_b = x;
-	f_b = f_x;
+        x_b = x;
+        f_b = f_x;
       } else {
-	x_a = x;
-	f_a = f_x;
+        x_a = x;
+        f_a = f_x;
       }
       aglerror = AGL_functions::polynom_eval (x, polynomialcoeffs, dx, 2);
       aglerror = AGL_functions::polynom_eval (x, polynomialcoeffs, f_x, 1);
       if(aglerror != 0) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "polynom_minimum: error evaluating polynomial" << endl;
-	aurostd::StringstreamClean(aus);
-	return 7;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_ERROR_ + "polynom_minimum: error evaluating polynomial" << endl;
+        aurostd::StringstreamClean(aus);
+        return 7;
       }
       // Estimate axis-intersection from slope of function
       x_0 = x;
       if( !(AGL_functions::val_bracketed_check(dx * (x_0 - x_a) - f_x, dx * (x_0 - x_b) - f_x))) {
-	x = 0.5 * (x_b + x_a);
-	dx = x - x_0;
+        x = 0.5 * (x_b + x_a);
+        dx = x - x_0;
       } else {
-	dx = - f_x / dx;
-	x = x_0 + dx;
+        dx = - f_x / dx;
+        x = x_0 + dx;
       }
     }
     pxmin = x;
@@ -894,25 +894,25 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       ierr = AGL_functions::polynom_bracket_minimum (itry, xvalues, polynomialcoeffs, FileMESSAGE);
       if(ierr != 0) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_WARNING_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	// OBSOLETE pmerr = 6;
-	return 6;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_WARNING_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        // OBSOLETE pmerr = 6;
+        return 6;
       } else {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_MESSAGE_ << "autocorrect_polynom_minimum: Minimum of (E, V) data is at point imin = " << itry << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_MESSAGE_ << "autocorrect_polynom_minimum: Minimum of (E, V) data is at point imin = " << itry << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       if(itry < 2) {
-	lowerbound = 0;
+        lowerbound = 0;
       } else {
-	lowerbound = itry - 2;
+        lowerbound = itry - 2;
       }
       if(itry + 2 > xvalues.size() - 1) {
-	upperbound = xvalues.size() - 1;
+        upperbound = xvalues.size() - 1;
       } else {
-	upperbound = itry + 2;
+        upperbound = itry + 2;
       }
       pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
     }
@@ -920,88 +920,88 @@ namespace AGL_functions {
     // If this does not correct the error, then AFLOW AGL exits giving an error message
     if(pmerr != 0) {
       if(pmerr == 1) {
-	while ((pmerr == 1) && ((itry + 2) < (xvalues.size() - 1))) {
-	  itry = itry + 1;
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_MESSAGE_ << "autocorrect_polynom_minimum: Resetting itry to itry = " << itry << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  if(itry < 2) {
-	    lowerbound = 0;
-	  } else {
-	    lowerbound = itry - 2;
-	  }
-	  if(itry + 2 > xvalues.size() - 1) {
-	    upperbound = xvalues.size() - 1;
-	  } else {
-	    upperbound = itry + 2;
-	  }
-	  pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
-	}
-	// If error indicator has changed from 1 to 2, then the bracket has shifted from one side of the minimum to the other
-	// Need to expand the size of the bracket to incorporate the minimum
-	if(pmerr == 2) {
-	  if(itry < 4) {
-	    lowerbound = 0;
-	  } else {
-	    lowerbound = itry - 4;
-	  }
-	  if(itry + 4 > xvalues.size() - 1) {
-	    upperbound = xvalues.size() - 1;
-	  } else {
-	    upperbound = itry + 4;
-	  }
-	  pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
-	}
-	if(pmerr != 0) {
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_ERROR_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  return 6;
-	}
+        while ((pmerr == 1) && ((itry + 2) < (xvalues.size() - 1))) {
+          itry = itry + 1;
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_MESSAGE_ << "autocorrect_polynom_minimum: Resetting itry to itry = " << itry << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          if(itry < 2) {
+            lowerbound = 0;
+          } else {
+            lowerbound = itry - 2;
+          }
+          if(itry + 2 > xvalues.size() - 1) {
+            upperbound = xvalues.size() - 1;
+          } else {
+            upperbound = itry + 2;
+          }
+          pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
+        }
+        // If error indicator has changed from 1 to 2, then the bracket has shifted from one side of the minimum to the other
+        // Need to expand the size of the bracket to incorporate the minimum
+        if(pmerr == 2) {
+          if(itry < 4) {
+            lowerbound = 0;
+          } else {
+            lowerbound = itry - 4;
+          }
+          if(itry + 4 > xvalues.size() - 1) {
+            upperbound = xvalues.size() - 1;
+          } else {
+            upperbound = itry + 4;
+          }
+          pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
+        }
+        if(pmerr != 0) {
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_ERROR_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          return 6;
+        }
       } else if(pmerr == 2) {
-	while ((pmerr == 2) && (itry >= 2)) {
-	  itry = itry - 1;
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_MESSAGE_ << "autocorrect_polynom_minimum: Resetting itry to itry = " << itry << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  if(itry < 2) {
-	    lowerbound = 0;
-	  } else {
-	    lowerbound = itry - 2;
-	  }
-	  if(itry + 2 > xvalues.size() - 1) {
-	    upperbound = xvalues.size() - 1;
-	  } else {
-	    upperbound = itry + 2;
-	  }
-	  pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
-	}
-	// If error indicator has changed from 2 to 1, then the bracket has shifted from one side of the minimum to the other
-	// Need to expand the size of the bracket to incorporate the minimum
-	if(pmerr == 1) {
-	  if(itry < 2) {
-	    lowerbound = 0;
-	  } else {
-	    lowerbound = itry - 2;
-	  }
-	  if(itry + 2 > xvalues.size() - 1) {
-	    upperbound = xvalues.size() - 1;
-	  } else {
-	    upperbound = itry + 2;
-	  }
-	  pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
-	}
-	if(pmerr != 0) {
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_ERROR_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  return 6;
-	}
+        while ((pmerr == 2) && (itry >= 2)) {
+          itry = itry - 1;
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_MESSAGE_ << "autocorrect_polynom_minimum: Resetting itry to itry = " << itry << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          if(itry < 2) {
+            lowerbound = 0;
+          } else {
+            lowerbound = itry - 2;
+          }
+          if(itry + 2 > xvalues.size() - 1) {
+            upperbound = xvalues.size() - 1;
+          } else {
+            upperbound = itry + 2;
+          }
+          pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
+        }
+        // If error indicator has changed from 2 to 1, then the bracket has shifted from one side of the minimum to the other
+        // Need to expand the size of the bracket to incorporate the minimum
+        if(pmerr == 1) {
+          if(itry < 2) {
+            lowerbound = 0;
+          } else {
+            lowerbound = itry - 2;
+          }
+          if(itry + 2 > xvalues.size() - 1) {
+            upperbound = xvalues.size() - 1;
+          } else {
+            upperbound = itry + 2;
+          }
+          pmerr = AGL_functions::polynom_minimum (xvalues.at(itry), xvalues.at(lowerbound), xvalues.at(upperbound), polynomialcoeffs, xmin, FileMESSAGE);
+        }
+        if(pmerr != 0) {
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_ERROR_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          return 6;
+        }
       } else {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	return 6;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_ERROR_ + "autocorrect_polynom_minimum: Cannot find minimum of (E, V) data" << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        return 6;
       }
     } 
     return 0;
@@ -1050,29 +1050,29 @@ namespace AGL_functions {
       zdiff = 1.0;
       iloops = 0;
       while ((zdiff > eps) && (iloops < AGL_data.maxloops)) {
-	iloops = iloops + 1;
-	polynom1 = 1.0;
-	polynom2 = 0.0;
-	// Iterate over the recurrence relation to get the Legendre polynomial evaluated at z.
-	for ( j = 1; j <= n; j++) {
-	  polynom3 = polynom2;
-	  polynom2 = polynom1;
-	  polynom1 = ((2.0*j-1.0)*z*polynom2-(j-1.0)*polynom3)/j;
-	}
-	// polynom1 is the desired Legendre polynomial
-	// It's derivative, polynomderiv, is computed using a standard relation involving polynom2, the polynomial of one lower order.     
-	polynomderiv = n * (z * polynom1 - polynom2)/(z * z - 1.0);
-	z1 = z;
-	// Newton's method.
-	z = z1 - polynom1 / polynomderiv;
-	// Convergence test
-	zdiff = aurostd::abs(z-z1);
+        iloops = iloops + 1;
+        polynom1 = 1.0;
+        polynom2 = 0.0;
+        // Iterate over the recurrence relation to get the Legendre polynomial evaluated at z.
+        for ( j = 1; j <= n; j++) {
+          polynom3 = polynom2;
+          polynom2 = polynom1;
+          polynom1 = ((2.0*j-1.0)*z*polynom2-(j-1.0)*polynom3)/j;
+        }
+        // polynom1 is the desired Legendre polynomial
+        // It's derivative, polynomderiv, is computed using a standard relation involving polynom2, the polynomial of one lower order.     
+        polynomderiv = n * (z * polynom1 - polynom2)/(z * z - 1.0);
+        z1 = z;
+        // Newton's method.
+        z = z1 - polynom1 / polynomderiv;
+        // Convergence test
+        zdiff = aurostd::abs(z-z1);
       }
       if((iloops >= AGL_data.maxloops) && (zdiff > eps)) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_WARNING_ + "gauss_legendre: Maximum number of convergence loops exceeded" << endl;
-	aus << _AGLSTR_WARNING_ + "gauss_legendre: Number of loops for convergence = " << iloops << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_WARNING_ + "gauss_legendre: Maximum number of convergence loops exceeded" << endl;
+        aus << _AGLSTR_WARNING_ + "gauss_legendre: Number of loops for convergence = " << iloops << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       // Scale the root to the desired interval.
       xabscissa.at(i) = xm - xl * z;  
@@ -1125,27 +1125,27 @@ namespace AGL_functions {
     for (int j = 0; j <= npolycoeffwork; j++) {
       cmatrix.at(j).at(npolycoeffwork+1) = 0.0;
       if(j > 0) {
-	for (uint k = first_entry_tofit; k <= last_entry_tofit; k++) {
-	  cmatrix.at(j).at(npolycoeffwork+1) = cmatrix.at(j).at(npolycoeffwork+1) + weight.at(k) * ydata.at(k) * (pow(xdata.at(k), j));
-	}
+        for (uint k = first_entry_tofit; k <= last_entry_tofit; k++) {
+          cmatrix.at(j).at(npolycoeffwork+1) = cmatrix.at(j).at(npolycoeffwork+1) + weight.at(k) * ydata.at(k) * (pow(xdata.at(k), j));
+        }
       } else {
-	for (uint k = first_entry_tofit; k <= last_entry_tofit; k++) {
-	  cmatrix.at(j).at(npolycoeffwork+1) = cmatrix.at(j).at(npolycoeffwork+1) + weight.at(k) * ydata.at(k);
-	}
+        for (uint k = first_entry_tofit; k <= last_entry_tofit; k++) {
+          cmatrix.at(j).at(npolycoeffwork+1) = cmatrix.at(j).at(npolycoeffwork+1) + weight.at(k) * ydata.at(k);
+        }
       }
       cmatrix.at(j).at(npolycoeffwork+1) = weightnorm * cmatrix.at(j).at(npolycoeffwork+1);
       for (int i = j; i <= npolycoeffwork; i++) {
-	cmatrix.at(i).at(j) = 0.0;
-	ij = i + j;
-	if(ij > 0) {
-	  for (uint k = first_entry_tofit; k <= last_entry_tofit; k++) {
-	    cmatrix.at(i).at(j) = cmatrix.at(i).at(j) + weight.at(k) * pow(xdata.at(k), ij);
-	  }
-	  cmatrix.at(i).at(j) = weightnorm * cmatrix.at(i).at(j);
-	} else {
-	  cmatrix.at(i).at(j) = 1.0;
-	}
-	cmatrix.at(j).at(i) = cmatrix.at(i).at(j);
+        cmatrix.at(i).at(j) = 0.0;
+        ij = i + j;
+        if(ij > 0) {
+          for (uint k = first_entry_tofit; k <= last_entry_tofit; k++) {
+            cmatrix.at(i).at(j) = cmatrix.at(i).at(j) + weight.at(k) * pow(xdata.at(k), ij);
+          }
+          cmatrix.at(i).at(j) = weightnorm * cmatrix.at(i).at(j);
+        } else {
+          cmatrix.at(i).at(j) = 1.0;
+        }
+        cmatrix.at(j).at(i) = cmatrix.at(i).at(j);
       }
     }
     // Solve the linear system for the best A()'s:
@@ -1168,12 +1168,12 @@ namespace AGL_functions {
 // ***************************************************************************
 // AGL_functions::gaussxm
 // ***************************************************************************
-  // 
-  // gaussxm: interface function for aurostd::GaussJordan
-  //      
-  //      Converts data sets of type vector to type xmatrix and passes to aurostd::GaussJordan 
-  //	  Also contains optional debugging to print out values of input matrices		
-  // 
+// 
+// gaussxm: interface function for aurostd::GaussJordan
+//      
+//      Converts data sets of type vector to type xmatrix and passes to aurostd::GaussJordan 
+//	  Also contains optional debugging to print out values of input matrices		
+// 
 namespace AGL_functions {
   uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool& gxmdebug, ofstream& FileMESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -1183,21 +1183,21 @@ namespace AGL_functions {
 
     for (int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
-	cxm[i+1][j+1] = cmatrix.at(i).at(j);
-	if(LDEBUG && gxmdebug) {
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_WARNING_ + "gaussxm: cxm[" << i+1 << "][" << j+1 << "] = " << cxm[i+1][j+1] << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	}
+        cxm[i+1][j+1] = cmatrix.at(i).at(j);
+        if(LDEBUG && gxmdebug) {
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_WARNING_ + "gaussxm: cxm[" << i+1 << "][" << j+1 << "] = " << cxm[i+1][j+1] << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
       }
     }
 
     for (int i = 0; i < n; i++) {
       bxm[i+1][1] = cmatrix.at(i).at(n+1);
       if(LDEBUG && gxmdebug) {
-      	aurostd::StringstreamClean(aus);
-      	aus << _AGLSTR_WARNING_ + "gaussxm: bxm(i+1)(1) = " << bxm[i+1][1] << endl;
-      	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_WARNING_ + "gaussxm: bxm(i+1)(1) = " << bxm[i+1][1] << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
     }
 
@@ -1251,7 +1251,7 @@ namespace AGL_functions {
     for (uint i = (polynomialcoeffs.size()-1); i > norder; i--) {
       next_coeff = polynomialcoeffs.at(i-1);
       for (uint j = 1; j < (norder+1); j++) {
-	next_coeff = next_coeff * (i - j);
+        next_coeff = next_coeff * (i - j);
       }
       yval = yval * xval + next_coeff;
     }
@@ -1291,17 +1291,17 @@ namespace AGL_functions {
       smsq = 0.0;
 
       for (int j = 1; j < npoints; j++) {
-	yval = tdtrial / AGL_data.temperature_external.at(j);
-	aglerror = AGL_functions::debyeint(yval, Debye_int_val, AGL_data, FileMESSAGE);
-	cvt = 9.0 * nkb * Debye_int_val;
-	smsq = smsq + pow((cvt - AGL_data.CvunitkB0pressure.at(j)), 2);
+        yval = tdtrial / AGL_data.temperature_external.at(j);
+        aglerror = AGL_functions::debyeint(yval, Debye_int_val, AGL_data, FileMESSAGE);
+        cvt = 9.0 * nkb * Debye_int_val;
+        smsq = smsq + pow((cvt - AGL_data.CvunitkB0pressure.at(j)), 2);
       }
 
       rms = sqrt(smsq);
 
       if(rms < rmsmin) {
-	rmsmin = rms;
-	tdbest = tdtrial;
+        rmsmin = rms;
+        tdbest = tdtrial;
       }
     }
     return aglerror;
@@ -1333,20 +1333,20 @@ namespace AGL_functions {
       // Iterate increasing the number of Legendre points.
       debye_int_prev = 1e30;
       for (nl = 5; nl <= maxnl; nl = nl+5) {
-	AGL_functions::gauss_legendre (cero, yval, xpoints, weight, nl, AGL_data, FileMESSAGE);
-	sumdebyeint = 0.0;
-	for (i = 0; i < nl; i++) {
-	  sumdebyeint = sumdebyeint + weight.at(i) * fdebyeint(xpoints.at(i));
-	}
-	debye_integral = sumdebyeint / (pow(yval, 3.0));
-	// Convergence check
-	diff_int_abs = aurostd::abs(debye_integral - debye_int_prev);
-	if(diff_int_abs < eps) {
-	  break;
-	}
-	else {
-	  debye_int_prev = debye_integral;
-	}
+        AGL_functions::gauss_legendre (cero, yval, xpoints, weight, nl, AGL_data, FileMESSAGE);
+        sumdebyeint = 0.0;
+        for (i = 0; i < nl; i++) {
+          sumdebyeint = sumdebyeint + weight.at(i) * fdebyeint(xpoints.at(i));
+        }
+        debye_integral = sumdebyeint / (pow(yval, 3.0));
+        // Convergence check
+        diff_int_abs = aurostd::abs(debye_integral - debye_int_prev);
+        if(diff_int_abs < eps) {
+          break;
+        }
+        else {
+          debye_int_prev = debye_integral;
+        }
       }
     }
     Debye_int_val = debye_integral;

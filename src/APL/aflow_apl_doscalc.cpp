@@ -83,7 +83,7 @@ namespace apl {
     _projectedDOS.clear(); //ME20190614
     _projections.clear();  //ME20190624
     _bzmethod = "";
-    _temperature = 0.0;  // ME20190614
+    _temperature = 0.0;  //ME20190614
     _minFreq = AUROSTD_NAN;
     _maxFreq = AUROSTD_NAN;
     _stepDOS = 0.0;
@@ -100,7 +100,7 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
     string function = "apl::DOSCalculator::initialize()";
     string message = "";
@@ -278,7 +278,7 @@ namespace apl {
     gauss.clear();
   }
 
-  // ME20200203 - DOS can now be calculated within any frequency range
+  //ME20200203 - DOS can now be calculated within any frequency range
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS) {
@@ -471,7 +471,7 @@ namespace apl {
         double fbin, dos, part;
         int br = ibranch - _freqs[0].lrows;
         for (int k = kstart; k <= kstop; k++) {
-          // ME20200203 - Use bins to accommodate different frequency range
+          //ME20200203 - Use bins to accommodate different frequency range
           fbin = _bins[k]; // _minFreq + k * _stepDOS + _halfStepDOS;
           dos = 0.0;
           if ((f[0] <= fbin) && (fbin <= f[1])) {
@@ -493,7 +493,7 @@ namespace apl {
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
               part = 0.0;
-              // ME20200320 - due to the big nesting level, loop unrolling
+              //ME20200320 - due to the big nesting level, loop unrolling
               // leads to a huge speed-up (x2 or more)
               //[OBSOLETE] for (int icorner = 0; icorner < 4; icorner++) {
               //[OBSOLETE]   part += parts[corners[icorner]][br][p][at];
@@ -622,14 +622,14 @@ namespace apl {
     double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
-    // ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
+    //ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
     // using different frequency ranges
     xdos.energy_max = _bins.back() * conv;
     xdos.energy_min = _bins[0] * conv;
     xdos.number_energies = _dos.size();
     xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
     xdos.venergy = aurostd::vector2deque(_bins);
-    xdos.venergyEf = xdos.venergy;  // ME20200324
+    xdos.venergyEf = xdos.venergy;  //ME20200324
     for (uint i = 0; i < xdos.number_energies; i++) xdos.venergy[i] *= conv;
     xdos.viDOS.resize(1);
     xdos.viDOS[0] = aurostd::vector2deque(_idos);
@@ -648,7 +648,7 @@ namespace apl {
       for (uint at = 0; at < xdos.number_atoms; at++) {
         for (uint p = 0; p < _projections.size(); p++) {
           vDOS[at + 1][p + 1][0] = aurostd::vector2deque(_projectedDOS[at][p]);
-          // ME20200321 - Add to totals for consistency
+          //ME20200321 - Add to totals for consistency
           for (uint e = 0; e < xdos.number_energies; e++) {
             vDOS[0][p + 1][0][e] += vDOS[at + 1][p + 1][0][e];
             vDOS[at + 1][0][0][e] += vDOS[at + 1][p + 1][0][e];
@@ -663,7 +663,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200108 - added const
+  //ME20200108 - added const
   const vector<double>& DOSCalculator::getBins() const {
     return _bins;
   }
@@ -672,9 +672,14 @@ namespace apl {
     return _dos;
   }
 
-  // ME20200210
+  //ME20200210
   const vector<double>& DOSCalculator::getIDOS() const {
     return _idos;
+  }
+
+  //AS20200512
+  const vector<xvector<double> >& DOSCalculator::getFreqs() const {
+    return _freqs;
   }
 
   bool DOSCalculator::hasNegativeFrequencies() const {

@@ -83,168 +83,177 @@ struct AGL_dos_pressures {
 
 class AGLStageBreak : public std::exception
 {
- public:
-  AGLStageBreak() { }
+  public:
+    AGLStageBreak() { }
 };
 
 // Class to hold input and output data for AGL
 class _AGL_data {
- public:
-  // constructors/destructors
-  _AGL_data();
-  ~_AGL_data();
-  const _AGL_data& operator=(const _AGL_data &b);    
-  
-  // Input title and filename
-  string dirpathname;
-  string sysname;
+  public:
+    // constructors/destructors
+    _AGL_data();
+    ~_AGL_data();
+    const _AGL_data& operator=(const _AGL_data &b);    
 
-  // Stringstreams for output data
-  stringstream outfiless, outfiletss;
+    // Input title and filename
+    string dirpathname;
+    string sysname;
 
-  // User input data
-  double natoms;
-  double energy_infinity;
-  int i_eqn_of_state;
-  int i_debye;
-  int i_optimize_beta;
-  double poissonratio;
-  vector<double> pressure_external;
-  vector<double> temperature_external;
-  int maxloops;
-  int maxfit;
-  int maxpolycoeffs;
-  int birchfitorder_iG;
-  int fittype;
-  bool gaussxm_debug;
-  // Variable to record origin of Poisson ratio used
-  string poissonratiosource;
-  // Variable to control whether PREC and ALGO values are set to ACCURATE and NORMAL, or are left as defaults/read from aflow.in file
-  bool precaccalgonorm;
-  // Variable to control what aflow run type is used (relax, static or relax_static)
-  bool relax_static;
-  bool static_only;
-  bool relax_only;
-  // Variable to control running of Hugoniot calculation
-  bool hugoniotrun;
-  bool hugoniotextrapolate;
+    // Stringstreams for output data
+    stringstream outfiless, outfiletss;
 
-  // Variable to control generation of pressure-volume data for AEL calculations
-  bool ael_pressure_calc;
-  
-  // List of failed ARUN directories to be skipped by AGL fitting procedure
-  vector<string> failed_arun_list;
-  bool autoskipfailedaruns;
-  uint skiparunsmax;
-  // Initial number of ARUN directories set-up
-  // Will be used to check number eliminated in error correction does not exceed skiparunsmax
-  uint nstructsinit;
+    // User input data
+    double natoms;
+    double energy_infinity;
+    int i_eqn_of_state;
+    int i_debye;
+    int i_optimize_beta;
+    double poissonratio;
+    vector<double> pressure_external;
+    vector<double> temperature_external;
+    int maxloops;
+    int maxfit;
+    int maxpolycoeffs;
+    int birchfitorder_iG;
+    int fittype;
+    bool gaussxm_debug;
+    // Variable to record origin of Poisson ratio used
+    string poissonratiosource;
+    // Variable to control whether PREC and ALGO values are set to ACCURATE and NORMAL, or are left as defaults/read from aflow.in file
+    bool precaccalgonorm;
+    // Variable to control what aflow run type is used (relax, static or relax_static)
+    bool relax_static;
+    bool static_only;
+    bool relax_only;
+    // Variable to control running of Hugoniot calculation
+    bool hugoniotrun;
+    bool hugoniotextrapolate;
+    // Number/size of temperature and pressure steps to be used for re-run of postprocessing from command line options
+    uint ntemperature;
+    double stemperature;
+    uint npressure;
+    double spressure;
 
-  // Calculated input data
-  double cellmass;
-  vector<double> energyinput;
-  vector<double> volumeinput;
-  vector<double> energyinput_orig;
-  vector<double> volumeinput_orig;
-  vector<double> pressurecalculated;
-  vector<xmatrix<double> > stresscalculated;
-  vector<int> structurecalculated;
-  vector<double> tdebye;
-  double pressurecalculatedmax;
 
-  // Data calculated within GIBBS
-  vector<double> d2EnergydVolume2_static;
-  double poissonratiofunction;
-  // Equation of state data
-  vector<double> voleqmin;
-  vector<double> bulkmodulus;
-  vector<double> alpha;
-  vector<double> d2EnergydVolume2_dynamic;
-  vector<double> gamma_G;
-  vector<double> gamma_poly;
-  vector<double> pressure_static;
-  double rms;
-  double bulkmodulus_0pressure;
-  double dbulkmodulusdpV_0pressure;
-  double d2bulkmodulusdpV2_0pressure;
-  // Equilibrium volume and lattice strain factor at zero pressure and temperature
-  // Can be used to create a fully relaxed volume structure
-  double volume_equilibrium_0p0T;
-  double xlattice_equilibrium_0p0T;
-  double energy_equilibrium_0p0T;
-  
-  // Vector of structs with Gibbs free energy and other quantities as a function of pressure and temperature
-  vector<AGL_pressure_temperature_energies> AGL_pressure_temperature_energy_list;
-  vector<AGL_pressure_enthalpies> AGL_pressure_enthalpy_list;  
-  // Variable to control whether to avoid truncating pressure or temperature range if no minimum energy is found
-  // This results in thermodynamic quantities being stored in the vector of structs defined above
-  bool run_all_pressure_temperature;
+    // Variable to control generation of pressure-volume data for AEL calculations
+    bool ael_pressure_calc;
 
-  // Vector of structs with data on electronic properties as a function of pressure
-  vector<AGL_dos_pressures> AGL_edos_properties;
-  double edosgap_pressure;
-  double dosvalEF_pressure;
-  double egap_min;
-  double egap_max;
-  double egap_min_pressure;
-  double egap_max_pressure;
-  double dosvalEF_min;
-  double dosvalEF_max;
-  double dosvalEF_min_pressure;
-  double dosvalEF_max_pressure;
+    // Variable to control if this is a postprocessing run (suppresses creation of new ARUN directories)
+    bool postprocess;
 
-  // Variable to record whether noise was detected in the E-V data
-  bool EV_noise;
-  // Variable to record the distance of the minimum of the E-V data from the center
-  int itdiff;
+    // List of failed ARUN directories to be skipped by AGL fitting procedure
+    vector<string> failed_arun_list;
+    bool autoskipfailedaruns;
+    uint skiparunsmax;
+    // Initial number of ARUN directories set-up
+    // Will be used to check number eliminated in error correction does not exceed skiparunsmax
+    uint nstructsinit;
 
-  // Saved data for equations for state
-  double bcnt_beta;
-  double x_K_opt;
-  double x_m_opt;
-  double bcntvolume0pressure;
-  bool optimize_beta;
-  vector<double> pfit;
-  vector<double> IntEnergStatic;
-  double bcnt_beta_statcalc;
-  double x_K_opt_statcalc;
-  double x_m_opt_statcalc;
-  double Vol_sp_statcalc;
-  double x_Press_sp_statcalc;
-  double volumestatcalc_0pressure;
-  double gibbsenergystatcalc_0pressure;
-  double bulkmodulusstatcalc_0pressure;
-  vector<double> astatic;
-  double Avinetstatcalc_0pressure;
-  double xsup_K_final;
-  double Press_sp_final;
-  double Vol_sp_final;
-  double bcnt_beta_final;
+    // Calculated input data
+    double cellmass;
+    vector<double> energyinput;
+    vector<double> volumeinput;
+    vector<double> energyinput_orig;
+    vector<double> volumeinput_orig;
+    vector<double> pressurecalculated;
+    vector<xmatrix<double> > stresscalculated;
+    vector<int> structurecalculated;
+    vector<double> tdebye;
+    double pressurecalculatedmax;
 
-  // Highest temperature reached
-  double max_temperature;
+    // Data calculated within GIBBS
+    vector<double> d2EnergydVolume2_static;
+    double poissonratiofunction;
+    // Equation of state data
+    vector<double> voleqmin;
+    vector<double> bulkmodulus;
+    vector<double> alpha;
+    vector<double> d2EnergydVolume2_dynamic;
+    vector<double> gamma_G;
+    vector<double> gamma_poly;
+    vector<double> pressure_static;
+    double rms;
+    double bulkmodulus_0pressure;
+    double dbulkmodulusdpV_0pressure;
+    double d2bulkmodulusdpV2_0pressure;
+    // Equilibrium volume and lattice strain factor at zero pressure and temperature
+    // Can be used to create a fully relaxed volume structure
+    double volume_equilibrium_0p0T;
+    double xlattice_equilibrium_0p0T;
+    double energy_equilibrium_0p0T;
 
-  // zero pressure output data
-  vector<double> InternalEnergy0pressurekjmol, Entropy0pressurekjmol, Cvkjmol0pressure, Cpkjmol0pressure, CvunitkB0pressure, CpunitkB0pressure; 
-  vector<double> DebyeTemperature0pressure, GruneisenParameter0pressure, HelmholtzEnergy0pressurekjmol, GibbsFreeEnergy0pressurekjmol;
-  vector<double> InternalEnergy0pressuremeV, Entropy0pressuremeV, HelmholtzEnergy0pressuremeV, Entropy0pressureunitkB, GibbsFreeEnergy0pressureeV;
-  vector<double> ThermalExpansion0pressure, bulkmodulusstatic_0pressure, bulkmodulusisothermal_0pressure;
+    // Vector of structs with Gibbs free energy and other quantities as a function of pressure and temperature
+    vector<AGL_pressure_temperature_energies> AGL_pressure_temperature_energy_list;
+    vector<AGL_pressure_enthalpies> AGL_pressure_enthalpy_list;  
+    // Variable to control whether to avoid truncating pressure or temperature range if no minimum energy is found
+    // This results in thermodynamic quantities being stored in the vector of structs defined above
+    bool run_all_pressure_temperature;
 
-  // output data for all pressures
-  vector<vector<double> > InternalEnergyPressurekjmol, EntropyPressurekjmol, CvkjmolPressure, DebyeTemperaturePressure, GruneisenParameterPressure, HelmholtzEnergyPressurekjmol;
-  vector<vector<double> > InternalEnergyPressuremeV, EntropyPressuremeV, HelmholtzEnergyPressuremeV, CvunitkBpressure, EntropyunitkBpressure;
-  // [OBSOLETE] vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib, EnergyDFT_UIntVibeV;
-  vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib;
-  vector<vector<double> > xminsav, VolumeEquilibrium, mass_density_gcm3;
+    // Vector of structs with data on electronic properties as a function of pressure
+    vector<AGL_dos_pressures> AGL_edos_properties;
+    double edosgap_pressure;
+    double dosvalEF_pressure;
+    double egap_min;
+    double egap_max;
+    double egap_min_pressure;
+    double egap_max_pressure;
+    double dosvalEF_min;
+    double dosvalEF_max;
+    double dosvalEF_min_pressure;
+    double dosvalEF_max_pressure;
 
-  // Enthalpy at finite pressure (no vibrational energy)
-  vector<double> EnthalpyPressureeV;
+    // Variable to record whether noise was detected in the E-V data
+    bool EV_noise;
+    // Variable to record the distance of the minimum of the E-V data from the center
+    int itdiff;
 
-  // Volume and pressure data for static pressure
-  vector<double> VolumeStaticPressure, StaticPressure, VolumeFactors;
-  bool savedatapressure;
- private:                                                //
-  void free();                                           // free space
+    // Saved data for equations for state
+    double bcnt_beta;
+    double x_K_opt;
+    double x_m_opt;
+    double bcntvolume0pressure;
+    bool optimize_beta;
+    vector<double> pfit;
+    vector<double> IntEnergStatic;
+    double bcnt_beta_statcalc;
+    double x_K_opt_statcalc;
+    double x_m_opt_statcalc;
+    double Vol_sp_statcalc;
+    double x_Press_sp_statcalc;
+    double volumestatcalc_0pressure;
+    double gibbsenergystatcalc_0pressure;
+    double bulkmodulusstatcalc_0pressure;
+    vector<double> astatic;
+    double Avinetstatcalc_0pressure;
+    double xsup_K_final;
+    double Press_sp_final;
+    double Vol_sp_final;
+    double bcnt_beta_final;
+
+    // Highest temperature reached
+    double max_temperature;
+
+    // zero pressure output data
+    vector<double> InternalEnergy0pressurekjmol, Entropy0pressurekjmol, Cvkjmol0pressure, Cpkjmol0pressure, CvunitkB0pressure, CpunitkB0pressure; 
+    vector<double> DebyeTemperature0pressure, GruneisenParameter0pressure, HelmholtzEnergy0pressurekjmol, GibbsFreeEnergy0pressurekjmol;
+    vector<double> InternalEnergy0pressuremeV, Entropy0pressuremeV, HelmholtzEnergy0pressuremeV, Entropy0pressureunitkB, GibbsFreeEnergy0pressureeV;
+    vector<double> ThermalExpansion0pressure, bulkmodulusstatic_0pressure, bulkmodulusisothermal_0pressure;
+
+    // output data for all pressures
+    vector<vector<double> > InternalEnergyPressurekjmol, EntropyPressurekjmol, CvkjmolPressure, DebyeTemperaturePressure, GruneisenParameterPressure, HelmholtzEnergyPressurekjmol;
+    vector<vector<double> > InternalEnergyPressuremeV, EntropyPressuremeV, HelmholtzEnergyPressuremeV, CvunitkBpressure, EntropyunitkBpressure;
+    // [OBSOLETE] vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib, EnergyDFT_UIntVibeV;
+    vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib;
+    vector<vector<double> > xminsav, VolumeEquilibrium, mass_density_gcm3;
+
+    // Enthalpy at finite pressure (no vibrational energy)
+    vector<double> EnthalpyPressureeV;
+
+    // Volume and pressure data for static pressure
+    vector<double> VolumeStaticPressure, StaticPressure, VolumeFactors;
+    bool savedatapressure;
+  private:                                                //
+    void free();                                           // free space
 };
 
 // Declaration of functions in AGL
@@ -253,13 +262,15 @@ class _AGL_data {
 namespace AGL_functions {
   // Functions to actually run AGL, either directly or from another part of AFLOW
   uint RunDebye_AGL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
+  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint Get_ThermalProperties_AGL_postprocess(string directory, const uint& ntemperature, const double& stemperature, const uint& npressure, const double& spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom);
   uint Get_EquilibriumVolumeTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
   uint Get_EquilibriumVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
   uint Get_BulkModulusStaticTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusStatic, ofstream& FileMESSAGE);
   uint Get_BulkModulusIsothermalTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, ofstream& FileMESSAGE);
   uint Get_BulkModulusVolumeTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
   uint Get_BulkModulusVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
-  uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, ofstream& FileMESSAGE);
+  uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, bool& postprocess, ofstream& FileMESSAGE);
   // Functions for generating _AFLOWIN_ input files for strained structures and checking (E,V) data calculated with VASP
   uint aglvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AGL_data& AGL_data, ofstream& FileMESSAGE);
   // [OBSOLETE] uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& kbinFlags, _vflags& vaspFlags, _AGL_data& AGL_data, ofstream& FileMESSAGE);

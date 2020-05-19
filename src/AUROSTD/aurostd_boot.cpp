@@ -274,8 +274,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<uint> vii; //CO20190622
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
-  aurostd::xmatrix<utype> mprod = aurostd::outer_product(v, w);  // ME20200327
-  
+  aurostd::xmatrix<utype> mprod = aurostd::outer_product(v, w);  //ME20200327
+
   //CO20200404 START - aurostd->pflow
   utype ut=(utype)3;std::vector<utype> vec;std::complex<utype> utcomp;vector<std::complex<utype> > veccomp;
   aurostd::matrix<utype> pmat,pmat2(1),pmat3(1,2),pmat4(1,vec),pmat5(1,2,ut);pmat=pmat2;

@@ -116,7 +116,7 @@ namespace aurostd {
   template<class utype> xvector<utype>                                   // vector_row*matrix
     operator*(const xvector<utype>&,const xmatrix<utype>&) __xprototype; // vector_row*matrix
 
-  // ME20200330 - Multiplication of a real matrix with a complex vector
+  //ME20200330 - Multiplication of a real matrix with a complex vector
   template<class utype> xvector<xcomplex<utype> >
     operator*(const xmatrix<utype>&, const xvector<xcomplex<utype> >&) __xprototype;
 
@@ -126,7 +126,7 @@ namespace aurostd {
   template<class utype> xmatrix<utype>                                   // matrix*scalar
     operator*(const xmatrix<utype>&,const utype) __xprototype;           // matrix*scalar
 
-  // ME20200329 - real * complex matrix
+  //ME20200329 - real * complex matrix
   template<class utype> xmatrix<xcomplex<utype> >
     operator*(const xmatrix<xcomplex<utype> >&, utype) __xprototype;
 
@@ -478,8 +478,8 @@ namespace aurostd {
   //  identity(const int&,const int&,utype) __xprototype;
 
   template<class utype> xmatrix<utype>
-    identity(const utype&, int, int=1);  // ME20200123
-    //identity(const utype&,const int&,const int&) __xprototype; // OBSOLETE ME20200123
+    identity(const utype&, int, int=1);  //ME20200123
+  //identity(const utype&,const int&,const int&) __xprototype; // OBSOLETE ME20200123
 
   template<class utype> xmatrix<utype>  // conjugate
     conj(const xmatrix<utype>&) __xprototype; //ME20180904
@@ -600,6 +600,29 @@ namespace aurostd {
 
   void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd); //CO20191201
   void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my); //CO20191201
+
+  //AS20200512 BEGIN
+  /// gives maximum among diagonal elements
+  template<class utype> utype
+    maxDiagonalElement(const xmatrix<utype>& M)
+    {
+      utype maxM = M[M.lrows][M.lcols];
+      for (int i=M.lrows+1,j=M.lcols+1; i<=M.urows && j<=M.ucols; i++, j++){
+        if (M[i][j] > maxM) maxM = M[i][j];
+      }
+      return maxM;
+    }
+  /// gives minimum among diagonal elements
+  template<class utype> utype
+    minDiagonalElement(const xmatrix<utype>& M)
+    {
+      utype minM = M[M.lrows][M.lcols];
+      for (int i=M.lrows+1,j=M.lcols+1; i<=M.urows && j<=M.ucols; i++, j++){
+        if (M[i][j] < minM) minM = M[i][j];
+      }
+      return minM;
+    }
+  //AS20200512 END
 }
 
 namespace aurostd {

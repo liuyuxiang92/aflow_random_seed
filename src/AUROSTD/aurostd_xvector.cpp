@@ -439,7 +439,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20200327
+//ME20200327
 namespace aurostd {
   template<class utype> xmatrix<utype>
     outer_product(const xvector<utype>& a, const xvector<utype>& b) {

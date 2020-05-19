@@ -74,7 +74,7 @@ bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //FCC/Si1_ICSD_150530
   system="ICSD_WEB/FCC/Si1_ICSD_150530";
-  
+
   path=AFLOWLIB_SERVER_DEFAULT+"/AFLOWDATA/"+system;
   query=path+"/?files";
   message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -153,7 +153,7 @@ bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
 bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO20190520
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy="gcdTest():";
+  string soliloquy = XHOST.sPID + "gcdTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -216,7 +216,7 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
 bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO20190520
 bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy="smithTest():";
+  string soliloquy = XHOST.sPID + "smithTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -302,14 +302,15 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 }
 
 int main(int _argc,char **_argv) {
-  string soliloquy="main():"; //CO20180419
+  string soliloquy = XHOST.sPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
     std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
     if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
-    std::vector<string> cmds;  
+    std::vector<string> cmds;
+
     // MACHINE
     init::InitMachine(FALSE,argv,cmds,cerr);    
     if(LDEBUG || XHOST.DEBUG) cerr << "AFLOW-MAIN [3]" << endl;
@@ -341,9 +342,71 @@ int main(int _argc,char **_argv) {
       return 1;
     }
 
+    if (0)     { // works with pointers
+      std::filebuf* fb_pre = new std::filebuf; fb_pre->open("friscosity_pre.txt",std::ios_base::out|std::ios_base::trunc);  // need to be generated before any assignments
+      std::filebuf* fb_post = new std::filebuf; fb_post->open("friscosity_post.txt",std::ios_base::out|std::ios_base::trunc); // need to be generated before any assignments
+      std::ostream* oss;
+#define _oss (*oss)
+      // PRE
+      //   oss = fb_pre;
+      //      _oss << "FRISCOSITY_PRE" << endl;
+      //  _oss.flush(); 
+      // COUT
+      oss = &std::cout;
+      _oss << "assigned COUT" << endl;
+      _oss.flush();
+      // CERR
+      oss = &std::cerr;
+      _oss << "assigned CERR" << endl;
+      _oss.flush();
+      exit(0);
+    }
+    if(0) { // https://stdcxx.apache.org/doc/stdlibug/34-2.html
+      std::ofstream oss;
+      // default COUT
+      // COUT DEFAULT
+      oss.copyfmt(std::cout);                             
+      oss.clear(std::cout.rdstate());                     
+      oss.basic_ios<char>::rdbuf(std::cout.rdbuf());      
+      oss << "COUT DEFAULT" << std::endl;
+      if(1) { // somebody chose a file
+        // FILE PRE
+        std::ofstream ofs_pre("friscosity_pre.txt", std::ofstream::out);
+        oss.copyfmt(ofs_pre);                             
+        oss.clear(ofs_pre.rdstate());                     
+        oss.basic_ios<char>::rdbuf(ofs_pre.rdbuf());
+      }
+      oss << "FRISCOSITY_PRE" << std::endl;
+      if(1) { // put it back on COUT
+        // COUT
+        oss.copyfmt(std::cout);                             
+        oss.clear(std::cout.rdstate());                     
+        oss.basic_ios<char>::rdbuf(std::cout.rdbuf());
+      }
+      oss << "COUT" << std::endl;
+      if(1) { // try CERR
+        // CERR
+        oss.copyfmt(std::cerr);                             
+        oss.clear(std::cerr.rdstate());                     
+        oss.basic_ios<char>::rdbuf(std::cerr.rdbuf());
+      }
+      oss << "CERR" << std::endl;
+      if(1) { // switch to file 
+        // FILE POST
+        std::ofstream ofs_post("friscosity_post.txt", std::ofstream::out);
+        oss.copyfmt(ofs_post);                             
+        oss.clear(ofs_post.rdstate());                     
+        oss.basic_ios<char>::rdbuf(ofs_post.rdbuf());
+      }
+      oss << "FRISCOSITY_POST" << std::endl;
+
+      exit(0);
+    }
+
+
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO20190911
-      string soliloquy="test_xmatrix()::";
-      bool LDEBUG=TRUE; // TRUE;
+      string soliloquy = XHOST.sPID + "test_xmatrix()::";
+      bool LDEBUG=TRUE;// TRUE;
       xmatrix<double> mat;
       mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
       mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
@@ -409,8 +472,8 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
-    
-      if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - aflow.cpp:main: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+
+      if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - aflow.cpp:main: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl;exit(0);}
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
         cout << "\"" << XHOST.vext.at(iext) << "\"" << " " << "\"" << XHOST.vcat.at(iext) << "\"" << endl;
@@ -426,7 +489,7 @@ int main(int _argc,char **_argv) {
       cout << "m=" << endl << m << endl;
       mi=inverse(m);
       cout << "mi=" << endl << mi << endl;
-      cout << "mi*m=" << endl << det(mi*m) << endl; 
+      cout << "mi*m=" << endl << det(mi*m) << endl;
 
       //CO how to create 64bit string from binary file
       //string b64String;
@@ -465,7 +528,7 @@ int main(int _argc,char **_argv) {
       rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
       if(rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
-        sqlite3_free(err_msg);        
+        sqlite3_free(err_msg);       
         sqlite3_close(db);
         return 1;
       } 
@@ -482,7 +545,7 @@ int main(int _argc,char **_argv) {
       //    sqlite3_close(db);
       //    return 1;
       //}
-      //rc = sqlite3_prepare_v2(db, "SELECT SQLITE_VERSION()", -1, &res, 0);    
+      //rc = sqlite3_prepare_v2(db, "SELECT SQLITE_VERSION()", -1, &res, 0);   
       //if(rc != SQLITE_OK) {
       //    fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
       //    sqlite3_close(db);
@@ -521,7 +584,7 @@ int main(int _argc,char **_argv) {
       cout << b64String << endl;
       exit(0);
     }
-    
+
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
       XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
@@ -545,19 +608,19 @@ int main(int _argc,char **_argv) {
       XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
       vector<string> vfile(aurostd::args2vectorstring(argv,"--FILE|--file|--F|--f","./"));
       for(uint ifile=0;ifile<vfile.size();ifile++) {
-	cerr << "PROCESSING = " << vfile.at(ifile) << endl;
-	xPOTCAR xPOT(vfile.at(ifile));
+        cerr << "PROCESSING = " << vfile.at(ifile) << endl;
+        xPOTCAR xPOT(vfile.at(ifile));
       }
       exit(0);
     }
-   if(!Arun && aurostd::args2flag(argv,cmds,"--scrub=OUTCAR")) { 
+    if(!Arun && aurostd::args2flag(argv,cmds,"--scrub=OUTCAR")) { 
       XHOST.DEBUG=FALSE;
       XHOST.PSEUDOPOTENTIAL_GENERATOR=FALSE;
       vector<string> vfile(aurostd::args2vectorstring(argv,"--FILE|--file|--F|--f","./"));
       for(uint ifile=0;ifile<vfile.size();ifile++) {
-	cerr << "PROCESSING = " << vfile.at(ifile) << endl;
-	xOUTCAR xOUT(vfile.at(ifile));
-	// cout << xOUT << endl;
+        cerr << "PROCESSING = " << vfile.at(ifile) << endl;
+        xOUTCAR xOUT(vfile.at(ifile));
+        // cout << xOUT << endl;
       }
       exit(0);
     }
@@ -583,7 +646,6 @@ int main(int _argc,char **_argv) {
       exit(0);
     }
 
-
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_proto1")) {
       vector<xstructure> vstr;
       vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
@@ -599,9 +661,9 @@ int main(int _argc,char **_argv) {
           aurostd::StringSubst(dataj.aurl,"aflowlib","materials");
           if(dataj.aurl!="") {
             xstructure str(dataj.aurl,"CONTCAR.relax.vasp",IOAFLOW_AUTO);
-            xEIGENVAL xEIGENVAL; xEIGENVAL.GetPropertiesUrlFile(dataj.aurl,"EIGENVAL.bands"+DEFAULT_KZIP_EXT+"",FALSE);
-            xOUTCAR xOUTCAR; xOUTCAR.GetPropertiesUrlFile(dataj.aurl,"OUTCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
-            xDOSCAR xDOSCAR; xDOSCAR.GetPropertiesUrlFile(dataj.aurl,"DOSCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
+            xEIGENVAL xEIGENVAL;xEIGENVAL.GetPropertiesUrlFile(dataj.aurl,"EIGENVAL.bands"+DEFAULT_KZIP_EXT+"",FALSE);
+            xOUTCAR xOUTCAR;xOUTCAR.GetPropertiesUrlFile(dataj.aurl,"OUTCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
+            xDOSCAR xDOSCAR;xDOSCAR.GetPropertiesUrlFile(dataj.aurl,"DOSCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
             // if(aurostd::args2flag(argv,cmds,"--vasp")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.vasp",stream);
             // if(aurostd::args2flag(argv,cmds,"--qe")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.qe",stream);
             // if(aurostd::args2flag(argv,cmds,"--abinit")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.abinit",stream);
@@ -753,8 +815,8 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE; cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY //CO20180419
-    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl; /*exit(0)*/return 0;} //CO20180419
+    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY //CO20180419
+    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;/*exit(0)*/return 0;} //CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
     // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
@@ -807,7 +869,7 @@ int AFLOW_main(vector<string> &argv) {
   if(!XHOST.QUIET) cout << aflow::Banner("INTRODUCTION");// << endl;
   KBIN::KBIN_Main(argv);
   // if(!XHOST.QUIET) cout << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << "  " << endl;
-  return 0; //1;  //CO20180419 - return 0 is normal
+  return 0; //1; //CO20180419 - return 0 is normal
 }
 
 // ***************************************************************************
@@ -815,15 +877,15 @@ int AFLOW_main(vector<string> &argv) {
 // ***************************************************************************
 namespace aflow {
   string License_Preamble_aflow(void) {
-    //( C) 2003-2020 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
+    //(C) 2003-2020 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
     strstream << endl;
     strstream << "***************************************************************************" << endl;
     strstream << "*                                                                         *" << endl;
-    strstream << "*           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+    strstream << "*                    AFLOW - Duke University 2003-2020                    *" << endl; //CO20200502 - SC -> AFLOW consortium
     strstream << "*                                                                         *" << endl;
     strstream << "***************************************************************************" << endl;
-    strstream << "Copyright 2003-2020 - Stefano Curtarolo - AFLOW.ORG consortium" << endl;
+    strstream << "Copyright 2003-2020 - AFLOW.ORG consortium" << endl;  //CO20200502 - SC -> AFLOW consortium
     strstream << endl;
     strstream << "This file is part of AFLOW software." << endl;
     strstream << endl;
@@ -853,7 +915,7 @@ namespace aflow {
 // patched by CO20200106 to avoid long string construction (patching for indents)
 namespace aflow {
   string Intro_aflow(string x) {
-    //( C) 2003-2020 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
+    //(C) 2003-2020 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
     string tab="  ";
     string xspaces="";for(uint i=0;i<x.size();i++){xspaces+=" ";} //spaces size of x
@@ -1048,7 +1110,7 @@ namespace aflow {
     }
     if(type=="BANNER_NORMAL") {
       oss << "****************************************************************************************************" << endl;
-      oss << "MMMMM  AFLOW V" << string(AFLOW_VERSION) << " Automatic-FLOW [" << TODAY << "] - " << endl; // << aflow_get_time_string() << endl; //CO
+      oss << "MMMMM  AFLOW V" << string(AFLOW_VERSION) << " Automatic-FLOW [" << TODAY << "] - " << endl; // << aflow_get_time_string() << endl;//CO
       oss << "****************************************************************************************************" << endl;
       return oss.str();
     }
@@ -1150,7 +1212,7 @@ namespace aflow {
       oss << "----------------------------------------------------------------------------------------------------" << endl;
       return oss.str();
     }
-    cerr << "aflow::Banner type=" << type << " not found..." << endl;
+    cerr << XHOST.sPID << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
     //exit(0);
     return 0; //CO20180419
@@ -1177,13 +1239,13 @@ namespace aflow {
 #ifndef _AFLOW_AURO_CPP_
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE) {
-    if(VERBOSE) cerr << "aflowlib::MOSFET mode=" << mode << endl;
+    if(VERBOSE) cerr << XHOST.sPID << "aflowlib::MOSFET mode=" << mode << endl;
     return 0;
   }
 }
 namespace aflowlib {
   uint MAIL2SCAN(string library,bool VERBOSE) {
-    if(VERBOSE) cerr << "aflowlib::MAIL2SCAN library=" << library << endl;
+    if(VERBOSE) cerr << XHOST.sPID << "aflowlib::MAIL2SCAN library=" << library << endl;
     return 0;
   }
 }

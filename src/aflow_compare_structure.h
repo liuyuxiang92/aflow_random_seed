@@ -174,7 +174,7 @@ namespace compare{
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match);  //DX20191108 - remove const & from bools
   double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
-  
+
   // ---------------------------------------------------------------------------
   // comparisons to AFLOW database 
   vector<StructurePrototype> compare2database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20200225
@@ -186,12 +186,12 @@ namespace compare{
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20200225
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout);  //CO20200225
   string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200225
-  
+
   // ---------------------------------------------------------------------------
   // comparisons between entries in AFLOW database 
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20191125
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20191125
-  
+
   // ---------------------------------------------------------------------------
   // comparisons to AFLOW prototype library 
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
@@ -209,7 +209,7 @@ namespace compare{
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc); // add number of threads
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match); // add number of threads and optimize matches
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match, bool& print_misfit, ostream& oss, ofstream& FileMESSAGE); // full function //DX20190319 - added FileMESSAGE
-  
+
   // ---------------------------------------------------------------------------
   // isopointal AFLOW prototype functions 
   string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131 
@@ -467,7 +467,7 @@ namespace compare{
       const AtomEnvironment& env_2, bool same_species, bool ignore_environment_angles, bool exact_match); //DX20190711 //DX20200320 - added environment angles
   bool compatibleEnvironments(const AtomEnvironment& env_1, 
       const AtomEnvironment& env_2, vector<vector<string> > & matched_species, 
-      bool same_species, bool ignore_environment_angles, bool exact_match); //DX 20190711 //DX20200320 - added environment angles
+      bool same_species, bool ignore_environment_angles, bool exact_match); //DX20190711 //DX20200320 - added environment angles
   vector<vector<double> > getAnglesBetweenMixedSpeciesEnvironments(const vector<vector<xvector<double> > >& neighbor_coordinates); //DX20190715
   bool compatibleNearestNeighborTypesEnvironments(const vector<vector<double> >& nn_lfa_with_types_1,
       const vector<vector<double> >& nn_lfa_with_types_2,

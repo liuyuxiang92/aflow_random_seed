@@ -221,7 +221,7 @@ namespace apl {
       for (uint dist = 0; dist < idist.distortions.size(); dist++) {
         const vector<int>& distortions = idist.distortions[dist][0];
 
-        // ME20190109 - add title
+        //ME20190109 - add title
         xstructure& xstr = xInputs[idxRun].getXStr();
         LightCopy(clst.scell, xstr);
         xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
@@ -255,7 +255,7 @@ namespace apl {
           }
           xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
 
-          // ME20190113 - make sure that POSCAR has the correct format
+          //ME20190113 - make sure that POSCAR has the correct format
           if ((kflags.KBIN_MPI && (kflags.KBIN_BIN.find("46") != string::npos)) ||
               (kflags.KBIN_MPI && (kflags.KBIN_MPI_BIN.find("46") != string::npos))) {
             xstr.is_vasp5_poscar_format = false;
@@ -298,7 +298,7 @@ namespace apl {
       const vector<xvector<double> >& distortion_vectors,
       const vector<int>& distortions,
       const vector<int>& atoms, double scale) {
-    xstructure& xstr = xinp.getXStr();  // ME20190109
+    xstructure& xstr = xinp.getXStr();  //ME20190109
     for (uint at = 0; at < atoms.size(); at++) {
       int atsc = atoms[at];
       int dist_index = distortions[at];
@@ -317,14 +317,14 @@ namespace apl {
         }
       }
       dist_cart *= distortion_magnitude;
-      // ME20190109 - Add to title
+      //ME20190109 - Add to title
       xstr.title += " atom=" + stringify(atoms[at]);
       //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME20190112
-      std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
+      std::stringstream distortion; //ME20190112 - need stringstream for nicer formatting
       distortion << " distortion=["
         << std::setprecision(3) << dist_cart[1] << ","
         << std::setprecision(3) << dist_cart[2] << ","
-        << std::setprecision(3) << dist_cart[3] << "]"; // ME20190112
+        << std::setprecision(3) << dist_cart[3] << "]"; //ME20190112
       xstr.title += distortion.str();
       xstr.atoms[atsc].cpos += dist_cart;
       xstr.atoms[atsc].fpos = xstr.c2f * xstr.atoms[atsc].cpos;
@@ -983,7 +983,7 @@ namespace apl {
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
-    // ME20200428 - We do not compare checksums anymore
+    //ME20200428 - We do not compare checksums anymore
     //parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
     //parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  //ME20190219
     //parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
