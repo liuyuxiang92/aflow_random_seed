@@ -302,8 +302,8 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 }
 
 int main(int _argc,char **_argv) {
-  string soliloquy = XHOST.sPID + "main():"; // CO20180419
-  ostream& oss=cout;  // CO20180419
+  string soliloquy = XHOST.sPID + "main():"; //CO20180419
+  ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
@@ -466,7 +466,7 @@ int main(int _argc,char **_argv) {
         if(m==0) {y--;m+=12;} 
       }
       //exit(0);
-      return 0; // CO20180419
+      return 0; //CO20180419
     }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
@@ -503,8 +503,8 @@ int main(int _argc,char **_argv) {
         cerr << _tokens[i] << endl;
       }
       //exit(0);
-      return 0; // CO20180419
-      // COREY START 170614 - some SQLITE tests
+      return 0; //CO20180419
+      //CO START 170614 - some SQLITE tests
       //http://zetcode.com/db/sqlitec/ - more tests here
       //this will create test.db file
       sqlite3 *db;
@@ -575,7 +575,7 @@ int main(int _argc,char **_argv) {
       aus << "************************   00000  MESSAGE KPOINTS KSHIFT=[" << 1 << " " << 2 << " " << 3 << "]" << " ************************ " << endl;
       cout << aus.str() << endl;
       //exit(0);
-      return 0; // CO20180419
+      return 0; //CO20180419
     }
 
     if(!Arun && aurostd::args2attachedflag(argv,"--bin2base64=")) {
@@ -680,7 +680,7 @@ int main(int _argc,char **_argv) {
         }
       }
       //exit(0);
-      return 0; // CO20180419
+      return 0; //CO20180419
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
@@ -732,7 +732,7 @@ int main(int _argc,char **_argv) {
     // INTERCEPT HELP
     if(XHOST.vflag_control.flag("AFLOW_HELP")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
       return 0;
@@ -743,70 +743,70 @@ int main(int _argc,char **_argv) {
       cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
       cout << " " << endl;
       cout << "*************************************************************************** " << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
       cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_FROZSL"))  {
       cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_APL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_QHA"))  {
       cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AAPL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AGL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AEL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_ANRL"))  {
       cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
       cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
-      /*exit(1)*/return 0;} // << endl; // CO20190401
+      /*exit(1)*/return 0;} // << endl; //CO20190401
     if(XHOST.vflag_control.flag("README_GFA"))  {
       cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
       cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_CCE"))  {
       cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_CHULL"))  {
       cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
       cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_APENNSY"))  {
       cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
       cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
       cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
       return 0;}  //ME20180531
     if(XHOST.vflag_control.flag("README_XAFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
       cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO20180419
+      /*exit(1)*/return 0;} // << endl; //CO20180419
 
     // **************************************************************
     // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
@@ -815,8 +815,8 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY // CO20180419
-    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;/*exit(0)*/return 0;} // CO20180419
+    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY //CO20180419
+    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;/*exit(0)*/return 0;} //CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
     // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
@@ -869,7 +869,7 @@ int AFLOW_main(vector<string> &argv) {
   if(!XHOST.QUIET) cout << aflow::Banner("INTRODUCTION");// << endl;
   KBIN::KBIN_Main(argv);
   // if(!XHOST.QUIET) cout << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << "  " << endl;
-  return 0; //1; // CO20180419 - return 0 is normal
+  return 0; //1; //CO20180419 - return 0 is normal
 }
 
 // ***************************************************************************
@@ -1110,7 +1110,7 @@ namespace aflow {
     }
     if(type=="BANNER_NORMAL") {
       oss << "****************************************************************************************************" << endl;
-      oss << "MMMMM  AFLOW V" << string(AFLOW_VERSION) << " Automatic-FLOW [" << TODAY << "] - " << endl; // << aflow_get_time_string() << endl;// CO
+      oss << "MMMMM  AFLOW V" << string(AFLOW_VERSION) << " Automatic-FLOW [" << TODAY << "] - " << endl; // << aflow_get_time_string() << endl;//CO
       oss << "****************************************************************************************************" << endl;
       return oss.str();
     }
@@ -1215,7 +1215,7 @@ namespace aflow {
     cerr << XHOST.sPID << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
     //exit(0);
-    return 0; // CO20180419
+    return 0; //CO20180419
     return oss.str();
   }
 } // namespace aflow

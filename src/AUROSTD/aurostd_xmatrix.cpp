@@ -814,7 +814,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20200330 - Multiplication of a real matrix with a complex vector
+//ME20200330 - Multiplication of a real matrix with a complex vector
 namespace aurostd {
   template<class utype>
     xvector<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xvector<xcomplex<utype> >& b) {
@@ -855,7 +855,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20200329 - real * complex matrix
+//ME20200329 - real * complex matrix
 namespace aurostd {
   template<class utype> xmatrix<xcomplex<utype> >
     operator*(utype s, const xmatrix<xcomplex<utype> >& a) {
@@ -2317,7 +2317,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20200123 - if the identity matrix must be square, why would we allow two
+//ME20200123 - if the identity matrix must be square, why would we allow two
 // input parameters?
 //[OBSOLETE]namespace aurostd {  // namespace aurostd
 //[OBSOLETE]  template<class utype>                                 // identity xmatrix
@@ -2333,7 +2333,7 @@ namespace aurostd {  // namespace aurostd
 //[OBSOLETE]    }
 //[OBSOLETE]}
 
-// ME20200123
+//ME20200123
 namespace aurostd {
   template<class utype>
     xmatrix<utype> identity(const utype& _type, int ubounds, int lbounds) {

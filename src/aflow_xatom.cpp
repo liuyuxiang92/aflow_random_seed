@@ -2565,7 +2565,7 @@ void xstructure::copy(const xstructure& bstr) {
   // ----------------------------------
 }
 
-// ME20200220 - from CO's function in apl::Supercell
+//ME20200220 - from CO's function in apl::Supercell
 void LightCopy(const xstructure& a, xstructure& b) {
   b.clear();
   stringstream POSCAR;
@@ -14363,7 +14363,7 @@ void CalculateSymmetryFactorGroup(xstructure& str) {
 
 //DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
-// ME20200114 - made capitalization more consistent with other functions
+//ME20200114 - made capitalization more consistent with other functions
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKLattice
 // ***************************************************************************
@@ -14409,7 +14409,7 @@ void CalculateSymmetryPointGroupKLattice(xstructure& str) {
   CalculateSymmetryPointGroupKLattice(str,FALSE,cout,FALSE);
 }
 
-// ME20200114 - added missing function
+//ME20200114 - added missing function
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKCrystal
 // ***************************************************************************
@@ -14449,7 +14449,7 @@ void CalculateSymmetryPointGroupKCrystal(xstructure& str) {
   CalculateSymmetryPointGroupKCrystal(str,FALSE,cout,FALSE);
 }
 
-// ME20200129
+//ME20200129
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKPatterson
 // ***************************************************************************
@@ -14859,9 +14859,9 @@ xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
   if(LDEBUG) { //CO20190520
     cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO20190520
     cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
-    cerr << soliloquy << " rm=" << endl;cerr << rm << endl; // ME20200204
+    cerr << soliloquy << " rm=" << endl;cerr << rm << endl; //ME20200204
   }
-  if (aurostd::isidentity(rm)) return a;  // ME20200204 - no need to go through all the motions for identity matrix
+  if (aurostd::isidentity(rm)) return a;  //ME20200204 - no need to go through all the motions for identity matrix
   // Get R_0(p) for all cartesian positions.
   xstructure b(a);
   xmatrix<double> nlattice(3,3);
@@ -15343,8 +15343,8 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   //DX20200320 - moved outside of loop so that LDEBUG boolean is not checked every time (speed increase when grid atoms is large)
   if(LDEBUG) { //CO20190520
     for(uint i=0;i<str.grid_atoms.size();i++){
-      //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-      //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
       cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << str.grid_atoms[i].cpos << endl; //CO20190520
       cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << str.grid_atoms[i].fpos << endl; //CO20190520
       cerr << soliloquy << " grid_atoms[" << i << "]=" << str.grid_atoms[i] << endl; //DX20191218

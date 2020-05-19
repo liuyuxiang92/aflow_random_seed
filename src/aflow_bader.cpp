@@ -2532,7 +2532,7 @@ namespace pflow {
       const vector<int>& downsample_ratios,
       vector<string>& output_files,
       const bool& cyclic,
-      ostream& oss) {                 //corey
+      ostream& oss) {                 //CO
     string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -3069,33 +3069,33 @@ namespace pflow {
 
     // look for PDIS
     if(aurostd::EFileExist(phondisdat,phondisdat_compressed) && aurostd::FileNotEmpty(phondisdat_compressed)){
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << ".EXT . . . " << endl;  // ME20190211 - use aflow.rc filenames
+      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phondisdat_compressed,PDIS_tmp); //aurostd::TmpFileCreate("PDIS_temp");
       pdis_was_decompressed = true;
       dis_data = true;
       phondisdat = PDIS_tmp;
     } else if(aurostd::FileExist(phondisdat) && aurostd::FileNotEmpty(phondisdat)) {dis_data = true;}
-    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << " in " << directory << "." << endl;}  // ME20190211 - use aflow.rc filenames
+    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
 
     // look for PDOS
     if(aurostd::EFileExist(phondosdat,phondosdat_compressed) && aurostd::FileNotEmpty(phondosdat_compressed)){
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << ".EXT . . . " << endl;  // ME20190211 - use aflow.rc filenames
+      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phondosdat_compressed,PDOS_tmp); //aurostd::TmpFileCreate("PDOS_temp");
       pdis_was_decompressed = true;
       dos_data = true;  //ME20190328
       phondosdat = PDOS_tmp;
     } else if(aurostd::FileExist(phondosdat) && aurostd::FileNotEmpty(phondosdat)) {dis_data = true;}
-    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << " in " << directory << "." << endl;}  // ME20190211 - use aflow.rc filenames
+    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
 
     // look for THERMO
     if(aurostd::EFileExist(phonthrmdat,phonthrmdat_compressed) && aurostd::FileNotEmpty(phonthrmdat_compressed)){
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << ".EXT . . . " << endl;  // ME20190211 - use aflow.rc filenames
+      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phonthrmdat_compressed,THERMO_tmp); //aurostd::TmpFileCreate("THERMO_temp");
       pdis_was_decompressed = true;
       thermo_data = true;  //ME20190328
       phonthrmdat = THERMO_tmp;
     } else if(aurostd::FileExist(phonthrmdat) && aurostd::FileNotEmpty(phonthrmdat)) {dis_data = true;}
-    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << " in " << directory << "." << endl;}  // ME20190211 - use aflow.rc filenames
+    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
 
     //CO20180515 STOP - new decompressing schemes
 

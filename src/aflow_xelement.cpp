@@ -74,7 +74,7 @@ double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-
 double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
 double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
 
-// RF/SK20200410 START
+//RF+SK20200410 START
 // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
 // https://en.wikipedia.org/wiki/Oxidation_state#Determination
 // since there were no Allen electronegativities available for f-elements besides Lu but these elements are usually very similar,
@@ -84,7 +84,7 @@ double electronegativity_Allen;          // https://pubs.acs.org/doi/abs/10.1021
 // preferred and all oxidation states of the elements according to the periodic table of the elements from Wiley-VCH, 5th edition (2012) with some modifications (e. g. for Cr, Cu, Fe, Ti)
 vector<double> oxidation_states_preferred;
 vector<double> oxidation_states;
-// RF/SK20200410 END
+//RF+SK20200410 END
 
 double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
 double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)

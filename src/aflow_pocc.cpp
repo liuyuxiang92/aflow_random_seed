@@ -1216,7 +1216,7 @@ namespace pocc {
     return vtemperatures;
   }
 
-  // CT20200319 - added AEL/AGL option
+  //CT20200319 - added AEL/AGL option
   void POccCalculator::postProcessing(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XHOST.sPID+"POccCalculator::postProcessing():";
@@ -1267,11 +1267,11 @@ namespace pocc {
     if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) {
       if(LDEBUG){cerr << soliloquy << "Running AEL postprocessing" << endl;}
       calculateElasticProperties(v_temperatures);
-    } // CT20200319
+    } //CT20200319
     if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) {
       if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
       calculateDebyeThermalProperties(v_temperatures);
-    } // CT20200323
+    } //CT20200323
 
     //END: TEMPERATURE DEPENDENT PROPERTIES
 

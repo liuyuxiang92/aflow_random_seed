@@ -4024,7 +4024,7 @@ namespace chull {
         if(n1eg_requested) {
           // point.m_i_nary = sum(elements_present) - 1
           // point.getDim() is dimension of hull
-          // SK20200330
+          //SK20200330
           if (point.getDim() == point.m_i_nary + 1) {
             continue;
           }
@@ -11231,7 +11231,7 @@ namespace chull {
     //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
     main_JSON_file="aflow_"+input; //SK20200406
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT20190620
-    //SK20200331 start
+    //SK20200331 START
     bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
     bool n1eg_requested=m_cflags.flag("CHULL::NPLUS1_ENTHALPY_GAIN");
     vector<string> sc_point;
@@ -11249,7 +11249,7 @@ namespace chull {
       delimiter = "_n1eg";  //CO20200404 - n+1 is the same for all points on a hull
       main_JSON_file=main_JSON_file + delimiter;
     }
-    //SK20200331 end
+    //SK20200331 END
     main_JSON_file=main_JSON_file+"_hull_web.json"; //SK20200327
     species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
     //for (uint i = 0; i < m_velements.size(); i++) {

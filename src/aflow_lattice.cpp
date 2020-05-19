@@ -2173,8 +2173,8 @@ namespace LATTICE {
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
-    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
@@ -2186,11 +2186,11 @@ namespace LATTICE {
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
-    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
-    // DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
@@ -2203,14 +2203,14 @@ namespace LATTICE {
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
-    // DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
-    // DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
-    // DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
     }
 
@@ -3291,7 +3291,7 @@ namespace LATTICE {
         same_eps = true; //force single while loop, no check
       }
       if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym)){
-        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} // DX20180426 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
           cerr << XHOST.sPID << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
           ignore_checks = true;
@@ -3312,18 +3312,18 @@ namespace LATTICE {
       _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
       _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
-      // DX20170814 - START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-      // DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-      // DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
-      // DX20170814 - END
-      // DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
-      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) // DX20180226 - do not need to do full sym on lattice
+      //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+      //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+      //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
+      //DX20170814 END
+      //DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
+      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) //DX20180226 - do not need to do full sym on lattice
       { //CO200106 - patching for auto-indenting
-        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} // DX20180426 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
           cerr << XHOST.sPID << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
         }

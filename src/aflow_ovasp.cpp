@@ -18,7 +18,7 @@ string time_delay(long double seconds) { return aurostd::utype2string<long doubl
 //---------------------------------------------------------------------------------
 // class xOUTCAR
 //---------------------------------------------------------------------------------
-// ME20200427 - included xStream::initialize
+//ME20200427 - included xStream::initialize
 xOUTCAR::xOUTCAR(ostream& oss) : xStream() {
   free();
   xStream::initialize(oss); //CO20200404 - xStream integration for logging
@@ -4029,7 +4029,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
 // ***************************************************************************
 // class xDOSCAR
-// ME20200427 - included xStream::initialize
+//ME20200427 - included xStream::initialize
 xDOSCAR::xDOSCAR(ostream& oss) : xStream() {
   free();
   xStream::initialize(oss); //CO20200404 - xStream integration for logging
@@ -4962,7 +4962,7 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
 
 // ***************************************************************************
 // class xEIGENVAL
-// ME20200427 - included xStream::initialize
+//ME20200427 - included xStream::initialize
 xEIGENVAL::xEIGENVAL(ostream& oss) : xStream() {
   free();
   xStream::initialize(oss); //CO20200404 - xStream integration for logging
@@ -5111,7 +5111,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   content=stringstreamIN.str();
   vcontent.clear();
   vector<string> vline,tokens;
-  // AS20200420 [BEGIN]
+  //AS20200420 BEGIN]
   // vasp 5.x.x uses '\n' as a separator between blocks of eigenvalues of
   // different k-points, while vasp 4.x.x uses " \n" (space+newline).
   // When a regular string2vectorsting is used, a sequence of "\n\n" is
@@ -5122,7 +5122,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //
   // aurostd::string2vectorstring(content,vcontent);
   aurostd::string2vectorstring(content,vcontent,true,false);
-  // AS20200420 [END]
+  //AS20200420 END]
   string line;
   if(filename=="") filename="stringstream";
   // crunching to eat the info
@@ -7458,7 +7458,7 @@ void CompareEdges (vector<vector<xvector<int> > >& branches,
 //-------------------------------------------------------------------------------------------------
 // ***************************************************************************
 // class xPOTCAR
-// ME20200427 - included xStream::initialize
+//ME20200427 - included xStream::initialize
 xPOTCAR::xPOTCAR(ostream& oss) : xStream() {
   free();
   xStream::initialize(oss); //CO20200404 - xStream integration for logging
@@ -8921,7 +8921,7 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //---------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 // constructor
-// ME20200427 - included xStream::initialize
+//ME20200427 - included xStream::initialize
 xQMVASP::xQMVASP(ostream& oss) : xStream() {
   free();
   xStream::initialize(oss); //CO20200404 - xStream integration for logging

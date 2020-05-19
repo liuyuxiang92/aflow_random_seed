@@ -401,7 +401,7 @@ namespace aflowlib {
 namespace aflowlib {
   uint PrototypeLibrariesSpeciesNumber(const string& _label,ostream& oss) { //CO20181226
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "aflowlib::PrototypeLibrariesSpeciesNumber():"; // CO20181226
+    string soliloquy = XHOST.sPID + "aflowlib::PrototypeLibrariesSpeciesNumber():"; //CO20181226
     bool silent=false;  //CO20181226
     if(LDEBUG) cerr << XHOST.sPID << "aflowlib::PrototypeLibrariesSpeciesNumber: label=" << _label << endl;
     // search for _ICSD_XXXX or ICSD_XXXX
@@ -621,7 +621,7 @@ namespace aflowlib {
     vector<string> vlabel_ANRL;
     if(aurostd::string2tokens(label,vlabel_ANRL,"_")>=4) {
       if(LDEBUG) { cerr << XHOST.sPID << "aflowlib::PrototypeLibraries: ANRL=" << 1 << endl; }
-      // DX20190708 - START 
+      //DX20190708 START 
       // add default permutation to label if not included in input //DX20190708
       vector<string> perm_tokens;
       if(aurostd::string2tokens(label,perm_tokens,".")==1) {

@@ -1740,7 +1740,7 @@ namespace KBIN {
 namespace KBIN {
   //ME20190220
   // Convert POSCAR into the format that is consistent with the binary version   
-  // ME20200114 - Throw a warning when the version could not be determined and
+  //ME20200114 - Throw a warning when the version could not be determined and
   // leave as is. Aborting is not desirable for instances where VASP does not
   // need to be run (e.g. post-processing).
   void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {

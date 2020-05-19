@@ -86,7 +86,7 @@ namespace plotter {
     scheme = xopt.getattachedscheme("PLOTTER::PRINT");
     if (!scheme.empty()) plotoptions.push_attached("IMAGE_FORMAT", aurostd::tolower(scheme));
 
-    // ME20200313 - Get user-defined output file name
+    //ME20200313 - Get user-defined output file name
     string outfile = xopt.getattachedscheme("PLOTTER::OUTFILE");
     // Remove extension from user-defined file name (extensions will be handled later)
     if (!outfile.empty()) {
@@ -190,7 +190,7 @@ namespace plotter {
         << " size " << plotoptions.getattachedscheme("PLOT_SIZE") << " linewidth 2" << std::endl;
       out << "set output " << "'" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << ".tex'" << std::endl;
       if (!plottitle.empty())
-        out << "set " << (multiplot?"multiplot layout 1,2 ":"")  // ME20200313 - some machines require layout
+        out << "set " << (multiplot?"multiplot layout 1,2 ":"")  //ME20200313 - some machines require layout
           << "title '" << plottitle << "' offset 0, -0.5" << std::endl;
       if (plotoptions.flag("NOBORDER")) out << "unset border" << std::endl;
       out << "set object 1 rectangle from graph 0,0 to graph 1,1 fc"
@@ -329,11 +329,11 @@ namespace plotter {
     string soliloquy=XHOST.sPID+"plotter::setFileName():";
     if(LDEBUG){cerr << soliloquy << " filename_in=" << filename << endl;}
     if (filename.empty()) {
-      filename = plotoptions.getattachedscheme("FILE_NAME_USER");  // ME20200313 - user-defined output file
+      filename = plotoptions.getattachedscheme("FILE_NAME_USER");  //ME20200313 - user-defined output file
       if (filename.empty()) {
         string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
         if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
-        // ME20200228 - Remove ANRL parameters
+        //ME20200228 - Remove ANRL parameters
         string::size_type t = default_title.find(":ANRL=");
         if (t != string::npos) {
           default_title = default_title.substr(0, t);
@@ -357,7 +357,7 @@ namespace plotter {
     plotoptions.push_attached("FILE_NAME", filename);
     // The .tex file created by gnuplot cannot have . or includegraphics will break
     plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ".", "_"));
-    // ME20200409 - Some terminals do not handle : well, which can break convert
+    //ME20200409 - Some terminals do not handle : well, which can break convert
     plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ":", "_"));
     if(LDEBUG){
       cerr << soliloquy << " filename=" << plotoptions.getattachedscheme("FILE_NAME") << endl;
@@ -2002,7 +2002,7 @@ namespace plotter {
   //getEnergyConversionFactor/////////////////////////////////////////////////
   // Returns the factor to convert eV into the desired energy/frequency unit.
   // Supported units are meV, THz, Hz, and reciprocal cm (CM-1/RCM).
-  // ME20200121 - Replaced with constants from xscalar.
+  //ME20200121 - Replaced with constants from xscalar.
   double getEnergyConversionFactor(const string& unit) {
     if (unit == "MEV") return 1000.0;
     if (unit == "THZ") return (eV2Hz * Hz2THz);
@@ -2043,7 +2043,7 @@ namespace plotter {
 
     // Get data
     string thermo_file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
-    // ME20200413 - Since multiple data files are plotted, the user file
+    //ME20200413 - Since multiple data files are plotted, the user file
     // name functions as base file name.
     string user_file_name = plotoptions.getattachedscheme("FILE_NAME_USER");
     plotoptions.pop_attached("FILE_NAME_USER");
@@ -2052,7 +2052,7 @@ namespace plotter {
       plotoptions.push_attached("DATA_FILE", thermo_file);
       plotoptions.push_attached("KEYWORD", "APL_THERMO");
       vector<vector<double> > data = readAflowDataFile(plotoptions);
-      if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  // ME20200413
+      if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  //ME20200413
       for (int i = 0; i < nprops; i++) {
         plotoptions.pop_attached("YMIN");
         if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);

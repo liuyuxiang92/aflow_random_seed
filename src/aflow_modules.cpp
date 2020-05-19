@@ -42,7 +42,7 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
-    module_opts.qhaflags = loadDefaultsQHA(); // AS20200302
+    module_opts.qhaflags = loadDefaultsQHA(); //AS20200302
     // The readParameters functions are necessary to set xvasp
     string placeholder = "";  // acts as pseudo-aflow.in
     readParametersAPL(placeholder, module_opts, xinput);
@@ -84,7 +84,7 @@ namespace KBIN {
     vector<aurostd::xoption> aplflags;
     aurostd::xoption opt;
     opt.keyword="RELAX"; opt.option = DEFAULT_APL_RELAX; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
-    opt.keyword="RELAX_COMMENSURATE"; opt.option = DEFAULT_APL_RELAX_COMMENSURATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200427
+    opt.keyword="RELAX_COMMENSURATE"; opt.option = DEFAULT_APL_RELAX_COMMENSURATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  //ME20200427
     opt.keyword="HIBERNATE"; opt.option = DEFAULT_APL_HIBERNATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="ENGINE"; opt.xscheme = DEFAULT_APL_ENGINE; aplflags.push_back(opt); opt.clear();
     opt.keyword="SUPERCELL"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
@@ -102,8 +102,8 @@ namespace KBIN {
     opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 //ME20190112
     opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  //ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
     opt.keyword="KPOINTS"; aplflags.push_back(opt); opt.clear();
-    opt.keyword="KPOINTS_GRID"; aplflags.push_back(opt); opt.clear();  // ME20200427
-    opt.keyword="KPOINTS_SHIFT"; aplflags.push_back(opt); opt.clear();  // ME20200427
+    opt.keyword="KPOINTS_GRID"; aplflags.push_back(opt); opt.clear();  //ME20200427
+    opt.keyword="KPOINTS_SHIFT"; aplflags.push_back(opt); opt.clear();  //ME20200427
     opt.keyword="PREC"; opt.xscheme = DEFAULT_APL_PREC; aplflags.push_back(opt); opt.clear();
     opt.keyword="ZEROSTATE"; opt.option = DEFAULT_APL_ZEROSTATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="FREQFORMAT"; opt.xscheme = DEFAULT_APL_FREQFORMAT; aplflags.push_back(opt); opt.clear();
@@ -119,7 +119,7 @@ namespace KBIN {
     opt.keyword="DOSMESH"; opt.xscheme = DEFAULT_APL_DOSMESH; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSSMEAR"; opt.xscheme = utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPOINTS"; opt.xscheme = utype2string<int>(DEFAULT_APL_DOSPOINTS); aplflags.push_back(opt); opt.clear();
-    opt.keyword="DOS_PROJECT"; opt.option = DEFAULT_APL_DOS_PROJECT; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200213
+    opt.keyword="DOS_PROJECT"; opt.option = DEFAULT_APL_DOS_PROJECT; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  //ME20200213
     opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
@@ -521,7 +521,7 @@ namespace KBIN {
   }
 
   // QHA-related functions -----------------------------------------------------
-  // AS20200302
+  //AS20200302
   //loadDefaultsQHA/////////////////////////////////////////////////////////////
   // Sets all QHA flags to their default values.
   vector<aurostd::xoption> loadDefaultsQHA() {

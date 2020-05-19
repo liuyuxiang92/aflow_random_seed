@@ -909,8 +909,8 @@ class _vflags {
     xoption KBIN_VASP_KPOINTS_PHONONS_KPPRA;      // isentry and content_int
     xoption KBIN_VASP_KPOINTS_PHONONS_KSCHEME;    // isentry and content_string
     xoption KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;  // EVEN ODD
-    xoption KBIN_VASP_KPOINTS_PHONONS_GRID;       // ME20200427
-    xoption KBIN_VASP_KPOINTS_PHONONS_SHIFT;      // ME20200427
+    xoption KBIN_VASP_KPOINTS_PHONONS_GRID;       //ME20200427
+    xoption KBIN_VASP_KPOINTS_PHONONS_SHIFT;      //ME20200427
     // BANDS
     xoption KBIN_VASP_KPOINTS_BANDS_LATTICE;
     //  bool KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -1537,10 +1537,10 @@ class xstructure {
     void CalculateSymmetryPointGroupCrystal(void);                // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(bool);               // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(void);               // Calculate the symmetry
-    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME20200114
-    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME20200114
-    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  // ME20200129
-    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  // ME20200129
+    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  //ME20200114
+    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  //ME20200114
+    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  //ME20200129
+    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  //ME20200129
     int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
     int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
     int  GenerateGridAtoms(int);                                  // generate grid of atoms
@@ -1833,7 +1833,7 @@ class xstructure {
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
-void LightCopy(const xstructure&, xstructure&);  // ME20200220
+void LightCopy(const xstructure&, xstructure&);  //ME20200220
 
 //CO20180420
 //for stream management with objects
@@ -1855,8 +1855,8 @@ class xStream {
     void free();
     //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
-    void initialize(ostream&);  // ME20200427
-    void initialize(ofstream&, ostream&);  // ME20200427
+    void initialize(ostream&);  //ME20200427
+    void initialize(ofstream&, ostream&);  //ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
@@ -2389,14 +2389,14 @@ void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream
 void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss);
 void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose);
 void CalculateSymmetryPointGroupKLattice(xstructure& str);
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME20200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME20200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME20200114
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  // ME20200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  // ME20200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str);  // ME20200129
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  //ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  //ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  //ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str);  //ME20200114
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  //ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  //ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  //ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str);  //ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
@@ -2706,8 +2706,8 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir);
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
-  int get_NCPUS();  // ME20200219
-  int get_NCPUS(const _kflags&);  // ME20200219
+  int get_NCPUS();  //ME20200219
+  int get_NCPUS(const _kflags&);  //ME20200219
 }
 
 // ----------------------------------------------------------------------------
@@ -2721,8 +2721,8 @@ namespace KBIN {
   vector<aurostd::xoption> loadDefaultsAPL();
   bool writeFlagAPL(const string& key,const xoption& xopt); //CO20181226  //ME20190113
   void readParametersAPL(const string&, _moduleOptions&, _xinput&);
-  vector<aurostd::xoption> loadDefaultsQHA();  // AS20200302
-  void readParametersQHA(const string&, _moduleOptions&, _xinput&); // AS20200302
+  vector<aurostd::xoption> loadDefaultsQHA();  //AS20200302
+  void readParametersQHA(const string&, _moduleOptions&, _xinput&); //AS20200302
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO20181226  //ME20190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
@@ -4344,8 +4344,8 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  // ME20181107
-  bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME20200427
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  //ME20181107
+  bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
   void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216

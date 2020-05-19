@@ -4640,7 +4640,7 @@ namespace aflowlib {
 //[SC20200327 - OBSOLETE]        oss << "var d3_bands_data = "; estructure::BANDSDATA_JSON(aaa, directory_LIB, bandsdata,true); oss << bandsdata.str();  //GG
 //[SC20200327 - OBSOLETE]        oss << ";</script>" << endl;
 //[SC20200327 - OBSOLETE]      }
-//[SC20200327 - OBSOLETE]      oss << "<! HARVEY WORK BEFORE HERE> " << endl;
+//[SC20200327 - OBSOLETE]      oss << "<! HS WORK BEFORE HERE> " << endl;
 //[SC20200327 - OBSOLETE]      oss << "<div id=\"content\">" << endl;
 //[SC20200327 - OBSOLETE]      oss << "<div class=\"title\">" << endl;
 //[SC20200327 - OBSOLETE]      oss << "<FONT SIZE=+3> " << title << " </FONT></div>" << endl;
@@ -4760,12 +4760,12 @@ namespace aflowlib {
 //[SC20200327 - OBSOLETE]        oss << "<!-- jmol: END -->" << endl;
 //[SC20200327 - OBSOLETE]      }
 //[SC20200327 - OBSOLETE]      if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
-//[SC20200327 - OBSOLETE]        oss << "<!-- geena bands: BEGIN -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- GG bands: BEGIN -->" << endl;
 //[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\" src=\"./Lib/JS/d3.min.js\"></script>" << endl;  //CO20170622  ///www/search/Lib/JS/d3.min.js
 //[SC20200327 - OBSOLETE]        oss << "<script type=\"text/javascript\">" << endl;
 //[SC20200327 - OBSOLETE]        oss << AFLOW_WEBAPP_BANDS_JS; //PC20180515
 //[SC20200327 - OBSOLETE]        oss << "</script>" << endl;
-//[SC20200327 - OBSOLETE]        oss << "<!-- geena bands: END -->" << endl;
+//[SC20200327 - OBSOLETE]        oss << "<!-- GG bands: END -->" << endl;
 //[SC20200327 - OBSOLETE]      }
 //[SC20200327 - OBSOLETE]      // NEW JSMOL END
 //[SC20200327 - OBSOLETE]      // ***************************************************************************
@@ -5648,7 +5648,7 @@ namespace aflowlib {
 //[SC20200327 - OBSOLETE]      }
 //[SC20200327 - OBSOLETE]      // DONE
 //[SC20200327 - OBSOLETE]
-//[SC20200327 - OBSOLETE]      oss << "<! HARVEY WORK AFTER HERE> " << endl;
+//[SC20200327 - OBSOLETE]      oss << "<! HS WORK AFTER HERE> " << endl;
 //[SC20200327 - OBSOLETE]    }
 //[SC20200327 - OBSOLETE]    return voptions.size();
 //[SC20200327 - OBSOLETE]  }

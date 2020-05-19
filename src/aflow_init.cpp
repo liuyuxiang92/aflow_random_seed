@@ -811,37 +811,37 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE") << endl;  //CO20191110
 
     // [CT20200320] run full AEL post-processing for POCC
-    XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--ael_run_postprocessing"));  // CT20200320
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AEL_RUN_POSTPROCESSING\")=" << XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING") << endl;  // CT20200320
+    XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--ael_run_postprocessing"));  //CT20200320
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AEL_RUN_POSTPROCESSING\")=" << XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING") << endl;  //CT20200320
     // [CT20200320] write full results for POCC+AEL
-    XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS",aurostd::args2flag(XHOST.argv,cmds,"--ael_write_full_results"));  // CT20200320
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AEL_WRITE_FULL_RESULTS\")=" << XHOST.vflag_control.flag("AEL_FULL_RESULTS") << endl;  // CT20200320
+    XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS",aurostd::args2flag(XHOST.argv,cmds,"--ael_write_full_results"));  //CT20200320
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AEL_WRITE_FULL_RESULTS\")=" << XHOST.vflag_control.flag("AEL_FULL_RESULTS") << endl;  //CT20200320
     // [CT20200323] run full AGL post-processing for POCC
-    XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--agl_run_postprocessing"));  // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_RUN_POSTPROCESSING\")=" << XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING") << endl;  // CT20200323
+    XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--agl_run_postprocessing"));  //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_RUN_POSTPROCESSING\")=" << XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING") << endl;  //CT20200323
     // [CT20200323] write full results for POCC+AGL
-    XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS",aurostd::args2flag(XHOST.argv,cmds,"--agl_write_full_results"));  // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_WRITE_FULL_RESULTS\")=" << XHOST.vflag_control.flag("AGL_FULL_RESULTS") << endl;  // CT20200323
+    XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS",aurostd::args2flag(XHOST.argv,cmds,"--agl_write_full_results"));  //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_WRITE_FULL_RESULTS\")=" << XHOST.vflag_control.flag("AGL_FULL_RESULTS") << endl;  //CT20200323
     //[CT20200323] set number of AGL temperatures from command line
-    XHOST.vflag_control.flag("AGL_NTEMPERATURE",aurostd::args2attachedflag(argv,"--agl_ntemperature="));  // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_NTEMPERATURE\")=" << XHOST.vflag_control.flag("AGL_NTEMPERATURE") << endl;  // CT20200323
-    if(XHOST.vflag_control.flag("AGL_NTEMPERATURE")) XHOST.vflag_control.push_attached("AGL_NTEMPERATURE",aurostd::args2attachedstring(argv,"--agl_ntemperature=","201")); // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_NTEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_NTEMPERATURE") << endl;  // CT20200323
+    XHOST.vflag_control.flag("AGL_NTEMPERATURE",aurostd::args2attachedflag(argv,"--agl_ntemperature="));  //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_NTEMPERATURE\")=" << XHOST.vflag_control.flag("AGL_NTEMPERATURE") << endl;  //CT20200323
+    if(XHOST.vflag_control.flag("AGL_NTEMPERATURE")) XHOST.vflag_control.push_attached("AGL_NTEMPERATURE",aurostd::args2attachedstring(argv,"--agl_ntemperature=","201")); //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_NTEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_NTEMPERATURE") << endl;  //CT20200323
     //[CT20200323] set AGL temperature step size from command line
-    XHOST.vflag_control.flag("AGL_STEMPERATURE",aurostd::args2attachedflag(argv,"--agl_stemperature="));  // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_STEMPERATURE\")=" << XHOST.vflag_control.flag("AGL_STEMPERATURE") << endl;  // CT20200323
+    XHOST.vflag_control.flag("AGL_STEMPERATURE",aurostd::args2attachedflag(argv,"--agl_stemperature="));  //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_STEMPERATURE\")=" << XHOST.vflag_control.flag("AGL_STEMPERATURE") << endl;  //CT20200323
     if(XHOST.vflag_control.flag("AGL_STEMPERATURE")) XHOST.vflag_control.push_attached("AGL_STEMPERATURE",aurostd::args2attachedstring(argv,"--agl_stemperature=","10.0")); //CT20200323
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_NTEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_NTEMPERATURE") << endl;  //CT20200323
     //[CT20200323] set number of AGL pressures from command line
-    XHOST.vflag_control.flag("AGL_NPRESSURE",aurostd::args2attachedflag(argv,"--agl_npressure="));  // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_NPRESSURE\")=" << XHOST.vflag_control.flag("AGL_NPRESSURE") << endl;  // CT20200323
-    if(XHOST.vflag_control.flag("AGL_NPRESSURE")) XHOST.vflag_control.push_attached("AGL_NPRESSURE",aurostd::args2attachedstring(argv,"--agl_npressure=","101")); // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_NPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_NPRESSURE") << endl;  // CT20200323
+    XHOST.vflag_control.flag("AGL_NPRESSURE",aurostd::args2attachedflag(argv,"--agl_npressure="));  //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_NPRESSURE\")=" << XHOST.vflag_control.flag("AGL_NPRESSURE") << endl;  //CT20200323
+    if(XHOST.vflag_control.flag("AGL_NPRESSURE")) XHOST.vflag_control.push_attached("AGL_NPRESSURE",aurostd::args2attachedstring(argv,"--agl_npressure=","101")); //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_NPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_NPRESSURE") << endl;  //CT20200323
     //[CT20200323] set AGL pressure step size from command line
-    XHOST.vflag_control.flag("AGL_SPRESSURE",aurostd::args2attachedflag(argv,"--agl_spressure="));  // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.flag("AGL_SPRESSURE") << endl;  // CT20200323
-    if(XHOST.vflag_control.flag("AGL_SPRESSURE")) XHOST.vflag_control.push_attached("AGL_SPRESSURE",aurostd::args2attachedstring(argv,"--agl_spressure=","1.0")); // CT20200323
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_SPRESSURE") << endl;  // CT20200323
+    XHOST.vflag_control.flag("AGL_SPRESSURE",aurostd::args2attachedflag(argv,"--agl_spressure="));  //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.flag("AGL_SPRESSURE") << endl;  //CT20200323
+    if(XHOST.vflag_control.flag("AGL_SPRESSURE")) XHOST.vflag_control.push_attached("AGL_SPRESSURE",aurostd::args2attachedstring(argv,"--agl_spressure=","1.0")); //CT20200323
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_SPRESSURE") << endl;  //CT20200323
 
 
 

@@ -1932,13 +1932,13 @@ namespace KBIN {
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XHOST.sPID + "KBIN::CompressDirectory():";
-    // DX and CO - START
+    //DX+CO START
     // [OBSOLETE] aus << "cd " << aflags.Directory << " && ";
-    // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                // CO, skip anything with bzip extension
-    // [OBSOLETE]  aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";     // CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
+    // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                //CO, skip anything with bzip extension
+    // [OBSOLETE]  aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";     //CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
     // [OBSOLETE] aus << "grep -v SKIP | ";
     // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
-    // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    // CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
+    // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
     vector<string> _vfiles,vfiles;
     string compressed_variant;
     aurostd::DirectoryLS(aflags.Directory,_vfiles);
@@ -2158,7 +2158,7 @@ namespace KBIN {
 // KBIN::XClean
 // *******************************************************************************************
 
-// ME20200219 - based on CO's code in old PhononCalculator
+//ME20200219 - based on CO's code in old PhononCalculator
 namespace KBIN {
   int get_NCPUS() {
     _kflags kflags;

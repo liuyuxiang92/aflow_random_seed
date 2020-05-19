@@ -1057,7 +1057,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     }
 
     // Set k-points
-    // ME20200427 - implemented grid option
+    //ME20200427 - implemented grid option
     string scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS_GRID");
     if (scheme.empty()) {
       scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
@@ -1066,11 +1066,11 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
         xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", scheme);
       }
       scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
-      //ME20190408 - START
+      //ME20190408 START
       if ((xvasp.AVASP_arun_mode == "AAPL") && xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL")) {
         scheme = xvasp.aaplopts.getattachedscheme("AFLOWIN_FLAG::AAPL_KPPRA_AAPL");
       }
-      //ME20190408 - END
+      //ME20190408 END
       if (!scheme.empty()) {
         xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", scheme);
       }
@@ -1128,7 +1128,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     // Set precision
     xvasp.aopts.pop_attached("AFLOWIN_FLAG::PRECISION");xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION", xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC"));
 
-    // ME20200427 - Scale number of bands appropriately when NBANDS has been
+    //ME20200427 - Scale number of bands appropriately when NBANDS has been
     // set in the parent aflow.in
     if (vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.isentry && !xvasp.aopts.flag("APL_FLAG::AVASP_BORN")) {
       int nbands = vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.content_int;
@@ -1197,7 +1197,7 @@ void setStatic(_xvasp& xvasp) {
 //ME20181102 - Do not convert unit cell
 void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL", false);
-  // ME20200307 - Safety, in case the flag get re-activated somewhere else
+  //ME20200307 - Safety, in case the flag get re-activated somewhere else
   xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
   xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_PRESERVE", true);
@@ -1633,8 +1633,8 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
                 if(tokens.at(2)=="PAW") {pottype="PAW_LDA";date=tokens.at(4);}
                 if(tokens.at(2)=="PAW_GGA") {pottype="PAW_GGA";date=tokens.at(4);}
                 if(tokens.at(2)=="PAW_RPBE") {pottype="PAW_RPBE";date=tokens.at(4);}  // potpaw_GGA/DEFAULT_VASP_POTCAR_DATE/Ge_h
-                if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO20181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO20191110
-                if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO20181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
+                if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO20181226 - SC, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX CO+SC LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO20191110
+                if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO20181226 - SC, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX CO+SC LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
                 // [GIFT OF KRESSE]  if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020
                 // [GIFT OF KRESSE]  if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020
                 if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead

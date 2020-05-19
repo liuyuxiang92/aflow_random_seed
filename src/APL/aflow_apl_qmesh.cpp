@@ -82,7 +82,7 @@ namespace apl {
     _qpoints = that._qpoints;
     _recCell = that._recCell;
     _reduced = that._reduced;
-    _shifted = that._shifted;  // ME20190813
+    _shifted = that._shifted;  //ME20190813
     _shift = that._shift;
     _weights = that._weights;
   }
@@ -364,7 +364,7 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
   }
 
-  // ME20200109
+  //ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
   // Calculates little/small groups for each irreducible q-point. The little
   // group is the group that leaves a q-point invariant, i.e. U q = q + G.
@@ -531,7 +531,7 @@ namespace apl {
     return _isGammaCentered;
   }
 
-  // ME20200109
+  //ME20200109
   bool QMesh::littleGroupsCalculated() const {
     return _littleGroupsCalculated;
   }
@@ -776,7 +776,7 @@ namespace apl {
 
   //makeIrreducibleTetrahedra/////////////////////////////////////////////////
   // Determines the irreducible tetrahedra.
-  // ME20191213 - Improved speed by storing the sorted irreducible tetrahedra
+  //ME20191213 - Improved speed by storing the sorted irreducible tetrahedra
   // instead of sorting in place.
   void QMesh::makeIrreducibleTetrahedra() {
     // Only makes sense with a reduced q-mesh
@@ -802,7 +802,7 @@ namespace apl {
           if (m == 4) break;
         }
         if (it == _nIrredTetra) {
-          irred.push_back(compare);  // ME20191213
+          irred.push_back(compare);  //ME20191213
           _irredTetrahedra.push_back(t);
           _weightsTetrahedra.push_back(1);
           _nIrredTetra++;

@@ -404,7 +404,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  // CT 20200323 - Relax structure if it hasn't relaxed yet before running AGL
+  //CT20200323 - Relax structure if it hasn't relaxed yet before running AGL
   uint relaxStructureAGL_VASP(const string& AflowIn,
       _xvasp& xvasp,
       _aflags& aflags,

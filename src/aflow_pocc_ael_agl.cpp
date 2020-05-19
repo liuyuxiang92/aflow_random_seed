@@ -32,7 +32,7 @@
 //CO20200502 END - may move to AUROSTD/aurostd_xscalar.h if these constants are needed elsewhere
 
 
-// CT20200319 - POCC+AEL functions
+//CT20200319 - POCC+AEL functions
 // ***************************************************************************
 //  void POccCalculator::calculateElasticProperties(const vector<double>& v_temperatures)
 //  Runs POCC+AEL
@@ -637,7 +637,7 @@ namespace pocc {
 } // namespace pocc
 
 
-// CT20200323 - POCC+AGL functions
+//CT20200323 - POCC+AGL functions
 // ***************************************************************************
 //  void POccCalculator::calculateDebyeThermalProperties(const vector<double>& v_temperatures)
 //  Runs POCC+AGL

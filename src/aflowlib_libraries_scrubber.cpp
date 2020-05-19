@@ -179,8 +179,8 @@ namespace aflowlib {
             }
           }
 
-          // check aflow.immiscibility.out   // SC20200318
-          if(ZIPNOMIX) { // SC20200318
+          // check aflow.immiscibility.out   //SC20200318
+          if(ZIPNOMIX) { //SC20200318
             if(FileExist_directory_LIB_AFLOW_IN) {
               if(aurostd::FileExist(directory_LIB+"/"+"aflow.immiscibility.out")) {
                 //    acerr << soliloquy << " fixing " << directory_LIB << endl;
@@ -191,8 +191,8 @@ namespace aflowlib {
             }
           }
 
-          // check BROKEN   // SC20200319
-          if(BROKEN) {    // SC20200319
+          // check BROKEN   //SC20200319
+          if(BROKEN) {    //SC20200319
             if(FileExist_directory_LIB_AFLOW_IN) {
               bool failed=FALSE;
               for(uint ibroken=0;ibroken<vbroken.size()&&!failed;ibroken++) {

@@ -6635,10 +6635,10 @@ namespace compare{
 
     double _TOL_EXACT_MATCH_ = 0.01; // hundredth of an Angstrom, perhaps put in header?
     //[CO20200508 - OBSOLETE]double _TOL_RELATIVE_MATCH_ = 0.10; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1
-    //DX 20200416 [OBSOLETE] double _TOL_LOOSE_MATCH_ = aurostd::min(env_1.distances_neighbor)/2.0; // ten percent, perhaps put in header? //DX 20190724 - changed from 0.25 to 0.1
+    //DX20200416 [OBSOLETE] double _TOL_LOOSE_MATCH_ = aurostd::min(env_1.distances_neighbor)/2.0; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1
     double max_distance_env1 = aurostd::max(env_1.distances_neighbor); // normalize distances for relative comparisons (needed for volume scaling) //DX20200421
     double max_distance_env2 = aurostd::max(env_2.distances_neighbor); // normalize distances for relative comparisons (needed for volume scaling) //DX20200421
-    double _TOL_LOOSE_MATCH_ = 0.2; // ten percent, perhaps put in header? //DX 20190724 - changed from 0.25 to 0.1 //DX20200421 - changed to 0.2 with new relative matching
+    double _TOL_LOOSE_MATCH_ = 0.2; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1 //DX20200421 - changed to 0.2 with new relative matching
 
     // ---------------------------------------------------------------------------
     // check for element for center first (fast)
@@ -6671,7 +6671,7 @@ namespace compare{
         // relative match 
         else if(!exact_match && 
             //aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])/(env_1.distances_neighbor[i]+env_2.distances_neighbor[j])<_TOL_RELATIVE_MATCH_) //DX20190730 - too strict
-            //DX20200416 [OBSOLETE]  TEST aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])<_TOL_LOOSE_MATCH_) //DX 20190730
+            //DX20200416 [OBSOLETE]  TEST aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])<_TOL_LOOSE_MATCH_) //DX20190730
           aurostd::abs((env_1.distances_neighbor[i]/max_distance_env1)-(env_2.distances_neighbor[j]/max_distance_env2))<_TOL_LOOSE_MATCH_) //DX20200421
           { //CO20200106 - patching for auto-indenting
             match_found = true; species.push_back(env_2.elements_neighbor[j]);
@@ -7508,7 +7508,7 @@ namespace compare{
       // peform expansion on structure2
       // wait until we confirm they are similar lattices, otherwise we build it
       // for nothing (i.e. unnecessary cost)
-      // DX20200330: no need to do supercell expansion anymore; once we have found
+      //DX20200330: no need to do supercell expansion anymore; once we have found
       // the possible lattices, we only need to perform c2f between the orig and new
       // lattice, then bring in cell. We have guaranteed that the new lattice will
       // be of the same size or smaller (since xstr2 is choosen as the larger of the
@@ -8281,25 +8281,25 @@ namespace compare{
         vector<uint> ij;
         ij.push_back(i); ij.push_back(j);
         ij_index.push_back(ij); 
-        // DX20200414 [OBSOLETE - redundant] bool vec_stored = false;
-        // DX20200414 [OBSOLETE - redundant] for(uint p=0;p<lattice_vecs.size();p++){
-        // DX20200414 [OBSOLETE - redundant]   if(identical(lattice_vecs[p],tmp_vec,1e-3)){ //DX 20190318 - changed from -10 to -3
-        // DX20200414 [OBSOLETE - redundant]     vec_stored = true;
-        // DX20200414 [OBSOLETE - redundant]     break;
-        // DX20200414 [OBSOLETE - redundant]   }
-        // DX20200414 [OBSOLETE - redundant] }
-        // DX20200414 [OBSOLETE - redundant] if(vec_stored == false){
-        // DX20200414 [OBSOLETE - redundant]  lattice_vecs.push_back(tmp_vec);
-        // DX20200414 [OBSOLETE - redundant]   // Store indices of atoms comprising the vector
-        // DX20200414 [OBSOLETE - redundant]   vector<uint> ij;
-        // DX20200414 [OBSOLETE - redundant]   ij.push_back(i); ij.push_back(j);
-        // DX20200414 [OBSOLETE - redundant]   ij_index.push_back(ij);
-        // DX20200414 [OBSOLETE - redundant]   // Store negative (may not be needed)
-        // DX20200414 [OBSOLETE - redundant]   //lattice_vecs.push_back(-tmp_vec);
-        // DX20200414 [OBSOLETE - redundant]   //vector<uint> ji;
-        // DX20200414 [OBSOLETE - redundant]   //ji.push_back(j); ji.push_back(i);
-        // DX20200414 [OBSOLETE - redundant]   //ij_index.push_back(ji);
-        // DX20200414 [OBSOLETE - redundant] }
+        //DX20200414 [OBSOLETE - redundant] bool vec_stored = false;
+        //DX20200414 [OBSOLETE - redundant] for(uint p=0;p<lattice_vecs.size();p++){
+        //DX20200414 [OBSOLETE - redundant]   if(identical(lattice_vecs[p],tmp_vec,1e-3)){ //DX20190318 - changed from -10 to -3
+        //DX20200414 [OBSOLETE - redundant]     vec_stored = true;
+        //DX20200414 [OBSOLETE - redundant]     break;
+        //DX20200414 [OBSOLETE - redundant]   }
+        //DX20200414 [OBSOLETE - redundant] }
+        //DX20200414 [OBSOLETE - redundant] if(vec_stored == false){
+        //DX20200414 [OBSOLETE - redundant]  lattice_vecs.push_back(tmp_vec);
+        //DX20200414 [OBSOLETE - redundant]   // Store indices of atoms comprising the vector
+        //DX20200414 [OBSOLETE - redundant]   vector<uint> ij;
+        //DX20200414 [OBSOLETE - redundant]   ij.push_back(i); ij.push_back(j);
+        //DX20200414 [OBSOLETE - redundant]   ij_index.push_back(ij);
+        //DX20200414 [OBSOLETE - redundant]   // Store negative (may not be needed)
+        //DX20200414 [OBSOLETE - redundant]   //lattice_vecs.push_back(-tmp_vec);
+        //DX20200414 [OBSOLETE - redundant]   //vector<uint> ji;
+        //DX20200414 [OBSOLETE - redundant]   //ji.push_back(j); ji.push_back(i);
+        //DX20200414 [OBSOLETE - redundant]   //ij_index.push_back(ji);
+        //DX20200414 [OBSOLETE - redundant] }
       }
       //DX TEST }
     }

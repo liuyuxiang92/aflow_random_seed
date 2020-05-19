@@ -120,7 +120,7 @@ namespace cce {
 
 
   //print_corrections///////////////////////////////////////////////////////////////////////
-  // ME20200213
+  //ME20200213
   // For poscar2cce
   void print_corrections(aurostd::xoption& flags, std::istream& ist) {
     // read structure
@@ -542,7 +542,7 @@ namespace cce {
     _aflags aflags;
     _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(aflowIn,aflags,kflags);
     //_xvasp xvasp;xvasp.clear();
-    //KBIN::readModulesFromAflowIn(aflowIn, kflags, xvasp);  // ME20181027
+    //KBIN::readModulesFromAflowIn(aflowIn, kflags, xvasp);  //ME20181027
     //cout << "xvasp.str.species_pp: " << xvasp.str.species_pp << endl;
     //cout << "xvasp.str: " << xvasp.str << endl;
     if (aurostd::FileExist(outcar_file) || aurostd::EFileExist(outcar_file)) {
@@ -673,7 +673,7 @@ namespace cce {
   /////////////////////////////////////////////////////////////////////////////
 
   //init_flags////////////////////////////////////////////////////////////
-  // ME20200213
+  //ME20200213
   // Initializes the CCE flags to their default values.
   aurostd::xoption init_flags() {
     aurostd::xoption flags;
@@ -686,7 +686,7 @@ namespace cce {
   }
 
   //init_variables////////////////////////////////////////////////////////
-  // ME20200213
+  //ME20200213
   // Initializes the variables struct.
   CCE_Variables init_variables(const xstructure& structure) {
     CCE_Variables cce_vars;
@@ -1091,7 +1091,7 @@ namespace cce {
     cce_flags.flag("NO_OX_STATES",FALSE);
     cce_flags.flag("OX_STATES_DETERMINED",FALSE);
     load_ox_states_templates_each_species(structure, cce_flags, cce_vars);
-    // ME Nov. 2019 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
+    //ME Nov. 2019 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
     uint natoms = structure.atoms.size();
     cce_vars.cations_map.resize(num_cation_species);
     uint i = 0;
@@ -1279,7 +1279,7 @@ namespace cce {
     if(LDEBUG){
       cerr << soliloquy << "Trying preferred oxidation numbers:" << endl;
     }
-    // use Marco's implementation of my algorithm to determine oxidation_numbers
+    // use ME's implementation of my algorithm to determine oxidation_numbers
     determine_cation_oxidation_states(structure, cce_vars, cce_vars.pref_ox_states_electronegativity_sorted);
     // print oxidation numbers and calculate sum
     cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars);
@@ -2101,12 +2101,12 @@ namespace cce {
     if(LDEBUG){
       cerr << soliloquy << "Trying all known oxidation numbers:" << endl;
     }
-    // use Marco's implementation of my algorithm to determine oxidation_numbers
+    // use ME's implementation of my algorithm to determine oxidation_numbers
     determine_cation_oxidation_states(structure, cce_vars, cce_vars.all_ox_states_electronegativity_sorted);
   }
 
   //determine_cation_oxidation_states////////////////////////////////////////////////////////
-  // ME Nov. 2019
+  //ME Nov. 2019
   // for avoiding recursion algorithm to determine cation oxidation_numbers
   // determine the cation oxidation numbers by using possible oxidation states for each species 
   // which can be either the preferred or all known oxidation numbers
@@ -2782,7 +2782,7 @@ namespace cce {
   /////////////////////////////////////////////////////////////////////////////
 
   //print_JSON/////////////////////////////////////////////////////////////
-  // ME20200213
+  //ME20200213
   // Returns CCE results in JSON format
   string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars) {
     stringstream json;

@@ -37,7 +37,7 @@ namespace apl {
     free();
     _pc = &pc;
     _pc_set = true;
-    _system = _pc->getSystemName();  // ME20190614
+    _system = _pc->getSystemName();  //ME20190614
   }
 
   PhononDispersionCalculator::PhononDispersionCalculator(const PhononDispersionCalculator& that) {
@@ -197,7 +197,7 @@ namespace apl {
   void PhononDispersionCalculator::calculateInOneThread(int startIndex, int endIndex) {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      // ME20200206 - get direction for q-points near Gamma for non-analytical correction
+      //ME20200206 - get direction for q-points near Gamma for non-analytical correction
       // or the discontinuity due to LO-TO splitting is not accurately captured.
       if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
         int npts = _pb.getDensity() + 1;
@@ -274,7 +274,7 @@ namespace apl {
 
 #else
 
-    // ME20200206 - use calculateInOneThread so changes only need to be made in one place
+    //ME20200206 - use calculateInOneThread so changes only need to be made in one place
     //[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     //[OBSOLETE]  _logger.updateProgressBar(iqp, _qpoints.size());
     //[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], _frequencyFormat));
@@ -1168,7 +1168,7 @@ namespace apl {
     }
 
     if(!CARTESIAN_COORDS){
-      // ME20200203 - these are custom points, i.e. they are user generated based
+      //ME20200203 - these are custom points, i.e. they are user generated based
       // on a user-defined input structure. AFLOW should not switch the basis
       // behind the scenes. Assume that the user knows what they are doing.
       //transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) ); //must be reciprocal
@@ -1255,7 +1255,7 @@ namespace apl {
       points = _points;
       labels = _labels;
     }
-    // ME20200117 - Convert to reciprocal coordinates of the
+    //ME20200117 - Convert to reciprocal coordinates of the
     // original structure or the distances will be wrong
     if (_store == CARTESIAN_LATTICE) {
       xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getOriginalStructure().lattice)));

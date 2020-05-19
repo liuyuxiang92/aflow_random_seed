@@ -249,7 +249,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  // CT20200323 - Relax structure if it hasn't relaxed yet before running AEL
+  //CT20200323 - Relax structure if it hasn't relaxed yet before running AEL
   uint relaxStructureAEL_VASP(const string& AflowIn,
       _xvasp& xvasp,
       _aflags& aflags,

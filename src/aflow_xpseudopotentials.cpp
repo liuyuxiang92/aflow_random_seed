@@ -169,9 +169,9 @@ bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE) {
     comment=xPOT.species_pp_version.at(0);
     xPOT.vTITEL.at(0)=aurostd::RemoveWhiteSpaces(xPOT.vTITEL.at(0));
     xPOT.vLEXCH.at(0)=aurostd::RemoveWhiteSpaces(xPOT.vLEXCH.at(0));
-    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: vTITEL.at(0)=" << xPOT.vTITEL.at(0) << endl;}   // SC20200326
-    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: species.at(0)=" << xPOT.species.at(0) << endl;}   // SC20200326
-    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: species_Z.at(0)=" << xPOT.species_Z.at(0) << endl;}    // SC20200326
+    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: vTITEL.at(0)=" << xPOT.vTITEL.at(0) << endl;}   //SC20200326
+    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: species.at(0)=" << xPOT.species.at(0) << endl;}   //SC20200326
+    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: species_Z.at(0)=" << xPOT.species_Z.at(0) << endl;}    //SC20200326
     oss << "  " << endl;
     oss << "  // ******************************************************************************************************************************************************** " << endl;
     //   oss << "  // [AFLOW]START=" << comment << " " << endl;

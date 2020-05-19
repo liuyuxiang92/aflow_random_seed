@@ -4497,8 +4497,8 @@ namespace estructure{
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
       if(LDEBUG) cerr << XHOST.sPID << "estructure::DOSDATA_JSON: working in directory=" << directory << endl;
-      //oss << "{" << std::endl;  // CO20171025
-      SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); // CO20171025
+      //oss << "{" << std::endl;  //CO20171025
+      SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
       //oss <<std::endl  << "}"; //CO20171025
       if(i!=directories.size()-1){oss<<",";}
@@ -5483,8 +5483,8 @@ namespace estructure {
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
       if(LDEBUG) cerr << XHOST.sPID << "estructure::BANDSDATA_JSON: working in directory=" << directory << endl;
-      //oss << "{" << std::endl; // CO20171025
-      SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); // CO20171025
+      //oss << "{" << std::endl; //CO20171025
+      SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
       //oss <<std::endl  << "}"; //CO20171025
       if(i!=directories.size()-1){oss<<",";}

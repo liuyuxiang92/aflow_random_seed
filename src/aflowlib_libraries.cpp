@@ -1532,36 +1532,36 @@ namespace aflowlib {
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout))) {
               if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout),directory_WEB);  // CO20171024
+              aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout),directory_WEB);  //CO20171024
             }  // FileExist
           } // iout
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout))) {
               if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  // CO20171024
+              aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  //CO20171024
             } // FileExist
           } // iout
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)))  {  // NO EXTENSION
               if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout),directory_WEB);       // CO20171024
+              aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout),directory_WEB);       //CO20171024
             }
             for(uint iext=0;iext<XHOST.vext.size();iext++) {
               if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)))  {
                 if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-                aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       // CO20171024
+                aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       //CO20171024
               } // FileExist
             } // iext
           } // iout
           for(uint iout=0;iout<vout.size();iout++) {
             if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout))) { // NO EXTENSION
               if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout),directory_WEB);     // CO20171024
+              aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout),directory_WEB);     //CO20171024
             } // FileExist
             for(uint iext=0;iext<XHOST.vext.size();iext++) {
               if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext))) {
                 if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-                aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     // CO20171024
+                aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     //CO20171024
               } // FileExist
             } // iext
           } // iout
@@ -2290,7 +2290,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics [-1]" << endl;
     // ZIP-AGNOSTIC
     if(XHOST.vext.size()!=XHOST.vzip.size()) { cerr << XHOST.sPID << "ERROR - aflowlib::LIB2RAW_Loop_Thermodynamics: XHOST.vext.size()!=XHOST.vzip.size()" << endl;exit(0); }
-    // CO and DX START 20170713 - adding symmetry output to RAW
+    //CO+DX START 20170713 - adding symmetry output to RAW
     _aflags aflags;
     aflags.Directory=directory_RAW;
     ofstream FileMESSAGE; //dummy ofstream, not really used
@@ -2298,7 +2298,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics [-2]" << endl;
     string system_name=KBIN::ExtractSystemName(directory_LIB);
     if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics [-3]" << endl;
-    // CO and DX STOP 20170713 - adding symmetry output to RAW
+    //CO+DX STOP 20170713 - adding symmetry output to RAW
     //    if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics data.aurl=" << data.aurl << endl;
     // aurostd::StringSubst(directory_LIB,"/./","/");
     // aurostd::StringSubst(directory_RAW,"/./","/");
@@ -3717,7 +3717,7 @@ namespace aflowlib {
     }
 
     // ONLY TO GET REFERENCE ENERGIES AND INTERCEPT PROTOTYPES
-    if(1) { // ONLY TO GENERATE AUIDS - STEFANO ONLY DONT TOUCH
+    if(1) { // ONLY TO GENERATE AUIDS - SC ONLY DONT TOUCH
       if(data.nspecies==1) {
         string s=str_relax.species.at(0);
         string TXT1,TXT2;
@@ -5551,7 +5551,7 @@ namespace aflowlib {
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
-      // ME20190627 - BEGIN
+      //ME20190627 BEGIN
       // [OBSOLETE] cerr << FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!";
@@ -5572,7 +5572,7 @@ namespace aflowlib {
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
-      // ME20190627 - BEGIN
+      //ME20190627 BEGIN
       // [OBSOLETE] cerr << FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!";
@@ -5593,7 +5593,7 @@ namespace aflowlib {
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
-      // ME20190627 - BEGIN
+      //ME20190627 BEGIN
       // [OBSOLETE] cerr << FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!";
@@ -5613,7 +5613,7 @@ namespace aflowlib {
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
-      // ME20190627 - BEGIN
+      //ME20190627 BEGIN
       // [OBSOLETE] cerr << FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";

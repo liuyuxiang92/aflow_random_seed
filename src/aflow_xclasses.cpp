@@ -1050,8 +1050,8 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_KPOINTS_PHONONS_KPPRA                                = b.KBIN_VASP_KPOINTS_PHONONS_KPPRA;
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME                              = b.KBIN_VASP_KPOINTS_PHONONS_KSCHEME;
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY                  = b.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;
-  KBIN_VASP_KPOINTS_PHONONS_GRID                                 = b.KBIN_VASP_KPOINTS_PHONONS_GRID;  // ME20200427
-  KBIN_VASP_KPOINTS_PHONONS_SHIFT                                = b.KBIN_VASP_KPOINTS_PHONONS_SHIFT; // ME20200427
+  KBIN_VASP_KPOINTS_PHONONS_GRID                                 = b.KBIN_VASP_KPOINTS_PHONONS_GRID;  //ME20200427
+  KBIN_VASP_KPOINTS_PHONONS_SHIFT                                = b.KBIN_VASP_KPOINTS_PHONONS_SHIFT; //ME20200427
   // BANDS
   KBIN_VASP_KPOINTS_BANDS_LATTICE                                = b.KBIN_VASP_KPOINTS_BANDS_LATTICE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -1369,12 +1369,12 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] AFLOWIN_FLAG_AIMS                      = b.AFLOWIN_FLAG_AIMS;
   // AVASP
   AVASP_aflowin_only_if_missing            = b.AVASP_aflowin_only_if_missing;
-  AVASP_arun                               = b.AVASP_arun;            // ME20181019
-  AVASP_arun_mode                          = b.AVASP_arun_mode;       // ME20181019
-  AVASP_arun_runname                       = b.AVASP_arun_runname;    // ME20181019
-  aplopts                                  = b.aplopts;               // ME20181025
-  aaplopts                                 = b.aaplopts;              // ME20181025
-  qhaopts                                  = b.qhaopts;               // AS20200302
+  AVASP_arun                               = b.AVASP_arun;            //ME20181019
+  AVASP_arun_mode                          = b.AVASP_arun_mode;       //ME20181019
+  AVASP_arun_runname                       = b.AVASP_arun_runname;    //ME20181019
+  aplopts                                  = b.aplopts;               //ME20181025
+  aaplopts                                 = b.aaplopts;              //ME20181025
+  qhaopts                                  = b.qhaopts;               //AS20200302
   AVASP_dirbase                            = b.AVASP_dirbase;
   AVASP_libbase                            = b.AVASP_libbase;
   AVASP_label                              = b.AVASP_label;
@@ -2057,7 +2057,7 @@ ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE) {p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 
-// ME20200427 - Initializer functions
+//ME20200427 - Initializer functions
 void xStream::initialize(ostream& oss) {
   free();
   p_FileMESSAGE = new ofstream();
