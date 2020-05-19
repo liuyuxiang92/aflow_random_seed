@@ -651,6 +651,16 @@ desired q-points. The file can be opened using V_sim or ASCII-phonons. These pro
 of doing supercells and animations on their own and do not require steps, periods, or supercell
 parameters.
 
+3.6. Group Velocities
+
+AFLOW can calculate group velocities by adding the following to the aflow.in file:
+
+    [AFLOW_APL]GROUP_VELOCITY=ON
+
+This is also the default option.
+
+The q-points for the group velocities are taken from the DOS_MESH keyword (see section 3.2.).
+
 
 4. Saving and Loading APL Results APL Calculations (Hibernation)
 
