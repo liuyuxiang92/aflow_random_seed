@@ -261,7 +261,7 @@ namespace AGL_functions {
       }
       // parameters for POCC CALCULATIONS
       kflags.KBIN_POCC=FALSE;
-      kflags.KBIN_POCC_CALCULATION=aurostd::substring2bool(AflowIn,"[AFLOW_POCC]CALC",TRUE) && (aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE",TRUE) && aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",TRUE)); //CO 180419
+      kflags.KBIN_POCC_CALCULATION=aurostd::substring2bool(AflowIn,"[AFLOW_POCC]CALC",TRUE) && (aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE",TRUE) && aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",TRUE)); //CO20180419
       if(kflags.KBIN_POCC_CALCULATION) {
         kflags.KBIN_POCC=TRUE;
       } 

@@ -2085,7 +2085,7 @@ namespace KBIN {
                         if(scqha.calculation_gruneisen(&qmesh))  //ME20190428
                         {
                           if(kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
-                          { //PN 180719
+                          { //PN20180719
                             scqha.write_gruneisen_parameter_mesh();
                             scqha.Writeaverage_gp(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
                             is_negative_freq=scqha.get_is_negative_freq();
@@ -2145,7 +2145,7 @@ namespace KBIN {
                   if(scqha.calculation_gruneisen(&qmesh))  //ME20190428
                   {
                     if(kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
-                    { //PN 180719
+                    { //PN20180719
                       scqha.write_gruneisen_parameter_mesh();
                       scqha.Writeaverage_gp(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
                       is_negative_freq=scqha.get_is_negative_freq();

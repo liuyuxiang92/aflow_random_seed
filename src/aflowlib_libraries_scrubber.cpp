@@ -144,7 +144,7 @@ namespace aflowlib {
             if(tokens.size()>2) {
               if(tokens.at(tokens.size()-2)=="ICSD") {
                 if(FileExist_directory_LIB_AFLOW_IN && FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT && aurostd::FileExist(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT))  // check aflowlib.out
-                { //CO200106 - patching for auto-indenting
+                { //CO20200106 - patching for auto-indenting
                   // acerr << directory_LIB << " " << directory_RAW << " " << directory_WEB << endl;
                   string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
                   if(!aurostd::FileExist(directory_ICSD2LINK+"/LIB")) {
@@ -228,7 +228,7 @@ namespace aflowlib {
                 }
                 //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
                 if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
-                { //CO200106 - patching for auto-indenting
+                { //CO20200106 - patching for auto-indenting
                   ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
                   fixes++;
                 }
@@ -248,7 +248,7 @@ namespace aflowlib {
               }
               //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
               if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
-              { //CO200106 - patching for auto-indenting
+              { //CO20200106 - patching for auto-indenting
                 ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --showPID --lib2raw=\"" << directory_LIB << "\"" << endl;
                 fixes++;
               }

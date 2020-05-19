@@ -504,7 +504,7 @@ int main(int _argc,char **_argv) {
       }
       //exit(0);
       return 0; //CO20180419
-      //CO START 170614 - some SQLITE tests
+      //CO START 20170614 - some SQLITE tests
       //http://zetcode.com/db/sqlitec/ - more tests here
       //this will create test.db file
       sqlite3 *db;

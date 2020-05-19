@@ -2431,7 +2431,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics [3]" << endl;
     if(TRUE || flag_DATA_ORIG_ || flag_EDATA_ORIG_ || flag_SG1 || flag_SG2) {  // POSCAR.orig.EXT
       if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics [3.1]" << endl;
-      // if(flag_ORIG==FALSE) { //[CO200106 - close bracket for indenting]}
+      // if(flag_ORIG==FALSE) { //[CO20200106 - close bracket for indenting]}
       bool found=FALSE;
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(LDEBUG) cerr << XHOST.sPID << "aflowlib::LIB2RAW_Loop_Thermodynamics: BUILDING POSCAR.orig from POSCAR.orig.EXT" << endl;
@@ -3118,11 +3118,11 @@ namespace aflowlib {
             data.calculation_time+=outcar_tmp.calculation_time;  // will multiply after
             data.calculation_memory=aurostd::max(data.calculation_memory,outcar_tmp.calculation_memory);
             xOUTCAR outcar;
-            if(i==relax_max+2) { outcar.GetPropertiesFile(directory_LIB+"/OUTCAR.bands"+XHOST.vext.at(iext)); } // cerr << XHOST.sPID << "xOUTCAR.Efermi=" << outcar.Efermi << endl;  //CO200106 - patching for auto-indenting
+            if(i==relax_max+2) { outcar.GetPropertiesFile(directory_LIB+"/OUTCAR.bands"+XHOST.vext.at(iext)); } // cerr << XHOST.sPID << "xOUTCAR.Efermi=" << outcar.Efermi << endl;  //CO20200106 - patching for auto-indenting
             xEIGENVAL eigenval;
             if(i==relax_max+2) { eigenval.GetPropertiesFile(directory_LIB+"/EIGENVAL.bands"+XHOST.vext.at(iext)); }
             xDOSCAR doscar;
-            if(i==relax_max+2) { doscar.GetPropertiesFile(directory_LIB+"/DOSCAR.bands"+XHOST.vext.at(iext)); } // cerr << XHOST.sPID << "xDOSCAR.Efermi=" << doscar.Efermi << " " << outcar.Efermi-doscar.Efermi << endl; //CO200106 - patching for auto-indenting
+            if(i==relax_max+2) { doscar.GetPropertiesFile(directory_LIB+"/DOSCAR.bands"+XHOST.vext.at(iext)); } // cerr << XHOST.sPID << "xDOSCAR.Efermi=" << doscar.Efermi << " " << outcar.Efermi-doscar.Efermi << endl; //CO20200106 - patching for auto-indenting
           }
         }
       }
@@ -5226,7 +5226,7 @@ namespace aflowlib {
         //      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb << " no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
         if(vrelax.at(irelax)==".static")
           if(ok) { obb << "d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=DOSCAR"+vrelax.at(irelax)+".EXT"; }}
-        // "OUTCAR"+vrelax.at(irelax)+".EXT"  //CO200106 - patching for auto-indenting (quotes)
+        // "OUTCAR"+vrelax.at(irelax)+".EXT"  //CO20200106 - patching for auto-indenting (quotes)
         obb << ".";
         if(ok) { obb << "o";  // check Answer 4 or 5 in OUTCAR.RELAX.EXT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed

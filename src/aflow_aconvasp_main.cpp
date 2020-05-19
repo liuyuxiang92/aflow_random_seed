@@ -3183,7 +3183,7 @@ namespace pflow {
 
     //while(symmetry_commensurate==FALSE)
     if(print == false) //DX20170803 - PRINT
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
@@ -6638,7 +6638,7 @@ namespace pflow {
 
     //while(symmetry_commensurate==FALSE)
     if(print == false) //DX20170803 - PRINT
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
