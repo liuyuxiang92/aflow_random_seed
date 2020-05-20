@@ -1439,7 +1439,7 @@ namespace aflowlib {
       // [OBSOLETE] no compress jvxl   aurostd::CompressFile(directory_RAW+"/"+"*.jvxl",DEFAULT_KZIP_BIN);
       // [OBSOLETE] no compress jvxl     }
       // FILES to compress
-      deque<string> vfile2compress1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.fgroup,aflow.iatoms,aflow.agroup",vfile2compress1,",");
+      deque<string> vfile2compress1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.pgroupk_Patterson,aflow.fgroup,aflow.iatoms,aflow.agroup",vfile2compress1,","); //DX20200520 - added Patterson
       for(uint ilink=0;ilink<vfile2compress1.size();ilink++) {
         for(uint iout=0;iout<vout.size();iout++) {
           for(uint itype=0;itype<vtype.size();itype++) {   
@@ -3529,6 +3529,11 @@ namespace aflowlib {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,"orig",new_sym_file);
           aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,new_sym_file);
         } //DX20171207 - added pgroupk_xtal
+        KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_PGROUPK_PATTERSON_,false,message,"txt");
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)) {
+          AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,"orig",new_sym_file);
+          aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,new_sym_file);
+        } //DX20200520 - added pgroupk_Patterson
         KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_IATOMS_,false,message,"txt");
         if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_OUT)) {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_OUT,"orig",new_sym_file);
@@ -3565,6 +3570,11 @@ namespace aflowlib {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,"orig",new_sym_file);
           aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,new_sym_file);
         } //DX20171207 - added pgroupk_xtal
+        KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_PGROUPK_PATTERSON_,false,message,"json");
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) {
+          AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,"orig",new_sym_file);
+          aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,new_sym_file);
+        } //DX20200520 - added pgroupk_Patterson
         KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_IATOMS_,false,message,"json");
         if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_JSON)) {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_JSON,"orig",new_sym_file);
@@ -3813,6 +3823,11 @@ namespace aflowlib {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,"relax",new_sym_file);
           aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,new_sym_file);
         } //DX20171207 - added pgroupk_xtal
+        KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_PGROUPK_PATTERSON_,false,message,"txt");
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)) {
+          AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,"relax",new_sym_file);
+          aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,new_sym_file);
+        } //DX20200520 - added pgroupk_Patterson
         KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_IATOMS_,false,message,"txt");
         if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_OUT)) {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_OUT,"relax",new_sym_file);
@@ -3849,6 +3864,11 @@ namespace aflowlib {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,"relax",new_sym_file);
           aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,new_sym_file);
         } //DX20171207 - added pgroupk_xtal
+        KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_PGROUPK_PATTERSON_,false,message,"json");
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) {
+          AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,"relax",new_sym_file);
+          aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,new_sym_file);
+        } //DX20200520 - added pgroupk_Patterson
         KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_IATOMS_,false,message,"json");
         if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_JSON)) {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_JSON,"relax",new_sym_file);
@@ -4046,6 +4066,11 @@ namespace aflowlib {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,"bands",new_sym_file);
           aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,new_sym_file);
         } //DX20171207 - added pgroupk_xtal
+        KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_PGROUPK_PATTERSON_,false,message,"txt");
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)) {
+          AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,"bands",new_sym_file);
+          aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,new_sym_file);
+        } //DX20200520 - added pgroupk_Patterson
         KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_IATOMS_,false,message,"txt");
         if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_OUT)) {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_OUT,"bands",new_sym_file);
@@ -4082,6 +4107,11 @@ namespace aflowlib {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,"bands",new_sym_file);
           aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,new_sym_file);
         } //DX20171207 - added pgroupk_xtal
+        KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_PGROUPK_PATTERSON_,false,message,"json");
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) {
+          AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,"bands",new_sym_file);
+          aurostd::file2file(directory_RAW+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,new_sym_file);
+        } //DX20200520 - added pgroupk_Patterson
         KBIN_SymmetryWrite(FileMESSAGE,str_sp,aflags,_IATOMS_,false,message,"json");
         if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_JSON)) {
           AddFileNameBeforeExtension(directory_RAW+"/"+DEFAULT_AFLOW_IATOMS_JSON,"bands",new_sym_file);
