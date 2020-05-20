@@ -204,7 +204,7 @@ namespace KBIN {
       _vflags& vflags, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    uint aelerror = 1;
     bool USER_RELAX=true;
     ostringstream aus;
 
@@ -261,7 +261,7 @@ namespace KBIN {
     // uint num_relax = xvasp.NRELAX;
     uint num_relax = 2;
     bool relax_complete = true;
-    bool krun = true;
+    bool krun = false;
 
     // First check if relaxation has already been performed
     for (uint i = 1; i <= num_relax; i++) {
@@ -311,10 +311,10 @@ namespace KBIN {
   //
   // Run AEL postprocessing: calls AEL from other parts of AFLOW, to run AEL postprocessing on previously run calculations
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
-  void VASP_RunPhonons_AEL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
+  void VASP_RunPhonons_AEL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror = 0;
+    // OBSOLETE uint aelerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn = "";
@@ -324,7 +324,7 @@ namespace KBIN {
     ofstream FileMESSAGE;
 
     // Call AEL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
-    aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
+    uint aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
 
     // Set AEL postprocess flag to true
     AEL_data.postprocess = true;
@@ -360,10 +360,10 @@ namespace AEL_functions {
   // Run AEL postprocessing: calls AEL from other parts of AFLOW, to run AEL postprocessing on previously run calculations
   // Returns elastic properties: bulk and shear moduli, Poisson ratio, elastic stiffness tensor
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
-  uint Get_ElasticProperties_AEL_postprocess(string directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor) {  
+  uint Get_ElasticProperties_AEL_postprocess(const string& directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror = 0;
+    // [OBSOLETE] uint aelerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn = "";
@@ -400,7 +400,7 @@ namespace AEL_functions {
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     // Call AEL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
-    aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
+    uint aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
 
     // Set AEL postprocess flag to true
     AEL_data.postprocess = true;
@@ -456,17 +456,17 @@ namespace AEL_functions {
 // AEL_functions::Get_PoissonRatio
 // ***************************************************************************
 namespace AEL_functions {
-  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool& postprocess, ofstream& FileMESSAGE) {
+  uint Get_PoissonRatio(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool postprocess, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    // [OBSOLETE] uint aelerror;
     ostringstream aus;
 
     // Set AEL postprocess flag
     AEL_data.postprocess = postprocess;
 
     // Call RunElastic_AEL to run AEL
-    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    uint aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
     if(!AEL_data.mechanically_stable) {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
@@ -494,14 +494,14 @@ namespace AEL_functions {
 // AEL_functions::Get_BulkModulus
 // ***************************************************************************
 namespace AEL_functions {
-  uint Get_BulkModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE) {
+  uint Get_BulkModulus(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    // [OBSOLETE] uint aelerror;
     ostringstream aus;
 
     // Call RunElastic_AEL to run AEL
-    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    uint aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
     if(!AEL_data.mechanically_stable) {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
@@ -529,14 +529,14 @@ namespace AEL_functions {
 // AEL_functions::Get_ShearModulus
 // ***************************************************************************
 namespace AEL_functions {
-  uint Get_ShearModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE) {
+  uint Get_ShearModulus(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    // [OBSOLETE] uint aelerror;
     ostringstream aus;
 
     // Call RunElastic_AEL to run AEL
-    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    uint aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
     if(!AEL_data.mechanically_stable) {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
@@ -564,14 +564,14 @@ namespace AEL_functions {
 // AEL_functions::Get_ElasticTensor
 // ***************************************************************************
 namespace AEL_functions {
-  uint Get_ElasticTensor(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<vector<double> > ElasticTensor, ofstream& FileMESSAGE) {
+  uint Get_ElasticTensor(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<vector<double> > ElasticTensor, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    // uint aelerror;
     ostringstream aus;
 
     // Call RunElastic_AEL to run AEL
-    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    uint aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
     if(!AEL_data.mechanically_stable) {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
@@ -599,14 +599,14 @@ namespace AEL_functions {
 // AEL_functions::Get_ElasticTensor_xmatrix
 // ***************************************************************************
 namespace AEL_functions {
-  uint Get_ElasticTensor_xmatrix(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, xmatrix<double> ElasticTensor, ofstream& FileMESSAGE) {
+  uint Get_ElasticTensor_xmatrix(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, xmatrix<double> ElasticTensor, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    // [OBSOLETE] uint aelerror;
     ostringstream aus;
 
     // Call RunElastic_AEL to run AEL
-    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    uint aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
     if(!AEL_data.mechanically_stable) {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
@@ -641,7 +641,7 @@ namespace AEL_functions {
 // ***************************************************************************
 namespace AEL_functions {
   // Function to actually run the AEL method
-  uint RunElastic_AEL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE) {
+  uint RunElastic_AEL(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE) {
     // User's control of parameters for elastic constants calculation; setting defaults
 
     // Options to decide what to calculate and write
@@ -2633,7 +2633,7 @@ namespace AEL_functions {
       // Writes elastic moduli values in file for REST-API
       oss.clear();
       oss.str(std::string());
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[AEL_RESULTS]START" << endl;
       oss << "ael_poisson_ratio=" << AEL_data.poisson_ratio << "  " << endl;
       oss << "ael_bulk_modulus_voigt=" << AEL_data.bulkmodulus_voigt << "  (GPa)" << endl;
@@ -2652,7 +2652,7 @@ namespace AEL_functions {
       oss << "ael_applied_pressure=" << AEL_data.applied_pressure << "  (GPa)" << endl;
       oss << "ael_average_external_pressure=" << AEL_data.average_external_pressure << "  (GPa)" << endl;   
       oss << "[AEL_RESULTS]STOP" << endl;
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[AEL_STIFFNESS_TENSOR]START" << endl;
       for (uint i = 0; i < AEL_data.elastic_tensor.size(); i++) {
         for (uint j = 0; j < AEL_data.elastic_tensor.size(); j++) {
@@ -2661,7 +2661,7 @@ namespace AEL_functions {
         oss << endl;
       }
       oss << "[AEL_STIFFNESS_TENSOR]STOP" << endl;
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[AEL_COMPLIANCE_TENSOR]START" << endl;
       for (uint i = 0; i < AEL_data.compliance_tensor.size(); i++) {
         for (uint j = 0; j < AEL_data.compliance_tensor.size(); j++) {
@@ -2670,7 +2670,7 @@ namespace AEL_functions {
         oss << endl;
       }
       oss << "[AEL_COMPLIANCE_TENSOR]STOP" << endl;
-      oss << "[AFLOW] **************************************************************************************************************************" << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       string ofileafaelname = AEL_data.dirpathname + "/aflow.ael.out";
       if(!aurostd::stringstream2file(oss, ofileafaelname, "WRITE")) {
         aurostd::StringstreamClean(aus);
@@ -2887,7 +2887,7 @@ namespace AEL_functions {
           aus << _AELSTR_MESSAGE_ + "Pressure = " << Pressure.at(k) << "GPa" << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           // Writes elastic moduli values in file for REST-API
-          oss << "[AFLOW] **************************************************************************************************************************" << endl;
+	  oss << AFLOWIN_SEPARATION_LINE << endl;
           oss << "[AEL_PRESSURE]PRESSURE = " << Pressure.at(k) << "GPa" << endl;
           if(AEL_data_pressures.at(k).mechanically_stable) {
             oss << "[AEL_PRESSURE]Structure is mechanically stable at this pressure" << endl;
@@ -2911,7 +2911,7 @@ namespace AEL_functions {
           oss << "ael_applied_pressure=" << AEL_data_pressures.at(k).applied_pressure << "  (GPa)" << endl;
           oss << "ael_average_external_pressure=" << AEL_data_pressures.at(k).average_external_pressure << "  (GPa)" << endl;  
           oss << "[AEL_RESULTS]STOP" << endl;
-          oss << "[AFLOW] **************************************************************************************************************************" << endl;
+	  oss << AFLOWIN_SEPARATION_LINE << endl;
           oss << "[AEL_STIFFNESS_TENSOR]START" << endl;
           for (uint i = 0; i < AEL_data_pressures.at(k).elastic_tensor.size(); i++) {
             for (uint j = 0; j < AEL_data_pressures.at(k).elastic_tensor.size(); j++) {
@@ -2920,7 +2920,7 @@ namespace AEL_functions {
             oss << endl;
           }
           oss << "[AEL_STIFFNESS_TENSOR]STOP" << endl;
-          oss << "[AFLOW] **************************************************************************************************************************" << endl;
+	  oss << AFLOWIN_SEPARATION_LINE << endl;
           oss << "[AEL_COMPLIANCE_TENSOR]START" << endl;
           for (uint i = 0; i < AEL_data_pressures.at(k).compliance_tensor.size(); i++) {
             for (uint j = 0; j < AEL_data_pressures.at(k).compliance_tensor.size(); j++) {
@@ -2929,7 +2929,7 @@ namespace AEL_functions {
             oss << endl;
           }
           oss << "[AEL_COMPLIANCE_TENSOR]STOP" << endl;
-          oss << "[AFLOW] **************************************************************************************************************************" << endl;
+	  oss << AFLOWIN_SEPARATION_LINE << endl;
         }
         string ofileafaelname = AEL_data.dirpathname + "/aflow.ael_pressure.out";
         if(!aurostd::stringstream2file(oss, ofileafaelname, "WRITE")) {

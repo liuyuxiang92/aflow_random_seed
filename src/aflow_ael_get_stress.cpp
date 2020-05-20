@@ -26,7 +26,7 @@
 // The following functions are for setting up AEL inputs for postprocessing runs called from other parts of AFLOW
 // *****************************************************************************************************************
 namespace AEL_functions {
-  uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
+  uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, const string& AflowInName, const string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
     ifstream FileAFLOWIN, FileAFLOWINcheck;
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
@@ -78,7 +78,7 @@ namespace AEL_functions {
     vaflowins.push_back("ael_aflow.in");
     vaflowins.push_back("agl_aflow.in");
     for(uint iaf=0;iaf<vaflowins.size()&&!ael_aflowin_found;iaf++){
-      const string& aflowinname=vaflowins[iaf];
+      const string& aflowinname = vaflowins.at(iaf);
       if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
         FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
@@ -119,160 +119,6 @@ namespace AEL_functions {
       }
     }
     //CO20200502 STOP - CT, I am consolidating the following code with an outer loop, it should make it easier to patch in the future
-    if(0){
-      // Check if AflowInName exists
-      if((AflowInName.length() > 0) && (aurostd::FileExist(directory_LIB+"/"+AflowInName))) {
-        FileNameAFLOWINcheck = directory_LIB+"/"+AflowInName;
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck="";
-        char c;
-        // READ _AFLOWIN_ and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
-        vAflowInCheck.clear();
-        aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
-        // Check if _AFLOWIN_ contains command to run AEL
-        for(uint i=0;i<vAflowInCheck.size()&&!ael_aflowin_found;i++){
-          if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AEL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALCS",TRUE) || FALSE)){
-            FileNameAFLOWIN = FileNameAFLOWINcheck;
-            ael_aflowin_found = true;
-          } else if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
-            if (aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",USER_AEL_POISSON_RATIO.option);
-            } else if( aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",USER_AEL_POISSON_RATIO.option);
-            }        	
-            if (USER_AEL_POISSON_RATIO.option) {
-              FileNameAFLOWIN = FileNameAFLOWINcheck;
-              ael_aflowin_found = true;
-            }
-          }
-        }
-      }
-      // Otherwise, check if _AFLOWIN_ file is AEL input file
-      if((!ael_aflowin_found) && ((_AFLOWIN_.length() > 0) && (aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)))) { //CO20200502 - AflowInName.length() -> _AFLOWIN_.length()
-        FileNameAFLOWINcheck = directory_LIB+"/"+_AFLOWIN_;
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck="";
-        char c;
-        // READ _AFLOWIN_ and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
-        vAflowInCheck.clear();
-        aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
-        // Check if _AFLOWIN_ contains command to run AEL
-        for(uint i=0;i<vAflowInCheck.size()&&!ael_aflowin_found;i++){
-          if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AEL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALCS",TRUE) || FALSE)){
-            FileNameAFLOWIN = FileNameAFLOWINcheck;
-            ael_aflowin_found = true;
-          } else if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
-            if (aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",USER_AEL_POISSON_RATIO.option);
-            } else if( aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",USER_AEL_POISSON_RATIO.option);
-            }        	
-            if (USER_AEL_POISSON_RATIO.option) {
-              FileNameAFLOWIN = FileNameAFLOWINcheck;
-              ael_aflowin_found = true;
-            }
-          }
-        }
-      }
-      // Otherwise, check for other commonly used names for AEL aflow.in file:
-      if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/ael_aflow.in"))) {
-        FileNameAFLOWINcheck = directory_LIB+"/ael_aflow.in";
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck="";
-        char c;
-        // READ _AFLOWIN_ and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
-        vAflowInCheck.clear();
-        aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
-        // Check if _AFLOWIN_ contains command to run AEL
-        for(uint i=0;i<vAflowInCheck.size()&&!ael_aflowin_found;i++){
-          if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AEL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALCS",TRUE) || FALSE)){
-            FileNameAFLOWIN = FileNameAFLOWINcheck;
-            ael_aflowin_found = true;
-          } else if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
-            if (aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",USER_AEL_POISSON_RATIO.option);
-            } else if( aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",USER_AEL_POISSON_RATIO.option);
-            }        	
-            if (USER_AEL_POISSON_RATIO.option) {
-              FileNameAFLOWIN = FileNameAFLOWINcheck;
-              ael_aflowin_found = true;
-            }
-          }
-        }
-      }
-      if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/agl_aflow.in"))) {
-        FileNameAFLOWINcheck = directory_LIB+"/agl_aflow.in";
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck="";
-        // [OBSOLETE] aurostd::xoption USER_AEL_POISSON_RATIO;
-        // [OBSOLETE] USER_AEL_POISSON_RATIO.option = false;
-        char c;
-        // READ _AFLOWIN_ and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
-        vAflowInCheck.clear();
-        aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
-        // Check if _AFLOWIN_ contains command to run AEL
-        for(uint i=0;i<vAflowInCheck.size()&&!ael_aflowin_found;i++){
-          if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
-            if (aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AEL_POISSON_RATIO=",USER_AEL_POISSON_RATIO.option);
-            } else if( aurostd::substring2bool(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",TRUE) ) {
-              USER_AEL_POISSON_RATIO.options2entry(AflowInCheck,"[AFLOW_AGL]AELPOISSONRATIO=",USER_AEL_POISSON_RATIO.option);
-            }        	
-            if (USER_AEL_POISSON_RATIO.option) {
-              FileNameAFLOWIN = FileNameAFLOWINcheck;
-              ael_aflowin_found = true;
-            }
-          }
-        }
-      }
-    }
 
     if (ael_aflowin_found) {
       FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
