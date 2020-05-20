@@ -53,10 +53,9 @@ endif
 # -std=gnu++0x
 #CCFLAGS= -DCYGWIN -Wall -W -fno-inline
 #ME20200520 - need to add assembler flags for Cygwin or aurostd.o won't compile
+CCFLAGS=-Wall -W -fno-inline
 ifeq ($(OS), Windows_NT)
 CCFLAGS=-Wall -W -fno-inline -Wa,-mbig-obj
-else
-CCFLAGS=-Wall -W -fno-inline
 endif
 #ME20200514 - Allow inlining for threaded files (big performance penalty otherwise)
 CCFLAGS_MT=-Wall -W
