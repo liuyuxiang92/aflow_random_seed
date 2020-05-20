@@ -37,10 +37,7 @@ namespace aflowlib {
     vector<string> vlib;
     uint fixes=0;
     if(library=="ALL" || library=="all") {
-      vlib.push_back("LIB0");vlib.push_back("LIB1");vlib.push_back("LIB2");
-      vlib.push_back("LIB3");vlib.push_back("LIB4");vlib.push_back("LIB5");
-      vlib.push_back("LIB6");vlib.push_back("LIB7");vlib.push_back("LIB8");
-      vlib.push_back("ICSD");vlib.push_back("AUID");
+      aurostd::string2tokens("LIB0,LIB1,LIB2,LIB3,LIB4,LIB5,LIB6,LIB7,LIB8,LIB9,ICSD",vlib,","); // not default vlib.push_back("AUID");
     }
     if(library=="LIB0" || library=="lib0") { vlib.push_back("LIB0");}
     if(library=="LIB1" || library=="lib1") { vlib.push_back("LIB1");}
@@ -59,38 +56,50 @@ namespace aflowlib {
       if(VERBOSE) acerr << soliloquy << " **********************************" << endl;
       if(VERBOSE) acerr << soliloquy << " TESTING vlib.at(i)=" << vlib.at(i) << endl;
       vector<string> list2found;
-      vector<string> listLIB2RAW,listRM,listANRL,listENTHALPY,listppAUID,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX,listBROKEN;
-      stringstream ossLIB2RAW,ossRM,ossANRL,ossENTHALPY,ossppAUID,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX,ossBROKEN;
+      vector<string> listLIB2RAW,listRM,listANRL,listENTHALPY,listppAUID,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX,listBROKEN,listAUIDerrors;
+      stringstream ossLIB2RAW,ossRM,ossANRL,ossENTHALPY,ossppAUID,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX,ossBROKEN,ossAUIDerrors;
       vector<string> tokens;
 
       if(vlib.at(i)=="AUID") {
+	uint AUID_found=0;
+	uint AUID_errors=0;
         _aflags aflags;aflags.Directory=".";
         aurostd::string2tokens("0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f",tokens,",");
         for(uint j=0;j<tokens.size();j++) {
           for(uint k=0;k<tokens.size();k++) {
-            string digits_ij=tokens.at(j)+tokens.at(k);
-            acout << soliloquy << " TESTING /common/" << vlib.at(i) << "/RAW/" << "aflow:" << digits_ij << "*.json links" << endl;
-            //	    acout << soliloquy << " TIME" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::string2vectorstring(aurostd::execute2string("find /common/AUID/aflow:"+digits_ij+"* -name RAW"),list2found);
-            //	acout << soliloquy << " TIME" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+	    for(uint l=0;l<tokens.size();l++) {
+	      for(uint m=0;m<tokens.size();m++) {
+		string digits_jklm="aflow:"+tokens.at(j)+tokens.at(k)+"/"+tokens.at(l)+tokens.at(m)+"/";
+		// 	acout << soliloquy << " TESTING /common/" << vlib.at(i) << "/RAW/"  << digits_jklm << "*.json links" << endl;
+		//	acout << soliloquy << " TIME" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		aurostd::string2vectorstring(aurostd::execute2string("find /common/AUID/"+digits_jklm+"* -name RAW"),list2found);
+		//	acout << soliloquy << " TIME" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             //	acout << soliloquy << " list2found.size()=" << list2found.size() << endl;
             //	acout << soliloquy << " ordering " << endl;
             sort(list2found.begin(),list2found.end());
-            acout << soliloquy << " list2found.size()=" << list2found.size() << endl;
-            //  acout << soliloquy << " TIME" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            for(uint l=0;l<list2found.size();l++) {
-              string filename=list2found.at(l);
-              aurostd::StringSubst(filename,"/common/AUID/","");
-              aurostd::StringSubst(filename,"RAW","");
-              aurostd::StringSubst(filename,"/","");
-              filename=list2found.at(l)+"/"+filename+".json";
-              if(!aurostd::FileExist(filename)) {
-                acout << soliloquy << " MISSING " << filename << endl;
+		//	acout << soliloquy << " list2found.size()=" << list2found.size() << endl;
+		//  acout << soliloquy << " TIME" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+		for(uint n=0;n<list2found.size();n++) {
+		  AUID_found++;
+		  string filename_auid_json=list2found.at(n),filename_json;
+		  aurostd::StringSubst(filename_auid_json,"/common/AUID/","");
+		  aurostd::StringSubst(filename_auid_json,"RAW","");
+		  aurostd::StringSubst(filename_auid_json,"/","");
+		  filename_auid_json=list2found.at(n)+"/"+filename_auid_json+".json";
+		  filename_json=list2found.at(n)+"/aflowlib.json";	  
+		  if(!aurostd::FileExist(filename_auid_json)) {
+		    AUID_errors++;
+		    acout << soliloquy << " MISSING " << filename_auid_json << "   AUID_found=" << AUID_found << "   AUID_errors=" << AUID_errors << "  filename_json=" << filename_json << endl;
+		    listAUIDerrors.push_back(list2found.at(n));
+		    ossAUIDerrors << "fix " << list2found.at(n) << endl;
+		  }
+		  }
               }
             }
           }
-        }
-        exit(0);	
+	}
+	acout << soliloquy << " AUID_found=" << AUID_found << endl;
+	acout << soliloquy << " AUID_errors=" << AUID_errors << endl;
       }      
       if(vlib.at(i)!="AUID") {
         //   if(level==0) // just LIB/aflow.in RAW/aflowlib.out
@@ -435,6 +444,11 @@ namespace aflowlib {
       if(listTOUCH.size()) {
         aurostd::stringstream2file(ossTOUCH,XHOST.tmpfs+"/xscrubber_TOUCH."+vlib.at(i));
         aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_TOUCH."+vlib.at(i));
+      }
+      acerr << soliloquy << " listAUIDerrors.size()=" << listAUIDerrors.size() << endl;
+      if(listAUIDerrors.size()) {
+	aurostd::stringstream2file(ossAUIDerrors,XHOST.tmpfs+"/xscrubber_AUIDerrors");
+	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_AUIDerrors");
       }
     }
     if(VERBOSE) acerr << soliloquy << " fixes=" << fixes << endl;
