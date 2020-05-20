@@ -41,12 +41,12 @@ namespace apl {
 }
 
 namespace KBIN {
-  // ME20181107 - Relax structure with PREC=PHONONS before running APL
-  // ME20200102 - Make k-point grid commensurate with supercell size
+  //ME20181107 - Relax structure with PREC=PHONONS before running APL
+  //ME20200102 - Make k-point grid commensurate with supercell size
   bool relaxStructureAPL_VASP(int start_relax,
       const string& AflowIn,
-      aurostd::xoption supercell_opts,  // ME20200102
-      const xvector<int>& scell_dims,  // ME20200102
+      aurostd::xoption supercell_opts,  //ME20200102
+      const xvector<int>& scell_dims,  //ME20200102
       bool relax_commensurate,
       _xvasp& xvasp,
       _aflags& aflags,
@@ -77,11 +77,11 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_PREC.push(prec_phonons);
     vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry = true;
 
-    // ME20200427
+    //ME20200427
     bool Krun = true;
     if (relax_commensurate) {
       // Determine k-point grid that is commensurate with the grid of the supercell
-      // ME20200102
+      //ME20200102
       // Determine k-point grid that is commensurate with the k-point grid of
       // the supercell. APL automatically chooses the k-point grid for the
       // relaxation to be commensurate with the k-point grid for the supercell.
@@ -186,20 +186,20 @@ namespace KBIN {
   }
 
   bool runRelaxationsAPL_VASP(int start_relax, const string& AflowIn, _xvasp& xvasp,
-    _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& fileMessage) {
+      _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& fileMessage) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     ostringstream aus;
 
     bool Krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, fileMessage, aflags, kflags, vflags);
     Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
 
-    // ME20200115 - set for SPIN_REMOVE_RELAX
+    //ME20200115 - set for SPIN_REMOVE_RELAX
     xvasp.NRELAX = _NUM_RELAX_;
 
     if (Krun) {
       int i;
       for (i = start_relax; Krun && i <= _NUM_RELAX_; i++) {
-        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
         aurostd::PrintMessageStream(fileMessage, aus, XHOST.QUIET);
         if (i < _NUM_RELAX_) {
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
@@ -207,11 +207,11 @@ namespace KBIN {
           XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, fileMessage);
         } else { 
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
-          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  // ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work
+          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work
         }
       }
       if (Krun && (i == _NUM_RELAX_)) {
-        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
       }
     }
     if (!Krun) return false;
@@ -219,7 +219,7 @@ namespace KBIN {
     // Update structure - do not set xvasp.str = str_fin or all other
     // information (species, PPs) will be deleted!
     stringstream xstr;
-    string filename = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(_NUM_RELAX_);  // ME20190308
+    string filename = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(_NUM_RELAX_);  //ME20190308
     if (!aurostd::FileExist(filename)) return false;
     aurostd::file2stringstream(filename, xstr);
     xstructure str_fin(xstr, IOVASP_AUTO);
@@ -232,14 +232,14 @@ namespace KBIN {
     str_fin.species_pp_vLDAU = xvasp.str.species_pp_vLDAU; //ME20190109
 
     xvasp.str = str_fin; //ME20190109
-    if(LDEBUG){std::cerr << xvasp.str << std::endl;} // ME20190308
-    pflow::fixEmptyAtomNames(xvasp.str,true);  // ME20190308
+    if(LDEBUG){std::cerr << xvasp.str << std::endl;} //ME20190308
+    pflow::fixEmptyAtomNames(xvasp.str,true);  //ME20190308
 
     // Safeguard for when CONVERT is set in the aflow.in file
     // CONVERT_UNIT_CELL may shift the origin, so not doing it here
     // would lead to inconsistencies when between the supercell creation
     // and the APL/AAPL analysis
-    // ME20200102 - should not be necessary anymore when the state is saved,
+    //ME20200102 - should not be necessary anymore when the state is saved,
     // but it's good to convert it anyway to get "nicer" lattice vectors
     if (!vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") &&
         !vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme.empty()) { //ME20190109
@@ -335,10 +335,10 @@ namespace KBIN {
     //logger.setModuleName("PHONONS");  //will rename later
 
     string _ASTROPT_ = ""; //CO20170601
-    string modulename = "";  // ME20200220 - for pflow::logger
+    string modulename = "";  //ME20200220 - for pflow::logger
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       logger.setModuleName("AAPL");  //CO20170601
-      modulename = "AAPL";  // ME20200220
+      modulename = "AAPL";  //ME20200220
       _ASTROPT_ = _ASTROPT_AAPL_;    //CO20170601
     } else if (kflags.KBIN_PHONONS_CALCULATION_QHA || 
         kflags.KBIN_PHONONS_CALCULATION_QHA_A || 
@@ -353,11 +353,11 @@ namespace KBIN {
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_B ||
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_C) { //PN20180705
       logger.setModuleName("QHA");  //CO20170601
-      modulename = "QHA";  // ME20200220
+      modulename = "QHA";  //ME20200220
       _ASTROPT_ = _ASTROPT_QHA_;    //CO20170601
     } else {
       logger.setModuleName("APL");  //CO20170601
-      modulename = "APL";  // ME20200220
+      modulename = "APL";  //ME20200220
       _ASTROPT_ = _ASTROPT_APL_;    //CO20170601
     }
 
@@ -400,7 +400,7 @@ namespace KBIN {
       }
     }
 
-    // ME20200427 - added grid option. It has priority, so check that the formatting is correct.
+    //ME20200427 - added grid option. It has priority, so check that the formatting is correct.
     if (xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.isentry) {
       vector<int> kpts;
       aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.content_string, kpts, " xX");
@@ -433,7 +433,7 @@ namespace KBIN {
     string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO20190114 - initialize everything
     bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false; //USER_ZEROSTATE_CHGCAR = false; //CO20190114 - initialize everything
     bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO20190114 - initialize everything
-    bool USER_DOS_PROJECT = false, USER_RELAX_COMMENSURATE = false, USER_DISPLACEMENTS;  // ME20200213
+    bool USER_DOS_PROJECT = false, USER_RELAX_COMMENSURATE = false, USER_DISPLACEMENTS;  //ME20200213
     double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO20190114 - initialize everything  
     int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO20190114 - initialize everything
     vector<int> USER_DOS_MESH(3);
@@ -475,7 +475,7 @@ namespace KBIN {
       if (key == "DOSMETHOD") {USER_DOS_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
       if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
       if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME20200213
+      if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  //ME20200213
       if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  //ME20190625
       if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  //ME20190625
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
@@ -501,7 +501,7 @@ namespace KBIN {
         // Check if the structure has already been relaxed
         for (int i = 1; i <= _NUM_RELAX_; i++) {
           string contcar = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i);
-          if (aurostd::EFileExist(contcar) || aurostd::FileExist(contcar)) {  // ME20200103 - also look for uncompressed files
+          if (aurostd::EFileExist(contcar) || aurostd::FileExist(contcar)) {  //ME20200103 - also look for uncompressed files
             START_RELAX++;
           } else {
             break;
@@ -559,7 +559,7 @@ namespace KBIN {
       }
     }
 
-    // ME20200102 - BEGIN
+    //ME20200102 BEGIN
     // Store supercell generation parameters in xoption.
     aurostd::xoption supercell_opts;
     if (kflags.KBIN_MODULE_OPTIONS.supercell_method[0]) {
@@ -584,7 +584,7 @@ namespace KBIN {
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     supercell_opts.flag("SUPERCELL::VERBOSE", true);  // Use verbose output for supercell construction
-    // ME20200102 - END
+    //ME20200102 END
 
     if (USER_DC) {
       if (USER_DC_METHOD == "LATTICE") {
@@ -640,8 +640,8 @@ namespace KBIN {
         USER_DOS_MESH[1] = aurostd::string2utype<int>(tokens[1]);
         USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
       }
-      // ME20190625 - projected DOS
-      // ME20200213 - now has fully atom projected DOS (use zero vector to indicate)
+      //ME20190625 - projected DOS
+      //ME20200213 - now has fully atom projected DOS (use zero vector to indicate)
       if (USER_DOS_PROJECT) {
         if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
           if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
@@ -1426,7 +1426,7 @@ namespace KBIN {
       }
     }
 
-    // ME20200102 - BEGIN
+    //ME20200102 BEGIN
     // The PHPOSCAR file now also serves as the canonical structure
     // for the phonon calculations. This prevents any changes in symmetry codes,
     // especially the structure conversion codes, from changing the structure
@@ -1455,7 +1455,7 @@ namespace KBIN {
 
     // Don't relax when we already have a PHPOSCAR file (state saved)
     if (!aurostd::EFileExist(phposcar_file) && USER_RELAX) {
-      // ME20190107 - Relax after fixing the vasp bin to make version consistent.
+      //ME20190107 - Relax after fixing the vasp bin to make version consistent.
       // Run relaxations if necessary
       bool Krun=true;
       string function;
@@ -1477,7 +1477,7 @@ namespace KBIN {
     supercell.build(scell_dims);
     if (USER_MAXSHELL > 0) supercell.setupShellRestrictions(USER_MAXSHELL);
 
-    // ME20200427 - If NBANDS has been specified, store the number of supercells
+    //ME20200427 - If NBANDS has been specified, store the number of supercells
     // to scale.
     if (xflags.vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.isentry) {
       int ncells = scell_dims[1] * scell_dims[2] * scell_dims[3];
@@ -1497,7 +1497,7 @@ namespace KBIN {
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       }
     }
-    // ME20200102 - END
+    //ME20200102 END
 
     //ME20190626 - Convert projection directions for DOS to Cartesian
     if ((USER_DOS_PROJECTIONS.size() > 0) && (!USER_DOS_PROJECTIONS_FRAC_SCHEME.empty())) {
@@ -1514,9 +1514,9 @@ namespace KBIN {
 
     //AS20200513 BEGIN
     bool run_any_qha =
-          kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
-          kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
+      kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
+      kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
+      kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
     if (NEW_QHA && run_any_qha){
       apl::QHAN qha(USER_TPT, xinput, kflags, supercell_opts, messageFile, oss);
       qha.apl_options.push_attached("ENGINE", USER_ENGINE);
@@ -1585,7 +1585,7 @@ namespace KBIN {
         fccalcdm->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
         fccalcdm->setCalculateZeroStateForces(USER_ZEROSTATE);
         fccalc.reset(fccalcdm);
-        fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
+        fccalc->setPolarMaterial(USER_POLAR);  //ME20200218
       } //CO20200106 - patching for auto-indenting
       //CO generally redirects to DM, the distinction between DM and GSA is obsolete
       //else if (USER_ENGINE == string("GSA")) {
@@ -1601,7 +1601,7 @@ namespace KBIN {
       //  } //CO20200106 - patching for auto-indenting
       else {
         fccalc.reset(new apl::LinearResponsePC(supercell, messageFile, oss));
-        fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
+        fccalc->setPolarMaterial(USER_POLAR);  //ME20200218
       }
       // Run calculations
       fccalc->setDirectory(aflags.Directory);
@@ -1706,7 +1706,7 @@ namespace KBIN {
     stagebreak = (stagebreak || aapl_stagebreak);
 
     // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
-    // ME20200507 - This feature is not ready yet. The speed-ups
+    //ME20200507 - This feature is not ready yet. The speed-ups
     // are not reliable enough and it makes the workflow too complicated.
     // Revisit when the concept is more solid.
     //[OBSOLETE] if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
@@ -1776,7 +1776,7 @@ namespace KBIN {
         apl::PhononDispersionCalculator pdisc(phcalc);
 
         // Init path according to the aflow's definition for elec. struc.
-        // ME20181029 - Restructured
+        //ME20181029 - Restructured
         if (USER_DC_METHOD == "LATTICE") {
           pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
         } else {
@@ -1846,7 +1846,7 @@ namespace KBIN {
               pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
             }
           }
-          // ME20190501 Allow user to override path
+          //ME20190501 Allow user to override path
           if(!USER_DC_USERPATH.empty()) {  // Set path
             pdisc.setPath(USER_DC_USERPATH);
           }
@@ -1881,7 +1881,6 @@ namespace KBIN {
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
     if (!USER_FREQFORMAT.empty()) {
-      //     try {
       // Convert format to machine representation
       tokens.clear();
       apl::tokenize(USER_FREQFORMAT, tokens, string(" |:;,"));
@@ -1944,7 +1943,7 @@ namespace KBIN {
           pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
         }
       }
-      // ME20190501 Allow user to override path
+      //ME20190501 Allow user to override path
       if(!USER_DC_USERPATH.empty()){  // Set path
         pdisc.setPath(USER_DC_USERPATH);
       }
@@ -2000,7 +1999,7 @@ namespace KBIN {
       if (USER_TP) {
         //if (!dosc.hasNegativeFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
         apl::ThermalPropertiesCalculator tpc(dosc, messageFile, aflags.Directory, oss);  //ME20190423
-        // ME20200108 - new ThermalPropertiesCalculator format
+        //ME20200108 - new ThermalPropertiesCalculator format
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
 
@@ -2013,7 +2012,7 @@ namespace KBIN {
         //calculate Gruneisen
         //ME20190428 START
         //calculate group velocities
-        if (!dosc.hasNegativeFrequencies()) {  // ME20200210
+        if (!dosc.hasNegativeFrequencies()) {  //ME20200210
           // This is just here so that PN's code doesn't break. This should
           // become obsolete in the future.
           apl::QMesh& qmesh = phcalc.getQMesh();
@@ -2086,7 +2085,7 @@ namespace KBIN {
                         if(scqha.calculation_gruneisen(&qmesh))  //ME20190428
                         {
                           if(kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
-                          { //PN 180719
+                          { //PN20180719
                             scqha.write_gruneisen_parameter_mesh();
                             scqha.Writeaverage_gp(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
                             is_negative_freq=scqha.get_is_negative_freq();
@@ -2146,7 +2145,7 @@ namespace KBIN {
                   if(scqha.calculation_gruneisen(&qmesh))  //ME20190428
                   {
                     if(kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
-                    { //PN 180719
+                    { //PN20180719
                       scqha.write_gruneisen_parameter_mesh();
                       scqha.Writeaverage_gp(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
                       is_negative_freq=scqha.get_is_negative_freq();
@@ -2197,10 +2196,10 @@ namespace KBIN {
             }
             scqha_T.clear();
           }
-          if(ptr_hsq.get()) ptr_hsq->clear();  // ME20190423
+          if(ptr_hsq.get()) ptr_hsq->clear();  //ME20190423
           //QHA/SCQHA/QHA3P END
         } else {
-          // ME20200210 - changed warning
+          //ME20200210 - changed warning
           const vector<double>& freqs = dosc.getBins();
           const vector<double>& idos = dosc.getIDOS();
           uint i = 0;
@@ -2233,7 +2232,6 @@ namespace KBIN {
       // Get q-points
       message = "Starting thermal conductivity calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-      std::cout << aurostd::joinWDelimiter(USER_THERMALGRID, "x") << std::endl;
       phcalc.initialize_qmesh(USER_THERMALGRID, true, true);
       apl::QMesh& qmtcond = phcalc.getQMesh();
       qmtcond.makeIrreducible();
@@ -2271,7 +2269,7 @@ namespace KBIN {
 namespace apl {
 
   //createAflowInPhonons////////////////////////////////////////////////////////
-  // ME20181022 - New method to create the aflow.in files. Uses the aflow.in
+  //ME20181022 - New method to create the aflow.in files. Uses the aflow.in
   // creator in aflow_avasp.cpp
   bool createAflowInPhonons(const _aflags& _aflowFlags, const _kflags& _kbinFlags, const _xflags& _xFlags, _xinput& xinp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -2299,7 +2297,7 @@ namespace apl {
     return write;
   }
 
-  // ME20181022 - Old method to create aflow.in files for AIMS
+  //ME20181022 - Old method to create aflow.in files for AIMS
   void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& messageFile) {
     if (!xinp.AFLOW_MODE_AIMS) {
       string function = "apl::createAflowInPhononsAIMS():";
@@ -2340,8 +2338,8 @@ namespace apl {
     outfile << "[AFLOW_MODE=AIMS]" << std::endl;
     if(!_kbinFlags.KZIP_BIN.empty()){outfile << "[AFLOW_MODE_ZIP=" << _kbinFlags.KZIP_BIN << "]" << std::endl;}  //CO
 
-    //CO20180130 - START
-    //corey - at some point, fix alien mode for aims, for now omit!
+    //CO20180130 START
+    //CO - at some point, fix alien mode for aims, for now omit!
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     outfile << "[AIMS_CONTROL_MODE_EXPLICIT]START " << std::endl;
     outfile << xaims.CONTROL.str();
@@ -2361,14 +2359,14 @@ namespace apl {
       string geom_filename = xaims.Directory + "/" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM;
       aurostd::stringstream2file(xaims.GEOM, geom_filename);
       if(!aurostd::FileExist(geom_filename)){
-      string function = "apl::createAflowInPhononsAIMS():";
+        string function = "apl::createAflowInPhononsAIMS():";
         string message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::ChmodFile("a+rw", geom_filename);
     }
 
-    //CO - START
+    //CO START
     string filename = directory + string("/") + _AFLOWIN_;
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)){
@@ -2377,7 +2375,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::ChmodFile("a+rw", filename); // CHMOD a+rw _AFLOWIN_
-    //CO - END
+    //CO END
   }
 
 }  // namespace apl
@@ -2400,7 +2398,7 @@ namespace apl {
       if(xinps[idxRun].AFLOW_MODE_VASP) {
         if(aurostd::EFileExist(dir + string("/vasprun.xml.static")) ||
             aurostd::EFileExist(dir + string("/vasprun.xml")) ||
-            aurostd::EFileExist(dir + "/" + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME20190607
+            aurostd::EFileExist(dir + "/" + DEFAULT_AFLOW_QMVASP_OUT)) {  //ME20190607
           return true;
         }
       }
@@ -2422,7 +2420,7 @@ namespace apl {
     if (xinp.AFLOW_MODE_VASP){
       if(aurostd::EFileExist(dir + string("vasprun.xml.static")) ||
           aurostd::EFileExist(dir + string("vasprun.xml")) ||
-          aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME20200203 - Added qmvasp file
+          aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  //ME20200203 - Added qmvasp file
         return true;
       }
     }
@@ -2447,7 +2445,7 @@ namespace apl {
     uint ninps = xinps.size();
     if (contains_born) ninps--;
     for (uint idxRun = 0; idxRun < ninps; idxRun++) {
-      _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO20190116  // ME20190607
+      _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO20190116  //ME20190607
       pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), messageFile, oss);
       string directory = xinps[idxRun].getDirectory();
       if (!readForcesFromDirectory(xinps[idxRun])) {
@@ -2462,7 +2460,7 @@ namespace apl {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
     }
-    _logger << "No errors caught, all force files read successfully."; //CO20190116  // ME20190607
+    _logger << "No errors caught, all force files read successfully."; //CO20190116  //ME20190607
     pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, messageFile, oss, _LOGGER_COMPLETE_);
     return true;
   }
@@ -2474,11 +2472,11 @@ namespace apl {
     // Load data....
     if(xinp.AFLOW_MODE_VASP) {
       if (!aurostd::EFileExist(xinp.getDirectory() + "/" + DEFAULT_AFLOW_QMVASP_OUT)
-        && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml.static")
-        && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml")) {
+          && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml.static")
+          && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml")) {
         return false;
       }
-      // ME20190607 - BEGIN
+      //ME20190607 BEGIN
       // Read forces from aflow qmvasp file - much faster
       string file = xinp.getDirectory() + "/" + DEFAULT_AFLOW_QMVASP_OUT;
       if (aurostd::EFileExist(file)) {
@@ -2526,7 +2524,7 @@ namespace apl {
     }
   }
 
-  // ME20190114
+  //ME20190114
   // Cannot use const reference for zerostate because of getXStr()
   // This is used for AAPL and needs an extra input because the ZEROSTATE
   // calculation is not part of the xInputs vector

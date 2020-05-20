@@ -61,7 +61,7 @@ namespace pflow {
 // ***************************************************************************
 bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
   ostringstream aus;
-  aus << "00000  MESSAGE running POCC_GENERATE_INPUT files " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "00000  MESSAGE running POCC_GENERATE_INPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
   string aflowin=aflags.Directory+"/"+_AFLOWIN_;
@@ -139,7 +139,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       //    Num_calculated=MaxNumberPOSCAR;
       //}
 
-      string soliloquy = "iPOcc():";
+      string soliloquy = XHOST.sPID + "iPOcc():";
       stringstream message;
       ostream& oss=cout;
       //ofstream FileMESSAGE;
@@ -161,7 +161,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     file_aflowin.close();
   } 
   else {
-    aus << "00000  MESSAGE POCC input file already created " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE POCC input file already created " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     return FALSE;
   }
@@ -258,13 +258,13 @@ void UpdateXstr(xstructure &xstr_orig, ofstream &FileMESSAGE, _aflags &aflags) {
   //Update paritial occupation value
   if(xstr_orig.partial_occupation_flag) {
     ostringstream aus;
-    aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO20180409
+    aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_); //CO20180409
     if(xstr_orig.partial_occupation_site_tol>1E-6) { //CO20180409
       epsilon = xstr_orig.partial_occupation_site_tol; //CO20180409
     }
     else {
-      aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO20180409
-      aus << "0000 MESSAGE    Default value (1E-2) of \"partial_occupation_site_tol\" is set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO20180409
+      aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_); //CO20180409
+      aus << "0000 MESSAGE    Default value (1E-2) of \"partial_occupation_site_tol\" is set " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_); //CO20180409
     }
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     double partial_value_tmp;
@@ -284,10 +284,10 @@ void UpdateXstr(xstructure &xstr_orig, ofstream &FileMESSAGE, _aflags &aflags) {
 void OptimizeXstr(xstructure &a, ofstream &FileMESSAGE, _aflags &aflags) {
   //This function optimize partial values of xstructure
   ostringstream aus;
-  aus <<"0000 MESSAGE    Optimizing POSCAR " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+  aus <<"0000 MESSAGE    Optimizing POSCAR " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   UpdateXstr(a, FileMESSAGE, aflags);
-  aus <<"0000 MESSAGE    Printing optimized POSCAR " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+  aus <<"0000 MESSAGE    Printing optimized POSCAR " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
   aus << AFLOWIN_SEPARATION_LINE << endl;
   aus << a;
   aus << AFLOWIN_SEPARATION_LINE << endl;
@@ -1711,7 +1711,7 @@ vector<xstructure> Partial2Supercell(xstructure xstr_ori) {
 
   ostringstream aus;
   aus << AFLOWIN_SEPARATION_LINE << endl;
-  aus << "0000 MESSAGE    Printing Derivative Supercells ... " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    Printing Derivative Supercells ... " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   for (uint i=0; i<vxstr_sorted.size();i++) {
     aus << AFLOWIN_SEPARATION_LINE << endl;
     aus << "[VASP_POSCAR_MODE_EXPLICIT]START.HNFCELL_" << i+1 << endl;
@@ -1732,13 +1732,13 @@ vector<xstructure> Partial2Supercell(xstructure xstr_ori) {
 vector<xstructure> CalculateInitialSupercell(xstructure xstr, int n, ofstream &FileMESSAGE, _aflags &aflags) {
   XHOST.QUIET=FALSE;
   ostringstream aus;
-  aus << "0000 MESSAGE    Calculating HNF index ... " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    Calculating HNF index ... " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   vector<xmatrix<double> > sHNF=CalculateHNF(xstr, n);
   vector<xstructure> vxstr_init;
   xstructure b_tmp;
-  aus << "0000 MESSAGE    Generating supercells ... " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    Generating supercells ... " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   stringstream ss;
@@ -1766,7 +1766,7 @@ vector<xstructure> CalculateInitialSupercell(xstructure xstr, int n, ofstream &F
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     aus.str("");
   }
-  aus << "0000 MESSAGE    Total number of initial supercells is " << vxstr_init.size() <<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    Total number of initial supercells is " << vxstr_init.size() <<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
 
@@ -1794,7 +1794,7 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
   }
   if(xstr.partial_occupation_site_tol>0) {tolerance=xstr.partial_occupation_site_tol;}
   oss << "[AFLOW] hnf_tolerance=" << tolerance << endl;
-  oss << "Printing Input PARTCAR ... " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  oss << "Printing Input PARTCAR ... " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   oss << AFLOWIN_SEPARATION_LINE << endl;    // --------------------------------
   oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
   oss << AssignNameXstr(xstr, vxstr_species_ori);// << endl;
@@ -1854,7 +1854,7 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
     if(xstr.atoms.at(iatom).partial_occupation_value<1.0) {xstr.atoms.at(iatom).partial_occupation_value = effective_pocc_iatom.at(iatom) ;}
   }
   UpdateXstr_comp_each_type(xstr); //update partial occupation
-  oss << "Printing optimized input PARTCAR ..." << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  oss << "Printing optimized input PARTCAR ..." << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   oss << AFLOWIN_SEPARATION_LINE << endl;
   oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
   oss << AssignNameXstr(xstr, vxstr_species_ori);// << endl;
@@ -2173,15 +2173,15 @@ vector<vector<xstructure> > Partial2Xstr(xstructure xstr, int nHNF, ofstream &Fi
 
   XHOST.QUIET= FALSE;
   ostringstream aus;
-  aus << "0000 MESSAGE    POCC running " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    POCC running " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   xstructure xstr_c = NormalizeXstructure(xstr);  
 
   int n = nHNF;
   vector<xstructure> vxstr_init =  CalculateInitialSupercell(xstr_c, n, FileMESSAGE, aflags);
-  aus << "0000 MESSAGE    Generating derivate supercells ..." << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-  aus << "0000 MESSAGE    Please be patient ..." << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    Generating derivate supercells ..." << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    Please be patient ..." << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aus << AFLOWIN_SEPARATION_LINE << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
 
@@ -2417,7 +2417,7 @@ vector<xstructure> RemoveEquivalentXstr(vector<xstructure> vec_xstr, ofstream &F
 
   int number = vec_xstr_energy.size() - vec_xstr_energy_final.size();
   ostringstream aus;
-  aus << "0000 MESSAGE    " << number << " equivalent structures are removed!" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+  aus << "0000 MESSAGE    " << number << " equivalent structures are removed!" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   vector<xstructure> vec_xstr_final;
@@ -2630,8 +2630,8 @@ void xstructure::AddAtom_POCC(const _atom& atom) {
     species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
     species_mass.push_back(GetAtomMass(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
   } else {
-    // cerr <<  num_each_type.size() << " " <<  btom.type << endl;
-    // cerr <<  comp_each_type.size() << " " <<  btom.type << endl;
+    // cerr << num_each_type.size() << " " <<  btom.type << endl;
+    // cerr << comp_each_type.size() << " " <<  btom.type << endl;
     if(LDEBUG) {cerr << "AddAtom increasing species_position " << species_position << endl;}
     num_each_type.at(species_position)++;
     comp_each_type.at(species_position)+=atom.partial_occupation_value;
@@ -2696,7 +2696,7 @@ namespace pocc {
     _aflags aflags;
 
     ostringstream aus;
-    aus <<"0000 MESSAGE    Printing input POSCAR " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus <<"0000 MESSAGE    Printing input POSCAR " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     aus << xstr_in;
@@ -2770,7 +2770,7 @@ namespace pocc {
 
     ostringstream aus;
     aus.str("");
-    aus <<"0000 MESSAGE    Printing \'struct_enum.in\' file " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus <<"0000 MESSAGE    Printing \'struct_enum.in\' file " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     aus << oss.str();
@@ -2857,7 +2857,7 @@ namespace pocc {
     FileMESSAGE.open("LOG.ENUM");
     _aflags aflags;
     ostringstream aus;
-    aus << "0000 MESSAGE    Printing input POSCAR " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus << "0000 MESSAGE    Printing input POSCAR " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus << AFLOWIN_SEPARATION_LINE<< endl;
     aus << xstr;
     aus << AFLOWIN_SEPARATION_LINE<< endl;
@@ -2880,7 +2880,7 @@ namespace pocc {
       oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
       oss << AFLOWIN_SEPARATION_LINE<< endl;
     }
-    aus << "0000 MESSAGE    Printing derivate POSCARs " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus << "0000 MESSAGE    Printing derivate POSCARs " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus << oss.str();
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     FileMESSAGE.close();
@@ -2917,7 +2917,7 @@ namespace pocc {
 
 
     ostringstream aus;
-    aus << "0000 MESSAGE    Print multienum input file " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus << "0000 MESSAGE    Print multienum input file " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aus << pocc::POSCAR2ENUM(xstr);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
@@ -3059,7 +3059,7 @@ namespace pocc {
     }
 
     ////output
-    aus << "0000 MESSAGE    Print multienum output file " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus << "0000 MESSAGE    Print multienum output file " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     aus << str_out.str();
@@ -3161,7 +3161,7 @@ namespace pocc {
       oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
       oss << AFLOWIN_SEPARATION_LINE<< endl;
     }
-    aus << "0000 MESSAGE    Printing sorted derivate POSCARs " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_);
+    aus << "0000 MESSAGE    Printing sorted derivate POSCARs " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
     aus << oss.str();
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     /*
@@ -3383,7 +3383,7 @@ namespace pocc {
 // ***************************************************************************
 void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_aflowin) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="ExtracAllPOSCARSFromAflowin():";
+  string soliloquy = XHOST.sPID + "ExtracAllPOSCARSFromAflowin():";
   vxstr.clear();
   string POSCAR_START_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]START.";
   string POSCAR_STOP_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]STOP.";
@@ -3409,7 +3409,7 @@ void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_af
 // ***************************************************************************
 void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetDegeneracyFromVPOSCAR():";
+  string soliloquy = XHOST.sPID + "GetDegeneracyFromVPOSCAR():";
   string title="";
   vector<string> vtitle,vtitle2;
   int DEI=1;
@@ -3453,7 +3453,7 @@ namespace pocc {
     //Warnning: DOS is absolute value, no shift, and the output DOS, it is format is Energy, s, p, d, f, TDOS, TDOS_sum
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pocc::POCC_GENERATE_DOSDATA():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_GENERATE_DOSDATA():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     if(LDEBUG) {cerr << soliloquy << " directory=[" << directory << "]" << endl;}
 
@@ -3493,13 +3493,12 @@ namespace pocc {
       //double kpt_tol;
 
       bool found_ext=false;
-      deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
       string outcar_file,doscar_file;
 
       for(uint i=0;i<vrun.size();i++) {
         found_ext=false;
-        for(uint j=0;j<vext.size();j++){
-          outcar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static"+vext[j]);
+        for(uint iext=0;iext<XHOST.vext.size();iext++){
+          outcar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static"+XHOST.vext.at(iext));
           if(aurostd::FileExist(outcar_file)) {
             if(LDEBUG) {
               aus << "00000  MESSAGE POCC OUTCAR file OK: " << outcar_file << " " << endl;
@@ -3520,8 +3519,8 @@ namespace pocc {
       }
       for(uint i=0;i<vrun.size();i++) {
         found_ext=false;
-        for(uint j=0;j<vext.size();j++){
-          doscar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static"+vext[j]);
+        for(uint iext=0;iext<XHOST.vext.size();iext++){
+          doscar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static"+XHOST.vext.at(iext));
           if(aurostd::FileExist(doscar_file)) {
             if(LDEBUG) {
               aus << "00000  MESSAGE POCC DOSCAR file OK: " << doscar_file << " " << endl;
@@ -3686,7 +3685,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO20190808 - one without IDOS and one with
-    string soliloquy="pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
     if(TDOS.size()!=PDOS.size()) {cerr << " TDOS and PDOS have different size! Aborting! " << endl; exit(1);}
     vector<double> vtmp;
     if(TDOS.at(0).size()==3) { //non-spin
@@ -3806,7 +3805,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POCC_GENERATE_OUTPUT(const string& directory, const double& T, const double& DOS_Emin, double& DOS_Emax, const double& DOSSCALE) {
-    string soliloquy="pocc::POCC_GENERATE_OUTPUT():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_GENERATE_OUTPUT():";
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     //produce DOS data
     if(!XHOST.is_command("gnuplot")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR gnuplot is necessary." << endl;exit(1);}; 

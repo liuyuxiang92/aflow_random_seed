@@ -514,7 +514,7 @@ namespace apl {
       message = "Unrecognized format " + format + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
-    
+
     // Amplitude
     string amplitude_str = vpflow.getattachedscheme("ADISP::AMPLITUDE");
     double amplitude = 0.0;
@@ -772,6 +772,6 @@ namespace apl {
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *               Pinku Nath - Duke University 2014 - 2016                  *
-// *                  Marco Esters - Duke University 2020                    *
+// *            Aflow MARCO ESTERS - Duke University 2020                    *
 // *                                                                         *
 // ***************************************************************************

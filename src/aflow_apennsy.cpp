@@ -175,11 +175,11 @@ bool APENNSY_Parameters::LoadDynamicMemory(bool _verbose) {
     //   ZMINElibrary.push_back(*(new vector<uint>(Nconcentrations[2]+1)));
     //   // alloys.size()*Nconcentrations[2]
   }
-  
+
   // alloys.size()
   // RankLib.push_back(temp); // moved to aflow_apennsy_gndstate.cpp
   // RankLibInt.push_back(temp); // moved to aflow_apennsy_gndstate.cpp
-  
+
   return TRUE;
 }
 
@@ -274,7 +274,7 @@ bool _NEW_is_alphabetic(string alloy_dir) {
       if(vspeciesD.size()==0) {;}
       if(vspeciesD.size()==1) {;}
       if(vspeciesD.size()==2) {
-	//	cout << "[5] " << "[" << vspeciesD.at(0) << "," << vspeciesD.at(1) << "]" << endl;
+        //	cout << "[5] " << "[" << vspeciesD.at(0) << "," << vspeciesD.at(1) << "]" << endl;
       }
       if(vspeciesD.size()>=3) {cerr << "ERROR: unsupported number of species (vspecies) in " << in_file_name_aflowlib_entry << endl; exit(0);}
     }
@@ -283,7 +283,7 @@ bool _NEW_is_alphabetic(string alloy_dir) {
       if(vspeciesP.size()==0) {;}
       if(vspeciesP.size()==1) {;}
       if(vspeciesP.size()==2) {
-	//	cout << "[5] " << "[" << vspeciesP.at(0) << "," << vspeciesP.at(1) << "]" << endl;
+        //	cout << "[5] " << "[" << vspeciesP.at(0) << "," << vspeciesP.at(1) << "]" << endl;
       }
       if(vspeciesP.size()>=3) {cerr << "ERROR: unsupported number of species (vspeciesP) in " << in_file_name_aflowlib_entry << endl; exit(0);}
     }

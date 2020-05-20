@@ -65,9 +65,9 @@ xstructure WyckoffPOSITIONS(uint spacegroup, xstructure strin) {
 
 xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  
+
   if(LDEBUG) cerr << "WyckoffPOSITIONS [0]" << endl;
-  
+
   xvector<double> o(3);
   xstructure str(strin);
   double x=0,y=0,z=0;
@@ -79,43 +79,43 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
   // str.species.clear();str.species_pp.clear();str.species_pp_type.clear();str.species_pp_version.clear();str.species_pp_ZVAL.clear();species_pp_vLDAU.clear();str.species_volume.clear();str.species_mass.clear(); // patch for RemoveAtom
 
   if(LDEBUG) cerr << "WyckoffPOSITIONS [1]" << endl;
-  
+
   for(uint i=0;i<strin.atoms.size();i++) {
     x=strin.atoms.at(i).fpos[1];
     y=strin.atoms.at(i).fpos[2];
     z=strin.atoms.at(i).fpos[3];
     a=strin.atoms.at(i);
 
-//     //(0,0,0)(1./2,1./2,0)
-//     for(uint j=1;j<=2;j++) {
-//       if(j==1) o=wv(0,0,0);
-//       if(j==2) o=wv(1./2,1./2,0);
-//     }
-//     //(0,0,0)(0,1./2,1./2)
-//     for(uint j=1;j<=2;j++) {
-//       if(j==1) o=wv(0,0,0);
-//       if(j==2) o=wv(0,1./2,1./2);
-//     }
-//     //(0,0,0)(1./2,1./2,1./2)
-//     for(uint j=1;j<=2;j++) {
-//       if(j==1) o=wv(0,0,0);
-//       if(j==2) o=wv(1./2,1./2,1./2);
-//     }
-//     //(0,0,0)(2./3,1./3,1./3)(1./3,2./3,2./3)
-//     for(uint j=1;j<=3;j++) {
-//       if(j==1) o=wv(0,0,0);
-//       if(j==2) o=wv(2./3,1./3,1./3);
-//       if(j==3) o=wv(1./3,2./3,2./3);
-//     }
-//     //(0,0,0)(0,1./2,1./2)(1./2,0,1./2)(1./2,1./2,0)
-//     //(0,0,0)(1./2,0,1./2)(0,1./2,1./2)(1./2,1./2,0)
-//     for(uint j=1;j<=4;j++) {
-//       if(j==1) o=wv(0,0,0);
-//       if(j==2) o=wv(0,1./2,1./2);
-//       if(j==3) o=wv(1./2,0,1./2);
-//       if(j==4) o=wv(1./2,1./2,0);
-//     }
-    
+    //     //(0,0,0)(1./2,1./2,0)
+    //     for(uint j=1;j<=2;j++) {
+    //       if(j==1) o=wv(0,0,0);
+    //       if(j==2) o=wv(1./2,1./2,0);
+    //     }
+    //     //(0,0,0)(0,1./2,1./2)
+    //     for(uint j=1;j<=2;j++) {
+    //       if(j==1) o=wv(0,0,0);
+    //       if(j==2) o=wv(0,1./2,1./2);
+    //     }
+    //     //(0,0,0)(1./2,1./2,1./2)
+    //     for(uint j=1;j<=2;j++) {
+    //       if(j==1) o=wv(0,0,0);
+    //       if(j==2) o=wv(1./2,1./2,1./2);
+    //     }
+    //     //(0,0,0)(2./3,1./3,1./3)(1./3,2./3,2./3)
+    //     for(uint j=1;j<=3;j++) {
+    //       if(j==1) o=wv(0,0,0);
+    //       if(j==2) o=wv(2./3,1./3,1./3);
+    //       if(j==3) o=wv(1./3,2./3,2./3);
+    //     }
+    //     //(0,0,0)(0,1./2,1./2)(1./2,0,1./2)(1./2,1./2,0)
+    //     //(0,0,0)(1./2,0,1./2)(0,1./2,1./2)(1./2,1./2,0)
+    //     for(uint j=1;j<=4;j++) {
+    //       if(j==1) o=wv(0,0,0);
+    //       if(j==2) o=wv(0,1./2,1./2);
+    //       if(j==3) o=wv(1./2,0,1./2);
+    //       if(j==4) o=wv(1./2,1./2,0);
+    //     }
+
     // for all spacegroups
     o=wv(0,0,0);
 
@@ -126,7 +126,7 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
     if(option!=1 && option!=2) {
       if(spacegroup::SpaceGroupOptionRequired(spacegroup)) SpaceGroupOptionRequired(spacegroup,option);
       //    cerr << spacegroup << " " << spacegroup::SpaceGroupOptionRequired(spacegroup) << endl;
-     // if(SpaceGroupOptionRequired(spacegroup)) SpaceGroupOptionRequired(spacegroup,option);
+      // if(SpaceGroupOptionRequired(spacegroup)) SpaceGroupOptionRequired(spacegroup,option);
     }
     if(spacegroup::SpaceGroupOptionRequired(spacegroup)) str.spacegroupnumberoption=option;    // plug option inside   
     // ----------------------------------------------------------------------------
@@ -213,10 +213,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=5;
       str.spacegroupoption="unique axis b";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
       }
     }
     if(spacegroup==5 && option==2) {
@@ -225,10 +225,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=5;
       str.spacegroupoption="unique axis c";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -288,10 +288,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=8;
       str.spacegroupoption="unique axis b";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
       }
     }
     if(spacegroup==8 && option==2) {
@@ -300,10 +300,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=8;
       str.spacegroupoption="unique axis c";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -317,10 +317,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=9;
       str.spacegroupoption="unique axis b";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
       }
     }
     if(spacegroup==9 && option==2) {
@@ -329,10 +329,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=9;
       str.spacegroupoption="unique axis c";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -400,12 +400,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=12;
       str.spacegroupoption="unique axis b";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
       }
     }
     if(spacegroup==12 && option==2) {
@@ -414,12 +414,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=12;
       str.spacegroupoption="unique axis c";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -487,12 +487,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=15;
       str.spacegroupoption="unique axis b";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
       }
     }
     if(spacegroup==15 && option==2) {
@@ -501,12 +501,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=15;
       str.spacegroupoption="unique axis c";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -584,12 +584,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=20;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -603,12 +603,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=21;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -622,14 +622,14 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=22;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -643,12 +643,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=23;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -662,12 +662,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=24;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -841,12 +841,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=35;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -860,12 +860,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=36;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -879,12 +879,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=37;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -898,12 +898,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=38;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -917,12 +917,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=39;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -936,12 +936,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=40;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -955,12 +955,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=41;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -974,14 +974,14 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=42;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -995,14 +995,14 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=43;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,y+1./4,z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,y+1./4,z+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1016,12 +1016,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=44;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1035,12 +1035,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=45;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1054,12 +1054,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=46;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1438,16 +1438,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=63;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1461,16 +1461,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=64;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1484,16 +1484,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=65;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1507,16 +1507,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=66;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1530,16 +1530,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=67;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1553,16 +1553,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=68;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,z+1./2);wa(a,str);
       }
     }
     if(spacegroup==68 && option==2) {
@@ -1571,16 +1571,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=68;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1594,18 +1594,18 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=69;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1619,18 +1619,18 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=70;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-y+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,y+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,y+1./4,z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-y+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,y+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,y+1./4,z+1./4);wa(a,str);
       }
     }
     if(spacegroup==70 && option==2) {
@@ -1639,18 +1639,18 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=70;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+3./4,-y+3./4,z);wa(a,str);
-	a.fpos=o+wv(-x+3./4,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x,-y+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./4,y+1./4,-z);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x,y+1./4,z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+3./4,-y+3./4,z);wa(a,str);
+        a.fpos=o+wv(-x+3./4,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x,-y+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./4,y+1./4,-z);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x,y+1./4,z+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1664,16 +1664,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=71;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1687,16 +1687,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=72;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1710,16 +1710,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=73;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1733,16 +1733,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=74;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1820,12 +1820,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=79;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1839,12 +1839,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=80;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -1874,12 +1874,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=82;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2003,16 +2003,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=87;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2026,16 +2026,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=88;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
       }
     }
     if(spacegroup==88 && option==2) {
@@ -2044,16 +2044,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=88;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,-x+3./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,x+1./4,-z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,-x+3./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,x+1./4,-z+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2227,16 +2227,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=97;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2250,16 +2250,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=98;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2433,16 +2433,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=107;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2456,16 +2456,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=108;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
-	a.fpos=o+wv(y,x,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
+        a.fpos=o+wv(y,x,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2479,16 +2479,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=109;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,x,z+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,x,z+3./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2502,16 +2502,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=110;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-y,-x+1./2,z+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,x,z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-y,-x+1./2,z+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,x,z+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2685,16 +2685,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=119;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2708,16 +2708,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=120;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(y,x,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(y,x,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2731,16 +2731,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=121;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -2754,16 +2754,16 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=122;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,x,z+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,x,z+3./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3409,24 +3409,24 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=139;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3440,24 +3440,24 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=140;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y,x,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
-	a.fpos=o+wv(y,x,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y,x,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
+        a.fpos=o+wv(y,x,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3471,24 +3471,24 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=141;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(y,x+1./2,z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(y,x+1./2,z+1./4);wa(a,str);
       }
     }
     if(spacegroup==141 && option==2) {
@@ -3497,24 +3497,24 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=141;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(y+1./4,x+3./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-x+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+3./4,z+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(y+1./4,x+3./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-x+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+3./4,z+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3528,24 +3528,24 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=142;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,-z+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x,z+1./4);wa(a,str);
-	a.fpos=o+wv(y,x+1./2,z+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,-z+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x,z+1./4);wa(a,str);
+        a.fpos=o+wv(y,x+1./2,z+3./4);wa(a,str);
       }
     }
     if(spacegroup==142 && option==2) {
@@ -3554,24 +3554,24 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=142;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./4,x+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-x+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+3./4,z+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./4,x+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-x+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+3./4,z+3./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3639,12 +3639,12 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=146;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3688,15 +3688,15 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=148;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(y,-x+y,-z);wa(a,str);
-	a.fpos=o+wv(x-y,x,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(y,-x+y,-z);wa(a,str);
+        a.fpos=o+wv(x-y,x,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3831,15 +3831,15 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=155;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(x-y,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-x+y,-z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(x-y,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-x+y,-z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3938,15 +3938,15 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=160;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x+y,y,z);wa(a,str);
-	a.fpos=o+wv(x,x-y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x+y,y,z);wa(a,str);
+        a.fpos=o+wv(x,x-y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -3973,15 +3973,15 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=161;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+y,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(x,x-y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+y,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(x,x-y,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -4110,21 +4110,21 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=166;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(x-y,-y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-x+y,-z);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(y,-x+y,-z);wa(a,str);
-	a.fpos=o+wv(x-y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(-x+y,y,z);wa(a,str);
-	a.fpos=o+wv(x,x-y,z);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(x-y,-y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-x+y,-z);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(y,-x+y,-z);wa(a,str);
+        a.fpos=o+wv(x-y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(-x+y,y,z);wa(a,str);
+        a.fpos=o+wv(x,x-y,z);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -4157,21 +4157,21 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=167;
       str.spacegroupoption="hexagonal axes";
       for(uint j=1;j<=3;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(2./3,1./3,1./3);
-	if(j==3) o=wv(1./3,2./3,2./3);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-y,x-y,z);wa(a,str);
-	a.fpos=o+wv(-x+y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x-y,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-x+y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(y,-x+y,-z);wa(a,str);
-	a.fpos=o+wv(x-y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+y,y,z+1./2);wa(a,str);
-	a.fpos=o+wv(x,x-y,z+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(2./3,1./3,1./3);
+        if(j==3) o=wv(1./3,2./3,2./3);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-y,x-y,z);wa(a,str);
+        a.fpos=o+wv(-x+y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x-y,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-x+y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(y,-x+y,-z);wa(a,str);
+        a.fpos=o+wv(x-y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+y,y,z+1./2);wa(a,str);
+        a.fpos=o+wv(x,x-y,z+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -4863,22 +4863,22 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=196;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -4892,20 +4892,20 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=197;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -4943,20 +4943,20 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=199;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5071,34 +5071,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=202;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,x,y);wa(a,str);
-	a.fpos=o+wv(z,x,-y);wa(a,str);
-	a.fpos=o+wv(z,-x,y);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,x);wa(a,str);
-	a.fpos=o+wv(y,z,-x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,x,y);wa(a,str);
+        a.fpos=o+wv(z,x,-y);wa(a,str);
+        a.fpos=o+wv(z,-x,y);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,x);wa(a,str);
+        a.fpos=o+wv(y,z,-x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5112,34 +5112,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=203;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-y+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,y+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,y+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-x+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,x+1./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,x+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-x+1./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-z+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-z+1./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,z+1./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,z+1./4,-x+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-y+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,y+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,y+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-x+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,x+1./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,x+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-x+1./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-z+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-z+1./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,z+1./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,z+1./4,-x+1./4);wa(a,str);
       }
     }
     if(spacegroup==203 && option==2) {
@@ -5148,34 +5148,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=203;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+3./4,-y+3./4,z);wa(a,str);
-	a.fpos=o+wv(-x+3./4,y,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x,-y+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x+3./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,-x+3./4,y);wa(a,str);
-	a.fpos=o+wv(-z+3./4,x,-y+3./4);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y+3./4,z,-x+3./4);wa(a,str);
-	a.fpos=o+wv(y,-z+3./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-z+3./4,x);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./4,y+1./4,-z);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x,y+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,x+1./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,x+1./4,-y);wa(a,str);
-	a.fpos=o+wv(z+1./4,-x,y+1./4);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y+1./4,-z,x+1./4);wa(a,str);
-	a.fpos=o+wv(-y,z+1./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,z+1./4,-x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+3./4,-y+3./4,z);wa(a,str);
+        a.fpos=o+wv(-x+3./4,y,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x,-y+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x+3./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,-x+3./4,y);wa(a,str);
+        a.fpos=o+wv(-z+3./4,x,-y+3./4);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y+3./4,z,-x+3./4);wa(a,str);
+        a.fpos=o+wv(y,-z+3./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-z+3./4,x);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./4,y+1./4,-z);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x,y+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,x+1./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,x+1./4,-y);wa(a,str);
+        a.fpos=o+wv(z+1./4,-x,y+1./4);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y+1./4,-z,x+1./4);wa(a,str);
+        a.fpos=o+wv(-y,z+1./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,z+1./4,-x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5189,32 +5189,32 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=204;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,x,y);wa(a,str);
-	a.fpos=o+wv(z,x,-y);wa(a,str);
-	a.fpos=o+wv(z,-x,y);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,x);wa(a,str);
-	a.fpos=o+wv(y,z,-x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,x,y);wa(a,str);
+        a.fpos=o+wv(z,x,-y);wa(a,str);
+        a.fpos=o+wv(z,-x,y);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,x);wa(a,str);
+        a.fpos=o+wv(y,z,-x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5264,32 +5264,32 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=206;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+1./2,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,x,-y+1./2);wa(a,str);
-	a.fpos=o+wv(z,-x+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+1./2,x);wa(a,str);
-	a.fpos=o+wv(y+1./2,z,-x+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+1./2,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,x,-y+1./2);wa(a,str);
+        a.fpos=o+wv(z,-x+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+1./2,x);wa(a,str);
+        a.fpos=o+wv(y+1./2,z,-x+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5375,34 +5375,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=209;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(x,z,-y);wa(a,str);
-	a.fpos=o+wv(-x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x,-z,y);wa(a,str);
-	a.fpos=o+wv(z,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,x);wa(a,str);
-	a.fpos=o+wv(-z,y,x);wa(a,str);
-	a.fpos=o+wv(-z,-y,-x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(x,z,-y);wa(a,str);
+        a.fpos=o+wv(-x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x,-z,y);wa(a,str);
+        a.fpos=o+wv(z,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,x);wa(a,str);
+        a.fpos=o+wv(-z,y,x);wa(a,str);
+        a.fpos=o+wv(-z,-y,-x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5416,34 +5416,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=210;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,-x+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-z+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+3./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z+3./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y+3./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+1./4,-x+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,-x+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-z+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+3./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z+3./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y+3./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+1./4,-x+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5457,32 +5457,32 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=211;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(x,z,-y);wa(a,str);
-	a.fpos=o+wv(-x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x,-z,y);wa(a,str);
-	a.fpos=o+wv(z,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,x);wa(a,str);
-	a.fpos=o+wv(-z,y,x);wa(a,str);
-	a.fpos=o+wv(-z,-y,-x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(x,z,-y);wa(a,str);
+        a.fpos=o+wv(-x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x,-z,y);wa(a,str);
+        a.fpos=o+wv(z,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,x);wa(a,str);
+        a.fpos=o+wv(-z,y,x);wa(a,str);
+        a.fpos=o+wv(-z,-y,-x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5568,32 +5568,32 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=214;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-x+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,-z+3./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z+1./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y+1./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,-y+3./4,-x+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-x+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,-z+3./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z+1./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y+1./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,-y+3./4,-x+3./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5643,34 +5643,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=216;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,z,-y);wa(a,str);
-	a.fpos=o+wv(-x,-z,y);wa(a,str);
-	a.fpos=o+wv(x,-z,-y);wa(a,str);
-	a.fpos=o+wv(z,y,x);wa(a,str);
-	a.fpos=o+wv(z,-y,-x);wa(a,str);
-	a.fpos=o+wv(-z,y,-x);wa(a,str);
-	a.fpos=o+wv(-z,-y,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,z,-y);wa(a,str);
+        a.fpos=o+wv(-x,-z,y);wa(a,str);
+        a.fpos=o+wv(x,-z,-y);wa(a,str);
+        a.fpos=o+wv(z,y,x);wa(a,str);
+        a.fpos=o+wv(z,-y,-x);wa(a,str);
+        a.fpos=o+wv(-z,y,-x);wa(a,str);
+        a.fpos=o+wv(-z,-y,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5684,32 +5684,32 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=217;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,z,-y);wa(a,str);
-	a.fpos=o+wv(-x,-z,y);wa(a,str);
-	a.fpos=o+wv(x,-z,-y);wa(a,str);
-	a.fpos=o+wv(z,y,x);wa(a,str);
-	a.fpos=o+wv(z,-y,-x);wa(a,str);
-	a.fpos=o+wv(-z,y,-x);wa(a,str);
-	a.fpos=o+wv(-z,-y,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,z,-y);wa(a,str);
+        a.fpos=o+wv(-x,-z,y);wa(a,str);
+        a.fpos=o+wv(x,-z,-y);wa(a,str);
+        a.fpos=o+wv(z,y,x);wa(a,str);
+        a.fpos=o+wv(z,-y,-x);wa(a,str);
+        a.fpos=o+wv(-z,y,-x);wa(a,str);
+        a.fpos=o+wv(-z,-y,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5759,34 +5759,34 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=219;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,-y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-y+1./2,x+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,-y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-y+1./2,x+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -5800,32 +5800,32 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=220;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./4,x+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+3./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,z+1./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z+3./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+3./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,-z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,y+1./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,-y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y+3./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+3./4,x+3./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./4,x+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+3./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,z+1./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z+3./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+3./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,-z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,y+1./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,-y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y+3./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+3./4,x+3./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -6185,58 +6185,58 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=225;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(x,z,-y);wa(a,str);
-	a.fpos=o+wv(-x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x,-z,y);wa(a,str);
-	a.fpos=o+wv(z,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,x);wa(a,str);
-	a.fpos=o+wv(-z,y,x);wa(a,str);
-	a.fpos=o+wv(-z,-y,-x);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,x,y);wa(a,str);
-	a.fpos=o+wv(z,x,-y);wa(a,str);
-	a.fpos=o+wv(z,-x,y);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,x);wa(a,str);
-	a.fpos=o+wv(y,z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-x,-z,y);wa(a,str);
-	a.fpos=o+wv(x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,z,-y);wa(a,str);
-	a.fpos=o+wv(-z,-y,x);wa(a,str);
-	a.fpos=o+wv(-z,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,-x);wa(a,str);
-	a.fpos=o+wv(z,y,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(x,z,-y);wa(a,str);
+        a.fpos=o+wv(-x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x,-z,y);wa(a,str);
+        a.fpos=o+wv(z,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,x);wa(a,str);
+        a.fpos=o+wv(-z,y,x);wa(a,str);
+        a.fpos=o+wv(-z,-y,-x);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,x,y);wa(a,str);
+        a.fpos=o+wv(z,x,-y);wa(a,str);
+        a.fpos=o+wv(z,-x,y);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,x);wa(a,str);
+        a.fpos=o+wv(y,z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-x,-z,y);wa(a,str);
+        a.fpos=o+wv(x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,z,-y);wa(a,str);
+        a.fpos=o+wv(-z,-y,x);wa(a,str);
+        a.fpos=o+wv(-z,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,-x);wa(a,str);
+        a.fpos=o+wv(z,y,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -6250,58 +6250,58 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=226;
       str.spacegroupoption="";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,-y+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,y+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,x,y);wa(a,str);
-	a.fpos=o+wv(z,x,-y);wa(a,str);
-	a.fpos=o+wv(z,-x,y);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,x);wa(a,str);
-	a.fpos=o+wv(y,z,-x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-y+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,-y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,-y+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,y+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,x,y);wa(a,str);
+        a.fpos=o+wv(z,x,-y);wa(a,str);
+        a.fpos=o+wv(z,-x,y);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,x);wa(a,str);
+        a.fpos=o+wv(y,z,-x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-y+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,-y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -6315,58 +6315,58 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=227;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,-x+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-z+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+3./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z+3./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y+3./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-y+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,y+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,-y+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,y+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-x+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,x+1./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,x+3./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,-x+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-z+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,-z+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,z+1./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,z+3./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x,z+1./2);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
-	a.fpos=o+wv(-y,x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x+1./2,-z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-z,y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-z+1./2,-y);wa(a,str);
-	a.fpos=o+wv(x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-y,x+1./2);wa(a,str);
-	a.fpos=o+wv(-z,y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,-y+1./2,-x);wa(a,str);
-	a.fpos=o+wv(z,y,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,-x+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-z+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+3./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z+3./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y+3./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-y+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,y+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,-y+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,y+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-x+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,x+1./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,x+3./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,-x+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-z+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,-z+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,z+1./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,z+3./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x,z+1./2);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
+        a.fpos=o+wv(-y,x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x+1./2,-z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-z,y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-z+1./2,-y);wa(a,str);
+        a.fpos=o+wv(x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-y,x+1./2);wa(a,str);
+        a.fpos=o+wv(-z,y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,-y+1./2,-x);wa(a,str);
+        a.fpos=o+wv(z,y,x);wa(a,str);
       }
     }
     if(spacegroup==227 && option==2) {
@@ -6376,58 +6376,58 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=227;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+3./4,-y+1./4,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./4,y+1./2,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+3./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+3./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,-x+1./4,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./4,x+1./2,-y+3./4);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y+1./4,z+1./2,-x+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+3./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-z+1./4,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+1./2,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z+1./2,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y+1./2,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+1./2,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z,-y,-x);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./4,y+3./4,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+3./4,-y+1./2,z+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+1./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,x+3./4,-y+1./2);wa(a,str);
-	a.fpos=o+wv(z+3./4,-x+1./2,y+1./4);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y+3./4,-z+1./2,x+1./4);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+1./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,z+3./4,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+3./4,z+1./2);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+3./4,y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(x,z,y);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z+1./2,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+3./4,x+1./2);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y+1./2,-x+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./2,-y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(z,y,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+3./4,-y+1./4,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./4,y+1./2,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+3./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+3./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,-x+1./4,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./4,x+1./2,-y+3./4);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y+1./4,z+1./2,-x+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+3./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-z+1./4,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+1./2,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z+1./2,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y+1./2,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+1./2,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z,-y,-x);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./4,y+3./4,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+3./4,-y+1./2,z+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+1./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,x+3./4,-y+1./2);wa(a,str);
+        a.fpos=o+wv(z+3./4,-x+1./2,y+1./4);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y+3./4,-z+1./2,x+1./4);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+1./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,z+3./4,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+3./4,z+1./2);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+3./4,y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(x,z,y);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z+1./2,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+3./4,x+1./2);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y+1./2,-x+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./2,-y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(z,y,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -6441,58 +6441,58 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=228;
       str.spacegroupoption="origin choice 1";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x,-y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,-x+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-z+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+3./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z+3./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y+3./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,-y+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,y+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,y+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,-x+3./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,x+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,x+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-x+1./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-z+3./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-z+1./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,z+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,z+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(-y,-x+1./2,z);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-z+1./2,y);wa(a,str);
-	a.fpos=o+wv(x,-z,-y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,z,-y);wa(a,str);
-	a.fpos=o+wv(-z,-y+1./2,x);wa(a,str);
-	a.fpos=o+wv(-z+1./2,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,-x+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x,-y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,-x+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-z+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+3./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z+3./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y+3./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,-y+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,y+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,y+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,-x+3./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,x+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,x+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-x+1./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-z+3./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-z+1./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,z+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,z+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(-y,-x+1./2,z);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-z+1./2,y);wa(a,str);
+        a.fpos=o+wv(x,-z,-y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,z,-y);wa(a,str);
+        a.fpos=o+wv(-z,-y+1./2,x);wa(a,str);
+        a.fpos=o+wv(-z+1./2,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,-x+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
       }
     }
     if(spacegroup==228 && option==2) {
@@ -6501,58 +6501,58 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=228;
       str.spacegroupoption="origin choice 2";
       for(uint j=1;j<=4;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(0,1./2,1./2);
-	if(j==3) o=wv(1./2,0,1./2);
-	if(j==4) o=wv(1./2,1./2,0);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-y+3./4,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+3./4,y+1./2,-z+1./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-x+3./4,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z+3./4,x+1./2,-y+1./4);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y+3./4,z+1./2,-x+1./4);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-z+3./4,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-x+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y);wa(a,str);
-	a.fpos=o+wv(-x,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-z+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-y+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+3./4,y+1./4,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./4,-y+1./2,z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,x+1./4,-y+1./2);wa(a,str);
-	a.fpos=o+wv(z+1./4,-x+1./2,y+3./4);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y+1./4,-z+1./2,x+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,z+1./4,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+3./4,z);wa(a,str);
-	a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+3./4,y);wa(a,str);
-	a.fpos=o+wv(x,-z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+3./4,x);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y,-x+1./4);wa(a,str);
-	a.fpos=o+wv(z,-y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(0,1./2,1./2);
+        if(j==3) o=wv(1./2,0,1./2);
+        if(j==4) o=wv(1./2,1./2,0);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-y+3./4,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+3./4,y+1./2,-z+1./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-x+3./4,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z+3./4,x+1./2,-y+1./4);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y+3./4,z+1./2,-x+1./4);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-z+3./4,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-x+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y);wa(a,str);
+        a.fpos=o+wv(-x,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-z+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-y+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+3./4,y+1./4,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./4,-y+1./2,z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,x+1./4,-y+1./2);wa(a,str);
+        a.fpos=o+wv(z+1./4,-x+1./2,y+3./4);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y+1./4,-z+1./2,x+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,z+1./4,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+3./4,z);wa(a,str);
+        a.fpos=o+wv(y+1./2,x+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+3./4,y);wa(a,str);
+        a.fpos=o+wv(x,-z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(x+1./2,z+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+3./4,x);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y,-x+1./4);wa(a,str);
+        a.fpos=o+wv(z,-y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./2,y+1./2,x+1./2);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -6566,56 +6566,56 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=229;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,-x,y);wa(a,str);
-	a.fpos=o+wv(-z,x,-y);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-z,x);wa(a,str);
-	a.fpos=o+wv(y,x,-z);wa(a,str);
-	a.fpos=o+wv(-y,-x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,z);wa(a,str);
-	a.fpos=o+wv(-y,x,z);wa(a,str);
-	a.fpos=o+wv(x,z,-y);wa(a,str);
-	a.fpos=o+wv(-x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x,-z,y);wa(a,str);
-	a.fpos=o+wv(z,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,x);wa(a,str);
-	a.fpos=o+wv(-z,y,x);wa(a,str);
-	a.fpos=o+wv(-z,-y,-x);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x,y,-z);wa(a,str);
-	a.fpos=o+wv(x,-y,z);wa(a,str);
-	a.fpos=o+wv(-x,y,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z,x,y);wa(a,str);
-	a.fpos=o+wv(z,x,-y);wa(a,str);
-	a.fpos=o+wv(z,-x,y);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z,x);wa(a,str);
-	a.fpos=o+wv(-y,z,x);wa(a,str);
-	a.fpos=o+wv(y,z,-x);wa(a,str);
-	a.fpos=o+wv(-y,-x,z);wa(a,str);
-	a.fpos=o+wv(y,x,z);wa(a,str);
-	a.fpos=o+wv(-y,x,-z);wa(a,str);
-	a.fpos=o+wv(y,-x,-z);wa(a,str);
-	a.fpos=o+wv(-x,-z,y);wa(a,str);
-	a.fpos=o+wv(x,-z,-y);wa(a,str);
-	a.fpos=o+wv(x,z,y);wa(a,str);
-	a.fpos=o+wv(-x,z,-y);wa(a,str);
-	a.fpos=o+wv(-z,-y,x);wa(a,str);
-	a.fpos=o+wv(-z,y,-x);wa(a,str);
-	a.fpos=o+wv(z,-y,-x);wa(a,str);
-	a.fpos=o+wv(z,y,x);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,-x,y);wa(a,str);
+        a.fpos=o+wv(-z,x,-y);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-z,x);wa(a,str);
+        a.fpos=o+wv(y,x,-z);wa(a,str);
+        a.fpos=o+wv(-y,-x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,z);wa(a,str);
+        a.fpos=o+wv(-y,x,z);wa(a,str);
+        a.fpos=o+wv(x,z,-y);wa(a,str);
+        a.fpos=o+wv(-x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x,-z,y);wa(a,str);
+        a.fpos=o+wv(z,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,x);wa(a,str);
+        a.fpos=o+wv(-z,y,x);wa(a,str);
+        a.fpos=o+wv(-z,-y,-x);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x,y,-z);wa(a,str);
+        a.fpos=o+wv(x,-y,z);wa(a,str);
+        a.fpos=o+wv(-x,y,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z,x,y);wa(a,str);
+        a.fpos=o+wv(z,x,-y);wa(a,str);
+        a.fpos=o+wv(z,-x,y);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z,x);wa(a,str);
+        a.fpos=o+wv(-y,z,x);wa(a,str);
+        a.fpos=o+wv(y,z,-x);wa(a,str);
+        a.fpos=o+wv(-y,-x,z);wa(a,str);
+        a.fpos=o+wv(y,x,z);wa(a,str);
+        a.fpos=o+wv(-y,x,-z);wa(a,str);
+        a.fpos=o+wv(y,-x,-z);wa(a,str);
+        a.fpos=o+wv(-x,-z,y);wa(a,str);
+        a.fpos=o+wv(x,-z,-y);wa(a,str);
+        a.fpos=o+wv(x,z,y);wa(a,str);
+        a.fpos=o+wv(-x,z,-y);wa(a,str);
+        a.fpos=o+wv(-z,-y,x);wa(a,str);
+        a.fpos=o+wv(-z,y,-x);wa(a,str);
+        a.fpos=o+wv(z,-y,-x);wa(a,str);
+        a.fpos=o+wv(z,y,x);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------
@@ -6629,56 +6629,56 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
       str.spacegroupnumber=230;
       str.spacegroupoption="";
       for(uint j=1;j<=2;j++) {
-	if(j==1) o=wv(0,0,0);
-	if(j==2) o=wv(1./2,1./2,1./2);
-	a.fpos=o+wv(x,y,z);wa(a,str);
-	a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
-	a.fpos=o+wv(z,x,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
-	a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
-	a.fpos=o+wv(y,z,x);wa(a,str);
-	a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
-	a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
-	a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
-	a.fpos=o+wv(y+3./4,x+1./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,-x+3./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,z+1./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,z+3./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,-z+3./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,-z+1./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,y+1./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,-y+1./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,y+3./4,x+1./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,-y+3./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(-x,-y,-z);wa(a,str);
-	a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
-	a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
-	a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
-	a.fpos=o+wv(-z,-x,-y);wa(a,str);
-	a.fpos=o+wv(-z+1./2,x+1./2,y);wa(a,str);
-	a.fpos=o+wv(z+1./2,x,-y+1./2);wa(a,str);
-	a.fpos=o+wv(z,-x+1./2,y+1./2);wa(a,str);
-	a.fpos=o+wv(-y,-z,-x);wa(a,str);
-	a.fpos=o+wv(y,-z+1./2,x+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./2,z+1./2,x);wa(a,str);
-	a.fpos=o+wv(y+1./2,z,-x+1./2);wa(a,str);
-	a.fpos=o+wv(-y+1./4,-x+3./4,z+3./4);wa(a,str);
-	a.fpos=o+wv(y+1./4,x+1./4,z+1./4);wa(a,str);
-	a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
-	a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
-	a.fpos=o+wv(-x+1./4,-z+3./4,y+3./4);wa(a,str);
-	a.fpos=o+wv(x+3./4,-z+1./4,-y+3./4);wa(a,str);
-	a.fpos=o+wv(x+1./4,z+1./4,y+1./4);wa(a,str);
-	a.fpos=o+wv(-x+3./4,z+3./4,-y+1./4);wa(a,str);
-	a.fpos=o+wv(-z+1./4,-y+3./4,x+3./4);wa(a,str);
-	a.fpos=o+wv(-z+3./4,y+3./4,-x+1./4);wa(a,str);
-	a.fpos=o+wv(z+3./4,-y+1./4,-x+3./4);wa(a,str);
-	a.fpos=o+wv(z+1./4,y+1./4,x+1./4);wa(a,str);
+        if(j==1) o=wv(0,0,0);
+        if(j==2) o=wv(1./2,1./2,1./2);
+        a.fpos=o+wv(x,y,z);wa(a,str);
+        a.fpos=o+wv(-x+1./2,-y,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x,y+1./2,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x+1./2,-y+1./2,-z);wa(a,str);
+        a.fpos=o+wv(z,x,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,-x+1./2,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,-x,y+1./2);wa(a,str);
+        a.fpos=o+wv(-z,x+1./2,-y+1./2);wa(a,str);
+        a.fpos=o+wv(y,z,x);wa(a,str);
+        a.fpos=o+wv(-y,z+1./2,-x+1./2);wa(a,str);
+        a.fpos=o+wv(y+1./2,-z+1./2,-x);wa(a,str);
+        a.fpos=o+wv(-y+1./2,-z,x+1./2);wa(a,str);
+        a.fpos=o+wv(y+3./4,x+1./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,-x+3./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,-x+1./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(-y+1./4,x+3./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,z+1./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,z+3./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,-z+3./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,-z+1./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,y+1./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,-y+1./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,y+3./4,x+1./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,-y+3./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(-x,-y,-z);wa(a,str);
+        a.fpos=o+wv(x+1./2,y,-z+1./2);wa(a,str);
+        a.fpos=o+wv(x,-y+1./2,z+1./2);wa(a,str);
+        a.fpos=o+wv(-x+1./2,y+1./2,z);wa(a,str);
+        a.fpos=o+wv(-z,-x,-y);wa(a,str);
+        a.fpos=o+wv(-z+1./2,x+1./2,y);wa(a,str);
+        a.fpos=o+wv(z+1./2,x,-y+1./2);wa(a,str);
+        a.fpos=o+wv(z,-x+1./2,y+1./2);wa(a,str);
+        a.fpos=o+wv(-y,-z,-x);wa(a,str);
+        a.fpos=o+wv(y,-z+1./2,x+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./2,z+1./2,x);wa(a,str);
+        a.fpos=o+wv(y+1./2,z,-x+1./2);wa(a,str);
+        a.fpos=o+wv(-y+1./4,-x+3./4,z+3./4);wa(a,str);
+        a.fpos=o+wv(y+1./4,x+1./4,z+1./4);wa(a,str);
+        a.fpos=o+wv(-y+3./4,x+3./4,-z+1./4);wa(a,str);
+        a.fpos=o+wv(y+3./4,-x+1./4,-z+3./4);wa(a,str);
+        a.fpos=o+wv(-x+1./4,-z+3./4,y+3./4);wa(a,str);
+        a.fpos=o+wv(x+3./4,-z+1./4,-y+3./4);wa(a,str);
+        a.fpos=o+wv(x+1./4,z+1./4,y+1./4);wa(a,str);
+        a.fpos=o+wv(-x+3./4,z+3./4,-y+1./4);wa(a,str);
+        a.fpos=o+wv(-z+1./4,-y+3./4,x+3./4);wa(a,str);
+        a.fpos=o+wv(-z+3./4,y+3./4,-x+1./4);wa(a,str);
+        a.fpos=o+wv(z+3./4,-y+1./4,-x+3./4);wa(a,str);
+        a.fpos=o+wv(z+1./4,y+1./4,x+1./4);wa(a,str);
       }
     }
     // ----------------------------------------------------------------------------

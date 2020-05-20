@@ -83,7 +83,8 @@ bool xAIMSOUT::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUI
 }
 
 bool xAIMSOUT::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
-  string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
+  //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;  //CO20200502 - threadID
+  string tmpfile=aurostd::TmpFileCreate("xAIMSOUT_GetProperties"); //CO20200502 - threadID
   aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
   bool out=GetPropertiesFile(tmpfile);
   aurostd::RemoveFile(tmpfile);

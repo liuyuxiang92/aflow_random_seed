@@ -54,18 +54,18 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 1;
     }
-    
+
     // Create plot title by replacing "_" by "\_" to avoid it being interpreted as a subscript command
     string plot_title;
     char chwork;
     for (uint i = 0; i < sysname.size(); i++) {
       chwork = sysname.at(i);
       if(chwork != '_') {
-	plot_title.push_back(chwork);
+        plot_title.push_back(chwork);
       } else {
-	plot_title.push_back('\\');
-	// OBSOLETE plot_title.push_back('\\');
-	plot_title.push_back(chwork);
+        plot_title.push_back('\\');
+        // OBSOLETE plot_title.push_back('\\');
+        plot_title.push_back(chwork);
       }
     }
     aurostd::StringstreamClean(aus);
@@ -108,7 +108,7 @@ namespace AGL_functions {
     finss << "\"" << datafilename << "\""  << endl;
 
     finss << endl;
-  
+
     if(!aurostd::stringstream2file(finss, gnuplotscript, "WRITE")) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_ERROR_ + "Unable to open file " << gnuplotscript.c_str() <<  endl;
@@ -125,35 +125,35 @@ namespace AGL_functions {
 
     // Call gnuplot to plot the data	
     aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
- 
+
     // Convert the plot file to the format requested by the user
     aurostd::StringstreamClean(aus);
     // OBSOLETE if(XHOST.vflag_control.isflag("KEEP::PNG")) {
     if(XHOST.vflag_control.flag("KEEP::PNG")) {
       aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".png" << endl;
       // OBSOLETE }  else if(XHOST.vflag_control.isflag("KEEP::PDF")) {
-    }  else if(XHOST.vflag_control.flag("KEEP::PDF")) {
-      aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".pdf" << endl;
-      // OBSOLETE }  else if(XHOST.vflag_control.isflag("KEEP::JPG")) 
-    }  else if(XHOST.vflag_control.flag("KEEP::JPG")) {
-      aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".jpg" << endl;
-      // OBSOLETE }  else if(XHOST.vflag_control.isflag("KEEP::GIF")) {
-    }  else if(XHOST.vflag_control.flag("KEEP::GIF")) {
-      aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".gif" << endl;
-    }
-    aurostd::execute(aus);
-    aurostd::StringstreamClean(aus);
-	
-    // Postprocess clean up
-    if(!XHOST.vflag_control.flag("KEEP::GPL")) {
-      aurostd::RemoveFile(datafilename);
-      aurostd::RemoveFile(gnuplotscript);
-    }
-    if(!XHOST.vflag_control.flag("KEEP::EPS")) {
-      aurostd::RemoveFile(plotfilenameeps);
-    }
+  }  else if(XHOST.vflag_control.flag("KEEP::PDF")) {
+    aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".pdf" << endl;
+    // OBSOLETE }  else if(XHOST.vflag_control.isflag("KEEP::JPG")) 
+  }  else if(XHOST.vflag_control.flag("KEEP::JPG")) {
+    aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".jpg" << endl;
+    // OBSOLETE }  else if(XHOST.vflag_control.isflag("KEEP::GIF")) {
+  }  else if(XHOST.vflag_control.flag("KEEP::GIF")) {
+    aus << XHOST.command("convert") << " " << plotfilename << ".eps" << " " << plotfilename << ".gif" << endl;
+  }
+  aurostd::execute(aus);
+  aurostd::StringstreamClean(aus);
 
-    return 0;
+  // Postprocess clean up
+  if(!XHOST.vflag_control.flag("KEEP::GPL")) {
+    aurostd::RemoveFile(datafilename);
+    aurostd::RemoveFile(gnuplotscript);
+  }
+  if(!XHOST.vflag_control.flag("KEEP::EPS")) {
+    aurostd::RemoveFile(plotfilenameeps);
+  }
+
+  return 0;
   } 
 } // namespace AGL_functions
 
@@ -187,7 +187,7 @@ namespace AGL_functions {
       volumeinputBohr.push_back(AGL_data.volumeinput.at(i) * pow(angstrom2bohr, 3.0));
       energyinputHartree.push_back(AGL_data.energyinput.at(i) / hart2ev);	
     }
- 
+
     outfiless << AGL_data.sysname << endl;
     outfiless << outputfilename << endl;
     outfiless << AGL_data.natoms << endl;
@@ -209,16 +209,16 @@ namespace AGL_functions {
     // OBSOLETE outfiless << AGL_data.volumeinput.size() << endl;
     outfiless << volumeinputBohr.size() << endl;
     if(AGL_data.i_debye == 1) {
-      // OBSOLETE for (uint i = 0; i < AGL_data.volumeinput.size(); i++) {
+      // OBSOLETE for (uint i = 0; i < AGL_data.volumeinput.size(); i++)
       for (uint i = 0; i < volumeinputBohr.size(); i++) {
-	// OBSOLETE outfiless << AGL_data.volumeinput.at(i) << "\t" << AGL_data.energyinput.at(i) << "\t" << AGL_data.tdebye.at(i) << endl;
-	outfiless << volumeinputBohr.at(i) << "\t" << energyinputHartree.at(i) << "\t" << AGL_data.tdebye.at(i) << endl;
+        // OBSOLETE outfiless << AGL_data.volumeinput.at(i) << "\t" << AGL_data.energyinput.at(i) << "\t" << AGL_data.tdebye.at(i) << endl;
+        outfiless << volumeinputBohr.at(i) << "\t" << energyinputHartree.at(i) << "\t" << AGL_data.tdebye.at(i) << endl;
       }
     } else {
-      // OBSOLETE for (uint i = 0; i < AGL_data.volumeinput.size(); i++) {
+      // OBSOLETE for (uint i = 0; i < AGL_data.volumeinput.size(); i++)
       for (uint i = 0; i < volumeinputBohr.size(); i++) {
-	// OBSOLETE outfiless << AGL_data.volumeinput.at(i) << "\t" << AGL_data.energyinput.at(i) << endl;
-	outfiless << volumeinputBohr.at(i) << "\t" << energyinputHartree.at(i) << endl;
+        // OBSOLETE outfiless << AGL_data.volumeinput.at(i) << "\t" << AGL_data.energyinput.at(i) << endl;
+        outfiless << volumeinputBohr.at(i) << "\t" << energyinputHartree.at(i) << endl;
       }
     }
 
