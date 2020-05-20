@@ -46,7 +46,7 @@ namespace AGL_functions {
     int mloops = 25;
     bool converged = false;
     double theta0 = 0.0, theta = 0.0;
-    double DebyeIntegral = 0.0, DebyeIntegralerror, UIntEnergy, Cvt, F_Helmholtz, S_Entropy;
+    double DebyeIntegral = 0.0, DebyeIntegralerror = 0.0, UIntEnergy = 0.0, Cvt = 0.0, F_Helmholtz = 0.0, S_Entropy = 0.0;
     uint itry = 0;
     uint ierr = 0;
     uint aglerror = 0;
