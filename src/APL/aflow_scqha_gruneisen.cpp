@@ -27,7 +27,7 @@ namespace apl
 {
   // ***************************************************************************************
   //constructor 
-  SCQHA_QHA3P::SCQHA_QHA3P( IPhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
+  SCQHA_QHA3P::SCQHA_QHA3P( PhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
   {
     //clear all memories before using
     clear();

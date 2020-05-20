@@ -4724,7 +4724,7 @@ namespace pocc {
     //fix up structure
     xstr_pocc.neg_scale=false;  //NO negative scale... doesn't really matter, scale is one variable
     xstr_pocc.ReScale(1.0);
-    xstr_pocc.ShifOriginToAtom(0);
+    xstr_pocc.ShiftOriginToAtom(0);
     xstr_pocc.BringInCell();
     xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -6442,7 +6442,7 @@ namespace pocc {
         if(LDEBUG) {cerr << soliloquy << " structure post-primitivization" << endl;cerr << supercell << endl;}
       }
       supercell.ReScale(1.0);
-      supercell.ShifOriginToAtom(0);
+      supercell.ShiftOriginToAtom(0);
       supercell.BringInCell();
       if(LDEBUG) {cerr << soliloquy << " structure post-cleaning" << endl;cerr << supercell << endl;}
     }

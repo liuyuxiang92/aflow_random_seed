@@ -27,6 +27,8 @@
 // [OBSOLETE] #include "aflow_contrib_cormac.h"
 #include "aflowlib.h"
 #include "aflow_gfa.h" //DF20190329
+#include "aflow_cce.h" //RF20200203
+#include "APL/aflow_apl.h"  //ME20200330
 
 extern double NearestNeighbour(const xstructure& a);
 
@@ -863,25 +865,76 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("PLATON",aurostd::args2flag(argv,cmds,"--platon") && argv.at(1)=="--platon");
   vpflow.args2addattachedscheme(argv,cmds,"PLATON","--platon=",""); 
 
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND","--plotband=|--plotbands=","./");  //ME20190614
+  // ME20200313 - Added guards for when plots commands are used without = sign
+  if (aurostd::args2flag(argv, cmds, "--plotband|--plotbands")) {
+    vpflow.flag("PLOT_BAND", true);
+    vpflow.addattachedscheme("PLOT_BAND", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND","--plotband=|--plotbands=","./");  // ME20190614
+  }
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDSPINSPLIT","--plotband_spinsplit=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=","./");
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos","./");  //ME20190614
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOS","--plotdos=","./");
+  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos")) {
+    vpflow.flag("PLOT_BANDDOS", true);
+    vpflow.addattachedscheme("PLOT_BANDDOS", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos","./");  // ME20190614
+  }
+  if (aurostd::args2flag(argv, cmds, "--plotdos|--plotdos")) {
+    vpflow.flag("PLOT_DOS", true);
+    vpflow.addattachedscheme("PLOT_DOS", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOS","--plotdos=","./");
+  }
   vpflow.flag("PLOT_ALL_ATOMS",aurostd::args2flag(argv,cmds,"--plot_all_atoms|--plotallatoms"));  //CO20191010
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOSWEB","--plotdosweb=","./");
   //  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOS","--plotpedos=","./,1"); OBSOLETE ME20190614
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOS","--plotpedos=|--plotpdos=","./");  //ME20190614
+  if (aurostd::args2flag(argv, cmds, "--plotpedos|--plotpdos")) {
+    vpflow.flag("PLOT_PDOS", true);
+    vpflow.addattachedscheme("PLOT_PDOS", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOS","--plotpedos=|--plotpdos=","./");  // ME20190614
+  }
   //  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOSALL","--plotpedosall=","./"); OBSOLETE ME20190614;
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOSALL","--plotpedosall=|--plotpdosall=","./");  //ME20190614
+  if (aurostd::args2flag(argv, cmds, "--plotpedosall|--plotpdosall")) {
+    vpflow.flag("PLOT_PDOSALL", true);
+    vpflow.addattachedscheme("PLOT_PDOSALL", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOSALL","--plotpedosall=|--plotpdosall=","./");  // ME20190614
+  }
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOSALL_AFLOWLIB","--plotpedos_nonequivalent=","./");
-  //ME20190614 BEGIN
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO","--plotthermo=","./");
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
+  // ME20190614 - BEGIN
+  if (aurostd::args2flag(argv, cmds, "--plotthermo")) {
+    vpflow.flag("PLOT_THERMO", true);
+    vpflow.addattachedscheme("PLOT_THERMO", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO","--plotthermo=","./");
+  }
+  if (aurostd::args2flag(argv, cmds, "--plottcond|--plotthermalconductivity")) {
+    vpflow.flag("PLOT_TCOND", true);
+    vpflow.addattachedscheme("PLOT_TCOND", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
+  }
   //[OBSOLETE] vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
-  vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDOS", "--plotphdos=", "./");
-  vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISP", "--plotphdisp=|--plotphonondispersion=|==pphdis=", "./");
-  vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISPDOS", "--plotphdispdos=", "./");
+  if (aurostd::args2flag(argv, cmds, "--plotphdos")) {
+    vpflow.flag("PLOT_PHDOS", true);
+    vpflow.addattachedscheme("PLOT_PHDOS", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDOS", "--plotphdos=", "./");
+  }
+  if (aurostd::args2flag(argv, cmds, "--plotphdisp|--plotphononsdispersion|--pphdis")) {
+    vpflow.flag("PLOT_PHDISP", true);
+    vpflow.addattachedscheme("PLOT_PHDISP", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISP", "--plotphdisp=|--plotphonondispersion=|--pphdis=", "./");
+  }
+  if (aurostd::args2flag(argv, cmds, "--plotphdispdos")) {
+    vpflow.flag("PLOT_PHDISPDOS", true);
+    vpflow.addattachedscheme("PLOT_PHDISPDOS", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISPDOS", "--plotphdispdos=", "./");
+  }
   // Additional DOS/band structure options
   vpflow.flag("PLOTTER::NOSHIFT", aurostd::args2flag(argv, cmds, "--noshift"));
   vpflow.flag("PLOTTER::NOWATERMARK", aurostd::args2flag(argv, cmds, "--nowatermark"));
@@ -889,7 +942,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::UNIT", "--unit=", "EV");
   vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::PRINT", "--print=", "pdf");
   vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::TITLE", "--title=", "");
-  //ME20190614 END
+  vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::OUTFILE", "--outfile=", "");  // ME20200313 - user defined output file name
+  //ME20190614 - END
 
   vpflow.flag("POCC",aurostd::args2flag(argv,cmds,"--pocc") && argv.at(1)=="--pocc");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
@@ -1144,6 +1198,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DFT_FORMATION_ENERGIES","--dft_formation_energies=|--dfte=","");
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::FUNCTIONALS","--functional=|--func=|--functionals=","");
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::OXIDATION_NUMBERS","--oxidation_numbers=|--ox_nums=|--oxidation_number=","");
+  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce")); // ME
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::PRINT","--print=","OUT"); // ME
+  vpflow.flag("CCE_CORRECTION::TEST",aurostd::args2flag(argv,cmds,"--cce_test")); // RF20200409
 
   vpflow.flag("RMATOM",aurostd::args2flag(argv,cmds,"--rm_atom") && argv.at(1)=="--rm_atom");
   vpflow.flag("RMCOPIES",aurostd::args2flag(argv,cmds,"--rm_copies") && argv.at(1)=="--rm_copies");
@@ -1308,6 +1365,19 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
+
+  // ME20200330
+  vpflow.flag("VISUALIZE_PHONONS", aurostd::args2flag(argv,cmds,"--visualize_phonons"));
+  if (vpflow.flag("VISUALIZE_PHONONS")) {
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::AMPLITUDE","--amplitude=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::BRANCHES","--branches=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::FORMAT","--format=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::PERIODS","--periods=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::QPOINTS","--qpoints=|--qpoint=|--q=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::STEPS","--steps=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::SUPERCELL","--scell=","");
+    vpflow.push_attached("ADISP::DIRECTORY", XHOST.vflag_control.getattachedscheme("DIRECTORY"));
+  }
 
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::EQUAL","--volume=","");
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::MULTIPLY_EQUAL","--volume*=","");
@@ -1862,7 +1932,8 @@ namespace pflow {
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION")) {pflow::CCE(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} // ME
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}
@@ -1916,6 +1987,7 @@ namespace pflow {
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
       if(vpflow.flag("VASP")) {cout << input2VASPxstr(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} // ME20200330
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::PLUS_EQUAL")) {cout << pflow::VOLUME("VOLUME::PLUS_EQUAL,"+vpflow.getattachedscheme("VOLUME::PLUS_EQUAL"),cin); _PROGRAMRUN=true;} 
@@ -2330,19 +2402,19 @@ namespace pflow {
     strstream << tab << x << " --pearson_symbol|--pearson < POSCAR" << endl;
     strstream << tab << x << " --platon[=EQUAL|EXACT][,ang,d1,d2,d3] < POSCAR|platonSG" << endl;
     strstream << tab << x << " --platonSG[_label,_number][=EQUAL|EXACT][,ang,d1,d2,d3] < POSCAR" << endl;
-    strstream << tab << x << " --plotband|--plotbands[=directory[,Emin[,Emax]]]] [--keep=gpl] [--print=pdf|gif|eps|jpg|png] [--title=]" << endl;
+    strstream << tab << x << " --plotband|--plotbands[=directory[,Emin[,Emax]]]] [--keep=gpl] [--print=pdf|gif|eps|jpg|png] [--title=] [--outfile=]" << endl;
     strstream << tab << x << " --plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]" << endl;
-    strstream << tab << x << " --plotbanddos|--plotbandsdos[=directory[,Emin[,Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]" << endl;
-    strstream << tab << x << " --plotdos[=directory[,Emin[,Emax[,DOSSCALE]]]]] [--print=pdf|eps|gif|jpg|png] [--keep=gpl] [--noshift] [--projection=atoms|lm|none|orbitals] [--title=]" << endl;
+    strstream << tab << x << " --plotbanddos|--plotbandsdos[=directory[,Emin[,Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=] [--outfile=]" << endl;
+    strstream << tab << x << " --plotdos[=directory[,Emin[,Emax[,DOSSCALE]]]]] [--print=pdf|eps|gif|jpg|png] [--keep=gpl] [--noshift] [--projection=atoms|lm|none|orbitals] [--title=] [--outfile=]" << endl;
     strstream << tab << x << " --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]" << endl;
-    strstream << tab << x << " --plotpdos|--plotpedos[=directory[,atom[,Emin[,Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]" << endl;
-    strstream << tab << x << " --plotpdosall|--plotpedosall[=directory[,Emin[,Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]" << endl;
+    strstream << tab << x << " --plotpdos|--plotpedos[=directory[,atom[,Emin[,Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=] [--outfile=]" << endl;
+    strstream << tab << x << " --plotpdosall|--plotpedosall[=directory[,Emin[,Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=] [--outfile=]" << endl;
     strstream << tab << x << " --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]" << endl;
-    strstream << tab << x << " --plotphdisp|--plotphonondispersion|--pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]" << endl;
-    strstream << tab << x << " --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]" << endl;
-    strstream << tab << x << " --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]" << endl;
-    strstream << tab << x << " --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]" << endl;
-    strstream << tab << x << " --plotcond|--plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]" << endl;
+    strstream << tab << x << " --plotphdisp|--plotphonondispersion|--pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]" << endl;
+    strstream << tab << x << " --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]" << endl;
+    strstream << tab << x << " --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]" << endl;
+    strstream << tab << x << " --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]" << endl;
+    strstream << tab << x << " --plotcond|--plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]" << endl;
     strstream << tab << x << " --pomass[=directory]" << endl;
     strstream << tab << x << " --pomass_atom[=directory]" << endl;
     strstream << tab << x << " --pomass_cell[=directory]" << endl;
@@ -5972,6 +6044,13 @@ namespace pflow {
     bool sym_done=PerformFullSymmetry(a,FileMESSAGE,aflags,kflags,osswrite,oss_empty);
     if(!see_output){oss_empty.clear();} //clear NULL
     return sym_done;
+  }
+
+  // ME20200224 - added directory option
+  bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
+    _aflags aflags;
+    aflags.Directory = directory;
+    return PerformFullSymmetry(a, FileMESSAGE, aflags, kflags, osswrite, oss, format);
   }
 
   bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format){

@@ -20,7 +20,7 @@
 
 namespace apl {
   // ***************************************************************************************
-  QHAsubdirectoryData::QHAsubdirectoryData( IPhononCalculator& pc, Logger& l):
+  QHAsubdirectoryData::QHAsubdirectoryData( PhononCalculator& pc, Logger& l):
     _pc(pc),_logger(l)
   {
     _gp_vol_distortion=0.0;
