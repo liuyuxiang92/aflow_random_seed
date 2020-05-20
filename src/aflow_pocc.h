@@ -125,10 +125,13 @@ namespace pocc {
       uint equivalent;                                  //from iatoms of non-pocc structure
 
       //general setters
-      void initialize(ostream& oss=cout);
-      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      bool initialize(ostream& oss);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const _aflags& aflags,ostream& oss);
+      bool initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags);
+
       void setAFlags(const _aflags& aflags);
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
@@ -366,22 +369,31 @@ namespace pocc {
       vector<int> sc2pc_map;
       vector<int> pc2sc_map;
 
-      void initialize(ostream& oss=cout);
-      void initialize(const aurostd::xoption& pocc_flags,ostream& oss=cout); 
-      void initialize(const _aflags& aflags,ostream& oss=cout);
-      void initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
-      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      //initializers
+      bool initialize(ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,ostream& oss);
+      bool initialize(const _aflags& aflags,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const aurostd::xoption& pocc_flags);
+      bool initialize(const _aflags& aflags);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags);
+      bool initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags);
 
       void setSpeciesRedecoration(const vector<string>& species_redecoration);
       void setExplorationRadius();
@@ -447,10 +459,10 @@ namespace pocc {
       POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss=cout);
@@ -460,10 +472,10 @@ namespace pocc {
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
@@ -509,58 +521,85 @@ namespace pocc {
       vector<double> m_Egap;
       double m_Egap_net;
 
-      void initialize(ostream& oss=cout);
-      void initialize(const _aflags& aflags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
-      void initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      //initializers
+      bool initialize(ostream& oss);
+      bool initialize(const _aflags& aflags,ostream& oss);
+      bool initialize(const _aflags& aflags,const _kflags& kflags,ostream& oss);
+      bool initialize(const _aflags& aflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const _aflags& aflags);
+      bool initialize(const _aflags& aflags,const _kflags& kflags);
+      bool initialize(const _aflags& aflags,const _vflags& vflags);
+      bool initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags);
+      bool initialize(const xstructure& xstr_pocc,const _kflags& kflags);
+      bool initialize(const xstructure& xstr_pocc,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
+      bool initialize(const aurostd::xoption& pocc_flags,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& pocc_flags);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags);
+      bool initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags);
+      bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
 
       //external methods
       void setPOccFlags(const aurostd::xoption& pocc_flags);  //input flags, e.g., vpflow
@@ -697,12 +736,12 @@ namespace pocc {
       //constructors - START
       POccStructuresFile(ostream& oss=cout);
       POccStructuresFile(ofstream& FileMESSAGE,ostream& oss=cout);
-      POccStructuresFile(const string& fileIn,ostream& oss=cout);
-      POccStructuresFile(const string& fileIn,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const string& fileIN,ostream& oss=cout);
+      POccStructuresFile(const string& fileIN,ofstream& FileMESSAGE,ostream& oss=cout);
       POccStructuresFile(const _aflags& aflags,ostream& oss=cout);
       POccStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      POccStructuresFile(const string& fileIn,const _aflags& aflags,ostream& oss=cout);
-      POccStructuresFile(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const string& fileIN,const _aflags& aflags,ostream& oss=cout);
+      POccStructuresFile(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
 
       POccStructuresFile(const POccStructuresFile& b);
       //constructors - STOP
@@ -718,17 +757,22 @@ namespace pocc {
       aurostd::xoption m_fileoptions;
       vector<vector<vector<uint> > > m_vPOSCAR_lines;  //contains start/stop indices for POSCARs in m_vcontent
 
-      void initialize(ostream& oss=cout);
-      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const string& fileIn,ostream& oss=cout);
-      void initialize(const string& fileIn,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const _aflags& aflags,ostream& oss=cout);
-      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
-      void initialize(const string& fileIn,const _aflags& aflags,ostream& oss=cout);
-      void initialize(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      //initializers
+      bool initialize(ostream& oss);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const string& fileIN,ostream& oss);
+      bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& fileIN);
+      bool initialize(const _aflags& aflags,ostream& oss);
+      bool initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const _aflags& aflags);
+      bool initialize(const string& fileIN,const _aflags& aflags,ostream& oss);
+      bool initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& fileIN,const _aflags& aflags);
 
       void setAFlags(const _aflags& aflags);
-      void readFile(const string& fileIn);
+      void readFile(const string& fileIN);
       void processFile();
       bool getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS=true);
       bool loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS=true);
