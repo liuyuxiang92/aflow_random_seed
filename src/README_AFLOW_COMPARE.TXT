@@ -7,23 +7,24 @@
 LATEST VERSION OF THE FILE:    materials.duke.edu/AFLOW/README_AFLOW_COMPARE.TXT
 ********************************************************************************
 
-AFLOW-XtalMatch (COMPARE STRUCTURE) README
+AFLOW-XtalFinder (COMPARE STRUCTURE) README
 
 README written by: David Hicks (david.hicks@duke.edu)
 
 Citation info: D. Hicks, C. Toher, D.C. Ford, F. Rose, 
                C. De Santo O. Levy, M.J. Mehl, and S. Curtarolo, 
-               AFLOW-XtalMatch: Automated method for quantifying the 
-               structural similarity of materials and identifying unique 
-               crystal prototypes, in preparation (2019).
+               AFLOW-XtalFinder: a reliable choice to identify crystalline
+               prototypes, submitted (2020).
 
 ********************************************************************************
 GENERAL OVERVIEW
 
-AFLOW-XtalMatch compares crystal structures, regardless of their representation, and 
-quantifies their similarity based on criteria specified by H. Burzlaff (Acta Cryst., A53, 217-224 (1997)).
+AFLOW-XtalFinder identifies crystallographic prototypes, regardless of their representation.
+The code compares structures based on symmetry (isopointal analysis), atom environment
+(isoconfigurational snapshots), and geometric structure (complete isoconfigurational analysis).
+Structural similarity is quantified via the Burzlaff and Malinovsky misfit criteria (Acta Cryst., A53, 217-224 (1997)).
 
-The AFLOW-XtalMatch similarity metrics and functionalities are briefly described below. 
+The AFLOW-XtalFinder similarity metrics and functionalities are briefly described below.
 
 ----------------------------------------------------------------------
 MISFIT CRITERIA
@@ -44,7 +45,7 @@ The module offers four comparison modes:
 
 ----------------------------------------------------------------------
 MULTIPLE COMPARISONS
-AFLOW-XtalMatch can automatically compare multiple compounds in a single command.  
+AFLOW-XtalFinder can automatically compare multiple compounds in a single command.
 Structures are automatically grouped into comparison sets by stoichiometry, 
 species (if applicable), symmetry (space group number and Wyckoff positions), and atomic environment. 
 Compounds are compared until each structure is matched or all possible comparisons have been exhausted.
@@ -53,7 +54,7 @@ See AFLOW COMMANDS USAGE for more details.
 
 ----------------------------------------------------------------------
 INPUT FILE TYPES
-AFLOW-XtalMatch automatically detects the input geometry file type. 
+AFLOW-XtalFinder automatically detects the input geometry file type.
 The supported formats are:
   - VASP (POSCAR or CONTCAR)
   - QuantumESPRESSO
@@ -80,11 +81,11 @@ params values : 4.3814,0.901127,0.548523,105.81,0.6918,0.0942,0.1112,0.9123,0.13
 
 ----------------------------------------------------------------------
 MULTITHREADED CAPABILITIES
-Many of the AFLOW-XtalMatch functions are parallelized: symmetry analysis, environment analysis, and comparisons.
+Many of the AFLOW-XtalFinder functions are parallelized: symmetry analysis, environment analysis, and comparisons.
 Use the --np=<number> flag to specify the number of threads for multithreaded comparisons.
 
 ****************************************************************************************************
-LIST OF AFLOW-XtalMatch COMMANDS:
+LIST OF AFLOW-XtalFinder COMMANDS:
   
   aflow --compare2database        : Returns AFLOW database entries that match with the structure 
   aflow --compare2prototypes      : Returns AFLOW prototypes that match with the structure
@@ -264,7 +265,7 @@ General options - applicable to all commands - is listed at the bottom of this s
           --unique_atom_decorations or --compare2prototypes (redundant).
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
           signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
-          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+          AFLOW-XtalFinder supports three input formats for the magnetic moment:
               1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
               2) read from a VASP INCAR, or
               3) read from a VASP OUTCAR.
@@ -277,7 +278,7 @@ General options - applicable to all commands - is listed at the bottom of this s
         [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
           and the transformed structures in the closest matching representation.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
 
