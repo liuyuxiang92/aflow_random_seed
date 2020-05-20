@@ -85,8 +85,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AURL2LOOP","--aflowlib_aurl2loop=|--aurl2loop=","");
 
   //DX20190206 - add AFLUX functionality to command line - START
-  vpflow.args2addattachedscheme(argv,cmds,"AFLUX","--aflux=",""); 
-  if(vpflow.flag("AFLUX")){
+  vpflow.args2addattachedscheme(argv,cmds,"AFLUX::SUMMONS","--aflux=","");  //CO20200520 - AFLUX::SUMMONS
+  if(vpflow.flag("AFLUX::SUMMONS")){  //CO20200520 - AFLUX::SUMMONS
     vpflow.flag("AFLUX::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
   //DX20190206 - add AFLUX functionality to command line - END
@@ -1678,7 +1678,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2AUID")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2AUID"),"AFLOWLIB_AURL2AUID"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AUID2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2LOOP"),"AFLOWLIB_AUID2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
-      if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
+      if(vpflow.flag("AFLUX::SUMMONS")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality //CO20200520 - AFLUX::SUMMONS
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  //CO20171006

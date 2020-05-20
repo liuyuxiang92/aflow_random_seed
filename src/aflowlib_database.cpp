@@ -598,11 +598,11 @@ namespace aflowlib {
 
   //getSchemaKeys/////////////////////////////////////////////////////////////
   // Returns the keys from the AFLOW schema.
-  vector<string> AflowDB::getSchemaKeys() {
+  vector<string> getSchemaKeys() {
     vector<string> keys;
     string key = "";
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
-      if(aurostd::substring2bool(XHOST.vschema.vxsghost[i], "::NAME:")) {
+      if(XHOST.vschema.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) { //CO20200520
         key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
         keys.push_back(key);
       }
@@ -612,11 +612,26 @@ namespace aflowlib {
 
   // Data --------------------------------------------------------------------
 
-  //getDataTypes//////////////////////////////////////////////////////////////
+  //getDataNames//////////////////////////////////////////////////////////////
+  // Gets the data names of the schema keys and converts them into SQLite
+  // types. Note that SQLite does not recognize arrays, so they will be stored
+  // as text.
+  vector<string> getDataNames() { //CO20200520
+    vector<string> keys;
+    string key = "";
+    for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
+      if(XHOST.vschema.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) {
+        key=XHOST.vschema.vxsghost[i+1];
+        keys.push_back(key);
+      }
+    }
+    return keys;
+  }
+
   // Gets the data types of the schema keys and converts them into SQLite
   // types. Note that SQLite does not recognize arrays, so they will be stored
   // as text.
-  vector<string> AflowDB::getDataTypes(const vector<string>& keys, bool unique) {
+  vector<string> getDataTypes(const vector<string>& keys, bool unique) {
     uint nkeys = keys.size();
     vector<string> types(nkeys);
     string type = "";
@@ -636,7 +651,7 @@ namespace aflowlib {
 
   //getDataValues/////////////////////////////////////////////////////////////
   // Retrieves the values of each property from the aflowlib.json file.
-  vector<string> AflowDB::getDataValues(const string& entry, const vector<string>& cols, const vector<string>& types) {
+  vector<string> getDataValues(const string& entry, const vector<string>& cols, const vector<string>& types) {
     string value = "", id = "";
     uint ncols = cols.size();
     vector<string> values(ncols, "NULL");
@@ -654,7 +669,7 @@ namespace aflowlib {
   // This function extracts values from an aflowlib.json file. It is much
   // faster than using SQLite's JSON extension, but has was designed to only
   // work for the aflowlib.json. It cannot handle nested JSONs!
-  string AflowDB::extractJsonValueAflow(const string& json, string key) {
+  string extractJsonValueAflow(const string& json, string key) {
     string value = "";
     key = "\"" + key + "\":";
     string::size_type start, end;

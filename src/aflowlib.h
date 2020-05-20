@@ -285,7 +285,7 @@ namespace aflowlib {
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ) : PORT(80),Summons(a_Summons),API_Path(a_API_Path),Domain(a_Domain) {}; //CO20181226
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
@@ -297,10 +297,10 @@ namespace aflowlib {
   uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
-  string AFLUXCall(aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
-  string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
-  string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
-  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
+  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line   //CO20200520
+  string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality //CO20200520
+  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality   //CO20200520
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
@@ -513,6 +513,14 @@ namespace aflowlib {
     vector<string> species;
     string catalog;
   };
+  
+  //CO20200520 START - moving from inside AflowDB
+  vector<string> getSchemaKeys();
+  vector<string> getDataNames();
+  vector<string> getDataTypes(const vector<string>&, bool);
+  vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+  string extractJsonValueAflow(const string&, string);
+  //CO20200520 END - moving from inside AflowDB
 
   class AflowDB {
     public:
@@ -568,11 +576,6 @@ namespace aflowlib {
       void rebuildDB();
       void buildTables(int, int, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
-
-      vector<string> getSchemaKeys();
-      vector<string> getDataTypes(const vector<string>&, bool);
-      vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
-      string extractJsonValueAflow(const string&, string);
 
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
       void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,

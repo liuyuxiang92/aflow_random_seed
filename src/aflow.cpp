@@ -26,6 +26,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
+#include "aflowlib_entry_loader.h"
 // [OBSOLETE] #include "aflow_aqe.h"
 #include "aflow_makefile.h" //DELETE ME!
 
@@ -56,6 +57,27 @@
 //[OBSOLETE]string AFLOWLogicError::where(){return f_name;}
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
+bool EntryLoaderTest(ostream& oss){ofstream FileMESSAGE;return EntryLoaderTest(FileMESSAGE,oss);}  //CO20200520
+bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
+  string soliloquy="EntryLoaderTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+  
+  message << "Performing EntryLoader test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  string sinput="",soutput="";
+  aurostd::xoption elflags;
+
+  sinput="species(Mn,Pd)";
+
+  aflowlib::EntryLoader el(sinput,elflags,FileMESSAGE,oss);
+  el.retrieveOutput(soutput);
+
+  return true;
+}
 
 bool EgapTest(ostream& oss){ofstream FileMESSAGE;return EgapTest(FileMESSAGE,oss);}  //CO20190520
 bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
@@ -468,6 +490,7 @@ int main(int _argc,char **_argv) {
       //exit(0);
       return 0; //CO20180419
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_EntryLoader|--EntryLoader_test")) {return (EntryLoaderTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601

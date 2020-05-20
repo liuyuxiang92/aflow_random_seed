@@ -4012,14 +4012,14 @@ namespace aflowlib {
 //FR+CO20180329
 namespace aflowlib {
   bool APIget::establish(){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     struct hostent * host = gethostbyname( Domain.c_str() );
 
     //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
 
     if ( (host == NULL) || (host->h_addr == NULL) ) {
-      cerr << "Error retrieving DNS information." << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error retrieving DNS information.",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
-      //exit(1);
     }
 
     bzero(&client, sizeof(client));
@@ -4030,30 +4030,29 @@ namespace aflowlib {
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sock < 0) {
-      cerr << "Error creating socket." << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error creating socket.",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
-      //exit(1);
     }
 
     if ( connect(sock, (struct sockaddr *)&client, sizeof(client)) < 0 ) {
       close(sock);
-      cerr << "Could not connect" << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Could not connect",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
-      //exit(1);
     }
 
+    //do NOT use endl: endl is locale dependent and HTTP standard specifically calls out \r\n
     stringstream ss;
-    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
-    //    cerr << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
+    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n";
     ss << "HOST: " << Domain << "\r\n";
     ss << "Connection: close\r\n";
     ss << "\r\n";
     string request = ss.str();
 
+    if(LDEBUG){cerr << "aflowlib::APIget::establish():" << " request=" << endl;cerr << request << endl;}  //CO20200520
+
     if (send(sock, request.c_str(), request.length(), 0) != (int)request.length()) {
-      cerr << "Error sending request." << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error sending request.",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
-      //exit(1);
     }
     return true;
   }
@@ -4069,19 +4068,21 @@ namespace aflowlib {
     }
   }
   ostream& operator<<( ostream& output, APIget& a ) { 
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     char cur;
     bool responsedata = false;
     bool waslinefeed = false;
     if( a.establish() ) {
       while ( ! responsedata ) { //discard headers
         read(a.sock, &cur, 1);
-        //cerr << cur << ":" << (int)cur << endl;
+        if(LDEBUG){cerr << "aflowlib::APIget::operator<<():" << " cur=" << (int)cur << endl;}
         if( waslinefeed  && cur == '\r') responsedata = true;
         if( cur == '\n' ) waslinefeed = true;
         else waslinefeed = false;
       };
       read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
-      while ( read(a.sock, &cur, 1) > 0 ) output << cur; //cout << cur;
+      while ( read(a.sock, &cur, 1) > 0 ) output << cur;
+      if(LDEBUG){cerr << "aflowlib::APIget::operator<<():" << " cur=" << (int)cur << endl;}
       close(a.sock);
     }
     return output;
@@ -4091,70 +4092,63 @@ namespace aflowlib {
 //DX+FR20190206 - AFLUX functionality via command line - START
 // ***************************************************************************
 namespace aflowlib {
-  string AFLUXCall(aurostd::xoption& vpflow){
-
+  string AFLUXCall(const aurostd::xoption& vpflow){
     // Performs AFLUX call based on summons input from command line
-
-    string usage="aflow --aflux=<summons>";
-    string options="";
-
     if(vpflow.flag("AFLUX::USAGE")) {
+      string usage="aflow --aflux=<summons>";
+      string options="";
       stringstream ss_usage;
       init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
       return ss_usage.str();
     }
 
     string summons = "";
-    if(vpflow.flag("AFLUX")) {
-      summons=vpflow.getattachedscheme("AFLUX");
-      // check if string is enclosed in double or single quotes 
+    if(vpflow.flag("AFLUX::SUMMONS")) { //CO20200520 - AFLUX::SUMMONS
+      summons=vpflow.getattachedscheme("AFLUX::SUMMONS"); //CO20200520 - AFLUX::SUMMONS
+      // check if string is enclosed in double or single quotes
       // (since bash throws error for unprotected parentheses)
-      if((summons[0] == '\"' && summons[summons.size()-1] == '\"') || (summons[0] == '\'' && summons[summons.size()-1] == '\'')){
+      if(!summons.empty() && ((summons[0] == '\"' && summons[summons.size()-1] == '\"') || (summons[0] == '\'' && summons[summons.size()-1] == '\''))){
         summons.erase(summons.begin()); summons.erase(summons.begin()+summons.size()-1);
       }
     }
     return AFLUXCall(summons);
   }
-}
-
-namespace aflowlib {
-  string AFLUXCall(vector<string>& matchbook){
-
+  string AFLUXCall(const vector<string>& matchbook){
     // Performs AFLUX call based on vector of matchbook entries
     string summons = aurostd::joinWDelimiter(matchbook,",");
-
     return AFLUXCall(summons);
   }
-}
-
-namespace aflowlib {
-  string AFLUXCall(string& summons){
-
+  string AFLUXCall(const string& _summons){
     // Performs AFLUX call based on summons input
-
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XHOST.sPID + "AFLUXCall()";
 
     // percent encoding (otherwise it will not work)
     // NOT NEEDED - aurostd::StringSubst(summons,"\'","%27"); // percent encoding for "'" 
+    string summons(_summons);   //CO20200520
     aurostd::StringSubst(summons," ","%20");  // percent encoding for space 
     aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
 
     if(LDEBUG) {
-      cerr << function_name << ": Summons = " << summons << endl;
-      cerr << function_name << ": Peforming call ... please be patient ..." << endl;
+      cerr << function_name << ": Summons=\"" << summons << "\"" << endl;
+      cerr << function_name << ": Performing call ... please be patient ..." << endl;
     }
 
+    //CO20200520 - added attempts and sleep
     aflowlib::APIget API_socket(summons);
-    stringstream response; response << API_socket;
-    return response.str();
-
+    stringstream response_ss;
+    string response_str="";
+    uint attempts=0;
+    while(response_str.empty() && (++attempts)<10){
+      response_ss << API_socket;response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_ss.str());
+      if(attempts>1){aurostd::Sleep(2);}
+    }
+    return response_str;
   }
 }
 
 namespace aflowlib {
-  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response){
-
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response){
     // Puts list of keyword-value pairs into a vector corresponding to each entry
     // Assumes the response format to be "format(aflow)", i.e., "|" delimiter
     // Here, pair.first=<keyword> and pair.second=<value>
@@ -4165,7 +4159,8 @@ namespace aflowlib {
     vector<vector<std::pair<string,string> > > properties_response;
 
     vector<string> entries,fields,key_value;
-    aurostd::string2tokens(response,entries,"\n");
+    aurostd::string2vectorstring(response,entries); //CO20200520
+    //[CO20200520 - OBSOLETE]aurostd::string2tokens(response,entries,"\n");
 
     // for each entry in response
     for(uint e=0;e<entries.size();e++){

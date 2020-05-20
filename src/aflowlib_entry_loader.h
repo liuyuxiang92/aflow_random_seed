@@ -34,6 +34,7 @@ namespace aflowlib {
       bool m_initialized;
       aurostd::xoption m_elflags;
       string m_sinput;
+      _aflags m_aflags; //NOT an input, it's not required, just for directory manipulation
       
       //initializers
       bool initialize(ostream& oss);
@@ -50,6 +51,7 @@ namespace aflowlib {
       bool initialize(const string& sinput,const aurostd::xoption& flags);
 
       //loaders
+      void loadAFlags();  //dummy
       void loadInput(const string& sinput);
       void loadInput(const aurostd::xoption& flags);
       void loadInput(const string& sinput,const aurostd::xoption& flags);
@@ -59,12 +61,13 @@ namespace aflowlib {
       void retrieveOutput(vector<aflowlib::_aflowlib_entry>& entries);
       void retrieveOutput(vector<vector<aflowlib::_aflowlib_entry> >& entries);
       void retrieveOutput(vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
-      
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
       void copy(const EntryLoader& b);
       //NECESSARY END CLASS METHODS - END
+
+      void processInput();
   };
 } // namespace aflowlib
 

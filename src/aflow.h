@@ -2454,12 +2454,14 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
-bool EgapTest(ostream& oss=cout);
-bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool gcdTest(ostream& oss=cout);
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool smithTest(ostream& oss=cout);
-bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool EntryLoaderTest(ostream& oss=cout);  //CO20200520
+bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
+bool EgapTest(ostream& oss=cout); //CO20200520
+bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout); //CO20200520
+bool gcdTest(ostream& oss=cout);  //CO20200520
+bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
+bool smithTest(ostream& oss=cout);  //CO20200520
+bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
