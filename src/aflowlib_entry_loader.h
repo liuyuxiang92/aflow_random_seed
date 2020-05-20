@@ -35,18 +35,31 @@ namespace aflowlib {
       aurostd::xoption m_elflags;
       string m_sinput;
       
-      //initialization methods
-      bool initialize(ostream& oss=cout);
-      bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);
-      bool initialize(const aurostd::xoption& flags,ostream& oss=cout);
-      bool initialize(const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      bool initialize(const string& sinput,ostream& oss=cout);
-      bool initialize(const string& sinput,ofstream& FileMESSAGE,ostream& oss=cout);
-      bool initialize(const string& sinput,const aurostd::xoption& flags,ostream& oss=cout);
-      bool initialize(const string& sinput,const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      //initializers
+      bool initialize(ostream& oss);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const aurostd::xoption& flags,ostream& oss);
+      bool initialize(const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& flags);
+      bool initialize(const string& sinput,ostream& oss);
+      bool initialize(const string& sinput,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& sinput);
+      bool initialize(const string& sinput,const aurostd::xoption& flags,ostream& oss);
+      bool initialize(const string& sinput,const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& sinput,const aurostd::xoption& flags);
+
+      //loaders
+      void loadInput(const string& sinput);
+      void loadInput(const aurostd::xoption& flags);
+      void loadInput(const string& sinput,const aurostd::xoption& flags);
 
       //getters
-      //
+      void retrieveOutput(string& soutput);
+      void retrieveOutput(vector<aflowlib::_aflowlib_entry>& entries);
+      void retrieveOutput(vector<vector<aflowlib::_aflowlib_entry> >& entries);
+      void retrieveOutput(vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
+      
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
