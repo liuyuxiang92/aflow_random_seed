@@ -1226,13 +1226,13 @@ namespace chull {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(),m_initialized(false) {initialize(oss,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(),m_initialized(false) {initialize(coord,oss,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : xStream(),m_initialized(false) {initialize(velements,entry,oss,formation_energy_coord);}
-  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(),m_initialized(false) {initialize(coord,FileMESSAGE,oss,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : xStream(),m_initialized(false) {initialize(velements,entry,FileMESSAGE,oss,formation_energy_coord);}
-  ChullPoint::ChullPoint(const ChullPoint& b) {copy(b);} // copy PUBLIC
+  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : xStream(oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   ChullPoint::~ChullPoint() {xStream::free();free();}
 
@@ -1305,34 +1305,39 @@ namespace chull {
   //void ChullPoint::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
   //void ChullPoint::setOSS(ostream& oss) {p_oss=&oss;}
 
+
   bool ChullPoint::initialize(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(*_p_FileMESSAGE,oss,has_stoich_coords,formation_energy_coord,is_artificial); 
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(has_stoich_coords,formation_energy_coord,is_artificial);
   }
 
   bool ChullPoint::initialize(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(coord,*_p_FileMESSAGE,oss,has_stoich_coords,formation_energy_coord,is_artificial);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);
   }
 
   bool ChullPoint::initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(velements,entry,*_p_FileMESSAGE,oss,formation_energy_coord);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(velements,entry,formation_energy_coord);
   }
 
   bool ChullPoint::initialize(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(has_stoich_coords,formation_energy_coord,is_artificial);
+  }
+
+  bool ChullPoint::initialize(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);
+  }
+
+  bool ChullPoint::initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(velements,entry,formation_energy_coord);
+  }
+
+  bool ChullPoint::initialize(bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
     free();
-    setOFStream(FileMESSAGE); f_new_ofstream=false;
-    setOSS(oss);
     m_has_stoich_coords=has_stoich_coords;
     m_formation_energy_coord=formation_energy_coord;
     m_is_artificial=is_artificial;
@@ -1340,14 +1345,12 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ChullPoint::initialize(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
+  bool ChullPoint::initialize(const xvector<double>& coord,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
     //we start by setting the most general coords, m_coords, relating to highest d-hull
     //then, if we can, we derive stoich and composition coords
     //it may seem "backwards", as stoich and composition are most accesible to entries, but
     //this code is GENERAL (any type of coords, not just energy/stoich)
     free();
-    setOFStream(FileMESSAGE); f_new_ofstream=false;
-    setOSS(oss);
     initializeCoords(coord,formation_energy_coord);
     m_has_stoich_coords=has_stoich_coords;
     if(m_has_stoich_coords){setStoichCoords();}
@@ -1356,14 +1359,12 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ChullPoint::initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) {
+  bool ChullPoint::initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
     //we start by setting the most general coords, m_coords, relating to highest d-hull
     //then, if we can, we derive stoich and composition coords
     //it may seem "backwards", as stoich and composition are most accesible to entries, but
     //this code is GENERAL (any type of coords, not just energy/stoich)
     free();
-    setOFStream(FileMESSAGE); f_new_ofstream=false;
-    setOSS(oss);
     initializeCoords(velements,entry,formation_energy_coord);
     m_has_stoich_coords=true;
     setStoichCoords();
@@ -1699,9 +1700,9 @@ namespace chull {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  ChullFacet::ChullFacet(ostream& oss) : xStream(),m_initialized(false) {create(oss);}
-  ChullFacet::ChullFacet(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {create(FileMESSAGE,oss);}
-  ChullFacet::ChullFacet(const ChullFacet& b) {copy(b);} // copy PUBLIC
+  ChullFacet::ChullFacet(ostream& oss) : xStream(oss),m_initialized(false) {free();}
+  ChullFacet::ChullFacet(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {free();}
+  ChullFacet::ChullFacet(const ChullFacet& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
   ChullFacet::~ChullFacet() {xStream::free();free();}
 
   const ChullFacet& ChullFacet::operator=(const ChullFacet& other) {
@@ -1928,18 +1929,18 @@ namespace chull {
     return vi;
   }
 
-  void ChullFacet::create(ostream& oss) { //this it NOT an initialization, as we do this piece by piece
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    create(*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-  }
+  //[CO20200508 - OBSOLETE]void ChullFacet::create(ostream& oss) { //this it NOT an initialization, as we do this piece by piece
+  //[CO20200508 - OBSOLETE]  xStream::free();
+  //[CO20200508 - OBSOLETE]  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  //[CO20200508 - OBSOLETE]  create(*_p_FileMESSAGE,oss);
+  //[CO20200508 - OBSOLETE]  f_new_ofstream=true;  //override
+  //[CO20200508 - OBSOLETE]}
 
-  void ChullFacet::create(ofstream& FileMESSAGE,ostream& oss) { //this it NOT an initialization, as we do this piece by piece
-    xStream::free();
-    setOFStream(FileMESSAGE); f_new_ofstream=false;
-    setOSS(oss);
-  }
+  //[CO20200508 - OBSOLETE]void ChullFacet::create(ofstream& FileMESSAGE,ostream& oss) { //this it NOT an initialization, as we do this piece by piece
+  //[CO20200508 - OBSOLETE]  xStream::free();
+  //[CO20200508 - OBSOLETE]  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  //[CO20200508 - OBSOLETE]  setOSS(oss);
+  //[CO20200508 - OBSOLETE]}
 
   //MOVED TO xStream
   //void ChullFacet::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
@@ -2492,35 +2493,35 @@ namespace chull {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  ConvexHull::ConvexHull(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);}
-  ConvexHull::ConvexHull(string alloy,ostream& oss) : xStream(),m_initialized(false) {initialize(alloy,oss);}
-  ConvexHull::ConvexHull(const vector<string>& velements,ostream& oss) : xStream(),m_initialized(false) {initialize(velements,oss);}
-  ConvexHull::ConvexHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss) : xStream(),m_initialized(false) {initialize(velements,entries,oss);}
-  ConvexHull::ConvexHull(const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vcoords,oss,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpoints,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpoints,velements,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(string alloy,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(alloy,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(velements,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(velements,entries,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vcoords,FileMESSAGE,oss,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpoints,FileMESSAGE,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpoints,velements,FileMESSAGE,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,string alloy,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,alloy,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,velements,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,velements,entries,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpflow,vcoords,oss,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpflow,vpoints,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpflow,vpoints,velements,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,string alloy,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,alloy,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,velements,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(vpflow,velements,entries,FileMESSAGE,oss);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpflow,vcoords,FileMESSAGE,oss,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpflow,vpoints,FileMESSAGE,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(),m_initialized(false) {initialize(vpflow,vpoints,velements,FileMESSAGE,oss,formation_energy_hull,add_artificial_unaries);}
-  ConvexHull::ConvexHull(const ConvexHull& b) {copy(b);}
+  ConvexHull::ConvexHull(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
+  ConvexHull::ConvexHull(const string& alloy,ostream& oss) : xStream(oss),m_initialized(false) {initialize(alloy);}
+  ConvexHull::ConvexHull(const vector<string>& velements,ostream& oss) : xStream(oss),m_initialized(false) {initialize(velements);}
+  ConvexHull::ConvexHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss) : xStream(oss),m_initialized(false) {initialize(velements,entries);}
+  ConvexHull::ConvexHull(const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(oss),m_initialized(false) {initialize(vcoords,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(oss),m_initialized(false) {initialize(vpoints,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(oss),m_initialized(false) {initialize(vpoints,velements,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  ConvexHull::ConvexHull(const string& alloy,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(alloy);}
+  ConvexHull::ConvexHull(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(velements);}
+  ConvexHull::ConvexHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(velements,entries);}
+  ConvexHull::ConvexHull(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vcoords,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpoints,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpoints,velements,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const string& alloy,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow,alloy);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow,velements);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow,velements,entries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(oss),m_initialized(false) {initialize(vpflow,vcoords,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(oss),m_initialized(false) {initialize(vpflow,vpoints,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(oss),m_initialized(false) {initialize(vpflow,vpoints,velements,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const string& alloy,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,alloy);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,velements);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,velements,entries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,vcoords,has_stoich_coords,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,vpoints,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,vpoints,velements,formation_energy_hull,add_artificial_unaries);}
+  ConvexHull::ConvexHull(const ConvexHull& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);}
 
   ConvexHull::~ConvexHull() {xStream::free();free();}
 
@@ -2592,66 +2593,78 @@ namespace chull {
   }
 
   bool ConvexHull::initialize(ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize();
   }
 
-  bool ConvexHull::initialize(string alloy,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(alloy,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+  bool ConvexHull::initialize(const string& alloy,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(alloy);
   }
 
   bool ConvexHull::initialize(const vector<string>& velements,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(velements,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(velements);
   }
 
   bool ConvexHull::initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(velements,entries,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(velements,entries);
   }
 
   bool ConvexHull::initialize(const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vcoords,*_p_FileMESSAGE,oss,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
   }
 
   bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpoints,*_p_FileMESSAGE,oss,formation_enthalpy_hull,add_artificial_unaries);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpoints,formation_enthalpy_hull,add_artificial_unaries);
   }
 
   bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpoints,velements,*_p_FileMESSAGE,oss,formation_enthalpy_hull,add_artificial_unaries);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
   }
 
   bool ConvexHull::initialize(ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
+
+  bool ConvexHull::initialize(const string& alloy,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(alloy);
+  }
+
+  bool ConvexHull::initialize(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(velements);
+  }
+
+  bool ConvexHull::initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(velements,entries);
+  }
+
+  bool ConvexHull::initialize(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
+  }
+
+  bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpoints,formation_enthalpy_hull,add_artificial_unaries);
+  }
+
+  bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
+  }
+
+  bool ConvexHull::initialize() {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
       m_initialized=false;  //no points
@@ -2660,11 +2673,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(string alloy,ofstream& FileMESSAGE,ostream& oss) {
+  bool ConvexHull::initialize(const string& alloy) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
     }
@@ -2672,11 +2683,9 @@ namespace chull {
     return createHull(alloy);
   }
 
-  bool ConvexHull::initialize(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) {
+  bool ConvexHull::initialize(const vector<string>& velements) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
     }
@@ -2684,11 +2693,9 @@ namespace chull {
     return createHull(velements);
   }
 
-  bool ConvexHull::initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) {
+  bool ConvexHull::initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
     }
@@ -2696,11 +2703,9 @@ namespace chull {
     return createHull(velements,entries);
   }
 
-  bool ConvexHull::initialize(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+  bool ConvexHull::initialize(const vector<xvector<double> >& vcoords,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
     }
@@ -2708,11 +2713,9 @@ namespace chull {
     return createHull(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
   }
 
-  bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+  bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,bool formation_enthalpy_hull,bool add_artificial_unaries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
     }
@@ -2720,11 +2723,9 @@ namespace chull {
     return createHull(vpoints,formation_enthalpy_hull,add_artificial_unaries);
   }
 
-  bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+  bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,bool formation_enthalpy_hull,bool add_artificial_unaries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setDefaultCFlags();
       setDirectory();
     }
@@ -2733,66 +2734,78 @@ namespace chull {
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpflow);
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,string alloy,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,alloy,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const string& alloy,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(vpflow,alloy);
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,velements,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpflow,velements);
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,velements,entries,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpflow,velements,entries);
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,vcoords,*_p_FileMESSAGE,oss,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpflow,vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,vpoints,*_p_FileMESSAGE,oss,formation_enthalpy_hull,add_artificial_unaries);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpflow,vpoints,formation_enthalpy_hull,add_artificial_unaries);
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(vpflow,vpoints,velements,*_p_FileMESSAGE,oss,formation_enthalpy_hull,add_artificial_unaries);
-    f_new_ofstream=true;  //override
-    return m_initialized;
+    xStream::initialize(oss);
+    return initialize(vpflow,vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
   }
 
   bool ConvexHull::initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const string& alloy,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow,alloy);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow,velements);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow,velements,entries);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow,vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow,vpoints,formation_enthalpy_hull,add_artificial_unaries);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow,vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
+  }
+
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=false;  //no points
@@ -2801,11 +2814,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,string alloy,ofstream& FileMESSAGE,ostream& oss) {
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const string& alloy) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=createHull(alloy);
@@ -2814,11 +2825,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) {
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=createHull(velements);
@@ -2827,11 +2836,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss) {
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=createHull(velements,entries);
@@ -2840,11 +2847,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=createHull(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
@@ -2853,11 +2858,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,bool formation_enthalpy_hull,bool add_artificial_unaries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=createHull(vpoints,formation_enthalpy_hull,add_artificial_unaries);
@@ -2866,11 +2869,9 @@ namespace chull {
     return m_initialized;
   }
 
-  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries) {
+  bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,bool formation_enthalpy_hull,bool add_artificial_unaries) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setCFlags(vpflow);
       setDirectory();
       m_initialized=createHull(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
@@ -2879,7 +2880,7 @@ namespace chull {
     return m_initialized;
   }
 
-  void ConvexHull::initializePoints(string alloy){
+  void ConvexHull::initializePoints(const string& alloy){
     loadPoints(alloy);
     structurePoints();
   }
@@ -3224,7 +3225,7 @@ namespace chull {
   //void ConvexHull::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
   //void ConvexHull::setOSS(ostream& oss) {p_oss=&oss;}
 
-  bool ConvexHull::createHull(string alloy) {
+  bool ConvexHull::createHull(const string& alloy) {
     try{
       initializePoints(alloy);
       checkStructurePoints(); //some nice checks that everything checks out
@@ -3424,7 +3425,7 @@ namespace chull {
     return true;
   }
 
-  void ConvexHull::loadPoints(string alloy) {
+  void ConvexHull::loadPoints(const string& alloy) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy = XHOST.sPID + "ConvexHull::loadPoints():";
     if(LDEBUG) {cerr << soliloquy << " initializing alloy, compound=" << alloy << endl;}

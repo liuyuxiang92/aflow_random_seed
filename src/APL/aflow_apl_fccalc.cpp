@@ -28,21 +28,19 @@ static const string _APL_FCCALC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
-  ForceConstantCalculator::ForceConstantCalculator(ostream& oss) {
+  ForceConstantCalculator::ForceConstantCalculator(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
     _directory = "./";
   }
 
-  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, ofstream& mf, ostream& oss) {
+  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
     _supercell = &sc;
     _sc_set = true;
-    xStream::initialize(mf, oss);
     _directory = "./";
   }
 
-  ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
+  ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
     copy(that);
   }

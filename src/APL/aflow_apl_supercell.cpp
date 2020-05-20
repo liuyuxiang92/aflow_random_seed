@@ -20,33 +20,29 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  Supercell::Supercell(ostream& oss) : xStream() {
+  Supercell::Supercell(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
   }
 
-  Supercell::Supercell(ofstream& mf, ostream& oss) : xStream() {
+  Supercell::Supercell(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
   }
 
   //ME20200102 - Refactored
-  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, const string& directory, ostream& oss) : xStream() {  //CO20181226
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {  //CO20181226
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(_xstr);
   }
 
   //ME20200212 - read from a state file
-  Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) {
+  Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     readFromStateFile(filename);
   }
 
-  Supercell::Supercell(const Supercell& that) {
+  Supercell::Supercell(const Supercell& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
     copy(that);
   }

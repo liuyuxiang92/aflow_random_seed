@@ -2030,16 +2030,15 @@ const _xqsub& _xqsub::operator=(const _xqsub& b) {  // operator=
 // look into aflow.h for the definitions
 
 // constructors
-xStream::xStream() : p_FileMESSAGE(NULL),f_new_ofstream(false) {} //{free();}
-xStream::~xStream() {free();} //{freeAll();} //CO20190318
-//void xStream::free() {} //CO20190318 - not necessary
+xStream::xStream(ostream& oss) : p_FileMESSAGE(NULL),f_new_ofstream(false) {initialize(oss);} //{free();}
+xStream::xStream(ofstream& ofs,ostream& oss) : p_FileMESSAGE(NULL),f_new_ofstream(false) {initialize(ofs,oss);} //{free();}
+xStream::~xStream() {free();} //CO20190318
 void xStream::free() {
-  p_oss=NULL;
   if(f_new_ofstream) {delete p_FileMESSAGE;}  //first delete, then set to null
   p_FileMESSAGE=NULL;
   f_new_ofstream=false;
+  p_oss=NULL;
 }
-//void xStream::freeAll() {free();free();}  //CO20190318 - not necessary
 void xStream::copy(const xStream& b) {
   //must handle this very carefully
   //first, since we are interested in copying the stream from b, we must delete the new pointer of self (if it's new)
@@ -2047,30 +2046,27 @@ void xStream::copy(const xStream& b) {
   //simply create a new one, and declare it as such
   //p_FileMESSAGE=b.p_FileMESSAGE;
   free();
-  p_oss=b.p_oss;
   if(b.f_new_ofstream) {p_FileMESSAGE=(new ofstream());}
-  else {p_FileMESSAGE=b.p_FileMESSAGE;}
+  else {setOFStream(*b.p_FileMESSAGE);}  //p_FileMESSAGE=b.p_FileMESSAGE;
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
+  setOSS(*b.p_oss); //p_oss=b.p_oss;
 }
 ostream* xStream::getOSS() const {return p_oss;} //CO20191110
 ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE) {p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
-
-//ME20200427 - Initializer functions
+//ME20200427 START - Initializer functions
 void xStream::initialize(ostream& oss) {
   free();
-  p_FileMESSAGE = new ofstream();
-  f_new_ofstream = true;
-  initialize(*p_FileMESSAGE, oss);
-  f_new_ofstream = true;  // override
+  p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*p_FileMESSAGE,oss);
+  f_new_ofstream=true;  // override
 }
-
-void xStream::initialize(ofstream& ofs, ostream& oss) {
-  setOFStream(ofs);
-  f_new_ofstream = false;
+void xStream::initialize(ofstream& ofs,ostream& oss) {
+  setOFStream(ofs);f_new_ofstream=false;
   setOSS(oss);
 }
+//ME20200427 STOP - Initializer functions
 
 #endif  // _AFLOW_CLASSES_CPP
 

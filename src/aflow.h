@@ -78,7 +78,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 "";
 
 //MESSAGE defaults - CO20200502
-#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,tid,time"
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -1841,7 +1841,8 @@ class xStream {
   public:
     //NECESSARY PUBLIC CLASS METHODS - START
     //constructors - START
-    xStream();
+    xStream(ostream& oss=cout);
+    xStream(ofstream& ofs,ostream& oss=cout);
     //constructors - STOP
     ~xStream();
     //NECESSARY PUBLIC CLASS METHODS - END
@@ -1851,12 +1852,10 @@ class xStream {
     ofstream* getOFStream() const; //CO20191110
   protected:
     //NECESSARY private CLASS METHODS - START
-    //void free();  //CO20190318 - not necessary
     void free();
-    //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
-    void initialize(ostream&);  //ME20200427
-    void initialize(ofstream&, ostream&);  //ME20200427
+    void initialize(ostream& oss=cout);  //ME20200427
+    void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
@@ -2995,7 +2994,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     xOUTCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN, bool=TRUE);  //ME20200427
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
 
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
     ~xOUTCAR();                                                   // kill everything
@@ -3155,6 +3156,8 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     xDOSCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xDOSCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
 
     xDOSCAR(const xDOSCAR& b);                                    // constructor copy
@@ -3227,6 +3230,8 @@ class xEIGENVAL : public xStream { //CO20200404 - xStream integration for loggin
     xEIGENVAL(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
 
     xEIGENVAL(const xEIGENVAL& b);                                // constructor copy
@@ -3268,6 +3273,8 @@ class xPOTCAR : public xStream { //CO20200404 - xStream integration for logging
     xPOTCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
 
     ~xPOTCAR();                                                   // kill everything
@@ -3446,6 +3453,8 @@ class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integratio
     xQMVASP(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
 
     ~xQMVASP();                                                    // kill everything

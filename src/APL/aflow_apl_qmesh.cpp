@@ -27,34 +27,30 @@ static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 namespace apl {
 
   // Default Constructor
-  QMesh::QMesh(ostream& oss) : xStream() {
+  QMesh::QMesh(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
   }
 
-  QMesh::QMesh(ofstream& mf, ostream& oss) : xStream() {
+  QMesh::QMesh(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
   }
 
   QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream() {
+      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(grid, xs, include_inversions, gamma_centered);
   }
 
   QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream() {
+      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
 
   // Copy constructors
-  QMesh::QMesh(const QMesh& that) {
+  QMesh::QMesh(const QMesh& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
     copy(that);
   }
