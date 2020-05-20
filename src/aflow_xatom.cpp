@@ -4474,7 +4474,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     bool bohr_lat = false;   //DX20180215 - added bohr for lattice
     bool bohr_pos = false;   //DX20180215 - added bohr for positions
     bool alat = false;   //DX20180215 - added alat
-    uint iline,jline;
+    uint iline = 0, jline = 0;
     iline=vinput.size();
     //DX20180123 - added nat - START
     for(uint i=0;i<vinput.size();i++){ 

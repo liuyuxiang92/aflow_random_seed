@@ -1192,7 +1192,7 @@ namespace pflow {
       // Read/write atomic environments file
 
       if(AE_file_read != "none"){
-        uint count, line_count;
+        uint count = 0, line_count = 0;
         stringstream AE_file_read_sstr;
         aurostd::file2stringstream(AE_file_read,AE_file_read_sstr);
         vector<string> AE_file_read_vstr;

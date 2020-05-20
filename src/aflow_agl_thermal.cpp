@@ -44,14 +44,14 @@ namespace AGL_functions {
   uint self_consistent_debye (double& Temperature, vector<double>& polynomialcoeffs, vector<double>& polynomialerror, vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, uint& imin, bool firsttime, vector<double>& press_stat, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
     double eps = 5.0;
     int mloops = 25;
-    bool converged;
-    double theta0, theta;
-    double DebyeIntegral, DebyeIntegralerror, UIntEnergy, Cvt, F_Helmholtz, S_Entropy;
-    uint itry;
+    bool converged = false;
+    double theta0 = 0.0, theta = 0.0;
+    double DebyeIntegral = 0.0, DebyeIntegralerror = 0.0, UIntEnergy = 0.0, Cvt = 0.0, F_Helmholtz = 0.0, S_Entropy = 0.0;
+    uint itry = 0;
     uint ierr = 0;
     uint aglerror = 0;
-    double dFdx, d2Fdx2, plnv;
-    double pressure_F, bulkmodT, mie_gruneisen, bulkmodstV, delta_theta;
+    double dFdx = 0.0, d2Fdx2 = 0.0, plnv = 0.0;
+    double pressure_F = 0.0, bulkmodT = 0.0, mie_gruneisen = 0.0, bulkmodstV = 0.0, delta_theta = 0.0;
     ostringstream aus;
     // If in static part of algorithm (before temperature loop), then calculates static pressures
     if(firsttime) {

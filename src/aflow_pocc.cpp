@@ -5024,7 +5024,7 @@ namespace pocc {
     //cerr << "START, n=" << pocc_groups_count << ",k=" << i_hnf << endl;
     int pocc_group_iterator=0;    //current group impacted
     int pocc_group_to_skip=-1;    //slight optimizer, if occupation_number hits i_hnf early, skip remaining possibilities
-    bool skipping;                //needed for resetting pocc_group_to_skip
+    bool skipping = false;        //needed for resetting pocc_group_to_skip
 
     double eps=1.0;
     xvector<int> xv_next_occupation_multiple=site_config.xv_occupation_multiple;

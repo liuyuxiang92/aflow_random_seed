@@ -3798,8 +3798,8 @@ namespace AGL_functions {
         }
 
         // Finds temperature value which is closest to the user's value of the Debye temperature to get the equilibrium volume
-        double difftdU, difftdminU;
-        int jtdbestU;
+        double difftdU = 0.0, difftdminU = 0.0;
+        int jtdbestU = 0;
         difftdminU = aurostd::abs(thetaU - AGL_data.temperature_external.at(0));
         for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
           difftdU = aurostd::abs(thetaU - AGL_data.temperature_external.at(j));
