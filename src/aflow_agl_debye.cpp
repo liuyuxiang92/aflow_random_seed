@@ -2355,15 +2355,15 @@ namespace AGL_functions {
         int idVaspRun = vaspRuns.size()-1;
 
         // Set up name of separate directory for AFLOW run for each strained structure
-        string stridVaspRun;
+        // [OBSOLETE] string stridVaspRun;
         ostringstream cnvidVaspRun;
         cnvidVaspRun << idVaspRun;
-        stridVaspRun = cnvidVaspRun.str();
+        string stridVaspRun = cnvidVaspRun.str();
 
-        string strstrainfactor;
+        // [OBSOLETE] string strstrainfactor;
         ostringstream cnvstrainfactor;
         cnvstrainfactor << strainfactor;
-        strstrainfactor = cnvstrainfactor.str();
+        string strstrainfactor = cnvstrainfactor.str();
 
         // [OBSOLETE] string runname;
         if(USER_DIRNAME_ARUN.option) {
@@ -2493,7 +2493,8 @@ namespace AGL_functions {
         // If a minimum is found, the value of cm is set to 0
         // If the lowest energy corresponds to the smallest volume, the value of cm is set to 1
         // If the lowest energy corresponds to the largest volume, the value of cm is set to 2
-        int cm;
+	// Default to assuming that minimum is present to avoid running unnecessary additional calculations
+        int cm = 0;
         aglerror = AGL_functions::checkmin(AGL_data, cm, FileMESSAGE);
         if(aglerror != 0) {
           aurostd::StringstreamClean(aus);
@@ -2531,14 +2532,14 @@ namespace AGL_functions {
           strainedstructure.InflateLattice(strainfactor);
           vaspRuns.push_back(vaspRun);
           int idVaspRun = vaspRuns.size()-1;
-          string stridVaspRun;
+          // [OBSOLETE] string stridVaspRun;
           ostringstream cnvidVaspRun;
           cnvidVaspRun << idVaspRun;
-          stridVaspRun = cnvidVaspRun.str();
-          string strstrainfactor;
+          string stridVaspRun = cnvidVaspRun.str();
+          // [OBSOLETE] string strstrainfactor;
           ostringstream cnvstrainfactor;
           cnvstrainfactor << strainfactor;
-          strstrainfactor = cnvstrainfactor.str();
+          string strstrainfactor = cnvstrainfactor.str();
           // [OBSOLETE] string runname;
           if(USER_DIRNAME_ARUN.option) {
             // [OBSOLETE] runname = _ARAGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor;
@@ -2690,14 +2691,14 @@ namespace AGL_functions {
           strainedstructure.InflateLattice(strainfactor);
           vaspRuns.push_back(vaspRun);
           int idVaspRun = vaspRuns.size()-1;
-          string stridVaspRun;
+          // [OBSOLETE] string stridVaspRun;
           ostringstream cnvidVaspRun;
           cnvidVaspRun << idVaspRun;
-          stridVaspRun = cnvidVaspRun.str();
-          string strstrainfactor;
+          string stridVaspRun = cnvidVaspRun.str();
+          // [OBSOLETE] string strstrainfactor;
           ostringstream cnvstrainfactor;
           cnvstrainfactor << strainfactor;
-          strstrainfactor = cnvstrainfactor.str();
+          string strstrainfactor = cnvstrainfactor.str();
           // [OBSOLETE] string runname;
           if(USER_DIRNAME_ARUN.option) {
             // [OBSOLETE] runname = _ARAGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor;
@@ -2824,7 +2825,8 @@ namespace AGL_functions {
         // The function "checkconcav" checks the concavity of the (E, V) data
         // If the data is concave, it sets cc = 0
         // If the data is not concave, it sets cc = 1
-        int cc;
+	// Initialize to 0 so that default assumption is that data is concave to avoid running unnecessary additional calculations
+        int cc = 0;
         aglerror = AGL_functions::checkconcav(AGL_data, cc, FileMESSAGE);
         if(aglerror != 0) {
           aurostd::StringstreamClean(aus);
@@ -2845,10 +2847,10 @@ namespace AGL_functions {
               return aglerror;
             }
             vaspRuns.at(idVaspRun).AVASP_value_KPPRA = vaspRuns.at(idVaspRun).AVASP_value_KPPRA * 2;
-            string strkppra;
+            // [OBSOLETE] string strkppra;
             ostringstream cnvkppra;
             cnvkppra << vaspRuns.at(idVaspRun).AVASP_value_KPPRA;
-            strkppra = cnvkppra.str();
+            string strkppra = cnvkppra.str();
             vaspRuns.at(idVaspRun).Directory = vaspRuns.at(idVaspRun).Directory + "_K_" + strkppra;	    
           }
           aurostd::StringstreamClean(aus);
@@ -3438,7 +3440,7 @@ namespace AGL_functions {
       // Checks that number of volumes as a function of pressure is equal to number of pressures
       if(AGL_data.VolumeStaticPressure.size() == AGL_data.StaticPressure.size()) {
         // Prints volume as a function of pressure
-        double volumefactor;
+        double volumefactor = 1.0;
         for (uint i = 0; i < AGL_data.VolumeStaticPressure.size(); i++) {
           volumefactor = AGL_data.VolumeStaticPressure.at(i) / initialvolume;
           AGL_data.VolumeFactors.push_back(volumefactor);
@@ -3647,8 +3649,9 @@ namespace AGL_functions {
       }
 
       // Finds temperature value which produces Debye temperature which is closest to the value which produces the best fit to the heat capacity data
-      double difftd, difftdmin;
-      difftdmin = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(0));
+      // [OBSOLETE] double difftd, difftdmin;
+      double difftdmin = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(0));
+      double difftd = difftdmin;
       for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
         difftd = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(j));
         if(difftd < difftdmin) {
@@ -3774,18 +3777,18 @@ namespace AGL_functions {
       // This is useful for testing and debugging where experimental values are available
       // [OBSOLETE] if(USER_THETA_COND.isflag("THETA_EQUAL") && USER_GRUNEISEN.isflag("GRUNEISEN_EQUAL"))
       if(USER_THETA_COND.flag("THETA_EQUAL") && USER_GRUNEISEN.flag("GRUNEISEN_EQUAL")) {  
-        double kappaU;
+        double kappaU = 0.0;
         vector<double> kappaTU;
         double gammaU = USER_GRUNEISEN.getattachedutype<double>("GRUNEISEN_EQUAL");
-        double thetaU = USER_THETA_COND.getattachedutype<double>("THETA_EQUAL");\
-                        // Check that values are not zero or negative; warn user and reset to default values if they are zero or negative
-                        if(gammaU < tolzero) {
-                          aurostd::StringstreamClean(aus);
-                          aus << _AGLSTR_WARNING_ + "User Gruneisen parameter = " << gammaU << " <= 0.0" << endl;  
-                          gammaU = 2.0;
-                          aus << _AGLSTR_WARNING_ + "Increasing Gruneisen parameter to default value of " << gammaU << endl;
-                          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                        }
+        double thetaU = USER_THETA_COND.getattachedutype<double>("THETA_EQUAL");
+	// Check that values are not zero or negative; warn user and reset to default values if they are zero or negative
+	if(gammaU < tolzero) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AGLSTR_WARNING_ + "User Gruneisen parameter = " << gammaU << " <= 0.0" << endl;  
+	  gammaU = 2.0;
+	  aus << _AGLSTR_WARNING_ + "Increasing Gruneisen parameter to default value of " << gammaU << endl;
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	}
         if(thetaU < tolzero) {
           aurostd::StringstreamClean(aus);
           aus << _AGLSTR_WARNING_ + "User Debye temperature = " << thetaU << " <= 0.0" << endl;  
