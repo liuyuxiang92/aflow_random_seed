@@ -7536,7 +7536,7 @@ namespace chull {
     stringstream num_ss;
 
     // initializing some strings
-    string main_TEX_file = "", main_PDF_file, main_PNG_file;
+    string main_TEX_file = "", main_PDF_file = "", main_PNG_file = "";
     string main_file = "", main_output_file = "";
     string input = "",input_hyphened = "";
 

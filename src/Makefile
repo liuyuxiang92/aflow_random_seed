@@ -38,12 +38,10 @@ CPP=g++
 # for sqllite
 CC=gcc
 ARCH=
-WUNINITIALIZED=-Wmaybe-uninitialized
 ifeq ($(UNAME),Darwin)
 CPP=clang++
 CC=clang
 ARCH=-D_MACOSX_
-WUNINITIALIZED=-Wuninitialized
 endif
 
 
@@ -56,9 +54,9 @@ endif
 #CCFLAGS= -DCYGWIN -Wall -W -fno-inline
 #ME20200520 - need to add assembler flags for Cygwin or aurostd.o won't compile
 ifeq ($(OS), Windows_NT)
-CCFLAGS=-Wall -W -fno-inline $(WUNINITIALIZED) -Wa,-mbig-obj
+CCFLAGS=-Wall -W -fno-inline -Wa,-mbig-obj
 else
-CCFLAGS=-Wall -W -fno-inline $(WUNINITIALIZED)
+CCFLAGS=-Wall -W -fno-inline
 endif
 #ME20200514 - Allow inlining for threaded files (big performance penalty otherwise)
 CCFLAGS_MT=-Wall -W $(WUNINITIALIAZED)
