@@ -38,10 +38,12 @@ CPP=g++
 # for sqllite
 CC=gcc
 ARCH=
+WUNINITIALIAZED=-Wmaybe-uninitialized
 ifeq ($(UNAME),Darwin)
 CPP=clang++
 CC=clang
 ARCH=-D_MACOSX_
+WUNINITIALIAZED=-Wuninitialized
 endif
 
 
@@ -52,9 +54,9 @@ endif
 #CPP=g++ -std=c++0x-4.7 -std=c++0x
 # -std=gnu++0x
 #CCFLAGS= -DCYGWIN -Wall -W -fno-inline
-CCFLAGS=-Wall -W -fno-inline -Wmaybe-uninitialized
+CCFLAGS=-Wall -W -fno-inline $(WUNINITIALIAZED)
 #ME20200514 - Allow inlining for threaded files (big performance penalty otherwise)
-CCFLAGS_MT=-Wall -W -Wmaybe-uninitialized
+CCFLAGS_MT=-Wall -W $(WUNINITIALIAZED)
 #[CO20191217 - put in OPTS_MT]CCFLAGS_MT=$(CCFLAGS) -O2
 #CCFLAGS_GSA=$(CCFLAGS) -O1	#CO OBSOLETE 170601
 INCLUDE = -I ./
@@ -193,7 +195,10 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
 #[CO20200508 - do not include AFLOW*.h or AUROSTD*.cpp/AUROSTD*.h].cpp.o: .cpp .h $(MFS) $(AFLOW_HPPS) $(AUROSTD_HPPS) $(AUROSTD_CPPS)
-.cpp.o: .cpp .h Makefile
+#[CO20200508 - addressing: warning: ignoring prerequisites on suffix rule definition].cpp.o: .cpp .h Makefile
+%.o: %.cpp %.h Makefile
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+%.o: %.cpp Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
