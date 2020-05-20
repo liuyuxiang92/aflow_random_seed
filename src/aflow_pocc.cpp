@@ -54,7 +54,7 @@ namespace pocc {
   //temporary function to replace KY's code, but should never be called
   //does NOT handle aflow.in generation well at all
   bool poccInput() {
-    string soliloquy="pocc::poccInput():";
+    string soliloquy = XHOST.sPID + "pocc::poccInput():";
     stringstream message;
 
     //streams
@@ -96,7 +96,7 @@ namespace pocc {
 
 namespace KBIN {
   void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE) {
-    string soliloquy="KBIN::VASP_RunPOCC():";
+    string soliloquy = XHOST.sPID + "KBIN::VASP_RunPOCC():";
     stringstream message;
     ostream& oss=cout;
 
@@ -124,7 +124,7 @@ namespace pocc {
   string POCC_MINIMUM_CONFIGURATION(const aurostd::xoption& vpflow){return POCC_MINIMUM_CONFIGURATION(vpflow.getattachedscheme("POCC_MINIMUM_CONFIGURATION"));}
   string POCC_MINIMUM_CONFIGURATION(const string& directory){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::POCC_MINIMUM_CONFIGURATION():";
+    string soliloquy = XHOST.sPID + "pocc::POCC_MINIMUM_CONFIGURATION():";
 
     if(!aurostd::IsDirectory(directory)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Directory="+directory+" does not exist",_FILE_NOT_FOUND_);}
     vector<string> ls_contents;
@@ -167,7 +167,7 @@ namespace pocc {
 namespace pocc {
   bool structuresGenerated(const string& directory){return aurostd::EFileNotEmpty(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);}
   xstructure extractPARTCAR(const string& AflowIn){
-    string soliloquy="pocc::extractPARTCAR():";
+    string soliloquy = XHOST.sPID + "pocc::extractPARTCAR():";
     stringstream ss_pocc_structure;
     aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
     if(ss_pocc_structure.str().empty()){
@@ -185,7 +185,7 @@ namespace pocc {
   }
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& site_config_index_str){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::parsePOccHashFromXStructureTitle():";
+    string soliloquy = XHOST.sPID + "pocc::parsePOccHashFromXStructureTitle():";
     if(LDEBUG){cerr << soliloquy << " title=" << title << endl;}
     vector<string> vtokens,vtokens2;
     string tmp_str;
@@ -240,7 +240,7 @@ namespace pocc {
   }
   unsigned long long int getDGFromXStructureTitle(const string& title){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getDGFromXStructureTitle():";
+    string soliloquy = XHOST.sPID + "pocc::getDGFromXStructureTitle():";
     if(!aurostd::substring2bool(title,"DG=")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"DG=\" not found in title [title=\""+title+"\"]",_FILE_CORRUPT_);}
     unsigned long long int dg=1;
     vector<string> vtokens,vtokens2;
@@ -258,7 +258,7 @@ namespace pocc {
   }
   void parsePropertyByTag(const string& line,const string& tag,double& prop){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::parsePropertyByTag():";
+    string soliloquy = XHOST.sPID + "pocc::parsePropertyByTag():";
     vector<string> vtokens;
     aurostd::string2tokens(line,vtokens,"=");
     if(vtokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown "+tag+" line format",_FILE_CORRUPT_);}
@@ -267,7 +267,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " " << tag << "=" << prop << endl;}
   }
   bool patchStructuresAllFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss){
-    string soliloquy="pocc::patchStructuresAllFile():";
+    string soliloquy = XHOST.sPID + "pocc::patchStructuresAllFile():";
     bool found_file=false;
     if(!found_file && aurostd::EFileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,structures_file)){aurostd::efile2stringstream(structures_file,structures_file_ss);found_file=true;}
     if(!found_file && aurostd::FileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,structures_file)){aurostd::file2stringstream(structures_file,structures_file_ss);found_file=true;}
@@ -280,7 +280,7 @@ namespace pocc {
   }
   bool patchStructuresAllFile(stringstream& structures_file_ss){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::patchStructuresAllFile():";
+    string soliloquy = XHOST.sPID + "pocc::patchStructuresAllFile():";
     stringstream message;
     vector<string> vlines,vtokens,vtokens2;
     string pocc_hash="";
@@ -401,7 +401,7 @@ namespace pocc {
   }
 
   bool patchStructuresUniqueFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss){
-    string soliloquy="pocc::patchStructuresUniqueFile():";
+    string soliloquy = XHOST.sPID + "pocc::patchStructuresUniqueFile():";
     bool found_file=false;
     if(!found_file && aurostd::EFileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,structures_file)){aurostd::efile2stringstream(structures_file,structures_file_ss);found_file=true;}
     if(!found_file && aurostd::FileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,structures_file)){aurostd::file2stringstream(structures_file,structures_file_ss);found_file=true;}
@@ -414,7 +414,7 @@ namespace pocc {
   }
   bool patchStructuresUniqueFile(stringstream& structures_file_ss){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::patchStructuresUniqueFile():";
+    string soliloquy = XHOST.sPID + "pocc::patchStructuresUniqueFile():";
     stringstream message;
     vector<string> vlines;
     string pocc_hash="";
@@ -471,7 +471,7 @@ namespace pocc {
 
   void patchStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::patchStructuresFile():";
+    string soliloquy = XHOST.sPID + "pocc::patchStructuresFile():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -480,7 +480,7 @@ namespace pocc {
     string structures_file="";
     stringstream structures_file_ss;
     if(patchStructuresAllFile(aflags,structures_file,structures_file_ss,FileMESSAGE,oss)){
-      message << "Writing out patched " << POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "Writing out patched " << POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       string structures_file_new=structures_file;
       aurostd::StringSubst(structures_file_new,POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+".OLD");
       if(LDEBUG){
@@ -493,7 +493,7 @@ namespace pocc {
 
     //POCC_UNIQUE_SUPERCELLS_FILE
     if(patchStructuresUniqueFile(aflags,structures_file,structures_file_ss,FileMESSAGE,oss)){
-      message << "Writing out patched " << POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "Writing out patched " << POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       string structures_file_new=structures_file;
       aurostd::StringSubst(structures_file_new,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+".OLD");
       if(LDEBUG){
@@ -505,7 +505,7 @@ namespace pocc {
     }
 
     if(!(aurostd::EFileExist(aflags.Directory+"/PARTCAR") || aurostd::FileExist(aflags.Directory+"/PARTCAR"))){   //patch: write out PARTCAR, should really only happen during generateStructures()
-      message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       string AflowIn_file,AflowIn;
       KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);
       xstructure xstr_pocc=pocc::extractPARTCAR(AflowIn); //prefer to pull from AflowIn input vs. aflags
@@ -521,7 +521,7 @@ namespace pocc {
 namespace pocc {
   vector<string> getElementsList() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getElementsList():";
+    string soliloquy = XHOST.sPID + "pocc::getElementsList():";
     uint skip_every=2;
     vector<string> elements;
     vector<string> VSTD_ELEMENTS_LIST;
@@ -541,24 +541,34 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies){
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies){double dg_total;return getHmix(v_dg,v_energies,dg_total);}
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getEFA():";
-    double dg_total=aurostd::sum(v_dg);
+    string soliloquy=XHOST.sPID+"pocc::getHmix():";
+    dg_total=aurostd::sum(v_dg);
     if(LDEBUG){cerr << soliloquy << " dg_total=" << dg_total << endl;}
     double Hmix=aurostd::scalar_product(v_dg,v_energies)/dg_total;
     if(LDEBUG){cerr << soliloquy << " Hmix=" << Hmix << endl;}
+    return Hmix;
+  }
+  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy="pocc::getEFA():";
+    double dg_total=0.0;
+    double Hmix=getHmix(v_dg,v_energies,dg_total);
     double sigma=0.0;
     for(int i=v_dg.lrows;i<=v_dg.urows;i++){sigma+=v_dg[i]*pow(v_energies[i]-Hmix,2.0);}
     sigma/=(dg_total-1);
     sigma=sqrt(sigma);
     if(LDEBUG){cerr << soliloquy << " sigma=" << sigma << endl;}
-    return 1.0/sigma;
+    double efa=1.0/sigma;
+    if(LDEBUG){cerr << soliloquy << " efa=" << efa << endl;}
+    return efa;
   }
 
   void POccCalculator::StructuresAllFile2SupercellSets(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pocc::StructuresAllFile2SupercellSets():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"pocc::StructuresAllFile2SupercellSets():";
 
     vector<string> vlines,vtokens,vtokens2;
 
@@ -643,8 +653,8 @@ namespace pocc {
   }
 
   void POccCalculator::StructuresUniqueFile2SupercellSets(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pocc::StructuresUniqueFile2SupercellSets():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"pocc::StructuresUniqueFile2SupercellSets():";
 
     vector<string> vlines,vtokens,vtokens2;
 
@@ -714,8 +724,8 @@ namespace pocc {
   }
 
   void POccCalculator::setDFTEnergies() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="setDFTEnergies():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"setDFTEnergies():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
@@ -751,8 +761,8 @@ namespace pocc {
   }
 
   void POccCalculator::setPOccStructureProbabilities(double temperature) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="setPOccStructureProbabilities():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"setPOccStructureProbabilities():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " temperature=" << temperature << endl;}
@@ -762,7 +772,7 @@ namespace pocc {
     if(std::signbit(temperature)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative temperature found",_VALUE_ILLEGAL_);}
     if(aurostd::isequal(temperature,0.0)){
       temperature=_ZERO_TOL_; //1e-6;
-      message << "Converting T=0 -> T=" << temperature << " for Boltzmann probabilities";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //WARNING
+      message << "Converting T=0 -> T=" << temperature << " for Boltzmann probabilities";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //WARNING
     }
 
     double denom=0.0;
@@ -783,8 +793,8 @@ namespace pocc {
   }
 
   void POccCalculator::setEFA(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::getEFA():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::getEFA():";
 
     if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
     xvector<double> v_dg(l_supercell_sets.size()),v_energies(l_supercell_sets.size());
@@ -798,13 +808,13 @@ namespace pocc {
         cerr << " v_energies[" << isupercell+v_energies.lrows << "]=" << v_energies[isupercell+v_energies.lrows] << endl;
       }
     }
+    m_Hmix=pocc::getHmix(v_dg,v_energies);
     m_efa=pocc::getEFA(v_dg,v_energies);
-    if(LDEBUG){cerr << soliloquy << " m_efa=" << m_efa << endl;}
   }
 
   string POccCalculator::getTemperatureString(double temperature) const {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::getTemperatureString():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::getTemperatureString():";
 
     stringstream t_ss;
     if(m_temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(TEMPERATURE_PRECISION);}
@@ -823,8 +833,8 @@ namespace pocc {
   }
 
   void POccCalculator::setAvgDOSCAR(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::setAvgDOSCAR():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::setAvgDOSCAR():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -842,12 +852,12 @@ namespace pocc {
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/DOSCAR.static",DOSCAR_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DOSCAR.static not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
-      message << "Processing xDOSCAR of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Processing xDOSCAR of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       xdoscar.GetPropertiesFile(DOSCAR_file);
-      message << "xDOSCAR read";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "xDOSCAR read";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       xdoscar.GetBandGap();
       for(uint ispin=0;ispin<xdoscar.Egap.size();ispin++){
-        message << "ISPIN=" << ispin << ", Egap=" << xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        message << "ISPIN=" << ispin << ", Egap=" << xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       }
       if(isupercell==0){ //set all to 0
         m_xdoscar=xdoscar;  //import all properties
@@ -875,7 +885,7 @@ namespace pocc {
         if(m_xdoscar.venergy.size()!=xdoscar.venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.venergy.size()!=xdoscar.venergy.size()",_INDEX_MISMATCH_);}
         if(m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()",_INDEX_MISMATCH_);}
         if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
-          message << "Mismatch SPIN-ON/SPIN-OFF settings, attempting to rectify";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+          message << "Mismatch SPIN-ON/SPIN-OFF settings, attempting to rectify";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
           if(m_xdoscar.viDOS.size()==1){m_xdoscar.convertSpinOFF2ON();} //make duplicate for spin-off
           else if(xdoscar.viDOS.size()==1){xdoscar.convertSpinOFF2ON();}
           if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
@@ -946,7 +956,7 @@ namespace pocc {
       m_Egap_net+=( (*it).m_probability*xdoscar.Egap_net);
     }
     if(metal_found && insulator_found){
-      message << "Mixed metal and insulator states found, averaging to a metallic gap";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+      message << "Mixed metal and insulator states found, averaging to a metallic gap";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
     }
     if(metal_found){
       for(uint ispin=0;ispin<m_Egap.size();ispin++){m_Egap[ispin]=_METALGAP_;}
@@ -960,23 +970,23 @@ namespace pocc {
     m_xdoscar.GetBandGap(); //gap of averaged vDOS, we don't use this definition anymore
 
     //from m_xdoscar
-    message << "Egap of average DOS (OBSOLETE)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Egap of average DOS (OBSOLETE)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     for(uint ispin=0;ispin<m_xdoscar.Egap.size();ispin++){
-      message << "ISPIN=" << ispin << ", Egap=" << m_xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "ISPIN=" << ispin << ", Egap=" << m_xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
-    message << "Egap_net=" << xdoscar.Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Egap_net=" << xdoscar.Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //from POccCalculator
-    message << "Average of Egaps";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Average of Egaps";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     for(uint ispin=0;ispin<xdoscar.Egap.size();ispin++){
-      message << "ISPIN=" << ispin << ", Egap=" << m_Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "ISPIN=" << ispin << ", Egap=" << m_Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
-    message << "Egap_net=" << m_Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Egap_net=" << m_Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
     string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+getTemperatureString(temperature)+"K";
-    message << "Writing out " << xdoscar_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Writing out " << xdoscar_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_xdoscar_ss;
     pocc_xdoscar_ss << m_xdoscar;
     aurostd::stringstream2file(pocc_xdoscar_ss,m_aflags.Directory+"/"+xdoscar_filename);
@@ -985,8 +995,8 @@ namespace pocc {
   }
 
   void POccCalculator::calculateSTATICProperties(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::calculateSTATICProperties():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::calculateSTATICProperties():";
 
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
@@ -1005,8 +1015,8 @@ namespace pocc {
   }
 
   void POccCalculator::plotAvgDOSCAR(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::plotAvgDOSCAR():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
@@ -1058,8 +1068,8 @@ namespace pocc {
 #define pocc_precision 12
 #define pocc_roundoff_tol 5.0*pow(10,-((int)pocc_precision)-1)
   void POccCalculator::writeResults() const { //TEMPERATURE-INDEPENDENT
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::writeResults():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::writeResults():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1070,14 +1080,15 @@ namespace pocc {
     //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
 
     //POCC.OUT
-    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (temperature-independent properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (temperature-independent properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
+    if(m_Hmix!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_mix=" << aurostd::utype2string(m_Hmix,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
     if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "EFA=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
@@ -1087,8 +1098,8 @@ namespace pocc {
   }
 
   void POccCalculator::writeResults(double temperature) const { //TEMPERATURE-DEPENDENT
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::writeResults():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::writeResults():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1097,11 +1108,11 @@ namespace pocc {
     //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
 
     //POCC.OUT
-    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (temperature = " << getTemperatureString(temperature) << "  (K) properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << "K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     //supercell probabilities
     unsigned long long int isupercell=0;
@@ -1128,7 +1139,7 @@ namespace pocc {
       pocc_out_ss << "Egap_spin_dn=" << aurostd::utype2string(Egap[1],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     }
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
@@ -1138,8 +1149,8 @@ namespace pocc {
   }
 
   bool POccCalculator::QMVASPsFound() const{
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="QMVASPsFound():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"QMVASPsFound():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1155,7 +1166,7 @@ namespace pocc {
       }
     }
     if(!found_all_QMVASPs){
-      message << "Waiting for complete VASP calculations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+      message << "Waiting for complete VASP calculations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
       return false;
     }
 
@@ -1164,8 +1175,8 @@ namespace pocc {
   }
 
   vector<double> getVTemperatures(const string& temp_string){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::getVTemperatures():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::getVTemperatures():";
 
     if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
     if(temp_string.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temp_string.empty()",_INPUT_ILLEGAL_);}
@@ -1204,9 +1215,10 @@ namespace pocc {
     return vtemperatures;
   }
 
+  //CT20200319 - added AEL/AGL option
   void POccCalculator::postProcessing(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccCalculator::postProcessing():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccCalculator::postProcessing():";
     stringstream message;
 
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
@@ -1241,14 +1253,25 @@ namespace pocc {
     for(uint itemp=0;itemp<v_temperatures.size();itemp++){if(!aurostd::isinteger(v_temperatures[itemp])){m_temperatures_int=false;break;}}  //found a non-int temperature
     m_zero_padding_temperature=aurostd::getZeroPadding(max(v_temperatures))+(m_temperatures_int ? 0 : TEMPERATURE_PRECISION+1); //+1 for decimal place
 
-    message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
-    writeResults(); //write temperature-independent properties first
-    for(uint itemp=0;itemp<v_temperatures.size();itemp++){
-      calculateSTATICProperties(v_temperatures[itemp]);
-      writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
+    if(1){  //turn off slow pocc-postprocessing
+      aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
+      writeResults(); //write temperature-independent properties first
+      for(uint itemp=0;itemp<v_temperatures.size();itemp++){
+        calculateSTATICProperties(v_temperatures[itemp]);
+        writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
+      }
     }
+    if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) {
+      if(LDEBUG){cerr << soliloquy << "Running AEL postprocessing" << endl;}
+      calculateElasticProperties(v_temperatures);
+    } //CT20200319
+    if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) {
+      if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
+      calculateDebyeThermalProperties(v_temperatures);
+    } //CT20200323
+
     //END: TEMPERATURE DEPENDENT PROPERTIES
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
@@ -1309,7 +1332,7 @@ namespace pocc {
   //setOSS(oss);
   //m_initialized=false;  //no point
   //}
-  //catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  //catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   //}
 
   //void POccGroup::initialize(const _aflags& aflags,ostream& oss) {
@@ -1326,7 +1349,7 @@ namespace pocc {
   //setAFlags(aflags);
   //m_initialized=false;  //no point
   //}
-  //catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  //catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   //}
 
   //void POccGroup::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
@@ -1385,7 +1408,7 @@ namespace pocc {
   }
   const POccSuperCell& POccSuperCellSet::getSuperCell() const {
     if(m_psc_set.size()==0){
-      string soliloquy=" POccSuperCellSet::getSuperCell():";
+      string soliloquy = XHOST.sPID + " POccSuperCellSet::getSuperCell():";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_psc_set.size()==0",_INDEX_ERROR_);
     }
     return m_psc_set[0];
@@ -1465,11 +1488,11 @@ namespace pocc {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  POccUnit::POccUnit(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);}
-  POccUnit::POccUnit(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);}
-  POccUnit::POccUnit(const _aflags& aflags,ostream& oss) : xStream(),m_initialized(false) {initialize(aflags,oss);}
-  POccUnit::POccUnit(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(aflags,FileMESSAGE,oss);}
-  POccUnit::POccUnit(const POccUnit& b) {copy(b);} // copy PUBLIC
+  POccUnit::POccUnit(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
+  POccUnit::POccUnit(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  POccUnit::POccUnit(const _aflags& aflags,ostream& oss) : xStream(oss),m_initialized(false) {initialize(aflags);}
+  POccUnit::POccUnit(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags);}
+  POccUnit::POccUnit(const POccUnit& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccUnit::~POccUnit() {xStream::free();free();}
 
@@ -1478,18 +1501,16 @@ namespace pocc {
     return *this;
   }
 
-  /*
-     bool POccUnit::operator<(const POccUnit& other) const {
-     if(v_occupants.size()!=other.v_occupants.size()){
-     if(equivalent!=other.equivalent){
-     return v_occupants.size()>other.v_occupants.size(); //sort in ascending order
-     }
-//return equivalent<other.equivalent;
-}
-if(equivalent!=other.equivalent){return equivalent<other.equivalent;}
-return site<other.site;
-}
-*/
+  //   bool POccUnit::operator<(const POccUnit& other) const {
+  //   if(v_occupants.size()!=other.v_occupants.size()){
+  //   if(equivalent!=other.equivalent){
+  //   return v_occupants.size()>other.v_occupants.size(); //sort in ascending order
+  //   }
+  //   //return equivalent<other.equivalent;
+  //   }
+  //   if(equivalent!=other.equivalent){return equivalent<other.equivalent;}
+  //   return site<other.site;
+  //   }
 
 void POccUnit::clear() {POccUnit a;copy(a);}
 void POccUnit::free() {
@@ -1519,37 +1540,37 @@ void POccUnit::copy(const POccUnit& b) { // copy PRIVATE
   equivalent=b.equivalent;
 }
 
-void POccUnit::initialize(ostream& oss) {
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(*_p_FileMESSAGE,oss);
-  f_new_ofstream=true;  //override
-}
-void POccUnit::initialize(ofstream& FileMESSAGE,ostream& oss) {
-  free();
-  try{
-    setOFStream(FileMESSAGE); f_new_ofstream=false;
-    setOSS(oss);
-    m_initialized=false;  //no point
-  }
-  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+bool POccUnit::initialize(ostream& oss) {
+  xStream::initialize(oss);
+  return initialize();
 }
 
-void POccUnit::initialize(const _aflags& aflags,ostream& oss) {
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(aflags,*_p_FileMESSAGE,oss);
-  f_new_ofstream=true;  //override
+bool POccUnit::initialize(ofstream& FileMESSAGE,ostream& oss) {
+  xStream::initialize(FileMESSAGE,oss);
+  return initialize();
 }
-void POccUnit::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+
+bool POccUnit::initialize() {
   free();
-  try{
-    setOFStream(FileMESSAGE); f_new_ofstream=false;
-    setOSS(oss);
-    setAFlags(aflags);
-    m_initialized=false;  //no point
-  }
-  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  m_initialized=false;  //no point
+  return m_initialized;
+}
+
+bool POccUnit::initialize(const _aflags& aflags,ostream& oss) {
+  xStream::initialize(oss);
+  return initialize(aflags);
+}
+
+bool POccUnit::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  xStream::initialize(FileMESSAGE,oss);
+  return initialize(aflags);
+}
+
+bool POccUnit::initialize(const _aflags& aflags) {
+  free();
+  setAFlags(aflags);
+  m_initialized=false;  //no point
+  return m_initialized;
 }
 
 void POccUnit::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
@@ -1563,59 +1584,59 @@ namespace pocc {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  POccCalculator::POccCalculator(ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,vflags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,kflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,kflags,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,kflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,kflags,vflags,oss);}
-  POccCalculator::POccCalculator(ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,kflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,kflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,kflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,aflags,kflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(pocc_flags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,pocc_flags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,pocc_flags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,vflags,pocc_flags,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,vflags,pocc_flags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,vflags,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags,oss);}
-  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(pocc_flags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,pocc_flags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,pocc_flags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,vflags,pocc_flags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,kflags,vflags,pocc_flags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags,FileMESSAGE,oss);}
-  POccCalculator::POccCalculator(const POccCalculator& b) {copy(b);} // copy PUBLIC
+  POccCalculator::POccCalculator(ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize();}
+  POccCalculator::POccCalculator(const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(aflags);}
+  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(aflags,kflags);}
+  POccCalculator::POccCalculator(const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(aflags,vflags);}
+  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,aflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,aflags,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,aflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  POccCalculator::POccCalculator(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags);}
+  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags,kflags);}
+  POccCalculator::POccCalculator(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags,vflags);}
+  POccCalculator::POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,aflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,aflags,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,aflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags,aflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags,aflags,kflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags,aflags,vflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags,aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags,aflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags,aflags,kflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags,aflags,vflags);}
+  POccCalculator::POccCalculator(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags,aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,kflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,vflags);}
+  POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags);}
+  POccCalculator::POccCalculator(const POccCalculator& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccCalculator::~POccCalculator() {xStream::free();free();}
 
@@ -1642,6 +1663,7 @@ namespace pocc {
     //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
     l_supercell_sets.clear();
     m_ARUN_directories.clear();
+    m_Hmix=AUROSTD_MAX_DOUBLE;
     m_efa=AUROSTD_MAX_DOUBLE;
     m_zero_padding_temperature=0;
     m_temperatures_int=false;
@@ -1678,6 +1700,7 @@ namespace pocc {
     total_permutations_count=b.total_permutations_count;
     //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
     l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=b.l_supercell_sets.begin();it!=b.l_supercell_sets.end();++it){l_supercell_sets.push_back(*it);}
+    m_Hmix=b.m_Hmix;
     m_efa=b.m_efa;
     m_zero_padding_temperature=b.m_zero_padding_temperature;
     m_temperatures_int=b.m_temperatures_int;
@@ -1690,134 +1713,154 @@ namespace pocc {
     enumerator_mode=b.enumerator_mode;
   }
 
-  void POccCalculator::initialize(ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(ostream& oss) {
+    xStream::initialize(oss);
+    return initialize();
   }
-  void POccCalculator::initialize(const _aflags& aflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(aflags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,kflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(aflags,kflags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(aflags,vflags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,kflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(aflags,kflags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,aflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,kflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,kflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,kflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,kflags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,aflags,kflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,aflags,kflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,aflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,aflags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,aflags,kflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,aflags,kflags,vflags);
   }
-  void POccCalculator::initialize(ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
+  bool POccCalculator::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags);
+  }
+  bool POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags,kflags);
+  }
+  bool POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags,vflags);
+  }
+  bool POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags,kflags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,aflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,kflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,kflags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,aflags,kflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,aflags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,aflags,kflags,vflags);
+  }
+  bool POccCalculator::initialize() {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const _aflags& aflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setKFlags(kflags);
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setVFlags(vflags);
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setKFlags(kflags);
@@ -1825,59 +1868,54 @@ namespace pocc {
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setAFlags(aflags);
       setPOccStructure(xstr_pocc);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setKFlags(kflags);
       setPOccStructure(xstr_pocc);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setVFlags(vflags);
       setPOccStructure(xstr_pocc);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setKFlags(kflags);
       setVFlags(vflags);
@@ -1885,12 +1923,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setAFlags(aflags);
       setKFlags(kflags);
@@ -1898,12 +1935,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setAFlags(aflags);
       setVFlags(vflags);
@@ -1911,12 +1947,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setAFlags(aflags);
       setKFlags(kflags);
@@ -1925,114 +1960,137 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
 
-  void POccCalculator::initialize(const aurostd::xoption& pocc_flags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(pocc_flags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const aurostd::xoption& pocc_flags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(pocc_flags,aflags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,kflags,pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(pocc_flags,aflags,kflags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,vflags,pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(pocc_flags,aflags,vflags);
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,kflags,vflags,pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(pocc_flags,aflags,kflags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,aflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,kflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,kflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,kflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,kflags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,aflags,kflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,aflags,kflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,aflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,aflags,vflags);
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags);
   }
-  void POccCalculator::initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags);
+  }
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags,aflags);
+  }
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags,aflags,kflags);
+  }
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags,aflags,vflags);
+  }
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags,aflags,kflags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,aflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,kflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,kflags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,aflags,kflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,aflags,vflags);
+  }
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags);
+  }
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccFlags(pocc_flags);
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setPOccFlags(pocc_flags);
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setKFlags(kflags);
@@ -2040,12 +2098,11 @@ namespace pocc {
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setVFlags(vflags);
@@ -2053,12 +2110,11 @@ namespace pocc {
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       loadPOccStructureFromAFlags(aflags);
       setKFlags(kflags);
@@ -2067,24 +2123,22 @@ namespace pocc {
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccFlags(pocc_flags);
       setPOccStructure(xstr_pocc);
@@ -2092,12 +2146,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
@@ -2105,12 +2158,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
@@ -2118,12 +2170,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
@@ -2132,12 +2183,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
@@ -2146,12 +2196,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
@@ -2160,12 +2209,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccCalculator::initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
@@ -2175,30 +2223,31 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
 
   void POccCalculator::setPOccFlags(const aurostd::xoption& pocc_flags) {m_p_flags=pocc_flags;}
 
   void POccCalculator::loadPOccStructureFromAFlags(const _aflags& aflags) {
-    string soliloquy="POccCalculator::loadPOccStructureFromAFlags():";
+    string soliloquy = XHOST.sPID + "POccCalculator::loadPOccStructureFromAFlags():";
     string AflowIn_file,AflowIn;
     KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
     setPOccStructure(pocc::extractPARTCAR(AflowIn));
   }
 
   void POccCalculator::setPOccStructure(const xstructure& xstr_pocc) {
-    string soliloquy="POccCalculator::setPOccStructure():";
+    string soliloquy = XHOST.sPID + "POccCalculator::setPOccStructure():";
     POccCalculatorTemplate::setPOccStructure(xstr_pocc);
     initializePOccStructure();
   }
 
   void POccCalculator::writePARTCAR() const {
-    string soliloquy="POccCalculator::writePARTCAR():";
+    string soliloquy = XHOST.sPID + "POccCalculator::writePARTCAR():";
     stringstream message;
 
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
 
-    message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream partcar_ss;
     partcar_ss << xstr_pocc;
     aurostd::stringstream2file(partcar_ss,m_aflags.Directory+"/PARTCAR");
@@ -2256,7 +2305,7 @@ namespace pocc {
 
   bool POccCalculator::iterateHNFMatrix(){
     bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
-    string soliloquy="POccCalculator::iterateHNFMatrix()";
+    string soliloquy = XHOST.sPID + "POccCalculator::iterateHNFMatrix()";
 
     xmatrix<double> _hnf_mat(3,3),duplicate_mat(3,3);
     xmatrix<double> superlattice(3,3), rotated_superlattice(3,3);
@@ -2636,10 +2685,10 @@ namespace pocc {
 
   void POccCalculator::getTotalPermutationsCount(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy = "POccCalculator::getTotalPermutationsCount():";
+    string soliloquy = XHOST.sPID + "POccCalculator::getTotalPermutationsCount():";
     stringstream message;
 
-    message << "Getting total number of supercell decoration permutations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Getting total number of supercell decoration permutations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //unsigned long long int hnf_count=0;
     //unsigned long long int types_config_permutations_count=0;   //per hnf matrix
@@ -2672,7 +2721,7 @@ namespace pocc {
     //}
     //if(ENUMERATE_ALL_HNF){exit(0);}  //for debugging purposes - EXCEPTION
     message << "Total count of unique HNF matrices = " << hnf_count;
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     //exit(0);
 
     //starting criteria for site combinations
@@ -2708,7 +2757,7 @@ namespace pocc {
     //cerr << types_config_permutations_count << endl;
     //exit(0);
     message << "Total count of unique types-configuration permutations = " << types_config_permutations_count;
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     if(LDEBUG) {
       cerr << soliloquy << " Checking unique types-configuration permutation count" << endl;
@@ -2738,7 +2787,7 @@ namespace pocc {
     message << "Total number of supercell decoration permutations = " <<total_permutations_count;
     char LOGGER_TYPE=_LOGGER_MESSAGE_;
     if(m_p_flags.flag("POCC_COUNT_TOTAL")){LOGGER_TYPE=_LOGGER_COMPLETE_;}
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
   }
 
 
@@ -2937,7 +2986,7 @@ namespace pocc {
 
   vector<UFFParamAtom> getTypes2UFFParamsMap(const vector<string>& elements){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getUFFParameters():";
+    string soliloquy = XHOST.sPID + "pocc::getUFFParameters():";
     vector<UFFParamAtom> types2uffparams_map;
 
     string uff_parameters_string="";
@@ -3132,7 +3181,7 @@ namespace pocc {
       xmatrix<double>& _hnf_mat,
       vector<vector<int> >& _v_types_config){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::getHNFMatSiteConfig():";
+    string soliloquy = XHOST.sPID + "POccCalculator::getHNFMatSiteConfig():";
     if(LDEBUG) {
       cerr << soliloquy << " psc.m_hnf_index=" << psc.m_hnf_index << endl;
       cerr << soliloquy << " psc.m_site_config_index=" << psc.m_site_config_index << endl;
@@ -3169,7 +3218,7 @@ namespace pocc {
 
   bool POccCalculator::areEquivalentStructures(const xstructure& a, const xstructure& b) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::areEquivalentStructures():";
+    string soliloquy = XHOST.sPID + "POccCalculator::areEquivalentStructures():";
     if(LDEBUG) {
       cerr << soliloquy << " comparing structure:" << endl;
       cerr << a;
@@ -3189,7 +3238,7 @@ namespace pocc {
     //NOTE, this function needs UFF comparisons first
     //it assumes distinct structures by UFF are indeed distinct, and so no comparisons are made cross-bin, only within bins
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::runRobustStructureComparison():";
+    string soliloquy = XHOST.sPID + "POccCalculator::runRobustStructureComparison():";
     stringstream message;
 
     const vector<POccSuperCell>& vpsc=(*it_pscs).m_psc_set;
@@ -3202,7 +3251,7 @@ namespace pocc {
 
     unsigned long long int i_pscs=std::distance(l_supercell_sets.begin(),it_pscs);
     message << "Performing robust structure comparison for structure group[" << i_pscs+1 << "/" << std::distance(l_supercell_sets.begin(),l_supercell_sets.end()) << "]";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); 
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); 
 
     bool are_equivalent=false,found_equivalent=false;
     bool test_iterator_insertion=false; //short circuit
@@ -3257,7 +3306,7 @@ namespace pocc {
 
     message << "Splitting structure group[" << std::distance(l_supercell_sets.begin(),it_pscs)+1;
     message << "] into " << unique_structure_bins.size() << " groups as determined by the robust structure comparison";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
 
     vector<uint> vi_psc_to_remove;
     std::list<POccSuperCellSet>::iterator it=it_pscs;
@@ -3293,7 +3342,7 @@ namespace pocc {
 
   void POccCalculator::calculate(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy = "POccCalculator::calculate():";
+    string soliloquy = XHOST.sPID + "POccCalculator::calculate():";
     stringstream message;
 
     //starting criteria for HNF matrices
@@ -3364,7 +3413,7 @@ namespace pocc {
     //make functions for getting nn distances and then determining bonding, which simply returns if no vacancies and already set
 
     message << "Calculating unique supercells. Please be patient";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     ////[CO20181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out CO, only works if energy radius = 10
     //double energy_radius=DEFAULT_UFF_CLUSTER_RADIUS;
@@ -3440,7 +3489,7 @@ namespace pocc {
     if(!l_supercell_sets.size()){
       message << "No supercells detected by UFF. Please run calculate() to determine unique supercells";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-      //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       //cerr << "probably broken pointers" << endl;
       //exit(1);
     }
@@ -3449,7 +3498,7 @@ namespace pocc {
     if(DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON){
       bool DEBUG_RSC=false;
       message << "Calculated " << l_supercell_sets.size() << " unique supercell groups via UFF, now performing robust structure comparison";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);//_LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);//_LOGGER_COMPLETE_);
 
       unsigned long long int count_new_groups;
       for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
@@ -3465,7 +3514,7 @@ namespace pocc {
     }
 
     message << "Calculated " << l_supercell_sets.size() << " unique supercells";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
 
     unsigned long long int total_degeneracy=0;
 
@@ -3474,7 +3523,7 @@ namespace pocc {
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       //cerr << "UNIQUE " << std::distance(l_supercell_sets.begin(),it) << endl;
       message_prec << std::fixed << std::setprecision(prec) << "Structure bin "  << std::distance(l_supercell_sets.begin(),it)+1 << ": energy=" << (*it).getUFFEnergy() << ", " << "degeneracy=" << (*it).getDegeneracy();
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_prec,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_prec,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       //cerr << endl;
       total_degeneracy+=(*it).getDegeneracy();
     }
@@ -3484,7 +3533,7 @@ namespace pocc {
     }
 
     message << "Resorting unique supercell order by HNF matrix/site configuration indices";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //go through sets and sort by hnf/site_config index
     //this ensures that even if we mess with underlying UFF/structure comparison algorithm, the same structure is chosen everytime
@@ -3495,7 +3544,7 @@ namespace pocc {
     l_supercell_sets.sort();  //finally sort on indices so the list is always fixed
 
     if(true && !m_aflags.Directory.empty() && !m_p_flags.flag("POCC_SKIP_WRITING_FILES")){ //move me so it runs whenever pocc runs (even post-processing)
-      message << "Writing out " << POCC_ALL_HNF_MATRICES_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Writing out " << POCC_ALL_HNF_MATRICES_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       stringstream all_hnf_mat_ss;
       resetHNFMatrices();
       hnf_index=0;
@@ -3510,7 +3559,7 @@ namespace pocc {
     }
 
     if(true && !m_aflags.Directory.empty() && !m_p_flags.flag("POCC_SKIP_WRITING_FILES")){ //move me so it runs whenever pocc runs (even post-processing)
-      message << "Writing out " << POCC_ALL_SITE_CONFIGURATIONS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Writing out " << POCC_ALL_SITE_CONFIGURATIONS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       stringstream all_site_configs_ss;
       resetSiteConfigurations();
       site_config_index=0;
@@ -3544,7 +3593,7 @@ namespace pocc {
 
     if(DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS && !m_aflags.Directory.empty() && !m_p_flags.flag("POCC_SKIP_WRITING_FILES")){
       message << "Writing out " << POCC_ALL_SUPERCELLS_FILE << ". Please be patient.";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       stringstream all_supercells_ss;
       //string POSCAR_START=POSCAR_POCC_series_START_tag;
       //string POSCAR_STOP=POSCAR_POCC_series_STOP_tag;
@@ -3639,7 +3688,7 @@ namespace pocc {
   }
 
   xstructure POccCalculator::getUniqueSuperCell(unsigned long long int i) {
-    string soliloquy = "POccCalculator::getUniqueSuperCell():";
+    string soliloquy = XHOST.sPID + "POccCalculator::getUniqueSuperCell():";
     stringstream message;
 
     if(i>l_supercell_sets.size()-1){
@@ -3656,13 +3705,13 @@ namespace pocc {
   }
 
   vector<xstructure> POccCalculator::getUniqueDerivativeStructures() {
-    string soliloquy = "POccCalculator::getUniqueDerivativeStructures():";
+    string soliloquy = XHOST.sPID + "POccCalculator::getUniqueDerivativeStructures():";
     stringstream message;
 
     vector<xstructure> v_xstr;
     if(!l_supercell_sets.size()){
       message << "No supercells detected. Please run calculate() to determine unique supercells";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       return v_xstr;
     }
 
@@ -3680,7 +3729,7 @@ namespace pocc {
     }
 
     message << "Full list generated";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     return v_xstr;
 
@@ -3721,7 +3770,7 @@ namespace pocc {
 
     //ostream& oss=cout;
     //message << "Total number of derivative structure possibilities = " << total_permutations_count;
-    //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //exit(0);
 
@@ -3816,7 +3865,7 @@ namespace pocc {
 
   void POccSiteConfiguration::preparePOccConfig() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="preparePOccConfig():";
+    string soliloquy = XHOST.sPID + "preparePOccConfig():";
     //////////////////////////////////////////////////////////////////////////////
     //clear all fields, but save that which is declared in constructor
     int _site=site, _i_hnf=i_hnf;
@@ -3880,7 +3929,7 @@ namespace pocc {
 
   void POccSiteConfiguration::updateOccupationCounts(int _i_hnf, xvector<int> & xv_next_occupation_multiple){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccSiteConfiguration::updateOccupationCounts():";
+    string soliloquy = XHOST.sPID + "POccSiteConfiguration::updateOccupationCounts():";
     i_hnf=_i_hnf;
     xv_occupation_multiple=xv_next_occupation_multiple;
     occupation_count_total=calculateOccupationCountTotal(xv_occupation_multiple); //aurostd::scalar_product(xv_occupation_multiple,xv_occupation_count_input);
@@ -3895,7 +3944,7 @@ namespace pocc {
   }
 
   void POccSiteConfiguration::calculateError() {
-    string soliloquy="POccSiteConfiguration::calculateError():";
+    string soliloquy = XHOST.sPID + "POccSiteConfiguration::calculateError():";
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     //now check max_site_error
     max_site_error=0.0;
@@ -3979,7 +4028,7 @@ namespace pocc {
 namespace pocc {
   vector<uint> getVacanciesSuperCell(const vector<int>& pc2sc_map,const vector<vector<int> >& v_types_config) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getVacanciesSuperCell():";
+    string soliloquy = XHOST.sPID + "pocc::getVacanciesSuperCell():";
     vector<uint> v_vacancies;
 
     int type;
@@ -4011,7 +4060,7 @@ namespace pocc {
       const vector<vector<int> >& v_types_config,
       xstructure& supercell){
 #if _DEBUG_POCC_CLUSTER_ANALYSIS_
-    string soliloquy="replaceRandomSitesSuperCell():";
+    string soliloquy = XHOST.sPID + "replaceRandomSitesSuperCell():";
     stringstream message;
 #endif
     uint starting_supercell_atom_index,pocc_atom_index,supercell_atom_index;
@@ -4074,7 +4123,7 @@ namespace pocc {
 
   void rebuildSuperCell(const xstructure& xstr_pocc,const vector<uint>& v_vacancies,xstructure& supercell) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::rebuildSuperCell():";
+    string soliloquy = XHOST.sPID + "pocc::rebuildSuperCell():";
     stringstream message;
 
     //remove vacancies from atoms first
@@ -4611,7 +4660,7 @@ namespace pocc {
 
     void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
       bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-      string soliloquy="pocc::generateStructures():";
+      string soliloquy = XHOST.sPID + "pocc::generateStructures():";
       stringstream message;
       //[NO NEED, AVASP_populateXVASP() is now const]_aflags aflags=m_aflags; //make copies
       _xvasp xvasp=in_xvasp; //[NO NEED, AVASP_populateXVASP() is now const]_kflags kflags=in_kflags;_vflags vflags=in_vflags; //make copies
@@ -4622,7 +4671,7 @@ namespace pocc {
       getTotalPermutationsCount();
       calculate();
 
-      message << "Writing out " << POCC_UNIQUE_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Writing out " << POCC_UNIQUE_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
       stringstream unique_derivative_structures_ss;
       stringstream new_AflowIn_ss;
@@ -4676,7 +4725,7 @@ namespace pocc {
 
   void POccCalculator::cleanPOccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::cleanPOccStructure():";
+    string soliloquy = XHOST.sPID + "POccCalculator::cleanPOccStructure():";
     stringstream message;
 
     //fix up structure
@@ -4693,7 +4742,7 @@ namespace pocc {
   }
 
   vector<uint> getTypes2PCMap(const xstructure& xstr) {
-    string soliloquy="pocc::getTypes2PCMap():";
+    string soliloquy = XHOST.sPID + "pocc::getTypes2PCMap():";
     stringstream message;
     vector<uint> types2pc_map;
     uint atom_index=0;
@@ -4738,7 +4787,7 @@ namespace pocc {
 
   void POccCalculator::initializePOccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG); 
-    string soliloquy="POccCalculator::initializePOccStructure():";
+    string soliloquy = XHOST.sPID + "POccCalculator::initializePOccStructure():";
     stringstream message;
 
     if(!xstr_pocc.partial_occupation_flag){
@@ -4746,8 +4795,8 @@ namespace pocc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
     }
 
-    message << "Input PARTCAR" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-    message << xstr_pocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    message << "Input PARTCAR" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << xstr_pocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
 
     //no need to assign fake names to xstr_pocc, we already do in xstr_nopocc
 
@@ -4784,16 +4833,16 @@ namespace pocc {
     }
     preparePOccStructure(); //need to redo this chunk after resorting atoms
 
-    message << "Clean PARTCAR" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-    message << xstr_pocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    message << "Clean PARTCAR" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << xstr_pocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
 
-    message << "Parent structure" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-    message << xstr_nopocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    message << "Parent structure" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << xstr_nopocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
 
     redecorateXStructures();  //redecorate to create standard parent structure, eventually we will also standardize xstr_pocc by permutation symmetry
 
-    message << "Standardized (re-decorated) parent structure" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-    message << xstr_nopocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    message << "Standardized (re-decorated) parent structure" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << xstr_nopocc;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
 
     ///////////////////////////////////////////////////////////////////
     //
@@ -4823,7 +4872,7 @@ namespace pocc {
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getPOccSites():";
+    string soliloquy = XHOST.sPID + "pocc::getPOccSites():";
 
     //occupy pocc_sites
     vector<POccUnit> pocc_sites;
@@ -4924,7 +4973,7 @@ namespace pocc {
       int i_hnf,
       vector<POccSiteConfiguration>& v_site_configs) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::getOptimizedSiteCountConfigurations():";
+    string soliloquy = XHOST.sPID + "POccCalculator::getOptimizedSiteCountConfigurations():";
     stringstream message;
     //reset
     v_site_configs.clear();
@@ -5061,7 +5110,7 @@ namespace pocc {
   void POccCalculator::getSiteCountConfigurations(int i_hnf)
   { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::getSiteCountConfigurations():";
+    string soliloquy = XHOST.sPID + "POccCalculator::getSiteCountConfigurations():";
     //return these values, do not necessarily store as "global" values
 
     //reset
@@ -5205,7 +5254,7 @@ namespace pocc {
 
   xstructure createNonPOccStructure(const xstructure& xstr_pocc,const vector<POccUnit>& pocc_sites,bool use_automatic_volumes_in){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::createNonPOccStructure():";
+    string soliloquy = XHOST.sPID + "pocc::createNonPOccStructure():";
     stringstream message;
 
     xstructure xstr_nopocc(xstr_pocc);
@@ -5306,7 +5355,7 @@ namespace pocc {
 
   void POccCalculator::redecorateXStructures(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::redecorateXStructures():";
+    string soliloquy = XHOST.sPID + "POccCalculator::redecorateXStructures():";
     stringstream message;
 
     //check that code can handle arbitrary reassignment of random elements
@@ -5316,7 +5365,7 @@ namespace pocc {
       use_standard_elements_set=false;
       message << "Unexpectedly large count of species in structure (nspecies=" << xstr_pocc.num_each_type.size();
       message <<  ">" << elements_std.size()<< "), resorting to exact UFF energy determination";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
     }
     if(COMPARE_WITH_KESONG){use_standard_elements_set=false;}
     vector<string>& species=m_species_redecoration;
@@ -5480,7 +5529,7 @@ namespace pocc {
 
   void POccCalculator::calculateSymNonPOccStructure(bool verbose) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::calculateSymNonPOccStructure():";
+    string soliloquy = XHOST.sPID + "POccCalculator::calculateSymNonPOccStructure():";
     stringstream message;
     //CO - default should always be to turn everything on, modify input
     //get ROBUST symmetry determination
@@ -5502,7 +5551,7 @@ namespace pocc {
       p_FileMESSAGE_sym=&devNull;
     }
     message << "Calculating symmetry of parent structure" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE_sym,*p_oss_sym,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE_sym,*p_oss_sym,_LOGGER_MESSAGE_);
     bool sym_calculated=pflow::PerformFullSymmetry(xstr_sym,*p_FileMESSAGE_sym,m_aflags,m_kflags,osswrite,*p_oss_sym);
     if(!badbit_set){(*p_oss_sym).clear();}  //clear NULL
     if(sym_calculated==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW-SYM failed to calculate the symmetry of the clean (non-pocc'd) structure");}
@@ -5524,7 +5573,7 @@ namespace pocc {
 
   void POccCalculator::propagateEquivalentAtoms2POccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::propagateEquivalentAtoms2POccStructure():";
+    string soliloquy=XHOST.sPID+"POccCalculator::propagateEquivalentAtoms2POccStructure():";
     //CO - default should always be to turn everything on, modify input
     //assign iatoms info to pocc structure as well, allows sorting later
     //remember, the 0th occupant of xstr_pocc remains in xstr_sym (xstr_nopocc)
@@ -5580,7 +5629,7 @@ namespace pocc {
 
   string POccCalculator::hnfTableLineOutput(int i_hnf,int str_config){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::hnfTableLineOutput():";
+    string soliloquy = XHOST.sPID + "POccCalculator::hnfTableLineOutput():";
     stringstream message;
     stringstream line_output;
     stringstream tmp_ss;tmp_ss.precision(getHNFTableGeneralPrecision());tmp_ss.setf(std::ios::fixed,std::ios::floatfield);
@@ -5666,7 +5715,7 @@ namespace pocc {
   //}
 
   void POccCalculator::writeHNFTableOutput(int i_hnf,double& stoich_error,double& site_error) {
-    string soliloquy="POccCalculator::writeHNFTableOutput()";
+    string soliloquy = XHOST.sPID + "POccCalculator::writeHNFTableOutput()";
     stringstream message;
     stringstream multiple_configs_ss;
 
@@ -5692,29 +5741,29 @@ namespace pocc {
     if(v_str_configs.size()>1){
       multiple_configs_ss.str("");
       multiple_configs_ss << "*** MULTIPLE CONFIGURATIONS POSSIBLE FOR HNF=" << i_hnf << " - START ***" << endl;
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
 
     for(uint str_config=0;str_config<v_str_configs.size();str_config++){
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableLineOutput(i_hnf,str_config),*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,hnfTableLineOutput(i_hnf,str_config),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
 
     if(v_str_configs.size()>1){
       multiple_configs_ss.str("");
       multiple_configs_ss << "*** MULTIPLE CONFIGURATIONS POSSIBLE FOR HNF=" << i_hnf << " - END ***" << endl;
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
 
   //tol -> HNF optimizer
   void POccCalculator::calculateHNF(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::calculateHNF():";
+    string soliloquy = XHOST.sPID + "POccCalculator::calculateHNF():";
 
     stringstream message,message_raw;
     message_raw.precision(getHNFTableGeneralPrecision());
     message << "Fetching HNF value";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     const double& stoich_tolerance=xstr_pocc.partial_occupation_stoich_tol;
     const double& site_tolerance=xstr_pocc.partial_occupation_site_tol;
@@ -5728,13 +5777,13 @@ namespace pocc {
     }
     //[OLD, SHOW EVERYTHING NOW]n_hnf=xstr_pocc.partial_occupation_HNF;
     //[OLD, SHOW EVERYTHING NOW]message << "Using input HNF value = " << n_hnf;
-    //[OLD, SHOW EVERYTHING NOW]pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    //[OLD, SHOW EVERYTHING NOW]pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     //[OLD, SHOW EVERYTHING NOW]//getSiteCountConfigurations(n_hnf,stoich_error);
     //[OLD, SHOW EVERYTHING NOW]getSiteCountConfigurations(n_hnf);
-    //[OLD, SHOW EVERYTHING NOW]message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-    //[OLD, SHOW EVERYTHING NOW]pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    //[OLD, SHOW EVERYTHING NOW]message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    //[OLD, SHOW EVERYTHING NOW]pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     //[OLD, SHOW EVERYTHING NOW]if(!writeHNFTableOutput(n_hnf,stoich_error,site_error)){return false;}
-    //[OLD, SHOW EVERYTHING NOW]message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    //[OLD, SHOW EVERYTHING NOW]message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
 
     bool hnf_already_provided=(xstr_pocc.partial_occupation_HNF!=0);
 
@@ -5742,28 +5791,28 @@ namespace pocc {
       message << "Using input HNF value = " << xstr_pocc.partial_occupation_HNF; 
       char LOGGER_TYPE=_LOGGER_MESSAGE_;
       if(m_p_flags.flag("HNF")){LOGGER_TYPE=_LOGGER_COMPLETE_;}
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
     } else {
-      message << "Stoichiometry tolerance = " << stoich_tolerance; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-      message << "Site tolerance = " << site_tolerance; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-      message << "Optimizing HNF value"; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Stoichiometry tolerance = " << stoich_tolerance; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Site tolerance = " << site_tolerance; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "Optimizing HNF value"; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
 
     i_hnf=0;
-    message_raw << AFLOWIN_SEPARATION_LINE  << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    message_raw << AFLOWIN_SEPARATION_LINE  << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     while( hnf_already_provided ? i_hnf<xstr_pocc.partial_occupation_HNF : stoich_error>stoich_tolerance || site_error>site_tolerance ){
       i_hnf++;
       getSiteCountConfigurations(i_hnf);
       writeHNFTableOutput(i_hnf,stoich_error,site_error);
     }
-    message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     n_hnf=i_hnf;
 
     if(hnf_already_provided==false) { //if HNF exists, no need to optimize pocc values
       message << "Optimized HNF value = " << n_hnf;
       char LOGGER_TYPE=_LOGGER_MESSAGE_;
       if(m_p_flags.flag("HNF")){LOGGER_TYPE=_LOGGER_COMPLETE_;}
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
     }
   }
 
@@ -5776,24 +5825,24 @@ namespace pocc {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(pocc_flags,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(pocc_flags,aflags,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(pocc_flags,FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(aflags,FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(pocc_flags,aflags,FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags,FileMESSAGE,oss);}
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags,FileMESSAGE,oss);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize();}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(pocc_flags,aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(pocc_flags,aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss) : POccCalculatorTemplate(),xStream(oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags);}
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags);}
 
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const POccUFFEnergyAnalyzer& b) {copy(b);} // copy PUBLIC
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const POccUFFEnergyAnalyzer& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccUFFEnergyAnalyzer::~POccUFFEnergyAnalyzer() {free();}
 
@@ -5847,103 +5896,113 @@ namespace pocc {
 
   void POccUFFEnergyAnalyzer::clear() {POccUFFEnergyAnalyzer a;copy(a);}  // clear PRIVATE
 
-  void POccUFFEnergyAnalyzer::initialize(ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(ostream& oss){
+    xStream::initialize(oss);
+    return initialize();
   }
-  void POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(pocc_flags);
   }
-  void POccUFFEnergyAnalyzer::initialize(const _aflags& aflags,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const _aflags& aflags,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(aflags);
   }
-  void POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(pocc_flags,aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(pocc_flags,aflags);
   }
-  void POccUFFEnergyAnalyzer::initialize(ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(pocc_flags,aflags);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setExplorationRadius();
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setPOccFlags(pocc_flags);
       setExplorationRadius();
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccUFFEnergyAnalyzer::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(const _aflags& aflags){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setAFlags(aflags);
       setExplorationRadius();
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(const aurostd::xoption& pocc_flags,const _aflags& aflags){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setPOccFlags(pocc_flags);
       setAFlags(aflags);
       setExplorationRadius();
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,xstr_nopocc,species_redecoration,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration);
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags);
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags);
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss){
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss){
+    xStream::initialize(oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags);
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags);
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setPOccStructure(xstr_pocc);
       setNonPOccStructure(xstr_nopocc);
       setSpeciesRedecoration(species_redecoration);
@@ -5951,12 +6010,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setPOccFlags(pocc_flags);
       setPOccStructure(xstr_pocc);
       setNonPOccStructure(xstr_nopocc);
@@ -5965,27 +6023,11 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags){
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
-      setAFlags(aflags);
-      setPOccStructure(xstr_pocc);
-      setNonPOccStructure(xstr_nopocc);
-      setSpeciesRedecoration(species_redecoration);
-      setExplorationRadius();
-      m_initialized=true;
-    }
-    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
-  }
-  void POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-    free();
-    try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
-      setPOccFlags(pocc_flags);
       setAFlags(aflags);
       setPOccStructure(xstr_pocc);
       setNonPOccStructure(xstr_nopocc);
@@ -5994,6 +6036,21 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
+  }
+  bool POccUFFEnergyAnalyzer::initialize(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags){
+    free();
+    try{
+      setPOccFlags(pocc_flags);
+      setAFlags(aflags);
+      setPOccStructure(xstr_pocc);
+      setNonPOccStructure(xstr_nopocc);
+      setSpeciesRedecoration(species_redecoration);
+      setExplorationRadius();
+      m_initialized=true;
+    }
+    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return m_initialized;
   }
 
   void POccUFFEnergyAnalyzer::calculateNNDistances(xstructure& xstr,vector<uint>& v_vacancies){
@@ -6049,7 +6106,7 @@ namespace pocc {
 
   void POccUFFEnergyAnalyzer::getCluster(xmatrix<double>& _hnf_mat){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccUFFEnergyAnalyzer::getCluster():";
+    string soliloquy = XHOST.sPID + "POccUFFEnergyAnalyzer::getCluster():";
     hnf_mat=_hnf_mat;
     sc2pc_map.clear(); pc2sc_map.clear();
     xstr_ss=GetSuperCell(xstr_nopocc,hnf_mat,sc2pc_map,pc2sc_map,false,false,false,false);  //force_strict_pc2scMap==false is very important here, we want the FIRST equivalent atom
@@ -6113,7 +6170,7 @@ namespace pocc {
   //if they match, do not recalculate
   void POccUFFEnergyAnalyzer::setBonds(vector<vector<int> >& v_types_config){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccUFFEnergyAnalyzer::setBonds():";
+    string soliloquy = XHOST.sPID + "POccUFFEnergyAnalyzer::setBonds():";
 
     //cout << "m_types_config OLD ";
     //for(uint i=0;i<m_types_config.size();i++){for(uint j=0;j<m_types_config[i].size();j++){cout << m_types_config[i][j] << " ";} }
@@ -6237,7 +6294,7 @@ namespace pocc {
 
   double POccUFFEnergyAnalyzer::getUFFBondEnergy(xstructure& xstr,vector<vector<uint> >& v_bonded_atom_indices,uint MODE) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccUFFEnergyAnalyzer::getUFFBondEnergy()";
+    string soliloquy = XHOST.sPID + "POccUFFEnergyAnalyzer::getUFFBondEnergy()";
     stringstream message;
     double energy=0.0;
     double distij;
@@ -6362,7 +6419,7 @@ namespace pocc {
       unsigned long long int types_config_permutations_count,
       bool clean_structure,bool primitivize){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccCalculator::createXStructure():";
+    string soliloquy = XHOST.sPID + "POccCalculator::createXStructure():";
     vector<int> sc2pc_map,pc2sc_map;
 
     xmatrix<double> hnf_mat;
@@ -6429,7 +6486,7 @@ namespace pocc {
 
   double POccUFFEnergyAnalyzer::getUFFEnergy() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="POccUFFEnergyAnalyzer::getUFFEnergy():";
+    string soliloquy = XHOST.sPID + "POccUFFEnergyAnalyzer::getUFFEnergy():";
     stringstream message;
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
@@ -6475,15 +6532,15 @@ namespace pocc {
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  POccStructuresFile::POccStructuresFile(ostream& oss): xStream(),m_initialized(false) {initialize(oss);}
-  POccStructuresFile::POccStructuresFile(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);}
-  POccStructuresFile::POccStructuresFile(const string& fileIn,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIn,oss);}
-  POccStructuresFile::POccStructuresFile(const string& fileIn,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIn,FileMESSAGE,oss);}
-  POccStructuresFile::POccStructuresFile(const _aflags& aflags,ostream& oss): xStream(),m_initialized(false) {initialize(aflags,oss);}
-  POccStructuresFile::POccStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(aflags,FileMESSAGE,oss);}
-  POccStructuresFile::POccStructuresFile(const string& fileIn,const _aflags& aflags,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIn,aflags,oss);}
-  POccStructuresFile::POccStructuresFile(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIn,aflags,FileMESSAGE,oss);}
-  POccStructuresFile::POccStructuresFile(const POccStructuresFile& b){copy(b);} // copy PUBLIC
+  POccStructuresFile::POccStructuresFile(ostream& oss): xStream(oss),m_initialized(false) {initialize();}
+  POccStructuresFile::POccStructuresFile(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  POccStructuresFile::POccStructuresFile(const string& fileIN,ostream& oss) : xStream(oss),m_initialized(false) {initialize(fileIN);}
+  POccStructuresFile::POccStructuresFile(const string& fileIN,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(fileIN);}
+  POccStructuresFile::POccStructuresFile(const _aflags& aflags,ostream& oss): xStream(oss),m_initialized(false) {initialize(aflags,oss);}
+  POccStructuresFile::POccStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags);}
+  POccStructuresFile::POccStructuresFile(const string& fileIN,const _aflags& aflags,ostream& oss) : xStream(oss),m_initialized(false) {initialize(fileIN,aflags,oss);}
+  POccStructuresFile::POccStructuresFile(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(fileIN,aflags);}
+  POccStructuresFile::POccStructuresFile(const POccStructuresFile& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccStructuresFile::~POccStructuresFile() {xStream::free();free();}
 
@@ -6529,86 +6586,87 @@ namespace pocc {
     }
   }
 
-  void POccStructuresFile::initialize(ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccStructuresFile::initialize(ostream& oss) {
+    xStream::initialize(oss);
+    return initialize();
   }
-  void POccStructuresFile::initialize(ofstream& FileMESSAGE,ostream& oss) {
+  bool POccStructuresFile::initialize(ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
+  bool POccStructuresFile::initialize() {
+    free();
+    m_initialized=false;  //no point
+    return m_initialized;
+  }
+  bool POccStructuresFile::initialize(const string& fileIN,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(fileIN);
+  }
+  bool POccStructuresFile::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(fileIN);
+  }
+  bool POccStructuresFile::initialize(const string& fileIN) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
-      m_initialized=false;  //no point
-    }
-    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
-  }
-  void POccStructuresFile::initialize(const string& fileIn,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(fileIn,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
-  }
-  void POccStructuresFile::initialize(const string& fileIn,ofstream& FileMESSAGE,ostream& oss) {
-    free();
-    try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
-      readFile(fileIn);
+      readFile(fileIN);
       processFile();
       m_initialized=true;
     }
-    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return initialize();
   }
-  void POccStructuresFile::initialize(const _aflags& aflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccStructuresFile::initialize(const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(aflags);
   }
-  void POccStructuresFile::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccStructuresFile::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags);
+  }
+  bool POccStructuresFile::initialize(const _aflags& aflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setAFlags(aflags);
       m_initialized=false;  //no point
     }
-    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return initialize();
   }
-  void POccStructuresFile::initialize(const string& fileIn,const _aflags& aflags,ostream& oss) {
-    xStream::free();
-    ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-    initialize(fileIn,aflags,*_p_FileMESSAGE,oss);
-    f_new_ofstream=true;  //override
+  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(fileIN,aflags);
   }
-  void POccStructuresFile::initialize(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(fileIN,aflags);
+  }
+  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags) {
     free();
     try{
-      setOFStream(FileMESSAGE); f_new_ofstream=false;
-      setOSS(oss);
       setAFlags(aflags);
-      readFile(fileIn);
+      readFile(fileIN);
       processFile();
       m_initialized=true;
     }
-    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return initialize();
   }
 
   void POccStructuresFile::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
 
-  void POccStructuresFile::readFile(const string& fileIn) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccStructuresFile::readFile():";
+  void POccStructuresFile::readFile(const string& fileIN) {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccStructuresFile::readFile():";
 
     m_filename="";
     stringstream structures_file_ss;
 
     bool found_file=false;
-    if(!found_file && aurostd::EFileExist(m_aflags.Directory+"/"+fileIn,m_filename)){aurostd::efile2stringstream(m_filename,structures_file_ss);found_file=true;}
-    if(!found_file && aurostd::FileExist(m_aflags.Directory+"/"+fileIn,m_filename)){aurostd::file2stringstream(m_filename,structures_file_ss);found_file=true;}
-    if(!found_file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,m_aflags.Directory+"/"+fileIn+" does not exist",_FILE_NOT_FOUND_);}
+    if(!found_file && aurostd::EFileExist(m_aflags.Directory+"/"+fileIN,m_filename)){aurostd::efile2stringstream(m_filename,structures_file_ss);found_file=true;}
+    if(!found_file && aurostd::FileExist(m_aflags.Directory+"/"+fileIN,m_filename)){aurostd::file2stringstream(m_filename,structures_file_ss);found_file=true;}
+    if(!found_file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,m_aflags.Directory+"/"+fileIN+" does not exist",_FILE_NOT_FOUND_);}
     if(LDEBUG){cerr << soliloquy << " m_filename=" << m_filename << endl;}
 
     m_content=structures_file_ss.str();
@@ -6617,8 +6675,8 @@ namespace pocc {
   }
 
   void POccStructuresFile::processFile() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccStructuresFile::processFile():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccStructuresFile::processFile():";
 
     //get poscar_start_tag and poscar_stop_tag
     string POccStructure_title_tag="HNF(n="; //in case we cannot find POSCAR_START_tag, SHACHAR OLD FORMAT
@@ -6815,8 +6873,8 @@ namespace pocc {
   }
 
   bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccStructuresFile::getARUNDirectories():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccStructuresFile::getARUNDirectories():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccStructuresFile not initialized",_RUNTIME_ERROR_);}
 
     ARUN_directories.clear();
@@ -6882,8 +6940,8 @@ namespace pocc {
   }
 
   bool POccStructuresFile::loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="POccStructuresFile::loadDataIntoCalculator():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XHOST.sPID+"POccStructuresFile::loadDataIntoCalculator():";
 
     //copy over l_supercell_sets
     pcalc.l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){pcalc.l_supercell_sets.push_back(*it);}

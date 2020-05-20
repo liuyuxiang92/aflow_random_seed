@@ -814,7 +814,6 @@ namespace apl {
       void buildPath();
       void free();
       void copy(const PathBuilder&);
-      // [OBSOLETE ME20190219] void tokenize(const string&, vector<string>&, string);
 
     public:
       PathBuilder();
@@ -1228,6 +1227,7 @@ namespace apl
       void calculateResiduals(const xvector<double> &params);
       double calculateResidualSquareSum(const xvector<double> &params);
       void clear();
+
     private:
       void free();
       void copy(const NonlinearFit &nlf);

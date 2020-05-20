@@ -1688,7 +1688,7 @@ string APENNSY_Parameters::APENNSY_StructureVolumes(bool _verbose,_aflags &aflag
     minE-=0.02;maxE=0.05;
     ofstream gnu;
     if(_verbose) cerr << "compiling hull data...";
-    // [OBSOLETE] string hull_dat_file="./hull.dat."+XHOST.ostrPID.str()+"."+aurostd::utype2string(k);
+    // [OBSOLETE] string hull_dat_file="./hull.dat."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+"."+aurostd::utype2string(k);  //CO20200502 - threadID
     string hull_dat_file=aurostd::TmpFileCreate("hull_dat_"+aurostd::utype2string(k));
     gnu.open(hull_dat_file.c_str());
     gnu.setf(ios_base::fixed, ios_base::floatfield);
@@ -1743,7 +1743,7 @@ string APENNSY_Parameters::APENNSY_StructureVolumes(bool _verbose,_aflags &aflag
     if(_verbose) {cerr << "done" << endl;
       cerr << "compiling structure data...";}
     ofstream gnu1;
-    //    [OBSOLETE] string str_info_dat_file="./str_info.dat."+XHOST.ostrPID.str()+"."+aurostd::utype2string(k);
+    //    [OBSOLETE] string str_info_dat_file="./str_info.dat."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+"."+aurostd::utype2string(k); //CO20200502 - threadID
     string str_info_dat_file=aurostd::TmpFileCreate("str_info_dat_"+aurostd::utype2string(k));
 
     gnu1.open(str_info_dat_file.c_str());
@@ -1775,7 +1775,7 @@ string APENNSY_Parameters::APENNSY_StructureVolumes(bool _verbose,_aflags &aflag
     if(_verbose) cerr << "done" << endl;
     //GNUPLOT SCRIPT EPS/PDF
     cerr << "preparing gnuplot script..." << endl;
-    string syscommand1="head -4 "+hull_dat_file+ "> temp1"+XHOST.ostrPID.str()+" ;tail -1 "+ hull_dat_file + " > temp2"+XHOST.ostrPID.str()+";cat "+ "temp1"+XHOST.ostrPID.str()+ " temp2"+XHOST.ostrPID.str()+">vergard.dat."+XHOST.ostrPID.str()+";rm -rf temp1"+XHOST.ostrPID.str()+";rm -rf temp2"+XHOST.ostrPID.str();
+    string syscommand1="head -4 "+hull_dat_file+ "> temp1"+XHOST.ostrPID.str()+XHOST.ostrTID.str()+" ;tail -1 "+ hull_dat_file + " > temp2"+XHOST.ostrPID.str()+XHOST.ostrTID.str()+";cat "+ "temp1"+XHOST.ostrPID.str()+XHOST.ostrTID.str()+ " temp2"+XHOST.ostrPID.str()+XHOST.ostrTID.str()+">vergard.dat."+XHOST.ostrPID.str()+XHOST.ostrTID.str()+";rm -rf temp1"+XHOST.ostrPID.str()+XHOST.ostrTID.str()+";rm -rf temp2"+XHOST.ostrPID.str()+XHOST.ostrTID.str(); //CO20200502 - threadID
     aurostd::execute(syscommand1);
     oss << "set terminal postscript landscape color enhanced '" << aflags.APENNSY_GNUPLOT_FONT_str << "' 11" << endl;  // EPS
     // oss << "set terminal pdf landscape color enhanced '" << aflags.APENNSY_GNUPLOT_FONT_str << "' 11" << endl;  // PDF
@@ -1801,7 +1801,7 @@ string APENNSY_Parameters::APENNSY_StructureVolumes(bool _verbose,_aflags &aflag
     // CANT DO IN THIS WAY SINCE IT IS NOT EXTE$NSIVE LOOK CONVEX HULL AND HOW THE OSS IS COUT-ED AND USED OUTSIDE THE ROUTINE
     // if(_verbose) cerr << "running...";
     // stringstream aus;aus.clear();aus.str(std::string());
-    // aus << XHOST.command("gnuplot") << " " << " gsplot.gp." << XHOST.ostrPID.str() << ";rm -rf " << hull_dat_file << ";rm -rf " << str_info_dat_file << ";rm -rf gsplot.gp." << XHOST.ostrPID.str();
+    // aus << XHOST.command("gnuplot") << " " << " gsplot.gp." << XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << ";rm -rf " << hull_dat_file << ";rm -rf " << str_info_dat_file << ";rm -rf gsplot.gp." << XHOST.ostrPID.str() << "." << XHOST.ostrTID.str(); //CO20200502 - threadID
     // aurostd::execute(aus);
     // if(_verbose) cerr << "done" << endl;
   }
@@ -1966,7 +1966,7 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
 
       ofstream gnu;
       if(_verbose) cerr << speciesAB.at(k) << endl << "compiling hull data...";
-      //  [OBSOLETE] string hull_dat_file="./hull.dat."+XHOST.ostrPID.str()+"."+aurostd::utype2string(k);
+      //  [OBSOLETE] string hull_dat_file="./hull.dat."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+"."+aurostd::utype2string(k); //CO20200502 - threadID
       string hull_dat_file=aurostd::TmpFileCreate("hull_dat_"+aurostd::utype2string(k));
       gnu.open(hull_dat_file.c_str());
       gnu.setf(ios_base::fixed, ios_base::floatfield);
@@ -2008,7 +2008,7 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
       gnu.close();
       if(_verbose) cerr << "done" << endl << "compiling structure data...";
       ofstream gnu1;
-      //  [OBSOLETE] string str_info_dat_file="./str_info.dat."+XHOST.ostrPID.str()+"."+aurostd::utype2string(k);
+      //  [OBSOLETE] string str_info_dat_file="./str_info.dat."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+"."+aurostd::utype2string(k); //CO20200502 - threadID
       string str_info_dat_file=aurostd::TmpFileCreate("str_info_dat_"+aurostd::utype2string(k));
       gnu1.open(str_info_dat_file.c_str());
       gnu1 << setw(18) << "conc." << setw(18) << "H_" << setw(18) << "vol." << setw(18) << "S_time" << setw(18) << "HT_name" << "      " << "name" << endl;

@@ -68,7 +68,7 @@ namespace pflow {
   void CAGES(_aflags &aflags,string options,istream& input);
   //DX+CO START
   bool PerformFullSymmetry(xstructure& a);
-  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");  // ME20200224
+  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");  //ME20200224
   bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
   bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
   void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info); //DX20190801
@@ -334,18 +334,19 @@ namespace pflow {
   // START - added by Corey Oses - May 2017
   // effectively logs EVERYTHING, deals with cout and logger
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=std::cout);
-  void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
-  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
+  void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // main function
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // main function
+  /**/
   // END - added by Corey Oses - May 2017
   xstructure LTCELL(string options,istream& input);
   // [OBSOLETE]  xstructure LTCELLFV(string options,istream& input);

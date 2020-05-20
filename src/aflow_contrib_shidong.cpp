@@ -54,57 +54,57 @@ vector<cestructure>  ReadInFitStructure(istream & ins, string & structure_type) 
 
   stringstream ss;
 
-  //while ( getline(cin, line_content)  ) {
+  //while ( getline(cin, line_content)  )
   while ( getline(ins, line_content)  ) {
     if( line_content.at(0) != _COMMENT_CHAR ) {
       ss.clear();
       ss << line_content;
       ss >> alloy_name >> structure_name >> stoich_b
-	 >> fit_quantity;
+        >> fit_quantity;
 
       if( structure_name.at(0) == structure_type[0] ) {
-	// type begin with a letter
+        // type begin with a letter
 
-	if( int(structure_name.size()) < _SLname_length
-	     || structure_name.substr(_SLname_pos, 2) != "SL" ) {
-	  str_tmp = cestructure(structure_name, stoich_b,
-				fit_quantity);
-	  str_out_list.push_back(str_tmp);
-	} else {
-	  ceSL str_SL_tmp;
-	  string str_type = structure_type;
-	  str_SL_tmp = ceSL(str_type, stoich_b,
-                            fit_quantity);
-	  str_SL_tmp.SetUp(structure_name);
-	  str_out_list.push_back(str_SL_tmp);
-	}
+        if( int(structure_name.size()) < _SLname_length
+            || structure_name.substr(_SLname_pos, 2) != "SL" ) {
+          str_tmp = cestructure(structure_name, stoich_b,
+              fit_quantity);
+          str_out_list.push_back(str_tmp);
+        } else {
+          ceSL str_SL_tmp;
+          string str_type = structure_type;
+          str_SL_tmp = ceSL(str_type, stoich_b,
+              fit_quantity);
+          str_SL_tmp.SetUp(structure_name);
+          str_out_list.push_back(str_SL_tmp);
+        }
 
       } else  if(0 <= structure_name.at(0) &&  structure_name.at(0) <= '9') {
-	// type present as number
-	int typenum = atoi(structure_name.c_str());
-	switch (structure_type[0]) {
-	case 'f':
-	  if( _FCC_BEGIN <= typenum && typenum <= _FCC_END ) {
-	    str_tmp = cestructure(structure_name, stoich_b,
-				  fit_quantity);
-	    str_out_list.push_back(str_tmp);
-	  }
-	  break;
-	case 'b':
-	  if( _BCC_BEGIN <= typenum && typenum <= _BCC_END ) {
-	    str_tmp = cestructure(structure_name, stoich_b,
-				  fit_quantity);
-	    str_out_list.push_back(str_tmp);
-	  }
-	  break;
-	case 'h':
-	  if( _HCP_BEGIN <= typenum && typenum <= _HCP_END ) {
-	    str_tmp = cestructure(structure_name, stoich_b,
-				  fit_quantity);
-	    str_out_list.push_back(str_tmp);
-	  }
-	  break;
-	}
+        // type present as number
+        int typenum = atoi(structure_name.c_str());
+        switch (structure_type[0]) {
+          case 'f':
+            if( _FCC_BEGIN <= typenum && typenum <= _FCC_END ) {
+              str_tmp = cestructure(structure_name, stoich_b,
+                  fit_quantity);
+              str_out_list.push_back(str_tmp);
+            }
+            break;
+          case 'b':
+            if( _BCC_BEGIN <= typenum && typenum <= _BCC_END ) {
+              str_tmp = cestructure(structure_name, stoich_b,
+                  fit_quantity);
+              str_out_list.push_back(str_tmp);
+            }
+            break;
+          case 'h':
+            if( _HCP_BEGIN <= typenum && typenum <= _HCP_END ) {
+              str_tmp = cestructure(structure_name, stoich_b,
+                  fit_quantity);
+              str_out_list.push_back(str_tmp);
+            }
+            break;
+        }
       }
 
     }
@@ -124,7 +124,7 @@ vector<cestructure>  ReadInFitStructure(istream & ins, string & structure_type) 
 
 
 void WriteOutFitStructure(ostream & os, string & alloy_name,
-			  vector<cestructure> & str_list) {
+    vector<cestructure> & str_list) {
 
   for (uint i=0; i<str_list.size(); i++) {
     os << "(" << alloy_name << ") " << str_list.at(i) << endl;
@@ -135,7 +135,7 @@ void WriteOutFitStructure(ostream & os, string & alloy_name,
 // Convex Hull functions
 //*************************************
 vector<int> GroundStateCandidate(vector< vector<double> > & points) {
-    
+
   vector<int> ground_states;
 
   // first sort the input list
@@ -170,10 +170,10 @@ vector<int> GroundStateCandidate(vector< vector<double> > & points) {
   double _EQUAL_DB_HERE = 1.0e-6;
   for (uint i=0; i<points_sorted.size(); i++) {
     if( abs(points_sorted.at(i).at(0) - points_sorted.at(pt_min).at(0)) < _EQUAL_DB_HERE ) {
-      //if( points_sorted.at(i).at(1) < points_sorted.at(pt_min).at(1) ) {
+      //if( points_sorted.at(i).at(1) < points_sorted.at(pt_min).at(1) )
       if( points_sorted.at(i).at(1) - points_sorted.at(pt_min).at(1)
-	   < _EQUAL_NDB_HERE ) {
-	pt_min = i;
+          < _EQUAL_NDB_HERE ) {
+        pt_min = i;
       }
     } else {
 
@@ -199,7 +199,7 @@ vector<int> GroundStateCandidate(vector< vector<double> > & points) {
   //        << endl;
   //}
   //cerr << endl;
-            
+
   return ground_states;
 
 }
@@ -247,15 +247,15 @@ vector<int> CEConvexHull(vector< vector<double> > & points, const string & optio
   double _EQUAL_DB_HERE = 1.0e-6;
   for (uint i=1; i<points_sorted.size(); i++) {
     if( abs(points_sorted.at(i).at(0) - points_sorted.at(pt_min).at(0))
-	 < _EQUAL_DB_HERE ) {
+        < _EQUAL_DB_HERE ) {
       if( points_sorted.at(i).at(1) - points_sorted.at(pt_min).at(1)
-	   < _EQUAL_NDB_HERE ) {
-	pt_min = i;
+          < _EQUAL_NDB_HERE ) {
+        pt_min = i;
       } else if(
-		 points_sorted.at(pt_min).at(1) -
-		 points_sorted.at(i).at(1) < _EQUAL_NDB_HERE
-		 ) {
-	pt_max = i;
+          points_sorted.at(pt_min).at(1) -
+          points_sorted.at(i).at(1) < _EQUAL_NDB_HERE
+          ) {
+        pt_max = i;
       }
     } else {
       minima.push_back(pt_min);
@@ -518,12 +518,12 @@ void ACEGroundStateConvexHull(ifstream & os, vector<cestructure> str_list) {
   for (uint i=0; i<ground_state_candidates.size(); i++) {
     int index = ground_state_candidates.at(i);
     groundstate_file << setw(18)
-		     << SLname_list.at(index)
-		     << setw(12)
-		     << SLres_list.at(index).at(0)
-		     << setw(12)
-		     << SLres_list.at(index).at(1)
-		     << endl;
+      << SLname_list.at(index)
+      << setw(12)
+      << SLres_list.at(index).at(0)
+      << setw(12)
+      << SLres_list.at(index).at(1)
+      << endl;
   }
 
   total_pt_file.close();
@@ -543,14 +543,14 @@ vector<string> GetNewHullState(vector<cestructure> & str_list) {
   string name;
   double stoich_b, fit_quantity;
 
-  //while ( !fin.eof() ) {
+  //while ( !fin.eof() )
   while ( fin >> name >> stoich_b >> fit_quantity ) {
 
     bool flag = false;
     for (uint i=0; i < str_list.size(); i++) {
       if  (name == str_list.at(i).Name()) {
-	flag = true;
-	break;
+        flag = true;
+        break;
       }
     }
 
@@ -591,8 +591,8 @@ vector<string> GetNewGroundState(vector<cestructure> & str_list) {
     bool flag = false;
     for (uint i=0; i < str_list.size(); i++) {
       if  (name == str_list.at(i).Name()) {
-	flag = true;
-	break;
+        flag = true;
+        break;
       }
     }
 
@@ -623,7 +623,7 @@ bool comparison_pair(cepair pair1, cepair pair2) {
 // ***************************************************************************
 
 void ACEOptimalECIClusters(vector<cestructure> & str_list,
-			   ceECIcluster & ECIcluster) {
+    ceECIcluster & ECIcluster) {
   // obtain the optimal set of clusters for ECI and ECI's
   // store it in ECIcluster.ECI_cluster
   // and ECIcluster.ECI
@@ -651,7 +651,7 @@ void ACEOptimalECIClusters(vector<cestructure> & str_list,
 }
 
 vector<int> StepWise( vector<cestructure> & str_list,
-		      ceECIcluster & ECIcluster) {
+    ceECIcluster & ECIcluster) {
   // forward/backward greedy search algorithm
 
   double score_opt_global;
@@ -665,7 +665,7 @@ vector<int> StepWise( vector<cestructure> & str_list,
   int left_out_num = aurostd::min(int(total_str*_TRIAL_RATIO)+1,_LEFTOUT_NUM);
 
   str_leftout_set_list = ACESetUpCrossValidationSetsRandom(
-							   left_out_num, total_str);
+      left_out_num, total_str);
 
   score_opt_global = 1.0e4;
 
@@ -697,13 +697,13 @@ vector<int> StepWise( vector<cestructure> & str_list,
       int index = rand()%total_cluster;
       bool flag = true;
       for (uint i=0; i<trial_set.size(); i++) {
-	if( index == trial_set.at(i) ) {
-	  flag = false;
-	  break;
-	}
+        if( index == trial_set.at(i) ) {
+          flag = false;
+          break;
+        }
       }
       if(flag) {
-	trial_set.push_back(index);
+        trial_set.push_back(index);
       }
 
     }
@@ -732,7 +732,7 @@ vector<int> StepWise( vector<cestructure> & str_list,
     bool flag;
 
     score = ACECrossValidation(str_leftout_set_list,
-			       str_list, ECIcluster_tmp);
+        str_list, ECIcluster_tmp);
 
     //cerr << "str left out list size " << str_leftout_set_list.size() << endl;
     //for (uint l=0; l<str_leftout_set_list.size(); l++) {
@@ -767,85 +767,85 @@ vector<int> StepWise( vector<cestructure> & str_list,
 
       bool flag1 = true;
       if( leftout_set_size != 0 ) {
-	// forward search
+        // forward search
 
-	//cerr << "SetWise: left out clusters size " << leftout_set_size << endl;
-	cerr << "forward search !\n";
+        //cerr << "SetWise: left out clusters size " << leftout_set_size << endl;
+        cerr << "forward search !\n";
 
-	for (int i=0; i< leftout_set_size; i++) {
-	  // add one cluster each time
+        for (int i=0; i< leftout_set_size; i++) {
+          // add one cluster each time
 
-	  trial_set = trial_set_orig;
-	  trial_set.push_back(leftout_set.at(i));
+          trial_set = trial_set_orig;
+          trial_set.push_back(leftout_set.at(i));
 
-	  sort(trial_set.begin(), trial_set.end());
+          sort(trial_set.begin(), trial_set.end());
 
-	  ECIcluster_tmp.GetECICluster(trial_set);
+          ECIcluster_tmp.GetECICluster(trial_set);
 
-	  // get correlation functions of ECI cluster
-	  for (uint i=0; i<str_list.size(); i++) {
-	    str_list.at(i).SetECICluster(ECIcluster_tmp);
-	    str_list.at(i).GetECICorrelation();
-	    //str_list.at(i).PrintOutCorrelation();
-	  }
+          // get correlation functions of ECI cluster
+          for (uint i=0; i<str_list.size(); i++) {
+            str_list.at(i).SetECICluster(ECIcluster_tmp);
+            str_list.at(i).GetECICorrelation();
+            //str_list.at(i).PrintOutCorrelation();
+          }
 
-	  score = ACECrossValidation(str_leftout_set_list,
-				     str_list, ECIcluster_tmp);
+          score = ACECrossValidation(str_leftout_set_list,
+              str_list, ECIcluster_tmp);
 
-	  //cerr << "score " << score << endl;
-	  //cerr << "score opt " << score_opt << endl;
+          //cerr << "score " << score << endl;
+          //cerr << "score opt " << score_opt << endl;
 
-	  // keep only the shortest optimal ECI cluster with
-	  // the same score
-	  if(score < score_opt && score_opt > _SCORE_ZERO) {
-	    score_opt = score;
-	    trial_set_opt = trial_set;
-	    flag1 = false;
-	  } else if(score_opt < _SCORE_ZERO) {
-	    break;
-	  }
-	}
+          // keep only the shortest optimal ECI cluster with
+          // the same score
+          if(score < score_opt && score_opt > _SCORE_ZERO) {
+            score_opt = score;
+            trial_set_opt = trial_set;
+            flag1 = false;
+          } else if(score_opt < _SCORE_ZERO) {
+            break;
+          }
+        }
       }
 
       if( trial_set_size != 1 ) {
-	// backward search
+        // backward search
 
-	cerr << "backward search !\n";
+        cerr << "backward search !\n";
 
-	for (int i=0; i< trial_set_size; i++) {
-	  // add one cluster each time
+        for (int i=0; i< trial_set_size; i++) {
+          // add one cluster each time
 
-	  trial_set = trial_set_orig;
-	  trial_set.erase(trial_set.begin()+i);
+          trial_set = trial_set_orig;
+          trial_set.erase(trial_set.begin()+i);
 
-	  //cerr << "backward \n";
-	  //for ( uint i = 0; i<trial_set.size(); i++) {
-	  //    cerr << "i " << i << " " << trial_set.at(i) << endl;
-	  //}
+          //cerr << "backward \n";
+          //for ( uint i = 0; i<trial_set.size(); i++) {
+          //    cerr << "i " << i << " " << trial_set.at(i) << endl;
+          //}
 
-	  //sort(trial_set.begin(), trial_set.end());
+          //sort(trial_set.begin(), trial_set.end());
 
-	  ECIcluster_tmp.GetECICluster(trial_set);
+          ECIcluster_tmp.GetECICluster(trial_set);
 
-	  // get correlation functions of ECI cluster
-	  for (uint i=0; i<str_list.size(); i++) {
-	    str_list.at(i).SetECICluster(ECIcluster_tmp);
-	    str_list.at(i).GetECICorrelation();
-	    //str_list.at(i).PrintOutCorrelation();
-	  }
+          // get correlation functions of ECI cluster
+          for (uint i=0; i<str_list.size(); i++) {
+            str_list.at(i).SetECICluster(ECIcluster_tmp);
+            str_list.at(i).GetECICorrelation();
+            //str_list.at(i).PrintOutCorrelation();
+          }
 
-	  score = ACECrossValidation(str_leftout_set_list,
-				     str_list, ECIcluster_tmp);
+          score = ACECrossValidation(str_leftout_set_list,
+              str_list, ECIcluster_tmp);
 
-	  //cerr << "score " << score << endl;
-	  //cerr << "score opt " << score_opt << endl;
+          //cerr << "score " << score << endl;
+          //cerr << "score opt " << score_opt << endl;
 
-	  if(score <= score_opt) {
-	    score_opt = score;
-	    trial_set_opt = trial_set;
-	    flag1 = false;
-	  }
-	}
+          if(score <= score_opt) {
+            score_opt = score;
+            trial_set_opt = trial_set;
+            flag1 = false;
+          }
+        }
       }
 
       flag = flag1;
@@ -857,13 +857,13 @@ vector<int> StepWise( vector<cestructure> & str_list,
       cerr << "score_opt " << score_opt << endl;
       cerr << "current best cluster \n";
       for (uint i=0; i<trial_set_opt.size(); i++) {
-	cerr << trial_set_opt.at(i) << " ";
+        cerr << trial_set_opt.at(i) << " ";
       }
       cerr << endl;
     }
 
     cerr << "current optimal cluster: "
-	 << trial_set_opt.size() << endl;
+      << trial_set_opt.size() << endl;
     cerr << "score opt " << score_opt << endl;
     for (uint i=0; i<trial_set_opt.size(); i++) {
       cerr << trial_set_opt.at(i) << " ";
@@ -894,7 +894,7 @@ vector<int> StepWise( vector<cestructure> & str_list,
 
   vector<double> ECI_opt;
   ECI_opt = ACEGetECIAverage( str_leftout_set_list,
-			      str_list,  ECIcluster);
+      str_list,  ECIcluster);
 
   ECIcluster.SetECI(ECI_opt);
   ECIcluster.SetChiSQ(score_opt_global);
@@ -904,7 +904,7 @@ vector<int> StepWise( vector<cestructure> & str_list,
 
 
 vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
-			      ceECIcluster & ECIcluster) {
+    ceECIcluster & ECIcluster) {
   // genetic algorithm using rank selection and elitism
   // randomly choose the crossover position
 
@@ -914,7 +914,7 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
   int left_out_num = _LEFTOUT_NUM;
 
   str_leftout_set_list = ACESetUpCrossValidationSetsRandom(
-							   left_out_num, total_str);
+      left_out_num, total_str);
 
 
   // set up paramters
@@ -950,7 +950,7 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
   }
 
   cerr << "Initial total gene_num "
-       << total_gene_num << endl;
+    << total_gene_num << endl;
 
   int evolution_count = 0;
 
@@ -962,45 +962,45 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
 
 
       for (int i1=0; i1<gene_num; i1++) {
-	int gene_index = rand()%total_cluster;
-	bool flag;
-	flag = true;
-	for (int i2=0; i2<i1; i2++) {
-	  if( chromosome[i][i1] == gene_index ) {
-	    //duplicate
-	    flag = false;
-	    break;
-	  }
-	}
-	if(flag) {
-	  chromosome[i][gene_index] = true;
-	}
+        int gene_index = rand()%total_cluster;
+        bool flag;
+        flag = true;
+        for (int i2=0; i2<i1; i2++) {
+          if( chromosome[i][i1] == gene_index ) {
+            //duplicate
+            flag = false;
+            break;
+          }
+        }
+        if(flag) {
+          chromosome[i][gene_index] = true;
+        }
       }
       if( i == 0 ) {
-	flag1 = true;
+        flag1 = true;
       } else {
-	bool flag2 = true;
+        bool flag2 = true;
 
-	// flag2 = ture : no duplication
-	//       = false: duplication
+        // flag2 = ture : no duplication
+        //       = false: duplication
 
-	for (int i1=0; i1<i; i1++) { // no duplication of chromosomes
-	  flag2 = true;
-	  for (int i2=0; i2<total_cluster; i2++) {
-	    flag2 = flag2 && (!(chromosome[i][i2]^chromosome[i1][i2]));
-	  }
-	  flag2 = !flag2;
+        for (int i1=0; i1<i; i1++) { // no duplication of chromosomes
+          flag2 = true;
+          for (int i2=0; i2<total_cluster; i2++) {
+            flag2 = flag2 && (!(chromosome[i][i2]^chromosome[i1][i2]));
+          }
+          flag2 = !flag2;
 
-	  if(!flag2) {
-	    break;
-	  }
-	}
+          if(!flag2) {
+            break;
+          }
+        }
 
-	if(flag2) {
-	  flag1 = true;
-	} else {
-	  flag1 = false;
-	}
+        if(flag2) {
+          flag1 = true;
+        } else {
+          flag1 = false;
+        }
 
       }
     }
@@ -1060,18 +1060,18 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
   cerr.precision(6);
   for (uint i=0; i<fit_score.size(); i++) {
     myfile << setw(8)
-	   << evolution_count
-	   << setw(12)
-	   <<fit_score.at(i).score
-	   << endl ;
+      << evolution_count
+      << setw(12)
+      <<fit_score.at(i).score
+      << endl ;
   }
 
   int no_replacement_num = 0;
   int same_best_chromosome_num = 0;
 
   while ( no_replacement_num < _NO_REPLACEMENT_NUM
-	  && evolution_count < _EVOLUTION_NUM
-	  && same_best_chromosome_num < _SAME_BEST_CHROMOSOME_NUM) {
+      && evolution_count < _EVOLUTION_NUM
+      && same_best_chromosome_num < _SAME_BEST_CHROMOSOME_NUM) {
     // reproduction
 
     //////////////////////////////////////////////////////////////
@@ -1120,32 +1120,32 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
       bool flag = false;
       int count=0;
       while (!flag) {
-	double r = double(rand()) / double(RAND_MAX);
-	double sum_tmp=0.0;
+        double r = double(rand()) / double(RAND_MAX);
+        double sum_tmp=0.0;
 
-	for (int i1=fit_score.size()-1; i1>=0; i1--) {
-	  sum_tmp += fit_score.at(i1).rank;
-	  if( r < sum_tmp ) {
-	    count = i1;
-	    break;
-	  }
-	}
-	flag = true;
+        for (int i1=fit_score.size()-1; i1>=0; i1--) {
+          sum_tmp += fit_score.at(i1).rank;
+          if( r < sum_tmp ) {
+            count = i1;
+            break;
+          }
+        }
+        flag = true;
 
-	for (uint i=0; i<reproduction_pool.size(); i++) {
-	  if( count == reproduction_pool.at(i) ) {
-	    flag = false;
-	    break;
-	  }
-	}
+        for (uint i=0; i<reproduction_pool.size(); i++) {
+          if( count == reproduction_pool.at(i) ) {
+            flag = false;
+            break;
+          }
+        }
 
       }
 
       reproduction_pool.push_back(count);
 
       for (int i1=0; i1<total_cluster; i1++) {
-	int index = fit_score.at(count).index;
-	parent[i][i1] = chromosome[index][i1];
+        int index = fit_score.at(count).index;
+        parent[i][i1] = chromosome[index][i1];
       }
 
     }
@@ -1185,9 +1185,9 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
 
 
       for (int i2=crossover_position-1; i2<total_cluster; i2++) {
-	bool flag = parent[index1][i2];
-	parent[index1][i2] = parent[index2][i2];
-	parent[index2][i2] = flag;
+        bool flag = parent[index1][i2];
+        parent[index1][i2] = parent[index2][i2];
+        parent[index2][i2] = flag;
       }
 
 
@@ -1214,10 +1214,10 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
 
       for (int j1=0; j1<total_cluster; j1++) {
 
-	rd = double(rand()) / double(RAND_MAX);
-	if( rd < _MUTATION_PROPABILITY ) {
-	  parent[j][j1] = !(parent[j][j1]);
-	}
+        rd = double(rand()) / double(RAND_MAX);
+        if( rd < _MUTATION_PROPABILITY ) {
+          parent[j][j1] = !(parent[j][j1]);
+        }
 
       }
 
@@ -1247,9 +1247,9 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
 
       // get correlation functions of ECI cluster
       for (uint i1=0; i1<str_list.size(); i1++) {
-	str_list.at(i1).SetECICluster(ECIcluster_tmp);
-	str_list.at(i1).GetECICorrelation();
-	//str_list.at(i1).PrintOutCorrelation();
+        str_list.at(i1).SetECICluster(ECIcluster_tmp);
+        str_list.at(i1).GetECICorrelation();
+        //str_list.at(i1).PrintOutCorrelation();
       }
 
       score = ACECrossValidation(str_leftout_set_list, str_list, ECIcluster_tmp);
@@ -1307,44 +1307,44 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
       //////////////////////////////////////////////////////////////
       bool flag=true;
       for (int i1=0; i1<population; i1++) {
-	flag = true;
-	for (int i2=0; i2<total_cluster; i2++) {
-	  flag = flag && (!(parent[index_offspring][i2]^chromosome[i1][i2]));
-	}
-	flag = !flag;
-	if(!flag) {
-	  //cerr << "offspring " << index_offspring
-	  //    << " is the same as parent " << i1 << endl;
-	  break;
-	}
+        flag = true;
+        for (int i2=0; i2<total_cluster; i2++) {
+          flag = flag && (!(parent[index_offspring][i2]^chromosome[i1][i2]));
+        }
+        flag = !flag;
+        if(!flag) {
+          //cerr << "offspring " << index_offspring
+          //    << " is the same as parent " << i1 << endl;
+          break;
+        }
       }
-            
+
       if(flag) {
 
-	for (uint i1=0; i1<fit_score.size(); i1++) {
+        for (uint i1=0; i1<fit_score.size(); i1++) {
 
-	  double score_parent = fit_score.at(i1).score;
-	  int index_parent = fit_score.at(i1).index;
+          double score_parent = fit_score.at(i1).score;
+          int index_parent = fit_score.at(i1).index;
 
-	  if( score_offspring < score_parent ) {
-	    //cerr << "offspring " << index_offspring
-	    //    << " replace parent "  << index_parent << endl;
-	    for (int j=0; j<total_cluster; j++) {
-	      chromosome[index_parent][j] = parent[index_offspring][j];
-	    }
-	    fit_score.at(i1).score = score_offspring;
-	    fit_score.at(i1).size = size_offspring;
-	    break;
-	  }
-	}
+          if( score_offspring < score_parent ) {
+            //cerr << "offspring " << index_offspring
+            //    << " replace parent "  << index_parent << endl;
+            for (int j=0; j<total_cluster; j++) {
+              chromosome[index_parent][j] = parent[index_offspring][j];
+            }
+            fit_score.at(i1).score = score_offspring;
+            fit_score.at(i1).size = size_offspring;
+            break;
+          }
+        }
 
-	no_replacement_num = 0;
+        no_replacement_num = 0;
       } else {
-	++no_replacement_num;
+        ++no_replacement_num;
       }
 
     }
-        
+
     sort(fit_score.begin(), fit_score.end(), &comparison_fitscore);
 
     //cerr << "population score\n";
@@ -1369,16 +1369,16 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
       same_best_chromosome_num = 0;
     }
     cerr << "evolution " << evolution_count
-	 << " current best " << best
-	 << " score " << fit_score.back().score
-	 << " size " << fit_score.back().size
-	 << endl;
+      << " current best " << best
+      << " score " << fit_score.back().score
+      << " size " << fit_score.back().size
+      << endl;
     cerr << "current best chromosome \n";
     int count_pa = 0;
     for (int i1=0; i1<total_cluster; i1++) {
       cerr << chromosome[best][i1];
       if( chromosome[best][i1] ) {
-	++count_pa;
+        ++count_pa;
       }
     }
     cerr << " size " << count_pa << endl;
@@ -1390,10 +1390,10 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
     cerr.precision(6);
     for (uint i=0; i<fit_score.size(); i++) {
       myfile << setw(8)
-	     << evolution_count
-	     << setw(12)
-	     <<fit_score.at(i).score
-	     << endl ;
+        << evolution_count
+        << setw(12)
+        <<fit_score.at(i).score
+        << endl ;
     }
 
     if( fit_score.back().score < _SCORE_ZERO ) {
@@ -1427,7 +1427,7 @@ vector<int> GeneticAlgorithm( vector<cestructure> & str_list,
   cerr << "Average ECI cluster size " << ECIcluster.ECICluster().size() << endl;
 
   ECI_opt = ACEGetECIAverage( str_leftout_set_list,
-			      str_list,  ECIcluster);
+      str_list,  ECIcluster);
   ECIcluster.SetECI(ECI_opt);
   ECIcluster.SetChiSQ(fit_score.back().score);
 
@@ -1510,7 +1510,7 @@ void ACEGetECI(vector<cestructure> & str_list, ceECIcluster & cluster1) {
     for (int j=0; j< ncol; j++) { // different clusters
 
       x_mat[i+1][j+1] = str_list.at(i).ECICorrelation().at(j)
-	* str_list.at(i).ECIEquivalentNum().at(j);
+        * str_list.at(i).ECIEquivalentNum().at(j);
     }
   }
 
@@ -1589,7 +1589,7 @@ void ACEGetECI(vector<cestructure> & str_list, vector<int> fit_list, ceECIcluste
     for (int j=0; j< ncol; j++) { // different clusters
 
       x_mat[i+1][j+1] = str_list.at(index).ECICorrelation().at(j)
-	* str_list.at(index).ECIEquivalentNum().at(j);
+        * str_list.at(index).ECIEquivalentNum().at(j);
     }
   }
 
@@ -1650,8 +1650,8 @@ vector<int> LeftOutSet(int total_size, vector<int> kept_set) {
   for (uint i=0; i<kept_set.size(); i++) {
     for (uint j=0; j<comp_set.size(); j++) {
       if( kept_set.at(i) == comp_set.at(j) ) {
-	comp_set.erase(comp_set.begin()+j);
-	break;
+        comp_set.erase(comp_set.begin()+j);
+        break;
       }
     }
   }
@@ -1661,7 +1661,7 @@ vector<int> LeftOutSet(int total_size, vector<int> kept_set) {
 }
 
 vector<double> ACEGetECIAverage(vector< vector<int> > str_leftout_set_list,
-				vector<cestructure> & str_list, ceECIcluster & ECIcluster) {
+    vector<cestructure> & str_list, ceECIcluster & ECIcluster) {
 
   // calculate the averaged ECI
 
@@ -1692,7 +1692,7 @@ vector<double> ACEGetECIAverage(vector< vector<int> > str_leftout_set_list,
       ECI_ave = ECI_new;
     } else {
       for (uint i=0; i<ECI_ave.size(); i++) {
-	ECI_ave.at(i) += ECI_new.at(i);
+        ECI_ave.at(i) += ECI_new.at(i);
       }
     }
 
@@ -1712,7 +1712,7 @@ vector<double> ACEGetECIAverage(vector< vector<int> > str_leftout_set_list,
 // ****************************************************
 
 double ACECrossValidation(vector< vector<int> > str_leftout_set_list,
-			  vector<cestructure> & str_list, ceECIcluster & ECIcluster) {
+    vector<cestructure> & str_list, ceECIcluster & ECIcluster) {
   // Select the optimal ECIs by cross validation scores
   // leftout_list sets are given by left_out_set_list
 
@@ -1724,7 +1724,7 @@ double ACECrossValidation(vector< vector<int> > str_leftout_set_list,
   myfile.open(_LOCVFILE.c_str());
   myfile << "Left some out cross-validation\n";
 
-    
+
   //int total_str = str_list.size();
   double pre_error;
   int total_config;
@@ -1757,7 +1757,7 @@ double ACECrossValidation(vector< vector<int> > str_leftout_set_list,
       int nr = leftout_list.at(k);
       myfile <<  str_list.at(nr).Name() << " ";
 
-      //cerr <<  str_list.at(nr).Name() << " ";
+      //cerr << str_list.at(nr).Name() << " ";
     }
     myfile << endl;
     //cerr << endl;
@@ -1775,13 +1775,13 @@ double ACECrossValidation(vector< vector<int> > str_leftout_set_list,
     for (uint k=0; k<leftout_list.size(); k++) {
       int nr = leftout_list.at(k);
       pre_error = (str_list.at(nr).Energy() - str_list.at(nr).EnergyIn())
-	/ str_list.at(nr).EnergyIn();
+        / str_list.at(nr).EnergyIn();
 
       myfile << "structure "
-	     << str_list.at(nr).Name()
-	     << " predict error  = "
-	     <<  pre_error
-	     << endl;
+        << str_list.at(nr).Name()
+        << " predict error  = "
+        <<  pre_error
+        << endl;
     }
 
     double score = 0.0;
@@ -1812,7 +1812,7 @@ double ACECrossValidation(vector< vector<int> > str_leftout_set_list,
 }
 
 vector< vector<int> >  ACESetUpCrossValidationSetsRandom(int left_out_num,
-							 int total_str) {
+    int total_str) {
   // Select the optimal ECIs by cross validation scores
   // leftout_list is chosen by random number
 
@@ -1872,8 +1872,8 @@ vector< vector<int> >  ACESetUpCrossValidationSetsRandom(int left_out_num,
 //////////////////////////////////////////////////////////////
 
 void ACESLProperties(ostream & os, string & structure_type,
-		     int cell_nr_min, int cell_nr_max, const ceallclusters & allcluster1,
-		     ceECIcluster & ecicluster1) {
+    int cell_nr_min, int cell_nr_max, const ceallclusters & allcluster1,
+    ceECIcluster & ecicluster1) {
   ceSL sl1;
   sl1 = ceSL(structure_type);
   vector<int> atom_config;
@@ -1919,251 +1919,251 @@ void ACESLProperties(ostream & os, string & structure_type,
 
     for (int l11=-nr1; l11<nr1+1; l11++) {
       for (int l12=-nr1; l12 < nr1+1; l12++) {
-	for (int l13=-nr1; l13 < nr1+1; l13++) {
+        for (int l13=-nr1; l13 < nr1+1; l13++) {
 
-	  b1[1] = l11*str_base.lattice[1][1]
-	    +l12*str_base.lattice[2][1]
-	    +l13*str_base.lattice[3][1];
-	  b1[2] = l11*str_base.lattice[1][2]
-	    +l12*str_base.lattice[2][2]
-	    +l13*str_base.lattice[3][2];
-	  b1[3] = l11*str_base.lattice[1][3]
-	    +l12*str_base.lattice[2][3]
-	    +l13*str_base.lattice[3][3];
-
-
-	  for (int l21=-nr2; l21 < nr2+1; l21++) {
-	    for (int l22=-nr2; l22 < nr2+1; l22++) {
-	      for (int l23=-nr2; l23 < nr2+1; l23++) {
-
-		b2[1] = l21*str_base.lattice[1][1]
-		  +l22*str_base.lattice[2][1]
-		  +l23*str_base.lattice[3][1];
-		b2[2] = l21*str_base.lattice[1][2]
-		  +l22*str_base.lattice[2][2]
-		  +l23*str_base.lattice[3][2];
-		b2[3] = l21*str_base.lattice[1][3]
-		  +l22*str_base.lattice[2][3]
-		  +l23*str_base.lattice[3][3];
+          b1[1] = l11*str_base.lattice[1][1]
+            +l12*str_base.lattice[2][1]
+            +l13*str_base.lattice[3][1];
+          b1[2] = l11*str_base.lattice[1][2]
+            +l12*str_base.lattice[2][2]
+            +l13*str_base.lattice[3][2];
+          b1[3] = l11*str_base.lattice[1][3]
+            +l12*str_base.lattice[2][3]
+            +l13*str_base.lattice[3][3];
 
 
-		if( l11 == l21 && l12 == l22 && l13 == l23 ) {
-		  continue;
-		}
+          for (int l21=-nr2; l21 < nr2+1; l21++) {
+            for (int l22=-nr2; l22 < nr2+1; l22++) {
+              for (int l23=-nr2; l23 < nr2+1; l23++) {
 
-		//if( scalar_product(b1,b2) < 0 ) {
-		//    continue;
-		//}
-
-		if( aurostd::modulus(b1) > aurostd::modulus(b2) ) {
-		  continue;
-		}
-
-		double leng_max = aurostd::max(aurostd::modulus(b1), aurostd::modulus(b2));
-		if( (aurostd::modulus(b2-b1) < leng_max) || (aurostd::modulus(b2+b1) < leng_max ) ) {
-		  continue;
-		}
+                b2[1] = l21*str_base.lattice[1][1]
+                  +l22*str_base.lattice[2][1]
+                  +l23*str_base.lattice[3][1];
+                b2[2] = l21*str_base.lattice[1][2]
+                  +l22*str_base.lattice[2][2]
+                  +l23*str_base.lattice[3][2];
+                b2[3] = l21*str_base.lattice[1][3]
+                  +l22*str_base.lattice[2][3]
+                  +l23*str_base.lattice[3][3];
 
 
-		for (int l31=-nr3; l31 < nr3+1; l31++) {
-		  for (int l32=-nr3; l32 < nr3+1; l32++) {
-		    for (int l33=-nr3; l33 < nr3+1; l33++) {
+                if( l11 == l21 && l12 == l22 && l13 == l23 ) {
+                  continue;
+                }
+
+                //if( scalar_product(b1,b2) < 0 ) {
+                //    continue;
+                //}
+
+                if( aurostd::modulus(b1) > aurostd::modulus(b2) ) {
+                  continue;
+                }
+
+                double leng_max = aurostd::max(aurostd::modulus(b1), aurostd::modulus(b2));
+                if( (aurostd::modulus(b2-b1) < leng_max) || (aurostd::modulus(b2+b1) < leng_max ) ) {
+                  continue;
+                }
 
 
-		      b3[1] = l31*str_base.lattice[1][1]
-			+l32*str_base.lattice[2][1]
-			+l33*str_base.lattice[3][1];
-		      b3[2] = l31*str_base.lattice[1][2]
-			+l32*str_base.lattice[2][2]
-			+l33*str_base.lattice[3][2];
-		      b3[3] = l31*str_base.lattice[1][3]
-			+l32*str_base.lattice[2][3]
-			+l33*str_base.lattice[3][3];
-
-		      //if( scalar_product(b1, b3) < 0
-		      //        || scalar_product(b2, b3) < 0) {
-		      //    continue;
-		      //}
-
-		      if( aurostd::modulus(b2) > aurostd::modulus(b3) ) {
-			continue;
-		      }
-
-		      double leng_max;
-		      leng_max = aurostd::max(aurostd::modulus(b1), aurostd::modulus(b3));
-		      if( (aurostd::modulus(b3-b1) < leng_max) || (aurostd::modulus(b3+b1) < leng_max ) ) {
-			continue;
-		      }
-		      leng_max = aurostd::max(aurostd::modulus(b2), aurostd::modulus(b3));
-		      if( (aurostd::modulus(b3-b2) < leng_max) || (aurostd::modulus(b3+b2) < leng_max ) ) {
-			continue;
-		      }
+                for (int l31=-nr3; l31 < nr3+1; l31++) {
+                  for (int l32=-nr3; l32 < nr3+1; l32++) {
+                    for (int l33=-nr3; l33 < nr3+1; l33++) {
 
 
-		      vol = (l11*l22 - l12*l21)*l33 + (l12*l23-l13*l22)*l31
-			+ (l13*l21 - l11*l23)*l32;
-		      //if( abs(vol) != nr ) {
-		      //    continue;
-		      //}
+                      b3[1] = l31*str_base.lattice[1][1]
+                        +l32*str_base.lattice[2][1]
+                        +l33*str_base.lattice[3][1];
+                      b3[2] = l31*str_base.lattice[1][2]
+                        +l32*str_base.lattice[2][2]
+                        +l33*str_base.lattice[3][2];
+                      b3[3] = l31*str_base.lattice[1][3]
+                        +l32*str_base.lattice[2][3]
+                        +l33*str_base.lattice[3][3];
 
-		      if( vol != nr ) {
-			// keep only vol > 0
-			continue;
-		      }
+                      //if( scalar_product(b1, b3) < 0
+                      //        || scalar_product(b2, b3) < 0) {
+                      //    continue;
+                      //}
 
-		      trans_SL[1][1] = l11;
-		      trans_SL[1][2] = l12;
-		      trans_SL[1][3] = l13;
-		      trans_SL[2][1] = l21;
-		      trans_SL[2][2] = l22;
-		      trans_SL[2][3] = l23;
-		      trans_SL[3][1] = l31;
-		      trans_SL[3][2] = l32;
-		      trans_SL[3][3] = l33;
+                      if( aurostd::modulus(b2) > aurostd::modulus(b3) ) {
+                        continue;
+                      }
 
-		      //cerr << "trans_SL \n";
-		      //cerr << trans_SL << endl;
+                      double leng_max;
+                      leng_max = aurostd::max(aurostd::modulus(b1), aurostd::modulus(b3));
+                      if( (aurostd::modulus(b3-b1) < leng_max) || (aurostd::modulus(b3+b1) < leng_max ) ) {
+                        continue;
+                      }
+                      leng_max = aurostd::max(aurostd::modulus(b2), aurostd::modulus(b3));
+                      if( (aurostd::modulus(b3-b2) < leng_max) || (aurostd::modulus(b3+b2) < leng_max ) ) {
+                        continue;
+                      }
 
-		      sl1.GetStructure(trans_SL, nr);
 
-		      if( sl1.AtomNr() != nr ) {
-			continue;
-		      }
+                      vol = (l11*l22 - l12*l21)*l33 + (l12*l23-l13*l22)*l31
+                        + (l13*l21 - l11*l23)*l32;
+                      //if( abs(vol) != nr ) {
+                      //    continue;
+                      //}
 
-		      // check whether sl1 has been found or not
-		      // follow the criterion given by Ferreira, Wei, and Zunger
-		      // Int. J. High Performance Comp. Appl. 5, 34 (1991)
+                      if( vol != nr ) {
+                        // keep only vol > 0
+                        continue;
+                      }
 
-		      //sl1.Structure().FixLattices();
+                      trans_SL[1][1] = l11;
+                      trans_SL[1][2] = l12;
+                      trans_SL[1][3] = l13;
+                      trans_SL[2][1] = l21;
+                      trans_SL[2][2] = l22;
+                      trans_SL[2][3] = l23;
+                      trans_SL[3][1] = l31;
+                      trans_SL[3][2] = l32;
+                      trans_SL[3][3] = l33;
 
-		      //cerr << sl1.Name() << endl;
-		      //cerr << sl1.Structure().lattice << endl << endl;
+                      //cerr << "trans_SL \n";
+                      //cerr << trans_SL << endl;
 
-		      xmatrix<double> grot(1, 1, 3, 3); // point-group*k-lattice
-		      bool flag_eq = false;
+                      sl1.GetStructure(trans_SL, nr);
 
-		      for (uint k1=0; k1 < lattice_old_list.size(); k1++) {
-			lattice_old[1][1] = lattice_old_list.at(k1).at(0);
-			lattice_old[1][2] = lattice_old_list.at(k1).at(1);
-			lattice_old[1][3] = lattice_old_list.at(k1).at(2);
-			lattice_old[2][1] = lattice_old_list.at(k1).at(3);
-			lattice_old[2][2] = lattice_old_list.at(k1).at(4);
-			lattice_old[2][3] = lattice_old_list.at(k1).at(5);
-			lattice_old[3][1] = lattice_old_list.at(k1).at(6);
-			lattice_old[3][2] = lattice_old_list.at(k1).at(7);
-			lattice_old[3][3] = lattice_old_list.at(k1).at(8);
+                      if( sl1.AtomNr() != nr ) {
+                        continue;
+                      }
 
-			for (uint l1=0; l1< str_base.pgroup.size(); l1++) {
-			  grot = sl1.Structure().klattice*str_base.pgroup.at(l1).Uc/(2.0*_pi);
-			  double a1, a2, a3; // lattice *dot* reciprocal lattice
+                      // check whether sl1 has been found or not
+                      // follow the criterion given by Ferreira, Wei, and Zunger
+                      // Int. J. High Performance Comp. Appl. 5, 34 (1991)
 
-			  bool flag1=true;
-			  for (int l2=1; l2 < 4; l2++) {
-			    a1 = abs(grot[l2][1]*lattice_old[1][1]
-				     + grot[l2][2]*lattice_old[1][2]
-				     + grot[l2][3]*lattice_old[1][3]) + _EQUAL_DOUBLE*0.1;
-			    a2 = abs(grot[l2][1]*lattice_old[2][1]
-				     + grot[l2][2]*lattice_old[2][2]
-				     + grot[l2][3]*lattice_old[2][3]) + _EQUAL_DOUBLE*0.1;
-			    a3 = abs(grot[l2][1]*lattice_old[3][1]
-				     + grot[l2][2]*lattice_old[3][2]
-				     + grot[l2][3]*lattice_old[3][3]) + _EQUAL_DOUBLE*0.1;
+                      //sl1.Structure().FixLattices();
 
-			    // check if a1, a2, a2 are integer
+                      //cerr << sl1.Name() << endl;
+                      //cerr << sl1.Structure().lattice << endl << endl;
 
-			    //cerr << endl << grot << endl << endl;
-			    //cerr << lattice_old << endl << endl;
-			    //cerr << a1 << " " << a2 << " " << a3 << endl;
+                      xmatrix<double> grot(1, 1, 3, 3); // point-group*k-lattice
+                      bool flag_eq = false;
 
-			    flag1 = flag1 && ((abs(a1 - int(a1)) < _EQUAL_DOUBLE)
-					      && (abs(a2 - int(a2)) < _EQUAL_DOUBLE)
-					      && (abs(a3 - int(a3)) < _EQUAL_DOUBLE));
+                      for (uint k1=0; k1 < lattice_old_list.size(); k1++) {
+                        lattice_old[1][1] = lattice_old_list.at(k1).at(0);
+                        lattice_old[1][2] = lattice_old_list.at(k1).at(1);
+                        lattice_old[1][3] = lattice_old_list.at(k1).at(2);
+                        lattice_old[2][1] = lattice_old_list.at(k1).at(3);
+                        lattice_old[2][2] = lattice_old_list.at(k1).at(4);
+                        lattice_old[2][3] = lattice_old_list.at(k1).at(5);
+                        lattice_old[3][1] = lattice_old_list.at(k1).at(6);
+                        lattice_old[3][2] = lattice_old_list.at(k1).at(7);
+                        lattice_old[3][3] = lattice_old_list.at(k1).at(8);
 
-			  }
+                        for (uint l1=0; l1< str_base.pgroup.size(); l1++) {
+                          grot = sl1.Structure().klattice*str_base.pgroup.at(l1).Uc/(2.0*_pi);
+                          double a1, a2, a3; // lattice *dot* reciprocal lattice
 
-			  flag_eq = flag1;
+                          bool flag1=true;
+                          for (int l2=1; l2 < 4; l2++) {
+                            a1 = abs(grot[l2][1]*lattice_old[1][1]
+                                + grot[l2][2]*lattice_old[1][2]
+                                + grot[l2][3]*lattice_old[1][3]) + _EQUAL_DOUBLE*0.1;
+                            a2 = abs(grot[l2][1]*lattice_old[2][1]
+                                + grot[l2][2]*lattice_old[2][2]
+                                + grot[l2][3]*lattice_old[2][3]) + _EQUAL_DOUBLE*0.1;
+                            a3 = abs(grot[l2][1]*lattice_old[3][1]
+                                + grot[l2][2]*lattice_old[3][2]
+                                + grot[l2][3]*lattice_old[3][3]) + _EQUAL_DOUBLE*0.1;
 
-			  if(flag_eq) {
-			    break;
-			  }
+                            // check if a1, a2, a2 are integer
 
-			}
+                            //cerr << endl << grot << endl << endl;
+                            //cerr << lattice_old << endl << endl;
+                            //cerr << a1 << " " << a2 << " " << a3 << endl;
 
-			if(flag_eq) {
-			  break;
-			}
+                            flag1 = flag1 && ((abs(a1 - int(a1)) < _EQUAL_DOUBLE)
+                                && (abs(a2 - int(a2)) < _EQUAL_DOUBLE)
+                                && (abs(a3 - int(a3)) < _EQUAL_DOUBLE));
 
-		      }
+                          }
 
-		      if( flag_eq ) {
-			continue;
-		      } else {
-			// store the lattice
-			vector<double> a_vec;
-			for (int l1=1; l1<4; l1++) {
-			  for (int l2=1; l2<4; l2++) {
-			    a_vec.push_back(sl1.Structure().lattice[l1][l2]);
-			  }
-			}
-			lattice_old_list.push_back(a_vec);
-		      }
+                          flag_eq = flag1;
 
-		      for (int i=1; i<sl1.AtomNr(); i++) {
-			int total_size = CombinationNr(i,sl1.AtomNr()-1);
+                          if(flag_eq) {
+                            break;
+                          }
 
-			for (int j=0; j<total_size; j++) {
+                        }
 
-			  int index = j;
-			  if( index ==0 ) {
-			    atom_config = AllCombination41(i, total_size, index+1);
-			  } else {
-			    atom_config = AllCombination42(i, total_size, atom_config);
-			  }
+                        if(flag_eq) {
+                          break;
+                        }
 
-			  //for (uint k=0; k<atom_config.size(); k++) {
-			  //    cerr << atom_config.at(k) << " ";
-			  //}
-			  //cerr << endl;
+                      }
 
-			  for(uint i1=0; i1<atom_config.size(); i1++) {
-			    atom_config.at(i1) += 1;
-			  }
+                      if( flag_eq ) {
+                        continue;
+                      } else {
+                        // store the lattice
+                        vector<double> a_vec;
+                        for (int l1=1; l1<4; l1++) {
+                          for (int l2=1; l2<4; l2++) {
+                            a_vec.push_back(sl1.Structure().lattice[l1][l2]);
+                          }
+                        }
+                        lattice_old_list.push_back(a_vec);
+                      }
 
-			  sl1.SetConfig(atom_config);
-			  sl1.StructureToName();
+                      for (int i=1; i<sl1.AtomNr(); i++) {
+                        int total_size = CombinationNr(i,sl1.AtomNr()-1);
 
-			  // restore to the original atom_config for getting correct combinations
-			  for(uint i1=0; i1<atom_config.size(); i1++) {
-			    atom_config.at(i1) -= 1;
-			  }
+                        for (int j=0; j<total_size; j++) {
 
-			  if( !sl1.IsPrimitiveCell() ) {
-			    continue;
-			  }
+                          int index = j;
+                          if( index ==0 ) {
+                            atom_config = AllCombination41(i, total_size, index+1);
+                          } else {
+                            atom_config = AllCombination42(i, total_size, atom_config);
+                          }
 
-			  sl1.PrintStructure(mySLfile);
+                          //for (uint k=0; k<atom_config.size(); k++) {
+                          //    cerr << atom_config.at(k) << " ";
+                          //}
+                          //cerr << endl;
 
-			  sl1.SetStrCluster(allcluster1);
-			  sl1.SetAllECICluster(ecicluster1);
+                          for(uint i1=0; i1<atom_config.size(); i1++) {
+                            atom_config.at(i1) += 1;
+                          }
 
-			  sl1.GetAllECICorrelation();
-			  sl1.WriteFile(mySLfilecor);
+                          sl1.SetConfig(atom_config);
+                          sl1.StructureToName();
 
-			  mySLfilename << setw(12)
-				       << sl1.Name()
-				       << setw(12)
-				       << sl1.StoichB()
-				       << endl;
+                          // restore to the original atom_config for getting correct combinations
+                          for(uint i1=0; i1<atom_config.size(); i1++) {
+                            atom_config.at(i1) -= 1;
+                          }
 
-			}
-		      }
-		    }
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+                          if( !sl1.IsPrimitiveCell() ) {
+                            continue;
+                          }
+
+                          sl1.PrintStructure(mySLfile);
+
+                          sl1.SetStrCluster(allcluster1);
+                          sl1.SetAllECICluster(ecicluster1);
+
+                          sl1.GetAllECICorrelation();
+                          sl1.WriteFile(mySLfilecor);
+
+                          mySLfilename << setw(12)
+                            << sl1.Name()
+                            << setw(12)
+                            << sl1.StoichB()
+                            << endl;
+
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -2176,8 +2176,8 @@ void ACESLProperties(ostream & os, string & structure_type,
 }
 
 void ACESLProperties_Readin_Corfile(istream & os, string & structure_type,
-				    const ceallclusters & allcluster1,
-				    ceECIcluster & ecicluster1) {
+    const ceallclusters & allcluster1,
+    ceECIcluster & ecicluster1) {
 
   // read correlation from the file
   // not as fast as calculating correlation when
@@ -2222,7 +2222,7 @@ void ACESLProperties_Readin_Corfile(istream & os, string & structure_type,
     pos_new = sl1.GetAllECICorrelation(corfilein, pos);
     if( pos_new == _NOCORRELATON_FOUND ) {
       cerr << SL_name
-	   << " : correlations are not found. Ignore this superlattice.\n";
+        << " : correlations are not found. Ignore this superlattice.\n";
       continue;
     }
     pos = pos_new;
@@ -2252,10 +2252,10 @@ void ACESLProperties_Readin_Corfile(istream & os, string & structure_type,
 }
 
 void ACESLPropertiesSQS_Readin_Corfile(istream & os, string & structure_type,
-				       const ceallclusters & allcluster1,
-				       ceECIcluster & ecicluster1, int site_num, int NNNum,
-				       int min_SLcell_nr, int max_SLcell_nr,
-				       vector<_ceatom> atom_species) {
+    const ceallclusters & allcluster1,
+    ceECIcluster & ecicluster1, int site_num, int NNNum,
+    int min_SLcell_nr, int max_SLcell_nr,
+    vector<_ceatom> atom_species) {
 
   // get SQS's with different concentration and number of atom inside a unit cell
 
@@ -2316,38 +2316,38 @@ void ACESLPropertiesSQS_Readin_Corfile(istream & os, string & structure_type,
     for (uint i=0; i<SQS_list.size() && flag; i++) {
 
       if( abs(sl1.StoichB() - SQS_list.at(i).at(0).stoich_b)
-	   < _EQUAL_DOUBLE
-	   && sl1.CellNr() == SQS_list.at(i).at(0).cell_nr ) {
-	// same concentration and cell number
+          < _EQUAL_DOUBLE
+          && sl1.CellNr() == SQS_list.at(i).at(0).cell_nr ) {
+        // same concentration and cell number
 
-	for (uint j=0; j<SQS_list.at(i).size(); j++) {
-	  // store new SL if its weigh is smaller
+        for (uint j=0; j<SQS_list.at(i).size(); j++) {
+          // store new SL if its weigh is smaller
 
-	  if(  SQSweight <= SQS_list.at(i).at(j).weight ) {
-	    // smaller weight
+          if(  SQSweight <= SQS_list.at(i).at(j).weight ) {
+            // smaller weight
 
-	    if( is_equal_structure(sl1, SQS_list.at(i).at(j).SQS) ) {
-	      // store only structure with different
-	      // correlations, that is, not equivalent
-	      // symmetrically
-	      flag = false;
-	      break;
-	    }
+            if( is_equal_structure(sl1, SQS_list.at(i).at(j).SQS) ) {
+              // store only structure with different
+              // correlations, that is, not equivalent
+              // symmetrically
+              flag = false;
+              break;
+            }
 
-	    for (uint k=SQS_list.at(i).size()-1; k>j; k--) {
-	      SQS_list.at(i).at(k) = SQS_list.at(i).at(k-1);
-	    }
+            for (uint k=SQS_list.at(i).size()-1; k>j; k--) {
+              SQS_list.at(i).at(k) = SQS_list.at(i).at(k-1);
+            }
 
-	    sqs_tmp.weight = SQSweight;
-	    sqs_tmp.SQS = sl1;
-	    sqs_tmp.stoich_b = sl1.StoichB();
-	    sqs_tmp.cell_nr = sl1.CellNr();
-	    SQS_list.at(i).at(j) = sqs_tmp;
-	    flag = false;
-	    break;
-	  }
-	}
-	flag = false;
+            sqs_tmp.weight = SQSweight;
+            sqs_tmp.SQS = sl1;
+            sqs_tmp.stoich_b = sl1.StoichB();
+            sqs_tmp.cell_nr = sl1.CellNr();
+            SQS_list.at(i).at(j) = sqs_tmp;
+            flag = false;
+            break;
+          }
+        }
+        flag = false;
       }
 
     }
@@ -2375,16 +2375,16 @@ void ACESLPropertiesSQS_Readin_Corfile(istream & os, string & structure_type,
 
   if( SQS_list.size() == 0 ) {
     cerr << "No superlattice with number of atoms in a unit cell \n"
-	 << "between "
-	 << min_SLcell_nr
-	 << " and "
-	 << max_SLcell_nr
-	 << ". Please run the command aflow --sl "
-	 << min_SLcell_nr
-	 << " "
-	 << max_SLcell_nr
-	 << " to get those superlattices."
-	 << endl;
+      << "between "
+      << min_SLcell_nr
+      << " and "
+      << max_SLcell_nr
+      << ". Please run the command aflow --sl "
+      << min_SLcell_nr
+      << " "
+      << max_SLcell_nr
+      << " to get those superlattices."
+      << endl;
   } else {
     sort(SQS_list.begin(), SQS_list.end(), &comparison_SLSQS);
 
@@ -2395,45 +2395,45 @@ void ACESLPropertiesSQS_Readin_Corfile(istream & os, string & structure_type,
     sort(cell_nr_list.begin(), cell_nr_list.end());
     int cell_nr_min = cell_nr_list.at(0);
     int cell_nr_max = cell_nr_list.back();
-        
+
     if( cell_nr_min != min_SLcell_nr || cell_nr_max != max_SLcell_nr ) {
       sqsfileout  << "Obtain the two best condidates of SQS's of superlattice \n"
-		  << "with number of atoms in a unit cell between "
-		  << cell_nr_min
-		  << " and "
-		  << cell_nr_max
-		  << endl;
+        << "with number of atoms in a unit cell between "
+        << cell_nr_min
+        << " and "
+        << cell_nr_max
+        << endl;
 
       if( cell_nr_min > min_SLcell_nr ) {
-	sqsfileout << "Please run the command aflow --sl "
-		   << min_SLcell_nr
-		   << " "
-		   << cell_nr_min
-		   << " to get those superlattices."
-		   << endl;
+        sqsfileout << "Please run the command aflow --sl "
+          << min_SLcell_nr
+          << " "
+          << cell_nr_min
+          << " to get those superlattices."
+          << endl;
       }
       if( cell_nr_max < max_SLcell_nr ) {
-	sqsfileout << "Please run the command aflow --sl "
-		   << cell_nr_max
-		   << " "
-		   << max_SLcell_nr
-		   << " to get those superlattices."
-		   << endl;
+        sqsfileout << "Please run the command aflow --sl "
+          << cell_nr_max
+          << " "
+          << max_SLcell_nr
+          << " to get those superlattices."
+          << endl;
       }
     }
 
     // output SQS_list
     for (uint i=0; i<SQS_list.size(); i++) {
       for (uint j=0; j<SQS_list.at(i).size(); j++) {
-	sqsfileout << "------------------------------------------------------------\n";
-	sqsfileout << setw(20)
-		   << "weight "
-		   << setw(20)
-		   << SQS_list.at(i).at(j).weight << endl;
-	SQS_list.at(i).at(j).SQS.OutputSQS(sqsfileout);
-	SQS_list.at(i).at(j).SQS.PrintStructure(sqsfileout, atom_species);
-	sqsfileout << "------------------------------------------------------------\n";
-	sqsfileout << endl;
+        sqsfileout << "------------------------------------------------------------\n";
+        sqsfileout << setw(20)
+          << "weight "
+          << setw(20)
+          << SQS_list.at(i).at(j).weight << endl;
+        SQS_list.at(i).at(j).SQS.OutputSQS(sqsfileout);
+        SQS_list.at(i).at(j).SQS.PrintStructure(sqsfileout, atom_species);
+        sqsfileout << "------------------------------------------------------------\n";
+        sqsfileout << endl;
       }
     }
     sqsfileout.close();
@@ -2460,17 +2460,17 @@ bool comparison_SLSQS(const vector<SLSQS> sqs1_list, const vector<SLSQS> sqs2_li
 
 bool is_equal_structure(ceSL sl1, ceSL sl2) {
   // two SL are equivalent symmetrically or not
-    
+
   if( sl1.SQScompareClusterList().size() !=
-       sl2.SQScompareClusterList().size() ) {
+      sl2.SQScompareClusterList().size() ) {
     return false;
   } else {
     for (uint i=0; i<sl1.SQScompareClusterList().size(); i++) {
       if( sl1.SQScompareClusterList().at(i).pair_name !=
-	   sl2.SQScompareClusterList().at(i).pair_name ||
-	   sl1.SQScompareClusterList().at(i).correlation !=
-	   sl2.SQScompareClusterList().at(i).correlation ) {
-	return false;
+          sl2.SQScompareClusterList().at(i).pair_name ||
+          sl1.SQScompareClusterList().at(i).correlation !=
+          sl2.SQScompareClusterList().at(i).correlation ) {
+        return false;
       }
     }
     return true;
@@ -2478,8 +2478,8 @@ bool is_equal_structure(ceSL sl1, ceSL sl2) {
 }
 
 void ACESLProperties(istream & os, string & structure_type,
-		     const ceallclusters & allcluster1,
-		     ceECIcluster & ecicluster1) {
+    const ceallclusters & allcluster1,
+    ceECIcluster & ecicluster1) {
 
   // calculate correlation
 
@@ -2532,8 +2532,8 @@ void ACESLProperties(istream & os, string & structure_type,
 }
 
 void ACESLCorrelations(istream & os, string & structure_type,
-		       const ceallclusters & allcluster1,
-		       ceECIcluster & ecicluster1) {
+    const ceallclusters & allcluster1,
+    ceECIcluster & ecicluster1) {
   // calculate the correlations of all candidate clusters
   // store in slcor.dat to accelerate the computation
   // ecicluster1 must be a ceECIcluster object without
@@ -2585,8 +2585,8 @@ void ACESLCorrelations(istream & os, string & structure_type,
 
 
 void GenerateAflowInputFile(string structure_type,
-			    string AlloyName,
-			    string SL_name, vector<_ceatom> atom_species, bool mpi_flag) {
+    string AlloyName,
+    string SL_name, vector<_ceatom> atom_species, bool mpi_flag) {
 
   ofstream input_file;
   string aflowin=_AFLOWIN_;
@@ -2715,14 +2715,14 @@ void GenerateAflowInputFile(string structure_type,
   input_file << "[VASP_POTCAR_FILE]" << atom_species.at(0).name << endl;
   input_file << "[VASP_POTCAR_FILE]" << atom_species.at(1).name << endl;
   input_file << "[AFLOW] potpaw_PBE: "
-	     << atom_species.at(0).name
-	     << " " << atom_species.at(1).name << endl;
+    << atom_species.at(0).name
+    << " " << atom_species.at(1).name << endl;
   input_file << "[VASP_FORCE_OPTION]LDAU_PARAMETERS="
-	     << atom_species.at(0).name
-	     <<","
-	     << atom_species.at(1).name
-	     << ";1,0;4.0,4.0;0.0,0.0"
-	     << endl;
+    << atom_species.at(0).name
+    <<","
+    << atom_species.at(1).name
+    << ";1,0;4.0,4.0;0.0,0.0"
+    << endl;
   input_file.close();
 
 }
@@ -2744,9 +2744,9 @@ void CheckAllInputFileExistence(string structure_type) {
   if( !myfile.is_open()) {
 
     cerr << "The cluster data file is missing\n"
-	 << "Please use the command\n"
-	 << "    aflow --cluster structure_type minimun_site_num maximun_site_num minimum_nearest_neighbour maximun_nearest_neighbour \n"
-	 << "to generate it\n";
+      << "Please use the command\n"
+      << "    aflow --cluster structure_type minimun_site_num maximun_site_num minimum_nearest_neighbour maximun_nearest_neighbour \n"
+      << "to generate it\n";
 
     myfile.close();
     flag_cluster_cal = true;
@@ -2784,16 +2784,16 @@ void CheckAllInputFileExistence(string structure_type) {
   }
   if( flag_SL_cal ) {
     cerr << "One or more input files for superlattice calculations are missing.\n"
-	 << "Please run the command \n"
-	 << "    aflow --sl structure_type mininum_atom_in_unit_cell maximun_atom_in_unit_cell \n"
-	 << "to obtained them\n";
+      << "Please run the command \n"
+      << "    aflow --sl structure_type mininum_atom_in_unit_cell maximun_atom_in_unit_cell \n"
+      << "to obtained them\n";
   }
 
   if( flag_cluster_cal || flag_SL_cal ) {
     exit(_EXIT_NO_INPUTFILE);
   } else {
     cerr << "All input files are found. Calculation begins.\n"
-	 << endl;
+      << endl;
   }
 
 }
@@ -2851,7 +2851,7 @@ void CheckAllInputFileExistence(string structure_type) {
 
 // [OBSOLETE]  vector<int> valley_electron(2), valley_hole(2); // used for the DoS effective mass denominator
 // [OBSOLETE]  string eigenval_file, outcar_file, doscar_file, poscar_file;
- 
+
 // [OBSOLETE]  // prepare a list of the input files
 // [OBSOLETE]  vector<string> files;
 // [OBSOLETE]  files.push_back("EIGENVAL");
@@ -2904,7 +2904,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]  
 // [OBSOLETE]  if( !getEfermiBandGap(doscar_file, ispin, compound_name, band_information) ) {
 // [OBSOLETE]    cerr << "getEfermiBandGap failed." << endl;
-// [OBSOLETE]    cerr << "pflow::EffectiveMass exiting." << endl;
+// [OBSOLETE]    cerr << XHOST.sPID << "pflow::EffectiveMass exiting." << endl;
 // [OBSOLETE]    return FALSE;
 // [OBSOLETE]  }
 // [OBSOLETE]
@@ -2921,7 +2921,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]    // we can't compute anything meaningful
 // [OBSOLETE]    if( !getFitDataForMass(eigenval_file, poscar_file, band_information, number_of_valley_list, energy_range, fit_data_all) ) { 
 // [OBSOLETE]      cerr << "getFitDataForMass failed." << endl;
-// [OBSOLETE]      cerr << "pflow::EffectiveMass exiting." << endl;
+// [OBSOLETE]      cerr << XHOST.sPID << "pflow::EffectiveMass exiting." << endl;
 // [OBSOLETE]      return FALSE;
 // [OBSOLETE]    };
 // [OBSOLETE]
@@ -2940,7 +2940,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]      // fit the data for each valley of 1 spin
 // [OBSOLETE]      if( !fitToEllipsisEquation(fit_data, spin_idx, mass_eff_list) ) {
 // [OBSOLETE]	cerr << "fitToEllipsisEquation failed." << endl;
-// [OBSOLETE]	cerr << "pflow::EffectiveMass exiting." << endl;
+// [OBSOLETE]	cerr << XHOST.sPID << "pflow::EffectiveMass exiting." << endl;
 // [OBSOLETE]	return FALSE;
 // [OBSOLETE]      }
 // [OBSOLETE]      
@@ -3186,7 +3186,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]    kEn_st kp1 = fit_data.at(i).at(0);
 // [OBSOLETE]    double kp1xx, kp1yy, kp1zz, kp1xy, kp1xz, kp1yz;
 // [OBSOLETE]    kp1xx = kp1.kpoint(1) * kp1.kpoint(1); kp1yy = kp1.kpoint(2) * kp1.kpoint(2); kp1zz = kp1.kpoint(3) * kp1.kpoint(3);
- // [OBSOLETE]   kp1xy = kp1.kpoint(1) * kp1.kpoint(2); kp1xz = kp1.kpoint(1) * kp1.kpoint(3); kp1yz = kp1.kpoint(2) * kp1.kpoint(3);
+// [OBSOLETE]   kp1xy = kp1.kpoint(1) * kp1.kpoint(2); kp1xz = kp1.kpoint(1) * kp1.kpoint(3); kp1yz = kp1.kpoint(2) * kp1.kpoint(3);
 // [OBSOLETE]   
 // [OBSOLETE]    //cout << "size " << fit_data.at(i).size() << endl;
 // [OBSOLETE]    int nrow = fit_data.at(i).size()-1; // one less data

@@ -15,17 +15,17 @@ namespace apl {
   // ***************************************************************************************
   QHA_AFLOWIN_CREATOR::QHA_AFLOWIN_CREATOR(Supercell& sc, ofstream& mf, ostream& oss)
     : ForceConstantCalculator(sc, mf, oss) {
-    clear();
-    _log.open(_logfile.c_str());
-    if (!_log.is_open()) {
-      //ME20191031 - use xerror
-      //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon() Cannot create [aflow_qha_aflowcreate_information.out] file.");
-      string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon()";
-      string message = "Cannot create [" + _logfile + "] file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      clear();
+      _log.open(_logfile.c_str());
+      if (!_log.is_open()) {
+        //ME20191031 - use xerror
+        //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon() Cannot create [aflow_qha_aflowcreate_information.out] file.");
+        string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon()";
+        string message = "Cannot create [" + _logfile + "] file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      }
+      _log << std::setprecision(8) << std::fixed;
     }
-    _log << std::setprecision(8) << std::fixed;
-  }
   // ***************************************************************************************
   QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear();}
   // ***************************************************************************************
@@ -76,7 +76,7 @@ namespace apl {
     _EOS_VOL_END=0.0;
     _EOS_VOL_INC=0.0;
     _lattice_index=-1;
-    _PSTRESS = ""; // ME20200220
+    _PSTRESS = ""; //ME20200220
     _directory = "";
   }
   // ***************************************************************************************

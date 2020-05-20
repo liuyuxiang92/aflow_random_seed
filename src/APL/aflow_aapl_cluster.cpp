@@ -31,38 +31,34 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
-  ClusterSet::ClusterSet(ostream& oss) : xStream() {
+  ClusterSet::ClusterSet(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
     directory = "./";
   }
 
-  ClusterSet::ClusterSet(ofstream& mf, ostream& oss) : xStream() {
+  ClusterSet::ClusterSet(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     directory = "./";
   }
 
   ClusterSet::ClusterSet(const Supercell& supercell, int _order, int cut_shell,
-      double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream() {
+      double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     directory = dir;
     initialize(supercell, _order, cut_shell, cut_rad);
   }
 
   //From file
   ClusterSet::ClusterSet(const string& filename, const Supercell& supercell, int _order,
-      int cut_shell, double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream() {
+      int cut_shell, double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();  // Clear old vectors
-    xStream::initialize(mf, oss);
     directory = dir;
     initialize(supercell, _order, cut_shell, cut_rad);
     readClusterSetFromFile(filename);
   }
 
   //Copy Constructors/////////////////////////////////////////////////////////
-  ClusterSet::ClusterSet(const ClusterSet& that) {
+  ClusterSet::ClusterSet(const ClusterSet& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     if (this != &that) free();
     copy(that);
   }

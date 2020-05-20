@@ -485,8 +485,8 @@
 #define         DEFAULT_APL_DPM                               XHOST.adefault.getattachedscheme("DEFAULT_APL_DPM")
 #define AFLOWRC_DEFAULT_APL_RELAX                             TRUE
 #define         DEFAULT_APL_RELAX                             XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX")
-#define AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE                TRUE  // ME20200427
-#define         DEFAULT_APL_RELAX_COMMENSURATE                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX_COMMENSURATE")  // ME20200427
+#define AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE                TRUE  //ME20200427
+#define         DEFAULT_APL_RELAX_COMMENSURATE                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX_COMMENSURATE")  //ME20200427
 #define AFLOWRC_DEFAULT_APL_ZEROSTATE                         TRUE  //CO20181216
 #define         DEFAULT_APL_ZEROSTATE                         XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE")
 #define AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR                  FALSE  //ME20191029
@@ -513,12 +513,12 @@
 #define         DEFAULT_APL_DOSPOINTS                         XHOST.adefault.getattachedutype<int>("DEFAULT_APL_DOSPOINTS")
 #define AFLOWRC_DEFAULT_APL_DOSSMEAR                          0.0
 #define         DEFAULT_APL_DOSSMEAR                          XHOST.adefault.getattachedutype<double>("DEFAULT_APL_DOSSMEAR")
-#define AFLOWRC_DEFAULT_APL_DOS_PROJECT                       FALSE  // ME20200213
-#define         DEFAULT_APL_DOS_PROJECT                       XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DOS_PROJECT")  // ME20200213
+#define AFLOWRC_DEFAULT_APL_DOS_PROJECT                       FALSE  //ME20200213
+#define         DEFAULT_APL_DOS_PROJECT                       XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DOS_PROJECT")  //ME20200213
 #define AFLOWRC_DEFAULT_APL_TP                                TRUE
 #define         DEFAULT_APL_TP                                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_TP")
-#define AFLOWRC_DEFAULT_APL_DISPLACEMENTS                     TRUE  // ME20200421
-#define         DEFAULT_APL_DISPLACEMENTS                     XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DISPLACEMENTS")  // ME20200421
+#define AFLOWRC_DEFAULT_APL_DISPLACEMENTS                     TRUE  //ME20200421
+#define         DEFAULT_APL_DISPLACEMENTS                     XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DISPLACEMENTS")  //ME20200421
 #define AFLOWRC_DEFAULT_APL_TPT                               string("0:2000:10")
 #define         DEFAULT_APL_TPT                               XHOST.adefault.getattachedscheme("DEFAULT_APL_TPT")
 #define AFLOWRC_DEFAULT_APL_GVEL                              TRUE  // ME20200517
@@ -537,12 +537,12 @@
 #define         DEFAULT_APL_DYNMAT_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_DYNMAT_FILE")
 #define AFLOWRC_DEFAULT_APL_HARMIFC_FILE                      string("harmonicIFCs.xml")
 #define         DEFAULT_APL_HARMIFC_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_APL_HARMIFC_FILE")
-// ME20200415
+//ME20200415
 #define AFLOWRC_DEFAULT_APL_POLAR_FILE                        string("polar.xml")
 #define         DEFAULT_APL_POLAR_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_POLAR_FILE")
 #define AFLOWRC_DEFAULT_APL_HSKPTS_FILE                       string("hskpoints.out")
 #define         DEFAULT_APL_HSKPTS_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_HSKPTS_FILE")
-#define AFLOWRC_DEFAULT_APL_MSQRDISP_FILE                     string("displacements.out")  // ME20200329
+#define AFLOWRC_DEFAULT_APL_MSQRDISP_FILE                     string("displacements.out")  //ME20200329
 #define         DEFAULT_APL_MSQRDISP_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_MSQRDISP_FILE")  // ME20200329
 #define AFLOWRC_DEFAULT_APL_GVEL_FILE                         string("group_velocities.out")  //ME202000517
 #define         DEFAULT_APL_GVEL_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_APL_GVEL_FILE")  //ME20200517
@@ -555,11 +555,11 @@
 #define         DEFAULT_APL_PHKPOINTS_FILE                    XHOST.adefault.getattachedscheme("DEFAULT_APL_PHKPOINTS_FILE")
 #define AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE                   string("PHEIGENVAL")
 #define         DEFAULT_APL_PHEIGENVAL_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_APL_PHEIGENVAL_FILE")
-// ME20190614 END
+//ME20190614 END
 #define AFLOWRC_DEFAULT_APL_STATE_FILE                        string("fccalc_state.out")
-#define         DEFAULT_APL_STATE_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_STATE_FILE")  // ME20200224
+#define         DEFAULT_APL_STATE_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_STATE_FILE")  //ME20200224
 
-// ME20200329 BEGIN
+//ME20200329 BEGIN
 #define AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT                string("XCRYSDEN")
 #define         DEFAULT_APL_ADISP_SCENE_FORMAT                XHOST.adefault.getattachedscheme("DEFAULT_APL_ADISP_SCENE_FORMAT")
 #define AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE                   0.25
@@ -619,7 +619,7 @@
 #define         DEFAULT_AAPL_CUT_RAD                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_RAD")
 #define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6")  //ME20190301  //ME20190408  //ME20191029
 #define         DEFAULT_AAPL_CUT_SHELL                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_SHELL")
-#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  // ME20200110 - 21x21x21 more than enough for tetrahedron method; odd is preferred (Gamma-centered by construction)
+#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  //ME20200110 - 21x21x21 more than enough for tetrahedron method; odd is preferred (Gamma-centered by construction)
 #define         DEFAULT_AAPL_THERMALGRID                      XHOST.adefault.getattachedscheme("DEFAULT_AAPL_THERMALGRID")
 #define AFLOWRC_DEFAULT_AAPL_TCT                              string("50:550:50")
 #define         DEFAULT_AAPL_TCT                              XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCT")
@@ -766,11 +766,11 @@
 #define AFLOWRC_DEFAULT_AGL_PLOT_RESULTS                      FALSE
 #define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
 
-// RF20200413 - START
+//RF20200413 START
 // DEFAULT CCE
 #define AFLOWRC_DEFAULT_CCE_OX_METHOD                         string("ELECTRONEGATIVITY_ALLEN")
 #define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedscheme("DEFAULT_CCE_OX_METHOD")
-// RF20200413 - END
+//RF20200413 END
 
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
@@ -1035,14 +1035,21 @@ namespace aflowrc {
 namespace aflowrc {
   bool read(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    if(LDEBUG) oss << "aflowrc::read: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::read: XHOST.home=" << XHOST.home << endl;
+    string soliloquy="aflowrc::read():";  //CO20200404
+    stringstream message; //CO20200404
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << "aflowrc::read: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
-    if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)) 
-      if(!aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN"))
-        cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
+    if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)){
+      if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
+        if(!(aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN") || aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/uMAIN"))){ //CO20200404 - patching for new disk
+          //[CO20200404 - OBSOLETE]cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
+          message << XHOST.aflowrc_filename << " not found, loading DEFAULT values";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
+        }
+      }
+    }
 
     aurostd::file2string(XHOST.aflowrc_filename,XHOST.aflowrc_content);
     // oss << "BEGIN" << endl << XHOST.aflowrc_content << "END" << endl;
@@ -1305,7 +1312,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DINEQUIV_ONLY",AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY); //CO20181226
     aflowrc::load_default("DEFAULT_APL_DPM",AFLOWRC_DEFAULT_APL_DPM);
     aflowrc::load_default("DEFAULT_APL_RELAX",AFLOWRC_DEFAULT_APL_RELAX);
-    aflowrc::load_default("DEFAULT_APL_RELAX_COMMENSURATE",AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE);  // ME20200427
+    aflowrc::load_default("DEFAULT_APL_RELAX_COMMENSURATE",AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE);  //ME20200427
     aflowrc::load_default("DEFAULT_APL_ZEROSTATE",AFLOWRC_DEFAULT_APL_ZEROSTATE);
     aflowrc::load_default("DEFAULT_APL_ZEROSTATE_CHGCAR",AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR);  //ME20191029
     aflowrc::load_default("DEFAULT_APL_USE_LEPSILON",AFLOWRC_DEFAULT_APL_USE_LEPSILON);
@@ -1320,9 +1327,9 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DOSMESH",AFLOWRC_DEFAULT_APL_DOSMESH);
     aflowrc::load_default("DEFAULT_APL_DOSPOINTS",AFLOWRC_DEFAULT_APL_DOSPOINTS);
     aflowrc::load_default("DEFAULT_APL_DOSSMEAR",AFLOWRC_DEFAULT_APL_DOSSMEAR);
-    aflowrc::load_default("DEFAULT_APL_DOS_PROJECT",AFLOWRC_DEFAULT_APL_DOS_PROJECT);  // ME20200213
+    aflowrc::load_default("DEFAULT_APL_DOS_PROJECT",AFLOWRC_DEFAULT_APL_DOS_PROJECT);  //ME20200213
     aflowrc::load_default("DEFAULT_APL_TP",AFLOWRC_DEFAULT_APL_TP);
-    aflowrc::load_default("DEFAULT_APL_DISPLACEMENTS",AFLOWRC_DEFAULT_APL_DISPLACEMENTS);  // ME20200421
+    aflowrc::load_default("DEFAULT_APL_DISPLACEMENTS",AFLOWRC_DEFAULT_APL_DISPLACEMENTS);  //ME20200421
     aflowrc::load_default("DEFAULT_APL_TPT",AFLOWRC_DEFAULT_APL_TPT);
     aflowrc::load_default("DEFAULT_APL_GVEL",AFLOWRC_DEFAULT_APL_GVEL);  //ME20200517
 
@@ -1333,9 +1340,9 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_THERMO_FILE",AFLOWRC_DEFAULT_APL_THERMO_FILE);
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
-    aflowrc::load_default("DEFAULT_APL_POLAR_FILE",AFLOWRC_DEFAULT_APL_POLAR_FILE);  // ME20200415
+    aflowrc::load_default("DEFAULT_APL_POLAR_FILE",AFLOWRC_DEFAULT_APL_POLAR_FILE);  //ME20200415
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
-    aflowrc::load_default("DEFAULT_APL_MSQRDISP_FILE", AFLOWRC_DEFAULT_APL_MSQRDISP_FILE);  // ME20200329
+    aflowrc::load_default("DEFAULT_APL_MSQRDISP_FILE", AFLOWRC_DEFAULT_APL_MSQRDISP_FILE);  //ME20200329
     aflowrc::load_default("DEFAULT_APL_GVEL_FILE", AFLOWRC_DEFAULT_APL_GVEL_FILE);  // ME20200517
     //ME20190614 BEGIN
     aflowrc::load_default("DEFAULT_APL_PHDOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE);
@@ -1343,7 +1350,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_PHKPOINTS_FILE",AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE);
     aflowrc::load_default("DEFAULT_APL_PHEIGENVAL_FILE",AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE);
     //ME20190614 END
-    aflowrc::load_default("DEFAULT_APL_STATE_FILE",AFLOWRC_DEFAULT_APL_STATE_FILE);  // ME20200224
+    aflowrc::load_default("DEFAULT_APL_STATE_FILE",AFLOWRC_DEFAULT_APL_STATE_FILE);  //ME20200224
     //ME20200329 BEGIN
     aflowrc::load_default("DEFAULT_APL_ADISP_SCENE_FORMAT",AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT);
     aflowrc::load_default("DEFAULT_APL_ADISP_AMPLITUDE",AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE);
@@ -1459,10 +1466,10 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AGL_WRITE_GIBBS_INPUT",AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT);
     aflowrc::load_default("DEFAULT_AGL_PLOT_RESULTS",AFLOWRC_DEFAULT_AGL_PLOT_RESULTS);    
 
-    // RF20200413 - START
+    //RF20200413 START
     // DEFAULT CCE
     aflowrc::load_default("DEFAULT_CCE_OX_METHOD",AFLOWRC_DEFAULT_CCE_OX_METHOD);
-    // RF20200413 - END
+    //RF20200413 END
 
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
@@ -1551,7 +1558,8 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_MACHINE2",AFLOWRC_MPI_OPTIONS_MACHINE2); 
     aflowrc::load_default("MPI_COMMAND_MACHINE2",AFLOWRC_MPI_COMMAND_MACHINE2); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE2",AFLOWRC_MPI_BINARY_DIR_MACHINE2); 
-    if(LDEBUG) oss << "aflowrc::read: END" << endl;
+
+    if(LDEBUG) oss << soliloquy << " END" << endl;
 
     return TRUE;
   }
@@ -1564,10 +1572,12 @@ namespace aflowrc {
 namespace aflowrc {
   bool write_default(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    if(LDEBUG) oss << "aflowrc::write_default: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.home=" << XHOST.home << endl;
+    string soliloquy="aflowrc::write_default():"; //CO20200404
+    stringstream message;
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     stringstream aflowrc("");
     aflowrc << "// ****************************************************************************************************" << endl;
@@ -1853,7 +1863,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DINEQUIV_ONLY=" << AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY << endl;
     aflowrc << "DEFAULT_APL_DPM=\"" << AFLOWRC_DEFAULT_APL_DPM << "\"" << endl;
     aflowrc << "DEFAULT_APL_RELAX=" << AFLOWRC_DEFAULT_APL_RELAX << endl;
-    aflowrc << "DEFAULT_APL_RELAX_COMMENSURATE=" << AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE << endl;  // ME20200427
+    aflowrc << "DEFAULT_APL_RELAX_COMMENSURATE=" << AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE << endl;  //ME20200427
     aflowrc << "DEFAULT_APL_ZEROSTATE=" << AFLOWRC_DEFAULT_APL_ZEROSTATE << endl;
     aflowrc << "DEFAULT_APL_ZEROSTATE_CHGCAR=" << AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  //ME20191029
     aflowrc << "DEFAULT_APL_USE_LEPSILON=" << AFLOWRC_DEFAULT_APL_USE_LEPSILON << endl;
@@ -1868,7 +1878,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DOSSMEAR=" << AFLOWRC_DEFAULT_APL_DOSSMEAR << endl;
     aflowrc << "DEFAULT_APL_DOS_PROJECT=" << AFLOWRC_DEFAULT_APL_DOS_PROJECT << endl;
     aflowrc << "DEFAULT_APL_TP=" << AFLOWRC_DEFAULT_APL_TP << endl;
-    aflowrc << "DEFAULT_APL_DISPLACEMENTS=" << AFLOWRC_DEFAULT_APL_DISPLACEMENTS << endl;  // ME20200421
+    aflowrc << "DEFAULT_APL_DISPLACEMENTS=" << AFLOWRC_DEFAULT_APL_DISPLACEMENTS << endl;  //ME20200421
     aflowrc << "DEFAULT_APL_TPT=\"" << AFLOWRC_DEFAULT_APL_TPT << "\"" << endl;
     aflowrc << "DEFAULT_APL_GVEL=" << AFLOWRC_DEFAULT_APL_GVEL << endl;  //ME20200517
     aflowrc << "DEFAULT_APL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_APL_FILE_PREFIX << "\"" << endl;
@@ -1877,9 +1887,9 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_THERMO_FILE=\"" << AFLOWRC_DEFAULT_APL_THERMO_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
-    aflowrc << "DEFAULT_APL_POLAR_FILE=\"" << AFLOWRC_DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
+    aflowrc << "DEFAULT_APL_POLAR_FILE=\"" << AFLOWRC_DEFAULT_APL_POLAR_FILE << "\"" << endl;  //ME20200415
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
-    aflowrc << "DEFAULT_APL_MSQRDISP_FILE=\"" << AFLOWRC_DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
+    aflowrc << "DEFAULT_APL_MSQRDISP_FILE=\"" << AFLOWRC_DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  //ME20200329
     aflowrc << "DEFAULT_APL_GVEL_FILE=\"" << AFLOWRC_DEFAULT_APL_GVEL_FILE << "\"" << endl;  // ME20200517
     //ME20190614 BEGIN
     aflowrc << "DEFAULT_APL_PHDOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
@@ -1887,7 +1897,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_PHKPOINTS_FILE=\"" << AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHEIGENVAL_FILE=\"" << AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
     //ME20190614 END
-    aflowrc << "DEFAULT_APL_STATE_FILE=\"" << AFLOWRC_DEFAULT_APL_STATE_FILE << "\"" << endl;  // ME20200224
+    aflowrc << "DEFAULT_APL_STATE_FILE=\"" << AFLOWRC_DEFAULT_APL_STATE_FILE << "\"" << endl;  //ME20200224
     //ME20200329 BEGIN
     aflowrc << "DEFAULT_APL_ADISP_SCENE_FORMAT=\"" << AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT << "\"" << endl;
     aflowrc << "DEFAULT_APL_ADISP_AMPLITUDE=" << AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE << endl;
@@ -1993,11 +2003,11 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AGL_WRITE_GIBBS_INPUT=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     aflowrc << "DEFAULT_AGL_PLOT_RESULTS=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
-    // RF20200413 - START
+    //RF20200413 START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CCE" << endl;
     aflowrc << "DEFAULT_CCE_OX_METHOD=\"" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "\"" << "  // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
-    // RF20200413 - END
+    //RF20200413 END
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
@@ -2095,9 +2105,12 @@ namespace aflowrc {
     //   XHOST.DEBUG=TRUE;
     //[CO20190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
-      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
+      if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
+        //[CO20200404 - OBSOLETE]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
+        message << "WRITING default " << XHOST.aflowrc_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
+      }
     }
-    if(LDEBUG) oss << "aflowrc::write_default: END" << endl;
+    if(LDEBUG) oss << soliloquy << " END" << endl;
     //    exit(0);
     return TRUE;
   }
@@ -2388,9 +2401,9 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_THERMO_FILE\")=\"" << DEFAULT_APL_THERMO_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR_FILE\")=\"" << DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR_FILE\")=\"" << DEFAULT_APL_POLAR_FILE << "\"" << endl;  //ME20200415
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MSQRDISP_FILE\")=\"" << DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MSQRDISP_FILE\")=\"" << DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  //ME20200329
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_GVEL_FILE\")=\"" << DEFAULT_APL_GVEL_FILE << "\"" << endl;  // ME20200517
     //ME20190614 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHDOSCAR_FILE\")=\"" << DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
@@ -2500,10 +2513,10 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_GIBBS_INPUT\")=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_PLOT_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
-    // RF20200413 - START
+    //RF20200413 START
     if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
-    // RF20200413 - END
+    //RF20200413 END
 
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;

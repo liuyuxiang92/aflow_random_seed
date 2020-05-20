@@ -208,12 +208,15 @@ namespace chull {
       //_aflags m_aflags;                  //used PURELY for the logger (path), so no need to pass into constructor, pull from m_cflags
 
       //initialization methods
-      bool initialize(ostream& oss=cout,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
-      bool initialize(const xvector<double>& coord,ostream& oss=cout,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
-      bool initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss=cout,bool formation_energy_coord=true);
-      bool initialize(ofstream& FileMESSAGE,ostream& oss=cout,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
-      bool initialize(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss=cout,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
-      bool initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss=cout,bool formation_energy_coord=true);
+      bool initialize(ostream& oss,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
+      bool initialize(const xvector<double>& coord,ostream& oss,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
+      bool initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord=true);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
+      bool initialize(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
+      bool initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord=true);
+      bool initialize(bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
+      bool initialize(const xvector<double>& coord,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
+      bool initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord=true);
 
       //getters
       bool isWithinHalfHull(bool lower_hull=true) const;
@@ -404,8 +407,8 @@ namespace chull {
       vector<uint> f_neighbors;
 
       //general setters
-      void create(ostream& oss=cout);
-      void create(ofstream& FileMESSAGE,ostream& oss=cout);
+      //[CO20200508 - OBSOLETE]void create(ostream& oss=cout);
+      //[CO20200508 - OBSOLETE]void create(ofstream& FileMESSAGE,ostream& oss=cout);
       //MOVED TO xStream
       //void setCFlags(const aurostd::xoption& vpflow);
       //void setOFStream(ofstream& FileMESSAGE);
@@ -577,28 +580,28 @@ namespace chull {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       ConvexHull(ostream& _oss=cout);
-      ConvexHull(string alloy,ostream& _oss=cout);
+      ConvexHull(const string& alloy,ostream& _oss=cout);
       ConvexHull(const vector<string>& velements,ostream& _oss=cout);
       ConvexHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& _oss=cout);
       ConvexHull(const vector<xvector<double> >& vcoords,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const vector<ChullPoint>& vpoints,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(ofstream& FileMESSAGE,ostream& _oss=cout);
-      ConvexHull(string alloy,ofstream& FileMESSAGE,ostream& _oss=cout);
+      ConvexHull(const string& alloy,ofstream& FileMESSAGE,ostream& _oss=cout);
       ConvexHull(const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout);
       ConvexHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& _oss=cout);
       ConvexHull(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const aurostd::xoption& vpflow,ostream& _oss=cout);
-      ConvexHull(const aurostd::xoption& vpflow,string alloy,ostream& _oss=cout);
+      ConvexHull(const aurostd::xoption& vpflow,const string& alloy,ostream& _oss=cout);
       ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,ostream& _oss=cout);
       ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& _oss=cout);
       ConvexHull(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
       ConvexHull(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& _oss=cout);
-      ConvexHull(const aurostd::xoption& vpflow,string alloy,ofstream& FileMESSAGE,ostream& _oss=cout);
+      ConvexHull(const aurostd::xoption& vpflow,const string& alloy,ofstream& FileMESSAGE,ostream& _oss=cout);
       ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout);
       ConvexHull(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& _oss=cout);
       ConvexHull(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
@@ -634,37 +637,51 @@ namespace chull {
       _aflags m_aflags;                  //used PURELY for the logger (path), so no need to pass into constructor, pull from m_cflags
 
       //initialization methods
-      bool initialize(ostream& _oss=cout);
-      bool initialize(string alloy,ostream& _oss=cout);
-      bool initialize(const vector<string>& velements,ostream& _oss=cout);
-      bool initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& _oss=cout);
-      bool initialize(const vector<xvector<double> >& vcoords,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const vector<ChullPoint>& vpoints,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(string alloy,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const aurostd::xoption& vpflow,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,string alloy,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,string alloy,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& _oss=cout);
-      bool initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& _oss=cout,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
-      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& _oss=cout,bool formation_energy_hull=false,bool add_artificial_unaries=false);
+      bool initialize(ostream& oss);
+      bool initialize(const string& alloy,ostream& oss);
+      bool initialize(const vector<string>& velements,ostream& oss);
+      bool initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss);
+      bool initialize(const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const vector<ChullPoint>& vpoints,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& alloy,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize();
+      bool initialize(const string& alloy);
+      bool initialize(const vector<string>& velements);
+      bool initialize(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
+      bool initialize(const vector<xvector<double> >& vcoords,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const vector<ChullPoint>& vpoints,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const vector<ChullPoint>& vpoints,const vector<string>& velements,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const string& alloy,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const string& alloy,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow);
+      bool initialize(const aurostd::xoption& vpflow,const string& alloy);
+      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements);
+      bool initialize(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<xvector<double> >& vcoords,bool has_stoich_coords,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,bool formation_enthalpy_hull,bool add_artificial_unaries);
+      bool initialize(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,bool formation_enthalpy_hull,bool add_artificial_unaries);
 
       //initialize points ONLY
-      void initializePoints(string alloy);
+      void initializePoints(const string& alloy);
       void initializePoints(const vector<string>& velements);
       void initializePoints(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
       void initializePoints(const vector<xvector<double> >& vcoords,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
@@ -757,7 +774,7 @@ namespace chull {
       //void setOSS(ostream& oss);
 
       //wrapper for try/catch's
-      bool createHull(string alloy);
+      bool createHull(const string& alloy);
       bool createHull(const vector<string>& velements);
       bool createHull(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
       bool createHull(const vector<xvector<double> >& vcoords,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);
@@ -771,7 +788,7 @@ namespace chull {
       bool entryUnique(const vector<uint>& unique_entries,const aflowlib::_aflowlib_entry& entry2,string& canonical_auid) const;
       void addArtificialUnaries(uint dim);
       void addArtificialUnaries();
-      void loadPoints(string alloy);
+      void loadPoints(const string& alloy);
       void loadPoints(const vector<string>& velements);
       void loadPoints(const vector<string>& velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
       void loadPoints(const vector<xvector<double> >& vcoords,bool has_stoich_coords=false,bool formation_energy_hull=false,bool add_artificial_unaries=false);

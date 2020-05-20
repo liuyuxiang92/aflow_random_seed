@@ -54,6 +54,19 @@
 #include <list> //CO20170806 - need for POCC
 #include <netdb.h>  //CO20180321 - frisco needs for AFLUX
 
+#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
+
+//CO20200502 START - including gettid()
+#ifdef __GLIBC__
+#define GLIBC_VERSION (__GLIBC__ * 100 + __GLIBC_MINOR__)
+#if (GLIBC_VERSION < 230) //CO20200502 - apparently they patched at 230 - https://stackoverflow.com/questions/30680550/c-gettid-was-not-declared-in-this-scope
+//[CO20200502 - too many warnings]#warning "defining getid() with syscall(SYS_gettid)"
+#include <sys/syscall.h>  //CO20200502 - need for gettid()
+#define gettid() syscall(SYS_gettid)
+#endif  //GLIBC_VERSION
+#endif  //__GLIBC__
+//CO20200502 END - including gettid()
+
 #ifdef _USE_AFLOW_H_
 //#include "aflow.h"
 #endif
@@ -216,7 +229,7 @@ typedef unsigned uint;
 
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
-#include "../aflow.h"
+#include "../aflow.h"     //needed for XHOST
 //#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
@@ -245,6 +258,11 @@ namespace aurostd {
   string get_datetime(void);
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
   bool beep(uint=2000,uint=100); // standard values
+}
+// ----------------------------------------------------------------------------
+// threadID stuff
+namespace aurostd {
+  unsigned long long int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
 namespace aurostd {
@@ -351,7 +369,7 @@ namespace aurostd {
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
   bool DirectoryLS(string Directory,vector<string> &vfiles);
-   bool DirectoryLS(string Directory,deque<string> &vfiles);
+  bool DirectoryLS(string Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -374,8 +392,9 @@ namespace aurostd {
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
   bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default
-  bool ZIP2ZIP(string dir,string from,string to,bool=TRUE);
-  bool BZ2XZ(string dir,bool=TRUE); bool GZ2XZ(string dir,bool=TRUE);
+  bool ZIP2ZIP(string dir,string from,string to,bool=TRUE,const string& = "");
+  bool BZ2XZ(string dir,bool=TRUE,const string& = "");
+  bool GZ2XZ(string dir,bool=TRUE,const string& = "");
   // [OBSOLETE]  bool BunzipFile(const string& FileName); bool BzipFile(const string& FileName);
   // [OBSOLETE]  bool GunzipFile(const string& FileName); bool GzipFile(const string& FileName); 
   // [OBSOLETE]  bool XunzipFile(const string& FileName); bool XzipFile(const string& FileName); 
@@ -543,7 +562,7 @@ namespace aurostd {
   uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
   uint efile2dequestring(string FileNameIN,deque<string>& vline);
   bool dequestring2file(const deque<string>& vline,string FileNameOUT);
- // file2vectorstring overloading with deque
+  // file2vectorstring overloading with deque
   uint file2vectorstring(string FileNameIN,deque<string>& vline);
   uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
   uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
@@ -1294,7 +1313,7 @@ namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
   deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with ME
   deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with ME
- }
+}
 
 //base64 stuff
 //CO START

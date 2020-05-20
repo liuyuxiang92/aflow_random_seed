@@ -27,34 +27,30 @@ static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 namespace apl {
 
   // Default Constructor
-  QMesh::QMesh(ostream& oss) : xStream() {
+  QMesh::QMesh(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
   }
 
-  QMesh::QMesh(ofstream& mf, ostream& oss) : xStream() {
+  QMesh::QMesh(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
   }
 
   QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream() {
+      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(grid, xs, include_inversions, gamma_centered);
   }
 
   QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream() {
+      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
 
   // Copy constructors
-  QMesh::QMesh(const QMesh& that) {
+  QMesh::QMesh(const QMesh& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     if (this != &that) free();
     copy(that);
   }
@@ -81,7 +77,7 @@ namespace apl {
     _qpoints = that._qpoints;
     _recCell = that._recCell;
     _reduced = that._reduced;
-    _shifted = that._shifted;  // ME20190813
+    _shifted = that._shifted;  //ME20190813
     _shift = that._shift;
     _weights = that._weights;
   }
@@ -154,9 +150,9 @@ namespace apl {
 
   void QMesh::initialize(const xvector<int>& grid, const xstructure& xs,
       bool include_inversions, bool gamma_centered) {
-    string dir_tmp = _directory;  // Do not delete the directory
+    string tmp_dir = _directory;  // Do not delete the directory
     clear();
-    _directory = dir_tmp;
+    _directory = tmp_dir;
     setGrid(grid);
     setupReciprocalCell(xs, include_inversions);
     generateGridPoints(gamma_centered);
@@ -344,7 +340,7 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
   }
 
-  // ME20200109
+  //ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
   // Calculates little/small groups for each irreducible q-point. The little
   // group is the group that leaves a q-point invariant, i.e. U q = q + G.
@@ -511,7 +507,7 @@ namespace apl {
     return _isGammaCentered;
   }
 
-  // ME20200109
+  //ME20200109
   bool QMesh::littleGroupsCalculated() const {
     return _littleGroupsCalculated;
   }
@@ -756,7 +752,7 @@ namespace apl {
 
   //makeIrreducibleTetrahedra/////////////////////////////////////////////////
   // Determines the irreducible tetrahedra.
-  // ME20191213 - Improved speed by storing the sorted irreducible tetrahedra
+  //ME20191213 - Improved speed by storing the sorted irreducible tetrahedra
   // instead of sorting in place.
   void QMesh::makeIrreducibleTetrahedra() {
     // Only makes sense with a reduced q-mesh
@@ -782,7 +778,7 @@ namespace apl {
           if (m == 4) break;
         }
         if (it == _nIrredTetra) {
-          irred.push_back(compare);  // ME20191213
+          irred.push_back(compare);  //ME20191213
           _irredTetrahedra.push_back(t);
           _weightsTetrahedra.push_back(1);
           _nIrredTetra++;

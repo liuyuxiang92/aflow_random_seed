@@ -17,40 +17,36 @@
 
 using namespace std;
 
-static const xcomplex<double> iONE(0.0, 1.0);  // ME20200116
+static const xcomplex<double> iONE(0.0, 1.0);  //ME20200116
 static const string _APL_SUPERCELL_MODULE_ = "SUPERCELL";  // for the logger
 
 namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  Supercell::Supercell(ostream& oss) : xStream() {
+  Supercell::Supercell(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
   }
 
-  Supercell::Supercell(ofstream& mf, ostream& oss) : xStream() {
+  Supercell::Supercell(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
   }
 
-  // ME20200102 - Refactored
-  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, const string& directory, ostream& oss) : xStream() {  //CO20181226
+  //ME20200102 - Refactored
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {  //CO20181226
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(_xstr);
   }
 
-  // ME20200212 - read from a state file
-  Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) {
+  //ME20200212 - read from a state file
+  Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     _directory = directory;
     readFromStateFile(filename);
   }
 
-  Supercell::Supercell(const Supercell& that) {
+  Supercell::Supercell(const Supercell& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     if (this != &that) free();
     copy(that);
   }
@@ -76,17 +72,17 @@ namespace apl {
     _pc2scMap = that._pc2scMap;
     _sc2pcMap.clear();
     _sc2pcMap = that._sc2pcMap;
-    //CO - START
+    //CO START
     _skew = that._skew;
     _derivative_structure = that._derivative_structure;
     _sym_eps = that._sym_eps;
-    //CO - END
+    //CO END
     _isShellRestricted = that._isShellRestricted;
     _maxShellRadius.clear();
     _maxShellRadius = that._maxShellRadius;
     _isConstructed = that._isConstructed;  //CO
     _initialized = that._initialized;
-    phase_vectors = that.phase_vectors;  // ME20200116
+    phase_vectors = that.phase_vectors;  //ME20200116
   }
 
   // Destructor
@@ -179,7 +175,7 @@ namespace apl {
     build(dims, false);
   }
 
-  // ME20200315 - Added VERBOSE to prevent excessive file output when
+  //ME20200315 - Added VERBOSE to prevent excessive file output when
   // reading from state file
   void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -254,17 +250,17 @@ namespace apl {
     //_sym_eps = AUROSTD_NAN; //CO, same for _sc and _pc (DO NOT RESET)
     _maxShellRadius.clear();
     _maxShellID = -1;
-    phase_vectors.clear();  // ME20200116
+    phase_vectors.clear();  //ME20200116
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200315 - Added VERBOSE to prevent excessive file output when reading
+  //ME20200315 - Added VERBOSE to prevent excessive file output when reading
   // from state file
   void Supercell::calculateWholeSymmetry(xstructure& xstr, bool VERBOSE) {
     //CO20170804 - we want to append symmetry stuff to ofstream
     _kflags kflags;
-    // ME20200330 - Only write for verbose output
+    //ME20200330 - Only write for verbose output
     kflags.KBIN_SYMMETRY_PGROUP_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_FGROUP_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=VERBOSE;
@@ -314,7 +310,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20191225
+  //ME20191225
   // Determine the supercell dimensions of the supercell for different methods
   xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
     string function = "apl::Supercell::determineSupercellDimensions()";
@@ -485,7 +481,7 @@ namespace apl {
     LightCopy(_scStructure, _scStructure_light);
     //_scStructure_atoms_original = _scStructure.atoms;
 
-    // ME20200116 - calculate phase vectors; significantly speeds up post-processing
+    //ME20200116 - calculate phase vectors; significantly speeds up post-processing
     calculatePhaseVectors();
 
     if(LDEBUG){
@@ -709,7 +705,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200116 - rebase to primitive
+  //ME20200116 - rebase to primitive
   // Does not capture rotated conventional cells yet, but does work for AFLOW's
   // standard conventional unit cells.
   bool Supercell::projectToPrimitive() {
@@ -787,7 +783,7 @@ namespace apl {
     }
   }
 
-  // ME20200116 - rebase to original
+  //ME20200116 - rebase to original
   void Supercell::projectToOriginal() {
     vector<int> pc2sc, sc2pc;
     if (getMaps(_inStructure_original, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
@@ -805,7 +801,7 @@ namespace apl {
     }
   }
 
-  // ME20200116
+  //ME20200116
   // Recalculates _sc2pcMap and _pc2scMap based on the projected cell (pcell)
   // using the original cell (ocell).
   // Returns true when mapping is successful.
@@ -1045,7 +1041,7 @@ namespace apl {
 
   xstructure Supercell::calculatePrimitiveStructure() const { //CO20180409
     xstructure pcStructure=_inStructure;
-    // ME20200324 - Setting LatticeReduction_avoid to true can results in
+    //ME20200324 - Setting LatticeReduction_avoid to true can results in
     // primitive cells with slightly different lattice parameters, especially
     // for monoclinic cells. This error can propagate and break mappings from
     // the conventional to the primitive cell.
@@ -1065,7 +1061,7 @@ namespace apl {
     return _inStructure;
   }
 
-  // ME20200117
+  //ME20200117
   const xstructure& Supercell::getOriginalStructure() const {
     return _inStructure_original;
   }
@@ -1181,7 +1177,7 @@ namespace apl {
     }
 #endif
 
-    // ME20191219 - use basis_atoms_map
+    //ME20191219 - use basis_atoms_map
     if (symOp.basis_map_calculated) return symOp.basis_atoms_map[atomID];
 
     // Get the center atom center...
@@ -1257,7 +1253,7 @@ namespace apl {
     }
 #endif
 
-    // ME20191219 - use basis_atoms_map
+    //ME20191219 - use basis_atoms_map
     if (symOp.basis_map_calculated) {
       int natoms = (int) _scStructure.atoms.size();
       for (int at = 0; at < natoms; at++) {
@@ -1587,7 +1583,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200116 - Calculate the real space vectors for the phases once.
+  //ME20200116 - Calculate the real space vectors for the phases once.
   // Calculating them once for all atoms is very quick and significantly speeds
   // up dynamical matrix calculations.
   void Supercell::calculatePhaseVectors() {
@@ -1633,7 +1629,7 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  // ME20180827 -- overloaded to calculate derivatives
+  //ME20180827 -- overloaded to calculate derivatives
   bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
       xcomplex<double>& phase) {
     xvector<xcomplex<double> > placeholder;

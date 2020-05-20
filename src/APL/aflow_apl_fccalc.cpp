@@ -23,13 +23,12 @@ static const string _APL_FCCALC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
-  ForceConstantCalculator::ForceConstantCalculator(ostream& oss) {
+  ForceConstantCalculator::ForceConstantCalculator(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
     _directory = "./";
   }
 
-  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, ofstream& mf, ostream& oss) {
+  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
     _supercell = &sc;
     _sc_set = true;
@@ -37,7 +36,7 @@ namespace apl {
     _directory = _supercell->_directory;
   }
 
-  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, const aurostd::xoption& opts, ofstream& mf, ostream& oss) {
+  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, const aurostd::xoption& opts, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
     _supercell = &sc;
     _sc_set = true;
@@ -46,7 +45,7 @@ namespace apl {
     initialize(opts);
   }
 
-  ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
+  ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     if (this != &that) free();
     copy(that);
   }
@@ -250,7 +249,7 @@ namespace apl {
       return false;
     }
 
-    // ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
+    //ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
     // symmetry operations on-the-fly.
     if (!_supercell->fullBasisCalculatedAGROUP()) _supercell->getFullBasisAGROUP();
@@ -273,12 +272,12 @@ namespace apl {
       string message = "The site groups have not been calculated yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
-    //CO - START
+    //CO START
     if (_supercell->getEPS() == AUROSTD_NAN) {
       string message = "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
     }
-    //CO - END
+    //CO END
 
     string message = "Symmetrizing the force constant matrices.";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
@@ -302,7 +301,7 @@ namespace apl {
 
           try {
             // int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO20190218
-            // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+            //ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
             // the basis has not been calculated for some reason
             int l = _supercell->atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO20190218
             m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO20190218
@@ -332,16 +331,16 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200504 - this function needs to be rewritten to be more clear
+  //ME20200504 - this function needs to be rewritten to be more clear
   // Enfoces acoustic sum rules
   void ForceConstantCalculator::correctSumRules() {
-    // ME20200504
+    //ME20200504
     // sum appears to be the self-interaction term (diagonal terms) of the
     // force constant matrices. See http://cmt.dur.ac.uk/sjc/thesis_prt/node83.html
     xmatrix<double> sum(3, 3);//, sum2(3, 3); OBSOLETE ME20200504 - not used
 
     for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
-      // ME20200504 - sums are not used or cleared before they are used
+      //ME20200504 - sums are not used or cleared before they are used
       //[OBSOLETE] // Get SUMs
       //[OBSOLETE] for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
       //[OBSOLETE]   if (i != j) {
@@ -351,7 +350,7 @@ namespace apl {
       //[OBSOLETE] }
 
       // Correct SUM2
-      // ME20200504 - This appears to enforce the invariance of the force constants
+      //ME20200504 - This appears to enforce the invariance of the force constants
       // upon permutations
       for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i == j) continue;
@@ -370,7 +369,7 @@ namespace apl {
       }
 
       // Correct SUM1 to satisfied
-      // ME20200504 - Self-interaction term
+      //ME20200504 - Self-interaction term
       _forceConstantMatrices[i][i] = -sum;
     }
   }
@@ -384,7 +383,7 @@ namespace apl {
 //////////////////////////////////////////////////////////////////////////////
 
 namespace apl {
- 
+
   // Sets up the calculations that determine the Born effective charges and
   // the dielectric tensor
   bool ForceConstantCalculator::runVASPCalculationsBE(_xinput& xInput, _aflags& _aflowFlags,
@@ -419,7 +418,7 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  
+
   // Calculates the dielectric tensor and Born effective charges
   bool ForceConstantCalculator::calculateBornChargesDielectricTensor(const _xinput& xinpBE) {
     stringstream message;
@@ -470,11 +469,11 @@ namespace apl {
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
-  void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  // ME20190113
-    string directory = xinp.xvasp.Directory;  // ME20190113
+  void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  //ME20190113
+    string directory = xinp.xvasp.Directory;  //ME20190113
     string function = "apl::ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR():";
 
-    //CO - START
+    //CO START
     string infilename = directory + string("/OUTCAR.static");
 
     if (!aurostd::EFileExist(infilename, infilename)) {
@@ -484,11 +483,11 @@ namespace apl {
     }
 
     // Open our file
-    //CO - START
+    //CO START
     vector<string> vlines;
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
-      //CO - END
+      //CO END
       string message = "Cannot open input file OUTCAR.static.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -504,7 +503,7 @@ namespace apl {
 
     while (true) {
       // Get line
-      //CO - START
+      //CO START
       if (line_count == vlines.size()) {
         string message = "No information on Born effective charges in OUTCAR file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -518,7 +517,7 @@ namespace apl {
     // Read in all ...
     xmatrix<double> m(3, 3);
     vector<string> tokens;
-    //CO - START
+    //CO START
     line = vlines[line_count++]; // Skip line "----------------...."
     for (uint i = 0; i < _supercell->getInputStructure().atoms.size(); i++) {
       // Get atom ID but not use it...
@@ -537,12 +536,12 @@ namespace apl {
       // Store it
       _bornEffectiveChargeTensor.push_back(m);
     }
-    //CO - END
+    //CO END
   }
 
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::symmetrizeBornEffectiveChargeTensors(void) {
-    //CO - START
+    //CO START
     // Test of stupidity...
     stringstream message;
     if (_supercell->getEPS() == AUROSTD_NAN) {
@@ -550,7 +549,7 @@ namespace apl {
       message << "Symmetry tolerance not defined.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
-    //CO - END
+    //CO END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
@@ -576,14 +575,14 @@ namespace apl {
           const _sym_op& symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i, j), basedUniqueAtomID, _FGROUP_);
           sum += inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] * symOp.Uc;
         }
-        //CO - START
+        //CO START
         catch (aurostd::xerror& e) {
           string function = "apl::ForceConstantCalculator::symmetrizeBornEffectiveChargeTensors()";
           stringstream message;
           message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedUniqueAtomID << "?";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
-        //CO - END
+        //CO END
       }
 
       sum = (1.0 / _supercell->getNumberOfEquivalentAtomsOfType(i)) * sum; //CO20190218
@@ -652,10 +651,10 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void ForceConstantCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  // ME20190113
-    string directory = xinp.xvasp.Directory;  // ME20190113
+  void ForceConstantCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  //ME20190113
+    string directory = xinp.xvasp.Directory;  //ME20190113
 
-    //CO - START
+    //CO START
     string infilename = directory + string("/OUTCAR.static");
     if (!aurostd::EFileExist(infilename, infilename)) {
       // We already checked outside if one of the files exists, so if
@@ -673,7 +672,7 @@ namespace apl {
       string message = "Cannot open input file OUTCAR.";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    //CO - END
+    //CO END
 
     // Find
     string KEY = ""; //ME20181226
@@ -685,14 +684,14 @@ namespace apl {
 
     while (true) {
       // Get line
-      //CO - START
+      //CO START
       if (line_count == vlines.size()) {
-      string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
+        string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
         string message = "No information on dielectric tensor in OUTCAR.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];
-      //CO - END
+      //CO END
 
       // Check for our key line
       if (line.size() < KEY.size()) continue;
@@ -700,7 +699,7 @@ namespace apl {
     }
 
     // Read in all ...
-    //CO - START
+    //CO START
     line = vlines[line_count++]; // Skip line "----------------...."
 
     // Get it
@@ -765,7 +764,7 @@ namespace apl {
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     // OBSOLETE ME20200427 - we do not compare checksums anymore
     //outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-    //  << std::hex << aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    //  << std::hex << aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  //ME20190219
     //outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
@@ -819,7 +818,7 @@ namespace apl {
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     // OBSOLETE ME20200428 - Checksums are not used anymore
     //outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-    //  << std::hex << aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    //  << std::hex << aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  //ME20190219
     //outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
@@ -834,7 +833,7 @@ namespace apl {
         for (int l = 1; l <= 3; l++) {
           outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
           outfile << setprecision(8);
-          // ME20181030 - fixed prevents hexadecimal output
+          //ME20181030 - fixed prevents hexadecimal output
           outfile << setw(15) << std::fixed << _bornEffectiveChargeTensor[i](k, l) << " ";
         }
         outfile << "</v>" << std::endl;
@@ -852,7 +851,7 @@ namespace apl {
       for (int l = 1; l <= 3; l++) {
         outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
         outfile << setprecision(8);
-        // ME20181030 - fixed prevents hexadecimal output
+        //ME20181030 - fixed prevents hexadecimal output
         outfile << setw(15) << std::fixed << _dielectricTensor(k, l) << " ";
       }
       outfile << "</v>" << std::endl;
@@ -1705,7 +1704,7 @@ namespace apl {
     // Get all forces required for the construction of force-constant matrices
     if (!calculateForceFields()) return false;
 
-    // ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
+    //ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
     // symmetry operations on-the-fly.
     if (!_supercell->fullBasisCalculatedAGROUP()) _supercell->getFullBasisAGROUP();
@@ -1806,13 +1805,13 @@ namespace apl {
   void ForceConstantCalculator::completeForceFields() {
     stringstream message;
     string function = "apl::ForceConstantCalculator::completeForceFields():";
-    //CO - START
+    //CO START
     // Test of stupidity...
     if (_supercell->getEPS() == AUROSTD_NAN) {
       message << "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
-    //CO - END
+    //CO END
     // Show info
     message << "Calculating the missing force fields by symmetry.";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
@@ -1839,7 +1838,7 @@ namespace apl {
             testForce.clear();
             for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
               try {
-                // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+                //ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
                 // the basis has not been calculated for some reason
                 int l = _supercell->atomComesFrom(symOp, k, atomID, true); //CO20190218
                 testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
@@ -1934,7 +1933,7 @@ namespace apl {
       }
 
       // Update unique distortion vectors
-      // CO20190116 - using trasp(A) instead of A because _uniqueDistortions[i][0] is a vector, not a matrix (as m is below)
+      //CO20190116 - using trasp(A) instead of A because _uniqueDistortions[i][0] is a vector, not a matrix (as m is below)
       // we are really applying A * U == I,
       // so use A below (not trasp(A))
       _uniqueDistortions[i][0] = trasp(A) * _uniqueDistortions[i][0];
@@ -1987,12 +1986,12 @@ namespace apl {
       string message = "The factor group has not been calculated yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
-    //CO - START
+    //CO START
     if (DISTORTION_INEQUIVONLY && _supercell->getEPS() == AUROSTD_NAN) { //CO20190218
       string message = "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
     }
-    //CO - END
+    //CO END
 
     // Clear old matrices
     for (uint i = 0; i < _forceConstantMatrices.size(); i++)
@@ -2032,7 +2031,7 @@ namespace apl {
           double distortionLength = aurostd::modulus(DISTORTION_MAGNITUDE * _uniqueDistortions[i][k]);
           // FCM element = -F/d, but we will omit minus, because next force transformations are better
           // done without it, and in construction of dyn. matrix we will add it to the sum
-          // ME20200212 - we store _forceConstantMatrices in a human-readable file, so they should
+          //ME20200212 - we store _forceConstantMatrices in a human-readable file, so they should
           // represent the actual force constants, not an AFLOW-customized construct
           m(k + 1, 1) = _uniqueForces[i][k][j](1) / distortionLength;
           m(k + 1, 2) = _uniqueForces[i][k][j](2) / distortionLength;
@@ -2102,7 +2101,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
 
-    // ME20200211 - force constants are -F/d, not F/d
+    //ME20200211 - force constants are -F/d, not F/d
     for (uint i = 0; i < _forceConstantMatrices.size(); i++) {
       for (uint j = 0; j < _forceConstantMatrices.size(); j++) {
         _forceConstantMatrices[i][j] = -_forceConstantMatrices[i][j];
@@ -2251,7 +2250,7 @@ namespace apl {
   // [OBSOLETE]   string function = "apl::ForceConstantCalculator::writeXCrysDenForces()";
   // [OBSOLETE]   string message = "Writing forces into file XCrysDenForces.";
   // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
-  // [OBSOLETE]   _supercell->center_original();  //COREY
+  // [OBSOLETE]   _supercell->center_original();  //CO
 
   // [OBSOLETE]   stringstream outfile;  //CO
   // [OBSOLETE]   // forces + 1 line info about distortion
@@ -2333,7 +2332,7 @@ namespace apl {
 
     // For VASP, use the standardized aflow.in creator
     if(xInput.AFLOW_MODE_VASP) {
-      xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  // ME20200213
+      xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  //ME20200213
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", false);
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", true);
 
@@ -2344,7 +2343,7 @@ namespace apl {
     }
     // For AIMS, use the old method until we have AVASP_populateXAIMS
     if(xInput.AFLOW_MODE_AIMS) {
-      string runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  // ME20200213
+      string runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  //ME20200213
       xInput.setDirectory(_directory + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
