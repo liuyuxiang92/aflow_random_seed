@@ -287,31 +287,27 @@ namespace pflow {
   }
 }
 
-/*
-   std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
-   std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
-   std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
-   std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
-   std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-   std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
-   std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-   std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-   std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-   std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-// for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
-std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
-std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
-
-*/
+//   std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
+//   std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
+//   std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
+//   std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
+//   std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+//   std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+//   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+//   std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
+//   std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
+//   std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
+//   std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
+//   std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
+//   std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
+//   std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+//   std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
 
 namespace xelement {
-
 
   // initialize them all
   void Initialize(void) { for(uint Z=0;Z<NUM_ELEMENTS;Z++) { velement.at(Z)=xelement(Z); } }
@@ -323,7 +319,15 @@ namespace xelement {
   int name2Z(const string& name) { return xelement(name).Z; }
 
   // constructors
-  xelement::xelement() {
+  xelement::xelement() {free();}  //CO20200520
+
+  // destructor
+  xelement::~xelement() {free();} //CO20200520
+
+  void xelement::free() { //CO20200520
+    // will populate
+    // [AFLOW]START=FREE
+    // [AFLOW]STOP=FREE
     // DEFAULT
     verbose=FALSE;
     // [AFLOW]START=CONSTRUCTOR
@@ -412,110 +416,100 @@ namespace xelement {
     // [AFLOW]STOP=CONSTRUCTOR
   }
 
-  // destructor
-  xelement::~xelement() {
-    free();
-  }
-
-  void xelement::free() {
-    // will populate
-    // [AFLOW]START=FREE
-    // [AFLOW]STOP=FREE
-  }
-
   const xelement& xelement::operator=(const xelement& b) {      // operator=
-    if(this != &b) {
-      free();
-      // will populate
-      verbose=b.verbose;
-      // [AFLOW]START=ASSIGNMENT
-      Z=b.Z;
-      symbol=b.symbol;
-      name=b.name;
-      Period=b.Period;
-      Group=b.Group; 
-      Series=b.Series;
-      Block=b.Block;      
-      //                                          
-      mass=b.mass;
-      MolarVolume=b.MolarVolume;  
-      volume=b.volume;      
-      Miedema_Vm=b.Miedema_Vm;      
-      //
-      valence_std=b.valence_std;  
-      valence_iupac=b.valence_iupac;
-      valence_PT=b.valence_PT;       
-      Density_PT=b.Density_PT;       
-      crystal=b.crystal;    
-      CrystalStr_PT=b.CrystalStr_PT;
-      space_group=b.space_group;
-      space_group_number=b.space_group_number;    
-      Pearson_coefficient=b.Pearson_coefficient;
-      lattice_constant=b.lattice_constant; 
-      lattice_angle=b.lattice_angle;   
-      phase=b.phase;
-      radius=b.radius;         
-      radius_PT=b.radius_PT;          
-      radius_covalent_PT=b.radius_covalent_PT;   
-      radius_covalent=b.radius_covalent;  
-      radius_VanDerWaals_PT=b.radius_VanDerWaals_PT;
-      radii_Ghosh08=b.radii_Ghosh08;         
-      radii_Slatter=b.radii_Slatter;         
-      radii_Pyykko=b.radii_Pyykko;          
-      //                                          
-      electrical_conductivity=b.electrical_conductivity;
-      electronegativity_vec=b.electronegativity_vec;    
-      hardness_Ghosh=b.hardness_Ghosh;            
-      electronegativity_Pearson=b.electronegativity_Pearson;           
-      electronegativity_Ghosh=b.electronegativity_Ghosh;             
-
-      electronegativity_Allen=b.electronegativity_Allen;  //RF+SK20200410
-      oxidation_states=b.oxidation_states;  //RF+SK20200410
-      oxidation_states_preferred=b.oxidation_states_preferred;  //RF+SK20200410
-
-      electron_affinity_PT=b.electron_affinity_PT;      
-      Miedema_phi_star=b.Miedema_phi_star;         
-      Miedema_nws=b.Miedema_nws;              
-      Miedema_gamma_s=b.Miedema_gamma_s;          
-      //
-      Pettifor_scale=b.Pettifor_scale;          
-      //
-      boiling_point=b.boiling_point;         
-      melting_point=b.melting_point;         
-      vaporization_heat_PT=b.vaporization_heat_PT;     
-      specific_heat_PT=b.specific_heat_PT;         
-      critical_Pressure=b.critical_Pressure;     
-      critical_Temperature_PT=b.critical_Temperature_PT;  
-      thermal_expansion=b.thermal_expansion;     
-      thermal_conductivity=b.thermal_conductivity;  
-      //                                         
-      Brinelll_hardness=b.Brinelll_hardness;
-      Mohs_hardness=b.Mohs_hardness;    
-      Vickers_hardness=b.Vickers_hardness; 
-      Hardness_Pearson=b.Hardness_Pearson;   
-      Hardness_Putz=b.Hardness_Putz;      
-      Hardness_RB=b.Hardness_RB;        
-      shear_modulus=b.shear_modulus;    
-      Young_modulus=b.Young_modulus;    
-      bulk_modulus=b.bulk_modulus;     
-      Poisson_ratio_PT=b.Poisson_ratio_PT;    
-      Miedema_BVm=b.Miedema_BVm;        
-      //
-      Magnetic_Type_PT=b.Magnetic_Type_PT;
-      Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
-      Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
-      Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
-      Curie_point=b.Curie_point;                  
-      //
-      refractive_index=b.refractive_index;             
-      color_PT=b.color_PT;         
-      //
-      HHIP=b.HHIP;                           
-      HHIR=b.HHIR;                           
-      xray_scatt=b.xray_scatt;    
-      // [AFLOW]STOP=ASSIGNMENT
-    }
+    if(this!=&b) {free();copy(b);}  //CO20200520
     return *this;
+  }
+
+  void xelement::copy(const xelement& b) {  //copy PRIVATE  //CO20200520
+    // will populate
+    verbose=b.verbose;
+    // [AFLOW]START=ASSIGNMENT
+    Z=b.Z;
+    symbol=b.symbol;
+    name=b.name;
+    Period=b.Period;
+    Group=b.Group; 
+    Series=b.Series;
+    Block=b.Block;      
+    //                                          
+    mass=b.mass;
+    MolarVolume=b.MolarVolume;  
+    volume=b.volume;      
+    Miedema_Vm=b.Miedema_Vm;      
+    //
+    valence_std=b.valence_std;  
+    valence_iupac=b.valence_iupac;
+    valence_PT=b.valence_PT;       
+    Density_PT=b.Density_PT;       
+    crystal=b.crystal;    
+    CrystalStr_PT=b.CrystalStr_PT;
+    space_group=b.space_group;
+    space_group_number=b.space_group_number;    
+    Pearson_coefficient=b.Pearson_coefficient;
+    lattice_constant=b.lattice_constant; 
+    lattice_angle=b.lattice_angle;   
+    phase=b.phase;
+    radius=b.radius;         
+    radius_PT=b.radius_PT;          
+    radius_covalent_PT=b.radius_covalent_PT;   
+    radius_covalent=b.radius_covalent;  
+    radius_VanDerWaals_PT=b.radius_VanDerWaals_PT;
+    radii_Ghosh08=b.radii_Ghosh08;         
+    radii_Slatter=b.radii_Slatter;         
+    radii_Pyykko=b.radii_Pyykko;          
+    //                                          
+    electrical_conductivity=b.electrical_conductivity;
+    electronegativity_vec=b.electronegativity_vec;    
+    hardness_Ghosh=b.hardness_Ghosh;            
+    electronegativity_Pearson=b.electronegativity_Pearson;           
+    electronegativity_Ghosh=b.electronegativity_Ghosh;             
+
+    electronegativity_Allen=b.electronegativity_Allen;  //RF+SK20200410
+    oxidation_states=b.oxidation_states;  //RF+SK20200410
+    oxidation_states_preferred=b.oxidation_states_preferred;  //RF+SK20200410
+
+    electron_affinity_PT=b.electron_affinity_PT;      
+    Miedema_phi_star=b.Miedema_phi_star;         
+    Miedema_nws=b.Miedema_nws;              
+    Miedema_gamma_s=b.Miedema_gamma_s;          
+    //
+    Pettifor_scale=b.Pettifor_scale;          
+    //
+    boiling_point=b.boiling_point;         
+    melting_point=b.melting_point;         
+    vaporization_heat_PT=b.vaporization_heat_PT;     
+    specific_heat_PT=b.specific_heat_PT;         
+    critical_Pressure=b.critical_Pressure;     
+    critical_Temperature_PT=b.critical_Temperature_PT;  
+    thermal_expansion=b.thermal_expansion;     
+    thermal_conductivity=b.thermal_conductivity;  
+    //                                         
+    Brinelll_hardness=b.Brinelll_hardness;
+    Mohs_hardness=b.Mohs_hardness;    
+    Vickers_hardness=b.Vickers_hardness; 
+    Hardness_Pearson=b.Hardness_Pearson;   
+    Hardness_Putz=b.Hardness_Putz;      
+    Hardness_RB=b.Hardness_RB;        
+    shear_modulus=b.shear_modulus;    
+    Young_modulus=b.Young_modulus;    
+    bulk_modulus=b.bulk_modulus;     
+    Poisson_ratio_PT=b.Poisson_ratio_PT;    
+    Miedema_BVm=b.Miedema_BVm;        
+    //
+    Magnetic_Type_PT=b.Magnetic_Type_PT;
+    Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
+    Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
+    Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
+    Curie_point=b.Curie_point;                  
+    //
+    refractive_index=b.refractive_index;             
+    color_PT=b.color_PT;         
+    //
+    HHIP=b.HHIP;                           
+    HHIR=b.HHIR;                           
+    xray_scatt=b.xray_scatt;    
+    // [AFLOW]STOP=ASSIGNMENT
   }
 
   void xelement::clear(){
@@ -531,10 +525,14 @@ namespace xelement {
     return oss;
   }
 
-
   // ********************************************************************************************************************************************************
-  // constructor by name or symbol
-  xelement::xelement(string element) {
+
+  xelement::xelement(const string& element) {populate(element);}  //CO20200520
+  xelement::xelement(uint ZZ) {populate(ZZ);} //CO20200520
+  
+  // ********************************************************************************************************************************************************
+  // populate by name or symbol
+  void xelement::populate(const string& element) {  //CO20200520
     free();
     // DEFAULT
     verbose=FALSE;
@@ -542,21 +540,22 @@ namespace xelement {
 
     // try with symbol
     if(Z==0) {
-      for(uint i=1;i<=103;i++)
+      for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
-      for(uint i=1;i<=103;i++)
+      for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
     if(Z!=0) (*this)=xelement(Z);
-
+    
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_FILE_NOT_FOUND_); //CO20200520
   }
 
   // ********************************************************************************************************************************************************
-  // constructor by Z
-  xelement::xelement(uint ZZ) {
+  // populate by Z
+  void xelement::populate(uint ZZ) {  //CO20200520
     free();
     // DEFAULT
     verbose=FALSE;
@@ -568,6 +567,7 @@ namespace xelement {
       mass=0.0;// override
       valence_iupac=0;// override
       valence_std=0;// override
+      return; //CO20200520
     }
     // ROW 1
     // s-electron systems
@@ -650,6 +650,7 @@ namespace xelement {
       HHIR=NNN;
       xray_scatt=1.000;
       // H volume wrong *dimer* MIEDEMA =PAUL VAN DER PUT book
+      return; //CO20200520
     }
     // [AFLOW]STOP=Hydrogen
     // ********************************************************************************************************************************************************
@@ -732,6 +733,7 @@ namespace xelement {
       HHIR=3900;
       xray_scatt=2.000;
       // He
+      return; //CO20200520
     }
     // [AFLOW]STOP=Helium
     // ********************************************************************************************************************************************************
@@ -816,6 +818,7 @@ namespace xelement {
       HHIR=4200;
       xray_scatt=3.00145;
       // Li
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lithium
     // ********************************************************************************************************************************************************
@@ -898,6 +901,7 @@ namespace xelement {
       HHIR=4000;
       /*xray_scatt=NNN;*/
       // Be
+      return; //CO20200520
     }
     // [AFLOW]STOP=Beryllium
     // ********************************************************************************************************************************************************
@@ -981,6 +985,7 @@ namespace xelement {
       HHIR=2000;
       /*xray_scatt=NNN;*/
       // B
+      return; //CO20200520
     }
     // [AFLOW]STOP=Boron
     // ********************************************************************************************************************************************************
@@ -1063,6 +1068,7 @@ namespace xelement {
       HHIR=500;
       xray_scatt=6.019;
       // C//DX+CO20170904 radius_covalent uses sp3 hybridization (most common)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Carbon
     // ********************************************************************************************************************************************************
@@ -1145,6 +1151,7 @@ namespace xelement {
       HHIR=500;
       /*xray_scatt=NNN;*/
       //N JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Nitrogen
     // ********************************************************************************************************************************************************
@@ -1227,6 +1234,7 @@ namespace xelement {
       HHIR=500;
       xray_scatt=8.052;
       // O Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Oxygen
     // ********************************************************************************************************************************************************
@@ -1309,6 +1317,7 @@ namespace xelement {
       HHIR=1500;
       /*xray_scatt=NNN;*/
       //F
+      return; //CO20200520
     }
     // [AFLOW]STOP=Fluorine
     // ********************************************************************************************************************************************************
@@ -1391,6 +1400,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ne volume calculated with fcc-pawpbe
+      return; //CO20200520
     }
     // [AFLOW]STOP=Neon
     // ********************************************************************************************************************************************************
@@ -1475,6 +1485,7 @@ namespace xelement {
       HHIR=500;
       /*xray_scatt=NNN;*/
       // Na
+      return; //CO20200520
     }
     // [AFLOW]STOP=Sodium
     // ********************************************************************************************************************************************************
@@ -1557,6 +1568,7 @@ namespace xelement {
       HHIR=500;
       /*xray_scatt=NNN;*/
       //Mg
+      return; //CO20200520
     }
     // [AFLOW]STOP=Magnesium
     // ********************************************************************************************************************************************************
@@ -1640,6 +1652,7 @@ namespace xelement {
       HHIR=1000;
       /*xray_scatt=NNN;*/
       //Al
+      return; //CO20200520
     }
     // [AFLOW]STOP=Aluminium
     // ********************************************************************************************************************************************************
@@ -1722,6 +1735,7 @@ namespace xelement {
       HHIR=1000;
       xray_scatt=14.43;
       //Si ???
+      return; //CO20200520
     }
     // [AFLOW]STOP=Silicon
     // ********************************************************************************************************************************************************
@@ -1804,6 +1818,7 @@ namespace xelement {
       HHIR=5100;
       xray_scatt=15.3133;
       //P MIEDEMA =PAUL VAN DER PUT book
+      return; //CO20200520
     }
     // [AFLOW]STOP=Phosphorus
     // ********************************************************************************************************************************************************
@@ -1886,6 +1901,7 @@ namespace xelement {
       HHIR=1000;
       /*xray_scatt=NNN;*/
       //S Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Sulphur
     // ********************************************************************************************************************************************************
@@ -1968,6 +1984,7 @@ namespace xelement {
       HHIR=1500;
       /*xray_scatt=NNN;*/
       //Cl interpolation phi_star, nws, Vm, gamma JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Chlorine
     // ********************************************************************************************************************************************************
@@ -2050,6 +2067,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ar guessed volume, must double check from results JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Argon
     // ********************************************************************************************************************************************************
@@ -2134,6 +2152,7 @@ namespace xelement {
       HHIR=7200;
       /*xray_scatt=NNN;*/
       //K
+      return; //CO20200520
     }
     // [AFLOW]STOP=Potassium
     // ********************************************************************************************************************************************************
@@ -2216,6 +2235,7 @@ namespace xelement {
       HHIR=1500;
       /*xray_scatt=NNN;*/
       //Ca
+      return; //CO20200520
     }
     // [AFLOW]STOP=Calcium
     // ********************************************************************************************************************************************************
@@ -2299,6 +2319,7 @@ namespace xelement {
       HHIR=4500;
       xray_scatt=21.34;
       //Sc
+      return; //CO20200520
     }
     // [AFLOW]STOP=Scandium
     // ********************************************************************************************************************************************************
@@ -2381,6 +2402,7 @@ namespace xelement {
       HHIR=1600;
       xray_scatt=22.24;
       //Ti
+      return; //CO20200520
     }
     // [AFLOW]STOP=Titanium
     // ********************************************************************************************************************************************************
@@ -2463,6 +2485,7 @@ namespace xelement {
       HHIR=3400;
       /*xray_scatt=NNN;*/
       //V
+      return; //CO20200520
     }
     // [AFLOW]STOP=Vanadium
     // ********************************************************************************************************************************************************
@@ -2545,6 +2568,7 @@ namespace xelement {
       HHIR=4100;
       xray_scatt=23.84;
       //Cr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Chromium
     // ********************************************************************************************************************************************************
@@ -2627,6 +2651,7 @@ namespace xelement {
       HHIR=1800;
       xray_scatt=24.46;
       //xray_scatt=24.3589; Mn JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Manganese
     // ********************************************************************************************************************************************************
@@ -2709,6 +2734,7 @@ namespace xelement {
       HHIR=1400;
       xray_scatt=24.85;
       //xray_scatt=24.6830; Fe JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Iron
     // ********************************************************************************************************************************************************
@@ -2791,6 +2817,7 @@ namespace xelement {
       HHIR=2700;
       xray_scatt=24.59;
       //Co JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cobalt
     // ********************************************************************************************************************************************************
@@ -2873,6 +2900,7 @@ namespace xelement {
       HHIR=1500;
       xray_scatt=25.02;
       //Ni
+      return; //CO20200520
     }
     // [AFLOW]STOP=Nickel
     // ********************************************************************************************************************************************************
@@ -2955,6 +2983,7 @@ namespace xelement {
       HHIR=1500;
       xray_scatt=27.03;
       //Cu JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Copper
     // ********************************************************************************************************************************************************
@@ -3037,6 +3066,7 @@ namespace xelement {
       HHIR=1900;
       xray_scatt=28.44;
       //Zn
+      return; //CO20200520
     }
     // [AFLOW]STOP=Zinc
     // ********************************************************************************************************************************************************
@@ -3120,6 +3150,7 @@ namespace xelement {
       HHIR=1900;
       /*xray_scatt=NNN;*/
       //Ga
+      return; //CO20200520
     }
     // [AFLOW]STOP=Gallium
     // ********************************************************************************************************************************************************
@@ -3202,6 +3233,7 @@ namespace xelement {
       HHIR=1900;
       /*xray_scatt=NNN;*/
       //Ge
+      return; //CO20200520
     }
     // [AFLOW]STOP=Germanium
     // ********************************************************************************************************************************************************
@@ -3284,6 +3316,7 @@ namespace xelement {
       HHIR=4000;
       /*xray_scatt=NNN;*/
       //As
+      return; //CO20200520
     }
     // [AFLOW]STOP=Arsenic
     // ********************************************************************************************************************************************************
@@ -3366,6 +3399,7 @@ namespace xelement {
       HHIR=1900;
       /*xray_scatt=NNN;*/
       //Se Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Selenium
     // ********************************************************************************************************************************************************
@@ -3448,6 +3482,7 @@ namespace xelement {
       HHIR=6900;
       /* xray_scatt=NNN;*/
       //Br interpolation phi_star, nws, Vm, gamma, BVm JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Bromine
     // ********************************************************************************************************************************************************
@@ -3530,6 +3565,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Kr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Krypton
     // ********************************************************************************************************************************************************
@@ -3614,6 +3650,7 @@ namespace xelement {
       HHIR=6000;
       /*xray_scatt=NNN;*/
       //Rb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Rubidium
     // ********************************************************************************************************************************************************
@@ -3696,6 +3733,7 @@ namespace xelement {
       HHIR=3000;
       /*xray_scatt=NNN;*/
       //Sr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Strontium
     // ********************************************************************************************************************************************************
@@ -3779,6 +3817,7 @@ namespace xelement {
       HHIR=2600;
       /*xray_scatt=NNN;*/
       //Y
+      return; //CO20200520
     }
     // [AFLOW]STOP=Yttrium
     // ********************************************************************************************************************************************************
@@ -3861,6 +3900,7 @@ namespace xelement {
       HHIR=2600;
       /*xray_scatt=NNN;*/
       //Zr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Zirconium
     // ********************************************************************************************************************************************************
@@ -3943,6 +3983,7 @@ namespace xelement {
       HHIR=8800;
       /*xray_scatt=NNN;*/
       //Nb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Niobium
     // ********************************************************************************************************************************************************
@@ -4025,6 +4066,7 @@ namespace xelement {
       HHIR=5300;
       /*xray_scatt=NNN;*/
       //Mo
+      return; //CO20200520
     }
     // [AFLOW]STOP=Molybdenum
     // ********************************************************************************************************************************************************
@@ -4107,6 +4149,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Tc JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Technetium
     // ********************************************************************************************************************************************************
@@ -4189,6 +4232,7 @@ namespace xelement {
       HHIR=8000;
       /*xray_scatt=NNN;*/
       //Ru JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Ruthenium
     // ********************************************************************************************************************************************************
@@ -4271,6 +4315,7 @@ namespace xelement {
       HHIR=8000;
       /*xray_scatt=NNN;*/
       //Rh
+      return; //CO20200520
     }
     // [AFLOW]STOP=Rhodium
     // ********************************************************************************************************************************************************
@@ -4353,6 +4398,7 @@ namespace xelement {
       HHIR=8000;
       /*xray_scatt=NNN;*/
       //Pd
+      return; //CO20200520
     }
     // [AFLOW]STOP=Palladium
     // ********************************************************************************************************************************************************
@@ -4435,6 +4481,7 @@ namespace xelement {
       HHIR=1400;
       xray_scatt=47.18;
       //Ag JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Silver
     // ********************************************************************************************************************************************************
@@ -4517,6 +4564,7 @@ namespace xelement {
       HHIR=1300;
       /*xray_scatt=NNN;*/
       //Cd
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cadmium
     // ********************************************************************************************************************************************************
@@ -4600,6 +4648,7 @@ namespace xelement {
       HHIR=2000;
       /*xray_scatt=NNN;*/
       //In
+      return; //CO20200520
     }
     // [AFLOW]STOP=Indium
     // ********************************************************************************************************************************************************
@@ -4682,6 +4731,7 @@ namespace xelement {
       HHIR=1600;
       /*xray_scatt=NNN;*/
       //Sn
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tin
     // ********************************************************************************************************************************************************
@@ -4764,6 +4814,7 @@ namespace xelement {
       HHIR=3400;
       /*xray_scatt=NNN;*/
       //Sb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Antimony
     // ********************************************************************************************************************************************************
@@ -4846,6 +4897,7 @@ namespace xelement {
       HHIR=4900;
       /*xray_scatt=NNN;*/
       //Te Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tellurium
     // ********************************************************************************************************************************************************
@@ -4928,6 +4980,7 @@ namespace xelement {
       HHIR=4800;
       /*xray_scatt=NNN;*/
       //I interpolation phi_star, nws, Vm,
+      return; //CO20200520
     }
     // [AFLOW]STOP=Iodine
     // ********************************************************************************************************************************************************
@@ -5010,6 +5063,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Xe JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Xenon
     // ********************************************************************************************************************************************************
@@ -5094,6 +5148,7 @@ namespace xelement {
       HHIR=6000;
       /*xray_scatt=NNN;*/
       //Cs
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cesium
     // ********************************************************************************************************************************************************
@@ -5176,6 +5231,7 @@ namespace xelement {
       HHIR=2300;
       /*xray_scatt=NNN;*/
       //Ba
+      return; //CO20200520
     }
     // [AFLOW]STOP=Barium
     // ********************************************************************************************************************************************************
@@ -5259,6 +5315,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //La
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lanthanium
     // ********************************************************************************************************************************************************
@@ -5342,6 +5399,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Ce Pettifor linear interpolation// Miedema from Alonso-March.
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cerium
     // ********************************************************************************************************************************************************
@@ -5424,6 +5482,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Pr Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Praseodymium
     // ********************************************************************************************************************************************************
@@ -5506,6 +5565,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Nd Pettifor linear interpolation JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Neodymium
     // ********************************************************************************************************************************************************
@@ -5588,6 +5648,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       // Pm Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Promethium
     // ********************************************************************************************************************************************************
@@ -5670,6 +5731,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Sm Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Samarium
     // ********************************************************************************************************************************************************
@@ -5752,6 +5814,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Eu Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Europium
     // ********************************************************************************************************************************************************
@@ -5834,6 +5897,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       // Gd Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Gadolinium
     // ********************************************************************************************************************************************************
@@ -5916,6 +5980,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       // Tb Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Terbium
     // ********************************************************************************************************************************************************
@@ -5998,6 +6063,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Dy Pettifor linear interpolation JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Dysprosium
     // ********************************************************************************************************************************************************
@@ -6080,6 +6146,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Ho Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Holmium
     // ********************************************************************************************************************************************************
@@ -6162,6 +6229,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Er Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Erbium
     // ********************************************************************************************************************************************************
@@ -6244,6 +6312,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Tm Pettifor linear interpolation JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Thulium
     // ********************************************************************************************************************************************************
@@ -6326,6 +6395,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Yb Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Ytterbium
     // ********************************************************************************************************************************************************
@@ -6408,6 +6478,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Lu
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lutetium
     // ********************************************************************************************************************************************************
@@ -6491,6 +6562,7 @@ namespace xelement {
       HHIR=2600;
       /*xray_scatt=NNN;*/
       //Hf
+      return; //CO20200520
     }
     // [AFLOW]STOP=Hafnium
     // ********************************************************************************************************************************************************
@@ -6573,6 +6645,7 @@ namespace xelement {
       HHIR=4800;
       /*xray_scatt=NNN;*/
       //Ta
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tantalum
     // ********************************************************************************************************************************************************
@@ -6655,6 +6728,7 @@ namespace xelement {
       HHIR=4300;
       /*xray_scatt=NNN;*/
       //W
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tungsten
     // ********************************************************************************************************************************************************
@@ -6737,6 +6811,7 @@ namespace xelement {
       HHIR=3300;
       /*xray_scatt=NNN;*/
       //Re
+      return; //CO20200520
     }
     // [AFLOW]STOP=Rhenium
     // ********************************************************************************************************************************************************
@@ -6819,6 +6894,7 @@ namespace xelement {
       HHIR=9100;
       /*xray_scatt=NNN;*/
       //Os JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Osmium
     // ********************************************************************************************************************************************************
@@ -6901,6 +6977,7 @@ namespace xelement {
       HHIR=9100;
       /*xray_scatt=NNN;*/
       //Ir JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Iridium
     // ********************************************************************************************************************************************************
@@ -6983,6 +7060,7 @@ namespace xelement {
       HHIR=9100;
       /*xray_scatt=NNN;*/
       //Pt
+      return; //CO20200520
     }
     // [AFLOW]STOP=Platinum
     // ********************************************************************************************************************************************************
@@ -7065,6 +7143,7 @@ namespace xelement {
       HHIR=1000;
       xray_scatt=74.99;
       //Au
+      return; //CO20200520
     }
     // [AFLOW]STOP=Gold
     // ********************************************************************************************************************************************************
@@ -7147,6 +7226,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Hg
+      return; //CO20200520
     }
     // [AFLOW]STOP=Mercury
     // ********************************************************************************************************************************************************
@@ -7230,6 +7310,7 @@ namespace xelement {
       HHIR=6500;
       /*xray_scatt=NNN;*/
       //Tl
+      return; //CO20200520
     }
     // [AFLOW]STOP=Thallium
     // ********************************************************************************************************************************************************
@@ -7312,6 +7393,7 @@ namespace xelement {
       HHIR=1800;
       /*xray_scatt=NNN;*/
       //Pb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lead
     // ********************************************************************************************************************************************************
@@ -7394,6 +7476,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Bi
+      return; //CO20200520
     }
     // [AFLOW]STOP=Bismuth
     // ********************************************************************************************************************************************************
@@ -7476,6 +7559,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Po
+      return; //CO20200520
     }
     // [AFLOW]STOP=Polonium
     // ********************************************************************************************************************************************************
@@ -7558,6 +7642,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //At
+      return; //CO20200520
     }
     // [AFLOW]STOP=Astatine
     // ********************************************************************************************************************************************************
@@ -7640,6 +7725,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Rn
+      return; //CO20200520
     }
     // [AFLOW]STOP=Radon
     // ********************************************************************************************************************************************************
@@ -7724,6 +7810,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Fr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Francium
     // ********************************************************************************************************************************************************
@@ -7806,6 +7893,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ra
+      return; //CO20200520
     }
     // [AFLOW]STOP=Radium
     // ********************************************************************************************************************************************************
@@ -7889,6 +7977,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ac
+      return; //CO20200520
     }
     // [AFLOW]STOP=Actinium
     // ********************************************************************************************************************************************************
@@ -7972,6 +8061,7 @@ namespace xelement {
       HHIR=NNN;
       xray_scatt=86.64;
       //Th
+      return; //CO20200520
     }
     // [AFLOW]STOP=Thorium
     // ********************************************************************************************************************************************************
@@ -8054,6 +8144,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Pa
+      return; //CO20200520
     }
     // [AFLOW]STOP=Protoactinium
     // ********************************************************************************************************************************************************
@@ -8136,6 +8227,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //U
+      return; //CO20200520
     }
     // [AFLOW]STOP=Uranium
     // ********************************************************************************************************************************************************
@@ -8218,6 +8310,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Np
+      return; //CO20200520
     }
     // [AFLOW]STOP=Neptunium
     // ********************************************************************************************************************************************************
@@ -8300,6 +8393,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Pu
+      return; //CO20200520
     }
     // [AFLOW]STOP=Plutonium
     // ********************************************************************************************************************************************************
@@ -8382,6 +8476,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Am
+      return; //CO20200520
     }
     // [AFLOW]STOP=Americium
     // ********************************************************************************************************************************************************
@@ -8464,6 +8559,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Cm
+      return; //CO20200520
     }
     // [AFLOW]STOP=Curium
     // ********************************************************************************************************************************************************
@@ -8546,6 +8642,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Bk
+      return; //CO20200520
     }
     // [AFLOW]STOP=Berkelium
     // ********************************************************************************************************************************************************
@@ -8628,6 +8725,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Cf
+      return; //CO20200520
     }
     // [AFLOW]STOP=Californium
     // ********************************************************************************************************************************************************
@@ -8710,6 +8808,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Es
+      return; //CO20200520
     }
     // [AFLOW]STOP=Einsteinium
     // ********************************************************************************************************************************************************
@@ -8792,6 +8891,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Fm
+      return; //CO20200520
     }
     // [AFLOW]STOP=Fermium
     // ********************************************************************************************************************************************************
@@ -8874,6 +8974,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Md
+      return; //CO20200520
     }
     // [AFLOW]STOP=Mendelevium
     // ********************************************************************************************************************************************************
@@ -8956,6 +9057,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //No
+      return; //CO20200520
     }
     // [AFLOW]STOP=Nobelium
     // ********************************************************************************************************************************************************
@@ -9038,9 +9140,12 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Lr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lawrencium
     // ********************************************************************************************************************************************************
+    
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element number does not exist: "+aurostd::utype2string(ZZ),_FILE_NOT_FOUND_);  //CO20200520
   }
 } // namespace xelement
 
