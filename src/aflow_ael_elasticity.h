@@ -186,12 +186,12 @@ class _AEL_data {
 // Namespace for functions used by AEL method, to avoid potential naming conflicts with other parts of AFLOW
 namespace AEL_functions {
   // Functions to actually run AEL, either directly or from another part of AFLOW
-  uint RunElastic_AEL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
-  uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
-  uint Get_ElasticProperties_AEL_postprocess(string directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor);
-  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool& postprocess, ofstream& FileMESSAGE);
-  uint Get_BulkModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE);
-  uint Get_ShearModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE);
+  uint RunElastic_AEL(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
+  uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, const string& AflowInName, const string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint Get_ElasticProperties_AEL_postprocess(const string& directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor);
+  uint Get_PoissonRatio(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool postprocess, ofstream& FileMESSAGE);
+  uint Get_BulkModulus(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE);
+  uint Get_ShearModulus(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE);
   // Functions for generating aflow.in input files for strained structures and extracting stress tensor data calculated with VASP
   uint aelvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AEL_data& AEL_data, ofstream& FileMESSAGE);
   // [OBSOLETE] uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& kbinFlags, _vflags& vaspFlags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
@@ -199,7 +199,7 @@ namespace AEL_functions {
   // Functions for implementing the elastic constants method 
   uint elasticityfit(_AEL_data& AEL_data, ofstream& FileMESSAGE);
   uint elasticitycheck(_AEL_data& AEL_data, _xvasp& xvasp, ofstream& FileMESSAGE);
-  uint cij_fit(vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, double& Cij, int& npolycoeffwork, bool& gxmdebug, ofstream& FileMESSAGE);
+  uint cij_fit(vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, double& Cij, int& npolycoeffwork, bool gxmdebug, ofstream& FileMESSAGE);
   uint elasticmoduli(_AEL_data& AEL_data, ofstream& FileMESSAGE);
 } // end of namespace
 

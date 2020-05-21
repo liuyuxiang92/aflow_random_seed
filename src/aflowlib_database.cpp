@@ -623,7 +623,7 @@ namespace aflowlib {
     for (uint k = 0; k < nkeys; k++) {
       // AUID has to be unique
       type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + keys[k]);
-      if (unique && (keys[k] == "auid")) {
+      if (unique && (keys[k] == "AUID")) {
         types[k] = "TEXT UNIQUE NOT NULL";
       } else if (type == "number") {
         types[k] = "REAL";

@@ -2402,7 +2402,7 @@ namespace aflowlib {
       exit(0);
     }
 
-    string *_pstrstream;
+    string *_pstrstream = NULL;
     vector<string> database;
     stringstream strstream;
     vector<uint> vnspecies;

@@ -2931,6 +2931,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       //  aflowin << "[VASP_KPOINTS_FILE]BANDS_LATTICE=" << xvasp.AVASP_path_BANDS << endl;
       //  aflowin << "[VASP_KPOINTS_FILE]BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;
     }
+    //CO20200501 - LIBRARY_MODE_PROTOTYPE is used for --poscar2aflowin
+    //we don't need to perform the symmetry-analysis (multiple times)
+    //to figure out which KSCHEME/BANDS_LATTICE
+    //now we assign auto and the symmetry analysis is done during the --run
     //[CO20200501 - OBSOLETE with AUTO as above]// PROTOTYPE check the stuff out
     //[CO20200501 - OBSOLETE with AUTO as above]if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
     //[CO20200501 - OBSOLETE with AUTO as above]  write_all = true;

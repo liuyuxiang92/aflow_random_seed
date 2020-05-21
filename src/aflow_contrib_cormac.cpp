@@ -36,14 +36,14 @@ namespace pflow {
     string thermofilename="";
     if(tokens.size()>=1) thermofilename=tokens.at(0);
 
-    string cvfilename, debyefilename, firstline, flword, line, sysname;
+    string cvfilename = "", debyefilename = "", firstline = "", flword = "", line = "", sysname = "";
     ifstream infilethermo;
     ofstream ofilecv, ofiledebye;
-    int cvcolumn, tcolumn, ncolumn, itmin, itmax, id, jstart;
+    int cvcolumn = 0, tcolumn = 0, ncolumn = 0, itmin = 0, itmax = 0, id = 0, jstart = 0;
     int initcol = 0, npoints = 0;
     stringstream thermofile;
-    double rowvar, cvt, nkb, natoms, tol, tol2, tinit, y, Deb, fy, ya, fya, yb, fyb;
-    double tdmin, tdmax, rmsmin, tdtrial, smsq, rms, tdbest, DEB_min, DEB_max, Tmin, Tmax;
+    double rowvar = 0.0, cvt = 0.0, nkb = 0.0, natoms = 0.0, tol = 0.0, tol2 = 0.0, tinit = 0.0, y = 0.0, Deb = 0.0, fy = 0.0, ya = 0.0, fya = 0.0, yb = 0.0, fyb = 0.0;
+    double tdmin = 0.0, tdmax = 0.0, rmsmin = 0.0, tdtrial = 0.0, smsq = 0.0, rms = 0.0, tdbest = 0.0, DEB_min = 0.0, DEB_max = 0.0, Tmin = 0.0, Tmax = 0.0;
     bool natomcalcd = false;
 
     nkb = 1.0;

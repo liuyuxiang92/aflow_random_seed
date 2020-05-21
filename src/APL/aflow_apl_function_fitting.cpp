@@ -109,8 +109,8 @@ bool aflowFITTING::gaussj(xmatrix<utype> &a,
   // b[1,n][1,m] is input containing the m right-hand side vectors. On the output a is replaced
   // by its matrix inverse, and b is replaced by the corresponding set of solution vectors.
 
-  int i, icol, irow, j, k, l, ll;
-  utype big, dum, pivinv, temp;
+  int i = 0, icol = 0, irow = 0, j = 0, k = 0, l = 0, ll = 0;
+  utype big = 0, dum = 0, pivinv = 0, temp = 0;
 
   // int n=a.rows,m=b.cols;
   // if(a.cols!=a.rows) {cerr << _AUROSTD_XLIBS_ERROR_ << "gaussj: a.cols!=a.rows" << endl; exit(0);}

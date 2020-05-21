@@ -1738,7 +1738,7 @@ vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const str
 
   // Calculate the LFA atomic environments
   // i.e., only environments comprised of the least frequent atom (LFA) type
-  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalMatch)
+  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalFinder)
 
   vector<AtomEnvironment> environments_LFA;
 
@@ -4474,7 +4474,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     bool bohr_lat = false;   //DX20180215 - added bohr for lattice
     bool bohr_pos = false;   //DX20180215 - added bohr for positions
     bool alat = false;   //DX20180215 - added alat
-    uint iline,jline;
+    uint iline = 0, jline = 0;
     iline=vinput.size();
     //DX20180123 - added nat - START
     for(uint i=0;i<vinput.size();i++){ 

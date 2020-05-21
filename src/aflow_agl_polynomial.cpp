@@ -1031,12 +1031,12 @@ namespace AGL_functions {
   //    
   uint gauss_legendre(double& xlower, double& xupper, vector<double>& xabscissa, vector<double>& weight, int& n, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
     double eps=3.0e-16;
-    int i, j, mid, id;
-    double xm, xl;
-    double polynom1, polynom2, polynom3;
-    double polynomderiv, z, z1;
-    double zdiff;
-    int iloops;
+    int i = 0, j = 0, mid = 0, id = 0;
+    double xm = 0.0, xl = 0.0;
+    double polynom1 = 0.0, polynom2 = 0.0, polynom3 = 0.0;
+    double polynomderiv = 0.0, z = 0.0, z1 = 0.0;
+    double zdiff = 0.0;
+    int iloops = 0;
     ostringstream aus;
     // The roots are symmetric in the interval, so we only have to find half of them.
     mid = (n + 1) / 2;
@@ -1104,7 +1104,7 @@ namespace AGL_functions {
   // Adapted from original Fortran version written by M. A. Blanco et al.
   // See Computer Physics Communications 158, 57-72 (2004) and Journal of Molecular Structure (Theochem) 368, 245-255 (1996) for details
   // 
-  uint polynom_fit(uint& first_entry_tofit, uint& last_entry_tofit, vector<double>& xdata, vector<double>& ydata, vector<double>& weight, double& rms, int & npolycoeffwork, vector<double>& polycoeffwork, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint polynom_fit(uint& first_entry_tofit, uint& last_entry_tofit, vector<double>& xdata, vector<double>& ydata, vector<double>& weight, double& rms, int& npolycoeffwork, vector<double>& polycoeffwork, bool gxmdebug, ofstream& FileMESSAGE) {
     vector<vector<double> > cmatrix;
     double weightnorm;
     int ij;
@@ -1175,7 +1175,7 @@ namespace AGL_functions {
 //	  Also contains optional debugging to print out values of input matrices		
 // 
 namespace AGL_functions {
-  uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool gxmdebug, ofstream& FileMESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     xmatrix<double> cxm(n, n);
     xmatrix<double> bxm(n, 1);
@@ -1274,9 +1274,9 @@ namespace AGL_functions {
   // c_V = 9 n k_B (T / Theta_D)^3 \int_0^{Theta_D / T} (x^4 e^x) / (e^x - 1)^2 dx
   // 
   uint cvdebfit(double& tdmin, double& tdmax, double& nkb, int& npoints, double& tdbest, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
-    int itmin, itmax, id;
-    double rmsmin, tdtrial, smsq, rms, yval, cvt, Debye_int_val;
-    uint aglerror;
+    int itmin = 0, itmax = 0, id = 0;
+    double rmsmin = 0.0, tdtrial = 0.0, smsq = 0.0, rms = 0.0, yval = 0.0, cvt = 0.0, Debye_int_val = 0.0;
+    uint aglerror = 0;
     tdmin = tdmin - fmod(tdmin, 1.0);
     tdmax = tdmax - fmod(tdmax, 1.0);
 

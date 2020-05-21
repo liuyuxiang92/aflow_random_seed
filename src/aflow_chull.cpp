@@ -3948,7 +3948,7 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " remove_outliers=" << remove_outliers << endl;}
 
     vector<string> points_neglect;
-    double extrema_val;
+    double extrema_val = 0.0;
     if(remove_requested){aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),points_neglect,",");}
     if(points_neglect.size()==0){remove_requested=false;}
     if(remove_extreme){
@@ -4263,8 +4263,8 @@ namespace chull {
       if(m_naries[i_nary].m_alloys.size()!=m_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing unary alloys");} //these are populated by default if done correctly
 
       //check for ground-states (non-artificial points)
-      bool found_real,found_artificial;
-      uint i_coord_group,i_point,i_point_real;
+      bool found_real = false, found_artificial = false;
+      uint i_coord_group = 0,i_point = 0,i_point_real = 0;
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
         if(m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
         found_real=found_artificial=false;
@@ -4932,7 +4932,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     //determines nearness by vertical distance
     string soliloquy = XHOST.sPID + "ConvexHull::getNearestFacetVertically():";
-    uint i_facet,i_facet_min;
+    uint i_facet = 0, i_facet_min = 0;
     uint i_facet_artificial=-1; //really large uint
     double vdist,dist=AUROSTD_MAX_DOUBLE;
     for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
@@ -7536,9 +7536,9 @@ namespace chull {
     stringstream num_ss;
 
     // initializing some strings
-    string main_TEX_file, main_PDF_file, main_PNG_file;
-    string main_file,main_output_file;
-    string input,input_hyphened;
+    string main_TEX_file = "", main_PDF_file = "", main_PNG_file = "";
+    string main_file = "", main_output_file = "";
+    string input = "",input_hyphened = "";
 
     // creating name of output file
     input=aurostd::joinWDelimiter(m_velements,"");
@@ -7551,21 +7551,21 @@ namespace chull {
     string aflow_logo_full_file = "aflow_logo_full.pdf";
     string aflow_logo_skinny_file = "aflow_logo_skinny.pdf";
     string logo_file_2 = "logo2.png";
-    string DEFAULT_PLOT_COLUMN_HEADER;
+    string DEFAULT_PLOT_COLUMN_HEADER = "";
     if(m_formation_energy_hull){DEFAULT_PLOT_COLUMN_HEADER="H_f_meVatom";}
     else {DEFAULT_PLOT_COLUMN_HEADER="T_S";}
 
     // other initialization
-    uint plot_points_count;                // points to put on ternary plot
-    uint plot_points_count_no_end_points;  // mostly for count purposes
+    uint plot_points_count = 0;                // points to put on ternary plot
+    uint plot_points_count_no_end_points = 0;  // mostly for count purposes
     vector<uint> chull_points;
     vector<vector<uint> > facet_lines, facet_lines_dropshadow;
     double min_point = 0.0, max_point = 0.0, point_range = 0.0;  // saves min/max energy value to determine if we can
     // have a colorbar
-    double z_filter_cutoff, dist_filter_cutoff;
-    string plot_command;
-    string output_name;
-    string misc;
+    double z_filter_cutoff = 0.0, dist_filter_cutoff = 0.0;
+    string plot_command = "";
+    string output_name = "";
+    string misc = "";
     vector<string> files_2_move; //, sg_tokens;
     stringstream command;
     uint num_horizontal_planes = 0;  // to determine whether or not we should have heatmaps
