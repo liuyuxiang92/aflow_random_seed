@@ -1216,7 +1216,6 @@ namespace apl {
       }
 #endif
       string function = "apl::Supercell::atomGoesTo():";
->>>>>>> 8f23c20c09393f81a5747fe2c3a6b685869a4764
       string message = "Mapping failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
