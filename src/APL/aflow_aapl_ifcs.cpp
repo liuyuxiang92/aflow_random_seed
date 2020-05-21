@@ -175,7 +175,7 @@ namespace apl {
 namespace apl {
 
   bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags) {
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations()";
+    string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations():";
     string message = "";
     if (order > 4) {
       message = "Not implemented for order > 4.";
@@ -517,7 +517,7 @@ namespace apl {
       }
     }
     // If the for-loop runs until the end, the atom was not found
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "getTransformedAtom";
+    string function = _AAPL_IFCS_ERR_PREFIX_ + "getTransformedAtom():";
     stringstream message;
     message << "Could not transform atom " << at;
     throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);

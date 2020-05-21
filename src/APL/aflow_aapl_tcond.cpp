@@ -177,7 +177,7 @@ namespace apl {
   // The main function that calculates the thermal conductivity tensor, the
   // Grueneisen parameters, and the scattering phase space.
   void TCONDCalculator::calculateThermalConductivity() {
-    string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
+    string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity():";
     string message = "";
 
     if (!_pc_set) {
@@ -1036,7 +1036,7 @@ namespace apl {
         num_iter++;
       } while ((std::abs(norm) > TCOND_ITER_THRESHOLD) && (num_iter <= max_iter));
       if (num_iter > max_iter) {
-        string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor()";
+        string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor():";
         stringstream message;
         message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
         message << "at " << T << " K.";
@@ -1317,7 +1317,7 @@ namespace apl {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(output, path);
     if (!aurostd::FileExist(path)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput()";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput():";
       stringstream message;
       message << "Could not write file " << path << ".";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -1346,7 +1346,7 @@ namespace apl {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput()";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput():";
       stringstream message;
       message << "Could not write file " << filename << ".";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -1406,7 +1406,7 @@ namespace apl {
     // Write to file
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeGroupVelocities()";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeGroupVelocities():";
       string message = "Could not write group velocities to file.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -1537,7 +1537,7 @@ namespace apl {
 
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity():";
       string message = "Could not write thermal conductivities to file.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }

@@ -151,27 +151,28 @@ namespace apl {
   // Symmetrizes the force constant matrices using site point group symmetry
   void ForceConstantCalculator::symmetrizeForceConstantMatrices() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()"; //CO20190218
+    string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices():"; //CO20190218
+    string message = "";
     // Test of stupidity...
     if (!_supercell->getSupercellStructure().agroup_calculated) {
-      string message = "The site groups have not been calculated yet.";
+      message = "The site groups have not been calculated yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
     //CO START
     if (_supercell->getEPS() == AUROSTD_NAN) {
-      string message = "Need to define symmetry tolerance.";
+      message = "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
     }
     //CO END
 
-    string message = "Symmetrizing the force constant matrices.";
+    message = "Symmetrizing the force constant matrices.";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     vector<xmatrix<double> > row;
     for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO20190218
       if (agroup.size() == 0) {
-        string message = "Site point group operations are missing.";
+        message = "Site point group operations are missing.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
       }
 
@@ -202,7 +203,7 @@ namespace apl {
               std::cerr << (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc)) << std::endl;
             }
           } catch (aurostd::xerror& e) {
-            string message = "Mapping problem " + aurostd::utype2string<int>(j);
+            message = "Mapping problem " + aurostd::utype2string<int>(j);
             throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
           }
         }
@@ -349,7 +350,7 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT(void) {
-    string function = "ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT()";
+    string function = "ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT():";
     string message = "This functionality has not been implemented yet.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
@@ -357,6 +358,7 @@ namespace apl {
   void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  //ME20190113
     string directory = xinp.xvasp.Directory;  //ME20190113
     string function = "apl::ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR():";
+    string message = "";
 
     //CO START
     string infilename = directory + string("/OUTCAR.static");
@@ -373,7 +375,7 @@ namespace apl {
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
       //CO END
-      string message = "Cannot open input file OUTCAR.static.";
+      message = "Cannot open input file OUTCAR.static.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
@@ -390,7 +392,7 @@ namespace apl {
       // Get line
       //CO START
       if (line_count == vlines.size()) {
-        string message = "No information on Born effective charges in OUTCAR file.";
+        message = "No information on Born effective charges in OUTCAR file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];  //CO
@@ -428,9 +430,9 @@ namespace apl {
   void ForceConstantCalculator::symmetrizeBornEffectiveChargeTensors(void) {
     //CO START
     // Test of stupidity...
+    string function = "apl::ForceConstantCalculator::symmetrizeEffectiveChargeTensors():";
     stringstream message;
     if (_supercell->getEPS() == AUROSTD_NAN) {
-      string function = "apl::ForceConstantCalculator::symmetrizeEffectiveChargeTensors()";
       message << "Symmetry tolerance not defined.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
@@ -462,7 +464,6 @@ namespace apl {
         }
         //CO START
         catch (aurostd::xerror& e) {
-          string function = "apl::ForceConstantCalculator::symmetrizeBornEffectiveChargeTensors()";
           stringstream message;
           message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedUniqueAtomID << "?";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -530,13 +531,15 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readDielectricTensorFromAIMSOUT(void) {
-    string function = "apl::ForceConstantCalculator::readDielectricTensorFromAIMSOUT()";
+    string function = "apl::ForceConstantCalculator::readDielectricTensorFromAIMSOUT():";
     string message = "This functionality has not been implemented yet.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  //ME20190113
+    string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
+    string message = "";
     string directory = xinp.xvasp.Directory;  //ME20190113
 
     //CO START
@@ -553,8 +556,7 @@ namespace apl {
     string line;
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
-      string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
-      string message = "Cannot open input file OUTCAR.";
+      message = "Cannot open input file OUTCAR.";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     //CO END
@@ -571,8 +573,7 @@ namespace apl {
       // Get line
       //CO START
       if (line_count == vlines.size()) {
-        string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
-        string message = "No information on dielectric tensor in OUTCAR.";
+        message = "No information on dielectric tensor in OUTCAR.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];
@@ -1167,7 +1168,7 @@ namespace apl {
     //     equivalent distortions go first (you could consider it like the most "natural" choices for distortions based on crystal symmetry)
 
     stringstream message;
-    string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
+    string function = "apl::DirectMethodPC::estimateUniqueDistortions():";
     // Is there a list of inequivalent atoms?
     if (DISTORTION_INEQUIVONLY && !xstr.iatoms_calculated) { //CO20190218
       message << "The list of the inequivalent atoms is missing.";
@@ -1699,12 +1700,12 @@ namespace apl {
     stringstream message;
     // Test of stupidity...
     if (DISTORTION_INEQUIVONLY && !_supercell->getSupercellStructure().fgroup_calculated) { //CO20190218
-      string message = "The factor group has not been calculated yet.";
+      message << "The factor group has not been calculated yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
     //CO START
     if (DISTORTION_INEQUIVONLY && _supercell->getEPS() == AUROSTD_NAN) { //CO20190218
-      string message = "Need to define symmetry tolerance.";
+      message << "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
     }
     //CO END
@@ -2072,7 +2073,7 @@ namespace apl {
   // aflow.in files and should only be used to read forces for force constant
   // calculations. It is still in development and has only been tested with VASP.
   void DirectMethodPC::readFromStateFile(const string& filename) {
-    string function = "apl::DirectMethodPC::readFromStateFile()";
+    string function = "apl::DirectMethodPC::readFromStateFile():";
     string message = "";
     if (!_sc_set) {
       message = "Supercell pointer not set.";
@@ -2406,7 +2407,7 @@ namespace apl {
   bool LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
-      string function = "apl::LinearResponsePC::calculateForceFields()";
+      string function = "apl::LinearResponsePC::calculateForceFields():";
       string message = "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
@@ -2424,6 +2425,7 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
   //ME20200211
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
+    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun():";
     stringstream message;
     message << "Reading force constants from vasprun.xml";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
@@ -2461,7 +2463,6 @@ namespace apl {
       }
     }
 
-    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
     // Check that the file was read successfully.
     if (iline == nlines) {
       message << "Hessian tag not found or incomplete.";
@@ -2513,7 +2514,7 @@ namespace apl {
 namespace apl {
 
   void LinearResponsePC::saveState(const string& filename) {
-    string function = "apl::LinearResponsePC::saveState()";
+    string function = "apl::LinearResponsePC::saveState():";
     string message = "";
     if (!_sc_set) {
       message = "Supercell pointer not set.";
@@ -2549,7 +2550,7 @@ namespace apl {
   // aflow.in files and should only be used to read forces for force constant
   // calculations. It is still in development and has only been tested with VASP.
   void LinearResponsePC::readFromStateFile(const string& filename) {
-    string function = "apl::LinearResponsePC::readFromStateFile()";
+    string function = "apl::LinearResponsePC::readFromStateFile():";
     string message = "";
     if (!_sc_set) {
       message = "Supercell pointer not set.";
