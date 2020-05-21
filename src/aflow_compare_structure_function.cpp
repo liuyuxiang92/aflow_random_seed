@@ -6186,8 +6186,8 @@ namespace compare{
                 tmp_xvec = ab_component + l3[p];  //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
                 tmp=aurostd::modulus(tmp_xvec);
                 if(tmp < dist){
-                  i1 = j;
-                  i2 = k;
+                  i1 = xstr1_atoms[j].basis; //DX20200521 - use basis not index (protects against resorting)
+                  i2 = PROTO_atoms[k].basis; //DX20200521 - use basis not index (protects against resorting)
                   dist = tmp;
                   min_xvec = tmp_xvec;
                 }
@@ -6200,8 +6200,8 @@ namespace compare{
         }
         else{
           if(incell_mod < dist){
-            i1 = j;
-            i2 = k;
+            i1 = xstr1_atoms[j].basis; //DX20200521 - use basis not index (protects against resorting)
+            i2 = PROTO_atoms[k].basis; //DX20200521 - use basis not index (protects against resorting)
             dist = incell_mod;
             min_xvec = incell_dist;
           }
@@ -6975,10 +6975,10 @@ namespace compare{
     // Compute the coordinates deviation by looking at each pair of atoms from
     // the reference and mapped structure
 
-    uint j;
+    uint j=0;
     double num=0, den=0, nfail=0;
-    double dd, nn1, nn2; //dd=delta distance, nn=nearest neighbour 
-    int  fail1, fail2;
+    double dd=0.0, nn1=0.0, nn2=0.0; //dd=delta distance, nn=nearest neighbour
+    int fail1=0, fail2=0;
     xmatrix<double> klattice = xstr1.lattice;
     for(j=0; j<indexMatch1.size(); j++){
       //nn1=shortestDistance(xstr1,indexMatch1[j]);
