@@ -6086,7 +6086,7 @@ namespace compare{
 namespace compare{
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
-      vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, 
+      vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
       const int& type_match) {
 
     // In order to find the best matchings the routine computes 
@@ -6106,7 +6106,8 @@ namespace compare{
     string function_name = XHOST.sPID + "compare::findMatch():";
 
     uint j=0,k=0;
-    int i1=0,i2=0;                                  //Indices corresponding atoms
+    int i1=0,i2=0;                                  // indices of atoms (index after sorting)
+    int basis_index1=0,basis_index2=0;              // basis of atoms (index before sorting)
 
     vector<double> vdiffs;                      //Difference btwn atoms coords
     vector<std::pair<xvector<double>,xvector<double> > > min_positions;                      //Store sets of Cartesian coords which minimize distance
@@ -6115,12 +6116,12 @@ namespace compare{
     bool is_non_collinear = xstr1_atoms[0].noncoll_spin_is_given; //DX20191213
     bool is_collinear = xstr1_atoms[0].spin_is_given; //DX20191213
 
-    vector<uint> im1_tmp;
-    vector<uint> im2_tmp;
+    vector<uint> im1;
+    vector<uint> im2;
     vector<string> im1_name;
     vector<string> im2_name;
-    im1.clear();
-    im2.clear();
+    mapping_index_str1.clear(); //DX20200521
+    mapping_index_str2.clear(); //DX20200521
     vdiffs.clear();
     all_vdiffs.clear();
 
@@ -6128,8 +6129,10 @@ namespace compare{
     xmatrix<double> lattice=PROTO_lattice;
 
     double tmp = 1e9;
-    uint i1_real=0;
-    uint i2_real=0;
+    uint i1_min=0;
+    uint i2_min=0;
+    uint basis_index1_min=0; //DX20200521
+    uint basis_index2_min=0; //DX20200521
     string i1_name = "";
     string i2_name = "";
 
@@ -6186,8 +6189,10 @@ namespace compare{
                 tmp_xvec = ab_component + l3[p];  //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
                 tmp=aurostd::modulus(tmp_xvec);
                 if(tmp < dist){
-                  i1 = xstr1_atoms[j].basis; //DX20200521 - use basis not index (protects against resorting)
-                  i2 = PROTO_atoms[k].basis; //DX20200521 - use basis not index (protects against resorting)
+                  i1 = j;
+                  i2 = k;
+                  basis_index1 = xstr1_atoms[j].basis; //DX20200521 - use basis not index (protects against resorting)
+                  basis_index2 = PROTO_atoms[k].basis; //DX20200521 - use basis not index (protects against resorting)
                   dist = tmp;
                   min_xvec = tmp_xvec;
                 }
@@ -6200,19 +6205,23 @@ namespace compare{
         }
         else{
           if(incell_mod < dist){
-            i1 = xstr1_atoms[j].basis; //DX20200521 - use basis not index (protects against resorting)
-            i2 = PROTO_atoms[k].basis; //DX20200521 - use basis not index (protects against resorting)
+            i1 = j;
+            i2 = k;
+            basis_index1 = xstr1_atoms[j].basis; //DX20200521 - use basis not index (protects against resorting)
+            basis_index2 = PROTO_atoms[k].basis; //DX20200521 - use basis not index (protects against resorting)
             dist = incell_mod;
             min_xvec = incell_dist;
           }
         }
         //cerr << "match_dist: " << match_dist << endl;
         if(dist<match_dist){
-          i1_real=i1;
-          i2_real=i2;
+          i1_min=i1;
+          i2_min=i2;
           match_dist = dist;
-          i1_name = xstr1_atoms[i1_real].name;
-          i2_name = PROTO_atoms[i2_real].name;
+          i1_name = xstr1_atoms[i1_min].name;
+          i2_name = PROTO_atoms[i2_min].name;
+          basis_index1_min = basis_index1; //DX20200521 - use basis not index (protects against resorting)
+          basis_index2_min = basis_index2; //DX20200521 - use basis not index (protects against resorting)
           tmp_pair.second = min_xvec;
         }
         vdiffs.push_back(dist);
@@ -6242,9 +6251,9 @@ namespace compare{
       if(!_CALCULATE_MAGNETIC_MISFIT_){
         // Check non_collinear spin
         if(is_non_collinear){
-          if(aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(1)-PROTO_atoms[i2_real].noncoll_spin(1))>_SPIN_TOL_ ||
-              aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(2)-PROTO_atoms[i2_real].noncoll_spin(2))>_SPIN_TOL_ ||
-              aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(3)-PROTO_atoms[i2_real].noncoll_spin(3))>_SPIN_TOL_){
+          if(aurostd::abs(xstr1_atoms[i1_min].noncoll_spin(1)-PROTO_atoms[i2_min].noncoll_spin(1))>_SPIN_TOL_ ||
+              aurostd::abs(xstr1_atoms[i1_min].noncoll_spin(2)-PROTO_atoms[i2_min].noncoll_spin(2))>_SPIN_TOL_ ||
+              aurostd::abs(xstr1_atoms[i1_min].noncoll_spin(3)-PROTO_atoms[i2_min].noncoll_spin(3))>_SPIN_TOL_){
             if(VERBOSE){
               cerr << function_name << " WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
             }
@@ -6253,7 +6262,7 @@ namespace compare{
         }
         // Check collinear spin
         if(is_collinear){
-          if(aurostd::abs(xstr1_atoms[i1_real].spin-PROTO_atoms[i2_real].spin)>_SPIN_TOL_){
+          if(aurostd::abs(xstr1_atoms[i1_min].spin-PROTO_atoms[i2_min].spin)>_SPIN_TOL_){
             if(VERBOSE){
               cerr << function_name << " WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
             }
@@ -6265,19 +6274,19 @@ namespace compare{
       // Check for one-to-one mappings 
       for(uint i=0;i<im1_name.size();i++){
         // Check if i1 index has multiple mappings
-        if(i1_real == im1[i]){
+        if(i1_min == im1[i]){
           if(LDEBUG){
-            cerr << "WARNING: Used the same index for matching in i1! (" << i1_real << " == " << im1[i] << ")"<< endl;
-            cerr << "                                             i2! (" << i2_real << " == " << im2[i] << ")"<< endl;
+            cerr << "WARNING: Used the same index for matching in i1! (" << i1_min << " == " << im1[i] << ")"<< endl;
+            cerr << "                                             i2! (" << i2_min << " == " << im2[i] << ")"<< endl;
             cerr << match_dist << " vs " << min_dists[i] << endl;
           }
           return false;
         }
         // Check if i2 index has multiple mappings
-        if(i2_real == im2[i]){
+        if(i2_min == im2[i]){
           if(LDEBUG){
-            cerr << "WARNING: Used the same index for matching in i2! (" << i2_real << " == " << im2[i] << ")"<< endl;
-            cerr << "                                             i1! (" << i1_real << " == " << im1[i] << ")"<< endl;
+            cerr << "WARNING: Used the same index for matching in i2! (" << i2_min << " == " << im2[i] << ")"<< endl;
+            cerr << "                                             i1! (" << i1_min << " == " << im1[i] << ")"<< endl;
             cerr << match_dist << " vs " << min_dists[i] << endl;
           }
           return false;
@@ -6290,18 +6299,20 @@ namespace compare{
               for(uint j=0;j<im1_name.size();j++){
                 //  cerr << im1[j] << " == " << im2[j] << " | " << xstr1.atoms[im1[j]].cpos << " == " << PROTO.atoms[im2[j]].cpos << " (" << min_dists[i] << ") | " << im1_name[j] << " == " << im2_name[j] << endl;
               }
-              //cerr << i1_real << " == " << i2_real << " | " << xstr1.atoms[i1_real].cpos << " == " << PROTO.atoms[i2_real].cpos << " (" << match_dist << ") | " << i1_name << " == " << i2_name << endl;            
+              //cerr << i1_min << " == " << i2_min << " | " << xstr1.atoms[i1_min].cpos << " == " << PROTO.atoms[i2_real].cpos << " (" << match_dist << ") | " << i1_name << " == " << i2_name << endl;            
             }
             return false;
           }
         }
       }
-      im1_tmp.push_back(i1_real);
-      im2_tmp.push_back(i2_real);
-      im1.push_back(i1_real);
-      im2.push_back(i2_real);
+      //DX20200521 [OBSOLETE] im1_tmp.push_back(i1_min);
+      //DX20200521 [OBSOLETE] im2_tmp.push_back(i2_min);
+      im1.push_back(i1_min);
+      im2.push_back(i2_min);
       im1_name.push_back(i1_name);
       im2_name.push_back(i2_name);
+      mapping_index_str1.push_back(basis_index1_min); //DX20200521
+      mapping_index_str2.push_back(basis_index2_min); //DX20200521
       min_dists.push_back(match_dist);
       all_vdiffs.push_back(vdiffs);
       min_positions.push_back(tmp_pair);
@@ -8147,12 +8158,12 @@ namespace compare{
                 }
               }
             }
-            vector<uint> im1, im2;
+            vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,im1,im2,min_dists,type_match)){;
+            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,map_index_str1,map_index_str2,min_dists,type_match)){;
               if(VERBOSE){
-                for(uint m=0;m<im1.size();m++){
-                  cerr << "compare::structureSearch: " << im1[m] << " == " << im2[m] << " : dist=" << min_dists[m] << endl;
+                for(uint m=0;m<map_index_str1.size();m++){
+                  cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;
                 }
               }
               double cd=AUROSTD_NAN, f=AUROSTD_NAN; //DX20200421 - missing initialization
@@ -8168,11 +8179,11 @@ namespace compare{
                 }
                 all_nn_calculated = true;
               }
-              coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,im1,im2,min_dists,cd,f);
+              coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,map_index_str1,map_index_str2,min_dists,cd,f);
               if(_CALCULATE_MAGNETIC_MISFIT_&& 
                   ((xstr1.atoms[0].spin_is_given && proto.atoms[0].spin_is_given) || 
                    (xstr1.atoms[0].noncoll_spin_is_given && proto.atoms[0].noncoll_spin_is_given))){
-                magneticDeviation(xstr1,proto,im1,im2,mag_dis,mag_fail);
+                magneticDeviation(xstr1,proto,map_index_str1,map_index_str2,mag_dis,mag_fail);
                 mis=computeMagneticMisfit(latt_devs[p],cd,f,mag_dis,mag_fail);
                 if(LDEBUG){
                   cerr << "with spin: mis,latt_dev,cd,f,mag_dis,mag_fail: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f << ", " << mag_dis << ", " << mag_fail <<  endl;
@@ -8197,8 +8208,8 @@ namespace compare{
                 min_misfit_info.magnetic_misfit=mis; //DX20191218 - should we have this....
                 min_misfit_info.magnetic_displacement=mag_dis;
                 min_misfit_info.magnetic_failure=mag_fail;
-                index_match_1 = im1;
-                index_match_2 = im2;
+                index_match_1 = map_index_str1;
+                index_match_2 = map_index_str2;
                 min_distances = min_dists;
               }
               // If we want to simply find a match and not find the best match, we can exit early
