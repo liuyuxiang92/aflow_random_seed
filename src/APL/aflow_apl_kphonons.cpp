@@ -35,7 +35,7 @@ namespace KBIN {
   //ME20200102 - Make k-point grid commensurate with supercell size
   bool relaxStructureAPL_VASP(int start_relax,
       const string& AflowIn,
-      aurostd::xoption supercell_opts,  //ME20200102
+      aurostd::xoption& aplopts,  //ME20200102
       const xvector<int>& scell_dims,  //ME20200102
       bool relax_commensurate,
       _xvasp& xvasp,
@@ -129,8 +129,10 @@ namespace KBIN {
       // with the desired supercell dimensions, otherwise ghost-forces may appear.
       scell.clearSupercell();
       scell.initialize(xvasp.str);
-      supercell_opts.flag("SCELL::VERBOSE", false);
-      xvector<int> scell_dims_new = scell.determineSupercellDimensions(supercell_opts);
+      bool scell_verbose = aplopts.flag("SCELL::VERBOSE");
+      aplopts.flag("SCELL::VERBOSE", false);
+      xvector<int> scell_dims_new = scell.determineSupercellDimensions(aplopts);
+      aplopts.flag("SCELL::VERBOSE", scell_verbose);
       if (scell_dims != scell_dims_new) {
         message << "Supercell dimensions of the input structure (" << aurostd::joinWDelimiter(scell_dims, "x") << ")"
           << " and the relaxed structure (" << aurostd::joinWDelimiter(scell_dims_new, "x") << ")"
@@ -1854,6 +1856,8 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     aplopts.push_attached("ENGINE", USER_ENGINE);  // To make sure it's all caps
+
+    validateParametersSupercellAPL(aplopts);
 
     if (aplopts.flag("DC")) {
       validateParametersDispersionsAPL(aplopts);

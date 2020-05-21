@@ -358,6 +358,7 @@ namespace apl {
       for (Ni = 1; natoms < minatoms; Ni++) {
         natoms = (int) std::pow(Ni, 3) * _inStructure.atoms.size();
       }
+      Ni--;
       dims[1] = Ni; dims[2] = Ni; dims[3] = Ni;
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Ni=" << Ni
