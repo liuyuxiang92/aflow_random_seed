@@ -230,11 +230,12 @@ namespace apl {
     //CO, we already checked that it exists before, just open
     vector<string> vlines;                           //CO
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME20181226
-    string function = _APL_PHCALC_ERR_PREFIX_ + "readHarmonicIFCs()";
+    string function = _APL_PHCALC_ERR_PREFIX_ + "readHarmonicIFCs():";
+    string message = "";
 
     //CO START
     if (!vlines.size()) {
-      string message = "Cannot open output file " + hibfile + "."; //ME20181226
+      message = "Cannot open output file " + hibfile + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 
@@ -255,7 +256,7 @@ namespace apl {
     // follow an older, incompatible format and need to be recalculated
     while (true) {
       if (line_count == vlines.size()) {
-        string message = "The format for harmonic force constants has changed and is incomptable with the format found in this file.";
+        message = "The format for harmonic force constants has changed and is incomptable with the format found in this file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];  //CO
@@ -265,7 +266,7 @@ namespace apl {
     // Get force constant matrices
     while (true) {
       if (line_count == vlines.size()) { //CO
-        string message = "Cannot find <fcms> tag.";
+        message = "Cannot find <fcms> tag.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];  //CO
@@ -280,7 +281,7 @@ namespace apl {
     xmatrix<double> m(3, 3);
     while (true) {
       if (line_count == vlines.size()) { //CO
-        string message = "Incomplete <fcms> tag.";
+        message = "Incomplete <fcms> tag.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];  //CO
@@ -308,7 +309,7 @@ namespace apl {
   }
 
   void PhononCalculator::readBornChargesDielectricTensor(const string& hibfile) {
-    string function = _APL_PHCALC_ERR_PREFIX_ + "readBornChargesDielectricTensor()";
+    string function = _APL_PHCALC_ERR_PREFIX_ + "readBornChargesDielectricTensor():";
     string message = "";
     if (!aurostd::EFileExist(hibfile)) {
       message = "Cannot find file " + hibfile + ".";
@@ -406,7 +407,7 @@ namespace apl {
 
   void PhononCalculator::readAnharmonicIFCs(string filename) {
     filename = aurostd::CleanFileName(filename);
-    string function = _APL_PHCALC_ERR_PREFIX_ + "readAnharmonicIFCs()";
+    string function = _APL_PHCALC_ERR_PREFIX_ + "readAnharmonicIFCs():";
     string message = "";
     if (!aurostd::EFileExist(filename)) {
       message = "Could not open file " + filename + ". File not found.";

@@ -132,12 +132,11 @@ namespace apl {
   //initialize////////////////////////////////////////////////////////////////
   // Initialize basic parameters.
   void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad) {
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize():";
     stringstream message;
     if (_order > 1) {
       order = _order;
     } else {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize";
-      stringstream message;
       message << "Cluster order must be larger than 1 (is " << _order << ").";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
     }
@@ -201,20 +200,21 @@ namespace apl {
   // have the same symmetry.
   vector<vector<int> > ClusterSet::getSymmetryMap() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap()";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap():";
+    string message = "";
     // Check if the symmetry of the supercell and the primitive cell are the
     // same by comparing the crystal point groups.
     if (!scell.pgroup_xtal_calculated) {
       scell.CalculateSymmetryPointGroupCrystal(false);
       if (!scell.pgroup_xtal_calculated) {
-        string message = "Could not calculate the point group of the supercell.";
+        message = "Could not calculate the point group of the supercell.";
         throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
     if (!pcell.pgroup_xtal_calculated) {
       pcell.CalculateSymmetryPointGroupCrystal(false);
       if (!pcell.pgroup_xtal_calculated) {
-        string message = "Could not calculate the point group of the primitive cell.";
+        message = "Could not calculate the point group of the primitive cell.";
         throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
@@ -224,7 +224,7 @@ namespace apl {
       if (!pcell.fgroup_calculated) {
         pcell.CalculateSymmetryFactorGroup(false);
         if (!pcell.fgroup_calculated) {
-          string message = "Could not calculate the factor group of the primitive cell.";
+          message = "Could not calculate the factor group of the primitive cell.";
           throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
         }
       }
@@ -255,7 +255,7 @@ namespace apl {
             }
           }
           if (!mapped) {
-            string message = "At least one atom of the supercell could not be mapped.";
+            message = "At least one atom of the supercell could not be mapped.";
             if (LDEBUG) {
               std::cerr << function << " Failed to map atom " << atsc << " using fgroup number " << fg << "." << std::endl;
             }
@@ -265,7 +265,7 @@ namespace apl {
       }
       return sym_map;
     } else {
-      string message = "The point group of supercell is different than the point of the supercell.";
+      message = "The point group of supercell is different than the point of the supercell.";
       message += " This feature is not implemented yet.";
       if (LDEBUG) {
         std::cerr << "ClusterSet::getSymmetryMap: Point group mismatch. Primitive cell: ";
@@ -1589,7 +1589,7 @@ namespace apl {
   // Reads a ClusterSet from an XML file.
   void ClusterSet::readClusterSetFromFile(const string& filename) {
     // Open file and handle exceptions
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusterSetFromFile";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusterSetFromFile():";
     stringstream message;
 
     if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
@@ -1639,7 +1639,7 @@ namespace apl {
   // cutoff) are the same. This prevents the ClusterSet from being
   // recalculated when only post-processing parameters are changed.
   bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlines) {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility():";
     string line = "";
     std::stringstream message;
     bool compatible = true;
@@ -1862,7 +1862,7 @@ namespace apl {
   // Reads the inequivalent clusters.
   void ClusterSet::readInequivalentClusters(uint& line_count,
       const vector<string>& vlines) {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters():";
     string line = "", message = "";
     vector<string> tokens;
     int t = 0;
@@ -1912,7 +1912,7 @@ namespace apl {
   // Reads a set of _cluster objects for the inequivalent clusters.
   vector<_cluster> ClusterSet::readClusters(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readClusters";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusters():";
     string message = "", line = "";
     vector<_cluster> clusters;
     vector<string> tokens;
@@ -1963,7 +1963,7 @@ namespace apl {
   // Reads a single _linearCombinations object.
   _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readLinearCombinations";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readLinearCombinations():";
     string message = "", line = "";
     _linearCombinations lcombs;
     vector<string> tokens;
@@ -2060,7 +2060,7 @@ namespace apl {
   // Reads the inequivalent distortions.
   void ClusterSet::readInequivalentDistortions(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readInequivalentDistortions";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentDistortions():";
     string line = "", message = "";
     uint vsize = vlines.size();
 
@@ -2078,7 +2078,7 @@ namespace apl {
   }
 
   _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string>& vlines) {
-    string function = "readIneqDist";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readIneqDist():";
     string line = "", message = "";
     uint vsize = vlines.size();
     vector<string> tokens;
@@ -2203,7 +2203,7 @@ namespace apl {
 
   void ClusterSet::readHigherOrderDistortions(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readHigherOrderDistortions";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readHigherOrderDistortions():";
     string line = "", message = "";
     uint vsize = vlines.size();
 
