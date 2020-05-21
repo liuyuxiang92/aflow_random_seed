@@ -2887,7 +2887,7 @@ namespace AEL_functions {
           aus << _AELSTR_MESSAGE_ + "Pressure = " << Pressure.at(k) << "GPa" << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           // Writes elastic moduli values in file for REST-API
-	  oss << AFLOWIN_SEPARATION_LINE << endl;
+          oss << AFLOWIN_SEPARATION_LINE << endl;
           oss << "[AEL_PRESSURE]PRESSURE = " << Pressure.at(k) << "GPa" << endl;
           if(AEL_data_pressures.at(k).mechanically_stable) {
             oss << "[AEL_PRESSURE]Structure is mechanically stable at this pressure" << endl;
@@ -2911,7 +2911,7 @@ namespace AEL_functions {
           oss << "ael_applied_pressure=" << AEL_data_pressures.at(k).applied_pressure << "  (GPa)" << endl;
           oss << "ael_average_external_pressure=" << AEL_data_pressures.at(k).average_external_pressure << "  (GPa)" << endl;  
           oss << "[AEL_RESULTS]STOP" << endl;
-	  oss << AFLOWIN_SEPARATION_LINE << endl;
+          oss << AFLOWIN_SEPARATION_LINE << endl;
           oss << "[AEL_STIFFNESS_TENSOR]START" << endl;
           for (uint i = 0; i < AEL_data_pressures.at(k).elastic_tensor.size(); i++) {
             for (uint j = 0; j < AEL_data_pressures.at(k).elastic_tensor.size(); j++) {
@@ -2920,7 +2920,7 @@ namespace AEL_functions {
             oss << endl;
           }
           oss << "[AEL_STIFFNESS_TENSOR]STOP" << endl;
-	  oss << AFLOWIN_SEPARATION_LINE << endl;
+          oss << AFLOWIN_SEPARATION_LINE << endl;
           oss << "[AEL_COMPLIANCE_TENSOR]START" << endl;
           for (uint i = 0; i < AEL_data_pressures.at(k).compliance_tensor.size(); i++) {
             for (uint j = 0; j < AEL_data_pressures.at(k).compliance_tensor.size(); j++) {
@@ -2929,7 +2929,7 @@ namespace AEL_functions {
             oss << endl;
           }
           oss << "[AEL_COMPLIANCE_TENSOR]STOP" << endl;
-	  oss << AFLOWIN_SEPARATION_LINE << endl;
+          oss << AFLOWIN_SEPARATION_LINE << endl;
         }
         string ofileafaelname = AEL_data.dirpathname + "/aflow.ael_pressure.out";
         if(!aurostd::stringstream2file(oss, ofileafaelname, "WRITE")) {

@@ -1554,13 +1554,13 @@ namespace KBIN {
             }
           }
           // ---------------------------------------------------------
-	  // Warn user if both APL/AAPL and AEL/AGL flags are set, since they are mutually exclusive
-	  if ((kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA) && (kflags.KBIN_PHONONS_CALCULATION_AGL || kflags.KBIN_PHONONS_CALCULATION_AEL)) {
-	    aus << "WWWWW  WARNING: APL/AAPL/QHA and AEL/AGL flags both set" << endl;
-	    aus << "WWWWW  WARNING: These runs are mutually exclusive" << endl;
-	    aus << "WWWWW  WARNING: APL/AAPL/QHA runs will take priority" << endl;
+          // Warn user if both APL/AAPL and AEL/AGL flags are set, since they are mutually exclusive
+          if ((kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA) && (kflags.KBIN_PHONONS_CALCULATION_AGL || kflags.KBIN_PHONONS_CALCULATION_AEL)) {
+            aus << "WWWWW  WARNING: APL/AAPL/QHA and AEL/AGL flags both set" << endl;
+            aus << "WWWWW  WARNING: These runs are mutually exclusive" << endl;
+            aus << "WWWWW  WARNING: APL/AAPL/QHA runs will take priority" << endl;
             aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  } //CT20200520 - added warning
+          } //CT20200520 - added warning
           // ---------------------------------------------------------
           // parameters for NEIGHBOURS
           kflags.KBIN_NEIGHBOURS_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_NEIGHBOURS]CALC",TRUE) || aurostd::substring2bool(AflowIn, "[AFLOW_NEIGHBORS]CALC");  //ME20190107 - Added American spelling

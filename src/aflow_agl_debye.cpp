@@ -2493,7 +2493,7 @@ namespace AGL_functions {
         // If a minimum is found, the value of cm is set to 0
         // If the lowest energy corresponds to the smallest volume, the value of cm is set to 1
         // If the lowest energy corresponds to the largest volume, the value of cm is set to 2
-	// Default to assuming that minimum is present to avoid running unnecessary additional calculations
+        // Default to assuming that minimum is present to avoid running unnecessary additional calculations
         int cm = 0;
         aglerror = AGL_functions::checkmin(AGL_data, cm, FileMESSAGE);
         if(aglerror != 0) {
@@ -2825,7 +2825,7 @@ namespace AGL_functions {
         // The function "checkconcav" checks the concavity of the (E, V) data
         // If the data is concave, it sets cc = 0
         // If the data is not concave, it sets cc = 1
-	// Initialize to 0 so that default assumption is that data is concave to avoid running unnecessary additional calculations
+        // Initialize to 0 so that default assumption is that data is concave to avoid running unnecessary additional calculations
         int cc = 0;
         aglerror = AGL_functions::checkconcav(AGL_data, cc, FileMESSAGE);
         if(aglerror != 0) {
@@ -3781,14 +3781,14 @@ namespace AGL_functions {
         vector<double> kappaTU;
         double gammaU = USER_GRUNEISEN.getattachedutype<double>("GRUNEISEN_EQUAL");
         double thetaU = USER_THETA_COND.getattachedutype<double>("THETA_EQUAL");
-	// Check that values are not zero or negative; warn user and reset to default values if they are zero or negative
-	if(gammaU < tolzero) {
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_WARNING_ + "User Gruneisen parameter = " << gammaU << " <= 0.0" << endl;  
-	  gammaU = 2.0;
-	  aus << _AGLSTR_WARNING_ + "Increasing Gruneisen parameter to default value of " << gammaU << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	}
+        // Check that values are not zero or negative; warn user and reset to default values if they are zero or negative
+        if(gammaU < tolzero) {
+          aurostd::StringstreamClean(aus);
+          aus << _AGLSTR_WARNING_ + "User Gruneisen parameter = " << gammaU << " <= 0.0" << endl;  
+          gammaU = 2.0;
+          aus << _AGLSTR_WARNING_ + "Increasing Gruneisen parameter to default value of " << gammaU << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
         if(thetaU < tolzero) {
           aurostd::StringstreamClean(aus);
           aus << _AGLSTR_WARNING_ + "User Debye temperature = " << thetaU << " <= 0.0" << endl;  
