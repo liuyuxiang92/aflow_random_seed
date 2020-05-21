@@ -265,7 +265,7 @@ namespace apl {
       }
       return sym_map;
     } else {
-      message = "The point group of supercell is different than the point of the input structure.";
+      message = "The point group of supercell is different than the point group of the input structure.";
       message += " This feature is not implemented yet.";
       if (LDEBUG) {
         std::cerr << "ClusterSet::getSymmetryMap: Point group mismatch. Primitive cell: ";
