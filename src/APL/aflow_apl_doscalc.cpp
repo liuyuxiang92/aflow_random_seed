@@ -294,7 +294,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
       double fmin, double fmax) {
-    string function = "DOSCalculator::calc()";
+    string function = "DOSCalculator::calc():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
