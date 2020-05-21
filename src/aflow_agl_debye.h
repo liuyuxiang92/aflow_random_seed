@@ -261,16 +261,16 @@ class _AGL_data {
 // Namespace for functions used by AGL method, to avoid potential naming conflicts with other parts of AFLOW
 namespace AGL_functions {
   // Functions to actually run AGL, either directly or from another part of AFLOW
-  uint RunDebye_AGL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
-  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
-  uint Get_ThermalProperties_AGL_postprocess(string directory, const uint& ntemperature, const double& stemperature, const uint& npressure, const double& spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom);
-  uint Get_EquilibriumVolumeTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
-  uint Get_EquilibriumVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
-  uint Get_BulkModulusStaticTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusStatic, ofstream& FileMESSAGE);
-  uint Get_BulkModulusIsothermalTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, ofstream& FileMESSAGE);
-  uint Get_BulkModulusVolumeTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
-  uint Get_BulkModulusVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
-  uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, bool& postprocess, ofstream& FileMESSAGE);
+  uint RunDebye_AGL(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
+  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, const string& AflowInName, const string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint Get_ThermalProperties_AGL_postprocess(const string& directory, uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom);
+  uint Get_EquilibriumVolumeTemperature(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
+  uint Get_EquilibriumVolumeAngstromTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
+  uint Get_BulkModulusStaticTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusStatic, ofstream& FileMESSAGE);
+  uint Get_BulkModulusIsothermalTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, ofstream& FileMESSAGE);
+  uint Get_BulkModulusVolumeTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
+  uint Get_BulkModulusVolumeAngstromTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
+  uint Get_VolumeStaticPressure(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, bool postprocess, ofstream& FileMESSAGE);
   // Functions for generating _AFLOWIN_ input files for strained structures and checking (E,V) data calculated with VASP
   uint aglvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AGL_data& AGL_data, ofstream& FileMESSAGE);
   // [OBSOLETE] uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& kbinFlags, _vflags& vaspFlags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
@@ -283,8 +283,8 @@ namespace AGL_functions {
   uint qcksortev(vector<double>& vol, vector<double>& energ, ofstream& FileMESSAGE);
   uint qcksortevt(vector<double>& vol, vector<double>& energ, vector<double>& tdebye, ofstream& FileMESSAGE);
   uint polynom_eval (double& xval, vector<double>& polynomialcoeffs, double& yval, uint n);
-  uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool& gxmdebug, ofstream& FileMESSAGE);
-  uint polynom_fit (uint& first_entry_tofit, uint& last_entry_tofit, vector<double>& xdata, vector<double>& ydata, vector<double>& weight, double& rms, int& npolycoeffwork, vector<double>& polycoeffwork, bool& gxmdebug, ofstream& FileMESSAGE);
+  uint gaussxm (vector<vector<double> >& cmatrix, int& n, vector<double>& xdata, bool gxmdebug, ofstream& FileMESSAGE);
+  uint polynom_fit (uint& first_entry_tofit, uint& last_entry_tofit, vector<double>& xdata, vector<double>& ydata, vector<double>& weight, double& rms, int& npolycoeffwork, vector<double>& polycoeffwork, bool gxmdebug, ofstream& FileMESSAGE);
   uint polynomial_fit_weight_ave (uint& imin, vector<double>& polynomialcoeffs, vector<double>& polynomialerrors, vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, _AGL_data& AGL_data, ofstream& FileMESSAGE);
   uint polynomial_fit_weight_ave_debug (uint& imin, vector<double>& polynomialcoeffs, vector<double>& polynomialerrors, vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, _AGL_data& AGL_data, ofstream& FileMESSAGE);
   uint bracket_minimum (uint& imin, vector<double>& ydata_to_fit, ofstream& FileMESSAGE);
@@ -328,8 +328,8 @@ namespace AGL_functions {
   // Functions for extracting electronic properties as a function of pressure
   uint extractedos(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, vector<string>& dirrunname, ofstream& FileMESSAGE);
   uint edosbandgap(_AGL_data& AGL_data, ofstream& FileMESSAGE); 
-  uint edosfit(vector<double>& energtofit, vector<double>& dostofit, vector<double>& energtoeval, vector<double>& dospolyeval, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE);
-  uint edosgap_pressure_fit(vector<double>& pressure, vector<double>& edosgap, double& edosgap_pressure, vector<double>& edosgapfit, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE);
+  uint edosfit(vector<double>& energtofit, vector<double>& dostofit, vector<double>& energtoeval, vector<double>& dospolyeval, uint& nminlimit, uint& nmaxlimit, bool gxmdebug, ofstream& FileMESSAGE);
+  uint edosgap_pressure_fit(vector<double>& pressure, vector<double>& edosgap, double& edosgap_pressure, vector<double>& edosgapfit, uint& nminlimit, uint& nmaxlimit, bool gxmdebug, ofstream& FileMESSAGE);
 } // end of namespace
 
 // ***************************************************************************

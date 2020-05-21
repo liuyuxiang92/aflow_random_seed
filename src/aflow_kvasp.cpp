@@ -2197,8 +2197,8 @@ namespace KBIN {
 
     ostringstream aus_exec,aus;
     xoption xwarning,xfixed,xmessage;
-    int nbands,counter_ZPOTRF=0;
-    double enmax;
+    int nbands = 0,counter_ZPOTRF=0;
+    double enmax = 0.0;
     bool vasp_start=TRUE;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
@@ -3931,7 +3931,7 @@ namespace KBIN {
     vector<string> words_line ;
     vector<string> vec1, vec2, vec3 ;
     bool  check_digit = false ;
-    uint  refline ;
+    uint  refline = 0;
     for (uint ii=outcarlines.size()-1 ; ii > 1 ; ii--) { // line contents
       for (uint jj=0 ; jj < words_line.size() ; jj++) {
         string search_term = "MACROSCOPIC" ;
