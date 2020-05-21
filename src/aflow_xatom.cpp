@@ -1738,7 +1738,7 @@ vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const str
 
   // Calculate the LFA atomic environments
   // i.e., only environments comprised of the least frequent atom (LFA) type
-  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalMatch)
+  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalFinder)
 
   vector<AtomEnvironment> environments_LFA;
 
@@ -4474,7 +4474,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     bool bohr_lat = false;   //DX20180215 - added bohr for lattice
     bool bohr_pos = false;   //DX20180215 - added bohr for positions
     bool alat = false;   //DX20180215 - added alat
-    uint iline,jline;
+    uint iline = 0, jline = 0;
     iline=vinput.size();
     //DX20180123 - added nat - START
     for(uint i=0;i<vinput.size();i++){ 
@@ -4845,7 +4845,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //   2) three lines 3 fields per line
     bool is_lattice_line = false;
     uint lattice_line_count = 0;
-    a.lattice = aurostd::identity((double)0,3,3); //abinit default
+    a.lattice = aurostd::identity((double) 0,3); //abinit default //DX20200521 - new identity format
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"RPRIM",true)){
         if(LDEBUG){ cerr << soliloquy << " ABINIT READER rprim line found = " << vinput[i] << endl; }
@@ -5480,10 +5480,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // get space group setting
     string spacegroup_Hall="";
     for(uint i=0;i<vinput.size();i++) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SYMMETRY_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive //DX20200521 - missing "_SYMMETRY_" prefix
         vector<string> tokens; 
+        aurostd::string2tokens(vinput.at(i),tokens); //DX20200521 - this line was missing
         //DX20190708 - fix Hall reader - START
-        if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_H-M"){
+        if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_HALL"){ //DX20200521 - changed H-M to HALL
           tokens.erase(tokens.begin());
           spacegroup_Hall = aurostd::joinWDelimiter(tokens," "); //need a space here for Hall designation
           spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\''); //clean

@@ -1021,7 +1021,7 @@ namespace apl {
         num_iter++;
       } while ((std::abs(norm) > TCOND_ITER_THRESHOLD) && (num_iter <= max_iter));
       if (num_iter > max_iter) {
-        string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor()";
+        string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor():";
         message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
         message << "at " << T << " K.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -1300,7 +1300,7 @@ namespace apl {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput()";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput():";
       stringstream message;
       message << "Could not write file " << filename << ".";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -1330,7 +1330,7 @@ namespace apl {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput()";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput():";
       stringstream message;
       message << "Could not write file " << filename << ".";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -1478,7 +1478,7 @@ namespace apl {
 
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity";
+      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity():";
       string message = "Could not write thermal conductivities to file.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }

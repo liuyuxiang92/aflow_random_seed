@@ -150,7 +150,7 @@ namespace apl {
     string message = "Calculating thermal properties.";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (Tstart > Tend) {
-      string function = _APL_THERMO_ERR_PREFIX_ + "calculateThermalProperties()";
+      string function = _APL_THERMO_ERR_PREFIX_ + "calculateThermalProperties():";
       message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
@@ -333,7 +333,7 @@ namespace apl {
     if (freq.size() > 2) {
       stepDOS = freq[1] - freq[0];
     } else {
-      string function = _APL_THERMO_ERR_PREFIX_ + "getStepDOS()";
+      string function = _APL_THERMO_ERR_PREFIX_ + "getStepDOS():";
       string message = "Not enough DOS points (need at least two).";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_); 
     }
@@ -408,7 +408,7 @@ namespace apl {
 
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "ThermalPropertiesCalculator::writePropertiesToFile()";
+      string function = "ThermalPropertiesCalculator::writePropertiesToFile():";
       message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }

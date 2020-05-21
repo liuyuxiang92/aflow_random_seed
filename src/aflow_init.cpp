@@ -1313,7 +1313,7 @@ namespace init {
       //  cerr << "(*vLibrary).length()=" << (*vLibrary).length() << endl;
       // if(LDEBUG)
 
-      string *vLibrary; 
+      string *vLibrary = NULL;
       if(str=="Library_ICSD")  vLibrary=&XHOST_Library_ICSD_ALL;
       if(str=="aflowlib_icsd") vLibrary=&XHOST_aflowlib_icsd;
       if(str=="aflowlib_lib0") vLibrary=&XHOST_aflowlib_lib1;

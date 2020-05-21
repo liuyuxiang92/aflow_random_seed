@@ -141,10 +141,10 @@ namespace aflowlib {
   // Opens the database file and creates the main cursor
   void AflowDB::open(int open_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "open(): Opening " << database_file << std::endl;
+    string function = _AFLOW_DB_ERR_PREFIX_ + "open():";
+    if (LDEBUG) std::cerr << function << " Opening " << database_file << std::endl;
     int sql_code = sqlite3_open_v2(database_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
       string message = "Could not open database file " + database_file;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -155,10 +155,10 @@ namespace aflowlib {
   void AflowDB::close() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     if (isTMP()) closeTmpFile(false, true);
-    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "close() Closing " << database_file << std::endl;
+    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "close(): Closing " << database_file << std::endl;
     int sql_code = sqlite3_close(db);
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "close()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "close():";
       string message = "Could not close database file " + database_file;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -175,15 +175,15 @@ namespace aflowlib {
   // Opens a temporary database file 
   void AflowDB::openTmpFile(int open_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile():";
+    stringstream message;
     string tmp_file = database_file + ".tmp";
-    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile(): Opening " << tmp_file << std::endl;
+    if (LDEBUG) std::cerr << function << " Opening " << tmp_file << std::endl;
 
     // Create a symbolic link to lock the tmp file creation process. Since creating
     // symbolic links is an atomic process, it can be used to prevent race conditions.
     string lock_link = lock_file + ".lnk";
     if (symlink(lock_file.c_str(), lock_link.c_str())) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-      stringstream message;
       message << "Could not create symbolic link to lock file " + lock_file + ": ";
       if (errno == EEXIST) {
         message << "Another process has created it already.";
@@ -202,8 +202,7 @@ namespace aflowlib {
       int pid = -1;
       bool del_tmp = false;
       if (LDEBUG) {
-        std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile(): "
-          << "Found temporary database file with time stamp " << tm_tmp
+        std::cerr << function << "Found temporary database file with time stamp " << tm_tmp
           << " (current time: " << tm_curr << ")." << std::endl;
       }
       // Check if the rebuild process that is saved in the lock file
@@ -220,27 +219,21 @@ namespace aflowlib {
       }
 
       if (del_tmp) {
-        if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile():"
-          << " Temporary database file already exists,"
+        if (LDEBUG) std::cerr << function << " Temporary database file already exists,"
             << " but process has become stale. Removing temporary files"
             << " and killing outstanding process." << std::endl;
         if (pid > -1) {
           int killreturn = kill(pid, 9);
           if (killreturn) {
             aurostd::RemoveFile(lock_link);
-            string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-            stringstream message;
-            message << "Could not kill active process " << pid
-              << "(errno =  " << errno << ")." << std::endl;
+            message << "Could not kill active process " << pid << "(errno =  " << errno << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
           }
         }
         aurostd::RemoveFile(tmp_file);
         aurostd::RemoveFile(tmp_file + "-journal");
       } else {
-        string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-        string message = "Could not create temporary database file."
-          " File already exists and rebuild process is active.";
+        message << "Could not create temporary database file. File already exists and rebuild process is active.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
     }
@@ -249,17 +242,13 @@ namespace aflowlib {
     int sql_code = sqlite3_close(db);
     if (sql_code != SQLITE_OK) {
       aurostd::RemoveFile(lock_link);
-      string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-      string message = "Could not close main database file " + database_file;
-      message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
+      message << "Could not close main database file " + database_file << " (SQL code " << sql_code << ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-      string message = "Could not open tmp database file " + tmp_file;
-      message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
+      message << "Could not open tmp database file " + tmp_file << " (SQL code " << sql_code << ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
@@ -275,18 +264,18 @@ namespace aflowlib {
   bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string tmp_file = database_file + ".tmp";
-    string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
+    string function = _AFLOW_DB_ERR_PREFIX_ + "closeTmpFile():";
     if (LDEBUG) std::cerr << function << " Closing " << tmp_file << std::endl;
 
     bool nocopy = false;
     // If the tmp file is empty, the build failed, so all other tests will fail as well.
     if (aurostd::FileEmpty(tmp_file)) {
-      if (LDEBUG) std::cerr << "Temporary database file empty. Database will not be overwritten." << std::endl;
+      if (LDEBUG) std::cerr << function << "Temporary database file empty. Database will not be overwritten." << std::endl;
       nocopy = true;
     }
     if (!nocopy) {
       if ((int) getTables().size() != _N_AUID_TABLES_) {
-        std::cerr << "Temporary database file has the wrong number of tables."
+        std::cerr << function << "Temporary database file has the wrong number of tables."
           << " Database file will not be copied." << std::endl;
         nocopy = true;
       }
@@ -320,11 +309,11 @@ namespace aflowlib {
     if (nocopy) {
       copied = false;
     } else if (force_copy) {
-      if (LDEBUG) std::cerr << "Force copy selected. Database will be overwritten." << std::endl;
+      if (LDEBUG) std::cerr << function << "Force copy selected. Database will be overwritten." << std::endl;
       copied = aurostd::CopyFile(tmp_file, database_file);
     } else {
       if (!aurostd::FileEmpty(database_file)) {
-        if (LDEBUG) std::cerr << "Old database file found. "
+        if (LDEBUG) std::cerr << function << "Old database file found. "
           << " Determining number of entries and properties." << std::endl;
         open();
         vector<string> props, tables;
@@ -339,18 +328,18 @@ namespace aflowlib {
         for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
         close();
       } else {
-        if (LDEBUG) std::cerr << "No old datbase found." << std::endl;
+        if (LDEBUG) std::cerr << function << "No old datbase found." << std::endl;
         ncols_old = 0;
         nentries_old = 0;
       }
 
       if (LDEBUG) {
-        std::cerr << "Number of entries: " << nentries_tmp << " (current database: " << nentries_old << ")." << std::endl;
-        std::cerr << "Number of properties: " << ncols_tmp << " (current database: " << ncols_old << ")." << std::endl;
+        std::cerr << function << "Number of entries: " << nentries_tmp << " (current database: " << nentries_old << ")." << std::endl;
+        std::cerr << function << "Number of properties: " << ncols_tmp << " (current database: " << ncols_old << ")." << std::endl;
       }
 
       if (nentries_tmp < nentries_old) {
-        std::cerr << "The rebuild process resulted in less entries"
+        std::cerr << function << "The rebuild process resulted in less entries"
           << " than in the current database. To prevent accidental"
           << " data loss, the temporary database will not be copied."
           << " Rerun as aflow --rebuild_database if the database should"
@@ -372,14 +361,14 @@ namespace aflowlib {
         copied = aurostd::CopyFile(tmp_file, database_file);
       }
       if (LDEBUG) {
-        std::cerr << "Database file " << (copied?"successfully":"not") << " copied." << std::endl;
+        std::cerr << function << "Database file " << (copied?"successfully":"not") << " copied." << std::endl;
       }
     }
     if (!keep) {
       aurostd::RemoveFile(tmp_file);
-      if (LDEBUG) std::cerr << "Temporary database file removed." << std::endl;
+      if (LDEBUG) std::cerr << function << "Temporary database file removed." << std::endl;
     } else if (LDEBUG) {
-      std::cerr << "Temporary database file " << tmp_file << " will not be deleted." << std::endl;
+      std::cerr << function << "Temporary database file " << tmp_file << " will not be deleted." << std::endl;
     }
 
     open();
@@ -407,19 +396,20 @@ namespace aflowlib {
   // successfully rebuilt.
   bool AflowDB::rebuildDatabase(bool force_rebuild) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-    string function = _AFLOW_DB_ERR_PREFIX_ + "rebuildDatabase()";  // for LDEBUG and xerror
+    string function = _AFLOW_DB_ERR_PREFIX_ + "rebuildDatabase():";  // for LDEBUG and xerror
+    stringstream message;
     bool rebuild_db = false;
 
     // Always rebuild when the user wants the rebuild.
     rebuild_db = force_rebuild;
-    if (LDEBUG && rebuild_db) std::cerr << function << ": Rebuilding database (user rebuild)." << std::endl;
+    if (LDEBUG && rebuild_db) std::cerr << function << " Rebuilding database (user rebuild)." << std::endl;
 
     // Always rebuild if the database file doesn't exist. Note: When the
     // database is opened and the database file doesn't exist, SQLite creates
     // an empty file, so check if the file is empty and not if it exists.
     if (!rebuild_db) {
       rebuild_db = aurostd::FileEmpty(database_file); // file_empty needed for LDEBUG
-      if (LDEBUG && rebuild_db) std::cerr << function << ": Rebuilding database (file not found or empty)." << std::endl;
+      if (LDEBUG && rebuild_db) std::cerr << function << " Rebuilding database (file not found or empty)." << std::endl;
     }
 
     // Rebuild when the schema has been updated
@@ -434,7 +424,6 @@ namespace aflowlib {
       if (nkeys > columns.size()) {
         rebuild_db = true;
       } else if (nkeys < columns.size()) {
-        stringstream message;
         message << "The number of properties (" << nkeys << ") is smaller than in the"
           << " current database (" << columns.size() << "). To prevent accidental"
           << " data loss, AFLOW will abort the update process. Rerun as"
@@ -456,7 +445,7 @@ namespace aflowlib {
         }
         rebuild_db = (k != nkeys);
       }
-      if (LDEBUG && rebuild_db) std::cerr << function << ": Rebuilding database (schema updated)." << std::endl;
+      if (LDEBUG && rebuild_db) std::cerr << function << " Rebuilding database (schema updated)." << std::endl;
     }
 
     // Check if any relevant files are newer than the database.
@@ -467,7 +456,7 @@ namespace aflowlib {
         t << std::setfill('0') << std::setw(2) << std::hex << i;
         json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
         if (!aurostd::EFileExist(json_files[i]) && !aurostd::FileExist(json_files[i])) {
-          string message = data_path + " is not a valid data path. Missing file for aflow:" + t.str() + ".";
+          message << data_path + " is not a valid data path. Missing file for aflow:" << t.str() << ".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
         }
       }
@@ -480,8 +469,8 @@ namespace aflowlib {
       rebuild_db = (i != _N_AUID_TABLES_);
 
       if (LDEBUG) {
-        if (rebuild_db) std::cerr << function << ": Rebuilding database (updated files found)." << std::endl;
-        else std::cerr << function << ": No updated files found. Database will not be rebuilt." << std::endl;
+        if (rebuild_db) std::cerr << function << " Rebuilding database (updated files found)." << std::endl;
+        else std::cerr << function << " No updated files found. Database will not be rebuilt." << std::endl;
       }
     }
 
@@ -502,7 +491,8 @@ namespace aflowlib {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     // Do not constantly synchronize the database with file on disk (increases
     // performance significantly).
-    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Starting rebuild." << std::endl;
+    string function = _AFLOW_DB_ERR_PREFIX_ + "rebuildDB():";
+    if (LDEBUG) std::cerr << function << " Starting rebuild." << std::endl;
     sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
     // Get columns and types from schema
@@ -532,7 +522,7 @@ namespace aflowlib {
 #else
     buildTables(0, _N_AUID_TABLES_, columns, types);
 #endif
-    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Finished rebuild." << std::endl;
+    if (LDEBUG) std::cerr << function << " Finished rebuild." << std::endl;
   }
 
   //buildTables///////////////////////////////////////////////////////////////
@@ -626,7 +616,7 @@ namespace aflowlib {
     for (uint k = 0; k < nkeys; k++) {
       // AUID has to be unique
       type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + keys[k]);
-      if (unique && (keys[k] == "auid")) {
+      if (unique && (keys[k] == "AUID")) {
         types[k] = "TEXT UNIQUE NOT NULL";
       } else if (type == "number") {
         types[k] = "REAL";
@@ -670,7 +660,7 @@ namespace aflowlib {
         value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
         // If we have a nested object, "value" should only be '{' + white space by now.
         if (value[0] == '{') {
-          string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
+          string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow():";
           string message = "JSON parser cannot read nested objects.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
         }
@@ -682,7 +672,7 @@ namespace aflowlib {
         value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
         // If we have a nested object, it should start with '{'
         if (value[0] == '{') {
-          string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
+          string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow():";
           string message = "JSON parser cannot read nested objects.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
         }
@@ -704,7 +694,7 @@ namespace aflowlib {
   void AflowDB::analyzeDatabase(const string& outfile) {
 
     if (aurostd::FileEmpty(database_file)) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "analyzeDatabase()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "analyzeDatabase():";
       string message = "Cannot analyze database. File empty.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
@@ -880,10 +870,11 @@ namespace aflowlib {
       vector<vector<int> >& counts, vector<vector<int> >& loop_counts,
       vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
     sqlite3* cursor;
+    string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
+    string message = "";
     int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
-      string message = "Could not open cursor on database file " + database_file + ".";
+      message = "Could not open cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
@@ -907,8 +898,7 @@ namespace aflowlib {
 
     sql_code = sqlite3_close(cursor);
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
-      string message = "Could not close cursor on database file " + database_file + ".";
+      message = "Could not close cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
   }
@@ -1098,7 +1088,7 @@ namespace aflowlib {
   void AflowDB::createTable(const string& table, const vector<string>& cols, const vector<string>& types) {
     uint ncols = cols.size();
     if (ncols != types.size()) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "createTable()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "createTable():";
       string message = "Could not create table. ";
       message += "Number of columns and number of types do not match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -1129,7 +1119,7 @@ namespace aflowlib {
     uint ncols = cols.size();
     uint nvals = vals.size();
     if ((ncols > 0) && (ncols != nvals)) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "insertValues()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "insertValues():";
       string message = "Could not insert values. ";
       message += "Number of columns and number of values do not match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);

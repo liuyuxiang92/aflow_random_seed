@@ -1512,68 +1512,68 @@ namespace pocc {
   //   return site<other.site;
   //   }
 
-void POccUnit::clear() {POccUnit a;copy(a);}
-void POccUnit::free() {
-  m_initialized=false;
-  m_aflags.clear();
-  site=AUROSTD_MAX_UINT;
-  partial_occupation_flag=false;
-  partial_occupation_value=AUROSTD_MAX_DOUBLE;
-  v_occupants.clear();
-  v_types.clear();
-  m_pocc_groups.clear();
-  is_inequivalent=false;
-  equivalent=AUROSTD_MAX_UINT;
-}
+  void POccUnit::clear() {POccUnit a;copy(a);}
+  void POccUnit::free() {
+    m_initialized=false;
+    m_aflags.clear();
+    site=AUROSTD_MAX_UINT;
+    partial_occupation_flag=false;
+    partial_occupation_value=AUROSTD_MAX_DOUBLE;
+    v_occupants.clear();
+    v_types.clear();
+    m_pocc_groups.clear();
+    is_inequivalent=false;
+    equivalent=AUROSTD_MAX_UINT;
+  }
 
-void POccUnit::copy(const POccUnit& b) { // copy PRIVATE
-  xStream::copy(b);
-  m_initialized=b.m_initialized;
-  m_aflags=b.m_aflags;
-  site=b.site;
-  partial_occupation_flag=b.partial_occupation_flag;
-  partial_occupation_value=b.partial_occupation_value;
-  v_occupants.clear();for(uint i=0;i<b.v_occupants.size();i++){v_occupants.push_back(b.v_occupants[i]);}
-  v_types.clear();for(uint i=0;i<b.v_types.size();i++){v_types.push_back(b.v_types[i]);}
-  m_pocc_groups.clear();for(uint i=0;i<b.m_pocc_groups.size();i++){m_pocc_groups.push_back(b.m_pocc_groups[i]);}
-  is_inequivalent=b.is_inequivalent;
-  equivalent=b.equivalent;
-}
+  void POccUnit::copy(const POccUnit& b) { // copy PRIVATE
+    xStream::copy(b);
+    m_initialized=b.m_initialized;
+    m_aflags=b.m_aflags;
+    site=b.site;
+    partial_occupation_flag=b.partial_occupation_flag;
+    partial_occupation_value=b.partial_occupation_value;
+    v_occupants.clear();for(uint i=0;i<b.v_occupants.size();i++){v_occupants.push_back(b.v_occupants[i]);}
+    v_types.clear();for(uint i=0;i<b.v_types.size();i++){v_types.push_back(b.v_types[i]);}
+    m_pocc_groups.clear();for(uint i=0;i<b.m_pocc_groups.size();i++){m_pocc_groups.push_back(b.m_pocc_groups[i]);}
+    is_inequivalent=b.is_inequivalent;
+    equivalent=b.equivalent;
+  }
 
-bool POccUnit::initialize(ostream& oss) {
-  xStream::initialize(oss);
-  return initialize();
-}
+  bool POccUnit::initialize(ostream& oss) {
+    xStream::initialize(oss);
+    return initialize();
+  }
 
-bool POccUnit::initialize(ofstream& FileMESSAGE,ostream& oss) {
-  xStream::initialize(FileMESSAGE,oss);
-  return initialize();
-}
+  bool POccUnit::initialize(ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
 
-bool POccUnit::initialize() {
-  free();
-  m_initialized=false;  //no point
-  return m_initialized;
-}
+  bool POccUnit::initialize() {
+    free();
+    m_initialized=false;  //no point
+    return m_initialized;
+  }
 
-bool POccUnit::initialize(const _aflags& aflags,ostream& oss) {
-  xStream::initialize(oss);
-  return initialize(aflags);
-}
+  bool POccUnit::initialize(const _aflags& aflags,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(aflags);
+  }
 
-bool POccUnit::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
-  xStream::initialize(FileMESSAGE,oss);
-  return initialize(aflags);
-}
+  bool POccUnit::initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(aflags);
+  }
 
-bool POccUnit::initialize(const _aflags& aflags) {
-  free();
-  setAFlags(aflags);
-  m_initialized=false;  //no point
-  return m_initialized;
-}
+  bool POccUnit::initialize(const _aflags& aflags) {
+    free();
+    setAFlags(aflags);
+    m_initialized=false;  //no point
+    return m_initialized;
+  }
 
-void POccUnit::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
+  void POccUnit::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
 
 } // namespace pocc
 
@@ -4364,6 +4364,7 @@ namespace pocc {
   }
 
 } // namespace pocc
+
 namespace pocc {
   //--------------------------------------------------------------------------------
   // class POccCalculatorTemplate
@@ -5007,7 +5008,7 @@ namespace pocc {
     //cerr << "START, n=" << pocc_groups_count << ",k=" << i_hnf << endl;
     int pocc_group_iterator=0;    //current group impacted
     int pocc_group_to_skip=-1;    //slight optimizer, if occupation_number hits i_hnf early, skip remaining possibilities
-    bool skipping;                //needed for resetting pocc_group_to_skip
+    bool skipping = false;        //needed for resetting pocc_group_to_skip
 
     double eps=1.0;
     xvector<int> xv_next_occupation_multiple=site_config.xv_occupation_multiple;

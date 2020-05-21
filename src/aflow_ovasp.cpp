@@ -1799,11 +1799,11 @@ bool xOUTCAR::GetXStructure() {
   //get lattice
   bool found_lattice,found_types,found_positions;
   found_lattice=found_types=found_positions=false;
-  string line,token;
+  string line = "", token = "";
   vector<string> tokens;
   xmatrix<double> lattice(3,3),klattice(3,3);
   deque<int> num_each_type;
-  double num,natoms;
+  double num = 0.0, natoms = 0.0;
   deque<_atom> atoms;
   xvector<double> cpos(3),fpos(3);
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
@@ -2933,7 +2933,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     double max_VBT_net,min_CBB_net;
     max_VBT_net = (-1.0) * AUROSTD_MAX_DOUBLE;
     min_CBB_net =          AUROSTD_MAX_DOUBLE;
-    uint imax_VBT_net,imin_CBB_net,ispin_VBT_net,ispin_CBB_net;
+    uint imax_VBT_net = 0, imin_CBB_net = 0, ispin_VBT_net = 0, ispin_CBB_net = 0;
     vector<uint> vimax_VBTs_net,vimin_CBBs_net; //within tolerance of absolutes
     vector<uint> vispin_VBTs_net,vispin_CBBs_net;
     //first, get absolute max of VBT/min of CBB

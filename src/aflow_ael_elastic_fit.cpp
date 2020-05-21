@@ -853,7 +853,7 @@ namespace AEL_functions {
   // Elastic constant element is first derivative of polynomial at x=0
   // See Phys. Rev. Materials 1, 015401 (2017) and Scientific Data 2, 150009 (2015) for details
   //
-  uint cij_fit(vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, double& Cij, int& npolycoeffwork, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint cij_fit(vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, double& Cij, int& npolycoeffwork, bool gxmdebug, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     uint first_entry_tofit = 0;

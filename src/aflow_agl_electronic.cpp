@@ -239,9 +239,9 @@ namespace AGL_functions {
     double egap_tol = 1.0e-6;
     // [OBSOLETE] double energ_prev;
     // [OBSOLETE] double egapval;
-    uint below_EF, above_EF, bottom_EF, top_EF, min_EF;
-    uint valbandedge, condbandedge, valregionedge, condregionedge;
-    int j_min_EF, j_below_EF, j_above_EF;
+    uint below_EF = 0, above_EF = 0, bottom_EF = 0, top_EF = 0, min_EF = 0;
+    uint valbandedge = 0, condbandedge = 0, valregionedge = 0, condregionedge = 0;
+    int j_min_EF = 0, j_below_EF = 0, j_above_EF = 0;
     // [OBSOLETE] bool energy_ordered = true;
     // [OBSOLETE] bool metallic_dos = false;
     bool ingap = false;
@@ -254,11 +254,11 @@ namespace AGL_functions {
     uint aglerror = 0;
     uint valinit = 0;
     uint condinit = 0;
-    uint ienergdiffmin, iter, itermax;
-    double dvallower, dvalupper, dcondlower, dcondupper;
-    double valbandmax, condbandmin;
-    double dosminEF, energdiffmin;
-    double valdosmin, condosmin, valpolymin, condpolymin;
+    uint ienergdiffmin = 0, iter = 0, itermax = 0;
+    double dvallower = 0.0, dvalupper = 0.0, dcondlower = 0.0, dcondupper = 0.0;
+    double valbandmax = 0.0, condbandmin = 0.0;
+    double dosminEF = 0.0, energdiffmin = 0.0;
+    double valdosmin = 0.0, condosmin = 0.0, valpolymin = 0.0, condpolymin = 0.0;
     vector<double> energtofit, dostofit, energtoeval, dospolyeval, pressure_list, edosgap_list, dosvalEF_list, edosgapfit_list, dosvalEFfit_list;
     pressure_list.clear();
     edosgap_list.clear();
@@ -1830,7 +1830,7 @@ namespace AGL_functions {
   //
   // edosfit: Interpolate electronic density of states with polynomial function
   //
-  uint edosfit(vector<double>& energtofit, vector<double>& dostofit, vector<double>& energtoeval, vector<double>& dospolyeval, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint edosfit(vector<double>& energtofit, vector<double>& dostofit, vector<double>& energtoeval, vector<double>& dospolyeval, uint& nminlimit, uint& nmaxlimit, bool gxmdebug, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     uint pferr = 0;
     // [OBSOLETE] uint nmaxlimit = 0;
@@ -1944,7 +1944,7 @@ namespace AGL_functions {
   // edosgap_pressure_fit: Fit pressure versus electronic density of states data with polynomial
   // Derivative of polynomial at zero pressure is a screening descriptor for effect of pressure on electronic properties
   //
-  uint edosgap_pressure_fit(vector<double>& pressure, vector<double>& edosgap, double& edosgap_pressure, vector<double>& edosgapfit, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE) {
+  uint edosgap_pressure_fit(vector<double>& pressure, vector<double>& edosgap, double& edosgap_pressure, vector<double>& edosgapfit, uint& nminlimit, uint& nmaxlimit, bool gxmdebug, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     uint pferr = 0;
     // [OBSOLETE] uint nmaxlimit = 0;

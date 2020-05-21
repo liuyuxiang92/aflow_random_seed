@@ -102,7 +102,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
-    string function = "apl::DOSCalculator::initialize()";
+    string function = "apl::DOSCalculator::initialize():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
@@ -294,15 +294,15 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
       double fmin, double fmax) {
+    string function = "DOSCalculator::calc():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::calc()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Check parameters
-    if (aurostd::isequal(fmax, fmin, _ZERO_TOL_LOOSE_)) {
-      string function = "apl::DOSCalculator::calc()";
-      string message = "Frequency range of phonon DOS is nearly zero.";
+    if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
+      message = "Frequency range of phonon DOS is nearly zero.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {
       double tmp = fmax;
@@ -334,11 +334,11 @@ namespace apl {
     //ME20200321 - Added logger output
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
     if (_bzmethod == "LT") {
-      string message = "Calculating phonon DOS using the linear tetrahedron method.";
+      message = "Calculating phonon DOS using the linear tetrahedron method.";
       pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       calcDosLT();
     } else if (_bzmethod == "RS") {
-      string message = "Calculating phonon DOS using the root sampling method.";
+      message = "Calculating phonon DOS using the root sampling method.";
       pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       calcDosRS();
     }
@@ -515,9 +515,10 @@ namespace apl {
   //ME20190423 END
 
   void DOSCalculator::writePDOS(const string& directory) {
+    string function = "DOSCalculator::writePDOS():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::writePDOS()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Write PHDOS file
@@ -535,7 +536,7 @@ namespace apl {
     double factorRaw2rcm = _pc->getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
-    string message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME20181226
+    message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME20181226
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
@@ -551,7 +552,6 @@ namespace apl {
     //CO START
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
-      string function = "DOSCalculator::writePDOS()";
       message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
@@ -563,20 +563,20 @@ namespace apl {
 
   //ME20190614 - writes phonon DOS in DOSCAR format
   void DOSCalculator::writePHDOSCAR(const string& directory) {
+    string function = "DOSCalculator::writePHDOSCAR():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::writePHDOSCAR()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
-    string message = "Writing phonon density of states into file " + filename + ".";
+    message = "Writing phonon density of states into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     stringstream doscar;
     xDOSCAR xdos = createDOSCAR();
     doscar << xdos;
     aurostd::stringstream2file(doscar, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "DOSCalculator::writePHDOSCAR()";
       message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -690,9 +690,10 @@ namespace apl {
   //PN START
   void DOSCalculator::writePDOS(string path, string ex)  //[PN]
   {
+    string function = "DOSCalculator::writePDOS():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::writePDOS()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     //CO START
@@ -705,7 +706,7 @@ namespace apl {
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
     string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; //ME20181226
-    string message = "Writing phonon density of states into file " + filename + "."; //ME20181226
+    message = "Writing phonon density of states into file " + filename + "."; //ME20181226
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
@@ -722,7 +723,6 @@ namespace apl {
     string file = path + "/" + filename + "." + ex; //ME20181226
     aurostd::stringstream2file(outfile, file);
     if (!aurostd::FileExist(file)) {
-      string function = "DOSCalculator::writePDOS()";
       message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }

@@ -1392,7 +1392,7 @@ namespace plotter {
     uint nsegments = xkpts.vpath.size()/2;
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
-      string function = "plotter::generateBandPlot()";
+      string function = "plotter::generateBandPlot():";
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
@@ -2065,7 +2065,7 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO()";
+      string function = "plotter::PLOT_THERMO():";
       string message = "Could not find file " + thermo_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
     }
@@ -2197,6 +2197,8 @@ namespace plotter {
   // Reads data from an AFLOW data file. Requires a START and STOP string to
   // be present so that it can skip headers and other data sets.
   vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
+    string function = "plotter::readAflowDataFile():";
+    string message = "";
     vector<vector<double> > data;
     vector<double> row;
     vector<string> vcontent;
@@ -2228,14 +2230,12 @@ namespace plotter {
       }
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
-        string function = "plotter::readAflowDataFile()";
-        string message = "Wrong file format. No STOP tag found.";
+        message = "Wrong file format. No STOP tag found.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
-      string function = "plotter::readAflowDataFile()";
-      string message = "No data extracted from file " + path_to_file + ".";
+      message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
     }

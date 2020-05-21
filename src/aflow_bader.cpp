@@ -3100,8 +3100,8 @@ namespace pflow {
     //CO20180515 STOP - new decompressing schemes
 
     // prepare variables for storing calculation details contained in PDIS
-    IPCFreqFlags freqUnits;
-    int nbranches;
+    IPCFreqFlags freqUnits= apl::NONE;
+    int nbranches = 0;
     vector<string> tokens;
     string chemName = "None";
     string graph_title = "None";
