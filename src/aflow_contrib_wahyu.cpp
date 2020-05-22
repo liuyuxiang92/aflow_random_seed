@@ -23,7 +23,7 @@
 // AConvaspBandgap
 // ***************************************************************************
 void AConvaspBandgap(vector<string>& argv) {
-  // tmp safe, checked SC,JX 0512
+  // tmp safe, checked SC+JX 0512
   //Calculate band gap from bands run.
   //example:
   //   aflow --bandgap=/common/DATA/ZnO/
@@ -92,7 +92,7 @@ void AConvaspBandgaps(istream& bandsdir, ostream& oss) {
 }
 
 void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
-  // tmp safe, checked SC,JX 0512
+  // tmp safe, checked SC+JX 0512
   //  void AConvaspBandgaps(istream& bandsdir)  //JX
 
   //Calculate band gap from bands run.
