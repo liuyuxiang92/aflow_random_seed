@@ -7,7 +7,7 @@
 
 #ifndef _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
 #define _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
-#include "aflow.h" // AFLOW_REMOVE_GREP
+#include "../aflow.h" // AFLOW_REMOVE_GREP  //CO20200521
 
 
 // ***************************************************************************
