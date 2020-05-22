@@ -301,9 +301,9 @@ class _XHOST {
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
     int PID;               // aflow_init.cpp  PID number
-    int TID;               // aflow_init.cpp  TID number
+    int TID;               // aflow_init.cpp  TID number  //CO20200508
     ostringstream ostrPID; // aflow_init.cpp  PID in ostringstream...
-    ostringstream ostrTID; // aflow_init.cpp  TID in ostringstream...
+    ostringstream ostrTID; // aflow_init.cpp  TID in ostringstream... //CO20200508
     string sPID;           // aflow_init.cpp  [PID=12345678]
     bool showPID;          // aflow_init.cpp  check if --showPID
     // machinery
@@ -755,8 +755,8 @@ class _kflags {
     bool  KBIN_SYMMETRY_PGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_WRITE;     // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
-    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;//DX20171205 - Added pgroupk_xtal
-    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;//DX20200129 - taken TRUE by default
+    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE; //DX20171205 - Added pgroupk_xtal
+    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;  //DX20200129 - taken TRUE by default
     bool  KBIN_SYMMETRY_FGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_SGROUP_WRITE;
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default

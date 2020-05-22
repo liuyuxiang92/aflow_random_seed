@@ -1227,7 +1227,7 @@ void _sym_op::free() {
   Uc.clear();Uf.clear();           // clear stuff
   generator.clear();               // clear stuff
   generator_coefficients.clear();  // clear stuff       //DX20171206 - generator coefficients
-  SU2_matrix.clear();              // clear stuff	//DX20180115 - 2x2 complex SU(2) matrix
+  SU2_matrix.clear();              // clear stuff	      //DX20180115 - 2x2 complex SU(2) matrix
   su2_coefficients.clear();        // clear stuff       //DX20180115 - su(2) coefficients on Pauli matrices
   angle=0.0;                       // clear stuff
   axis.clear();                    // clear stuff
@@ -1239,7 +1239,7 @@ void _sym_op::free() {
   flag_inversion=FALSE;            // clear stuff
   is_pgroup=FALSE;                 // clear stuff
   is_pgroup_xtal=FALSE;            // clear stuff
-  is_pgroupk_Patterson=FALSE;       // clear stuff //DX20200129
+  is_pgroupk_Patterson=FALSE;       // clear stuff      //DX20200129
   is_pgroupk=FALSE;                // clear stuff
   is_pgroupk_xtal=FALSE;           // clear stuff       //DX20171205
   ctau.clear();ftau.clear();       // clear stuff
@@ -4645,10 +4645,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
         input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
         input_tmp.clear();input_tmp.str(vinput.at(iline++));
         input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
-        if(bohr_lat){                     //DX20180123 - added bohr 
+        if(bohr_lat){                          //DX20180123 - added bohr 
           a.lattice = a.lattice*bohr2angstrom; //DX20180123 - added bohr
-        }                             //DX20180123 - added bohr
-        if(alat){                     //DX20180215 - added alat 
+        }                                      //DX20180123 - added bohr
+        if(alat){                              //DX20180215 - added alat 
           if(isabc){
             a.lattice = a.lattice*parameters[1]; //DX20180123 - added alat
           }
@@ -6574,7 +6574,7 @@ void xstructure::AddAtom(const _atom& atom) {
     btom.CleanName();
     //DX20170921 - Need to keep spin info  btom.CleanSpin();
   }
-  GetStoich();  //20170724 - CO
+  GetStoich();  //CO20170724
 
   // OLD STYLE
   //  atoms.push_back(btom);  MakeBasis(); return;
@@ -6618,7 +6618,7 @@ void xstructure::AddAtom(const _atom& atom) {
 // xstructure::RemoveAtom
 // **************************************************************************
 // This removes an atom to the structure.
-// 20170721 - CO added some safety checks to make sure we weren't deleting an entry
+//CO20170721 - added some safety checks to make sure we weren't deleting an entry
 // of a vector/deque that didn't exist (see if size() > itype)
 // this is really important because if we build an xstructure on the fly and only occupy
 // some of these attributes, the code will seg fault badly, and the error will not
@@ -9756,7 +9756,7 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
 }
 
 xvector<int> LatticeDimensionSphere(const xstructure& str, double radius) {
-  return LatticeDimensionSphere(str.lattice,radius,str.scale);//str.scale*str.lattice,radius);  //CO20171024
+  return LatticeDimensionSphere(str.lattice,radius,str.scale); //str.scale*str.lattice,radius);  //CO20171024
 }
 
 // **************************************************************************
@@ -10398,7 +10398,7 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
 // GetNiggliCell
 // ***************************************************************************
 // Calculates the reduced Niggli cell.  It is based on
-// a program of EG Wu's.  Here is his + my documentation.
+// a program of Eric Wu's.  Here is his + my documentation.
 //FUNCTION:
 //Subroutine calculates the reduced cell (Niggli cell) for a given
 //primitive cell.  It also gives the transformation matrix to go from
@@ -10842,7 +10842,7 @@ LoopHead:
   }
 
   // Step 4
-  //EG's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
+  //EW's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
   if(ksi*eta*zeta<=0)
   { //CO20200106 - patching for auto-indenting
     m4(1,1)=-(SignNoZero(ksi));
@@ -11042,7 +11042,7 @@ void _sdebug_GetNiggliCell(int step,int iter,double a,double b,double c,
 // Function NiggliUnitCellForm
 // ***************************************************************************
 // Converts the unit cell to the standardized Niggli form.
-// It is based on the GetNiggliStr() function written by EG Wu and
+// It is based on the GetNiggliStr() function written by Eric Wu and
 // Dane Morgan, adapted by Stefano Curtarolo and present in aflow_pflow_funcs.cpp
 xstructure NiggliUnitCellForm(const xstructure& a) {
   xstructure b(a);
@@ -11315,14 +11315,14 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 #define _incellcutoff_ (1.0-_EPS_roundoff_)
 //DX+CO, IF EPSILON IS PROVIDED, THEN WE ASSUME YOU WANT US TO MOVE THE ATOMS, OTHERWISE IT'S A HARD CUT OFF
 
-// BringInCell() - ROBUST (DX+ME/CO20190905)
+// BringInCell() - ROBUST (DX+ME+CO20190905)
 // this function brings components/xvectors/_atoms into a unit cell
 // the upper bound and lower bound of the cell can be adjusted
 // (e.g., standard unit cell : 0.0 to 1.0 ; unit cell centered on origin: -0.5 to 0.5)
 // the tolerance can be tuned and "shifts" the bounds, favoring the lower bound
 // (e.g., for bounds 0.0 to 1.0, we favor the origin, bringing values 
 // inside the cell if they are between "lower_bound-tolerance" and "upper_bound-tolerance")
-// the AFLOW developers suggest a hard cutoff, e.g., _ZERO_TOL_ (DX+ME/CO)
+// the AFLOW developers suggest a hard cutoff, e.g., _ZERO_TOL_ (DX+ME+CO)
 
 // **************************************************************************
 // BringInCellInPlace() (change value/object in place)
@@ -11506,7 +11506,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 //DX20190905 [OBSOLETE]   //DX+CO END
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //DX anc CO START
+//DX20190905 [OBSOLETE] //DX+CO START
 //DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
@@ -12566,7 +12566,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
           }
         }
   }
-  b.GetStoich();  //20170724 - CO
+  b.GetStoich();  //CO20170724
   // rescale back to original scale.
   b.SetVolume(Volume(a)*b.atoms.size()/a.atoms.size());
   b=ReScale(b,a.scale);
@@ -13181,7 +13181,7 @@ double xstructure::GetVolume(void) const {  //CO20200201
 }
 
 double GetVolume(const xstructure& a) {
-  return a.scale*a.scale*a.scale*det(a.lattice);
+  return a.GetVolume(); //[CO20200520 - OBSOLETE]a.scale*a.scale*a.scale*det(a.lattice);
 }
 
 // ***************************************************************************

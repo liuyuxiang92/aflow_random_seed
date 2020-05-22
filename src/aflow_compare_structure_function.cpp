@@ -8136,6 +8136,7 @@ namespace compare{
       deque<int> sizes = SYM::arrange_atoms(new_basis);
       proto_new = pflow::SetNumEachType(proto_new, sizes);
       proto_new.species = proto.species; //DX20190718
+      proto_new.MakeBasis(); //DX20200522
       proto = proto_new;
 
       if(sameSpecies(proto,xstr1,false)){

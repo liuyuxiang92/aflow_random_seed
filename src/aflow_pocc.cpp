@@ -6081,16 +6081,14 @@ namespace pocc {
     }
   }
 
-  /*
-     void POccUFFEnergyAnalyzer::initialize(const POccCalculator& p_calc){
-     setPOccFlags(p_calc.m_p_flags);
-     setPOccStructure(p_calc.xstr_pocc);
-     setNonPOccStructure(p_calc.xstr_nopocc);
-     types2pc_map=getTypes2PCMap(xstr_pocc);     //get types2pc_map
-     types2uffparams_map=getTypes2UFFParamsMap(m_species_redecoration);
-     setExplorationRadius();
-     }
-     */
+  //   void POccUFFEnergyAnalyzer::initialize(const POccCalculator& p_calc){
+  //   setPOccFlags(p_calc.m_p_flags);
+  //   setPOccStructure(p_calc.xstr_pocc);
+  //   setNonPOccStructure(p_calc.xstr_nopocc);
+  //   types2pc_map=getTypes2PCMap(xstr_pocc);     //get types2pc_map
+  //   types2uffparams_map=getTypes2UFFParamsMap(m_species_redecoration);
+  //   setExplorationRadius();
+  //   }
 
   void POccUFFEnergyAnalyzer::setSpeciesRedecoration(const vector<string>& species_redecoration){
     POccCalculatorTemplate::setSpeciesRedecoration(species_redecoration);
@@ -6616,7 +6614,7 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
-    return initialize();
+    return m_initialized;
   }
   bool POccStructuresFile::initialize(const _aflags& aflags,ostream& oss) {
     xStream::initialize(oss);
@@ -6633,7 +6631,7 @@ namespace pocc {
       m_initialized=false;  //no point
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
-    return initialize();
+    return m_initialized;
   }
   bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ostream& oss) {
     xStream::initialize(oss);
@@ -6652,7 +6650,7 @@ namespace pocc {
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
-    return initialize();
+    return m_initialized;
   }
 
   void POccStructuresFile::setAFlags(const _aflags& aflags) {m_aflags=aflags;}

@@ -6825,7 +6825,7 @@ double CONV_FACT=(1.0E+10*E_ELECTRON/(4.0*PI*EPS_VACUUM));
 // ***************************************************************************
 // Ewald
 // ***************************************************************************
-// Calculates Ewald Sum.  Based on routine from EG Wu.
+// Calculates Ewald Sum.  Based on routine from Eric Wu.
 
 // ******************************************************************
 // **                   Subroutine ewald                           **

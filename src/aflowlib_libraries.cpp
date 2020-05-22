@@ -1413,7 +1413,7 @@ namespace aflowlib {
 
       // FILES to remove
       deque<string> vfile2remove; aurostd::string2tokens("KPOINTS.bands.old,EIGENVAL.bands.old,OUTCAR.relax1",vfile2remove,","); //CO20200404 - removed OUTCAR.bands from this list, we need for Egap. EIGENVAL.bands does not have occupancies
-      vfile2remove.push_back("aflow.pgroupk_xtal.out"); // comes from nowere DX
+      vfile2remove.push_back("aflow.pgroupk_xtal.out"); // comes from nowhere DX
       for(uint iremove=0;iremove<vfile2remove.size();iremove++) {
         if(aurostd::FileExist(directory_RAW+"/"+vfile2remove.at(iremove))) { // need to be present
           //if(LDEBUG)
@@ -1906,7 +1906,7 @@ namespace aflowlib {
     data.kpoints+=";"+kpoints_bands.path+";"+aurostd::utype2string(kpoints_bands.path_grid);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " KPOINTS = " << data.kpoints << endl;
 
-    if(flag_use_MATLAB) { // MATLAB STUFF  OLD WSETYAWAN-SC
+    if(flag_use_MATLAB) { // MATLAB STUFF  OLD WSETYAWAN+SC
       // PERFORM THE MATLAB STEP
       cout << MESSAGE << " MATLAB start: " << directory_RAW << endl;
       //WRITE plotbz.sh
@@ -1959,7 +1959,7 @@ namespace aflowlib {
       aurostd::execute(command);
     }
 
-    if(flag_use_GNUPLOT) { // GNUPLOT STUFF NEW KY-SC
+    if(flag_use_GNUPLOT) { // GNUPLOT STUFF NEW KY+SC
       //ME20190614 BEGIN
       // This has to come first because FIXBANDS messes up the EIGENVAL files
       aurostd::xoption opts, plotoptions;
@@ -5441,7 +5441,7 @@ namespace aflowlib {
         command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
         command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
         //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
-        command << aurostd::get_datetime_formatted("",true,"-",""); //no delim for date and time, include time, "-" between date and time
+        command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
         command << "_" << i/AFLOW_MAX_ARGV+1 << "_" << XHOST.hostname;
         command << " --size=" << NUM_SIZE << " --DIRECTORY ";
         for(uint j=i;j<i+AFLOW_MAX_ARGV && j<vzips.size();j++) command << " " << vzips.at(j);

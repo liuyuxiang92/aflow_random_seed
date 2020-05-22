@@ -1834,7 +1834,7 @@ namespace LATTICE {
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //20160217 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_20200615 was calculated to be TRI1B, not TRI1A like shown in
+            //CO20160217 Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
             //Interestingly, this system has weight_TRIa==weight_TRIb, so the check above (TRI1a before TRI1b) is very important.
             klattice=ReciprocalLattice(rlattice);
@@ -3028,7 +3028,7 @@ namespace LATTICE {
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //20160217 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_20200615 was calculated to be TRI1B, not TRI1A like shown in
+            //CO20160217 Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
             //Interestingly, this system has weight_TRIa==weight_TRIb, so the check above (TRI1a before TRI1b) is very important.
             klattice=ReciprocalLattice(rlattice);

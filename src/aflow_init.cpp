@@ -1714,15 +1714,15 @@ string aflow_get_time_string_short(void) {
 // [OBSOLETE]   return (string) oss.str();
 // [OBSOLETE] }
 
-// ***************************************************************************
-// strTID
-// ***************************************************************************
-string strTID(void) { //CO20200502 - threadID
-  int TID=aurostd::getTID();
-  ostringstream oss;
-  oss << TID;
-  return (string) oss.str();
-}
+// [OBSOLETE] // ***************************************************************************
+// [OBSOLETE] // strTID
+// [OBSOLETE] // ***************************************************************************
+// [OBSOLETE] string strTID(void) { //CO20200502 - threadID
+// [OBSOLETE]   int TID=aurostd::getTID();
+// [OBSOLETE]   ostringstream oss;
+// [OBSOLETE]   oss << TID;
+// [OBSOLETE]   return (string) oss.str();
+// [OBSOLETE] }
 
 // ***************************************************************************
 // Messages

@@ -1294,7 +1294,7 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::KPOINTS_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVECAR_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVEDER_PRESERVED",FALSE);           // DEFAULT VALUES
-  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES   //CO20170601
   aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",FALSE);        // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_APL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_QHA=OFF",FALSE);               // DEFAULT VALUES  //CO20170601

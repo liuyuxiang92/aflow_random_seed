@@ -35,8 +35,8 @@ const std::string LATEX_COLORS_TO_AVOID = "black,white,yellow,darkgray,gray,ligh
 
 // USAGE FLAGS
 //[CO20180819 - MOVED TO AFLOWRC]const bool IGNORE_BAD_DATABASE = true;        //skip bad entries
-const bool CORRECT_BAD_DATABASE = true;                                           //make minor corrections, carried over from apennsy (SC)
-const bool PRINT_DIST2HULL_COL_TEX = false;                                   //print Dist2hull column in tex, there's no need because it's not used for anything in the image
+const bool CORRECT_BAD_DATABASE = true;                                        //make minor corrections, carried over from apennsy (SC)
+const bool PRINT_DIST2HULL_COL_TEX = false;                                    //print Dist2hull column in tex, there's no need because it's not used for anything in the image
 
 // LATEX PRINTING MODES
 const char ADDPLOT_MODE_HULL_POINTS = 'P';
@@ -676,6 +676,7 @@ namespace chull {
           message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
           message << " = ";
           if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << chull::convertUnits(dist2hull, _m_) << " (meV/atom)";}
+          else {message << dist2hull << " (K)";}
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
         }
         continue;

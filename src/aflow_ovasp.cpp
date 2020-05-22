@@ -21,12 +21,13 @@ string time_delay(long double seconds) { return aurostd::utype2string<long doubl
 //ME20200427 - included xStream::initialize
 xOUTCAR::xOUTCAR(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
 xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
-xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
-xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
 
 bool xOUTCAR::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xOUTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xOUTCAR::initialize(const string& fileIN,bool QUIET) {
+  free();
   filename = fileIN;
   return GetPropertiesFile(fileIN,QUIET);
 }
@@ -4017,12 +4018,13 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 //ME20200427 - included xStream::initialize
 xDOSCAR::xDOSCAR(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
 xDOSCAR::xDOSCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
-xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
-xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized=initialize(fileIN,QUIET);}  //CO20200404 - xStream integration for logging
 
 bool xDOSCAR::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xDOSCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xDOSCAR::initialize(const string& fileIN, bool QUIET) {
+  free();
   filename = fileIN;
   return GetPropertiesFile(fileIN, QUIET);
 }
@@ -4935,12 +4937,13 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
 //ME20200427 - included xStream::initialize
 xEIGENVAL::xEIGENVAL(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
 xEIGENVAL::xEIGENVAL(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
-xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
-xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
 
 bool xEIGENVAL::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xEIGENVAL::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xEIGENVAL::initialize(const string& fileIN, bool QUIET) {
+  free();
   filename = fileIN;
   return GetPropertiesFile(fileIN,QUIET);
 }
@@ -7416,12 +7419,13 @@ void CompareEdges (vector<vector<xvector<int> > >& branches,
 //ME20200427 - included xStream::initialize
 xPOTCAR::xPOTCAR(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
 xPOTCAR::xPOTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
-xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
-xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
 
 bool xPOTCAR::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xPOTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xPOTCAR::initialize(const string& fileIN, bool QUIET) {
+  free();
   filename = fileIN;
   return GetPropertiesFile(fileIN, QUIET);
 }
@@ -7639,7 +7643,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontent.at(iline),"RMAX") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
   }
   if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  
+  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  
   for(uint j=0;j<vline.size();j++) {
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
@@ -7723,13 +7727,13 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LDEBUG) cerr << soliloquy << " vLEXCH.size()=" << vLEXCH.size() << endl;
   if(LDEBUG) cerr << soliloquy << " vRMAX.size()=" << vRMAX.size() << endl;
 
-  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
-  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
+  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
+  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
 
   for(uint j=0;j<vTITEL.size();j++) {
     if(LDEBUG) cerr << soliloquy << " SPECIES(" << j << ") " << endl;
@@ -7852,7 +7856,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xPOTCAR::GetProperties: ERROR_flag set in xPOTCAR" << endl;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << soliloquy << " ERROR_flag set in xPOTCAR" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xPOTCAR";
     if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
@@ -8864,12 +8868,13 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //ME20200427 - included xStream::initialize
 xQMVASP::xQMVASP(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
 xQMVASP::xQMVASP(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
-xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {free();m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
-xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {free();m_initialized = initialize(fileIN, QUIET);} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized = initialize(fileIN, QUIET);} //CO20200404 - xStream integration for logging
 
 bool xQMVASP::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xQMVASP::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
 bool xQMVASP::initialize(const string& fileIN, bool QUIET) {
+  free();
   filename = fileIN;
   return GetPropertiesFile(fileIN, QUIET);
 }
@@ -9009,7 +9014,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   if(LDBEUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xQMVASP::GetProperties: ERROR_flag set in xQMVASP" << endl;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << soliloquy << " ERROR_flag set in xQMVASP" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xQMVASP";
     if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}

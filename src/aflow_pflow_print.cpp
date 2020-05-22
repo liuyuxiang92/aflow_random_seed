@@ -433,7 +433,7 @@ namespace pflow {
     int spacegroupnumber=_spacegroupnumber;
     if(spacegroupnumber<1 || spacegroupnumber>230) spacegroupnumber=1;
     //title
-    //CO MODS START 20170613 - fixes for BOB cif
+    //CO MODS START 20170613 - fixes for BH cif
     string compound="",pd_name="";
     string tmp;
     if(!str.title.empty()){
@@ -460,7 +460,7 @@ namespace pflow {
     oss << "data_" << compound << endl;  //CO fix 20170606
     //CO try to get phase name, usually written as first part of title in AFLOW
     if(!pd_name.empty()){oss << "_pd_phase_name " << pd_name << endl;}  //just safety
-    //CO MODS END 20170613 - fixes for BOB cif
+    //CO MODS END 20170613 - fixes for BH cif
     xvector<double> data(6);
     data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
     oss << "_cell_length_a  " << setw(12) << data(1) <<endl;
@@ -979,7 +979,7 @@ namespace pflow {
         }
         oss << " Real space Volume: " << vol << endl;
         oss << " Real space c/a = " << data(3)/data(1) << endl;
-        str_aus=str;//,str_sp,str_sc; //CO20171027
+        str_aus=str; //,str_sp,str_sc; //CO20171027
         //DX20170901 -Add tolerance - START
         str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
         str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
@@ -1059,7 +1059,7 @@ namespace pflow {
           //DX20170901 - Add consistency check for input symmetry method and ITC method - END
           oss << "BRAVAIS LATTICE OF THE LATTICE (pgroup)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_lattice_type << endl;// " " << str.title << endl;
-          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl;//WSETYAWAN mod
+          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl; //WSETYAWAN mod
           oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_lattice_system << endl;
           oss << "SUPERLATTICE (equally decorated)" << endl;
           oss << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
@@ -1083,7 +1083,7 @@ namespace pflow {
           oss << " Reciprocal space Volume: " << kvol << endl;
           if(smode=="EDATA") {
             oss << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
-            oss << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl;//WSETYAWAN mod
+            oss << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl; //WSETYAWAN mod
             //oss << " Reciprocal conventional lattice         = " << str_aus.reciprocal_conventional_lattice_type << endl;
             oss << "SPRIM" << endl;
             oss << str_sp << endl;
@@ -1134,7 +1134,7 @@ namespace pflow {
           sscontent_json << "\"c_over_a\":" << data(3)/data(1) << eendl;
           vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-          str_aus=str;//,str_sp,str_sc; //CO20171027
+          str_aus=str; //,str_sp,str_sc; //CO20171027
           str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
           if(smode=="EDATA") {
             if(!already_calculated){  //CO20171025
@@ -3337,7 +3337,7 @@ void PrintXYZ(const xstructure& a, const xvector<int>& n, ostream& oss) {
 // data in an XYZ format
 // Stefano Curtarolo
 void PrintXYZws(const xstructure& a, ostream& oss) {
-  //SC 10Jan2003
+  //SC20030110
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(10);
   xstructure sstr=a;

@@ -770,7 +770,7 @@ namespace apl {
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *               Pinku Nath - Duke University 2014 - 2016                  *
+// *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *            Aflow MARCO ESTERS - Duke University 2020                    *
 // *                                                                         *
 // ***************************************************************************

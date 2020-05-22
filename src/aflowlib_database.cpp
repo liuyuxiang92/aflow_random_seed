@@ -219,9 +219,11 @@ namespace aflowlib {
       }
 
       if (del_tmp) {
-        if (LDEBUG) std::cerr << function << " Temporary database file already exists,"
-            << " but process has become stale. Removing temporary files"
-            << " and killing outstanding process." << std::endl;
+        if (LDEBUG) {
+          std::cerr << function << " Temporary database file already exists,";
+          std::cerr << " but process has become stale. Removing temporary files";
+          std::cerr << " and killing outstanding process." << std::endl;
+        }
         if (pid > -1) {
           int killreturn = kill(pid, 9);
           if (killreturn) {

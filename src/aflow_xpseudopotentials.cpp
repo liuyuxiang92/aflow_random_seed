@@ -11,39 +11,42 @@
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // _XPSEUDOPOTENTIAL_PROTOTYPES_
-//# commands to cut/paste to generate stuff
-//rm -f aflow_xpseudopotentials_data.cpp
-//touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
-//make -j
-//rm -f aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
-//# subst "/common/VASP/" "" aflow_xpseudopotentials_data.cpp
-//cat aflow_xpseudopotentials_data.cpp | grep -c TITEL
-//cat aflow_xpseudopotentials_data.cpp | grep structure | grep -v N/A | wc
-//make -j
-//
-//./aflow --scrub=POTCAR --FILE /common/VASP/potpaw_PBE/current/Mo_pv/POTCAR
-//./aflow --scrub=OUTCAR --FILE /common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
-//./aflow --pseudopotentials_check=/tmp/POTCAR1
-//./aflow --pseudopotentials_check=/tmp/POTCAR2
-//./aflow --pseudopotentials_check=/tmp/OUTCAR.relax2
-//./aflow --pseudopotentials_check=/common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
-//
-//./aflow --use_aflow.in=aflow.in --beep --force --showPID --lib2raw="/common/LIB3/LIB/TeW_pvY_sv/TFCC001.ABC"
-//
-//#!/bin/sh
-//#echo "$1"
-//#echo "$2"
-//STR1=`cat "/common/LIB1/LIB/$1/A1/aflow.in" | grep AUID | head -1 | sed "s/\[VASP_POTCAR_AUID\]/if(AUID==\""/g`
-//STR2="\") {"$2"}   //   "$1
-//echo $STR1$STR2
+/*
+# commands to cut/paste to generate stuff
+rm -f aflow_xpseudopotentials_data.cpp
+touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+make -j
+rm -f aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+# subst "/common/VASP/" "" aflow_xpseudopotentials_data.cpp
+cat aflow_xpseudopotentials_data.cpp | grep -c TITEL
+cat aflow_xpseudopotentials_data.cpp | grep structure | grep -v N/A | wc
+make -j
+
+./aflow --scrub=POTCAR --FILE /common/VASP/potpaw_PBE/current/Mo_pv/POTCAR
+./aflow --scrub=OUTCAR --FILE /common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
+./aflow --pseudopotentials_check=/tmp/POTCAR1
+./aflow --pseudopotentials_check=/tmp/POTCAR2
+./aflow --pseudopotentials_check=/tmp/OUTCAR.relax2
+./aflow --pseudopotentials_check=/common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
+
+./aflow --use_aflow.in=aflow.in --beep --force --showPID --lib2raw="/common/LIB3/LIB/TeW_pvY_sv/TFCC001.ABC"
+
+#!/bin/sh
+#echo "$1"
+#echo "$2"
+STR1=`cat "/common/LIB1/LIB/$1/A1/aflow.in" | grep AUID | head -1 | sed "s/\[VASP_POTCAR_AUID\]/if(AUID==\""/g`
+STR2="\") {"$2"}   //   "$1
+echo $STR1$STR2
+
+*/
 
 std::vector<xPOTCAR> vxpseudopotential;        // store starting from ONE
 
