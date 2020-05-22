@@ -1349,7 +1349,12 @@ check_cce:
 #RF20200302 - STOP
 .PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
-	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' |wc -l) && \
+ifeq ($(UNAME),Darwin)
+	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -e '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l) && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
+else
+	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l) && \
+		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
+endif
 	@echo "aflow_gcc_compatibility test 1 passed!"
 ###################################################################################################
