@@ -21,7 +21,7 @@ class CHull:
             if VERBOSE: print('aflow_command(): output = ' + output)
             return output
         except subprocess.CalledProcessError:
-            print('Error aflow executable not found at: ' + self.aflow_executable)
+            raise AssertionError('aflow executable not found: ' + self.aflow_executable)
 
     def REST_API_down(self, cmd):   #CO20200520
         cmd = cmd.replace(" --screen_only","")
@@ -36,7 +36,7 @@ class CHull:
                 return True
             return False
         except subprocess.CalledProcessError:
-            print('Error aflow executable not found at: ' + self.aflow_executable)
+            raise AssertionError('aflow executable not found: ' + self.aflow_executable)
 
     def get_hull(self, alloy, options = None):
         command = ' --chull --force'
