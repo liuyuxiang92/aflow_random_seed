@@ -238,7 +238,7 @@ namespace KBIN {
 namespace KBIN {
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO20191110
-    string soliloquy = XHOST.sPID + "KBIN::getAflowInFromAFlags():";
+    string soliloquy = XPID + "KBIN::getAflowInFromAFlags():";
     AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
     if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -253,7 +253,7 @@ namespace KBIN {
 namespace KBIN {
   int KBIN_Main(vector<string> argv) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "KBIN::KBIN_Main():";
+    string soliloquy = XPID + "KBIN::KBIN_Main():";
     string GENERIC;
     //  string Directory;
     int i;
@@ -461,7 +461,7 @@ namespace KBIN {
     if(aflags.AFLOW_PERFORM_DIRECTORY) {
       // [OBSOLETE] vruns=aurostd::args2vectorstring(argv,"--DIRECTORY|--D|--d","./");
       aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("VDIR"),vruns,",");
-      if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << XHOST.sPID << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
+      if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << XPID << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
     } else {
       if(!aflags.AFLOW_PERFORM_FILE)
         vruns.push_back(aurostd::getPWD()); //CO20191112
@@ -1522,11 +1522,11 @@ namespace KBIN {
           }
           // ---------------------------------------------------------
           // parameters for APL
-          // if(LDEBUG) cout << XHOST.sPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
+          // if(LDEBUG) cout << XPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
           if(!(kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA)){ //mutually exclusive
             kflags.KBIN_PHONONS_CALCULATION_APL  = aurostd::substring2bool(AflowIn,"[AFLOW_APL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_PHONONS]CALC",TRUE);
           }
-          // if(LDEBUG) cout << XHOST.sPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
+          // if(LDEBUG) cout << XPID << "KBIN::RUN_Directory: kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;
           // ---------------------------------------------------------
           // parameters for AGL (Debye Model)
           //Cormac created CALCSTRAINORIGIN, so we need to check [AFLOW_AEL]CALC vs. [AFLOW_AEL]CALCSTRAINORIGIN
@@ -1939,7 +1939,7 @@ namespace KBIN {
 namespace KBIN {
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "KBIN::CompressDirectory():";
+    string soliloquy = XPID + "KBIN::CompressDirectory():";
     //DX+CO START
     // [OBSOLETE] aus << "cd " << aflags.Directory << " && ";
     // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                //CO, skip anything with bzip extension
@@ -2019,7 +2019,7 @@ namespace KBIN {
 // *******************************************************************************************
 namespace KBIN {
   void Clean(const _aflags& aflags) {          // AFLOW_FUNCTION_IMPLEMENTATION
-    //    cerr << XHOST.sPID << "KBIN::Clean: aflags.Directory=" << aflags.Directory << endl;
+    //    cerr << XPID << "KBIN::Clean: aflags.Directory=" << aflags.Directory << endl;
     KBIN::Clean(aflags.Directory);
   }
 }
@@ -2027,7 +2027,7 @@ namespace KBIN {
 namespace KBIN {
   void Clean(const string _directory) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string directory=_directory;
-    //    cerr << XHOST.sPID << "KBIN::Clean: directory=" << aflags.Directory << endl;
+    //    cerr << XPID << "KBIN::Clean: directory=" << aflags.Directory << endl;
 
     aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");  // so it is easier to search
 
@@ -2115,7 +2115,7 @@ namespace KBIN {
 namespace KBIN {
   void XClean(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::XClean: BEGIN" << endl;  
+    if(LDEBUG) cerr << XPID << "KBIN::XClean: BEGIN" << endl;  
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=0) {
@@ -2137,27 +2137,27 @@ namespace KBIN {
     vector<string> vfile;
     bool test=false;
 
-    cout << XHOST.sPID << "KBIN::XClean: checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
+    cout << XPID << "KBIN::XClean: checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+_AFLOWLOCK_),vfile);
     for(uint j=0;j<vfile.size();j++) {
       aurostd::StringSubst(vfile.at(j),_AFLOWLOCK_,"");
       if(!aurostd::FileExist(vfile.at(j)+"OUTCAR") && !aurostd::EFileExist(vfile.at(j)+"OUTCAR.relax1")) {
-        cout << XHOST.sPID << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
+        cout << XPID << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
         if(!test) KBIN::Clean(vfile.at(j));
       }
     }
     for(uint i=0;i<vcheck1.size();i++) {
-      cout << XHOST.sPID << "KBIN::XClean: checking missing " << vcheck2.at(i) << " with " << vcheck1.at(i) << endl;  // check OUTCAR.static
+      cout << XPID << "KBIN::XClean: checking missing " << vcheck2.at(i) << " with " << vcheck1.at(i) << endl;  // check OUTCAR.static
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+vcheck1.at(i)),vfile);
       for(uint j=0;j<vfile.size();j++) {
         aurostd::StringSubst(vfile.at(j),vcheck1.at(i),"");
         if(!aurostd::FileExist(vfile.at(j)+vcheck2.at(i))) {
-          cout << XHOST.sPID << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
+          cout << XPID << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
           if(!test) KBIN::Clean(vfile.at(j));
         }
       }
     }    
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::XClean: END" << endl;  
+    if(LDEBUG) cerr << XPID << "KBIN::XClean: END" << endl;  
     // exit(0);
   }
 } // namespace KBIN

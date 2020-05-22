@@ -96,18 +96,22 @@ namespace init {
     XHOST.ostrPID.clear(); // PID as stringstream
     XHOST.ostrPID.str(std::string()); // PID as stringstream
     XHOST.ostrPID<<XHOST.PID;  // PID as stringstream
-    //CO20200502 START - threadID
+    XHOST.sPID="";
+    XHOST.showPID=aurostd::args2flag(argv,cmds,"--showPID");
+    if(XHOST.showPID) XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // PID as a comment
+    aurostd::xerror_PID=XHOST.sPID;
+
+    // get TID
     XHOST.TID=getpid();    // TID number
     XHOST.ostrTID.clear(); // TID as stringstream
     XHOST.ostrTID.str(std::string()); // TID as stringstream
     XHOST.ostrTID<<XHOST.TID;  // TID as stringstream
-    //CO20200502 END - threadID
-    XHOST.sPID="";
-    XHOST.showPID=aurostd::args2flag(argv,cmds,"--showPID");
-    if(XHOST.showPID) XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // PID as a comment
-    if(XHOST.showPID) XHOST.sPID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment  //CO20200502 - threadID
+    XHOST.sTID="";
+    XHOST.showTID=aurostd::args2flag(argv,cmds,"--showTID");
+    if(XHOST.showTID) XHOST.sTID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment
+    
+    //    if(XHOST.showPID) XHOST.sPID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment  //CO20200502 - threadID
     //   XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // for the time being (LIB4)
-    aurostd::xerror_PID=XHOST.sPID;
 
     // DO THREADS IMMEDIATELY
     // std::vector<pthread_t> _thread(MAX_ALLOCATABLE_PTHREADS);AFLOW_PTHREADS::vpthread=_thread;
@@ -873,7 +877,7 @@ namespace init {
           XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
           XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
           //	  if(INIT_VERBOSE)
-          cerr << XHOST.sPID << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+          cerr << XPID << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
         }
       }
     }
@@ -887,8 +891,8 @@ namespace init {
           XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","16");
           XHOST.vflag_control.flag("FILE",TRUE);  // if found
           XHOST.vflag_control.push_attached("FILE","x.lib"+vshort.at(ishort));
-          cerr << XHOST.sPID << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
-          cerr << XHOST.sPID << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+          cerr << XPID << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
+          cerr << XPID << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
         }
       }
     }
@@ -908,7 +912,7 @@ namespace init {
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER") &&
         !(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="aflowlib.duke.edu" || XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="materials.duke.edu")) {
-      cerr << XHOST.sPID << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
+      cerr << XPID << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
       exit(0);
     }
     // LOAD options
@@ -923,7 +927,7 @@ namespace init {
     XHOST.AFLOW_MULTIflag=aurostd::args2flag(XHOST.argv,"--run=multi|-run=multi|--multi|-multi");	
     XHOST.AFLOW_RUNXflag=!XHOST.AFLOW_MULTIflag && (aurostd::args2attachedflag(XHOST.argv,"--run=") || aurostd::args2attachedflag(XHOST.argv,"-run="));
 
-    //   cerr << XHOST.sPID << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
+    //   cerr << XPID << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
 
     XHOST.AFLOW_RUNXnumber=0;
     XHOST.vflag_pflow.clear(); 
@@ -1024,7 +1028,7 @@ namespace init {
 namespace init {
   string InitLoadString(string str2load,bool LVERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
-    string soliloquy = XHOST.sPID + "init::InitLoadString:";
+    string soliloquy = XPID + "init::InitLoadString:";
     if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
 
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again

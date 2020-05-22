@@ -24,7 +24,7 @@
 namespace pflow {
   void AClusterExpansionMethodMain(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::AClusterExpansionMethodMain: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::AClusterExpansionMethodMain: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
@@ -537,14 +537,14 @@ namespace pflow {
     }
 
     CleanUp();
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::AClusterExpansionMethodMain: END" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::AClusterExpansionMethodMain: END" << endl;
   }
 } // namespace pflow
 
 namespace pflow {
   void SQS(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::SQS: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::SQS: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=7 && tokens.size()!=3) {
@@ -567,7 +567,7 @@ namespace pflow {
     }
 
     if((tokens.size() != 3) && (tokens.size() != 7)) {
-      cerr << XHOST.sPID << "pflow::SQSMain: Incorrect argument numbers."<< endl
+      cerr << XPID << "pflow::SQSMain: Incorrect argument numbers."<< endl
         <<"Please use aflow --help to see the correct arguments \n";
       exit(_EXIT_FAIL);
     }
@@ -622,7 +622,7 @@ namespace pflow {
       //SLtmp = ceSL(str_type);
 
       if(a.species.size() > 2) {
-        cerr << XHOST.sPID << "pflow::SQS: only binary alloy is implemented\n";
+        cerr << XPID << "pflow::SQS: only binary alloy is implemented\n";
         exit(_EXIT_FAIL);
       }
 
@@ -670,14 +670,14 @@ namespace pflow {
       mySLfilein.close();
 
     }
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::SQS: END" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::SQS: END" << endl;
   }
 }
 
 namespace pflow {
   void Superlattice(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::Superlattice: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::Superlattice: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=3 && tokens.size()!=4) {
@@ -780,7 +780,7 @@ namespace pflow {
       ACESLProperties(cerr, structure_type, min_SLcell_nr, max_SLcell_nr, allcluster, ECIcluster);
     }
 
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::Superlattice: END" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::Superlattice: END" << endl;
   }
 }
 
@@ -791,7 +791,7 @@ namespace pflow {
 namespace pflow {
   void Cluster(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::Cluster: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::Cluster: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
@@ -829,7 +829,7 @@ namespace pflow {
     NNNum_up = aurostd::string2utype<int>(tokens.at(4));
     allcluster.SetCluster(site_num_low, site_num_up, NNNum_low, NNNum_up);
     allcluster.WriteFile(filename, open_opt);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::Cluster: END" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::Cluster: END" << endl;
   }
 }
 

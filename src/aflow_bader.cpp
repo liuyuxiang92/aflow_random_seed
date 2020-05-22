@@ -23,7 +23,7 @@ using namespace apl;
 namespace bader_functions {
   string BaderCalc(aurostd::xoption vpflow) {  //CO
     ostringstream oss;
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -100,7 +100,7 @@ namespace bader_functions {
       string& directory,
       ostream& oss) {
     //SECOND STOP FOR CALLS MADE FROM COMMAND_LINE
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
     string soliloquy_empty = "                                 ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -297,7 +297,7 @@ namespace bader_functions {
       ostream& oss) {
     //MAIN FUNCTION
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
     string soliloquy_empty = "                                 ";  // so you know who's speaking
 
     //CO20180220 moved up from below
@@ -1451,7 +1451,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   void FixDirectory(string& directory) {
-    string soliloquy = XHOST.sPID + "bader_functions::FixDirectory():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::FixDirectory():  ";  // so you know who's speaking
     string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     // translate "./" into a full path
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -1474,7 +1474,7 @@ namespace bader_functions {
     // Results for the Bader volume and net charge in the volume are stored in
     // the vectors passed into the function, volume and charge.
 
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalcFLAGS2COMMANDS():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalcFLAGS2COMMANDS():  ";  // so you know who's speaking
     // DEBUG
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -1835,7 +1835,7 @@ namespace bader_functions {
 namespace bader_functions {
   bool getPushCommand(const string& misc_option, string& push_command, ostream& oss) {
     //this converts aflow lists/ranges to bader lists/ranges
-    string soliloquy = XHOST.sPID + "bader_functions::getPushCommand():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::getPushCommand():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -1936,7 +1936,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool listORrange2vec(const string& misc_option, vector<int>& vout, ostream& oss) {
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
     int test_value;
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -2066,7 +2066,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   void adjust_header(string& new_header, stringstream& FileIN_ss) {
-    string soliloquy = XHOST.sPID + "bader_functions::adjust_header():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::adjust_header():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2103,7 +2103,7 @@ namespace bader_functions {
   string prepare_CHGCAR_4_Jmol(aurostd::xoption vpflow) {
     ostringstream oss;
     //adjust header of CHGCAR for reading in Jmol
-    string soliloquy = XHOST.sPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
     string usage_usage = "aflow --prep4jmol [options]";
@@ -2199,7 +2199,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool get_species_string(string& outcar_file, string& species_string, const string& dir_to_look, const string& file, ostream& oss) {
-    string soliloquy = XHOST.sPID + "bader_functions::get_species_string():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::get_species_string():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2256,7 +2256,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool prepare_CHGCAR_4_Jmol(const string& _chgcar_file, string& species_header, bool zip_file, ostream& oss) {
-    string soliloquy = XHOST.sPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2337,7 +2337,7 @@ namespace pflow {
   string CHGCAR2JVXL(aurostd::xoption& vpflow) {  //CO
     ostringstream oss;
     // handles flags for CHGCAR2JVXL
-    string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
+    string soliloquy = XPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
     string soliloquy_empty = "                       ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -2533,7 +2533,7 @@ namespace pflow {
       vector<string>& output_files,
       const bool& cyclic,
       ostream& oss) {                 //CO
-    string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";  // so you know who's speaking
+    string soliloquy = XPID + "pflow::CHGCAR2JVXL():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2737,7 +2737,7 @@ namespace pflow {
 namespace pflow {
   bool CHGCAR2JVXL(string chgcar_file, const double cutoff, const int downsample_ratio, string output_file, ostream& oss) {
     //ACTUALLY HANDLES JMOL INTERACTION
-    string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
+    string soliloquy = XPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
     string soliloquy_empty = "                       ";  // so you know who's speaking
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -3006,7 +3006,7 @@ namespace pflow {
     }
 
     // announce the directory to be searched for phonon data
-    cout << XHOST.sPID << "pflow::PLOT_PHDISP():  working on " << directory << endl;
+    cout << XPID << "pflow::PLOT_PHDISP():  working on " << directory << endl;
 
     // Process output unit selection arguments and initialize a bool for each unit
     bool printHZ = aurostd::args2flag(argv, "--hz|-hz");
@@ -3016,7 +3016,7 @@ namespace pflow {
 
     // set and declare default units if none are specified
     if((!printHZ && !printTHZ) && (!printRCM && !printMEV)) {
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  No output units specified; output will be in units of reciprocal centimeters." << endl;
+      cout << XPID << "pflow::PLOT_PHDISP:  No output units specified; output will be in units of reciprocal centimeters." << endl;
       printRCM = true;
     }
 
@@ -3025,7 +3025,7 @@ namespace pflow {
 
     // announce default behavior if no other selection is made
     if((!XHOST.vflag_control.flag("PRINT_MODE::PDF") && !XHOST.vflag_control.flag("PRINT_MODE::PNG")) && (!XHOST.vflag_control.flag("PRINT_MODE::JPG") && !XHOST.vflag_control.flag("PRINT_MODE::GIF"))) {
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  No output format specified; .eps output will not be converted." << endl;
+      cout << XPID << "pflow::PLOT_PHDISP:  No output format specified; .eps output will not be converted." << endl;
     }
 
     // Use output unit bools to prepare string vectors
@@ -3069,33 +3069,33 @@ namespace pflow {
 
     // look for PDIS
     if(aurostd::EFileExist(phondisdat,phondisdat_compressed) && aurostd::FileNotEmpty(phondisdat_compressed)){
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
+      cout << XPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phondisdat_compressed,PDIS_tmp); //aurostd::TmpFileCreate("PDIS_temp");
       pdis_was_decompressed = true;
       dis_data = true;
       phondisdat = PDIS_tmp;
     } else if(aurostd::FileExist(phondisdat) && aurostd::FileNotEmpty(phondisdat)) {dis_data = true;}
-    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
+    else {cout << XPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
 
     // look for PDOS
     if(aurostd::EFileExist(phondosdat,phondosdat_compressed) && aurostd::FileNotEmpty(phondosdat_compressed)){
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
+      cout << XPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phondosdat_compressed,PDOS_tmp); //aurostd::TmpFileCreate("PDOS_temp");
       pdis_was_decompressed = true;
       dos_data = true;  //ME20190328
       phondosdat = PDOS_tmp;
     } else if(aurostd::FileExist(phondosdat) && aurostd::FileNotEmpty(phondosdat)) {dis_data = true;}
-    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
+    else {cout << XPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
 
     // look for THERMO
     if(aurostd::EFileExist(phonthrmdat,phonthrmdat_compressed) && aurostd::FileNotEmpty(phonthrmdat_compressed)){
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
+      cout << XPID << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << ".EXT . . . " << endl;  //ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phonthrmdat_compressed,THERMO_tmp); //aurostd::TmpFileCreate("THERMO_temp");
       pdis_was_decompressed = true;
       thermo_data = true;  //ME20190328
       phonthrmdat = THERMO_tmp;
     } else if(aurostd::FileExist(phonthrmdat) && aurostd::FileNotEmpty(phonthrmdat)) {dis_data = true;}
-    else {cout << XHOST.sPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
+    else {cout << XPID << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << " in " << directory << "." << endl;}  //ME20190211 - use aflow.rc filenames
 
     //CO20180515 STOP - new decompressing schemes
 
@@ -3266,9 +3266,9 @@ namespace pflow {
         ofstream fout;
         fout.open(gnuplotscript_name.c_str());
         if(fout.is_open()) {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon dispersion to " << gnuplotscript_name << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon dispersion to " << gnuplotscript_name << endl;
         } else {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
           return FALSE;
         }
         fout << gnuplotPhononHeader(directory, chemName, unitName.at(b), plot_type, graph_title);
@@ -3299,9 +3299,9 @@ namespace pflow {
         ofstream fout;
         fout.open(gnuplotscript_name.c_str());
         if(fout.is_open()) {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon dispersion and DoSC to " << gnuplotscript_name << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon dispersion and DoSC to " << gnuplotscript_name << endl;
         } else {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
           return FALSE;
         }
         fout << gnuplotPhononHeader(directory, chemName, unitName.at(f), plot_type, graph_title);
@@ -3335,9 +3335,9 @@ namespace pflow {
         ofstream fout;
         fout.open(gnuplotscript_name.c_str());
         if(fout.is_open()) {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon dispersion to " << gnuplotscript_name << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon dispersion to " << gnuplotscript_name << endl;
         } else {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
           return FALSE;
         }
         fout << gnuplotPhononHeader(directory, chemName, unitName.at(f), plot_type, graph_title);
@@ -3366,9 +3366,9 @@ namespace pflow {
         ofstream fout;
         fout.open(gnuplotscript_name.c_str());
         if(fout.is_open()) {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon density of states to " << gnuplotscript_name << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for phonon density of states to " << gnuplotscript_name << endl;
         } else {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
           return FALSE;
         }
         fout << gnuplotPhononHeader(directory, chemName, unitName.at(f), plot_type, graph_title);
@@ -3399,9 +3399,9 @@ namespace pflow {
         ofstream fout;
         fout.open(gnuplotscript_name.c_str());
         if(fout.is_open()) {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for F, S, and C to " << gnuplotscript_name << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  Writing GNUPLOT script for F, S, and C to " << gnuplotscript_name << endl;
         } else {
-          cout << XHOST.sPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
+          cout << XPID << "pflow::PLOT_PHDISP:  ERROR!  Couldn't open " << gnuplotscript_name.c_str() << " for writing." << endl;
           return FALSE;
         }
         fout << gnuplotPhononHeader(directory, chemName, unitName.at(b), plot_type, graph_title);
@@ -3629,19 +3629,19 @@ string gnuplotPhononThermo(string thermo_path, string topmargin) {
 void callOutputConversion(bool PNG, bool PDF, bool JPG, bool GIF, string directory, string name, string unit, string plot) {
   // Helper function for pflow::PLOT_PHDISP() that calls `convert' to produce the requested image types from .eps
   if(PNG) {
-    cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .png . . . " << endl;
+    cout << XPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .png . . . " << endl;
     aurostd::execute(XHOST.command("convert") + " " + directory + "/" + name + "_" + unit + "_" + plot + ".eps " + directory + "/" + name + "_" + unit + "_" + plot + ".png");
   }
   if(PDF) {
-    cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .pdf . . . " << endl;
+    cout << XPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .pdf . . . " << endl;
     aurostd::execute(XHOST.command("convert") + " " + directory + "/" + name + "_" + unit + "_" + plot + ".eps " + directory + "/" + name + "_" + unit + "_" + plot + ".pdf");
   }
   if(JPG) {
-    cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .jpg . . . " << endl;
+    cout << XPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .jpg . . . " << endl;
     aurostd::execute(XHOST.command("convert") + " " + directory + "/" + name + "_" + unit + "_" + plot + ".eps " + directory + "/" + name + "_" + unit + "_" + plot + ".jpg");
   }
   if(GIF) {
-    cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .gif . . . " << endl;
+    cout << XPID << "pflow::PLOT_PHDISP:  Converting image [" << directory << "/" << name << ".eps] to .gif . . . " << endl;
     aurostd::execute(XHOST.command("convert") + " " + directory + "/" + name + "_" + unit + "_" + plot + ".eps " + directory + "/" + name + "_" + unit + "_" + plot + ".gif");
   }
 }
@@ -3653,7 +3653,7 @@ void cleanGnuplotScript(bool file1, bool file2, bool file3, string script) {
   // Helper function for pflow::PLOT_PHDISP() that removes the gnuplot scripts
   if(!XHOST.vflag_control.flag("KEEP::GPL")){ //CO20180809
     if((file1 || file2) || file3) {
-      cout << XHOST.sPID << "pflow::PLOT_PHDISP:  Cleaning up . . . Gnuplot script refers to temporary files; removing it." << endl;
+      cout << XPID << "pflow::PLOT_PHDISP:  Cleaning up . . . Gnuplot script refers to temporary files; removing it." << endl;
       aurostd::execute("rm -f " + script);  // script refers to the above temporary files--saving it is useless
     }
   }
