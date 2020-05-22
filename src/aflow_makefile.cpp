@@ -412,7 +412,7 @@ namespace makefile {
             //[CO20200508 - OBSOLETE]}
             vmt_required.push_back(mt_required);
             //get rid of any dependencies with AUROSTD and replace with $(AUROSTD_OBJ)
-            updateDependenciesAUROSTD(vvdependencies.back());
+            //[CO20200521 - do NOT replace AUROSTD .cpp and .h with .o, this will slow down make unnecessarily]updateDependenciesAUROSTD(vvdependencies.back());
           }
         }
       }
