@@ -441,8 +441,6 @@ namespace AEL_functions {
   }
 } // namespace KBIN
 
-
-
 // ***************************************************************************
 //
 // Set of functions to allow AEL to be called from other parts of AFLOW to obtain Poisson ratio, bulk modulus, etc.

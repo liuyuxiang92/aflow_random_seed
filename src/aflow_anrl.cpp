@@ -4285,6 +4285,7 @@ namespace anrl {
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       format = "json";
     }
+    //DX20191217 END
 
     //DX20191030 - add force Wyckoff choice option - START
     // check if forcing certain Wyckoff convention 

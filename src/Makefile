@@ -55,7 +55,6 @@ endif
 #ME20200520 - need to add assembler flags for Cygwin or aurostd.o won't compile
 #[CO20200520 - OBSOLETE]WUNINITIALIAZED=-Wmaybe-uninitialized #-Wuninitialized on mac
 W_AMBIG_OBJ=
-CCFLAGS=-Wall -W -fno-inline
 ifeq ($(OS), Windows_NT)
 W_AMBIG_OBJ=-Wa,-mbig-obj
 endif

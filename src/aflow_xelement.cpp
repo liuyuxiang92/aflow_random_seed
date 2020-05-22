@@ -2626,7 +2626,7 @@ namespace xelement {
       HHIP=1600;
       HHIR=1800;
       xray_scatt=24.46;
-      //xray_scatt=24.3589; Mn JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.3589; Mn JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
     }
     // [AFLOW]STOP=Manganese
     // ********************************************************************************************************************************************************
@@ -2708,7 +2708,7 @@ namespace xelement {
       HHIP=2400;
       HHIR=1400;
       xray_scatt=24.85;
-      //xray_scatt=24.6830; Fe JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.6830; Fe JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
     }
     // [AFLOW]STOP=Iron
     // ********************************************************************************************************************************************************
@@ -2790,7 +2790,7 @@ namespace xelement {
       HHIP=3100;
       HHIR=2700;
       xray_scatt=24.59;
-      //Co JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
+      //Co JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
     }
     // [AFLOW]STOP=Cobalt
     // ********************************************************************************************************************************************************

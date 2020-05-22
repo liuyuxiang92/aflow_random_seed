@@ -27,7 +27,7 @@
 #include "aflow.h"
 #include "aflow_pflow.h"
 // [OBSOLETE] #include "aflow_aqe.h"
-#include "aflow_makefile.h" //DELETE ME!
+#include "aflow_makefile.h"
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -1110,7 +1110,7 @@ namespace aflow {
     }
     if(type=="BANNER_NORMAL") {
       oss << "****************************************************************************************************" << endl;
-      oss << "MMMMM  AFLOW V" << string(AFLOW_VERSION) << " Automatic-FLOW [" << TODAY << "] - " << endl; // << aflow_get_time_string() << endl;//CO
+      oss << "MMMMM  AFLOW V" << string(AFLOW_VERSION) << " Automatic-FLOW [" << TODAY << "] - " << endl; // << aflow_get_time_string() << endl; //CO
       oss << "****************************************************************************************************" << endl;
       return oss.str();
     }

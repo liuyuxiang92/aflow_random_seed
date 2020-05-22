@@ -693,7 +693,7 @@ namespace AGL_functions {
 
       // If tarred and compressed directory exists...
       // [OBSOLETE]      string tarfilename = vaspRuns.at(idVaspRun).Directory + ".tar.bz2";
-      // [OBSOLETE]    if( aurostd::FileExist(tarfilename) )
+      // [OBSOLETE]    if( aurostd::FileExist(tarfilename) ) {
       // [OBSOLETE]   	// Extract all...
       // [OBSOLETE]   	aurostd::execute( string("tar -xf ") + tarfilename );
       // [OBSOLETE]     }
@@ -767,9 +767,9 @@ namespace AGL_functions {
       aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Pressure (kB) = " << AGL_data.pressurecalculated.at(AGL_data.pressurecalculated.size()-1) << endl;      
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       outcar.clear();
+    }
+    return 0;
   }
-  return 0;
-}
 } // namespace AGL_functions
 
 // ***************************************************************************

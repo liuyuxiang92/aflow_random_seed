@@ -608,7 +608,7 @@ namespace bader_functions {
     bader_command=XHOST.command("bader") + " " + bader_options + " CHGCAR -ref REFERENCE";
     if(LDEBUG) {cerr << soliloquy << " bader_command=\"" << bader_command << "\"" << endl;}
     BADER_CODE_OUTPUT << endl << aurostd::execute2string(bader_command) << endl;  //local variant
-    //BADER_CODE_OUTPUT << endl << aurostd::execute2string("/home/CO/bin/bader "+bader_options+" "+required_files.at(0)+" -ref "+ref_file) << endl;
+    //BADER_CODE_OUTPUT << endl << aurostd::execute2string("~/bin/bader "+bader_options+" "+required_files.at(0)+" -ref "+ref_file) << endl;
     if(aurostd::substring2bool(BADER_CODE_OUTPUT.str(), "ERROR: should be no new maxima in edge refinement")) {
       oss << endl;
       oss << soliloquy << "ERROR: bader command issued error" << " "; //<< endl //CO20180502;

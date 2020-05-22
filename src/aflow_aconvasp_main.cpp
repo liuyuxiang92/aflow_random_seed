@@ -1933,7 +1933,7 @@ namespace pflow {
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME
+      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}
@@ -2881,15 +2881,15 @@ namespace pflow {
       aliases = "--sitepointgroup|--agroup";
       sym_specific_options = "[--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]";
       options = vpflow.getattachedscheme("AGROUP");
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;   //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;       //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;        //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
@@ -2906,13 +2906,13 @@ namespace pflow {
       aliases = "--factorgroup|--fgroup";
       sym_specific_options = "[--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]";
       options = vpflow.getattachedscheme("FGROUP");
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -2930,13 +2930,13 @@ namespace pflow {
       mode = _PGROUP_;
       aliases = "--pointgroup|--pgroup";
       options = vpflow.getattachedscheme("PGROUP");
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -2954,13 +2954,13 @@ namespace pflow {
       mode = _PGROUPK_;
       aliases = "--pointgroupklattice|--pgroupk";
       options = vpflow.getattachedscheme("PGROUPK");
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;     //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -2979,13 +2979,13 @@ namespace pflow {
       aliases = "--pointgroup_crystal|--pgroup_crystal|--pgroup_xtal|--pgroupx|--pgroupX";
       sym_specific_options = "[--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]";
       options = vpflow.getattachedscheme("PGROUPX");
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;   //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -3004,13 +3004,13 @@ namespace pflow {
       aliases = "--pointgroupkcrystal|--pgroupk_xtal";
       sym_specific_options = "[--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]";
       options = vpflow.getattachedscheme("PGROUPK_XTAL");
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;   //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE;  //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -3060,13 +3060,13 @@ namespace pflow {
       if(vpflow.flag("SYMMETRY::SGROUP_RADIUS")){
         kflags.KBIN_SYMMETRY_SGROUP_RADIUS = aurostd::string2utype<double>(vpflow.getattachedscheme("SYMMETRY::SGROUP_RADIUS"));
       }
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  //DX20170815 - Add in consistency checks
-      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
-      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=TRUE;      //DX20170815 - Add in consistency checks
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=TRUE;        //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -3283,16 +3283,16 @@ namespace pflow {
     //DX20170815 - Add in consistency checks SYM::CalculateSpaceGroup(File,a,aflags,FALSE,verbose,cout);
     //DX20170815 - Add in consistency checks SYM::CalculateInequivalentAtoms(File,a,aflags,WRITE,verbose,cout);
     //DX20170815 - Add in consistency checks SYM::CalculateSitePointGroup(File,a,aflags,WRITE,TRUE,cout);
-    _kflags kflags;                                   //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE;//DX20200129
-    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;       //DX20170815 - Add in consistency checks
+    _kflags kflags;                                    //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;   //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
+    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;        //DX20170815 - Add in consistency checks
     pflow::PerformFullSymmetry(a,File,aflags,kflags,WRITE,cout); //DX20170815 - Add in consistency checks
   }
 } // namespace pflow
@@ -5812,15 +5812,15 @@ namespace pflow {
     //DX+CO START
     _kflags kflags;
     //DX20170815 - Add in consistency checks pflow::PerformFullSymmetry(a,File,aflags,kflags,PRINT_SCREEN,cout);
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE;//DX20200129
-    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;      //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;   //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20200129
+    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
     string options = vpflow.getattachedscheme("EQUIVALENT");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -6881,7 +6881,7 @@ namespace pflow {
 // pflow::FINDSYM
 // ***************************************************************************
 namespace pflow {
-  //DX20170921 [OBSOLETE] void FINDSYM(string options,uint mode,istream& input) {
+  //DX20170921 [OBSOLETE] void FINDSYM(string options,uint mode,istream& input)
   void FINDSYM(aurostd::xoption& vpflow,uint mode,istream& input) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XHOST.sPID << "pflow::FINDSYM: BEGIN" << endl;
@@ -8218,7 +8218,7 @@ namespace pflow {
       if(NK>10000000) NK=10000000;
       oss << kintro << "KPPRA     = " << NK << " (requested) " << endl;
       double NK_tmp=(int) ((double) NK/str.atoms.size()+0.5);if(NK<1) NK=1;  //CO20180226 - this is done inside KPPRA(), so don't overwrite NK
-      oss << kintro << "KPPRA/#AT = "<<NK_tmp<<endl;  //CO20180226
+      oss << kintro << "KPPRA/#AT = " << NK_tmp << endl;  //CO20180226
       KPPRA(str,NK);
       if(LDEBUG) { //CO20190401
         cerr << soliloquy << " str.kpoints_k1=" << str.kpoints_k1 << endl;
@@ -11241,7 +11241,7 @@ namespace pflow {
 namespace pflow {
   xstructure NANOPARTICLE(istream& input,const xvector<double>& iparams) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180226
-    string soliloquy= XHOST.sPID + "pflow::NANOPARTICLE)";
+    string soliloquy=XHOST.sPID+"pflow::NANOPARTICLE)";
     //  cout << aflow::Banner("BANNER_TINY") << endl;
     double radius=NANOPARTICLE_RADIUS_DEFAULT;
     double distance=NANOPARTICLE_DISTANCE_DEFAULT;
@@ -11587,15 +11587,15 @@ namespace pflow {
     xstructure a(input,IOAFLOW_AUTO);
     bool WRITE=TRUE;
     ofstream File("/dev/null");
-    _kflags kflags;                                   //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE; //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
-    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;      //DX20170815 - Add in consistency checks
+    _kflags kflags;                                    //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
     pflow::PerformFullSymmetry(a,File,aflags,kflags,WRITE,cout); //DX20170815 - Add in consistency checks
     //DX20170815 - Add in consistency checks - SYM::CalculatePointGroup(File,a,aflags,WRITE,TRUE,cout);
   }
@@ -11612,15 +11612,15 @@ namespace pflow {
     bool WRITE=TRUE;
     ofstream File("/dev/null");
     //DX20170815 SYM::CalculatePointGroupKLattice(File,a,aflags,WRITE,TRUE,cout);
-    _kflags kflags;                                   //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE; //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
-    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;      //DX20170815 - Add in consistency checks
+    _kflags kflags;                                    //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
     pflow::PerformFullSymmetry(a,File,aflags,kflags,WRITE,cout); //DX20170815 - Add in consistency checks
   }
 } // namespace pflow
@@ -11642,15 +11642,15 @@ namespace pflow {
     // SYM::CalculateInequivalentAtoms(File,a,aflags,WRITE,verbose,cout);
     // SYM::CalculateSitePointGroup(File,a,aflags,WRITE,TRUE,cout);
     //DX20170815 - Add in consistency checks SYM::CalculatePointGroupCrystal(File,a,aflags,WRITE,verbose,cout);
-    _kflags kflags;                                   //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;     //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;//DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
-    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;      //DX20170815 - Add in consistency checks
-    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;      //DX20170815 - Add in consistency checks
+    _kflags kflags;                                    //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;      //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;        //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;   //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20170815 - Add in consistency checks //DX20171205 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       //DX20170815 - Add in consistency checks
+    kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       //DX20170815 - Add in consistency checks
     pflow::PerformFullSymmetry(a,File,aflags,kflags,WRITE,cout); //DX20170815 - Add in consistency checks
   }
 } // namespace pflow

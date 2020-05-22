@@ -68,9 +68,9 @@ namespace AFLOW_PTHREADS {
     bool fnpmax=aurostd::args2flag(argv,"--npmax");
     bool multi_sh=aurostd::args2flag(argv,"--multi=sh|--multi=sh");
     if(!fnp && !fnpmax) {AFLOW_PTHREADS::MAX_PTHREADS=1;}
-    if(fnp && !fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; //SC20200319
+    if(fnp && !fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);; //SC20200319
     if(!fnp && fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();}
-    if(fnp && fnpmax)   {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; //SC20200319
+    if(fnp && fnpmax)   {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);; //SC20200319
     if(multi_sh && !fnp && !fnpmax) {AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();}
 
     if(AFLOW_PTHREADS::MAX_PTHREADS>1) {
@@ -78,20 +78,20 @@ namespace AFLOW_PTHREADS {
       if(AFLOW_PTHREADS::MAX_PTHREADS>MAX_ALLOCATABLE_PTHREADS) AFLOW_PTHREADS::MAX_PTHREADS=MAX_ALLOCATABLE_PTHREADS;
       if(LDEBUG) cerr << "AAAAA  AFLOW THREADED VERSION  threads=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
     }
-if(AFLOW_PTHREADS::MAX_PTHREADS<=1) {
-  AFLOW_PTHREADS::FLAG=FALSE;
-  AFLOW_PTHREADS::MAX_PTHREADS=1;
-  if(LDEBUG) cerr << "AAAAA  AFLOW SERIAL VERSION threads=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
-}
-//  AFLOW_PTHREADS::FLAG=TRUE;
-if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: fnp=" << fnp << endl;
-if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: fnpmax=" << fnpmax << endl;
-if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: multi_sh=" << multi_sh << endl;
-if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
-if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
-//  if(LDEBUG) exit(0); // for debug
-return AFLOW_PTHREADS::FLAG;
-}
+    if(AFLOW_PTHREADS::MAX_PTHREADS<=1) {
+      AFLOW_PTHREADS::FLAG=FALSE;
+      AFLOW_PTHREADS::MAX_PTHREADS=1;
+      if(LDEBUG) cerr << "AAAAA  AFLOW SERIAL VERSION threads=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+    }
+    //  AFLOW_PTHREADS::FLAG=TRUE;
+    if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: fnp=" << fnp << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: fnpmax=" << fnpmax << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: multi_sh=" << multi_sh << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+    if(LDEBUG) cerr << XHOST.sPID << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
+    //  if(LDEBUG) exit(0); // for debug
+    return AFLOW_PTHREADS::FLAG;
+  }
 } // namespace AFLOW_PTHREADS
 
 namespace AFLOW_PTHREADS {
