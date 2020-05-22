@@ -3,7 +3,7 @@
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
-// This file contains the ForceConstantCalculator class, which calculate
+// This file contains the ForceConstantCalculator class, which calculates
 // harmonic force constants using the direct method or gamma-point density
 // functional perturbation theory.
 

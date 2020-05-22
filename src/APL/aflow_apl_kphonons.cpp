@@ -641,7 +641,7 @@ namespace KBIN {
 
       if (aaplopts.flag("KPPRA")) message << "AAPL will use a KPPRA of " << aaplopts.getattachedscheme("KPPRA") << " for static calculations." << std::endl;
 
-      message << "Anharmonic IFCs will be calculated with a convergence criterion of " << aaplopts.getattachedscheme("SUMRULE") << "." << std::endl;;
+      message << "Anharmonic IFCs will be calculated with a convergence criterion of " << aaplopts.getattachedscheme("SUMRULE") << "." << std::endl;
       message << "A mixing coefficient of " << aaplopts.getattachedscheme("MIXING_COEFFICIENT")<< " will be used." << std::endl;
       message << "Anharmonic IFCs need to be converged within " << aaplopts.getattachedscheme("SUMRULE_MAX_ITER") << " iterations." << std::endl;
 
@@ -1104,7 +1104,7 @@ namespace KBIN {
       if (xinput.AFLOW_MODE_VASP) {
         function = "KBIN::relaxStructureAPL_VASP";
         Krun = relaxStructureAPL_VASP(START_RELAX, AflowIn, aplopts, scell_dims,
-            aplopts.flag("COMMENSURATE"), xinput.xvasp, aflags, kflags, xflags.vflags, messageFile);
+            aplopts.flag("RELAX_COMMENSURATE"), xinput.xvasp, aflags, kflags, xflags.vflags, messageFile);
       }
       if (!Krun) {
         message << "Relaxation calculations did not run successfully.";
