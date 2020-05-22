@@ -163,10 +163,10 @@ namespace apl {
   // Lattice Dynamics in the Harmonic Approximation", eq. 2.4.23 and 2.4.24.
   // Units are Angstrom^2.
   void AtomicDisplacements::calculateMeanSquareDisplacements(double Tstart, double Tend, double Tstep) {
-    string function = "AtomicDisplacements::calculateMeanSquareDisplacements()";
+    string function = "AtomicDisplacements::calculateMeanSquareDisplacements():";
     string message = "";
     if (!_pc_set) {
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     _qpoints.clear();
@@ -235,7 +235,7 @@ namespace apl {
   // Units are 1/sqrt(amu).
   void AtomicDisplacements::calculateModeDisplacements(const vector<xvector<double> >& qpts, bool coords_are_fractional) {
     if (!_pc_set) {
-      string function = "AtomicDisplacements::calculateModeDisplacements()";
+      string function = "AtomicDisplacements::calculateModeDisplacements():";
       string message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
@@ -343,7 +343,7 @@ namespace apl {
   //writeMeanSquareDisplacementsToFile////////////////////////////////////////
   // Writes the mean square displacement vectors to a file.
   void AtomicDisplacements::writeMeanSquareDisplacementsToFile(string filename) {
-    string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile()";
+    string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile():";
     if (!_pc_set) {
       string message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
@@ -383,7 +383,7 @@ namespace apl {
   // Writes an animated XCRYSDEN structure file that can be used to create a
   // gif or mpeg of a phonon mode displacement.
   void AtomicDisplacements::writeSceneFileXcrysden(string filename, const xstructure& scell, const vector<vector<vector<double> > >& disp, int nperiods) {
-    string function = "AtomicDisplacements::writeSceneFileXcrysden()";
+    string function = "AtomicDisplacements::writeSceneFileXcrysden():";
     if (!_pc_set) {
       string message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
@@ -429,7 +429,7 @@ namespace apl {
   // by V_sim or ASCII-phonons.
   void AtomicDisplacements::writeSceneFileVsim(string filename, const xstructure& xstr_projected,
       const vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
-    string function = "AtomicDisplacements::writeSceneFileVsim()";
+    string function = "AtomicDisplacements::writeSceneFileVsim():";
     if (!_pc_set) {
       string message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
@@ -496,7 +496,7 @@ namespace apl {
   }
 
   void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream& mf, ostream& oss) {
-    string function = "apl::createAtomicDisplacementSceneFile()";
+    string function = "apl::createAtomicDisplacementSceneFile():";
     string message = "";
 
     // Parse command line options

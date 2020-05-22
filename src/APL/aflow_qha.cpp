@@ -1009,6 +1009,7 @@ namespace apl
         double Volume = origStructure.GetVolume();
         origStructure = phcalc.getSupercell().getInputStructure();
         origStructure.InflateVolume(Volume/origStructure.GetVolume());
+        NatomsOrigCell = origStructure.atoms.size();
       }
       else{
         msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
@@ -1829,18 +1830,17 @@ namespace apl
     xvector<double> E = aurostd::vector2xvector<double>(E0_V);
     xvector<double> fit_params = fitToEOSmodel(E, method);
     double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
-    // to avoid division by zero in the self-consistent loop,
-    // the initial volume is taken to be 10% bigger
-    double V = 1.1*EOS_volume_at_equilibrium;
     double Vnew = 0.0;
 
     // self-consistent loop for 0 K
+    // to avoid division by zero in the self-consistent loop,
+    // the initial volume is taken to be 10% bigger
     double V0K = 1.1*EOS_volume_at_equilibrium;
     for (int i=0; i<max_scqha_iteration; i++){
-      Pe   = dEOSpoly(V, fit_params);
-      VPg  = VPgamma(0.0,V);
+      Pe   = dEOSpoly(V0K, fit_params);
+      VPg  = VPgamma(0.0,V0K);
       Vnew = VPg/Pe;
-      if (abs(V0K - Vnew)/V > Vtol) V0K += (Vnew - V0K) * dV; else break;
+      if (abs(V0K - Vnew)/V0K > Vtol) V0K += (Vnew - V0K) * dV; else break;
     }
 
     // the name of the output file depends on the EOS fit method
@@ -1881,6 +1881,10 @@ namespace apl
       std::endl;
 
     double T = Temperatures[0];
+
+    // to avoid division by zero in the self-consistent loop,
+    // the initial volume is taken to be 10% bigger
+    double V = 1.1*EOS_volume_at_equilibrium;
 
     // self-consistent loop for the initial temperature (defined by user)
     int iter=1;
@@ -1958,6 +1962,7 @@ namespace apl
       ui = 0.0;
       Bgamma = 0.0; Bdgamma = 0.0; Belec = 0.0; Pgamma = 0.0; B = 0.0;
       fi = 0.0; Feq = 0.0;
+      NQpoints = 0;
 
       for (uint q=0; q<NIrQpoints; q++){
         for (uint branch=0; branch<omegaV_mesh[q].size(); branch++){
@@ -1970,12 +1975,12 @@ namespace apl
 
           ui = 0.5*w;
           fi = 0.5*w;
-          if (w > 1e-12 && T > 0){
+          if (w > AUROSTD_ROUNDOFF_TOL && T > _ZERO_TOL_){
             expx = exp(w*betaT);
 
             // use volume at T=0K for calculation of isochoric specific heat
             expx0 = exp(w0K*betaT);
-            Cvi = pow(w,2)*expx0/pow(expx0-1.0,2) * qpWeights[q];
+            Cvi = pow(w0K,2)*expx0/pow(expx0-1.0,2) * qpWeights[q];
 
             ui  += w/(expx - 1.0);
             ui  *= qpWeights[q];
