@@ -916,7 +916,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   } else {
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
   }
-  //[OBSOLETE] vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
   if (aurostd::args2flag(argv, cmds, "--plotphdos")) {
     vpflow.flag("PLOT_PHDOS", true);
     vpflow.addattachedscheme("PLOT_PHDOS", "./", true);
@@ -1871,7 +1870,6 @@ namespace pflow {
       if(vpflow.flag("PLOT_BANDDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_BANDDOS"); plotter::PLOT_BANDDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOS",true); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOSALL")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOSALL",false); pltopts.push_attached("DATASET", "-1"); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
-      if(vpflow.flag("PLOTPHDISP")) {pflow::PLOT_PHDISP(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDOS"); plotter::PLOT_PHDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISP")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISP"); plotter::PLOT_PHDISP(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISPDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISPDOS"); plotter::PLOT_PHDISPDOS(pltopts); _PROGRAMRUN=true;}
