@@ -1387,7 +1387,7 @@ namespace KBIN {
       string dirname=store.getdir_name(aflags.Directory);
 
       if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOS_METHOD"), USER_DOS_PROJECTIONS);
+      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOSMETHOD"), USER_DOS_PROJECTIONS);
       // Calculate DOS
       dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
       if (aplopts.flag("DOS")) dosc.writePDOS(_TMPDIR_, dirname);
@@ -1436,7 +1436,7 @@ namespace KBIN {
         }
         {
           if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-          apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOS_METHOD"), USER_DOS_PROJECTIONS);
+          apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOSMETHOD"), USER_DOS_PROJECTIONS);
           // Calculate DOS
           dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
           if(aplopts.flag("DOS"))dosc.writePDOS(_TMPDIR_, dirname);
@@ -1459,7 +1459,7 @@ namespace KBIN {
 
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
-    string USER_FREQFORMAT = aplopts.getattachedscheme("FREQFORMAT");
+    string USER_FREQFORMAT = aurostd::toupper(aplopts.getattachedscheme("FREQFORMAT"));
     if (!USER_FREQFORMAT.empty()) {
       // Convert format to machine representation
       tokens.clear();
@@ -1567,7 +1567,7 @@ namespace KBIN {
     if (aplopts.flag("DOS") || aplopts.flag("TP")) {
       // Calculate DOS
       if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOS_METHOD"), USER_DOS_PROJECTIONS);
+      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOSMETHOD"), USER_DOS_PROJECTIONS);
       dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
       if (aplopts.flag("DOS")) {
         dosc.writePDOS(aflags.Directory);
@@ -1821,8 +1821,9 @@ namespace KBIN {
       tcond.calculateThermalConductivity();
       tcond.writeOutputFiles(phcalc.getDirectory());
     }
+
   }
-}
+}  // namespace KBIN
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
