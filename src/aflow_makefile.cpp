@@ -373,7 +373,7 @@ namespace makefile {
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
     vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
     vmt_required.push_back(mt_required);
-    
+
     //SC variables - hack
     //AUROSTD
     string var_vcpp_aurostd="AUROSTD_CPPS",var_vhpp_aurostd="AUROSTD_HPPS";
@@ -414,7 +414,7 @@ namespace makefile {
             true){vcpp_anrl.push_back(file);}
       }
     }
-    
+
     //do aflow.h dependencies next
     string var_vdep_aflowh="AFLOW_H_DEPS";
     vector<string> vdep_aflowh;
