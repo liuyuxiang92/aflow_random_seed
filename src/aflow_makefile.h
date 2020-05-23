@@ -20,6 +20,7 @@ namespace makefile {
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
   void updateDependenciesAUROSTD(vector<string>& vdependencies);
+  void updateDependenciesVariable(const vector<string>& vdeps_var,const string& var,vector<string>& vdeps_replace);
   void createMakefileAFLOW(const string& directory=".");
 }
 

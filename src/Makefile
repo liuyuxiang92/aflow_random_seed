@@ -678,7 +678,8 @@ aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_dat
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	$(MAKE) aflow_data.o
 #	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""aflow_data.cpp"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_data.cpp -c -o aflow_data.o
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(FLAGS_STATIC_POST)
+	@echo "linking aflow_data*.o"
+	@$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(FLAGS_STATIC_POST)
 .PHONY: data
 data: aflow_data
 .PHONY: amir
