@@ -26,8 +26,6 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
-// [OBSOLETE] #include "aflow_aqe.h"
-#include "aflow_makefile.h"
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"

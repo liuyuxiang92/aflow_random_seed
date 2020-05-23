@@ -5,9 +5,9 @@
 // ***************************************************************************
 // Written by Stefano Curtarolo, David Hicks - 2016
 
-#ifndef _AFLOW_ANRL_LIST_CPP
-#define _AFLOW_ANRL_LIST_CPP
-#include "aflow.h"
+#ifndef _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
+#define _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
+#include "../aflow.h" // AFLOW_REMOVE_GREP  //CO20200521
 
 
 // ***************************************************************************
@@ -70,7 +70,7 @@ namespace anrl {
     vproto.push_back("A2B_mC48_15_ae3f_2f;2;24;15;4;20;mC48;a,b/a,c/a,beta,y2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;SiO2;Coesite");
     vproto.push_back("ABC6D2_mC40_15_e_e_3f_f;4;20;15;6;18;mC40;a,b/a,c/a,beta,y1,y2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;CaFeO6Si2;Esseneite");
     vproto.push_back("ABC4_oP12_16_ag_cd_2u;3;12;16;5;9;oP12;a,b/a,c/a,x5,y5,z5,x6,y6,z6;-;AlPS4;AlPS4");
-    vproto.push_back("AB3_oP16_18_ab_3c;2;16;18;4;14;oP16;a,b/a,c/a,z1,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5;D0_{17};BaS3;BaS3"); //DX20180925 - moved Strukturberict designation from AB3_tP8_113_a_ce per M. Mehl's suggestion (historical reasons)
+    vproto.push_back("AB3_oP16_18_ab_3c;2;16;18;4;14;oP16;a,b/a,c/a,z1,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5;D0_{17};BaS3;BaS3"); //DX 20180925 - moved Strukturberict designation from AB3_tP8_113_a_ce per M. Mehl's suggestion (historical reasons)
     vproto.push_back("A2B_oP12_19_2a_a;2;12;19;4;12;oP12;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3;-;Ag2Se;Naumannite");
     vproto.push_back("A2B_oC24_20_abc_c;2;12;20;4;11;oC24;a,b/a,c/a,x1,y2,x3,y3,z3,x4,y4,z4;-;SiO2;Orthorhombic Tridymite");
     vproto.push_back("AB_oP2_25_b_a;2;2;25;4;5;oP2;a,b/a,c/a,z1,z2;-;CdTe;High-Pressure CdTe");
@@ -107,7 +107,7 @@ namespace anrl {
     vproto.push_back("A_oP8_62_2c;1;8;62;3;7;oP8;a,b/a,c/a,x1,z1,x2,z2;A_c;alphaNp;alphaNp");
     vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-;SrCuO2;SrCuO2");
     vproto.push_back("A2B_oC12_63_2c_c;2;6;63;4;6;oC12;a,b/a,c/a,y1,y2,y3;C49;ZrSi2;ZrSi2");
-    vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33;CrB;CrB");
+    vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33/-;CrB/-;CrB/-");
     vproto.push_back("A_oC4_63_c;1;2;63;3;4;oC4;a,b/a,c/a,y1;A20;alpha-U;alpha-Uranium");
     vproto.push_back("A_oC8_64_f;1;4;64;3;5;oC8;a,b/a,c/a,y1,z1;A11/A17/A14;alphaGa/P/I2;alphaGallium/Black Phosphorus/Molecular Iodine");
     vproto.push_back("A2B2C_oC80_64_efg_efg_df;3;40;64;5;18;oC80;a,b/a,c/a,x1,y2,y3,y4,z4,y5,z5,y6,z6,x7,y7,z7,x8,y8,z8;-;MgB2C2;MgB2C2");
@@ -130,7 +130,7 @@ namespace anrl {
     vproto.push_back("A2B_tP36_96_3b_ab;2;36;96;4;15;tP36;a,c/a,x1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5;-;SiO2;Keatite");
     vproto.push_back("A_tP12_96_ab;1;12;96;3;6;tP12;a,c/a,x1,x2,y2,z2;-;Si;\"ST12'' of Si");
     vproto.push_back("A3BC_tP5_99_bc_a_b;3;5;99;5;6;tP5;a,c/a,z1,z2,z3,z4;-;Pb(Zr0.52Ti0.48)O3;Tetragonal PZT [PbO3]");
-    vproto.push_back("AB3_tP8_113_a_ce;2;8;113;4;5;tP8;a,c/a,z2,x3,z3;-;BaS3;BaS3");//DX20180925 - moved Strukturberict designation to AB3_oP16_18_ab_3c per M. Mehl's suggestion (historical reasons)
+    vproto.push_back("AB3_tP8_113_a_ce;2;8;113;4;5;tP8;a,c/a,z2,x3,z3;-;BaS3;BaS3");//DX 20180925 - moved Strukturberict designation to AB3_oP16_18_ab_3c per M. Mehl's suggestion (historical reasons)
     vproto.push_back("A2BC4D_tI16_121_d_a_i_b;4;8;121;6;4;tI16;a,c/a,x4,z4;H2_6;Cu2FeS4Sn;Stannite");
     vproto.push_back("ABC2_tI16_122_a_b_d;3;8;122;5;3;tI16;a,c/a,x3;E1_1;CuFeS2;Chalcopyrite");
     vproto.push_back("AB5C_tP7_123_b_ci_a;3;7;123;5;3;tP7;a,c/a,z4;-;HoCoGa5;HoCoGa5");
@@ -143,7 +143,7 @@ namespace anrl {
     vproto.push_back("ABC_tP6_129_c_a_c;3;6;129;5;4;tP6;a,c/a,z2,z3;E0_1;PbFCl;Matlockite");
     vproto.push_back("A2B_tP6_129_ac_c;2;6;129;4;4;tP6;a,c/a,z2,z3;C38;Cu2Sb;Cu2Sb");
     vproto.push_back("AB_tP4_129_a_c;2;4;129;4;3;tP4;a,c/a,z2;B10;PbO;PbO");
-    vproto.push_back("AB_tP4_129_c_c;2;4;129;4;4;tP4;a,c/a,z1,z2;B11;gammaCuTi;gammaCuTi");
+    vproto.push_back("AB_tP4_129_c_c;2;4;129;4;4;tP4;a,c/a,z1,z2;B11/-;gammaCuTi/-;gammaCuTi/-");
     vproto.push_back("AB_tP4_131_c_e;2;4;131;4;2;tP4;a,c/a;B17;PtS;PtS");
     vproto.push_back("A_tP50_134_b2m2n;1;50;134;3;12;tP50;a,c/a,x2,z2,x3,z3,x4,y4,z4,x5,y5,z5;A_g;B;T-50 Boron");
     vproto.push_back("A_tP30_136_bf2ij;1;30;136;3;9;tP30;a,c/a,x2,x3,y3,x4,y4,x5,z5;A_b;betaU;betaU");
@@ -160,7 +160,7 @@ namespace anrl {
     vproto.push_back("A_tI2_139_a;1;1;139;3;2;tI2;a,c/a;A6/A_a;In/Pa;In/alphaPa");
     vproto.push_back("A_tI8_139_h;1;4;139;3;3;tI8;a,c/a,x1;-;C;Hypothetical Tetrahedrally Bonded Carbon with 4-Member Rings");
     vproto.push_back("A3B_tI8_139_bd_a;2;4;139;4;2;tI8;a,c/a;D0_22;Al3Ti;Al3Ti");
-    vproto.push_back("AB2_tI6_139_a_e;2;3;139;4;3;tI6;a,c/a,z2;C11_b;MoSi2;MoSi2");
+    vproto.push_back("AB2_tI6_139_a_e;2;3;139;4;3;tI6;a,c/a,z2;C11_b/-;MoSi2/-;MoSi2/-");
     vproto.push_back("A4B5_tI18_139_i_ah;2;9;139;4;4;tI18;a,c/a,x2,x3;-;V4Zn5;V4Zn5");
     vproto.push_back("A4B_tI10_139_de_a;2;5;139;4;3;tI10;a,c/a,z3;D1_3;Al4Ba;Al4Ba");
     vproto.push_back("A8B_tI18_139_hi_a;2;9;139;4;4;tI18;a,c/a,x2,x3;-;Pt8Ti;Pt8Ti");
@@ -174,7 +174,7 @@ namespace anrl {
     vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C5/C_{c};TiO2/alpha-ThSi2;Anatase/alpha-ThSi2"); // added info from part 2 - A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2
     vproto.push_back("AB_tI16_141_e_e;2;8;141;4;4;tI16;a,c/a,z1,z2;B_g;MoB;MoB");
     vproto.push_back("A2B_tI24_141_2e_e;2;12;141;4;5;tI28;a,c/a,z1,z2,z3;-;Ga2Hf;Ga2Hf");
-    vproto.push_back("AB_tI8_141_a_b;2;4;141;4;2;tI8;a,c/a;\"40\";NbP;NbP");
+    vproto.push_back("AB_tI8_141_a_b;2;4;141;4;2;tI8;a,c/a;\"40\"/-;NbP/-;NbP/-");
     vproto.push_back("A2B3_tI80_141_ceh_3h;2;40;141;4;11;tI80;a,c/a,z2,y3,z3,y4,z4,y5,z5,y6,z6;-;In2S3;betaIn2S3");
     vproto.push_back("ABC4_tI96_142_e_ab_2g;3;48;142;5;9;tI96;a,c/a,x3,x4,y4,z4,x5,y5,z5;-;PPrS4;PPrS4");
     vproto.push_back("A2B_hP9_147_g_ad;2;9;147;4;6;hP9;a,c/a,z2,x3,y3,z3;B_b;AgZn;zetaAgZn");
@@ -205,7 +205,7 @@ namespace anrl {
     vproto.push_back("A2B3_hR5_166_c_ac;2;5;166;4;4;hR5;a,c/a,x2,x3;C33;Bi2Te3;Bi2Te3");
     vproto.push_back("A5B2_hR7_166_a2c_c;2;7;166;4;5;hR7;a,c/a,x2,x3,x4;D8_i;B5Mo2;Mo2B5");
     vproto.push_back("A_hR12_166_2h;1;12;166;3;6;hR12;a,c/a,x1,z1,x2,z2;-;B;alphaBoron");
-    vproto.push_back("ABC2_hR4_166_a_b_c;3;4;166;5;3;hR4;a,c/a,x3;F5_1;CrNiS2;Caswellsilverite");
+    vproto.push_back("ABC2_hR4_166_a_b_c;3;4;166;5;3;hR4;a,c/a,x3;F5_1/-;CrNiS2/-;Caswellsilverite/-");
     vproto.push_back("A_hR105_166_bc9h4i;1;105;166;3;33;hR105;a,c/a,x2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8,x9,z9,x10,z10,x11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15;-;B;betaBoron");
     vproto.push_back("A6B_hR7_166_g_a;2;7;166;4;3;hR7;a,c/a,x2;-;CaC6;CaC6");
     vproto.push_back("ABC3_hR10_167_a_b_e;3;10;167;5;3;hR10;a,c/a,x3;-/G0_1;LiNbO3/CaCO3;Paraelectric LiNbO3/Calcite");
@@ -389,19 +389,19 @@ namespace anrl {
     vproto.push_back("A3B5_oP16_55_ch_agh;2;16;55;4;9;oP16;a,b/a,c/a,x3,y3,x4,y4,x5,y5;-;Rh5Ge3;Rh5Ge3");
     vproto.push_back("A_oP16_55_2g2h;1;16;55;3;11;oP16;a,b/a,c/a,x1,y1,x2,y2,x3,y3,x4,y4;-;C;R-carbon");
     vproto.push_back("A2B_oP6_58_g_a;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C50;alpha-PdCl2;alpha-PdCl2");
-    vproto.push_back("ABC_oP6_59_a_b_a;3;6;59;5;6;oP6;a,b/a,c/a,z1,z2,z3;E0_{5};FeOCl;FeOCl"); //DX20180925 - added Strukturbericht
+    vproto.push_back("ABC_oP6_59_a_b_a;3;6;59;5;6;oP6;a,b/a,c/a,z1,z2,z3;E0_{5};FeOCl;FeOCl"); //DX 20180925 - added Strukturbericht
     vproto.push_back("A2B3_oP20_60_d_cd;2;20;60;4;10;oP20;a,b/a,c/a,y1,x2,y2,z2,x3,y3,z3;-;Rh2S3;Rh2S3");
     vproto.push_back("A3B_oP32_60_3d_d;2;32;60;4;15;oP32;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;WO3;WO3");
     vproto.push_back("A7B8_oP120_60_7d_8d;2;120;60;4;48;oP120;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15;-;beta-C7H8;beta-Toluene");
     vproto.push_back("AB_oP48_61_3c_3c;2;48;61;4;21;oP48;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;Benzene;Benzene");
     vproto.push_back("A2B3_oP20_62_2c_3c;2;20;62;4;13;oP20;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5;D5_{10};Cr3C2;Tongbaite");
     vproto.push_back("A2B4C_oP28_62_ac_2cd_c;3;28;62;5;14;oP28;a,b/a,c/a,x2,z2,x3,z3,x4,z4,x5,z5,x6,y6,z6;S1_{2};Mg2SiO4;Forsterite");
-    //DX20180619 - added info to label in part 1 vproto.push_back("A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C29;SrH2;SrH2");
+    //DX 20180619 - added info to label in part 1 vproto.push_back("A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C29;SrH2;SrH2");
     vproto.push_back("A3B_oP16_62_cd_c;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_{20};epsilon-NiAl3;epsilon-NiAl3");
     vproto.push_back("AB2C3_oP24_62_c_d_cd;3;24;62;5;13;oP24;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3,x4,y4,z4;E9_{e};CuFe2S3;Cubanite");
     vproto.push_back("AB3_oP16_62_c_3c;2;16;62;4;11;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4;D0_{8};MoO3;Molybdite");
     vproto.push_back("AB4C_oP24_62_c_2cd_c;3;24;62;5;14;oP24;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,y5,z5;H0_{2};BaSO4;Barite");
-    //DX20180619 - added info to label in part 1 vproto.push_back("AB_oP8_62_c_c;2;8;62;4;7;oP8;a,b/a,c/a,x1,z1,x2,z2;B14;FeAs;Westerveldite");
+    //DX 20180619 - added info to label in part 1 vproto.push_back("AB_oP8_62_c_c;2;8;62;4;7;oP8;a,b/a,c/a,x1,z1,x2,z2;B14;FeAs;Westerveldite");
     vproto.push_back("A2BC3_oC24_63_e_c_cg;3;12;63;5;8;oC24;a,b/a,c/a,y1,y2,x3,x4,y4;-;KFe2S3;Rasvumite");
     vproto.push_back("A43B5C17_oC260_63_c8fg6h_cfg_ce3f2h;3;130;63;5;59;oC260;a,b/a,c/a,y1,y2,y3,x4,y5,z5,y6,z6,y7,z7,y8,z8,y9,z9,y10,z10,y11,z11,y12,z12,y13,z13,y14,z14,y15,z15,y16,z16,x17,y17,x18,y18,x19,y19,z19,x20,y20,z20,x21,y21,z21,x22,y22,z22,x23,y23,z23,x24,y24,z24,x25,y25,z25,x26,y26,z26;-;La43Ni17Mg5;La43Ni17Mg5");
     vproto.push_back("A6B_oC28_63_efg_c;2;14;63;4;9;oC28;a,b/a,c/a,y1,x2,y3,z3,x4,y4;D2_{h};MnAl6;MnAl6");
@@ -465,7 +465,7 @@ namespace anrl {
     vproto.push_back("AB_tI8_109_a_a;2;4;109;4;4;tI8;a,c/a,z1,z2;-;NbAs;NbAs");
     vproto.push_back("A2BC8_tI176_110_2b_b_8b;3;88;110;5;35;tI176;a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11;-;Be[BH4]2;Be2");
     vproto.push_back("A2B_tP12_111_2n_adf;2;12;111;4;6;tP12;a,c/a,x4,z4,x5,z5;-;MnF2;MnF2");
-    vproto.push_back("AB_tP8_111_n_n;2;8;111;4;6;tP8;a,c/a,x1,z1,x2,z2;-;VN;VN"); //DX20180925 - prototype name should be VN not NV
+    vproto.push_back("AB_tP8_111_n_n;2;8;111;4;6;tP8;a,c/a,x1,z1,x2,z2;-;VN;VN"); //DX 20180925 - prototype name should be VN not NV
     vproto.push_back("AB4C_tP12_112_b_n_e;3;12;112;5;5;tP12;a,c/a,x3,y3,z3;-;alpha-CuAlCl4;alpha-CuAlCl4");
     vproto.push_back("A2BC7D2_tP24_113_e_a_cef_e;4;24;113;6;12;tP24;a,c/a,z2,x3,z3,x4,z4,x5,z5,x6,y6,z6;S5_{3};Ca2MgSi2O7;Akermanite");
     vproto.push_back("A3B_tP32_114_3e_e;2;32;114;4;14;tP32;a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;SeO3;SeO3");
@@ -473,13 +473,13 @@ namespace anrl {
     vproto.push_back("A2B3_tP5_115_g_ag;2;5;115;4;4;tP5;a,c/a,z2,z3;-;Rh3P2;Rh3P2");
     vproto.push_back("AB2_tP12_115_j_egi;2;12;115;4;7;tP12;a,c/a,z1,z2,x3,x4,z4;-;HgI2;HgI2");
     vproto.push_back("A2B3_tP20_116_bci_fj;2;20;116;4;7;tP20;a,c/a,x3,z4,x5,y5,z5;-;Ru2Sn3;Ru2Sn3");
-    vproto.push_back("A2B3_tP20_117_i_adgh;2;20;117;4;7;tP20;a,c/a,x3,x4,x5,y5,z5;D5_{12};beta-Bi2O3;beta-Bi2O3"); //DX20180925 - added Strukturbericht designation
+    vproto.push_back("A2B3_tP20_117_i_adgh;2;20;117;4;7;tP20;a,c/a,x3,x4,x5,y5,z5;D5_{12};beta-Bi2O3;beta-Bi2O3"); //DX 20180925 - added Strukturbericht designation
     vproto.push_back("A3B_tP16_118_ei_f;2;16;118;4;7;tP16;a,c/a,z1,x2,x3,y3,z3;-;RuIn3;RuIn3");
     vproto.push_back("A5B3_tP32_118_g2i_aceh;2;32;118;4;11;tP32;a,c/a,z3,x4,z5,x6,y6,z6,x7,y7,z7;-;Ir3Ga5;Ir3Ga5");
     vproto.push_back("A3B_tI24_119_b2i_af;2;12;119;4;7;tI24;a,c/a,z3,x4,z4,x5,z5;-;RbGa3;RbGa3");
     vproto.push_back("AB_tI4_119_c_a;2;2;119;4;2;tI4;a,c/a;-;GaSb;GaSb");
     vproto.push_back("A4BC2_tI28_120_i_d_e;3;14;120;5;6;tI28;a,c/a,x2,x3,y3,z3;-;KAu4Sn2;KAu4Sn2");
-    vproto.push_back("A4BC4D_tP10_123_gh_a_i_d;4;10;123;6;5;tP10;a,c/a,z3,z4,z5;-;CaRbFe4As4;CaRbFe4As4"); //DX20180925 - prototype name should be Ca not Cs
+    vproto.push_back("A4BC4D_tP10_123_gh_a_i_d;4;10;123;6;5;tP10;a,c/a,z3,z4,z5;-;CaRbFe4As4;CaRbFe4As4"); //DX 20180925 - prototype name should be Ca not Cs
     vproto.push_back("AB4C_tP12_124_a_m_c;3;12;124;5;4;tP12;a,c/a,x3,y3;-;Nb4CoSi;Nb4CoSi");
     vproto.push_back("AB4_tP10_124_a_m;2;10;124;4;4;tP10;a,c/a,x2,y2;-;NbTe4;NbTe4");
     vproto.push_back("A4B_tP10_125_m_a;2;10;125;4;4;tP10;a,c/a,x2,z2;-;PtPb4;PtPb4");
@@ -500,16 +500,16 @@ namespace anrl {
     vproto.push_back("A4BC4_tP18_137_g_b_g;3;18;137;5;6;tP18;a,c/a,y2,z2,y3,z3;-;CeCo4B4;CeCo4B4");
     vproto.push_back("AB2_tP6_137_a_d;2;6;137;4;3;tP6;a,c/a,z2;C13;HgI2;HgI2");
     vproto.push_back("A_tP12_138_bi;1;12;138;3;4;tP12;a,c/a,x2,z2;-;C;C");
-    vproto.push_back("AB_tI8_139_e_e;2;4;139;4;4;tI8;a,c/a,z1,z2;D3_{1};Hg2Cl2;Calomel");
+    vproto.push_back("AB_tI8_139_e_e;2;4;139;4;4;tI8;a,c/a,z1,z2;D3_{1}/-;Hg2Cl2/-;Calomel/-");
     vproto.push_back("A3B5_tI32_140_ah_bk;2;16;140;4;5;tI32;a,c/a,x3,x4,y4;D8_{m};W5Si3;W5Si3");
     vproto.push_back("A3B5_tI32_140_ah_cl;2;16;140;4;5;tI32;a,c/a,x3,x4,z4;D8_{l};Cr5B3;Cr5B3");
-    //DX20180619 - added info to label in part 1 vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2");
+    //DX 20180619 - added info to label in part 1 vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2");
     vproto.push_back("A_tI16_142_f;1;8;142;3;3;tI16;a,c/a,x1;-;S;S-III");
     vproto.push_back("A4B14C3_hP21_143_bd_ac4d_d;3;21;143;5;23;hP21;a,c/a,z1,z2,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9;-;Ta3Al4O13[OH];Simpsonite");
     vproto.push_back("A4B6C_hP11_143_bd_2d_a;3;11;143;5;13;hP11;a,c/a,z1,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5;-;ScRh6P4;ScRh6P4");
     vproto.push_back("AB2_hP12_143_cd_ab2d;2;12;143;4;14;hP12;a,c/a,z1,z2,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;MoS2;MoS2");
     vproto.push_back("A4B_hP15_144_4a_a;2;15;144;4;17;hP15;a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5;-;IrGe4;IrGe4");
-    vproto.push_back("AB_hP6_144_a_a;2;6;144;4;8;hP6;a,c/a,x1,y1,z1,x2,y2,z2;-;ZnTe;ZnTe"); //DX20180925 - prototype name should be ZnTe not TeZn
+    vproto.push_back("AB_hP6_144_a_a;2;6;144;4;8;hP6;a,c/a,x1,y1,z1,x2,y2,z2;-;ZnTe;ZnTe"); //DX 20180925 - prototype name should be ZnTe not TeZn
     vproto.push_back("A2B3C3DE7_hP48_145_2a_3a_3a_a_7a;5;48;145;7;50;hP48;a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15,x16,y16,z16;-;NaCa3[CO3]2F3[H2O];Sheldrickite");
     vproto.push_back("A3BC_hR5_146_b_a_a;3;5;146;5;7;hR5;a,c/a,x1,x2,x3,y3,z3;-;gamma-Ag3SI;gamma-Ag3SI");
     vproto.push_back("ABC3_hR10_146_2a_2a_2b;3;10;146;5;12;hR10;a,c/a,x1,x2,x3,x4,x5,y5,z5,x6,y6,z6;-;FePSe3;FePSe3");
@@ -520,14 +520,14 @@ namespace anrl {
     vproto.push_back("A_hP9_154_bc;1;9;154;3;6;hP9;a,c/a,x1,x2,y2,z2;-;S;S-II");
     vproto.push_back("AB2_hP9_156_b2c_3a2bc;2;9;156;4;11;hP9;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8,z9;-;CdI2;CdI2");
     vproto.push_back("AB_hP12_156_2ab3c_2ab3c;2;12;156;4;14;hP12;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12;-;CuI;CuI");
-    vproto.push_back("AB_hP4_156_ab_ab;2;4;156;4;6;hP4;a,c/a,z1,z2,z3,z4;-;beta-CuI;beta-CuI");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("AB_hP4_156_ac_ac;2;4;156;4;6;hP4;a,c/a,z1,z2,z3,z4;-;beta-CuI;beta-CuI");
+    vproto.push_back("AB_hP4_156_ab_ab;2;4;156;4;6;hP4;a,c/a,z1,z2,z3,z4;-;beta-CuI;beta-CuI");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("AB_hP4_156_ac_ac;2;4;156;4;6;hP4;a,c/a,z1,z2,z3,z4;-;beta-CuI;beta-CuI");
     vproto.push_back("A5B6C2_hP13_157_2ac_2c_b;3;13;157;5;11;hP13;a,c/a,z1,z2,z3,x4,z4,x5,z5,x6,z6;-;Ag5Pb2O6;Ag5Pb2O6");
     vproto.push_back("A3B_hP8_158_d_a;2;8;158;4;6;hP8;a,c/a,z1,x2,y2,z2;-;beta-RuCl3;beta-RuCl3");
     vproto.push_back("A2B3_hP20_159_bc_2c;2;20;159;4;12;hP20;a,c/a,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;Bi2O3;Bi2O3");
     vproto.push_back("A4B3_hP28_159_ab2c_2c;2;28;159;4;16;hP28;a,c/a,z1,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;alpha-Si3N4;Nierite");
     vproto.push_back("AB4C7D_hP26_159_b_ac_a2c_b;4;26;159;6;15;hP26;a,c/a,z1,z2,z3,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;YbBaCo4O7;YbBaCo4O7");
     vproto.push_back("A3B_hR4_160_b_a;2;4;160;4;5;hR4;a,c/a,x1,x2,z2;-;H3S;H3S");
-    vproto.push_back("A8B5_hR26_160_a3bc_a3b;2;26;160;4;19;hR26;a,c/a,x1,x2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8,x9,y9,z9;D8_{10};Cr5Al8;Cr5Al8"); //DX20180925 - prototype name should be Cr5Al8 not Al8Cr5
+    vproto.push_back("A8B5_hR26_160_a3bc_a3b;2;26;160;4;19;hR26;a,c/a,x1,x2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8,x9,y9,z9;D8_{10};Cr5Al8;Cr5Al8"); //DX 20180925 - prototype name should be Cr5Al8 not Al8Cr5
     vproto.push_back("ABC_hR3_160_a_a_a;3;3;160;5;5;hR3;a,c/a,x1,x2,x3;F0_{2};COS;Carbonyl Sulphide");
     vproto.push_back("AB_hR10_160_5a_5a;2;10;160;4;12;hR10;a,c/a,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10;B7;SiC;Moissanite-15R");
     vproto.push_back("A2B3_hP5_164_d_ad;2;5;164;4;4;hP5;a,c/a,z2,z3;D5_{2};La2O3;La2O3");
@@ -550,9 +550,9 @@ namespace anrl {
     vproto.push_back("ABC_hP12_174_cj_fk_aj;3;12;174;5;8;hP12;a,c/a,x4,y4,x5,y5,x6,y6;-;GdSI;GdSI");
     vproto.push_back("A8B7C6_hP21_175_ck_aj_k;3;21;175;5;8;hP21;a,c/a,x3,y3,x4,y4,x5,y5;-;Nb7Ru6B8;Nb7Ru6B8");
     vproto.push_back("ABC_hP36_175_jk_jk_jk;3;36;175;5;14;hP36;a,c/a,x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6;-;Mg[NH];Mg");
-    vproto.push_back("A3B2_hP10_176_h_bc;2;10;176;4;4;hP10;a,c/a,x3,y3;-;Er3Ru2;Er3Ru2");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3B2_hP10_176_h_bd;2;10;176;4;4;hP10;a,c/a,x3,y3;-;Er3Ru2;Er3Ru2");
-    vproto.push_back("A3B3C_hP14_176_h_h_c;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Fe3Te3Tl;Fe3Te3Tl");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3B3C_hP14_176_h_h_d;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Fe3Te3Tl;Fe3Te3Tl");
-    vproto.push_back("A3B_hP8_176_h_c;2;8;176;4;4;hP8;a,c/a,x2,y2;-;UCl3;UCl3");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3B_hP8_176_h_d;2;8;176;4;4;hP8;a,c/a,x2,y2;-;UCl3;UCl3");
+    vproto.push_back("A3B2_hP10_176_h_bc;2;10;176;4;4;hP10;a,c/a,x3,y3;-;Er3Ru2;Er3Ru2");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3B2_hP10_176_h_bd;2;10;176;4;4;hP10;a,c/a,x3,y3;-;Er3Ru2;Er3Ru2");
+    vproto.push_back("A3B3C_hP14_176_h_h_c;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Fe3Te3Tl;Fe3Te3Tl");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3B3C_hP14_176_h_h_d;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Fe3Te3Tl;Fe3Te3Tl");
+    vproto.push_back("A3B_hP8_176_h_c;2;8;176;4;4;hP8;a,c/a,x2,y2;-;UCl3;UCl3");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3B_hP8_176_h_d;2;8;176;4;4;hP8;a,c/a,x2,y2;-;UCl3;UCl3");
     vproto.push_back("A2B_hP36_177_j2lm_n;2;36;177;4;9;hP36;a,c/a,x1,x2,x3,x4,x5,y5,z5;-;SiO2;SiO2");
     vproto.push_back("AB3_hP24_178_b_ac;2;24;178;4;7;hP24;a,c/a,x1,x2,x3,y3,z3;-;AuF3;AuF3");
     vproto.push_back("A_hP6_178_a;1;6;178;3;3;hP6;a,c/a,x1;-;Sc;Sc-V");
@@ -567,8 +567,8 @@ namespace anrl {
     vproto.push_back("AB3_hP24_185_c_ab2c;2;24;185;4;10;hP24;a,c/a,z1,z2,x3,z3,x4,z4,x5,z5;-;Na3As;Na3As");
     vproto.push_back("A3B7_hP20_186_c_b2c;2;20;186;4;9;hP20;a,c/a,z1,x2,z2,x3,z3,x4,z4;D10_{2};Fe3Th7;Fe3Th7");
     vproto.push_back("AB3_hP4_187_e_fh;2;4;187;4;3;hP4;a,c/a,z3;-;Re3N;Re3N");
-    vproto.push_back("A3BC_hP10_188_k_c_a;3;10;188;5;4;hP10;a,c/a,x3,y3;-;LiScI3;LiScI3");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3BC_hP10_188_k_a_e;3;10;188;5;4;hP10;a,c/a,x3,y3;-;LiScI3;LiScI3");
-    vproto.push_back("AB9C4_hP28_188_e_kl_ak;3;28;188;5;9;hP28;a,c/a,x3,y3,x4,y4,x5,y5,z5;S3_{2};BaSi4O9;BaSi4O9"); //DX20180925 - added Strukturbericht
+    vproto.push_back("A3BC_hP10_188_k_c_a;3;10;188;5;4;hP10;a,c/a,x3,y3;-;LiScI3;LiScI3");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("A3BC_hP10_188_k_a_e;3;10;188;5;4;hP10;a,c/a,x3,y3;-;LiScI3;LiScI3");
+    vproto.push_back("AB9C4_hP28_188_e_kl_ak;3;28;188;5;9;hP28;a,c/a,x3,y3,x4,y4,x5,y5,z5;S3_{2};BaSi4O9;BaSi4O9"); //DX 20180925 - added Strukturbericht
     vproto.push_back("A8BC3D6_hP18_189_bfh_a_g_i;4;18;189;6;7;hP18;a,c/a,x3,x4,z5,x6,z6;E9_{b};pi-FeMg3Al8Si6;pi-FeMg3Al8Si6");
     vproto.push_back("A9BC3D5_hP18_189_fi_a_g_bh;4;18;189;6;7;hP18;a,c/a,x3,x4,z5,x6,z6;-;pi-FeMg3Al9Si5;pi-FeMg3Al9Si5");
     vproto.push_back("A2B_hP18_190_gh_bf;2;18;190;4;6;hP18;a,c/a,z2,x3,x4,y4;-;Li2Sb;Li2Sb");
@@ -576,21 +576,21 @@ namespace anrl {
     vproto.push_back("AB_hP24_190_i_afh;2;24;190;4;8;hP24;a,c/a,z2,x3,y3,x4,y4,z4;-;FeS;Troilite");
     vproto.push_back("A2B3C18D6_hP58_192_c_f_lm_l;4;58;192;6;9;hP58;a,c/a,x3,y3,x4,y4,x5,y5,z5;G3_{1};Be3Al2Si6O18;Beryl");
     vproto.push_back("AB2_hP72_192_m_j2kl;2;72;192;4;10;hP72;a,c/a,x1,x2,x3,x4,y4,x5,y5,z5;-;AlPO4;AlPO4");
-    vproto.push_back("A5B3_hP16_193_dg_g;2;16;193;4;4;hP16;a,c/a,x2,x3;D8_{8};Mn5Si3;Mavlyanovite"); //DX20180925 - added Strukturbericht
+    vproto.push_back("A5B3_hP16_193_dg_g;2;16;193;4;4;hP16;a,c/a,x2,x3;D8_{8};Mn5Si3;Mavlyanovite"); //DX 20180925 - added Strukturbericht
     vproto.push_back("A3B_hP16_194_gh_ac;2;16;194;4;3;hP16;a,c/a,x4;D0_{24};Ni3Ti;Ni3Ti");
     vproto.push_back("A5B2_hP28_194_ahk_ch;2;28;194;4;6;hP28;a,c/a,x3,x4,x5,z5;D8_{11};Co2Al5;Co2Al5");
     vproto.push_back("A9B3C_hP26_194_hk_h_a;3;26;194;5;6;hP26;a,c/a,x2,x3,x4,z4;E9_{c};Al9Mn3Si;Al9Mn3Si");
     vproto.push_back("A12BC4_cP34_195_2j_ab_2e;3;34;195;5;9;cP34;a,x3,x4,x5,y5,z5,x6,y6,z6;-;PrRu4P12;PrRu4P12");
     vproto.push_back("A12B2C_cF60_196_h_bc_a;3;15;196;5;4;cF60;a,x4,y4,z4;-;Cu2Fe[CN]6;Cu2Fe6");
-    //DX20180925 - wrong space group, should be 210: vproto.push_back("A12B36CD12_cF488_196_2h_6h_ac_fgh;4;122;196;6;30;cF488;a,x3,x4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13;-;MgB12H12[H2O]12;MgB12H1212");
+    //DX 20180925 - wrong space group, should be 210: vproto.push_back("A12B36CD12_cF488_196_2h_6h_ac_fgh;4;122;196;6;30;cF488;a,x3,x4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13;-;MgB12H12[H2O]12;MgB12H1212");
     vproto.push_back("ABC3_cP20_198_a_a_b;3;20;198;5;6;cP20;a,x1,x2,x3,y3,z3;G3;NaClO3;Sodium Chlorate");
     vproto.push_back("A2B11_cP39_200_f_aghij;2;39;200;4;7;cP39;a,x2,x3,x4,x5,y6,z6;D8_{c};Mg2Zn11;Mg2Zn11");
-    vproto.push_back("AB3C_cP60_201_be_fh_g;3;60;201;5;7;cP60;a,x2,x3,x4,x5,y5,z5;-;KSbO3;KSbO3");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("AB3C_cP60_201_ce_fh_g;3;60;201;5;7;cP60;a,x2,x3,x4,x5,y5,z5;-;KSbO3;KSbO3");
+    vproto.push_back("AB3C_cP60_201_be_fh_g;3;60;201;5;7;cP60;a,x2,x3,x4,x5,y5,z5;-;KSbO3;KSbO3");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("AB3C_cP60_201_ce_fh_g;3;60;201;5;7;cP60;a,x2,x3,x4,x5,y5,z5;-;KSbO3;KSbO3");
     vproto.push_back("A6B6C_cF104_202_h_h_c;3;26;202;5;5;cF104;a,y2,z2,y3,z3;-;KB6H6;KB6H6");
     vproto.push_back("A_cF240_202_h2i;1;60;202;3;9;cF240;a,y1,z1,x2,y2,z2,x3,y3,z3;-;C;FCC C60 Buckminsterfullerine");
     vproto.push_back("A2BCD3E6_cF208_203_e_c_d_f_g;5;52;203;7;6;cF208;a,x3,x4,x5,y5,z5;-;Na3Co(CO3)2Cl;Pyrochlore");
     vproto.push_back("A4B2C6D16E_cF232_203_e_d_f_eg_a;5;58;203;7;7;cF232;a,x3,x4,x5,x6,y6,z6;-;Na6Mg2(SO4)(CO3)4;Tychite");
-    vproto.push_back("AB3C16_cF160_203_a_bc_eg;3;40;203;5;5;cF160;a,x4,x5,y5,z5;-;Rb3AsSe16;Rb3AsSe16");//DX20180925 - shifted Wyckoff positions, orig: vproto.push_back("AB3C16_cF160_203_b_ad_eg;3;40;203;5;5;cF160;a,x4,x5,y5,z5;-;Rb3AsSe16;Rb3AsSe16");
+    vproto.push_back("AB3C16_cF160_203_a_bc_eg;3;40;203;5;5;cF160;a,x4,x5,y5,z5;-;Rb3AsSe16;Rb3AsSe16");//DX 20180925 - shifted Wyckoff positions, orig: vproto.push_back("AB3C16_cF160_203_b_ad_eg;3;40;203;5;5;cF160;a,x4,x5,y5,z5;-;Rb3AsSe16;Rb3AsSe16");
     vproto.push_back("A2B3C6_cP264_205_2d_ab2c2d_6d;3;264;205;5;33;cP264;a,x3,x4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14;-;Ca3Al2O6;Ca3Al2O6");
     vproto.push_back("A_cP240_205_10d;1;240;205;3;31;cP240;a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10;-;C;Simple Cubic C60 Buckminsterfullerine");
     vproto.push_back("AB3C2_cI96_206_c_e_ad;3;48;206;5;6;cI96;a,x2,x3,x4,y4,z4;E9_{d};AlLi3N2;AlLi3N2");
@@ -598,15 +598,15 @@ namespace anrl {
     vproto.push_back("A3B_cP16_208_j_b;2;16;208;4;2;cP16;a,x2;-;PH3;PH3");
     vproto.push_back("A6B2CD6E_cP64_208_m_ad_b_m_c;5;64;208;7;7;cP64;a,x5,y5,z5,x6,y6,z6;-;Cs2ZnFe[CN]6;Cs2ZnFe6");
     vproto.push_back("A24BC_cF104_209_j_a_b;3;26;209;5;4;cF104;a,x3,y3,z3;-;F6KP;F6KP");
-    vproto.push_back("A12B36CD12_cF488_210_h_3h_a_fg;4;122;210;6;15;cF488;a,x2,y3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;MgB12H12[H2O]12;MgB12H1212"); //DX20180925 - moved this structure from SG196 to SG210
+    vproto.push_back("A12B36CD12_cF488_210_h_3h_a_fg;4;122;210;6;15;cF488;a,x2,y3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;MgB12H12[H2O]12;MgB12H1212"); //DX 20180925 - moved this structure from SG196 to SG210
     vproto.push_back("A12B6C_cF608_210_4h_2h_e;3;152;210;5;20;cF608;a,x1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;Te[OH]6;Te6");
     vproto.push_back("A2B_cI72_211_hi_i;2;36;211;4;4;cI72;a,y1,y2,y3;-;SiO2;SiO2");
     vproto.push_back("A2B_cP12_212_c_a;2;12;212;4;2;cP12;a,x2;-;SrSi2;SrSi2");
     vproto.push_back("A3B3C_cI56_214_g_h_a;3;28;214;5;3;cI56;a,y2,y3;-;Ca3PI3;Ca3PI3");
     vproto.push_back("A3BC2_cI48_214_f_a_e;3;24;214;5;3;cI48;a,x2,x3;-;Ag3AuTe2;Petzite");
     vproto.push_back("A4B9_cP52_215_ei_3efgi;2;52;215;4;11;cP52;a,x1,x2,x3,x4,x5,x6,x7,z7,x8,z8;D8_{3};gamma-Cu9Al4;gamma-brass");
-    vproto.push_back("ABCD_cF16_216_c_d_b_a;4;4;216;6;1;cF16;a;-;LiMgAuSn;Quaternary Heusler"); //DX20180925 - fixed typo in "Quaternary"
-    vproto.push_back("A3B4C_cP16_218_c_e_a;3;16;218;5;2;cP16;a,x3;H2_{1};Ag3[PO4];Ag3"); //DX20180925 - added Strukturbericht
+    vproto.push_back("ABCD_cF16_216_c_d_b_a;4;4;216;6;1;cF16;a;-;LiMgAuSn;Quaternary Heusler"); //DX 20180925 - fixed typo in "Quaternary"
+    vproto.push_back("A3B4C_cP16_218_c_e_a;3;16;218;5;2;cP16;a,x3;H2_{1};Ag3[PO4];Ag3"); //DX 20180925 - added Strukturbericht
     vproto.push_back("A7BC3D13_cF192_219_de_b_c_ah;4;48;219;6;5;cF192;a,x5,x6,y6,z6;-;Mg3B7ClO13;Boracite");
     vproto.push_back("A15B4_cI76_220_ae_c;2;38;220;4;5;cI76;a,x2,x3,y3,z3;D8_{6};Cu15Si4;Cu15Si4");
     vproto.push_back("A4B3_cI28_220_c_a;2;14;220;4;2;cI28;a,x2;D7_{3};Th3P4;Th3P4");
@@ -623,7 +623,7 @@ namespace anrl {
     vproto.push_back("A4B_cI10_229_c_a;2;5;229;4;1;cI10;a;-;beta-Hg4Pt;beta-Hg4Pt");
     vproto.push_back("A7B3_cI40_229_df_e;2;20;229;4;3;cI40;a,x2,x3;D8_{f};Ir3Ge7;Ir3Ge7");
     vproto.push_back("A2B3C12D3_cI160_230_a_c_h_d;4;80;230;6;4;cI160;a,x4,y4,z4;S1_{4};Co3Al2Si3O12;Garnet");
-    //DX20181130 - add Ohad's SQS structures - START
+    //DX 20181130 - add Ohad's SQS structures - START
     // -------------------------------------------------------------------------
     // SQS (from O. Levy)
     // -------------------------------------------------------------------------
@@ -634,10 +634,71 @@ namespace anrl {
     vproto.push_back("A3B13_oC32_38_ac_a2bcdef;2;16;38;4;18;oC32;a,b/a,c/a,z1,z2,z3,z4,x5,z5,x6,z6,y7,z7,y8,z8,x9,y9,z9;-;Ta3Ti13;Ta3Ti13");
     vproto.push_back("A3B5_oC32_38_abce_abcdf;2;16;38;4;18;oC32;a,b/a,c/a,z1,z2,z3,z4,x5,z5,x6,z6,y7,z7,y8,z8,x9,y9,z9;-;Ta3Ti5;Ta3Ti5");
     vproto.push_back("AB7_hR16_166_c_c2h;2;16;166;4;8;hR16;a,c/a,x1,x2,x3,z3,x4,z4;-;TaTi7;TaTi7");
-    //DX20181130 - add Ohad's SQS structures - END
-    //DX20181211 - add Corey's kesterite structure - START
+    //DX 20181130 - add Ohad's SQS structures - END
+    //DX 20181211 - add Corey's kesterite structure - START
     vproto.push_back("A2BCD4_tI16_82_ac_b_d_g;4;8;82;6;5;tI16;a,c/a,x5,y5,z5;-;Cu2(Zn,Fe)SnS4;Kesterite");
-    //DX20181211 - add Corey's kesterite structure - END
+    //DX 20181211 - add Corey's kesterite structure - END
+    // -------------------------------------------------------------------------
+    // misc prototypes (from Y. Lederer) //DX 20200203
+    // -------------------------------------------------------------------------
+    vproto.push_back("AB3_mC8_12_a_di;2;4;12;4;6;mC8;a,b/a,c/a,beta,x3,z3;-;-;-");
+    vproto.push_back("AB_mC8_12_i_i;2;4;12;4;8;mC8;a,b/a,c/a,beta,x1,z1,x2,z2;-;-;-");
+    vproto.push_back("AB3C4_mC16_12_a_di_2i;3;8;12;5;10;mC16;a,b/a,c/a,beta,x3,z3,x4,z4,x5,z5;-;-;-");
+    vproto.push_back("ABC2_mC16_12_i_i_adi;3;8;12;5;10;mC16;a,b/a,c/a,beta,x3,z3,x4,z4,x5,z5;-;-;-");
+    vproto.push_back("AB3_oP4_47_a_ct;2;4;47;4;4;oP4;a,b/a,c/a,z3;-;-;-");
+    vproto.push_back("A3B_oP4_47_cr_a;2;4;47;4;4;oP4;a,b/a,c/a,z3;-;-;-");
+    vproto.push_back("AB3C4_oP8_47_a_ct_egs;3;8;47;5;5;oP8;a,b/a,c/a,z5,z6;-;-;-");
+    vproto.push_back("A3BC4_oP8_47_eq_g_bdt;3;8;47;5;5;oP8;a,b/a,c/a,z5,z6;-;-;-");
+    vproto.push_back("AB_oP4_51_e_e;2;4;51;4;5;oP4;a,b/a,c/a,z1,z2;-;-;-");
+    vproto.push_back("ABC2_oP8_51_e_e_2f;3;8;51;5;7;oP8;a,b/a,c/a,z1,z2,z3,z4;-;-;-");
+    vproto.push_back("AB_oP4_59_a_a;2;4;59;4;5;oP4;a,b/a,c/a,z1,z2;-;-;-");
+    vproto.push_back("ABC2_oP8_59_a_a_2b;3;8;59;5;7;oP8;a,b/a,c/a,z1,z2,z3,z4;-;-;-");
+    vproto.push_back("ABC2_oC16_63_c_c_g;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,x3,y3;-;-;-");
+    vproto.push_back("AB2C3_oC12_65_a_i_cj;3;6;65;5;5;oC12;a,b/a,c/a,y3,y4;-;-;-");
+    vproto.push_back("A3BC4_oC16_65_ai_b_q;3;8;65;5;6;oC16;a,b/a,c/a,y3,x4,y4;-;-;-");
+    vproto.push_back("A3BC4_oC16_65_bj_a_eh;3;8;65;5;5;oC16;a,b/a,c/a,x4,y5;-;-;-");
+    vproto.push_back("AB3C4_oC16_65_a_bf_hi;3;8;65;5;5;oC16;a,b/a,c/a,x4,y5;-;-;-");
+    vproto.push_back("AB2_oC6_65_a_i;2;3;65;4;4;oC6;a,b/a,c/a,y2;-;-2;-2");
+    vproto.push_back("A3B_oC8_65_ai_b;2;4;65;4;4;oC8;a,b/a,c/a,y3;-;-;-");
+    vproto.push_back("A3B_oC8_65_bj_a;2;4;65;4;4;oC8;a,b/a,c/a,y3;-;-;-");
+    vproto.push_back("AB_oC8_65_i_i;2;4;65;4;5;oC8;a,b/a,c/a,y1,y2;-;-;-");
+    vproto.push_back("ABC2_oC16_65_i_i_fh;3;8;65;5;6;oC16;a,b/a,c/a,x2,y3,y4;-;-;-");
+    vproto.push_back("AB2C3_oI12_71_a_e_df;3;6;71;5;5;oI12;a,b/a,c/a,x3,x4;-;-;-");
+    vproto.push_back("AB_tP2_123_a_b;2;2;123;4;2;tP2;a,c/a;-;-;-");
+    vproto.push_back("AB_tP2_123_a_c;2;2;123;4;2;tP2;a,c/a;-;-;-");
+    vproto.push_back("A2B_tP3_123_g_a;2;3;123;4;3;tP3;a,c/a,z2;-;-;-");
+    vproto.push_back("A3B_tP4_123_abc_d;2;4;123;4;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("A3B_tP4_123_ag_b;2;4;123;4;3;tP4;a,c/a,z3;-;-;-");
+    vproto.push_back("A3B_tP4_123_cf_a;2;4;123;4;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("AB3_tP4_123_a_bh;2;4;123;4;3;tP4;a,c/a,z3;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_b_h;3;4;123;5;3;tP4;a,c/a,z3;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_c_e;3;4;123;5;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_d_bc;3;4;123;5;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("AB_tP4_123_g_g;2;4;123;4;4;tP4;a,c/a,z1,z2;-;-;-");
+    vproto.push_back("A2BC3_tP6_123_g_b_ch;3;6;123;5;4;tP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A3BC4_tP8_123_abc_d_i;3;8;123;5;3;tP8;a,c/a,z5;-;-;-");
+    vproto.push_back("A3BC4_tP8_123_ag_b_2h;3;8;123;5;5;tP8;a,c/a,z3,z4,z5;-;-;-");
+    vproto.push_back("A3BC4_tP8_123_cf_a_k;3;8;123;5;3;tP8;a,c/a,x4;-;-;-");
+    vproto.push_back("AB3C4_tP8_123_a_bh_cdg;3;8;123;5;4;tP8;a,c/a,z5,z6;-;-;-");
+    vproto.push_back("ABC2_tP8_123_h_h_abg;3;8;123;5;5;tP8;a,c/a,z3,z4,z5;-;-;-");
+    vproto.push_back("ABC2_tP8_129_c_c_2c;3;8;129;5;6;tP8;a,c/a,z1,z2,z3,z4;-;-;-");
+    vproto.push_back("A3B_tI8_139_ae_b;2;4;139;4;3;tI8;a,c/a,z3;-;-;-");
+    vproto.push_back("AB3_tI8_139_a_bd;2;4;139;4;2;tI8;a,c/a;-;-;-");
+    vproto.push_back("AB2C3_tI12_139_a_e_be;3;6;139;5;4;tI12;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A3BC4_tI16_139_ae_b_g;3;8;139;5;4;tI16;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("AB3C4_tI16_139_a_bd_ce;3;8;139;5;3;tI16;a,c/a,z5;-;-;-");
+    vproto.push_back("ABC2_tI16_139_e_e_cd;3;8;139;5;4;tI16;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("ABC2_tI16_141_a_b_e;3;8;141;5;3;tI16;a,c/a,z3;-;-;-");
+    vproto.push_back("A2B_hP3_164_d_a;2;3;164;4;3;hP3;a,c/a,z2;-;-;-");
+    vproto.push_back("A2BC3_hP6_164_d_a_bd;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A2BC3_hP6_164_d_b_ad;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A3B_hR4_166_bc_a;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
+    vproto.push_back("AB3_hR4_166_a_bc;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
+    vproto.push_back("AB_hR4_166_c_c;2;4;166;4;4;hR4;a,c/a,x1,x2;-;-;-");
+    vproto.push_back("A3BC4_hR8_166_bc_a_2c;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
+    vproto.push_back("AB3C4_hR8_166_a_bc_2c;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
+    vproto.push_back("ABC2_hR8_166_c_c_abc;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
+    vproto.push_back("AB3C4_cP8_221_a_c_bd;3;8;221;5;1;cP8;a;-;-;-");
     // done now produce
 
     // FROM PROTO LIST
@@ -971,6 +1032,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_oC8_63_c_c"){
         vparameters.push_back("2.9782,2.64253575985,0.985360284736,0.436,0.14525");
+        vparameters.push_back("1.0.0185797325,1.41421356236,0.707106781182,0.625,0.125"); // Lederer-13
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_oC4_63_c"){
@@ -1117,6 +1179,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tP4_129_c_c"){
         vparameters.push_back("3.107,1.90505310589,0.1,0.65");
+        vparameters.push_back("1.0,2.82842712472,0.875,0.375"); // Lederer-42
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tP4_131_c_e"){
@@ -1168,8 +1231,8 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_tI2_139_a"){
-        //DX20191218 [this is the a' parameter (fct) vs the a parameter (bct)] vparameters.push_back("4.6002,1.07523585931");
-        vparameters.push_back("3.25283,1.52061313499"); //DX20191218 [CORRECT PARAMETERS]
+        //DX 20191218 [this is the a' parameter (fct) vs the a parameter (bct)] vparameters.push_back("4.6002,1.07523585931");
+        vparameters.push_back("3.25283,1.52061313499"); //DX 20191218 [CORRECT PARAMETERS]
         vparameters.push_back("3.932,0.823499491353");
       }
       // ---------------------------------------------------------------------------
@@ -1179,10 +1242,12 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B_tI8_139_bd_a"){
         vparameters.push_back("3.8537,2.22744375535");
+        vparameters.push_back("1.0,2.0"); // Lederer-46
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2_tI6_139_a_e"){
         vparameters.push_back("3.2064,2.44754241517,0.3353");
+        vparameters.push_back("1.0,4.24264068707,0.3333333333"); // Lederer-44
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A4B5_tI18_139_i_ah"){
@@ -1239,6 +1304,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tI8_141_a_b"){
         vparameters.push_back("3.325,3.42255639098");
+        vparameters.push_back("1.0,1.99999999997"); // Lederer-53
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B3_tI80_141_ceh_3h"){
@@ -1366,6 +1432,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_hR4_166_a_b_c"){
         vparameters.push_back("3.5561,5.44557239673,0.2667");
+        vparameters.push_back("1.0,4.89897948553,0.25"); //Lederer-59
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_hR105_166_bc9h4i"){
@@ -2382,7 +2449,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tI8_109_a_a"){
-        vparameters.push_back("3.4517145504,3.38383984705,0.416,0.0"); //DX20181220 - changed from "0.5416,0.5" to "0.416,0.0"
+        vparameters.push_back("3.4517145504,3.38383984705,0.416,0.0"); //DX 20181220 - changed from "0.5416,0.5" to "0.416,0.0"
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC8_tI176_110_2b_b_8b"){
@@ -2535,6 +2602,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tI8_139_e_e"){
         vparameters.push_back("4.4795,2.43451278044,0.3356,0.119");
+        vparameters.push_back("1.0,2.82842712475,0.125,0.625"); // Lederer-47
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B5_tI32_140_ah_bk"){
@@ -3059,15 +3127,247 @@ namespace anrl {
       if(anrl_label=="A2BCD4_tI16_82_ac_b_d_g"){
         vparameters.push_back("5.427,2.00313248572,0.7434,0.256,0.6278");
       }
+      // misc structures (Y. Lederer)
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_mC8_12_a_di"){
+        vparameters.push_back("1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_mC8_12_i_i"){
+        vparameters.push_back("1.0,0.301511344581,0.522232967872,100.024987862,0.625,0.875,0.875,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_mC16_12_a_di_2i"){
+        vparameters.push_back("1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25,0.125,0.375,0.625,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_mC16_12_i_i_adi"){
+        vparameters.push_back("1.0,0.301511344581,0.522232967872,100.024987862,0.625,0.875,0.875,0.625,0.75,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_oP4_47_a_ct"){
+        vparameters.push_back("1.0,1.41421356239,2.0,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_oP4_47_cr_a"){
+        vparameters.push_back("1.0,1.41421356238,2.82842712476,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_oP8_47_a_ct_egs"){
+        vparameters.push_back("1.0,1.41421356239,2.0,0.25,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_oP8_47_eq_g_bdt"){
+        vparameters.push_back("1.0,1.41421356238,2.82842712476,0.75,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oP4_51_e_e"){
+        vparameters.push_back("1.0,0.707106781182,2.0,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oP8_51_e_e_2f"){
+        vparameters.push_back("1.0,0.707106781182,2.0,0.125,0.625,0.375,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oP4_59_a_a"){
+        vparameters.push_back("1.0,1.41421356238,2.0,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oP8_59_a_a_2b"){
+        vparameters.push_back("1.0,1.41421356238,2.0,0.875,0.375,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_63_c_c_g"){
+        vparameters.push_back("1.0,1.41421356236,0.707106781182,0.625,0.125,0.25,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C3_oC12_65_a_i_cj"){
+        vparameters.push_back("1.0,2.99999999998,0.707106781176,0.3333333333,0.8333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_oC16_65_ai_b_q"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.75,0.75,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_oC16_65_bj_a_eh"){
+        vparameters.push_back("1.0,1.41421356236,0.707106781182,0.75,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_oC16_65_a_bf_hi"){
+        vparameters.push_back("1.0,1.41421356239,0.5,0.75,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_oC6_65_a_i"){
+        vparameters.push_back("1.0,2.99999999998,0.707106781176,0.3333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_oC8_65_ai_b"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_oC8_65_bj_a"){
+        vparameters.push_back("1.0,1.41421356236,0.707106781182,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oC8_65_i_i"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_65_i_i_fh"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.75,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C3_oI12_71_a_e_df"){
+        vparameters.push_back("1.0,0.471404520797,0.333333333338,0.6666666667,0.6666666667");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP2_123_a_b"){
+        vparameters.push_back("1.0,2.00000000002");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP2_123_a_c"){
+        vparameters.push_back("1.0,0.707106781182");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_tP3_123_g_a"){
+        vparameters.push_back("1.0,3.00000000002,0.6666666667");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_abc_d"){
+        vparameters.push_back("1.0,1.41421356238");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_ag_b"){
+        vparameters.push_back("1.0,4.00000000002,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_cf_a"){
+        vparameters.push_back("1.0,0.499999999994");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_tP4_123_a_bh"){
+        vparameters.push_back("1.0,2.82842712477,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP4_123_a_b_h"){
+        vparameters.push_back("1.0,2.00000000002,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP4_123_a_c_e"){
+        vparameters.push_back("1.0,0.707106781182");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP4_123_a_d_bc"){
+        vparameters.push_back("1.0,1.41421356238");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP4_123_g_g"){
+        vparameters.push_back("1.0,4.00000000002,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_tP6_123_g_b_ch"){
+        vparameters.push_back("1.0,3.00000000002,0.1666666667,0.6666666667");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tP8_123_abc_d_i"){
+        vparameters.push_back("1.0,1.41421356238,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tP8_123_ag_b_2h"){
+        vparameters.push_back("1.0,4.00000000002,0.25,0.625,0.125");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tP8_123_cf_a_k"){
+        vparameters.push_back("1.0,0.499999999994,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_tP8_123_a_bh_cdg"){
+        vparameters.push_back("1.0,2.82842712477,0.25,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP8_123_h_h_abg"){
+        vparameters.push_back("1.0,4.00000000002,0.25,0.625,0.125");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP8_129_c_c_2c"){
+        vparameters.push_back("1.0,2.82842712472,0.875,0.375,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tI8_139_ae_b"){
+        vparameters.push_back("1.0,2.82842712475,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C3_tI12_139_a_e_be"){
+        vparameters.push_back("1.0,4.24264068707,0.3333333333,0.8333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tI16_139_ae_b_g"){
+        vparameters.push_back("1.0,2.82842712475,0.25,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_tI16_139_a_bd_ce"){
+        vparameters.push_back("1.0,2.0,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tI16_139_e_e_cd"){
+        vparameters.push_back("1.0,2.82842712475,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tI16_141_a_b_e"){
+        vparameters.push_back("1.0,1.99999999997,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_hP3_164_d_a"){
+        vparameters.push_back("1.0,2.44948974278,0.3333333333");
+        vparameters.push_back("1.0,1.22474487139,0.3333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_hP6_164_d_a_bd"){
+        vparameters.push_back("1.0,2.44948974278,0.3333333333,0.8333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_hP6_164_d_b_ad"){
+        vparameters.push_back("1.0,1.22474487139,0.8333333333,0.3333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_hR4_166_bc_a"){
+        vparameters.push_back("1.0,4.89897948557,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_hR4_166_a_bc"){
+        vparameters.push_back("1.0,9.79795897119,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hR4_166_c_c"){
+        vparameters.push_back("1.0,9.79795897107,0.625,0.125");
+        vparameters.push_back("1.0,4.89897948557,0.375,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_hR8_166_bc_a_2c"){
+        vparameters.push_back("1.0,4.89897948557,0.25,0.625,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_hR8_166_a_bc_2c"){
+        vparameters.push_back("1.0,9.79795897119,0.75,0.375,0.125");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_hR8_166_c_c_abc"){
+        vparameters.push_back("1.0,9.79795897107,0.625,0.125,0.75");
+        vparameters.push_back("1.0,4.89897948557,0.375,0.875,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_cP8_221_a_c_bd"){
+        vparameters.push_back("1.0");
+      }
     }
     if(library=="" && !keep_original_lattice_parameter){
-      //DX20190314 - loop over parameters - START
+      //DX 20190314 - loop over parameters - START
       for(uint p=0;p<vparameters.size();p++){
         aurostd::string2tokens(vparameters[p],tokens,",");
         tokens[0]="-1";
         vparameters[p]=aurostd::joinWDelimiter(tokens,",");
       }
-      //DX20190314 - loop over parameters - END
+      //DX 20190314 - loop over parameters - END
     }
     if(library != "all"){
       if(library=="" && choice!=-1){
@@ -3078,7 +3378,7 @@ namespace anrl {
         }
         else{
           message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX20191118 - exit to throw
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
@@ -3086,15 +3386,15 @@ namespace anrl {
         for(uint i=0;i<vparameters.size();i++){
           message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
         }   
-        message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX20190826 - changed "./aflow" to "aflow"
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_); //DX20191118 - exit to throw
+        message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }
     }
     return vparameters;  
   }
 }
 
-#endif // _AFLOW_ANRL_LIST_CPP
+#endif // AFLOW_REMOVE_GREP // _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
 
 // ***************************************************************************
 // *                                                                         *

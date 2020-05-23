@@ -4470,6 +4470,24 @@ void wa(_atom& a,xstructure &str);
 xstructure WyckoffPOSITIONS(uint spacegroup, xstructure strin);
 xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 
+
+// ----------------------------------------------------------------------------
+// aflow_makefile.cpp
+
+namespace makefile {
+  void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles);
+  void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles,bool& mt_required);
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<string>& vdefinitions);
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const string& definitions,vector<string>& vdefinitions);
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const vector<string>& vdefinitions,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  void updateDependenciesAUROSTD(vector<string>& vdependencies);
+  void updateDependenciesVariable(const vector<string>& vdeps_var,const string& var,vector<string>& vdeps_replace);
+  void createMakefileAFLOW(const string& directory=".");
+}
+
 // ----------------------------------------------------------------------------
 // aflow_apennsy stuff
 #include "aflow_apennsy.h"
