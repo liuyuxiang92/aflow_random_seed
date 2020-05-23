@@ -147,10 +147,10 @@ MFS=Makefile Makefile.aflow
 #CO20200508 - all MUST come first
 #CO20200508 - .PHONY rules do NOT get 'Makefile' as dependence
 .PHONY: all
-all: aflow aflow_data 
+all: aflow_data aflow 
 	$(MAKE) check
 include Makefile.aflow
-aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS) 
+aflow: $(SQLITE_OBJ) $(AFLOW_OBJS) $(MFS) 
 #	$(MAKE) -C ../AFLOW2_FREE/EXTRA/APL2AGR/ && cd ../../
 #	cp -f aflow_apl*.o  aflow_aapl*.o  aflow_qha*.o ./APL/
 #	cp -f aflow_anrl*.o ./ANRL/
@@ -206,7 +206,21 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
-
+#ANRL
+aflow_anrl.o: aflow_anrl.cpp SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_symmetry_spacegroup.h aflow_xelement.h aflowlib.h
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+aflow_anrl_data.o: aflow_anrl_data.cpp SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+aflow_anrl_list.o: aflow_anrl_list.cpp SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+aflow_anrl_data.cpp:
+	rm -f aflow_anrl_data.cpp
+	echo "#ifndef _AFLOW_ANRL_DATA_CPP" > aflow_anrl_data.cpp
+	echo "#define _AFLOW_ANRL_DATA_CPP" >> aflow_anrl_data.cpp
+	echo "#include \"aflow.h\"" >> aflow_anrl_data.cpp
+	cat ANRL/aflow_anrl_A*.cpp | grep -v "AFLOW_REMOVE_GREP" >> aflow_anrl_data.cpp
+	cat ANRL/aflow_anrl_sigma*.cpp  | grep -v "AFLOW_REMOVE_GREP" >> aflow_anrl_data.cpp 
+	echo "#endif" >> aflow_anrl_data.cpp
 ###################################################################################################
 .PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
@@ -948,7 +962,7 @@ dataclean:
 	rm -f aflow_data aflow_data_*
 .PHONY: clean_autogen
 clean_autogen:
-	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp aflow_anrl_data.cpp *.dat
 ###################################################################################################
 
 ###################################################################################################
