@@ -296,6 +296,7 @@ namespace makefile {
     if(LDEBUG){cerr << soliloquy << " vdeps(post)=" << aurostd::joinWDelimiter(vdeps,",") << endl;}
   }
   void updateDependenciesVariable(const vector<string>& vdeps_var,const string& var,vector<string>& vdeps_replace){
+    //ASSUMES vdeps_replace[0] IS $<
     bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
     string soliloquy="makefile::updateDependenciesVariable():";
     if(LDEBUG){cerr << soliloquy << " vdeps_replace(pre )=" << aurostd::joinWDelimiter(vdeps_replace,",") << endl;}
@@ -311,10 +312,13 @@ namespace makefile {
     if(!found_all){return;}
     if(LDEBUG){cerr << soliloquy << " found ALL $(" << var << ") in vdeps_replace" << endl;}
     for(i=vdeps_replace.size()-1;i<vdeps_replace.size();i--){  //go backwards so you can erase
-      if(aurostd::WithinList(vdeps_var,vdeps_replace[i])){
-        if(LDEBUG){cerr << soliloquy << " found " << var << " dependency:" << vdeps_replace[i] << endl;}
-        vdeps_replace.erase(vdeps_replace.begin()+i);
-        if(i<index_first){index_first=i;}
+      const string& dep=vdeps_replace[i];
+      if(aurostd::WithinList(vdeps_var,dep)){
+        if(LDEBUG){cerr << soliloquy << " found " << var << " dependency:" << dep << endl;}
+        if(!(i==0 && dep!=vdeps_var[0])){ //SUPER PROTECTION FOR $< : protect $< at all costs! even if it means having duplicates in dependencies
+          vdeps_replace.erase(vdeps_replace.begin()+i);
+          if(i<index_first){index_first=i;}
+        }
       }
     }
     //replace the variable at the first entry it was found, this ensures AUROSTD/aurostd.cpp stays at position $<
@@ -514,7 +518,7 @@ namespace makefile {
       makefile_rules_ss << obj_file << ": " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")  //ME20200514 - Added CCFLAGS_MT
     }
-    //unfortunate hacks that are needed
+    //[CO20200521 - OBSOLETE]//unfortunate hacks that are needed
     //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_matlab_funcs.cpp")){vfile_obj.push_back("aflow_matlab_funcs.cpp");}  //safety
     //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_gnuplot_funcs.cpp")){vfile_obj.push_back("aflow_gnuplot_funcs.cpp");}  //safety
     //[CO20200521 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_aflowrc.cpp")){vfile_obj.push_back("aflow_aflowrc.cpp");}  //safety
@@ -523,23 +527,27 @@ namespace makefile {
     updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vdep_aflowh);
     updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vdep_aflowh);
 
-    //unfortunate hacks that are needed
-    //vdep_aflowh needs aflow_aflowrc.cpp first for $<
-    file=directory+"/aflow_aflowrc.cpp";
-    trimPath(file);
-    if(vdep_aflowh.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vdep_aflowh.size()==0",_RUNTIME_ERROR_);}
-    bool found=false;
-    for(i=0;i<vdep_aflowh.size()&&found==false;i++){
-      const string& dep=vdep_aflowh[i];
-      if(dep.find(file)!=string::npos){
-        if(i!=0){
-          vdep_aflowh.erase(vdep_aflowh.begin()+i);
-          vdep_aflowh.insert(vdep_aflowh.begin(),file);
-        }
-        found=true;
-      }
-    }
-    if(vdep_aflowh[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vdep_aflowh",_RUNTIME_ERROR_);}
+    //this approach is not sustainable - do you think SC won't demand more hacks?
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//unfortunate hacks that are needed
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//vdep_aflowh needs aflow_aflowrc.cpp first for $<
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//aflow_aflowrc.cpp is half .cpp half .h
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//since it has the same dependencies as aflow.h, we need to make sure the AFLOW_H_DEPS variables is defined with aflow_aflowrc.cpp first
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//if another file 
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]file=directory+"/aflow_aflowrc.cpp";
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]trimPath(file);
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vdep_aflowh.size()==0",_RUNTIME_ERROR_);}
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]bool found=false;
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]for(i=0;i<vdep_aflowh.size()&&found==false;i++){
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  const string& dep=vdep_aflowh[i];
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  if(dep.find(file)!=string::npos){
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    if(i!=0){
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]      vdep_aflowh.erase(vdep_aflowh.begin()+i);
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]      vdep_aflowh.insert(vdep_aflowh.begin(),file);
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    }
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    found=true;
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  }
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]}
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vdep_aflowh",_RUNTIME_ERROR_);}
 
     stringstream makefile_definitions_ss;
     //MAIN DEPENDENCIES START
