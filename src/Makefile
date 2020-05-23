@@ -55,7 +55,6 @@ endif
 #ME20200520 - need to add assembler flags for Cygwin or aurostd.o won't compile
 #[CO20200520 - OBSOLETE]WUNINITIALIAZED=-Wmaybe-uninitialized #-Wuninitialized on mac
 W_AMBIG_OBJ=
-CCFLAGS=-Wall -W -fno-inline
 ifeq ($(OS), Windows_NT)
 W_AMBIG_OBJ=-Wa,-mbig-obj
 endif
@@ -207,7 +206,22 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
-
+#ANRL
+#aflow_anrl.o: aflow_anrl.cpp SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_symmetry_spacegroup.h aflow_xelement.h aflowlib.h
+#	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+#aflow_anrl_data.o: aflow_anrl_data.cpp SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
+#	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+#aflow_anrl_list.o: aflow_anrl_list.cpp SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
+#	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+#aflow_anrl_data.cpp: Makefile aflow.h
+#aflow_anrl_data.cpp: Makefile AUROSTD/aurostd.h AUROSTD/aurostd_argv.h AUROSTD/aurostd_xcombos.h AUROSTD/aurostd_xcomplex.h AUROSTD/aurostd_xerror.h AUROSTD/aurostd_xmatrix.h AUROSTD/aurostd_xoption.h AUROSTD/aurostd_xrandom.h AUROSTD/aurostd_xscalar.h AUROSTD/aurostd_xtensor.h AUROSTD/aurostd_xvector.h SQLITE/aflow_sqlite.h SQLITE/sqlite3.h aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflow_xelement.h aflowlib.h
+#	rm -f $@
+#	echo "#ifndef _AFLOW_ANRL_DATA_CPP_" > $@
+#	echo "#define _AFLOW_ANRL_DATA_CPP_" >> $@
+#	echo "#include \"aflow.h\"" >> $@
+#	cat ANRL/aflow_anrl_A*.cpp | grep -v "AFLOW_REMOVE_GREP" >> $@
+#	cat ANRL/aflow_anrl_sigma*.cpp  | grep -v "AFLOW_REMOVE_GREP" >> $@ 
+#	echo "#endif // _AFLOW_ANRL_DATA_CPP_" >> $@
 ###################################################################################################
 .PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
@@ -664,7 +678,8 @@ aflow_data: aflow_data.cpp aflow_data_readme.o aflow_data_calculated.o aflow_dat
 	echo "#endif  //  _AFLOW_DATA_EXTRA_CPP_" >> aflow_data_extra.cpp
 	$(MAKE) aflow_data.o
 #	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""aflow_data.cpp"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_data.cpp -c -o aflow_data.o
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(FLAGS_STATIC_POST)
+	@echo "linking aflow_data*.o"
+	@$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(FLAGS_STATIC_POST)
 .PHONY: data
 data: aflow_data
 .PHONY: amir
@@ -861,7 +876,7 @@ backup: realclean clean icsdclean
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean ; fi
 	mkdir -p aflow.$(VERSNUMBER)
 #	mkdir -p aflow.$(VERSNUMBER)/SOURCES
-	cp -drvf a*cpp a*.h *.js *.json *.py *.txt README* Makefile APL ANRL* AUROSTD SQLITE aflow.$(VERSNUMBER)
+	cp -drvf a*cpp a*.h *.js *.json *.py *.txt README* Makefile* APL* ANRL* AUROSTD* SQLITE* aflow.$(VERSNUMBER)
 # no EXTRA in SRC	if [ -d $(EXTRA_FREE) ]; then cp -drvf $(EXTRA_FREE) aflow.$(VERSNUMBER) ; fi
 	if [ -d SOURCE ]; then cp -drvf SOURCE aflow.$(VERSNUMBER) ; fi
 	tar Jcfvp aflow.$(VERSNUMBER).tar.xz aflow.$(VERSNUMBER)
@@ -874,7 +889,7 @@ www:	web
 .PHONY: web
 web:	realclean
 	rm -rvf aflow3.tar.xz aflow_test.tar.xz aflow3 ~/aflow3.tar.xz ~/aflow_test.tar.xz ~/aflow3
-	tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE
+	tar Jcfvp ~/aflow3.tar.xz Makefile* *cpp *.h *.js *.json *.py *.txt READ* APL* ANRL* AUROSTD* SQLITE*
 # no EXTRA IN SRC	if [ -d $(EXTRA_FREE) ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) ; fi
 # no other SOURCES in SRC	if [ -d SOURCES ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) SOURCES ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW.TXT /www/AFLOW ; fi
@@ -1152,9 +1167,9 @@ check_slab:
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
+	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER="32." && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
 		if [ -z "$$SC" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check  './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t'" && exit 0; fi && \
-		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$ANSWER meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
+		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
 	@echo "CHULL tests passed"
 .PHONY: check_pocc
 check_pocc:
@@ -1350,7 +1365,11 @@ check_cce:
 #RF20200302 - STOP
 .PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
-	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' |wc -l) && \
+ifeq ($(UNAME),Linux)
+	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l) && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
 	@echo "aflow_gcc_compatibility test 1 passed!"
+else
+	@echo "aflow_gcc_compatibility test 1 (no 'nullptr') requires GNU grep, try: find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)'"
+endif
 ###################################################################################################

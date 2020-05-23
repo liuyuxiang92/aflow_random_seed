@@ -211,7 +211,7 @@ namespace plotter {
   // Executes the gnuplot script and converts into the desired image format.
   void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
-    string soliloquy=XHOST.sPID+"plotter::savePlotGNUPLOT():";
+    string soliloquy=XPID+"plotter::savePlotGNUPLOT():";
     //ME20200327 - Check that all required binaries are available
     // Check that gnuplot is version 5+
     if (XHOST.is_command("gnuplot")) {
@@ -282,7 +282,7 @@ namespace plotter {
   // [OBSOLETE] // Executes the gnuplot script and converts into the desired image format.
   // [OBSOLETE] void savePlotGNUPLOT_OLD(const xoption& plotoptions, const stringstream& gpfile) {
   // [OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG); 
-  // [OBSOLETE]   string soliloquy = XHOST.sPID + "plotter::savePlotGNUPLOT():";
+  // [OBSOLETE]   string soliloquy = XPID + "plotter::savePlotGNUPLOT():";
   // [OBSOLETE]   string directory_work = plotoptions.getattachedscheme("DIRECTORY");
   // [OBSOLETE]   if(directory_work.empty()){directory_work=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
   // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " directory_work=" << directory_work << endl;}
@@ -326,7 +326,7 @@ namespace plotter {
   // than the output image.
   void setFileName(xoption& plotoptions, string filename) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::setFileName():";
+    string soliloquy=XPID+"plotter::setFileName():";
     if(LDEBUG){cerr << soliloquy << " filename_in=" << filename << endl;}
     if (filename.empty()) {
       filename = plotoptions.getattachedscheme("FILE_NAME_USER");  //ME20200313 - user-defined output file
@@ -381,7 +381,7 @@ namespace plotter {
   string formatDefaultPlotTitle(const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return formatDefaultPlotTitle(plotoptions,FileMESSAGE,oss);} //CO20200404
   string formatDefaultPlotTitle(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::formatDefaultPlotTitle():";
+    string soliloquy=XPID+"plotter::formatDefaultPlotTitle():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
     if (default_title.empty()) return default_title;
@@ -510,7 +510,7 @@ namespace plotter {
   string formatDefaultTitlePOCC_20191004(const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return formatDefaultTitlePOCC_20191004(plotoptions,FileMESSAGE,oss);}  //CO version //CO20191110  //CO20200404
   string formatDefaultTitlePOCC_20191004(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO version //CO20191110  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::formatDefaultTitlePOCC():";
+    string soliloquy=XPID+"plotter::formatDefaultTitlePOCC():";
     stringstream message;
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
@@ -623,7 +623,7 @@ namespace plotter {
   }
   string formatDefaultTitlePOCC_20190101(const xoption& plotoptions) {  //ME version
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::formatDefaultTitlePOCC():";
+    string soliloquy=XPID+"plotter::formatDefaultTitlePOCC():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     //Get all the pieces of the default title
     string::size_type t = default_title.find(":POCC");
@@ -849,7 +849,7 @@ namespace plotter {
   void PLOT_DOS(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_DOS(plotoptions,out,FileMESSAGE,oss);} //CO20191110 //CO20200404
   void PLOT_DOS(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20191110  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::PLOT_DOS():";
+    string soliloquy=XPID+"plotter::PLOT_DOS():";
 
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
@@ -862,7 +862,7 @@ namespace plotter {
 
   void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO20191110
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::patchDefaultTitleAFLOWIN():"; //CO20200404
+    string soliloquy=XPID+"plotter::patchDefaultTitleAFLOWIN():"; //CO20200404
 
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
@@ -883,7 +883,7 @@ namespace plotter {
   void PLOT_DOS(xoption& plotoptions, stringstream& out, const xDOSCAR& xdos,ostream& oss) {ofstream FileMESSAGE;return PLOT_DOS(plotoptions,out,xdos,FileMESSAGE,oss);}  //CO20200404
   void PLOT_DOS(xoption& plotoptions, stringstream& out, const xDOSCAR& xdos,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"plotter::PLOT_DOS():";
+    string soliloquy=XPID+"plotter::PLOT_DOS():";
     string extension=plotoptions.getattachedscheme("EXTENSION");
     if(extension.empty()) plotoptions.push_attached("EXTENSION", "dos");
     // Make sure the projections are consistent with the DOSCAR file
@@ -1260,7 +1260,7 @@ namespace plotter {
   void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
   void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
-    string soliloquy=XHOST.sPID+"plotter::generateDosPlot():";
+    string soliloquy=XPID+"plotter::generateDosPlot():";
     deque<deque<deque<double> > > dos;
     int pdos = aurostd::string2utype<int>(plotoptions.getattachedscheme("DATASET"));
     vector<string> labels;
@@ -1392,7 +1392,7 @@ namespace plotter {
     uint nsegments = xkpts.vpath.size()/2;
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
-      string function = "plotter::generateBandPlot()";
+      string function = "plotter::generateBandPlot():";
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
@@ -1618,7 +1618,7 @@ namespace plotter {
   double getDosLimits(const xoption& plotoptions, const xDOSCAR& xdos,
       const deque<deque<deque<double> > >& dos, const deque<double>& energies) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
-    string soliloquy=XHOST.sPID+"plotter::getDosLimits():";
+    string soliloquy=XPID+"plotter::getDosLimits():";
 
     double Emin = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMIN"));
     double Emax = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMAX"));
@@ -1706,7 +1706,7 @@ namespace plotter {
       const vector<double>& xvals, const vector<double>& ticvals,
       const vector<string>& ticlabels, const xoption& plotoptions) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
-    string soliloquy=XHOST.sPID+"plotter::generateBandPlotGNUPLOT():";
+    string soliloquy=XPID+"plotter::generateBandPlotGNUPLOT():";
 
     // Initialize variables
     double Efermi = aurostd::string2utype<double>(plotoptions.getattachedscheme("EFERMI"));
@@ -2064,7 +2064,7 @@ namespace plotter {
         }
       }
     } else {
-      string function = "plotter::PLOT_THERMO()";
+      string function = "plotter::PLOT_THERMO():";
       string message = "Could not find file " + thermo_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
     }
@@ -2196,6 +2196,8 @@ namespace plotter {
   // Reads data from an AFLOW data file. Requires a START and STOP string to
   // be present so that it can skip headers and other data sets.
   vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
+    string function = "plotter::readAflowDataFile():";
+    string message = "";
     vector<vector<double> > data;
     vector<double> row;
     vector<string> vcontent;
@@ -2227,14 +2229,12 @@ namespace plotter {
       }
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
-        string function = "plotter::readAflowDataFile()";
-        string message = "Wrong file format. No STOP tag found.";
+        message = "Wrong file format. No STOP tag found.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
-      string function = "plotter::readAflowDataFile()";
-      string message = "No data extracted from file " + path_to_file + ".";
+      message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
     }
@@ -2246,7 +2246,7 @@ namespace plotter {
   void generatePlotGNUPLOT(stringstream& out, const xoption& plotoptions,
       const vector<vector<double> >& data) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
-    string soliloquy=XHOST.sPID+"plotter::generatePlotGNUPLOT():";
+    string soliloquy=XPID+"plotter::generatePlotGNUPLOT():";
     uint ndata = data[0].size() - 1;
 
     // Axes settings

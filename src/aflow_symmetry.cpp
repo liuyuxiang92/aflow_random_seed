@@ -999,7 +999,7 @@ namespace SYM {
 
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
       const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
-    string soliloquy = XHOST.sPID + "SYM::FPOSMatch():";
+    string soliloquy = XPID + "SYM::FPOSMatch():";
 
     //DX20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
     if(XHOST.SKEW_TEST){
@@ -1066,7 +1066,7 @@ namespace SYM {
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "SYM::FPOSDistance():";
+    string soliloquy = XPID + "SYM::FPOSDistance():";
     if(LDEBUG){
       cerr << soliloquy << " fpos1=" << fpos1 << endl;
       cerr << soliloquy << " fpos2=" << fpos2 << endl;
@@ -1103,7 +1103,7 @@ namespace SYM {
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
-    string soliloquy = XHOST.sPID + "SYM::CPOSDistance():";
+    string soliloquy = XPID + "SYM::CPOSDistance():";
     if(VERBOSE){
       cerr << soliloquy << " fpos1=" << fpos1 << endl;
       cerr << soliloquy << " fpos2=" << fpos2 << endl;
@@ -2218,7 +2218,7 @@ namespace SYM {
   }
 
   bool AtomsEquivalent_20161115(xstructure& str,_atom& atom1,_atom& atom2) {
-    double _eps_=AUROSTD_NAN;//DX =_EPS_;
+    double _eps_=AUROSTD_NAN; //DX =_EPS_;
     if(str.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
       _eps_=str.sym_eps;
     }
@@ -2682,14 +2682,14 @@ namespace SYM {
   bool ComplexSU2Rotations(xmatrix<xcomplex<double> > & _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double& theta, xvector<double>& _axis){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    xcomplex<double> q11(1.0*cos(theta/2.0),_axis(3)*sin(theta/2.0));                   //DX20180117 - added SU(2) matrix
-    xcomplex<double> q12(_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));              //DX20180117 - added SU(2) matrix
-    xcomplex<double> q21(-_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));             //DX20180117 - added SU(2) matrix
-    xcomplex<double> q22(1.0*cos(theta/2.0),-_axis(3)*sin(theta/2.0));                  //DX20180117 - added SU(2) matrix
-    _SU2_matrix(1,1)=q11;_SU2_matrix(1,2)=q12;_SU2_matrix(2,1)=q21;_SU2_matrix(2,2)=q22;//DX20180117 - added SU(2) matrix
-    xcomplex<double> coefficient1(0.0,_axis(1)/2.0);_su2_coefficients(1)=coefficient1;  //DX20180117 - added su(2) coefficients
-    xcomplex<double> coefficient2(0.0,_axis(2)/2.0);_su2_coefficients(2)=coefficient2;  //DX20180117 - added su(2) coefficients
-    xcomplex<double> coefficient3(0.0,_axis(3)/2.0);_su2_coefficients(3)=coefficient3;  //DX20180117 - added su(2) coefficients
+    xcomplex<double> q11(1.0*cos(theta/2.0),_axis(3)*sin(theta/2.0));                    //DX20180117 - added SU(2) matrix
+    xcomplex<double> q12(_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));               //DX20180117 - added SU(2) matrix
+    xcomplex<double> q21(-_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));              //DX20180117 - added SU(2) matrix
+    xcomplex<double> q22(1.0*cos(theta/2.0),-_axis(3)*sin(theta/2.0));                   //DX20180117 - added SU(2) matrix
+    _SU2_matrix(1,1)=q11;_SU2_matrix(1,2)=q12;_SU2_matrix(2,1)=q21;_SU2_matrix(2,2)=q22; //DX20180117 - added SU(2) matrix
+    xcomplex<double> coefficient1(0.0,_axis(1)/2.0);_su2_coefficients(1)=coefficient1;   //DX20180117 - added su(2) coefficients
+    xcomplex<double> coefficient2(0.0,_axis(2)/2.0);_su2_coefficients(2)=coefficient2;   //DX20180117 - added su(2) coefficients
+    xcomplex<double> coefficient3(0.0,_axis(3)/2.0);_su2_coefficients(3)=coefficient3;   //DX20180117 - added su(2) coefficients
 
     if(LDEBUG) {
       xmatrix<xcomplex<double> > complex_matrix(2,2);
@@ -2726,7 +2726,7 @@ namespace SYM {
 //DX+CO START
 namespace SYM {
   bool CalculatePointGroupCrystal(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {
-    double _eps_=AUROSTD_NAN;//DX =_EPS_;
+    double _eps_=AUROSTD_NAN; //DX =_EPS_;
     if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
       _eps_=a.sym_eps;
     }
@@ -2832,7 +2832,7 @@ namespace SYM {
 // NOTE: This analysis is for reciprocal space only, so Uf is with respect to the klattice (reciprocal lattice)
 namespace SYM {  
   bool CalculatePointGroupKPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {
-    double _eps_=AUROSTD_NAN;//DX =_EPS_;
+    double _eps_=AUROSTD_NAN; //DX =_EPS_;
     if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
       _eps_=a.sym_eps;
     }
@@ -4347,7 +4347,7 @@ namespace SYM {
 namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) { 
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-    string soliloquy = XHOST.sPID + "SYM::CalculatePointGroup():";
+    string soliloquy = XPID + "SYM::CalculatePointGroup():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     // Obtain the structure tolerance
     //DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); //DX20180426 - added current working directory
@@ -5288,16 +5288,16 @@ namespace SYM {
       //DX TEST
       //tmp.fpos=SYM::mod_one_xvec(tmp.fpos);
       // === If identity operator and T=transp(0,0,0), point should not change; don't use mod_one_xvec (tolerance can mess this up) === //
-      /*if(symOp.str_Hermann_Mauguin == "1" && abs(symOp.ftau[1])<=_ZERO_TOL_ && abs(symOp.ftau[2])<=_ZERO_TOL_ && abs(symOp.ftau[3])<=_ZERO_TOL_ ){
-        tmp.fpos=atoms[k].fpos; //(Uf*atoms[k].fpos + ftau); //CO
-        }
-      // === Else bring back in the cell === //
-      else {
-      tmp.fpos = (SYM::mod_one_xvec((symOp.Uf*atoms[k].fpos + symOp.ftau))); 
-      }
-      tmp.cpos = f2c*tmp.fpos; 
-      tmp.name = atoms[k].name;
-      tmp.type = atoms[k].type;*/
+      //if(symOp.str_Hermann_Mauguin == "1" && abs(symOp.ftau[1])<=_ZERO_TOL_ && abs(symOp.ftau[2])<=_ZERO_TOL_ && abs(symOp.ftau[3])<=_ZERO_TOL_ ){
+      //  tmp.fpos=atoms[k].fpos; //(Uf*atoms[k].fpos + ftau); //CO
+      //  }
+      //// === Else bring back in the cell === //
+      //else {
+      //tmp.fpos = (SYM::mod_one_xvec((symOp.Uf*atoms[k].fpos + symOp.ftau))); 
+      //}
+      //tmp.cpos = f2c*tmp.fpos; 
+      //tmp.name = atoms[k].name;
+      //tmp.type = atoms[k].type;
       //DX TEST
       uint mapped_index=0;
       if(MapAtomWithBasis(atoms, tmp, map_types, index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX20190619 - lattice and f2c as input
@@ -8422,7 +8422,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       }
     }                                                       //DX20170802
     if(aurostd::toupper(format)=="JSON"){ //DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     //DX20170802
+      FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);    //DX20170802
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
@@ -8559,7 +8559,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();
     }                                                       //DX20170802
     if(aurostd::toupper(format)=="JSON"){ //DX20200206
-      FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   //DX20170802
+      FileOUTPUT << EquivalentAtomsToJson(a.iatoms);        //DX20170802
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
@@ -8739,8 +8739,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     if(mode == '\0' || mode == _PGROUPK_XTAL_){                                   //DX20171205 - Added pgroupk_xtal
       char tmp_mode = _PGROUPK_XTAL_;
       sscontent_json << "\"pgroupk_xtal\":" << SymmetryToJson(a.pgroupk_xtal,tmp_mode); //DX20171205 - Added pgroupk_xtal
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");        //DX20171205 - Added pgroupk_xtal
-    }                                                                             //DX20171205 - Added pgroupk_xtal
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");            //DX20171205 - Added pgroupk_xtal
+    }                                                                                   //DX20171205 - Added pgroupk_xtal
     //DX20200129 - Patterson - BEGIN
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
       char tmp_mode = _PGROUPK_PATTERSON_;

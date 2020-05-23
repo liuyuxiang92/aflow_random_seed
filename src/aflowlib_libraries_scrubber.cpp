@@ -32,7 +32,7 @@ namespace aflowlib {
 // will be moved near LI2RAW
 namespace aflowlib {
   uint LIB2SCRUB(string library,bool VERBOSE) {
-    string soliloquy = XHOST.sPID + "aflowlib::LIB2SCRUB:";
+    string soliloquy = XPID + "aflowlib::LIB2SCRUB:";
     if(VERBOSE) acerr << soliloquy << " BEGIN" << endl;
     vector<string> vlib;
     uint fixes=0;
@@ -462,7 +462,7 @@ namespace aflowlib {
   bool LIB2AUID(string entry,bool TEST,bool _VERBOSE) {
     if(_VERBOSE){;} //CO20190906 - keep _VERBOSE busy
     bool VERBOSE=FALSE;// _VERBOSE;
-    string soliloquy = XHOST.sPID + "aflowlib::LIB2AUID:";
+    string soliloquy = XPID + "aflowlib::LIB2AUID:";
     if(VERBOSE) acerr << soliloquy + " BEGIN" << endl;
     string _entry=entry,directory_LIB,directory_RAW,directory_WEB;
     aurostd::StringSubst(_entry,"/aflow.in","");

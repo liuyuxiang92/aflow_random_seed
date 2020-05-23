@@ -11,39 +11,42 @@
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // _XPSEUDOPOTENTIAL_PROTOTYPES_
-//# commands to cut/paste to generate stuff
-//rm -f aflow_xpseudopotentials_data.cpp
-//touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
-//make -j
-//rm -f aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
-//touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
-//# subst "/common/VASP/" "" aflow_xpseudopotentials_data.cpp
-//cat aflow_xpseudopotentials_data.cpp | grep -c TITEL
-//cat aflow_xpseudopotentials_data.cpp | grep structure | grep -v N/A | wc
-//make -j
-//
-//./aflow --scrub=POTCAR --FILE /common/VASP/potpaw_PBE/current/Mo_pv/POTCAR
-//./aflow --scrub=OUTCAR --FILE /common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
-//./aflow --pseudopotentials_check=/tmp/POTCAR1
-//./aflow --pseudopotentials_check=/tmp/POTCAR2
-//./aflow --pseudopotentials_check=/tmp/OUTCAR.relax2
-//./aflow --pseudopotentials_check=/common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
-//
-//./aflow --use_aflow.in=aflow.in --beep --force --showPID --lib2raw="/common/LIB3/LIB/TeW_pvY_sv/TFCC001.ABC"
-//
-//#!/bin/sh
-//#echo "$1"
-//#echo "$2"
-//STR1=`cat "/common/LIB1/LIB/$1/A1/aflow.in" | grep AUID | head -1 | sed "s/\[VASP_POTCAR_AUID\]/if(AUID==\""/g`
-//STR2="\") {"$2"}   //   "$1
-//echo $STR1$STR2
+/*
+  # commands to cut/paste to generate stuff
+  rm -f aflow_xpseudopotentials_data.cpp
+  touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+  make -j
+  rm -f aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  ./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+  touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+  # subst "/common/VASP/" "" aflow_xpseudopotentials_data.cpp
+  cat aflow_xpseudopotentials_data.cpp | grep -c TITEL
+  cat aflow_xpseudopotentials_data.cpp | grep structure | grep -v N/A | wc
+  make -j
+
+  ./aflow --scrub=POTCAR --FILE /common/VASP/potpaw_PBE/current/Mo_pv/POTCAR
+  ./aflow --scrub=OUTCAR --FILE /common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
+  ./aflow --pseudopotentials_check=/tmp/POTCAR1
+  ./aflow --pseudopotentials_check=/tmp/POTCAR2
+  ./aflow --pseudopotentials_check=/tmp/OUTCAR.relax2
+  ./aflow --pseudopotentials_check=/common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
+
+  ./aflow --use_aflow.in=aflow.in --beep --force --showPID --lib2raw="/common/LIB3/LIB/TeW_pvY_sv/TFCC001.ABC"
+
+  #!/bin/sh
+  #echo "$1"
+  #echo "$2"
+  STR1=`cat "/common/LIB1/LIB/$1/A1/aflow.in" | grep AUID | head -1 | sed "s/\[VASP_POTCAR_AUID\]/if(AUID==\""/g`
+  STR2="\") {"$2"}   //   "$1
+  echo $STR1$STR2
+
+*/
 
 std::vector<xPOTCAR> vxpseudopotential;        // store starting from ONE
 
@@ -85,17 +88,17 @@ xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_p
       (aurostd::abs(RMAX-vxpseudopotential.at(ipp).vRMAX.at(0))<0.0001);
     if(test && found) {
       if(!aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Xe") &&
-          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
-          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
-          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
-        //if(LVERBOSE)
-        cerr << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
-        species_pp_AUID_collisions.push_back(vxpseudopotential.at(ipp).AUID);
+	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
+	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
+	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
+	//if(LVERBOSE)
+	cerr << XPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
+	species_pp_AUID_collisions.push_back(vxpseudopotential.at(ipp).AUID);
       }
     }
     if(test && !found) {
       found=TRUE;
-      if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: FOUND: POTCAR=" << vxpseudopotential.at(ipp).filename << endl;
+      if(LVERBOSE) cerr << XPID << "xPOTCAR::xPOTCAR_Finder: FOUND: POTCAR=" << vxpseudopotential.at(ipp).filename << endl;
       species_pp_AUID.push_back(vxpseudopotential.at(ipp).AUID);
       xPOT=vxpseudopotential.at(ipp);
     }
@@ -103,8 +106,8 @@ xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_p
   if(!found) {
     if(vxpseudopotential.size()) {
       // if(LVERBOSE)
-      cerr << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: TITEL=" << TITEL << " LEXCH=" <<  LEXCH << " EATOM=" <<  EATOM << " RMAX =" <<  RMAX << endl;
-      //    cout << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: TITEL=" << TITEL << " LEXCH=" <<  LEXCH << " EATOM=" <<  EATOM << " RMAX =" <<  RMAX << endl;
+      cerr << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: TITEL=" << TITEL << " LEXCH=" <<  LEXCH << " EATOM=" <<  EATOM << " RMAX =" <<  RMAX << endl;
+      //    cout << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: TITEL=" << TITEL << " LEXCH=" <<  LEXCH << " EATOM=" <<  EATOM << " RMAX =" <<  RMAX << endl;
       // exit(0);
     }
     species_pp_AUID.push_back("N/A");
@@ -121,24 +124,24 @@ xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE) {
     bool test= (AUID==vxpseudopotential.at(ipp).AUID);
     if(test && found) {
       if(!aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Xe") &&
-          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
-          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
-          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
-        //if(LVERBOSE)
-        cerr << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
+	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
+	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
+	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
+	//if(LVERBOSE)
+	cerr << XPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
       }
     }
     if(test && !found) {
       found=TRUE;
-      if(LVERBOSE) cerr << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: FOUND: POTCAR=" << vxpseudopotential.at(ipp).filename << endl;
+      if(LVERBOSE) cerr << XPID << "xPOTCAR::xPOTCAR_Finder: FOUND: POTCAR=" << vxpseudopotential.at(ipp).filename << endl;
       xPOT=vxpseudopotential.at(ipp);
     }
   }
   if(!found) {
     if(vxpseudopotential.size()) {
       // if(LVERBOSE)
-      cerr << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: AUID=" << AUID << endl;
-      //   cout << XHOST.sPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: AUID=" << AUID << endl;
+      cerr << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: AUID=" << AUID << endl;
+      //   cout << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: AUID=" << AUID << endl;
       //    exit(0);
     }
   }
@@ -163,15 +166,15 @@ bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE) {
 
     bool found=xPOTCAR_EnthalpyReference_AUID(xPOT.AUID,"",groundstate_structure,groundstate_energy,volume_atom,spin_atom);
 
-    if(found)  cerr << XHOST.sPID << "xPOTCAR_PURE_Printer:     FOUND AUID=" << xPOT.AUID << endl;
-    if(!found) cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: NOT_FOUND AUID=" << xPOT.AUID << endl;
+    if(found)  cerr << XPID << "xPOTCAR_PURE_Printer:     FOUND AUID=" << xPOT.AUID << endl;
+    if(!found) cerr << XPID << "xPOTCAR_PURE_Printer: NOT_FOUND AUID=" << xPOT.AUID << endl;
 
     comment=xPOT.species_pp_version.at(0);
     xPOT.vTITEL.at(0)=aurostd::RemoveWhiteSpaces(xPOT.vTITEL.at(0));
     xPOT.vLEXCH.at(0)=aurostd::RemoveWhiteSpaces(xPOT.vLEXCH.at(0));
-    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: vTITEL.at(0)=" << xPOT.vTITEL.at(0) << endl;}   //SC20200326
-    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: species.at(0)=" << xPOT.species.at(0) << endl;}   //SC20200326
-    if(LVERBOSE) {cerr << XHOST.sPID << "xPOTCAR_PURE_Printer: species_Z.at(0)=" << xPOT.species_Z.at(0) << endl;}    //SC20200326
+    if(LVERBOSE) {cerr << XPID << "xPOTCAR_PURE_Printer: vTITEL.at(0)=" << xPOT.vTITEL.at(0) << endl;}   //SC20200326
+    if(LVERBOSE) {cerr << XPID << "xPOTCAR_PURE_Printer: species.at(0)=" << xPOT.species.at(0) << endl;}   //SC20200326
+    if(LVERBOSE) {cerr << XPID << "xPOTCAR_PURE_Printer: species_Z.at(0)=" << xPOT.species_Z.at(0) << endl;}    //SC20200326
     oss << "  " << endl;
     oss << "  // ******************************************************************************************************************************************************** " << endl;
     //   oss << "  // [AFLOW]START=" << comment << " " << endl;
@@ -280,22 +283,22 @@ uint xPOTCAR_Initialize(void) {
   for(uint i=0;i<vxpseudopotential.size();i++) {
     for(uint j=i+1;j<vxpseudopotential.size();j++) {
       if(vxpseudopotential.at(i).AUID!=vxpseudopotential.at(j).AUID) {
-        if(vxpseudopotential.at(i).vTITEL.at(0)==vxpseudopotential.at(j).vTITEL.at(0)) {
-          if(vxpseudopotential.at(i).vLEXCH.at(0)==vxpseudopotential.at(j).vLEXCH.at(0)) {
-            if(abs(vxpseudopotential.at(i).vEATOM.at(0)-vxpseudopotential.at(j).vEATOM.at(0))<0.00001) {
-              if(abs(vxpseudopotential.at(i).vRMAX.at(0)-vxpseudopotential.at(j).vRMAX.at(0))<0.0001) {
-                cerr << "COLLISION" << " "
-                  << "FILENAME " << vxpseudopotential.at(i).filename << " " << vxpseudopotential.at(j).filename << " "
-                  << "TITEL " << vxpseudopotential.at(i).vTITEL.at(0) << " "
-                  << "LEXCH " << vxpseudopotential.at(i).vLEXCH.at(0) << " "
-                  << "EATOM " << vxpseudopotential.at(i).vEATOM.at(0) << " "
-                  << "RMAX " << vxpseudopotential.at(i).vRMAX.at(0) << " "
-                  << endl;
-                COLLISIONS++;
-              }
-            }
-          }
-        }
+	if(vxpseudopotential.at(i).vTITEL.at(0)==vxpseudopotential.at(j).vTITEL.at(0)) {
+	  if(vxpseudopotential.at(i).vLEXCH.at(0)==vxpseudopotential.at(j).vLEXCH.at(0)) {
+	    if(abs(vxpseudopotential.at(i).vEATOM.at(0)-vxpseudopotential.at(j).vEATOM.at(0))<0.00001) {
+	      if(abs(vxpseudopotential.at(i).vRMAX.at(0)-vxpseudopotential.at(j).vRMAX.at(0))<0.0001) {
+		cerr << "COLLISION" << " "
+		     << "FILENAME " << vxpseudopotential.at(i).filename << " " << vxpseudopotential.at(j).filename << " "
+		     << "TITEL " << vxpseudopotential.at(i).vTITEL.at(0) << " "
+		     << "LEXCH " << vxpseudopotential.at(i).vLEXCH.at(0) << " "
+		     << "EATOM " << vxpseudopotential.at(i).vEATOM.at(0) << " "
+		     << "RMAX " << vxpseudopotential.at(i).vRMAX.at(0) << " "
+		     << endl;
+		COLLISIONS++;
+	      }
+	    }
+	  }
+	}
       }
     }
   }
@@ -312,7 +315,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA) {
 bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundstate_structure,double& groundstate_energy,double& volume_atom,double& spin_atom) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   bool VERBOSE=0;//TRUE;
-  if(LDEBUG) cerr << XHOST.sPID << "xPOTCAR_EnthalpyReference_AUID: [BEGIN]" << endl;
+  if(LDEBUG) cerr << XPID << "xPOTCAR_EnthalpyReference_AUID: [BEGIN]" << endl;
   bool found=FALSE;
   if(LDEBUG) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): AUID=[" << AUID << "]" << endl; // exit(0);
   if(LDEBUG) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): METAGGA=[" << METAGGA << "]" << endl; // exit(0);
@@ -322,7 +325,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(METAGGA=="SCAN" || METAGGA=="scan") {nKIN=FALSE;SCAN=TRUE;}
 
   if(!XHOST.PSEUDOPOTENTIAL_GENERATOR) if(VERBOSE) cout <<"xPOTCAR_EnthalpyReference_AUID: AUID=[" << AUID << "]  METAGGA=[" << METAGGA << "]" << endl;
-
+ 
   // Ac
   // find /common/LIB1/LIB/Ac* -name "A1" | sed "s/\/common/aflow --force --lib2raw=&/g" > /tmp/xpot && aflow --multi=8 --file=/tmp/xpot | grep XXX | sort | uniq
   if(AUID=="06e8eff4a6b826a0" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-4.031959;volume_atom=44.76122;spin_atom=0.0;} // Ac_s:PAW_PBE:06Sep2000
@@ -409,7 +412,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="70110ee6c6cbaf90" && nKIN) {found=TRUE;groundstate_structure="ICSD_56992";groundstate_energy=-7.46914;volume_atom=6.99838;spin_atom=0.0;} // B_h:PAW_LDA:17Apr2000
   if(AUID=="00b4dfcc28b5887b" && nKIN) {found=TRUE;groundstate_structure="ICSD_56992";groundstate_energy=-6.69181;volume_atom=7.24862;spin_atom=0.0;} // B_h:PAW_GGA:18Jul2000
   // A3  if(AUID=="97c23347b69407ee" && SCAN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-6.64898;volume_atom=8.99490;spin_atom=0.0;} // B_h:PAW_PBE_KIN:SCAN:06Feb2004
-
+    
   // Ba
   if(AUID=="062068333d4e7e80" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-1.92400;volume_atom=63.1759;spin_atom=0.0;} // Ba_sv:PAW_PBE:06Sep2000
   if(AUID=="0ea886f29a8f18e6" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-1.92401;volume_atom=62.1307;spin_atom=0.0;} // Ba_sv:PAW_GGA:14Apr2000
@@ -500,7 +503,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="6bf17162620b7ce3" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.787206;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE:17Jan2003
   if(AUID=="6dca7e86aecb68cc" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.776937;volume_atom=500;spin_atom=0.0;} // Cl_h:PAW_PBE:08Apr2002
   if(AUID=="9d680135d96b4029" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-7.906078;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE_KIN:SCAN:06Sep2000
-
+  
   // Co
   if(AUID=="41f6635e51e063f9" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-8.13760;volume_atom=10.0906;spin_atom=1.51284;} // Co:LDA:01Apr2000
   if(AUID=="4fb418aa1d0f1607" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-7.05079;volume_atom=10.9889;spin_atom=1.62675;} // Co:GGA:01Apr2000
@@ -579,10 +582,11 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="b7037854f4315aa3" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-4.527491;volume_atom=31.7888;spin_atom=0.0;} // Dy_3:PAW_PBE_KIN:06Sep2000
 
   // F
-  if(AUID=="3defbdd6f1dad3f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.790868;volume_atom=500;spin_atom=0.0;} // F_s:PAW_PBE:06Sep2000
-  if(AUID=="4c13232a0a03cdc4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.780263;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:08Apr2002
-  if(AUID=="4c13232a0a03cdc4" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.16947;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:SCAN:08Apr2002
-  if(AUID=="675e493e51b0f2f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.859526;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE:08Apr2002
+ if(AUID=="3defbdd6f1dad3f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.790868;volume_atom=500;spin_atom=0.0;} // F_s:PAW_PBE:06Sep2000
+ if(AUID=="4c13232a0a03cdc4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.780263;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:08Apr2002
+ if(AUID=="4c13232a0a03cdc4" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-3.16947;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:SCAN:08Apr2002
+ if(AUID=="675e493e51b0f2f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.859526;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE:08Apr2002
+ if(AUID=="306f88e141704ce5" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.908987;volume_atom=500;spin_atom=0.0;} // F_h:PAW_PBE:07Sep2000
 
   // Fe
   if(AUID=="53451df4122ca435" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-9.27793;volume_atom=10.5121;spin_atom=2.03940;} // Fe:LDA:01Apr2000
@@ -754,7 +758,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="15ba50edd26f214b" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-3.689587;volume_atom=20.20269;spin_atom=0.0;} // Li_sv_GW:PAW_PBE:25Mar2010
   if(AUID=="2d76bbafaaad041b" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-2.044447;volume_atom=18.75312;spin_atom=0.0;} // Li_sv:PAW_LDA:10Sep2004
   if(AUID=="faf632cf08a133d7" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-2.04007;volume_atom=19.03729;spin_atom=0.0;} // Li:PAW_LDA_KIN:15Mar2012
-
+  
   // Mg
   if(AUID=="285c78eec2b06a80" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-1.51618;volume_atom=22.8934;spin_atom=0.0;} // Mg:GGA:01Apr2000
   if(AUID=="d8bb30571ef22203" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-1.52082;volume_atom=22.7555;spin_atom=0.0;} // Mg:GGA:01Apr2000
@@ -813,10 +817,10 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="0f8c2e9ac364f9e3" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-12.13006;volume_atom=15.06347;spin_atom=0.0;} // Mo_sv:PAW_LDA_KIN:29Jan2005
 
   // N
-  if(AUID=="3cd4003f27559a49" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.318698;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE:08Apr2002
-  if(AUID=="be869d8257082ad4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.324198;volume_atom=500;spin_atom=0.0;} // N_h:PAW_PBE:13Feb2001
-  if(AUID=="4ce4637079c90d89" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.319179;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:08Apr2002
-  if(AUID=="4ce4637079c90d89" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-9.252821;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:SCAN:08Apr2002
+ if(AUID=="3cd4003f27559a49" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.318698;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE:08Apr2002
+ if(AUID=="be869d8257082ad4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.324198;volume_atom=500;spin_atom=0.0;} // N_h:PAW_PBE:13Feb2001
+ if(AUID=="4ce4637079c90d89" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-8.319179;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:08Apr2002
+ if(AUID=="4ce4637079c90d89" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-9.252821;volume_atom=500;spin_atom=0.0;} // N:PAW_PBE_KIN:SCAN:08Apr2002
 
   // Na
   if(AUID=="bd75e1ab544c0ed0" && nKIN) {found=TRUE;groundstate_structure="A2/A7";groundstate_energy=-1.31096;volume_atom=36.2541;spin_atom=0.0;} // Na_pv:PAW_PBE:05Jan2001
@@ -896,10 +900,11 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="fd7da3695dd95380" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.482908;volume_atom=10.80456;spin_atom=0.6293194;} // Ni_GW:PAW_PBE_KIN:31Mar2010
 
   // O
-  if(AUID=="85ded82734544fa9" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.931145;volume_atom=500;spin_atom=1;} // O:PAW_PBE:08Apr2002
-  if(AUID=="5c530b0eaed90a00" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.931071;volume_atom=500;spin_atom=1;} // O:PAW_PBE_KIN:08Apr2002
-  if(AUID=="5c530b0eaed90a00" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-6.022492;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE_KIN:SCAN:08Apr2002
-  if(AUID=="847e34315251cef5" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.701027;volume_atom=500;spin_atom=1.0;} // O_s:PAW_PBE:07Sep2000
+ if(AUID=="85ded82734544fa9" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.931145;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE:08Apr2002
+ if(AUID=="5c530b0eaed90a00" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.931071;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE_KIN:08Apr2002
+ if(AUID=="5c530b0eaed90a00" && SCAN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-6.022492;volume_atom=500;spin_atom=1.0;} // O:PAW_PBE_KIN:SCAN:08Apr2002
+ if(AUID=="847e34315251cef5" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-4.701027;volume_atom=500;spin_atom=1.0;} // O_s:PAW_PBE:07Sep2000
+ if(AUID=="60ee78e0c6ceac3d" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-5.017967;volume_atom=500;spin_atom=1.0;} // O_h:PAW_PBE:20Dec2001
 
   // Os
   if(AUID=="4cdd79622cbed39c" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-11.1466;volume_atom=14.3178;spin_atom=0.0;} // Os:PAW_GGA:06Feb2003
@@ -992,7 +997,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
 
   // Re
   // find /common/LIB1/LIB/Re* -name "A3" | sed "s/\/common/aflow --force --lib2raw=&/g" > /tmp/xpot && aflow --multi=8 --file=/tmp/xpot | grep XXX | sort | uniq
-  if(AUID=="1e59564cdfe6dd0a" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-12.34746;volume_atom=14.96078;spin_atom=0.0;} // Re:PAW_GGA:05Jan2001
+ if(AUID=="1e59564cdfe6dd0a" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-12.34746;volume_atom=14.96078;spin_atom=0.0;} // Re:PAW_GGA:05Jan2001
   if(AUID=="28be1918e906c6ea" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-14.04642;volume_atom=14.86271;spin_atom=0.0;} // Re_sv_GW:PAW_PBE_KIN:23Mar2010
   if(AUID=="2e6c1204bb1f83d9" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-13.75744;volume_atom=14.33156;spin_atom=0.0;} // Re:PAW_LDA_KIN:21Jan2003
   if(AUID=="330065ce03f40a48" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-13.71319;volume_atom=14.41776;spin_atom=0.0;} // Re_pv:PAW_LDA_KIN:11Feb1998
@@ -1304,19 +1309,19 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="1d3446a7830fa99e" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-11.06212;volume_atom=21.62537;spin_atom=0.0;} // Zr_sv_GW:PAW_LDA_KIN:05Dec2013
   if(AUID=="d9f9fc183b6567ac" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-9.283964;volume_atom=21.62691;spin_atom=0.0;} // Zr_sv:PAW_LDA_KIN:04Jan2005
 
-
+ 
   // ./xgo Sm_3:PAW_GGA:11May2000 "found=TRUE;groundstate_structure=\"ICSD_246657\";groundstate_energy=-4.621400;volume_atom=33.447633;spin_atom=0.0;"// FIX
   // ./xgo Sm_3:PAW_GGA:11May2000 && 0 "found=TRUE;groundstate_structure=\"ICSD_652637\";groundstate_energy=-4.64136;volume_atom=33.5075;spin_atom=0.0;"// IT HAS LDAU
   // ./xgo Sm_3:PAW_PBE:07Sep2000 && 0 "found=TRUE;groundstate_structure=\"A1\";groundstate_energy=-4.7062;volume_atom=33.8339;spin_atom=0.0;"// IT HAS LDAU
   // ./xgo Ce "found=TRUE;groundstate_structure=\"A1\";groundstate_energy=-5.92998;volume_atom=26.0579;spin_atom=0.0;"
   // ./xgo Ce "found=TRUE;groundstate_structure=\"ICSD_2284-mS4\";groundstate_energy=-5.93013;volume_atom=26.0697;spin_atom=0.0;"
   // ./xgo Cl_h:PAW_PBE:08Apr2002 "found=TRUE;groundstate_structure=\"A11\";groundstate_energy=-1.8156;volume_atom=37.3299;spin_atom=0.0;"WAITING
-
+ 
   if(!found) { volume_atom=999999,spin_atom=999999;} // some defaults
   //  if(!found) cerr <<"ERROR (xPOTCAR_EnthalpyReference_AUID): NOT FOUND: AUID=" << AUID << endl;// exit(0);
   if(LDEBUG && !found) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): NOT FOUND: AUID=" << AUID << endl;// exit(0);
   if(LDEBUG &&  found) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): FOUND: AUID=" << AUID << endl;// exit(0);
-  if(LDEBUG) cerr << XHOST.sPID << "xPOTCAR_EnthalpyReference_AUID: [END]" << endl;
+  if(LDEBUG) cerr << XPID << "xPOTCAR_EnthalpyReference_AUID: [END]" << endl;
   return found;
 };
 

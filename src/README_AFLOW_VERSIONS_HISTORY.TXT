@@ -1,5 +1,6 @@
-3.2.3 - 2020/05/20
+3.2.3 - 2020/05/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+        -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- added check for broken REST-API to aflow_chull_python.py (MB)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
@@ -147,6 +148,12 @@
         -- speeding up --poscar2aflowin with new AUTO settings (CO)
         -- adding TID (CO)
         -- restructured Makefile for auto-generation of dependency tree (CO)
+        (AFLOW: aconvasp.cpp, aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib_database.cpp, aflowlib.h, aflowlib_libraries.cpp, aflowlib_libraries_scrubber.cpp, aflowlib_webapp_bands.js, aflowlib_webapp_entry.js, aflowlib_web_interface.cpp, aflowlib_web_outreach.cpp, aflowrc.cpp, apennsy.cpp, apennsy_gndstate.cpp, apennsy_main.cpp, apennsy_vaspin.cpp, avasp.cpp, bader.cpp, cce.cpp, cce_data.cpp, cce.h, chull.cpp, chull.h, chull_python.py, compare_structure.cpp, compare_structure_function.cpp, compare_structure.h, contrib_cormac.cpp, contrib_shidong_auxiliary.cpp, contrib_shidong.cpp, contrib_shidong_main.cpp, contrib_wahyu.cpp, defects.cpp, estructure.cpp, gfa.cpp, iaims.cpp, ialien.cpp, ifrozsl.cpp, init.cpp, ivasp.cpp, kaims.cpp, kalien.cpp, kbin.cpp, kvasp.cpp, lattice.cpp, Makefile, Makefile.aflow, makefile.cpp, makefile.h, matlab.cpp, mix_experiments.cpp, modules.cpp, neighbours.cpp, oaims.cpp, ovasp.cpp, pflow_funcs.cpp, pflow.h, pflow_print.cpp, plotter.cpp, pocc.cpp, pocc.h, pocc_old.cpp, pthreads.cpp, qsub.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_CCE.TXT, README_AFLOW_COMPARE.TXT, README_AFLOW_SYM.TXT, README_PROTO.TXT, SQLITE/sqlite.cpp, surface.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, test.cpp, wyckoff.cpp, xatom.cpp, xclasses.cpp, xelement.cpp, xelement.h, xproto.cpp, xproto_gus.cpp, xproto_gus_lib.cpp, xpseudopotentials.cpp, xvaspin.h)
+        (ANRL: aflow_anrl.cpp, ANRL, ANRL_CPPS_20180710/*.cpp, data.cpp, README_AFLOW_ANRL.TXT)
+        (AEL: ael_elastic_fit.cpp, ael_elasticity.cpp, ael_elasticity.h, ael_get_stress.cpp, pocc_ael_agl.cpp)
+        (AGL: agl_debye.cpp, agl_debye.h, agl_electronic.cpp, agl_eqn_state.cpp, agl_get_ev.cpp, agl_hugoniot.cpp, agl_plot_write.cpp, agl_polynomial.cpp, agl_rungibbs.cpp, agl_thermal.cpp, pocc_ael_agl.cpp)
+        (APL: aapl_cluster.cpp, aapl_ifcs.cpp, aapl_setup.cpp, aapl_tcond.cpp, apl_atomic_disp.cpp, apl_dirphoncalc.cpp, apl_doscalc.cpp, apl_fccalc.cpp, apl_function_fitting.cpp, apl_group_velocity.cpp, apl_gsa.cpp, apl.h, apl_hsqpoints.cpp, apl_kphonons.cpp, apl_logger.cpp, apl_lrphoncalc.cpp, apl_ltet.cpp, apl_pathbuilder.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_shellhandle.cpp, apl_supercell.cpp, apl_thermalpc.cpp, qha3phonons_eos.cpp, qha_aflowin_creator.cpp, qha.cpp, qha_dm_pdos_save.cpp, qha_energies.cpp, qha_eos.cpp, qha_gruneisen.cpp, qha_operations.cpp, README_AFLOW_APL.TXT, scqha_eos.cpp, scqha_gruneisen.cpp, scqha_T_freqs.cpp)
+        (AUROSTD: aurostd.cpp, aurostd.h, boot.cpp, main.cpp, xcombos.cpp, xcombos.h, xcomplex.cpp, xcomplex.h, xerror.cpp, xerror.h, xmatrix.cpp, xmatrix.h, xoption.cpp, xoption.h, xrandom.cpp, xscalar.cpp, xscalar.h, xtensor.cpp, xtensor.h, xvector.cpp, xvector.h)
 3.2.2l - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- added PID to a bunch of messages 2l (SC)

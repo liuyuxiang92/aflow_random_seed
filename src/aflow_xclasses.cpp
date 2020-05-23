@@ -26,7 +26,9 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   ostrPID.clear();ostrPID.str(string(""));
   ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   sPID="";
+  sTID="";
   showPID=FALSE;
+  showTID=FALSE;
   QUIET=FALSE;
   TEST=FALSE;
   DEBUG=FALSE;
@@ -135,7 +137,9 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   ostrPID.clear();ostrPID.str(string(""));ostrPID << b.ostrPID.str();
   ostrTID.clear();ostrTID.str(string(""));ostrTID << b.ostrTID.str(); //CO20200502 - threadID
   sPID=b.sPID;
+  sTID=b.sTID;
   showPID=b.showPID;
+  showTID=b.showTID;
   QUIET=b.QUIET;
   TEST=b.TEST;
   DEBUG=b.DEBUG;
@@ -238,8 +242,8 @@ void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
   ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   vTemperatureCore.clear();
-  //  thread.clear();
-  //  iret.clear();
+  // thread.clear();
+  // iret.clear();
   // thread_busy.clear();
   vcmd.clear();
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
@@ -276,7 +280,7 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
-  string soliloquy = XHOST.sPID + "_XHOST::command():";  //CO20190629
+  string soliloquy = XPID + "_XHOST::command():";  //CO20190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
@@ -1294,7 +1298,7 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::KPOINTS_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVECAR_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVEDER_PRESERVED",FALSE);           // DEFAULT VALUES
-  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES   //CO20170601
   aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",FALSE);        // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_APL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_QHA=OFF",FALSE);               // DEFAULT VALUES  //CO20170601

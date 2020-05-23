@@ -717,7 +717,7 @@ namespace pflow {
       vector<string> species){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
-    string soliloquy = XHOST.sPID + "pflow::ComputeGFA():";  //CO20190424
+    string soliloquy = XPID + "pflow::ComputeGFA():";  //CO20190424
     if(LDEBUG) { //CO20190424
       for(uint i=0;i<Egs.size();i++){cerr << soliloquy << " Egs[i=" << i << "]=" << Egs[i] << endl;} //CO20190424
     } //CO20190424
@@ -1041,7 +1041,7 @@ namespace pflow {
 
   void CalculateGFA(aurostd::xoption& vpflow, const string& alloy, const string& AE_file_read, double fe_cut){
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
-    string soliloquy = XHOST.sPID + "pflow::CalculateGFA():";  //CO20190424
+    string soliloquy = XPID + "pflow::CalculateGFA():";  //CO20190424
 
     uint entries_size=0;
     string buffer;

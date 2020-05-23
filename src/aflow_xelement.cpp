@@ -152,7 +152,7 @@ std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting
 namespace pflow {
   void XelementPrint(string options,ostream& oss) {
     bool LDEBUG=0;//(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::XelementPrint [BEGIN]" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [BEGIN]" << endl;
     if(LDEBUG) cerr << "options=" << options << endl;
     if(LDEBUG) cerr << "velement.size()=" << velement.size() << endl;
 
@@ -283,7 +283,7 @@ namespace pflow {
       }
     }
 
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::XelementPrint [END]" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [END]" << endl;
   }
 }
 
@@ -2650,7 +2650,7 @@ namespace xelement {
       HHIP=1600;
       HHIR=1800;
       xray_scatt=24.46;
-      //xray_scatt=24.3589; Mn JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.3589; Mn JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
       return; //CO20200520
     }
     // [AFLOW]STOP=Manganese
@@ -2733,7 +2733,7 @@ namespace xelement {
       HHIP=2400;
       HHIR=1400;
       xray_scatt=24.85;
-      //xray_scatt=24.6830; Fe JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.6830; Fe JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
       return; //CO20200520
     }
     // [AFLOW]STOP=Iron
@@ -2816,7 +2816,7 @@ namespace xelement {
       HHIP=3100;
       HHIR=2700;
       xray_scatt=24.59;
-      //Co JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
+      //Co JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
       return; //CO20200520
     }
     // [AFLOW]STOP=Cobalt

@@ -299,12 +299,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID;               // aflow_init.cpp  PID number
-    int TID;               // aflow_init.cpp  TID number
-    ostringstream ostrPID; // aflow_init.cpp  PID in ostringstream...
-    ostringstream ostrTID; // aflow_init.cpp  TID in ostringstream...
-    string sPID;           // aflow_init.cpp  [PID=12345678]
-    bool showPID;          // aflow_init.cpp  check if --showPID
+    int PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508
+    ostringstream ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508
+    string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -394,6 +392,9 @@ class _XHOST {
     void copy(const _XHOST& b);                            //
     void clear();                                          // free space
 };
+
+#define XPID XHOST.sPID
+#define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256
 #define XHOST_Library_HTQC                             XHOST.vGlobal_string.at(0)
@@ -758,8 +759,8 @@ class _kflags {
     bool  KBIN_SYMMETRY_PGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_WRITE;     // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
-    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;//DX20171205 - Added pgroupk_xtal
-    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;//DX20200129 - taken TRUE by default
+    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE; //DX20171205 - Added pgroupk_xtal
+    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;  //DX20200129 - taken TRUE by default
     bool  KBIN_SYMMETRY_FGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_SGROUP_WRITE;
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default

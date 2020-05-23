@@ -278,22 +278,52 @@ namespace makefile {
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  splitMakefileDefinitions(vdefinitions,vvdefinitions);
   //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
 
-  void updateDependenciesAUROSTD(vector<string>& vdependencies){
+  void updateDependenciesAUROSTD(vector<string>& vdeps){
     bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
     string soliloquy="makefile::updateDependenciesAUROSTD():";
-    if(LDEBUG){cerr << soliloquy << " vdependencies(pre )=" << aurostd::joinWDelimiter(vdependencies,",") << endl;}
+    if(LDEBUG){cerr << soliloquy << " vdeps(pre )=" << aurostd::joinWDelimiter(vdeps,",") << endl;}
     //first look for AUROSTD dependencies and replace with single AUROSTD/aurostd.o
     uint i=0;
     bool found_aurostd=false;
-    for(i=vdependencies.size()-1;i<vdependencies.size();i--){  //go backwards so you can erase
-      if(vdependencies[i].find("AUROSTD/")!=string::npos){
+    for(i=vdeps.size()-1;i<vdeps.size();i--){  //go backwards so you can erase
+      if(vdeps[i].find("AUROSTD/")!=string::npos){
         if(LDEBUG){cerr << soliloquy << " found AUROSTD dependencies" << endl;}
-        vdependencies.erase(vdependencies.begin()+i);
+        vdeps.erase(vdeps.begin()+i);
         found_aurostd=true;
       }
     }
-    if(found_aurostd){vdependencies.insert(vdependencies.begin(),"AUROSTD/aurostd.o");}
-    if(LDEBUG){cerr << soliloquy << " vdependencies(post)=" << aurostd::joinWDelimiter(vdependencies,",") << endl;}
+    if(found_aurostd){vdeps.insert(vdeps.begin(),"AUROSTD/aurostd.o");}
+    if(LDEBUG){cerr << soliloquy << " vdeps(post)=" << aurostd::joinWDelimiter(vdeps,",") << endl;}
+  }
+  void updateDependenciesVariable(const vector<string>& vdeps_var,const string& var,vector<string>& vdeps_replace){
+    //ASSUMES vdeps_replace[0] IS $<
+    bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+    string soliloquy="makefile::updateDependenciesVariable():";
+    if(LDEBUG){cerr << soliloquy << " vdeps_replace(pre )=" << aurostd::joinWDelimiter(vdeps_replace,",") << endl;}
+    //first look for if ALL vdeps_var in vdeps_replace
+    uint i=0,index_first=AUROSTD_MAX_UINT;
+    bool found_all=true;
+    for(i=0;i<vdeps_var.size()&&found_all;i++){
+      if(!aurostd::WithinList(vdeps_replace,vdeps_var[i])){
+        if(LDEBUG){cerr << soliloquy << " " << vdeps_var[i] << " NOT found in vdeps_replace" << endl;}
+        found_all=false;
+      }
+    }
+    if(!found_all){return;}
+    if(LDEBUG){cerr << soliloquy << " found ALL $(" << var << ") in vdeps_replace" << endl;}
+    for(i=vdeps_replace.size()-1;i<vdeps_replace.size();i--){  //go backwards so you can erase
+      const string& dep=vdeps_replace[i];
+      if(aurostd::WithinList(vdeps_var,dep)){
+        if(LDEBUG){cerr << soliloquy << " found " << var << " dependency:" << dep << endl;}
+        if(!(i==0 && dep!=vdeps_var[0])){ //SUPER PROTECTION FOR $< : protect $< at all costs! even if it means having duplicates in dependencies
+          vdeps_replace.erase(vdeps_replace.begin()+i);
+          if(i<index_first){index_first=i;}
+        }
+      }
+    }
+    //replace the variable at the first entry it was found, this ensures AUROSTD/aurostd.cpp stays at position $<
+    vdeps_replace.insert(vdeps_replace.begin()+index_first,"$("+var+")");
+    if(LDEBUG){cerr << soliloquy << " vdeps_replace(post)=" << aurostd::joinWDelimiter(vdeps_replace,",") << endl;}
   }
   void createMakefileAFLOW(const string& directory){
     bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
@@ -301,8 +331,8 @@ namespace makefile {
 
     if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
 
-    if(!aurostd::FileExist(directory+"/aflow.h")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/aflow.h not found",_VALUE_ILLEGAL_);} //check we are in an aflow directory
     if(!aurostd::IsDirectory(directory+"/AUROSTD")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/AUROSTD not found",_VALUE_ILLEGAL_);}  //check that AUROSTD exists (fast check that ANY object files exist)
+    if(!aurostd::FileExist(directory+"/aflow.h")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/aflow.h not found",_VALUE_ILLEGAL_);} //check we are in an aflow directory
     //[not a good idea, circular flow of information]if(!aurostd::FileExist(directory+"/aflow.o")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/aflow.o not found",_VALUE_ILLEGAL_);}  //check that aflow.o exists (fast check that ANY object files exist)
 
     //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]vector<string> vvariables;
@@ -318,7 +348,7 @@ namespace makefile {
     vector<string> vsubdirectories;
     vsubdirectories.push_back(directory);
     vsubdirectories.push_back(directory+"/APL");
-    //DX20200512 vsubdirectories.push_back(directory+"/ANRL");
+    vsubdirectories.push_back(directory+"/ANRL");
     vsubdirectories.push_back(directory+"/SQLITE");
     std::sort(vsubdirectories.begin(),vsubdirectories.end()); //sort before adding AUROSTD, which must come first
 
@@ -330,7 +360,6 @@ namespace makefile {
     vector<vector<string> > vvdependencies;
     vector<bool> vmt_required;
     bool mt_required=false;
-    vector<string> vcpp_aurostd,vhpp_aurostd,vhpp_aflow; //SC variables - hack
 
     string Makefile_aflow="Makefile.aflow",Makefile_aflow_OLD="Makefile.aflow.OLD";
 
@@ -342,22 +371,63 @@ namespace makefile {
     vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
     mt_required=false;
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
+    vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
     vmt_required.push_back(mt_required);
 
     //SC variables - hack
-    dir=directory+"/AUROSTD";
+    //AUROSTD
+    string var_vcpp_aurostd="AUROSTD_CPPS",var_vhpp_aurostd="AUROSTD_HPPS";
+    vector<string> vcpp_aurostd,vhpp_aurostd;
+    //there are some AUROSTD files that are OBSOLETE, e.g., aurostd_xtensor_template.cpp
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]dir=directory+"/AUROSTD";
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]trimPath(dir);
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]aurostd::DirectoryLS(dir,vfs);
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]std::sort(vfs.begin(),vfs.end());
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]for(j=0;j<vfs.size();j++){
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]  file=dir+"/"+vfs[j];
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]  if(aurostd::IsFile(file)){
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]    if(vfs[j].size()>4 && vfs[j].find(".cpp")==vfs[j].size()-4){vcpp_aurostd.push_back(file);}
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]    else if(vfs[j].size()>2 && vfs[j].find(".h")==vfs[j].size()-2){vhpp_aurostd.push_back(file);}
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]  }
+    //[GET vcpp_aurostd and vhpp_aurostd FROM aurostd.cpp dependencies, close the loop]}
+    for(i=0;i<vvdependencies.back().size();i++){
+      const string& dep=vvdependencies.back()[i];
+      if(dep.find("AUROSTD")!=string::npos && dep.size()>4 && dep.find(".cpp")==dep.size()-4){vcpp_aurostd.push_back(dep);}
+      else if(dep.find("AUROSTD")!=string::npos && dep.size()>2 && dep.find(".h")==dep.size()-2){vhpp_aurostd.push_back(dep);}
+    }
+    //stupidity test: make sure vcpp_aurostd[0]==directory+"/AUROSTD/aurostd.cpp" for $<
+    if(vcpp_aurostd.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_aurostd.size()==0",_RUNTIME_ERROR_);}
+    if(vcpp_aurostd[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_aurostd",_RUNTIME_ERROR_);}
+    if(LDEBUG){cerr << soliloquy << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
+    //ANRL
+    vector<string> vcpp_anrl;
+    dir=directory+"/ANRL";
     trimPath(dir);
     aurostd::DirectoryLS(dir,vfs);
     std::sort(vfs.begin(),vfs.end());
     for(j=0;j<vfs.size();j++){
       file=dir+"/"+vfs[j];
       if(aurostd::IsFile(file)){
-        if(file.size()>4 && file.find(".cpp")==file.size()-4){vcpp_aurostd.push_back(file);}
-        else if(file.size()>2 && file.find(".h")==file.size()-2){vhpp_aurostd.push_back(file);}
+        if(vfs[j].size()>4 && vfs[j].find(".cpp")==vfs[j].size()-4 && 
+            vfs[j].find("aflow_anrl_A")!=string::npos && 
+            vfs[j].find("aflow_anrl_sigma")!=string::npos &&  //DX - you may need to add here eventually
+            true){vcpp_anrl.push_back(file);}
       }
     }
 
-    vector<string> vaflow_deps; //populate me with missing skipped files
+    //do aflow.h dependencies next
+    string var_vdep_aflowh="AFLOW_H_DEPS";
+    vector<string> vdep_aflowh;
+    file=directory+"/aflow.h";
+    trimPath(file);
+    if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
+    vdep_aflowh.push_back(file);  //add aflow.h to dependency
+    files_already_explored.clear();
+    getDependencies(file,files_already_explored,vdep_aflowh);
+    if(LDEBUG){cerr << soliloquy << " vdep_aflowh=" << aurostd::joinWDelimiter(vdep_aflowh,",") << endl;}
+
+    vector<string> vhpp_aflow; //SC variables - hack
+    vector<string> vdep_aflow; //populate me with missing skipped files
 
     bool skip_file=false; //these files do NOT get .o
     for(i=0;i<vsubdirectories.size();i++){
@@ -377,25 +447,31 @@ namespace makefile {
           else if(file.size()>4 && file.find(".cpp")==file.size()-4){
             skip_file=false;
             //BEGIN skipping
+            ////check that it has a header file
+            //_file=file;aurostd::StringSubst(_file,".cpp",".h");if(!aurostd::FileExist(_file)){if(LDEBUG){cerr << soliloquy << " SKIPPING non-headed file=" << _file << endl;}skip_file=true;}
             //check that it's not a .cpp generated by another file
             _file=file;aurostd::StringSubst(_file,".cpp",".js");if(aurostd::FileExist(_file)){if(LDEBUG){cerr << soliloquy << " SKIPPING generated file=" << _file << endl;}skip_file=true;}
+            _file=file;aurostd::StringSubst(_file,".cpp",".json");if(aurostd::FileExist(_file)){if(LDEBUG){cerr << soliloquy << " SKIPPING generated file=" << _file << endl;}skip_file=true;}
             _file=file;aurostd::StringSubst(_file,".cpp",".py");if(aurostd::FileExist(_file)){if(LDEBUG){cerr << soliloquy << " SKIPPING generated file=" << _file << endl;}skip_file=true;}
             _file=file;aurostd::StringSubst(_file,".cpp",".txt");if(aurostd::FileExist(_file)){if(LDEBUG){cerr << soliloquy << " SKIPPING generated file=" << _file << endl;}skip_file=true;}
             //check that it's not a git file
-            if(file.find("_BASE_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vaflow_deps
-            if(file.find("_REMOTE_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vaflow_deps
-            if(file.find("_LOCAL_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;}  //continue, we don't want these in vaflow_deps
-            if(file.find("_BACKUP_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vaflow_deps
+            if(file.find("_BASE_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vdep_aflow
+            if(file.find("_REMOTE_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vdep_aflow
+            if(file.find("_LOCAL_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;}  //continue, we don't want these in vdep_aflow
+            if(file.find("_BACKUP_")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING git file=" << file << endl;}continue;} //continue, we don't want these in vdep_aflow
             //remove anything with aflow_data
-            if(EXCLUDE_DATA){if(file.find("aflow_data")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;}} //continue, we don't want these in vaflow_deps
+            if(EXCLUDE_DATA){if(file.find("aflow_data")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;}} //continue, we don't want these in vdep_aflow
             //skip misc cpp files
-            if(file=="aflow_nomix.2014-01-15.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;} //continue, we don't want these in vaflow_deps  //no reason why we have this file in the build
-            if(file=="aflow_xproto_gus_lib.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
-            if(file=="aflow_test.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
-            if(file=="aflow_matlab_funcs.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
-            if(file=="aflow_gnuplot_funcs.cpp"){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(file.find("aflow_nomix.2014-01-15.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}continue;} //continue, we don't want these in vdep_aflow  //no reason why we have this file in the build
+            if(file.find("aflow_xproto_gus_lib.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(file.find("aflow_test.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(file.find("aflow_matlab_funcs.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(file.find("aflow_gnuplot_funcs.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(file.find("aflow_xpseudopotentials_data.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            //[CO20200521 - OBSOLETE]if(file.find("aflow_aflowrc.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(file.find("aflow_xproto_library_default.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
             if(skip_file){
-              vaflow_deps.push_back(file);  //add to aflow dependencies
+              vdep_aflow.push_back(file);  //add to aflow dependencies
               continue;
             }
             //END skipping
@@ -405,45 +481,84 @@ namespace makefile {
             //[didn't compile for some reason]vmt_required.push_back(false);
             mt_required=false;
             getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
-            //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
+            vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
+            //[CO20200508 - OBSOLETE]//unfortunate hacks that are needed
             //[CO20200508 - OBSOLETE]if(file=="aflowlib_libraries.cpp"){
             //[CO20200508 - OBSOLETE]  if(!aurostd::WithinList(vvdependencies.back(),"aflow_matlab_funcs.cpp")){vvdependencies.back().push_back("aflow_matlab_funcs.cpp");}  //safety
             //[CO20200508 - OBSOLETE]  if(!aurostd::WithinList(vvdependencies.back(),"aflow_gnuplot_funcs.cpp")){vvdependencies.back().push_back("aflow_gnuplot_funcs.cpp");}  //safety
             //[CO20200508 - OBSOLETE]}
             vmt_required.push_back(mt_required);
             //get rid of any dependencies with AUROSTD and replace with $(AUROSTD_OBJ)
-            updateDependenciesAUROSTD(vvdependencies.back());
+            //[CO20200521 - do NOT replace AUROSTD .cpp and .h with .o, this will slow down make unnecessarily]updateDependenciesAUROSTD(vvdependencies.back());
+            updateDependenciesVariable(vdep_aflowh,var_vdep_aflowh,vvdependencies.back());
           }
         }
       }
     }
-    //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
-    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vaflow_deps,"aflow_matlab_funcs.cpp")){vaflow_deps.push_back("aflow_matlab_funcs.cpp");}  //safety
-    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vaflow_deps,"aflow_gnuplot_funcs.cpp")){vaflow_deps.push_back("aflow_gnuplot_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]//unfortunate hacks that are needed
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vdep_aflow,"aflow_matlab_funcs.cpp")){vdep_aflow.push_back("aflow_matlab_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vdep_aflow,"aflow_gnuplot_funcs.cpp")){vdep_aflow.push_back("aflow_gnuplot_funcs.cpp");}  //safety
     stringstream makefile_rules_ss;
-    vector<string> vobj_files;
+    vector<string> vfile_obj;
     string obj_file="";
     for(i=0;i<vfiles.size();i++){
       if(vvdependencies[i].empty()){continue;} //we will define generic one at the end
       obj_file=vfiles[i];aurostd::StringSubst(obj_file,".cpp",".o");
       if(vfiles[i].find("aflow_data")==string::npos){ //CO20200508 - do not include anything for aflow_data in aflow dependencies
-        vobj_files.push_back(obj_file);
-        vaflow_deps.push_back(obj_file);
+        vfile_obj.push_back(obj_file);
+        vdep_aflow.push_back(obj_file);
       }
       //[not a good idea, circular flow of information]if(!aurostd::FileExist(obj_file)){continue;}  //since we can only run this code once aflow is compiled, we can check that the obj_file is a real target or not
-      makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
+      //[CO20200521 - OBSOLETE, we already injected vfiles[i] above]vvdependencies[i].insert(vvdependencies[i].begin(),vfiles[i]); //put .cpp at the front of dependencies for $<
+      if(obj_file.find("aurostd.o")!=string::npos){ //exception for aurostd.o
+        updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vvdependencies[i]);
+        updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vvdependencies[i]);
+      }
+      //makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
+      makefile_rules_ss << obj_file << ": " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")  //ME20200514 - Added CCFLAGS_MT
     }
-    //[CO20200508 - OBSOLETE]//unfortunate hack that's needed
-    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vobj_files,"aflow_matlab_funcs.cpp")){vobj_files.push_back("aflow_matlab_funcs.cpp");}  //safety
-    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vobj_files,"aflow_gnuplot_funcs.cpp")){vobj_files.push_back("aflow_gnuplot_funcs.cpp");}  //safety
+    //[CO20200521 - OBSOLETE]//unfortunate hacks that are needed
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_matlab_funcs.cpp")){vfile_obj.push_back("aflow_matlab_funcs.cpp");}  //safety
+    //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_gnuplot_funcs.cpp")){vfile_obj.push_back("aflow_gnuplot_funcs.cpp");}  //safety
+    //[CO20200521 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_aflowrc.cpp")){vfile_obj.push_back("aflow_aflowrc.cpp");}  //safety
+
+    //make some variable replacements before printing
+    updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vdep_aflowh);
+    updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vdep_aflowh);
+
+    //this approach is not sustainable - do you think SC won't demand more hacks?
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//unfortunate hacks that are needed
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//vdep_aflowh needs aflow_aflowrc.cpp first for $<
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//aflow_aflowrc.cpp is half .cpp half .h
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//since it has the same dependencies as aflow.h, we need to make sure the AFLOW_H_DEPS variables is defined with aflow_aflowrc.cpp first
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//if another file 
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]file=directory+"/aflow_aflowrc.cpp";
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]trimPath(file);
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vdep_aflowh.size()==0",_RUNTIME_ERROR_);}
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]bool found=false;
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]for(i=0;i<vdep_aflowh.size()&&found==false;i++){
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  const string& dep=vdep_aflowh[i];
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  if(dep.find(file)!=string::npos){
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    if(i!=0){
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]      vdep_aflowh.erase(vdep_aflowh.begin()+i);
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]      vdep_aflowh.insert(vdep_aflowh.begin(),file);
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    }
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    found=true;
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  }
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]}
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vdep_aflowh",_RUNTIME_ERROR_);}
 
     stringstream makefile_definitions_ss;
-    if(vaflow_deps.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vaflow_deps," ") << endl;}  //SC variables - hack
-    if(vobj_files.size()){makefile_definitions_ss << "AFLOW_OBJS=" << aurostd::joinWDelimiter(vobj_files," ") << endl;}  //SC variables - hack
+    //MAIN DEPENDENCIES START
+    if(vcpp_aurostd.size()){makefile_definitions_ss << var_vcpp_aurostd << "=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
+    if(vhpp_aurostd.size()){makefile_definitions_ss << var_vhpp_aurostd << "=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
+    if(vdep_aflowh.size()){makefile_definitions_ss << var_vdep_aflowh << "=" << aurostd::joinWDelimiter(vdep_aflowh," ") << endl;} //SC variables - hack
+    //MAIN DEPENDENCIES END
+    if(vdep_aflow.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vdep_aflow," ") << endl;}  //SC variables - hack
+    if(vfile_obj.size()){makefile_definitions_ss << "AFLOW_OBJS=" << aurostd::joinWDelimiter(vfile_obj," ") << endl;}  //SC variables - hack
     if(vhpp_aflow.size()){makefile_definitions_ss << "AFLOW_HPPS=" << aurostd::joinWDelimiter(vhpp_aflow," ") << endl;} //SC variables - hack
-    if(vcpp_aurostd.size()){makefile_definitions_ss << "AUROSTD_CPPS=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
-    if(vhpp_aurostd.size()){makefile_definitions_ss << "AUROSTD_HPPS=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
+    if(vcpp_anrl.size()){makefile_definitions_ss << "ANRL_CPPS=" << aurostd::joinWDelimiter(vcpp_anrl," ") << endl;} //SC variables - hack
 
     //join together
     stringstream makefile_aflow;

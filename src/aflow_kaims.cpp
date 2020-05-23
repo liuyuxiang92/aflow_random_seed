@@ -131,18 +131,18 @@ namespace KBIN{
     }
 
     // DEBUG
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::AIMS_Get_aimsflags_from_AflowIN: aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
 
     // VOLUMES
     // [OBSOLETE] aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME_EQUAL_EQUAL      =    aurostd::substring2bool(AflowIn,_STROPT_+"VOLUME=",TRUE);
@@ -256,7 +256,7 @@ namespace KBIN{
         aus << "00000  MESSAGE START loop " << xaims.GEOM_index << "/" << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
-      if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [1]" << xaims.str << endl; 
+      if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [1]" << xaims.str << endl; 
       // ------------------------------------------
       // now start for each xaims
       Krun=TRUE;  // guess everything is intelligent !
@@ -295,7 +295,7 @@ namespace KBIN{
       }
       // ------------------------------------------
       // do the flags
-      if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [2]" << xaims.str << endl;
+      if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [2]" << xaims.str << endl;
       aimsflags.KBIN_AIMS_CONTROL_VERBOSE=TRUE; // ALWAYS
 
       // produce BEFORE NOMIX
@@ -311,7 +311,7 @@ namespace KBIN{
       // ***************************************************************************
       // READY TO RUN
       if(Krun) {
-        if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [3]" << endl;
+        if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [3]" << endl;
         if(LDEBUG) cerr << xaims.str << endl;
         bool Krun=true;
         ostringstream aus;
@@ -403,7 +403,7 @@ namespace KBIN{
           if(Krun) {   // survived all troubles
             // ***************************************************************************
             // START
-            if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [4]" << xaims.str << endl;
+            if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [4]" << xaims.str << endl;
             // ***************************************************************************
             // PRESCRIPT
             if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
@@ -428,9 +428,9 @@ namespace KBIN{
             //[MAKE XINPUT]  KBIN::VASP_RunPhonons_FROZSL(xaims,AflowIn,aflags,kflags,aimsflags,FileMESSAGE);
             //[MAKE XINPUT]  //  return Krun;
             //[MAKE XINPUT]}
-            if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [5] xaims.str.species.size()=" << xaims.str.species.size() << endl;
-            if(LDEBUG) for(uint i=0;i<xaims.str.species.size();i++) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [5] xaims.str.species.at(i)=[" << xaims.str.species.at(i) << "]" << endl;
-            if(LDEBUG) cerr << XHOST.sPID << "KBIN::AIMS_Directory: [6]" << xaims.str << endl;
+            if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [5] xaims.str.species.size()=" << xaims.str.species.size() << endl;
+            if(LDEBUG) for(uint i=0;i<xaims.str.species.size();i++) cerr << XPID << "KBIN::AIMS_Directory: [5] xaims.str.species.at(i)=[" << xaims.str.species.at(i) << "]" << endl;
+            if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [6]" << xaims.str << endl;
             // --------------------------------------------------------------------------------------------------------------------
             // ***************************************************************************
             // POSTSCRIPT

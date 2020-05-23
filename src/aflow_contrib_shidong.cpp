@@ -2904,7 +2904,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]  
 // [OBSOLETE]  if( !getEfermiBandGap(doscar_file, ispin, compound_name, band_information) ) {
 // [OBSOLETE]    cerr << "getEfermiBandGap failed." << endl;
-// [OBSOLETE]    cerr << XHOST.sPID << "pflow::EffectiveMass exiting." << endl;
+// [OBSOLETE]    cerr << XPID << "pflow::EffectiveMass exiting." << endl;
 // [OBSOLETE]    return FALSE;
 // [OBSOLETE]  }
 // [OBSOLETE]
@@ -2921,7 +2921,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]    // we can't compute anything meaningful
 // [OBSOLETE]    if( !getFitDataForMass(eigenval_file, poscar_file, band_information, number_of_valley_list, energy_range, fit_data_all) ) { 
 // [OBSOLETE]      cerr << "getFitDataForMass failed." << endl;
-// [OBSOLETE]      cerr << XHOST.sPID << "pflow::EffectiveMass exiting." << endl;
+// [OBSOLETE]      cerr << XPID << "pflow::EffectiveMass exiting." << endl;
 // [OBSOLETE]      return FALSE;
 // [OBSOLETE]    };
 // [OBSOLETE]
@@ -2940,7 +2940,7 @@ void CheckAllInputFileExistence(string structure_type) {
 // [OBSOLETE]      // fit the data for each valley of 1 spin
 // [OBSOLETE]      if( !fitToEllipsisEquation(fit_data, spin_idx, mass_eff_list) ) {
 // [OBSOLETE]	cerr << "fitToEllipsisEquation failed." << endl;
-// [OBSOLETE]	cerr << XHOST.sPID << "pflow::EffectiveMass exiting." << endl;
+// [OBSOLETE]	cerr << XPID << "pflow::EffectiveMass exiting." << endl;
 // [OBSOLETE]	return FALSE;
 // [OBSOLETE]      }
 // [OBSOLETE]      

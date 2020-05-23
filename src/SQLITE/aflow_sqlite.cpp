@@ -1,6 +1,6 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
@@ -31,7 +31,7 @@ namespace sql {
     char* sqlErrMsg = 0;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback, 0, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      std::string function = "sql::SQLexecuteCommand()";
+      std::string function = "sql::SQLexecuteCommand():";
       std::string message = string(sqlErrMsg) + " in command " + command;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
     }
@@ -44,7 +44,7 @@ namespace sql {
     string returnstring = "";
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackSCALAR, &returnstring, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommandSCALAR()";
+      string function = "sql::SQLexecuteCommandSCALAR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -60,7 +60,7 @@ namespace sql {
     vector<string> returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackVECTOR, &returnvector, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommandVECTOR()";
+      string function = "sql::SQLexecuteCommandVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -76,7 +76,7 @@ namespace sql {
     vector<vector<string> > returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback2DVECTOR, &returnvector, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommand2DVECTOR()";
+      string function = "sql::SQLexecuteCommand2DVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -163,7 +163,7 @@ namespace sql {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
