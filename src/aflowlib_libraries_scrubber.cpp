@@ -343,11 +343,11 @@ namespace aflowlib {
             if(!aurostd::substring2bool(directory_LIB,"LDAU2")) {
               bool issueFOUND=FALSE;
               if(!issueFOUND) issueFOUND=!aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"species_pp_AUID");
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"6bf17162620b7ce3")) { issueFOUND=TRUE; }} // Cl:PAW_PBE:17Jan2003 changed to diatom
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"85ded82734544fa9")) { issueFOUND=TRUE; }} // O:PAW_PBE:08Apr2002 changed to diatom
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"5c530b0eaed90a00")) { issueFOUND=TRUE; }} // O:PAW_PBE_KIN:08Apr2002 changed to diatom
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"4ce4637079c90d89")) { issueFOUND=TRUE; }} // N:PAW_PBE_KIN:08Apr2002
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"3cd4003f27559a49")) { issueFOUND=TRUE; }} // N:PAW_PBE:08Apr2002
+	      //  [OBSOLETE]              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"6bf17162620b7ce3")) { issueFOUND=TRUE; }} // Cl:PAW_PBE:17Jan2003 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"85ded82734544fa9")) { issueFOUND=TRUE; }} // O:PAW_PBE:08Apr2002 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"5c530b0eaed90a00")) { issueFOUND=TRUE; }} // O:PAW_PBE_KIN:08Apr2002 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"4ce4637079c90d89")) { issueFOUND=TRUE; }} // N:PAW_PBE_KIN:08Apr2002 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"3cd4003f27559a49")) { issueFOUND=TRUE; }} // N:PAW_PBE:08Apr2002 changed to diatom
               if(issueFOUND) {
                 listppAUID.push_back(directory_LIB);
                 ossppAUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --showPID --lib2raw=\"" << directory_LIB << "\"" << endl;
