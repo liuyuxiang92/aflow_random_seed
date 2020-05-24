@@ -10511,6 +10511,7 @@ namespace pflow {
         //[CO20181226 OBSOLETE]if(!message.empty())
         for(uint i=0;i<message_parts.size();i++) //CO20181226
         { //CO20200106 - patching for auto-indenting
+          oss << XPID; //CO20200524
           oss << "EEEEE";
           oss << "  ";
 
@@ -10540,6 +10541,7 @@ namespace pflow {
       //[CO20181226 OBSOLETE]if(!message.empty())
       for(uint i=0;i<message_parts.size();i++) //CO20181226
       { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << XPID; //CO20200524
         FileMESSAGE << "EEEEE";
         FileMESSAGE << "  ";
         FileMESSAGE << "ERROR";
@@ -10572,6 +10574,7 @@ namespace pflow {
         //[CO20181226 OBSOLETE]if(!message.empty())
         for(uint i=0;i<message_parts.size();i++) //CO20181226
         { //CO20200106 - patching for auto-indenting
+          oss << XPID; //CO20200524
           oss << "WWWWW";
           oss << "  ";
 
@@ -10602,6 +10605,7 @@ namespace pflow {
       //[CO20181226 OBSOLETE]if(!message.empty())
       for(uint i=0;i<message_parts.size();i++) //CO20181226
       { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << XPID; //CO20200524
         FileMESSAGE << "WWWWW";
         FileMESSAGE << "  ";
         FileMESSAGE << "WARNING";
@@ -10632,6 +10636,7 @@ namespace pflow {
         //[CO20181226 OBSOLETE]if(!message.empty())
         for(uint i=0;i<message_parts.size();i++) //CO20181226
         { //CO20200106 - patching for auto-indenting
+          oss << XPID; //CO20200524
           oss << "CCCCC";
           oss << "  ";
 
@@ -10656,6 +10661,7 @@ namespace pflow {
       //[CO20181226 OBSOLETE]if(!message.empty())
       for(uint i=0;i<message_parts.size();i++) //CO20181226
       { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << XPID; //CO20200524
         FileMESSAGE << "CCCCC";
         FileMESSAGE << "  ";
         FileMESSAGE << "COMPLETE";
@@ -10682,6 +10688,7 @@ namespace pflow {
         //[CO20181226 OBSOLETE]if(!message.empty())
         for(uint i=0;i<message_parts.size();i++) //CO20181226
         { //CO20200106 - patching for auto-indenting
+          oss << XPID; //CO20200524
           oss << "-OPT-";
           oss << "  ";
           oss << "MESSAGE-OPTION";
@@ -10698,6 +10705,7 @@ namespace pflow {
       //[CO20181226 OBSOLETE]if(!message.empty())
       for(uint i=0;i<message_parts.size();i++) //CO20181226
       { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << XPID; //CO20200524
         FileMESSAGE << "-OPT-";
         FileMESSAGE << "  ";
         FileMESSAGE << "MESSAGE-OPTION";
@@ -10725,6 +10733,7 @@ namespace pflow {
         //[CO20181226 OBSOLETE]if(!message.empty())
         for(uint i=0;i<message_parts.size();i++) //CO20181226
         { //CO20200106 - patching for auto-indenting
+          oss << XPID; //CO20200524
           oss << message_parts[i] << endl; //CO20181226 //message;
         }
         oss.flush();
@@ -10733,6 +10742,7 @@ namespace pflow {
       //[CO20181226 OBSOLETE]if(!message.empty())
       for(uint i=0;i<message_parts.size();i++) //CO20181226
       { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << XPID; //CO20200524
         FileMESSAGE << message_parts[i] << endl; //CO20181226 //message;
       }
       FileMESSAGE.flush();
@@ -10752,6 +10762,7 @@ namespace pflow {
         //[CO20181226 OBSOLETE]if(!message.empty())
         for(uint i=0;i<message_parts.size();i++) //CO20181226
         { //CO20200106 - patching for auto-indenting
+          oss << XPID; //CO20200524
           oss << "00000";
           oss << "  ";
           oss << "MESSAGE";
@@ -10768,6 +10779,7 @@ namespace pflow {
       //[CO20181226 OBSOLETE]if(!message.empty())
       for(uint i=0;i<message_parts.size();i++) //CO20181226
       { //CO20200106 - patching for auto-indenting
+        FileMESSAGE << XPID; //CO20200524
         FileMESSAGE << "00000";
         FileMESSAGE << "  ";
         FileMESSAGE << "MESSAGE";
