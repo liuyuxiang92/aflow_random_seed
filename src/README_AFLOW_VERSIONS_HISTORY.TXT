@@ -1,3 +1,11 @@
+3.2.4 - 2020/06/22
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+        -- Moved POCC progress bar into pflow. (ME)
+        -- Added "Notice" from apl::Logger into pflow::logger. (ME)
+        -- Modularized APL option parsing. (ME)
+        -- Merged more pflow logging capabilities into APL. (ME)
+        -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
+        -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
 3.2.3 - 2020/05/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
 	-- Bug fixes in KBIN::ExtractSystemName() (ME)
