@@ -5848,7 +5848,7 @@ namespace KBIN {
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
     if(aurostd::FileExist(aflowin_path)) {
-      // ME20200525 - Need to take potential white space between [AFLOW],
+      //ME20200525 - Need to take potential white space between [AFLOW],
       // SYSTEM, and = into account.
       vector<string> aflowin;
       aurostd::file2vectorstring(aflowin_path, aflowin);
