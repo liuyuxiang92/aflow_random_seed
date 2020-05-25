@@ -43,7 +43,7 @@ namespace apl {
   Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {
     free();
     _directory = directory;
-    readFromStateFile(filename);
+    initialize(filename);
   }
 
   Supercell::Supercell(const Supercell& that) : xStream(*that.getOFStream(),*that.getOSS()) {
@@ -119,8 +119,13 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void Supercell::readFromStateFile(const string& filename) {
-    string function = "apl::Supercell::readFromStateFile():";
+  void Supercell::initialize(const string& filename, ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(filename);
+  }
+
+  void Supercell::initialize(const string& filename) {
+    string function = "apl::Supercell::initialize():";
     string message = "";
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
@@ -178,6 +183,11 @@ namespace apl {
 
   //ME20200315 - Added VERBOSE to prevent excessive file output when
   // reading from state file
+  void Supercell::initialize(const xstructure& _xstr, ofstream& mf, bool VERBOSE, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(_xstr, VERBOSE);
+  }
+
   void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::initialize():";

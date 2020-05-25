@@ -140,6 +140,11 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the anharmonic IFC calculator by building the ClusterSet.
+  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts, ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(scell, _order, opts);
+  }
+
   void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts) {
     string function = "apl::AnharmonicIFCs::initialize()";
     string message = "";

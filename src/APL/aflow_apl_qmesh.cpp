@@ -143,9 +143,21 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the q-point grid
+  void QMesh::initialize(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
+      bool include_inversions, bool gamma_centered, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(vgrid, xs, include_inversions, gamma_centered);
+  }
+
   void QMesh::initialize(const vector<int>& vgrid, const xstructure& xs,
       bool include_inversions, bool gamma_centered) {
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
+  }
+
+  void QMesh::initialize(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
+      bool include_inversions, bool gamma_centered, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(grid, xs, include_inversions, gamma_centered);
   }
 
   void QMesh::initialize(const xvector<int>& grid, const xstructure& xs,

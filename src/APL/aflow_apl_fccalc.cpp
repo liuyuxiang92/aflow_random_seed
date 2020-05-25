@@ -108,6 +108,11 @@ namespace apl {
     USER_GENERATE_PLUS_MINUS = false;  //CO
   }
 
+  void ForceConstantCalculator::initialize(const aurostd::xoption& opts, ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(opts);
+  }
+
   void ForceConstantCalculator::initialize(const aurostd::xoption& opts) {
     string function = "apl::ForceConstantCalculator::initialize()";
     string message = "";

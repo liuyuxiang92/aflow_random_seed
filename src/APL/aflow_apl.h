@@ -91,7 +91,9 @@ namespace apl {
       Supercell& operator=(const Supercell&);
       ~Supercell();
       void clear();
-      void readFromStateFile(const string&);  // ME20200212
+      void initialize(const string&, ofstream&, ostream& oss=std::cout);
+      void initialize(const string&);  // ME20200212
+      void initialize(const xstructure&, ofstream&, bool=true, ostream& oss=std::cout);
       void initialize(const xstructure&, bool=true);  // ME20191225
       void clearSupercell();
       //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
@@ -195,7 +197,9 @@ namespace apl {
       void clear();
       void clear_tetrahedra();
 
+      void initialize(const vector<int>&, const xstructure& xs, ofstream&, bool=true, bool=true, ostream& oss=std::cout);
       void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
+      void initialize(const xvector<int>&, const xstructure& xs, ofstream&, bool=true, bool=true, ostream& oss=std::cout);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
       void makeIrreducible();
@@ -399,6 +403,7 @@ namespace apl {
       ForceConstantCalculator& operator=(const ForceConstantCalculator&);
       ~ForceConstantCalculator();
       void clear(Supercell&);
+      void initialize(const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
       void initialize(const aurostd::xoption&);
 
       bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
@@ -451,7 +456,6 @@ namespace apl {
     vector<vector<int> > indep2depMap;
   };
 
-  class Supercell;  // Forward declaration
   class ClusterSet : public xStream {
     // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
     public:
@@ -463,6 +467,7 @@ namespace apl {
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
       void clear();
+      void initialize(const Supercell&, int, int, double, ofstream&, ostream& oss=std::cout);
       void initialize(const Supercell&, int, int, double);
       void readClusterSetFromFile(const string&);
 
@@ -566,6 +571,7 @@ namespace apl {
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
       void clear();
+      void initialize(const Supercell&, int, const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
       void initialize(const Supercell&, int, const aurostd::xoption&);
 
       void setOptions(double, int, double, double, bool);
@@ -972,7 +978,6 @@ namespace apl {
 
   class ThermalPropertiesCalculator : public xStream {
     private:
-      string _directory;
       std::vector<double> _freqs_0K;
       std::vector<double> _dos_0K;
       string system;
@@ -993,17 +998,16 @@ namespace apl {
       ~ThermalPropertiesCalculator();
       void clear();
 
-      void setDirectory(const string&);
-      string getDirectory() const;
-
       vector<double> temperatures;
       vector<double> Cv;
       vector<double> Fvib;
       vector<double> Svib;
       vector<double> U;
       double U0;
+      string _directory;
 
-      void initialize(const vector<double>&, const vector<double>&, string="");
+      void initialize(const vector<double>&, const vector<double>&, ofstream&, const string& system="", ostream& oss=std::cout);
+      void initialize(const vector<double>&, const vector<double>&, const string& system="");
       void calculateThermalProperties(double, double, double);
       void addPoint(double, const xDOSCAR&);
       void addPoint(double, const vector<double>&, const vector<double>&);

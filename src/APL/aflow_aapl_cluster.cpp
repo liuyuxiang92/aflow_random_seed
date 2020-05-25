@@ -130,6 +130,11 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initialize basic parameters.
+  void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad, ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(supercell, _order, cut_shell, cut_rad);
+  }
+
   void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad) {
     string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize():";
     stringstream message;

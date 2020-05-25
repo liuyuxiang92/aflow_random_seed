@@ -112,14 +112,6 @@ namespace apl {
     free();
   }
 
-  void ThermalPropertiesCalculator::setDirectory(const string& directory) {
-    _directory = directory;
-  }
-
-  string ThermalPropertiesCalculator::getDirectory() const {
-    return _directory;
-  }
-
 }  // namespace apl
 
 //////////////////////////////////////////////////////////////////////////////
@@ -133,8 +125,13 @@ namespace apl {
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the thermal properties calculator with a 0 K solution.
   void ThermalPropertiesCalculator::initialize(const vector<double>& freqs,
-      const vector<double>& dos,
-      string _system) {
+      const vector<double>& dos, ofstream& mf, const string& _system, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(freqs, dos, _system);
+  }
+
+  void ThermalPropertiesCalculator::initialize(const vector<double>& freqs,
+      const vector<double>& dos, const string& _system) {
     _freqs_0K = freqs;
     _dos_0K = dos;
     system = _system;

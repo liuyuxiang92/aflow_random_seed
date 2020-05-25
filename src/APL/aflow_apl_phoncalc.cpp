@@ -197,7 +197,7 @@ namespace apl {
     _supercell.initialize(xstr);
   }
   void PhononCalculator::initialize_supercell(const string& filename) {
-    _supercell.readFromStateFile(filename);
+    _supercell.initialize(filename);
   }
 }
 
