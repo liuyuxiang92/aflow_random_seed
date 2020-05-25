@@ -11,7 +11,6 @@
 #define _AFLOW_MAKEFILE_CPP_
 
 #include "aflow.h"
-#include "aflow_makefile.h"
 
 #define _DEBUG_MAKEFILE_ true
 #define EXCLUDE_DATA true
@@ -90,193 +89,193 @@ namespace makefile {
     if(LDEBUG){cerr << soliloquy << " dfiles=" << aurostd::joinWDelimiter(dfiles,",") << endl;}
   }
 
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<string>& vdefinitions){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::replaceMakefileDefinitions():";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool replacement_made=false;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string::size_type loc_var_first,loc_var_last;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string variable="";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  uint i=0,j=0;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  for(j=0;j<vdefinitions.size();j++){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    string& definitions=vdefinitions[j];
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    loc_var_first=definitions.find("$(");
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(loc_var_first!=string::npos){ //variable found in definition
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "]=\"" << definitions << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      loc_var_last=definitions.find(')',loc_var_first);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      variable=definitions.substr(loc_var_first,loc_var_last-loc_var_first);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      aurostd::StringSubst(variable,"$(","");
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      aurostd::StringSubst(variable,")","");
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      //aurostd::StringSubst(variable,"\\\"","");  //weird functionality: $(TIME)\" needs to remove \"
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(LDEBUG){cerr << soliloquy << " variable inside vdefinitions[j=" << j << "]: \"" << variable << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(variable.find("shell ")!=string::npos){continue;} //skip calls to shell
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(variable.find(":")!=string::npos && variable.find("=")!=string::npos){continue;} //skip subst_ref
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      replacement_made=false;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      for(i=0;i<vvariables.size();i++){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(variable==vvariables[i]){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "](pre )=\"" << definitions << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          string& definitions_sub=vdefinitions[i];
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          if(LDEBUG){cerr << soliloquy << " vdefinitions[i=" << i << "]=\"" << definitions_sub << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          if(definitions_sub.find("shell ")!=string::npos){break;} //skip replacing calls to shell
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          if(definitions_sub.find(":")!=string::npos && definitions_sub.find("=")!=string::npos){break;} //skip replacing subst_ref
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          aurostd::StringSubst(definitions,"$("+variable+")",definitions_sub);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          replacement_made=true;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "](post)=\"" << definitions << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          break;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(replacement_made){j--;continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<vector<string> >& vvdefinitions){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::replaceMakefileDefinitions():";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  vector<string> vdefinitions;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  for(uint j=0;j<vvdefinitions.size();j++){vdefinitions.push_back(aurostd::joinWDelimiter(vvdefinitions[j]," "));}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  replaceMakefileDefinitions(vvariables,vdefinitions);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  splitMakefileDefinitions(vdefinitions,vvdefinitions);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void splitMakefileDefinitions(const string& definitions,vector<string>& vdefinitions){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::splitMakefileDefinitions():";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //split by spaces, except for $(shell date ...)
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  vdefinitions.clear();
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  if(LDEBUG){cerr << soliloquy << " definitions=" << definitions << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string definition="";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  uint count_start=0,count_end=0;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //aurostd::string2tokens(definitions,vdefinitions," ");
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string::size_type loc_var_first,loc_var_middle,loc_var_last;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  loc_var_first=loc_var_last=0;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  loc_var_last=definitions.find(' ',loc_var_last+1);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  uint i=0;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  while(loc_var_last!=string::npos){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(LDEBUG){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      cerr << soliloquy << " loc_var_first=" << loc_var_first << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      cerr << soliloquy << " loc_var_last=" << loc_var_last << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    definition=definitions.substr(loc_var_first,loc_var_last-loc_var_first);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    loc_var_middle=loc_var_last+1;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    loc_var_last=definitions.find(' ',loc_var_middle);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    //check that you have enclosing $()
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    count_start=count_end=0;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    for(i=0;i<definition.size();i++){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(definition[i]=='$' && i+1<definition.size() && definition[i+1]=='('){count_start++;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(definition[i]==')'){count_end++;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(count_start!=count_end){continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    //if(definition.find("$(")!=string::npos && definition.find(")")==string::npos){continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    //if(definition.find("$(")==string::npos && definition.find(")")!=string::npos){continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    definition=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(definition); //repetita iuvant
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(definition.empty()){continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(LDEBUG){cerr << soliloquy << " splitting: " << definition << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    vdefinitions.push_back(definition);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    loc_var_first=loc_var_middle;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //get end
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  definition=definitions.substr(loc_var_first,string::npos);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  definition=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(definition); //repetita iuvant
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  if(!definition.empty()){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(LDEBUG){cerr << soliloquy << " splitting: " << definition << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    vdefinitions.push_back(definition);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void splitMakefileDefinitions(const vector<string>& vdefinitions,vector<vector<string> >& vvdefinitions){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::splitMakefileDefinitions():";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //split by spaces, except for $(shell date ...)
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  for(uint j=0;j<vdefinitions.size();j++){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "]=\"" << vdefinitions[j] << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    vvdefinitions.push_back(vector<string>(0));
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    splitMakefileDefinitions(vdefinitions[j],vvdefinitions.back());
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::readMakefileVariables():";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string filename=aurostd::CleanFileName(directory+"/Makefile");
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  aurostd::CleanStringASCII_InPlace(filename);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  if(!aurostd::FileExist(filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"File \""+filename+"\" does not exist",_VALUE_ILLEGAL_);}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  vector<string> vlines;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  aurostd::file2vectorstring(filename,vlines);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  return readMakefileVariables(vlines,vvariables,vvdefinitions);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string soliloquy="makefile::readMakefileVariables():";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //find raw variables and definitions
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  vector<string> vtokens,vdefinitions;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string::size_type loc,loc_var_first,loc_var_last;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  string line="",variable="",definition="",subst_ref_string="";
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  bool found_subst_ref=false;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  uint i=0,j=0;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  for(i=0;i<vlines.size();i++){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    line = vlines[i];
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    loc=line.find("#");line=line.substr(0,loc);line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line);  //remove comments
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(line.size()>0 && line[0]=='\t'){continue;} //a recipe
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    if(line.find("=")!=string::npos){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      //better to define definition first because you could have: TODAY=-DTODAY=\"$(TIME)\"
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      //definition
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      found_subst_ref=true;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      loc=string::npos;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      while(found_subst_ref){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        loc=line.find_last_of("=",loc);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(loc==string::npos){break;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        //check that it is not a substitution ref: $(AFLOW_CPP:.cpp=.o)
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        loc_var_first=line.find_last_of("$(",loc);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(loc_var_first==string::npos){break;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        loc_var_last=line.find(")",loc);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(LDEBUG){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          cerr << soliloquy << " loc=" << loc << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          cerr << soliloquy << " loc_var_first=" << loc_var_first << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          cerr << soliloquy << " loc_var_last=" << loc_var_last << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        subst_ref_string=line.substr(loc_var_first-1,loc_var_last-loc_var_first+2);  //-1 because "$(" is length 2
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(LDEBUG){cerr << soliloquy << " subst_ref_string=" << subst_ref_string << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(subst_ref_string.find(":")==string::npos && subst_ref_string.find("=")==string::npos){break;} //not a subst_ref
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        loc-=1;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(loc==string::npos){continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      definition=line.substr(loc+1,string::npos); //+1 for equals sign
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      definition=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(definition);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(0&&LDEBUG){cerr << soliloquy << " definition=\"" << definition << "\"" << endl;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      //variable
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      variable=line.substr(0,loc);  //no +1 because of equals sign
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      variable=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(variable);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      if(variable.back()==':'){variable.pop_back();}  //in case the definition uses := instead of =
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      aurostd::string2tokens(variable,vtokens,"="); //double variable assignment: TODAY=-DTODAY=\"$(TIME)\"
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      for(j=0;j<vtokens.size();j++){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        variable=vtokens[j];
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        variable=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(variable);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(variable.empty()){continue;}
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        vvariables.push_back(variable);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        vdefinitions.push_back(definition);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        if(LDEBUG){
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          cerr << soliloquy << " variable=\"" << vvariables.back() << "\"" << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]          cerr << soliloquy << " definition=\"" << vdefinitions.back() << "\"" << endl;
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]        }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]      }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  }
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //perform replacements
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //NB: some variables appear twice, e.g., ARCH
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //so this replaces with the first instance (not necessarily the correct one)
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //this does not affect current functionality, as we only care about prerequisites
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  //you are warned
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  replaceMakefileDefinitions(vvariables,vdefinitions);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  splitMakefileDefinitions(vdefinitions,vvdefinitions);
-  //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<string>& vdefinitions){
+  //[CO20200508 - OBSOLETE]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+  //[CO20200508 - OBSOLETE]  string soliloquy="makefile::replaceMakefileDefinitions():";
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  bool replacement_made=false;
+  //[CO20200508 - OBSOLETE]  string::size_type loc_var_first,loc_var_last;
+  //[CO20200508 - OBSOLETE]  string variable="";
+  //[CO20200508 - OBSOLETE]  uint i=0,j=0;
+  //[CO20200508 - OBSOLETE]  for(j=0;j<vdefinitions.size();j++){
+  //[CO20200508 - OBSOLETE]    string& definitions=vdefinitions[j];
+  //[CO20200508 - OBSOLETE]    loc_var_first=definitions.find("$(");
+  //[CO20200508 - OBSOLETE]    if(loc_var_first!=string::npos){ //variable found in definition
+  //[CO20200508 - OBSOLETE]      if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "]=\"" << definitions << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]      loc_var_last=definitions.find(')',loc_var_first);
+  //[CO20200508 - OBSOLETE]      variable=definitions.substr(loc_var_first,loc_var_last-loc_var_first);
+  //[CO20200508 - OBSOLETE]      aurostd::StringSubst(variable,"$(","");
+  //[CO20200508 - OBSOLETE]      aurostd::StringSubst(variable,")","");
+  //[CO20200508 - OBSOLETE]      //aurostd::StringSubst(variable,"\\\"","");  //weird functionality: $(TIME)\" needs to remove \"
+  //[CO20200508 - OBSOLETE]      if(LDEBUG){cerr << soliloquy << " variable inside vdefinitions[j=" << j << "]: \"" << variable << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]      if(variable.find("shell ")!=string::npos){continue;} //skip calls to shell
+  //[CO20200508 - OBSOLETE]      if(variable.find(":")!=string::npos && variable.find("=")!=string::npos){continue;} //skip subst_ref
+  //[CO20200508 - OBSOLETE]      replacement_made=false;
+  //[CO20200508 - OBSOLETE]      for(i=0;i<vvariables.size();i++){
+  //[CO20200508 - OBSOLETE]        if(variable==vvariables[i]){
+  //[CO20200508 - OBSOLETE]          if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "](pre )=\"" << definitions << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]          string& definitions_sub=vdefinitions[i];
+  //[CO20200508 - OBSOLETE]          if(LDEBUG){cerr << soliloquy << " vdefinitions[i=" << i << "]=\"" << definitions_sub << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]          if(definitions_sub.find("shell ")!=string::npos){break;} //skip replacing calls to shell
+  //[CO20200508 - OBSOLETE]          if(definitions_sub.find(":")!=string::npos && definitions_sub.find("=")!=string::npos){break;} //skip replacing subst_ref
+  //[CO20200508 - OBSOLETE]          aurostd::StringSubst(definitions,"$("+variable+")",definitions_sub);
+  //[CO20200508 - OBSOLETE]          replacement_made=true;
+  //[CO20200508 - OBSOLETE]          if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "](post)=\"" << definitions << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]          break;
+  //[CO20200508 - OBSOLETE]        }
+  //[CO20200508 - OBSOLETE]      }
+  //[CO20200508 - OBSOLETE]      if(replacement_made){j--;continue;}
+  //[CO20200508 - OBSOLETE]    }
+  //[CO20200508 - OBSOLETE]  }
+  //[CO20200508 - OBSOLETE]}
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<vector<string> >& vvdefinitions){
+  //[CO20200508 - OBSOLETE]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+  //[CO20200508 - OBSOLETE]  string soliloquy="makefile::replaceMakefileDefinitions():";
+  //[CO20200508 - OBSOLETE]  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  vector<string> vdefinitions;
+  //[CO20200508 - OBSOLETE]  for(uint j=0;j<vvdefinitions.size();j++){vdefinitions.push_back(aurostd::joinWDelimiter(vvdefinitions[j]," "));}
+  //[CO20200508 - OBSOLETE]  replaceMakefileDefinitions(vvariables,vdefinitions);
+  //[CO20200508 - OBSOLETE]  splitMakefileDefinitions(vdefinitions,vvdefinitions);
+  //[CO20200508 - OBSOLETE]}
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const string& definitions,vector<string>& vdefinitions){
+  //[CO20200508 - OBSOLETE]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+  //[CO20200508 - OBSOLETE]  string soliloquy="makefile::splitMakefileDefinitions():";
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  //split by spaces, except for $(shell date ...)
+  //[CO20200508 - OBSOLETE]  vdefinitions.clear();
+  //[CO20200508 - OBSOLETE]  if(LDEBUG){cerr << soliloquy << " definitions=" << definitions << endl;}
+  //[CO20200508 - OBSOLETE]  string definition="";
+  //[CO20200508 - OBSOLETE]  uint count_start=0,count_end=0;
+  //[CO20200508 - OBSOLETE]  //aurostd::string2tokens(definitions,vdefinitions," ");
+  //[CO20200508 - OBSOLETE]  string::size_type loc_var_first,loc_var_middle,loc_var_last;
+  //[CO20200508 - OBSOLETE]  loc_var_first=loc_var_last=0;
+  //[CO20200508 - OBSOLETE]  loc_var_last=definitions.find(' ',loc_var_last+1);
+  //[CO20200508 - OBSOLETE]  uint i=0;
+  //[CO20200508 - OBSOLETE]  while(loc_var_last!=string::npos){
+  //[CO20200508 - OBSOLETE]    if(LDEBUG){
+  //[CO20200508 - OBSOLETE]      cerr << soliloquy << " loc_var_first=" << loc_var_first << endl;
+  //[CO20200508 - OBSOLETE]      cerr << soliloquy << " loc_var_last=" << loc_var_last << endl;
+  //[CO20200508 - OBSOLETE]    }
+  //[CO20200508 - OBSOLETE]    definition=definitions.substr(loc_var_first,loc_var_last-loc_var_first);
+  //[CO20200508 - OBSOLETE]    loc_var_middle=loc_var_last+1;
+  //[CO20200508 - OBSOLETE]    loc_var_last=definitions.find(' ',loc_var_middle);
+  //[CO20200508 - OBSOLETE]    //check that you have enclosing $()
+  //[CO20200508 - OBSOLETE]    count_start=count_end=0;
+  //[CO20200508 - OBSOLETE]    for(i=0;i<definition.size();i++){
+  //[CO20200508 - OBSOLETE]      if(definition[i]=='$' && i+1<definition.size() && definition[i+1]=='('){count_start++;}
+  //[CO20200508 - OBSOLETE]      if(definition[i]==')'){count_end++;}
+  //[CO20200508 - OBSOLETE]    }
+  //[CO20200508 - OBSOLETE]    if(count_start!=count_end){continue;}
+  //[CO20200508 - OBSOLETE]    //if(definition.find("$(")!=string::npos && definition.find(")")==string::npos){continue;}
+  //[CO20200508 - OBSOLETE]    //if(definition.find("$(")==string::npos && definition.find(")")!=string::npos){continue;}
+  //[CO20200508 - OBSOLETE]    definition=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(definition); //repetita iuvant
+  //[CO20200508 - OBSOLETE]    if(definition.empty()){continue;}
+  //[CO20200508 - OBSOLETE]    if(LDEBUG){cerr << soliloquy << " splitting: " << definition << endl;}
+  //[CO20200508 - OBSOLETE]    vdefinitions.push_back(definition);
+  //[CO20200508 - OBSOLETE]    loc_var_first=loc_var_middle;
+  //[CO20200508 - OBSOLETE]  }
+  //[CO20200508 - OBSOLETE]  //get end
+  //[CO20200508 - OBSOLETE]  definition=definitions.substr(loc_var_first,string::npos);
+  //[CO20200508 - OBSOLETE]  definition=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(definition); //repetita iuvant
+  //[CO20200508 - OBSOLETE]  if(!definition.empty()){
+  //[CO20200508 - OBSOLETE]    if(LDEBUG){cerr << soliloquy << " splitting: " << definition << endl;}
+  //[CO20200508 - OBSOLETE]    vdefinitions.push_back(definition);
+  //[CO20200508 - OBSOLETE]  }
+  //[CO20200508 - OBSOLETE]}
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const vector<string>& vdefinitions,vector<vector<string> >& vvdefinitions){
+  //[CO20200508 - OBSOLETE]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+  //[CO20200508 - OBSOLETE]  string soliloquy="makefile::splitMakefileDefinitions():";
+  //[CO20200508 - OBSOLETE]  
+  //[CO20200508 - OBSOLETE]  //split by spaces, except for $(shell date ...)
+  //[CO20200508 - OBSOLETE]  for(uint j=0;j<vdefinitions.size();j++){
+  //[CO20200508 - OBSOLETE]    if(LDEBUG){cerr << soliloquy << " vdefinitions[j=" << j << "]=\"" << vdefinitions[j] << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]    vvdefinitions.push_back(vector<string>(0));
+  //[CO20200508 - OBSOLETE]    splitMakefileDefinitions(vdefinitions[j],vvdefinitions.back());
+  //[CO20200508 - OBSOLETE]  }
+  //[CO20200508 - OBSOLETE]}
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions){
+  //[CO20200508 - OBSOLETE]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+  //[CO20200508 - OBSOLETE]  string soliloquy="makefile::readMakefileVariables():";
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+  //[CO20200508 - OBSOLETE]  
+  //[CO20200508 - OBSOLETE]  string filename=aurostd::CleanFileName(directory+"/Makefile");
+  //[CO20200508 - OBSOLETE]  aurostd::CleanStringASCII_InPlace(filename);
+  //[CO20200508 - OBSOLETE]  if(!aurostd::FileExist(filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"File \""+filename+"\" does not exist",_VALUE_ILLEGAL_);}
+  //[CO20200508 - OBSOLETE]  vector<string> vlines;
+  //[CO20200508 - OBSOLETE]  aurostd::file2vectorstring(filename,vlines);
+  //[CO20200508 - OBSOLETE]  return readMakefileVariables(vlines,vvariables,vvdefinitions);
+  //[CO20200508 - OBSOLETE]}
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions){
+  //[CO20200508 - OBSOLETE]  bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
+  //[CO20200508 - OBSOLETE]  string soliloquy="makefile::readMakefileVariables():";
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  //find raw variables and definitions
+  //[CO20200508 - OBSOLETE]  vector<string> vtokens,vdefinitions;
+  //[CO20200508 - OBSOLETE]  string::size_type loc,loc_var_first,loc_var_last;
+  //[CO20200508 - OBSOLETE]  string line="",variable="",definition="",subst_ref_string="";
+  //[CO20200508 - OBSOLETE]  bool found_subst_ref=false;
+  //[CO20200508 - OBSOLETE]  uint i=0,j=0;
+  //[CO20200508 - OBSOLETE]  for(i=0;i<vlines.size();i++){
+  //[CO20200508 - OBSOLETE]    line = vlines[i];
+  //[CO20200508 - OBSOLETE]    loc=line.find("#");line=line.substr(0,loc);line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line);  //remove comments
+  //[CO20200508 - OBSOLETE]    if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]    if(line.size()>0 && line[0]=='\t'){continue;} //a recipe
+  //[CO20200508 - OBSOLETE]    if(line.find("=")!=string::npos){
+  //[CO20200508 - OBSOLETE]      //better to define definition first because you could have: TODAY=-DTODAY=\"$(TIME)\"
+  //[CO20200508 - OBSOLETE]      //definition
+  //[CO20200508 - OBSOLETE]      found_subst_ref=true;
+  //[CO20200508 - OBSOLETE]      loc=string::npos;
+  //[CO20200508 - OBSOLETE]      while(found_subst_ref){
+  //[CO20200508 - OBSOLETE]        loc=line.find_last_of("=",loc);
+  //[CO20200508 - OBSOLETE]        if(loc==string::npos){break;}
+  //[CO20200508 - OBSOLETE]        //check that it is not a substitution ref: $(AFLOW_CPP:.cpp=.o)
+  //[CO20200508 - OBSOLETE]        loc_var_first=line.find_last_of("$(",loc);
+  //[CO20200508 - OBSOLETE]        if(loc_var_first==string::npos){break;}
+  //[CO20200508 - OBSOLETE]        loc_var_last=line.find(")",loc);
+  //[CO20200508 - OBSOLETE]        if(LDEBUG){
+  //[CO20200508 - OBSOLETE]          cerr << soliloquy << " loc=" << loc << endl;
+  //[CO20200508 - OBSOLETE]          cerr << soliloquy << " loc_var_first=" << loc_var_first << endl;
+  //[CO20200508 - OBSOLETE]          cerr << soliloquy << " loc_var_last=" << loc_var_last << endl;
+  //[CO20200508 - OBSOLETE]        }
+  //[CO20200508 - OBSOLETE]        subst_ref_string=line.substr(loc_var_first-1,loc_var_last-loc_var_first+2);  //-1 because "$(" is length 2
+  //[CO20200508 - OBSOLETE]        if(LDEBUG){cerr << soliloquy << " subst_ref_string=" << subst_ref_string << endl;}
+  //[CO20200508 - OBSOLETE]        if(subst_ref_string.find(":")==string::npos && subst_ref_string.find("=")==string::npos){break;} //not a subst_ref
+  //[CO20200508 - OBSOLETE]        loc-=1;
+  //[CO20200508 - OBSOLETE]      }
+  //[CO20200508 - OBSOLETE]      if(loc==string::npos){continue;}
+  //[CO20200508 - OBSOLETE]      definition=line.substr(loc+1,string::npos); //+1 for equals sign
+  //[CO20200508 - OBSOLETE]      definition=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(definition);
+  //[CO20200508 - OBSOLETE]      if(0&&LDEBUG){cerr << soliloquy << " definition=\"" << definition << "\"" << endl;}
+  //[CO20200508 - OBSOLETE]      //variable
+  //[CO20200508 - OBSOLETE]      variable=line.substr(0,loc);  //no +1 because of equals sign
+  //[CO20200508 - OBSOLETE]      variable=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(variable);
+  //[CO20200508 - OBSOLETE]      if(variable.back()==':'){variable.pop_back();}  //in case the definition uses := instead of =
+  //[CO20200508 - OBSOLETE]      aurostd::string2tokens(variable,vtokens,"="); //double variable assignment: TODAY=-DTODAY=\"$(TIME)\"
+  //[CO20200508 - OBSOLETE]      for(j=0;j<vtokens.size();j++){
+  //[CO20200508 - OBSOLETE]        variable=vtokens[j];
+  //[CO20200508 - OBSOLETE]        variable=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(variable);
+  //[CO20200508 - OBSOLETE]        if(variable.empty()){continue;}
+  //[CO20200508 - OBSOLETE]        vvariables.push_back(variable);
+  //[CO20200508 - OBSOLETE]        vdefinitions.push_back(definition);
+  //[CO20200508 - OBSOLETE]        if(LDEBUG){
+  //[CO20200508 - OBSOLETE]          cerr << soliloquy << " variable=\"" << vvariables.back() << "\"" << endl;
+  //[CO20200508 - OBSOLETE]          cerr << soliloquy << " definition=\"" << vdefinitions.back() << "\"" << endl;
+  //[CO20200508 - OBSOLETE]        }
+  //[CO20200508 - OBSOLETE]      }
+  //[CO20200508 - OBSOLETE]    }
+  //[CO20200508 - OBSOLETE]  }
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  //perform replacements
+  //[CO20200508 - OBSOLETE]  //NB: some variables appear twice, e.g., ARCH
+  //[CO20200508 - OBSOLETE]  //so this replaces with the first instance (not necessarily the correct one)
+  //[CO20200508 - OBSOLETE]  //this does not affect current functionality, as we only care about prerequisites
+  //[CO20200508 - OBSOLETE]  //you are warned
+  //[CO20200508 - OBSOLETE]  replaceMakefileDefinitions(vvariables,vdefinitions);
+  //[CO20200508 - OBSOLETE]
+  //[CO20200508 - OBSOLETE]  splitMakefileDefinitions(vdefinitions,vvdefinitions);
+  //[CO20200508 - OBSOLETE]}
 
   void updateDependenciesAUROSTD(vector<string>& vdeps){
     bool LDEBUG=(FALSE || _DEBUG_MAKEFILE_ || XHOST.DEBUG);
@@ -335,15 +334,15 @@ namespace makefile {
     if(!aurostd::FileExist(directory+"/aflow.h")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/aflow.h not found",_VALUE_ILLEGAL_);} //check we are in an aflow directory
     //[not a good idea, circular flow of information]if(!aurostd::FileExist(directory+"/aflow.o")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/aflow.o not found",_VALUE_ILLEGAL_);}  //check that aflow.o exists (fast check that ANY object files exist)
 
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]vector<string> vvariables;
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]vector<vector<string> > vvdefinitions;
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]readMakefileVariables(directory,vvariables,vvdefinitions);
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]if(LDEBUG){
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  for(uint i=0;i<vvariables.size();i++){
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    cerr << soliloquy << " variable  =\"" << vvariables[i] << "\"" << endl;
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]    cerr << soliloquy << " definition=\"" << aurostd::joinWDelimiter(vvdefinitions[i],",") << "\"" << endl;
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]  }
-    //[CO20200508 - OBSOLETE, DON'T BUILD THE LATRINE UPSTREAM]}
+    //[CO20200508 - OBSOLETE]vector<string> vvariables;
+    //[CO20200508 - OBSOLETE]vector<vector<string> > vvdefinitions;
+    //[CO20200508 - OBSOLETE]readMakefileVariables(directory,vvariables,vvdefinitions);
+    //[CO20200508 - OBSOLETE]if(LDEBUG){
+    //[CO20200508 - OBSOLETE]  for(uint i=0;i<vvariables.size();i++){
+    //[CO20200508 - OBSOLETE]    cerr << soliloquy << " variable  =\"" << vvariables[i] << "\"" << endl;
+    //[CO20200508 - OBSOLETE]    cerr << soliloquy << " definition=\"" << aurostd::joinWDelimiter(vvdefinitions[i],",") << "\"" << endl;
+    //[CO20200508 - OBSOLETE]  }
+    //[CO20200508 - OBSOLETE]}
 
     vector<string> vsubdirectories;
     vsubdirectories.push_back(directory);
