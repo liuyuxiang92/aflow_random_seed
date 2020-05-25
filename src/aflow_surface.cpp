@@ -1094,10 +1094,10 @@ namespace surface {
 
 // ********************************************************************************************************/
 // ********************************************************************************************************/
-//RC-09: Depending on the initial input POSCAR, the obtained 2 basis vectors in the slab layer may be not as minimum as possible.
+//RC2009: Depending on the initial input POSCAR, the obtained 2 basis vectors in the slab layer may be not as minimum as possible.
 //        It should be corrected afterwards, by applying the general methods of unit cell minimization to the obtained here final slab POSCAR.
-//RC-09: The slab uc basis vectors coordinates are presented wrt initial POSCAR Cartesian system. So it is easy to find the position of slab uc basis vectors wrt initial POSCAR sites.
-//RC-09: If (a) parent latice is undistorted cubic-like and (b) Cartesian axises (wrt which the uc basis vectors of initial POSCAR are determined) are directed along cubic edges
+//RC2009: The slab uc basis vectors coordinates are presented wrt initial POSCAR Cartesian system. So it is easy to find the position of slab uc basis vectors wrt initial POSCAR sites.
+//RC2009: If (a) parent latice is undistorted cubic-like and (b) Cartesian axises (wrt which the uc basis vectors of initial POSCAR are determined) are directed along cubic edges
 //        then the Cartesian coordinates of third (normal to layers) basis bector of slab uc (S3) determine the slab Miller indices wrt parent CUBIC unit cell.
 //        E.g. for L10 with 4at/uc and 2at/us POSCAR definitions: (111)of4/uc=(101)of2/uc, (010)of4/uc=(110)of2/uc, (001)of4/uc=(001)of2/uc, (110)of4/uc=(100)of2/uc
 
@@ -1209,7 +1209,7 @@ namespace slab {
 namespace slab {
   xstructure MAKE_SLAB(string options,xstructure& _str_in) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "slab::MAKE_SLAB():";
+    string soliloquy = XPID + "slab::MAKE_SLAB():";
     if(LDEBUG) cerr << "slab::MAKE_SLAB: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -2005,7 +2005,7 @@ namespace slab {
     //[OBSOLETE CO20180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
     //[OBSOLETE CO20180727]    //CO20180202 - added safety
     //[OBSOLETE CO20180727]    if(i>(int)str_out.atoms.size()-1){
-    //[OBSOLETE CO20180727]      cerr << XHOST.sPID << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
+    //[OBSOLETE CO20180727]      cerr << XPID << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
     //[OBSOLETE CO20180727]      cerr << "Exiting!" << endl;
     //[OBSOLETE CO20180727]      exit(1);
     //[OBSOLETE CO20180727]    }
@@ -2032,7 +2032,7 @@ namespace slab {
   xvector<double> HKLPlane2Normal(const xstructure& xstr_in,const xvector<int>& hkl){return HKLPlane2Normal(xstr_in.scale*xstr_in.lattice,hkl);}  //CO20190320
   xvector<double> HKLPlane2Normal(const xmatrix<double>& lattice,const xvector<int>& hkl){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::HKLPlane2Normal():";
+    string soliloquy = XPID + "surface::HKLPlane2Normal():";
 
     //http://www.mse.mtu.edu/~drjohn/my3200/stereo/sg5.html
     //use metric tensor of reciprocal lattice to write 
@@ -2088,7 +2088,7 @@ namespace slab {
   bool Normal2HKLPlane(const xstructure& xstr_in,const xvector<double>& n,xvector<int>& hkl){return Normal2HKLPlane(xstr_in.scale*xstr_in.lattice,n,hkl);}  //CO20190320
   bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xvector<int>& hkl){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::Normal2HKLPlane():";
+    string soliloquy = XPID + "surface::Normal2HKLPlane():";
     stringstream message;
 
     //http://www.mse.mtu.edu/~drjohn/my3200/stereo/sg5.html
@@ -2161,7 +2161,7 @@ namespace slab {
   vector<xvector<double> > getHKLPlaneIntercepts(const xstructure& xstr_in,const xvector<int>& hkl){return getHKLPlaneIntercepts(xstr_in.scale*xstr_in.lattice,hkl);}  //CO20190320
   vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,const xvector<int>& hkl){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::getHKLPlaneIntercepts():";
+    string soliloquy = XPID + "surface::getHKLPlaneIntercepts():";
     stringstream message;
 
     if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
@@ -2258,7 +2258,7 @@ namespace slab {
   double getSpacingHKLPlane(const xstructure& xstr_in,const xvector<int>& hkl){return getSpacingHKLPlane(xstr_in.scale*xstr_in.lattice,hkl);} //CO20190320
   double getSpacingHKLPlane(const xmatrix<double>& lattice,const xvector<int>& hkl){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::getSpacingHKLPlane():";
+    string soliloquy = XPID + "surface::getSpacingHKLPlane():";
 
     //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
     //https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
@@ -2281,7 +2281,7 @@ namespace slab {
   double getAngleHKLPlanes(const xstructure& xstr_in,const xvector<int>& hkl1,const xvector<int>& hkl2){return getAngleHKLPlanes(xstr_in.scale*xstr_in.lattice,hkl1,hkl2);} //CO20190320
   double getAngleHKLPlanes(const xmatrix<double>& lattice,const xvector<int>& hkl1,const xvector<int>& hkl2){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::getAngleHKLPlanes():";
+    string soliloquy = XPID + "surface::getAngleHKLPlanes():";
 
     //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
     //https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
@@ -2329,7 +2329,7 @@ namespace slab {
     //good for hkl calculations
     //it also returns loop_iteration (how many times we loop unit cell in that direction)
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::getNextAtomInPath():";
+    string soliloquy = XPID + "surface::getNextAtomInPath():";
 
     if(LDEBUG){cerr << soliloquy << " starting" << endl;}
 
@@ -2613,7 +2613,7 @@ namespace slab {
   //getDistanceBetweenImages() considers both lattice + basis
   //outside_cell makes sure you loop outside the cell at least once
   double getDistanceBetweenImages(const xstructure& xstr_in,const xvector<double>& n_cpos,bool outside_cell){ //CO20190320
-    string soliloquy = XHOST.sPID + "surface::getDistanceBetweenImages():";
+    string soliloquy = XPID + "surface::getDistanceBetweenImages():";
     double dist=0.0;
     if(distanceBetweenImages_HKL(xstr_in,n_cpos,dist,outside_cell)){return dist;}
     if(distanceBetweenImages_Tracing(xstr_in,n_cpos,dist,outside_cell)){return dist;}
@@ -2623,7 +2623,7 @@ namespace slab {
   }
   bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& n_cpos,double& distance_between_images,bool outside_cell){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::distanceBetweenImages_HKL():";
+    string soliloquy = XPID + "surface::distanceBetweenImages_HKL():";
     distance_between_images=0.0;
 
     if(LDEBUG){
@@ -2730,7 +2730,7 @@ namespace slab {
 
   bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<double>& n_cpos,double& distance_between_images,bool outside_cell){ //CO20190320
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::distanceBetweenImages_Tracing():";
+    string soliloquy = XPID + "surface::distanceBetweenImages_Tracing():";
     distance_between_images=0.0;
 
     if(LDEBUG){
@@ -2908,7 +2908,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string soliloquy = XHOST.sPID + "surface::CreateSlab_RigidRotation():";
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string soliloquy = XPID + "surface::CreateSlab_RigidRotation():";
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream message;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  std::streamsize prec = 8;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -2991,7 +2991,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl_i,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string soliloquy = XHOST.sPID + "surface::CreateSlab_RigidRotation():";
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string soliloquy = XPID + "surface::CreateSlab_RigidRotation():";
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream message;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool check_min_dist=true; //turn off if it gets too slow
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  int count_check_min_dist=0;
@@ -3328,7 +3328,7 @@ namespace slab {
     //restricting vlen is NOT a priority (unless you want a particular v3), it is better to restrict angle via ang_dev
     //hence, the order of the default variables
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::getSlabLattice():";
+    string soliloquy = XPID + "surface::getSlabLattice():";
 
     //assume NO changes in xstr_in (too slow)
     const xmatrix<double>& lattice=xstr_in.lattice;
@@ -3614,7 +3614,7 @@ namespace slab {
   }
   xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::CreateSlab_SurfaceLattice():";
+    string soliloquy = XPID + "surface::CreateSlab_SurfaceLattice():";
     stringstream message;
     std::streamsize prec = 8;
 
@@ -3697,7 +3697,7 @@ namespace slab {
   }
   xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl_i,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "surface::CreateSlab_SurfaceLattice():";
+    string soliloquy = XPID + "surface::CreateSlab_SurfaceLattice():";
     stringstream message;
     bool check_min_dist=true; //turn off if it gets too slow
     int count_check_min_dist=0;
@@ -3974,7 +3974,7 @@ namespace slab {
   bool slabTest(ostream& oss){ofstream FileMESSAGE;return slabTest(FileMESSAGE,oss);}  //CO20190520
   bool slabTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "slabTest():";
+    string soliloquy = XPID + "slabTest():";
     stringstream message;
     _aflags aflags;aflags.Directory=".";
 

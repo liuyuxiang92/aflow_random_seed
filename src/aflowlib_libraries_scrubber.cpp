@@ -32,7 +32,7 @@ namespace aflowlib {
 // will be moved near LI2RAW
 namespace aflowlib {
   uint LIB2SCRUB(string library,bool VERBOSE) {
-    string soliloquy = XHOST.sPID + "aflowlib::LIB2SCRUB:";
+    string soliloquy = XPID + "aflowlib::LIB2SCRUB:";
     if(VERBOSE) acerr << soliloquy << " BEGIN" << endl;
     vector<string> vlib;
     uint fixes=0;
@@ -343,11 +343,11 @@ namespace aflowlib {
             if(!aurostd::substring2bool(directory_LIB,"LDAU2")) {
               bool issueFOUND=FALSE;
               if(!issueFOUND) issueFOUND=!aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"species_pp_AUID");
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"6bf17162620b7ce3")) { issueFOUND=TRUE; }} // Cl:PAW_PBE:17Jan2003 changed to diatom
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"85ded82734544fa9")) { issueFOUND=TRUE; }} // O:PAW_PBE:08Apr2002 changed to diatom
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"5c530b0eaed90a00")) { issueFOUND=TRUE; }} // O:PAW_PBE_KIN:08Apr2002 changed to diatom
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"4ce4637079c90d89")) { issueFOUND=TRUE; }} // N:PAW_PBE_KIN:08Apr2002
-              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"3cd4003f27559a49")) { issueFOUND=TRUE; }} // N:PAW_PBE:08Apr2002
+	      //  [OBSOLETE]              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"6bf17162620b7ce3")) { issueFOUND=TRUE; }} // Cl:PAW_PBE:17Jan2003 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"85ded82734544fa9")) { issueFOUND=TRUE; }} // O:PAW_PBE:08Apr2002 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"5c530b0eaed90a00")) { issueFOUND=TRUE; }} // O:PAW_PBE_KIN:08Apr2002 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"4ce4637079c90d89")) { issueFOUND=TRUE; }} // N:PAW_PBE_KIN:08Apr2002 changed to diatom
+              //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"3cd4003f27559a49")) { issueFOUND=TRUE; }} // N:PAW_PBE:08Apr2002 changed to diatom
               if(issueFOUND) {
                 listppAUID.push_back(directory_LIB);
                 ossppAUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --showPID --lib2raw=\"" << directory_LIB << "\"" << endl;
@@ -462,7 +462,7 @@ namespace aflowlib {
   bool LIB2AUID(string entry,bool TEST,bool _VERBOSE) {
     if(_VERBOSE){;} //CO20190906 - keep _VERBOSE busy
     bool VERBOSE=FALSE;// _VERBOSE;
-    string soliloquy = XHOST.sPID + "aflowlib::LIB2AUID:";
+    string soliloquy = XPID + "aflowlib::LIB2AUID:";
     if(VERBOSE) acerr << soliloquy + " BEGIN" << endl;
     string _entry=entry,directory_LIB,directory_RAW,directory_WEB;
     aurostd::StringSubst(_entry,"/aflow.in","");

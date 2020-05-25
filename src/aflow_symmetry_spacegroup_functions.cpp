@@ -2037,7 +2037,7 @@ namespace SYM {
 namespace SYM {
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XHOST.sPID + "SYM::get_wyckoff_pos()";
+    string function_name = XPID + "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
     //if(!invec<int>(mult_vec,mult)){cerr << "ERROR: no wyckoff position with multiplicity "<<mult << "."<<endl;exit(1);}
@@ -2244,7 +2244,7 @@ namespace SYM {
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XHOST.sPID + "SYM::getWyckoffInformation()";
+    string function_name = XPID + "SYM::getWyckoffInformation()";
     bool reduce = true; // DEBUGGING variable: simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
     vector<string> split_Wyckoff_strings, Wyckoff_tokens, positions;
 
@@ -2731,7 +2731,7 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190723
 
-    string soliloquy = XHOST.sPID + "SYM::formatWyckoffPosition()";
+    string soliloquy = XPID + "SYM::formatWyckoffPosition()";
 
     stringstream ss_eqn;
     string coordinate = "";
@@ -2815,7 +2815,7 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190708
 
-    string soliloquy = XHOST.sPID + "SYM::reorderWyckoffPosition()";
+    string soliloquy = XPID + "SYM::reorderWyckoffPosition()";
     stringstream message;
 
     // ---------------------------------------------------------------------------

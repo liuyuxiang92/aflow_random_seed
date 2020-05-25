@@ -4162,7 +4162,7 @@ namespace anrl {
   vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting ){
     // get lattice parameter values from the XSTRUCTURE
 
-    string function_name = XHOST.sPID + "anrl::getANRLLatticeParameterValuesFromABCAngles()";
+    string function_name = XPID + "anrl::getANRLLatticeParameterValuesFromABCAngles()";
 
     // extract lattice parameters from xstructure
     vector<double> all_lattice_parameters;
@@ -4263,7 +4263,7 @@ namespace anrl {
   string structure2anrl(istream& input, aurostd::xoption& vpflow) { 
     // determine anrl label, parameters, and parameter values of the input structure
 
-    string function_name = XHOST.sPID + "anrl::structure2anrl()";
+    string function_name = XPID + "anrl::structure2anrl()";
 
     string directory="";
     bool recalculate_symmetry = true; //DX20191030
@@ -4285,6 +4285,7 @@ namespace anrl {
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       format = "json";
     }
+    //DX20191217 END
 
     //DX20191030 - add force Wyckoff choice option - START
     // check if forcing certain Wyckoff convention 
@@ -4374,7 +4375,7 @@ namespace anrl {
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
 
-    string function_name = XHOST.sPID + "anrl::structure2anrl()";
+    string function_name = XPID + "anrl::structure2anrl()";
     ostringstream oss;
     stringstream message;
     ofstream FileMESSAGE;

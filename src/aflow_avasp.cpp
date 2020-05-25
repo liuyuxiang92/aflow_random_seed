@@ -480,7 +480,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
   //if(species=="B")  return "B"; //vasp recommends     [PAW_PBE]
   if(species=="Ba") return "Ba_sv"; // unique choice...     [PAW_PBE]
   if(species=="Be") return "Be_sv"; //SC     [PAW_PBE]
-  if(species=="Bi") return "Bi_d"; //SC,WSETYAWAN     [PAW_PBE]
+  if(species=="Bi") return "Bi_d"; //SC+WSETYAWAN     [PAW_PBE]
   if(species=="Br") return "Br"; // unique choice...     [PAW_PBE]
   if(species=="C")  return "C"; //SC, vasp recommends     [PAW_PBE]
   if(species=="Ca") return "Ca_sv"; //SC     [PAW_PBE]
@@ -511,14 +511,14 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
   if(species=="Ir") return "Ir"; // unique choice...     [PAW_PBE]
   if(species=="K")  return "K_sv"; //SC     [PAW_PBE]
   if(species=="Kr") return "Kr"; // unique choice...     [PAW_PBE]
-  if(species=="La") return "La"; //SC,WSETYAWAN // LDAU     [PAW_PBE]
+  if(species=="La") return "La"; //SC+WSETYAWAN // LDAU     [PAW_PBE]
   if(species=="Li") return "Li_sv"; //SC     [PAW_PBE]
   //  if(species=="Lu") return "Lu_3"; //WSETYAWAN, frozen f     [PAW_PBE]
   if(species=="Lu") return "Lu"; //WSETYAWAN, with f-states,  LDAU     [PAW_PBE]
   if(species=="Mg") return "Mg_pv"; //SC     [PAW_PBE]
   if(species=="Mn") return "Mn_pv"; //SC     [PAW_PBE]
   if(species=="Mo") return "Mo_pv"; //SC     [PAW_PBE]
-  if(species=="Na") return "Na_sv"; // was pv "; //SC,WSETYAWAN     [PAW_PBE]
+  if(species=="Na") return "Na_sv"; // was pv "; //SC+WSETYAWAN     [PAW_PBE]
   if(species=="N")  return "N"; // vasp recommends     [PAW_PBE]
   if(species=="Nb") return "Nb_sv"; //SC     [PAW_PBE]
   //  if(species=="Nd") return "Nd_3"; //WSETYAWAN, frozen f     [PAW_PBE]
@@ -530,7 +530,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
   if(species=="Os") return "Os_pv"; //SC     [PAW_PBE]
   if(species=="P")  return "P"; //WSETYAWAN, teragrid project     [PAW_PBE]
   if(species=="Pa") return "Pa"; // UNTESTED SC of Pa,Pa_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
-  if(species=="Pb") return "Pb_d"; //SC,WSETYAWAN     [PAW_PBE]
+  if(species=="Pb") return "Pb_d"; //SC+WSETYAWAN     [PAW_PBE]
   if(species=="Pd") return "Pd_pv"; //SC     [PAW_PBE]
   //  if(species=="Pm") return "Pm_3"; //WSETYAWAN, frozen f     [PAW_PBE]
   if(species=="Pm") return "Pm"; //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
@@ -546,7 +546,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
   if(species=="Sb") return "Sb"; // unique choice...     [PAW_PBE]
   if(species=="Sc") return "Sc_sv"; // unique choice...     [PAW_PBE]
   if(species=="Se") return "Se"; // unique choice...     [PAW_PBE]
-  if(species=="Si") return "Si"; // was _h"; //SC,WSETYAWAN     [PAW_PBE]
+  if(species=="Si") return "Si"; // was _h"; //SC+WSETYAWAN     [PAW_PBE]
   //  if(species=="Sm") return "Sm_3"; //WSETYAWAN, frozen f     [PAW_PBE]
   if(species=="Sm") return "Sm"; //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
   if(species=="Sn") return "Sn"; //SC     [PAW_PBE]
@@ -677,7 +677,7 @@ string AVASP_Get_PseudoPotential_PBE(string species) {
 
 bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,_xvasp& xvasp){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_populateXVASP():";
+  string soliloquy = XPID + "AVASP_populateXVASP():";
 
   if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
 
@@ -1251,7 +1251,7 @@ bool AVASP_MakeSingleAFLOWIN(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_W
 bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakeSingleAFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakeSingleAFLOWIN():";
   stringstream message;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[0]" << endl;
@@ -3314,7 +3314,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
 bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakeSingleAFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakeSingleAFLOWIN():";
   stringstream message;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[0]" << endl;
@@ -5061,7 +5061,7 @@ bool AVASP_MakePrototype_AFLOWIN(_AVASP_PROTO *PARAMS) {
 
 bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakePrototype_AFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
   if(LDEBUG) cerr << " " << soliloquy << " BEGIN" << endl; 
 
@@ -6024,7 +6024,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
 #ifndef COMPILE_SLIM
 bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakePrototype_AFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
   if(LDEBUG) cerr << " " << soliloquy << " BEGIN" << endl; 
 
@@ -6764,7 +6764,7 @@ bool AVASP_REMOVE_LDAU(_xvasp &xvasp) {
 bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONLY_IF_MISSING) { //CO20200106 - patching for auto-indenting
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakePrototypeICSD_AFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakePrototypeICSD_AFLOWIN():";
   if(LDEBUG) cerr << soliloquy << " 0a" << endl;
   _xvasp xvasp;
   AVASP_DefaultValuesICSD_AFLOWIN(xvasp);
