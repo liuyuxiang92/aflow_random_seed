@@ -70,4 +70,4 @@ src/MODIFIED_FILES_*.zip
 src/compile_output*.txt
 
 # old Makefiles
-Makefile.aflow.old
+Makefile.aflow.OLD
