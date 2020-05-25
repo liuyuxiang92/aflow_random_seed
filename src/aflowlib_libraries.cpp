@@ -3768,14 +3768,20 @@ namespace aflowlib {
         if(data.anrl_label_orig=="A_hR1_166_a" && (s=="Hg")) { // A10
           cout << TXT1 << "A10" << TXT2 << endl;}
         // A11
-        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="I")) { // A11
+        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga")) { // A11
           cout << TXT1 << "A11" << TXT2 << endl;}
         // A12
         if(data.anrl_label_orig=="A_cI58_217_ac2g" && (s=="Mn")) { // A12
           cout << TXT1 << "A12" << TXT2 << endl;} 
-        // diatom (A_tP2_123_g)
+        // diatom (A_tP2_123_g) just RICO choice
         if(data.anrl_label_orig=="A_tP2_123_g" && (s=="O" || s=="N" || s=="F" || s=="H" || s=="Cl")) { // diatom //  cat /tmp/xscrubber_ppAUID.LIB1 | grep diatom | grep '/O'
           cout << TXT1 << "diatom" << TXT2 << endl;} 
+        // A14
+        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="I")) { // A14
+          cout << TXT1 << "A14" << TXT2 << endl;}
+        // A16
+        if(data.anrl_label_orig=="A_oF128_70_4h" && (s=="S")) { // A16
+          cout << TXT1 << "A16" << TXT2 << endl;}
       }
     }
 
