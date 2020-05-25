@@ -677,7 +677,7 @@ string AVASP_Get_PseudoPotential_PBE(string species) {
 
 bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,_xvasp& xvasp){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_populateXVASP():";
+  string soliloquy = XPID + "AVASP_populateXVASP():";
 
   if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
 
@@ -1251,7 +1251,7 @@ bool AVASP_MakeSingleAFLOWIN(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_W
 bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakeSingleAFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakeSingleAFLOWIN():";
   stringstream message;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[0]" << endl;
@@ -3314,7 +3314,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
 bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakeSingleAFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakeSingleAFLOWIN():";
   stringstream message;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[0]" << endl;
@@ -5061,7 +5061,7 @@ bool AVASP_MakePrototype_AFLOWIN(_AVASP_PROTO *PARAMS) {
 
 bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakePrototype_AFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
   if(LDEBUG) cerr << " " << soliloquy << " BEGIN" << endl; 
 
@@ -6024,7 +6024,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
 #ifndef COMPILE_SLIM
 bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakePrototype_AFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
   if(LDEBUG) cerr << " " << soliloquy << " BEGIN" << endl; 
 
@@ -6764,7 +6764,7 @@ bool AVASP_REMOVE_LDAU(_xvasp &xvasp) {
 bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONLY_IF_MISSING) { //CO20200106 - patching for auto-indenting
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "AVASP_MakePrototypeICSD_AFLOWIN():";
+  string soliloquy = XPID + "AVASP_MakePrototypeICSD_AFLOWIN():";
   if(LDEBUG) cerr << soliloquy << " 0a" << endl;
   _xvasp xvasp;
   AVASP_DefaultValuesICSD_AFLOWIN(xvasp);

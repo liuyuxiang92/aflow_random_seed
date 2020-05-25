@@ -16,7 +16,7 @@
 // ***************************************************************************
 namespace LATTICE {
   bool lattice_is_working(string lat) {
-    if(lat.empty()){cerr << XHOST.sPID << "LATTICE::lattice_is_working(): " << "ERROR: input lattice string is empty" << endl;exit(0);} //CO20180622
+    if(lat.empty()){cerr << XPID << "LATTICE::lattice_is_working(): " << "ERROR: input lattice string is empty" << endl;exit(0);} //CO20180622
     if(lat=="CUB" || lat=="cP") return TRUE;
     if(lat=="BCC" || lat=="cI") return TRUE;
     if(lat=="FCC" || lat=="cF") return TRUE;
@@ -57,7 +57,7 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
-    string function_name = XHOST.sPID + "LATTICE::lattice2typeAndCentering()";
+    string function_name = XPID + "LATTICE::lattice2typeAndCentering()";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
@@ -157,7 +157,7 @@ namespace LATTICE {
     string lattice_type,lattice_system;
     for(uint sg=1;sg<=230;sg++) {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
-      if(lattice_type=="error") {cerr << XHOST.sPID << "LATTICE::Lattice2SpaceGroup error" << endl; exit(0);}
+      if(lattice_type=="error") {cerr << XPID << "LATTICE::Lattice2SpaceGroup error" << endl; exit(0);}
       if(lattice_type==lattice) vsgn.push_back(sg);
     }
     return vsgn.size();  // if zero, error
@@ -217,7 +217,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"TRI") || aurostd::substring2bool(lattice,"aP")) return lattice;
         else {
           return "TRI";
-          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of TRI for sg " << sg << endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of TRI for sg " << sg << endl;
         }
       }
       else return "TRI";
@@ -232,7 +232,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"MCLC") || aurostd::substring2bool(lattice,"mS")) return lattice;
         else {
           return "MCLC";
-          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of MCLC for sg " << sg << endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of MCLC for sg " << sg << endl;
         }
       }
       else return "MCLC";
@@ -251,7 +251,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"ORCF") || aurostd::substring2bool(lattice,"oF")) return lattice;
         else {
           return "ORCF";
-          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of ORCF for sg " << sg << endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of ORCF for sg " << sg << endl;
         }
       }
       else return "ORCF";
@@ -268,7 +268,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"BCT") || aurostd::substring2bool(lattice,"tI")) return lattice;
         else {
           return "BCT";
-          cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of BCT for sg " << sg << endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of BCT for sg " << sg << endl;
         }
       }
       else return "BCT";
@@ -282,7 +282,7 @@ namespace LATTICE {
           if(aurostd::substring2bool(lattice,"RHL") || aurostd::substring2bool(lattice,"hR")) return lattice;
           else {
             return "RHL";
-            cerr << XHOST.sPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of RHL for sg " << sg << endl;
+            cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of RHL for sg " << sg << endl;
           }
         }
         else return "RHL";
@@ -339,7 +339,7 @@ namespace LATTICE {
       //However, this function needs lattice vectors to determine alpha,kgamma,testphi
       //and to return the proper variation, for now it will return "MCLC".
       return "MCLC";
-      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in MCLCC" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in MCLCC" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -348,7 +348,7 @@ namespace LATTICE {
     // 5. ORCC
     if(sg==20 || sg==21 || (sg>=35 && sg<=41) || (sg>=63 && sg<=68)) {
       return "ORCC";
-      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCC" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCC" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -359,7 +359,7 @@ namespace LATTICE {
       if(mismatch>1+eps/5.0) return "ORCF1";
       if(mismatch<1-eps/5.0) return "ORCF2";
       if(aurostd::isequal(mismatch,1.0,eps/5.0)) return "ORCF3";
-      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCF" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCF" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -373,7 +373,7 @@ namespace LATTICE {
       if(a<c)  return "BCT2";
       // test if a=b=c
       if(aurostd::isequal(a,b,eps) && aurostd::isequal(a,c,eps)) return "BCT2";
-      cerr << XHOST.sPID << "LATTICE::ConventionalLattice_SpaceGroup: error in BCT" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in BCT" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -524,7 +524,7 @@ namespace LATTICE {
       return clattice;
     }
     else {
-      cerr << XHOST.sPID << "ERROR: lattice " << lattice << " not found in function LATTICE::sp2sc." << endl; abort();
+      cerr << XPID << "ERROR: lattice " << lattice << " not found in function LATTICE::sp2sc." << endl; abort();
     }
   }
 }
@@ -752,9 +752,9 @@ namespace LATTICE {
     str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
     //DX20190304 - moved above GetPrimitive - END
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     str_sp.GetPrimitive(0.005);
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 
     //DX20190304 - save transformation between orig and get prim (may have rotated) - START
@@ -772,7 +772,7 @@ namespace LATTICE {
     double str_sp_volume=str_sp.Volume();    // backups
     bool str_sp_neg_scale=str_sc.neg_scale;  // backups
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
     //[DX20190307 - moved up]str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
     //[DX20190307 - moved up]str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
@@ -818,7 +818,7 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
-      if(LDEBUG) { cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
+      if(LDEBUG) { cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       //pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
       string format="out";
       if(str_sp.pgroup_xtal_calculated==TRUE) { //DX20170814 - Speed increase, if already calculated just look use look-up table
@@ -853,7 +853,7 @@ namespace LATTICE {
 
     eps = str_sp.sym_eps;
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
     xvector<int> dims(3);    // to scan
     dims=LatticeDimensionSphere(str_sp.lattice,RadiusSphereLattice(str_sp.lattice)/1.0);
@@ -881,10 +881,10 @@ namespace LATTICE {
     //DX [OBSOLETE] - nndist is not used anywhere      if(modulus(aus)>eps && modulus(aus)<=nndist) nndist=modulus(aus);
     //DX [OBSOLETE] - nndist is not used anywhere    }
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
 
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
 
     if(LDEBUG) {
       cerr << "str_sp.atoms.size()=" << str_sp.atoms.size() << endl;
@@ -972,10 +972,10 @@ namespace LATTICE {
     //  bool VERBOSE_PROGRESS=TRUE;
     // try different solutions
     for (uint choice=0;choice<=2&&!found;choice++) {
-      if(VERBOSE_PROGRESS) if(choice==0) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
-      if(VERBOSE_PROGRESS) if(choice==1) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
-      if(VERBOSE_PROGRESS) if(choice==2) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
-      if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
+      if(VERBOSE_PROGRESS) if(choice==0) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
+      if(VERBOSE_PROGRESS) if(choice==1) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
+      if(VERBOSE_PROGRESS) if(choice==2) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
+      if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
 
       // ***************************************************************************************************
       // CUBIC CRYSTAL SYSTEM
@@ -1905,7 +1905,7 @@ namespace LATTICE {
     }
     // DONE
 
-    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -1939,7 +1939,7 @@ namespace LATTICE {
          }
          */
     }
-    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
 
     if(found==TRUE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -2000,7 +2000,7 @@ namespace LATTICE {
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }
 
-    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
     /* STEFANO OLD VERSION
@@ -2073,7 +2073,7 @@ namespace LATTICE {
     //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //SC OLD VERSION
   { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
     //  LDEBUG=TRUE;
     // starting from a str_in (whatever lattices) this routine returns a standard primitive (str_sp)
@@ -2081,20 +2081,20 @@ namespace LATTICE {
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     str_sp.GetPrimitive(0.005);
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 
     double str_sp_volume=str_sp.Volume();    // backups
     bool str_sp_neg_scale=str_sc.neg_scale;  // backups
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
     str_sp.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sp.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
     //   if(aurostd::isequal(str_sp.a,str_sp.b,eps) && aurostd::isequal(str_sp.b,str_sp.c,eps) && aurostd::isequal(str_sp.c,str_sp.a,eps)) {
-    //     cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: skipping str_sp.MinkowskiBasisReduction()" << endl;
+    //     cerr << XPID << "LATTICE::Standard_Lattice_Structure: skipping str_sp.MinkowskiBasisReduction()" << endl;
     //   } else
     {str_sp.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
 
@@ -2103,12 +2103,12 @@ namespace LATTICE {
     str_sc.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sc.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
     //   if(aurostd::isequal(str_sc.a,str_sc.b,eps) && aurostd::isequal(str_sc.b,str_sc.c,eps) && aurostd::isequal(str_sc.c,str_sc.a,eps)) {
-    //     cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: skipping str_sc.MinkowskiBasisReduction()" << endl;
+    //     cerr << XPID << "LATTICE::Standard_Lattice_Structure: skipping str_sc.MinkowskiBasisReduction()" << endl;
     //   } else
     {str_sc.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
     str_sc.ClearSymmetry();
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
     xvector<int> dims(3);    // to scan
     dims=LatticeDimensionSphere(str_sp.lattice,RadiusSphereLattice(str_sp.lattice)/1.0);
@@ -2133,7 +2133,7 @@ namespace LATTICE {
           if(modulus(aus)>eps && modulus(aus)<=nndist) nndist=modulus(aus);
         }
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
 
     string crystal_system="none";
     bool lattice_found=FALSE;
@@ -2158,7 +2158,7 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
-      if(LDEBUG) { cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
+      if(LDEBUG) { cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
     }
 
@@ -2172,12 +2172,12 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
     //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
     SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
     //  cerr << "[2]" << endl;
     if(str_sp.fgroup_calculated==FALSE) {
     //  cerr << "str_sp.fgroup_calculated" << endl;
@@ -2185,15 +2185,15 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
     //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
     SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
     //DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
     SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
     //  cerr << "[3]" << endl;
     if(str_sp.pgroup_xtal_calculated==FALSE) {
     //  cerr << "str_sp.pgroup_xtal_calculated" << endl;
@@ -2202,19 +2202,19 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
     //DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
     if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
     //DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
     if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
     //DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
     SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
     }
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
     //  cerr << "[4]" << endl;
     */ //OLD (DX)
     //DX END
@@ -2248,7 +2248,7 @@ namespace LATTICE {
     }
     */
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
 
     if(LDEBUG) {
       cerr << "str_sp.atoms.size()=" << str_sp.atoms.size() << endl;
@@ -2356,10 +2356,10 @@ namespace LATTICE {
     //  bool VERBOSE_PROGRESS=TRUE;
     // try different solutions
     for (uint choice=0;choice<=2&&!found;choice++) {
-      if(VERBOSE_PROGRESS) if(choice==0) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
-      if(VERBOSE_PROGRESS) if(choice==1) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
-      if(VERBOSE_PROGRESS) if(choice==2) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
-      if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
+      if(VERBOSE_PROGRESS) if(choice==0) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
+      if(VERBOSE_PROGRESS) if(choice==1) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
+      if(VERBOSE_PROGRESS) if(choice==2) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
+      if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
 
       // ***************************************************************************************************
       // CUBIC CRYSTAL SYSTEM
@@ -3087,7 +3087,7 @@ namespace LATTICE {
     }
     // DONE
 
-    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -3117,7 +3117,7 @@ namespace LATTICE {
       }
     }
 
-    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
 
     if(found==TRUE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -3169,7 +3169,7 @@ namespace LATTICE {
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }
 
-    if(VERBOSE_PROGRESS) cerr << XHOST.sPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
     //SC OLD VERSION
@@ -3291,9 +3291,9 @@ namespace LATTICE {
         same_eps = true; //force single while loop, no check
       }
       if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym)){
-        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << XPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
-          cerr << XHOST.sPID << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
+          cerr << XPID << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
           ignore_checks = true;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
@@ -3323,9 +3323,9 @@ namespace LATTICE {
       //DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
       if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) //DX20180226 - do not need to do full sym on lattice
       { //CO20200106 - patching for auto-indenting
-        if(LDEBUG) {cerr << XHOST.sPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << XPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
-          cerr << XHOST.sPID << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
+          cerr << XPID << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
         str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
@@ -3532,13 +3532,13 @@ namespace LATTICE {
     //analogous to --bzplotdatauseKPOINTS but for --bzplot.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: options=" << options << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::BZPLOTDATA: mode=" << mode << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: options=" << options << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: mode=" << mode << endl;
 
     if(mode==0 && tokens.size()!=0) {
       init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
@@ -3576,7 +3576,7 @@ namespace LATTICE {
       if(aurostd::FileExist(filename)) {
         aurostd::efile2vectorstring(filename,tokens);
       } else {
-        cerr << XHOST.sPID << "ERROR: LATTICE::BZPLOTDATA: " << filename << " can not be opened. aborted.";abort();
+        cerr << XPID << "ERROR: LATTICE::BZPLOTDATA: " << filename << " can not be opened. aborted.";abort();
       }
       if(tokens.size()>0) str_sp.bravais_lattice_variation_type=tokens.at(0);
       aurostd::string2tokens(string(tokens.at(0)),tokens," ");
@@ -3586,7 +3586,7 @@ namespace LATTICE {
           str_sp.bravais_lattice_variation_type=tokens.at(1);
       }
     }
-    //    cout << XHOST.sPID << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
+    //    cout << XPID << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
     cerr << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
     xvector<double> data(6),a1(3),a2(3),a3(3),b1(3),b2(3),b3(3),pL(3),
       pLaxis(3),pz(3),ptmp(3),tmpb1(3),tmpb2(3),tmpb3(3);
@@ -6547,10 +6547,10 @@ namespace LATTICE {
     //  if(grid>-1.0 && grid<0.0) grid=-1.0;
     if(grid>=0.0 && grid<1.0) grid=1.0;
 
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions iomode=" << iomode << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions isQE=" << isQE << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions isVASP=" << isVASP << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions grid=" << grid << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions iomode=" << iomode << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions isQE=" << isQE << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions isVASP=" << isVASP << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions grid=" << grid << endl;
 
     xvector<double> cdata(6),kdata(6);
     xmatrix<double> klattice(3,3),sc(3,3);
@@ -6831,7 +6831,7 @@ namespace LATTICE {
       P.fpos(1)=0.250; P.fpos(2)=0.250; P.fpos(3)=0.250; P.label="P";
       X.fpos(1)=0.000; X.fpos(2)=0.000; X.fpos(3)=0.500; X.label="X";
       eta=0.25*(1+c*c/a/a);
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
       //DX20181105 [OBSOLETE] stringstream Z,Z1;
       //DX20181105 [OBSOLETE] Z << eta << "  " << eta << "  " << -eta << "  ! Z";
       //DX20181105 [OBSOLETE] Z1 << -eta << "  " << (1-eta) << "  " << eta << "  ! Z_1";
@@ -6897,8 +6897,8 @@ namespace LATTICE {
       float eta,zeta;
       eta=0.25*(1+a*a/c/c);
       zeta=0.5*a*a/c/c;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
       //DX20181105 [OBSOLETE] stringstream Sg1,Sg,Y1,Y;
       //DX20181105 [OBSOLETE] Sg << -eta << "  " << eta << "  " << eta << "  ! \\Sigma";
@@ -7050,8 +7050,8 @@ namespace LATTICE {
       float zeta,eta;
       zeta = 0.25*(1+a*a/b/b-a*a/c/c);
       eta = 0.25*(1+a*a/b/b+a*a/c/c);
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
       //DX20181105 [OBSOLETE] A << "   0.500  " << 0.5+zeta << "  " <<  zeta << "   ! A";
       //DX20181105 [OBSOLETE] A1 << "   0.500  " <<  0.5-zeta << "  " <<  1.0-zeta << "   ! A_1";
@@ -7141,9 +7141,9 @@ namespace LATTICE {
       eta = 0.25*(1+a*a/b/b-a*a/c/c);
       phi = 0.25*(1+c*c/b/b-c*c/a/a);
       delta = 0.25*(1+b*b/a/a-b*b/c/c);
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
       //DX20181105 [OBSOLETE] C << "   0.500  " <<  0.5-eta   << "  " << 1.0-eta << "   ! C";
       //DX20181105 [OBSOLETE] C1 << "   0.500   " <<  0.5+eta << "  " <<  eta << "   ! C_1";
@@ -7236,10 +7236,10 @@ namespace LATTICE {
       eta = 0.25*(1+b*b/c/c);
       delta = 0.25*(b*b-a*a)/c/c;
       mu = 0.25*(a*a+b*b)/c/c;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
 
       //DX20181105 [OBSOLETE] L <<  -mu << "  " <<  mu << "  " <<  0.5-delta << "   ! L";
       //DX20181105 [OBSOLETE] L1 <<  mu << "  " <<  -mu << "  " <<  0.5+delta << "   ! L_1";    
@@ -7315,7 +7315,7 @@ namespace LATTICE {
     if(lattice_type=="ORCC") {
       foundBZ=TRUE;
       float zeta=(a*a+b*b)/(4.0*b*b);
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
       //DX20181105 [OBSOLETE] string G,R,S,T,Y,Z;
       //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
@@ -7463,8 +7463,8 @@ namespace LATTICE {
       h=sqrt(h2);
       eta= 5.0/6.0 - ap*ap/h/h/18.0;
       nu=0.5*(1.5-eta);
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
       //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
       //DX20181105 [OBSOLETE] F="   0.500   0.500   0.000    ! F";
@@ -7555,8 +7555,8 @@ namespace LATTICE {
       kh=sqrt(kh2);
       eta=0.5*ka*ka*h/kh;
       nu=(1.5-eta)*0.5;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
       //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
       //DX20181105 [OBSOLETE] F="   0.500  -0.500   0.000    ! F";
@@ -7638,8 +7638,8 @@ namespace LATTICE {
       alpharad=alpha*PI/180.0;
       eta=0.5*(1-b*cos(alpharad)/c)/sin(alpharad)/sin(alpharad);
       nu=0.5-eta*c*cos(alpharad)/b;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
       //DX20181105 [OBSOLETE] H << "   0.000  " << eta << "  " << (1-nu) << "  ! H";
       //DX20181105 [OBSOLETE] H1 << "   0.000  " << (1-eta) << "  " << nu << "  ! H_1";
@@ -7748,12 +7748,12 @@ namespace LATTICE {
       phi = psi + 0.25*a*a/b/c/tan(alpharad)/sin(alpharad);
       mu = psi + 0.25*(2-b/c/cos(alpharad))/tan(alpharad)/tan(alpharad);
       delta = 1.0 - 0.5*b/tan(alpharad)*(1/c/sin(alpharad)-2/b/tan(alpharad)) - mu;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
       //DX20181105 [OBSOLETE] F << (1.0-zeta) << "  " << (1.0-zeta) << "  " << (1.0-eta) << "   ! F";
       //DX20181105 [OBSOLETE] F1 << zeta << "  " << zeta << "  " << eta << "   ! F_1";
@@ -7887,12 +7887,12 @@ namespace LATTICE {
       delta = (2*mu-0.5)*c/b*cos(alpharad);
       phi = 0.75 - 0.25*b*b/a/a - 0.25*b/tan(alpharad)*(1/c/sin(alpharad)-1/b/tan(alpharad));
       psi = 0.5 + (2*phi-1)*c/b*cos(alpharad);
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
       //DX20181105 [OBSOLETE] F <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! F";
       //DX20181105 [OBSOLETE] F1 <<  phi << "  " <<  (phi-1.0) << "  "   << psi << "   ! F_1";
@@ -8020,15 +8020,15 @@ namespace LATTICE {
       omega = c*cos(alpharad)/b*(2.0*nu-0.5) + c*sin(alpharad)*tan(alpharad)/b*(2.0*nu-0.5*b*b/a/a-0.5);
       rho = 0.75 + 0.25*a*a/b/b/sin(alpharad)*(b/c/tan(alpharad)-1/sin(alpharad));
       delta = (2.0*mu-nu)*c*cos(alpharad)/b + 0.5*omega - 0.25;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-      if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
 
       //DX20181105 [OBSOLETE] F <<  nu << "  " <<  nu << "  " <<  omega << "   ! F";
       //DX20181105 [OBSOLETE] F1 << (1.0-nu) << "  " << (1.0-nu) << "  " << (1.0-omega) << "   ! F_1";
@@ -8169,18 +8169,18 @@ namespace LATTICE {
         eta=0.5*(zeta-rho);
         mu=0.5+0.5*b2(3)*(b2(3)+b3(3))/b2(2)/b2(2)-eta*b1(2)/b2(2);
         delta=0.5+(eta*b1(3)+mu*b2(3))/b3(3);
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
         // 10 center of faces
         //DX20181105 [OBSOLETE] L << "   0.500   0.500   0.000   ! L";
@@ -8306,18 +8306,18 @@ namespace LATTICE {
         omega=0.5*(b1(3)-b2(3)) - b1(1)*b1(1)*(theta-0.5)/b1(3) + 0.5*b1(2)*b1(2)/b1(3) - 0.5*b2(2)*b2(2)/b2(3);
         omega= -0.5*b2(3)-b2(2)*(omega*aa*b2(3)+0.5*b2(2))/b2(3)+theta*b1(3)+(1.0-lambda)*b2(3);
         omega=omega/b3(3);
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-        if(LDEBUG) cerr << XHOST.sPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
         //DX20181105 [OBSOLETE] // 10 center of faces
         //DX20181105 [OBSOLETE] L << "   0.500  -0.500   0.000   ! L";

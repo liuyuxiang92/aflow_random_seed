@@ -320,7 +320,7 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_PseudoPotential_CleanName_TEST(void){ //CO20190712
     bool LDEBUG=(TRUE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "KBIN::VASP_PseudoPotential_CleanName_TEST():";
+    string soliloquy = XPID + "KBIN::VASP_PseudoPotential_CleanName_TEST():";
     stringstream message;
 
     ostream& oss=cout;
@@ -592,7 +592,7 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) { // AFLOW_FUNCTION_IMPLEMENTATION
     if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::VASP_Produce_INCAR  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_VASP) {cerr << XHOST.sPID << "KBIN::VASP_Produce_INCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_INCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
     xvasp.INCAR.str(std::string());
@@ -1285,7 +1285,7 @@ namespace KBIN {
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::VASP_Produce_POSCAR  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_VASP) {cerr << XHOST.sPID << "KBIN::VASP_Produce_POSCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_POSCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
     xvasp.POSCAR.str(std::string());xvasp.POSCAR.clear();
@@ -1990,7 +1990,7 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Produce_KPOINTS(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::VASP_Produce_KPOINTS  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_VASP) {cerr << XHOST.sPID << "KBIN::VASP_Produce_KPOINTS: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_KPOINTS: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
     bool IMPLICIT=FALSE;
@@ -2541,9 +2541,9 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Produce_POTCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "KBIN::VASP_Produce_POTCAR():";
+    string soliloquy = XPID + "KBIN::VASP_Produce_POTCAR():";
     if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::VASP_Produce_POTCAR  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_VASP) {cerr << XHOST.sPID << "KBIN::VASP_Produce_POTCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_POTCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
     string::size_type sub_size1,sub_size2;
     string subS,subS1,subS2,subSDIR="$POTCARDIR";
     ostringstream aus;
@@ -4283,21 +4283,21 @@ namespace KBIN {
 
     // ***************************************************************************
 
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: RETURNING CORRECTLY" << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: command=" << command << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: svalue=" << svalue << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: ivalue=" << ivalue << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: dvalue=" << dvalue << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: OPTION=" << OPTION << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: RETURNING CORRECTLY" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: command=" << command << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: svalue=" << svalue << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: ivalue=" << ivalue << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: dvalue=" << dvalue << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: OPTION=" << OPTION << endl;
 
     if(DONE) return TRUE;
 
-    cerr << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: ERROR" << endl;
-    cerr << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: command=" << command << " not found " << endl;
-    cerr << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: svalue=" << svalue << endl;
-    cerr << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: ivalue=" << ivalue << endl;
-    cerr << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: dvalue=" << dvalue << endl;
-    cerr << XHOST.sPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: OPTION=" << OPTION << endl;
+    cerr << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: ERROR" << endl;
+    cerr << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: command=" << command << " not found " << endl;
+    cerr << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: svalue=" << svalue << endl;
+    cerr << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: ivalue=" << ivalue << endl;
+    cerr << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: dvalue=" << dvalue << endl;
+    cerr << XPID << "KBIN::XVASP_INCAR_PREPARE_GENERIC: OPTION=" << OPTION << endl;
 
     exit(0);
 
@@ -4491,19 +4491,19 @@ namespace KBIN {
     vector<string> tokens_group,tokens;
 
     if(vflags.KBIN_VASP_LDAU_AFLOW_AUTO_flag==TRUE) { // get them from the names
-      // cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON: vflags.KBIN_VASP_LDAU_AFLOW_AUTO_flag==TRUE => get them from the names " << endl;
+      // cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON: vflags.KBIN_VASP_LDAU_AFLOW_AUTO_flag==TRUE => get them from the names " << endl;
       if(vflags.KBIN_VASP_LDAU_SPECIES.length()>1) {
         aurostd::string2tokens(vflags.KBIN_VASP_LDAU_SPECIES,tokens," ");
         nspecies=tokens.size();
         if(xvasp.str.species.size()!=nspecies) {
-          cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON [1]: xvasp.str.species.size() and nspecies=tokens.size() should be identical.. unpredictable result: " << xvasp.str.title << endl;
+          cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON [1]: xvasp.str.species.size() and nspecies=tokens.size() should be identical.. unpredictable result: " << xvasp.str.title << endl;
           cerr << xvasp.str.species.size() << " " << nspecies << endl;exit(0);
         }
         for(uint i=0;i<xvasp.str.species.size();i++)
           AVASP_Get_LDAU_Parameters(aurostd::CleanStringASCII(KBIN::VASP_PseudoPotential_CleanName(tokens.at(i))),LDAU,vLDAUspecies,vLDAUtype,vLDAUL,vLDAUU,vLDAUJ); // parameters for LDAU2
       }
     } else { // get them from PARAMETERS
-      // cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON: vflags.KBIN_VASP_LDAU_AFLOW_AUTO_flag==FALSE => get them from the parameters:= " << vflags.KBIN_VASP_LDAU_PARAMETERS << endl;
+      // cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON: vflags.KBIN_VASP_LDAU_AFLOW_AUTO_flag==FALSE => get them from the parameters:= " << vflags.KBIN_VASP_LDAU_PARAMETERS << endl;
       LDAU=TRUE;
       aurostd::string2tokens(vflags.KBIN_VASP_LDAU_PARAMETERS,tokens_group,";");
       if(tokens_group.size()<3) { cerr << "ERROR: KBIN::XVASP_INCAR_LDAU_ON: you must specify 4 entries in " << vflags.KBIN_VASP_LDAU_PARAMETERS << endl; exit(0);}
@@ -4523,7 +4523,7 @@ namespace KBIN {
     }
     // get type
     if(xvasp.str.species.size()!=nspecies) {
-      cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON [2]: xvasp.str.species.size() and nspecies=tokens.size() should be identical.. unpredictable result: " << xvasp.str.title << endl;
+      cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON [2]: xvasp.str.species.size() and nspecies=tokens.size() should be identical.. unpredictable result: " << xvasp.str.title << endl;
       cerr << xvasp.str.species.size() << " " << nspecies << endl;exit(0);
     }
 
@@ -4534,13 +4534,13 @@ namespace KBIN {
       if(vLDAUtype.at(i)==2) type2=TRUE;
     }
     if(type1==FALSE && type2==FALSE)             // no LDAU
-      cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON: no need for LDAU, all species do not need or are not in the table: " << xvasp.str.title << endl;
+      cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON: no need for LDAU, all species do not need or are not in the table: " << xvasp.str.title << endl;
     if(type1==TRUE && type2==FALSE && type!=1)   // LDAU type 1
-      cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON: your type=" << type << " is incompatible with type1 of table : " << xvasp.str.title << endl;
+      cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON: your type=" << type << " is incompatible with type1 of table : " << xvasp.str.title << endl;
     if(type1==FALSE && type2==TRUE && type!=2)   // LDAU type 2
-      cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON: your type=" << type << " is incompatible with type2 of table : " << xvasp.str.title << endl;
+      cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON: your type=" << type << " is incompatible with type2 of table : " << xvasp.str.title << endl;
     if(type1==TRUE && type2==TRUE) {
-      cerr << XHOST.sPID << "KBIN::XVASP_INCAR_LDAU_ON: your type=" << type << " is incompatible with type1 and type2 of table : " << xvasp.str.title << endl;
+      cerr << XPID << "KBIN::XVASP_INCAR_LDAU_ON: your type=" << type << " is incompatible with type1 and type2 of table : " << xvasp.str.title << endl;
       cerr << "  You can NOT HAVE type1 and type2 simultaneously from table.... My suggestion is that you remove LDAU_SPECIES from " << _AFLOWIN_ << "" << endl;
       cerr << "  and specify LDAUL, LDAUU, LDAUJ in the INCAR part of aflow,in manually.. good luck.... " << endl;
       exit(0);
@@ -4825,11 +4825,11 @@ namespace KBIN {
       if(aurostd::FileExist(xvasp.Directory+string("/KPOINTS.bands"))) {  // with some LUCK I`ve already nailed the FCC/HEX
         xvasp.str.kpoints_kscheme=aurostd::GetLineString(FileContent,3);
         string KPOINTS_bands=aurostd::file2string(xvasp.Directory+"/KPOINTS.bands"); // cerr << KPOINTS_bands << endl;
-        bool isFCC=aurostd::substring2bool(KPOINTS_bands,"FCC","fcc"); // cerr << XHOST.sPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET: isFCC=" << isFCC << endl;
-        bool isHEX=aurostd::substring2bool(KPOINTS_bands,"HEX","hex"); // cerr << XHOST.sPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET: isHEX=" << isHEX << endl;
-        bool isRHL=aurostd::substring2bool(KPOINTS_bands,"RHL","rhl"); // cerr << XHOST.sPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET: isRHL=" << isRHL << endl;
+        bool isFCC=aurostd::substring2bool(KPOINTS_bands,"FCC","fcc"); // cerr << XPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET: isFCC=" << isFCC << endl;
+        bool isHEX=aurostd::substring2bool(KPOINTS_bands,"HEX","hex"); // cerr << XPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET: isHEX=" << isHEX << endl;
+        bool isRHL=aurostd::substring2bool(KPOINTS_bands,"RHL","rhl"); // cerr << XPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET: isRHL=" << isRHL << endl;
         if(abs(xvasp.str.kpoints_s1)+abs(xvasp.str.kpoints_s2)+abs(xvasp.str.kpoints_s3)>0.1) {isFCC=FALSE;isHEX=FALSE;isRHL=FALSE;} // no shift if already shifted
-        //  if(isFCC || isHEX) {cerr << XHOST.sPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET switching to GAMMA" << endl;}
+        //  if(isFCC || isHEX) {cerr << XPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET switching to GAMMA" << endl;}
         if(isFCC || isHEX || isRHL) {
           xvasp.str.kpoints_kscheme="Gamma";
           if(_iseven(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;if(LDEBUG) cout << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}
@@ -4844,7 +4844,7 @@ namespace KBIN {
     }
     // DYNAMIC
     if(svalue=="DYNAMIC" || svalue=="dynamic") {
-      cerr << XHOST.sPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET DYNAMIC" << endl;
+      cerr << XPID << "KBIN::XVASP_INCAR_KPOINTS_Dielectric_SET DYNAMIC" << endl;
       // a.  Reuse the STEP 01 WAVECAR
       // b.  ALGO=EXACT NELM=1 LOPTICS=.TRUE.   CSHIFT=0.15  OMEGAMAX=25   NEDOS=12500
       // i.  Remove LEPSILON and LRPA
@@ -4960,10 +4960,10 @@ namespace KBIN {
 namespace KBIN {
   bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,string operation) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); // TRUE;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  operation=" << operation << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_k*=(" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ")" << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_s*=(" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << ")" << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_kscheme=*=(" << xvasp.str.kpoints_kscheme << ")" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  operation=" << operation << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_k*=(" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ")" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_s*=(" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << ")" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_kscheme=*=(" << xvasp.str.kpoints_kscheme << ")" << endl;
     uint i=0;
     if(aurostd::substring2bool(operation,"X--")) {i++;xvasp.str.kpoints_k1--;if(LDEBUG) cout << "X-- k1=" << xvasp.str.kpoints_k1 << endl;}
     if(aurostd::substring2bool(operation,"Y--")) {i++;xvasp.str.kpoints_k2--;if(LDEBUG) cout << "Y-- k2=" << xvasp.str.kpoints_k2 << endl;}
@@ -4990,10 +4990,10 @@ namespace KBIN {
     if(xvasp.str.kpoints_k1<1) xvasp.str.kpoints_k1=1;
     if(xvasp.str.kpoints_k2<1) xvasp.str.kpoints_k2=1;
     if(xvasp.str.kpoints_k3<1) xvasp.str.kpoints_k3=1;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  i=" << i << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_k*=(" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ")" << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_s*=(" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << ")" << endl;
-    if(LDEBUG) cout << XHOST.sPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_kscheme=*=(" << xvasp.str.kpoints_kscheme << ")" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  i=" << i << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_k*=(" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ")" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_s*=(" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << ")" << endl;
+    if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_kscheme=*=(" << xvasp.str.kpoints_kscheme << ")" << endl;
     xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
     xvasp.str.kpoints_kppra=xvasp.str.kpoints_k1*xvasp.str.kpoints_k2*xvasp.str.kpoints_k3*xvasp.str.atoms.size();
     KBIN::XVASP_KPOINTS_KPOINTS(xvasp);
@@ -5006,7 +5006,7 @@ namespace KBIN {
 //   if(kscheme.at(0)=='M' || kscheme.at(0)=='m') xvasp.str.kpoints_kscheme="Monkhorst-Pack";// "Monkhorst-Pack";
 //   if(kscheme.at(0)=='G' || kscheme.at(0)=='g') xvasp.str.kpoints_kscheme="Gamma";// "Gamma";
 //   KBIN::XVASP_KPOINTS_KPOINTS(xvasp);
-//   cerr << XHOST.sPID << "KBIN::XVASP_KPOINTS_Kscheme" << endl << xvasp.KPOINTS.str() << endl;
+//   cerr << XPID << "KBIN::XVASP_KPOINTS_Kscheme" << endl << xvasp.KPOINTS.str() << endl;
 //   return TRUE;
 // }
 
@@ -5111,7 +5111,7 @@ namespace KBIN {
 }
 namespace KBIN {
   void XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,bool verbose,_aflags &aflags,ofstream &FileMESSAGE) {
-    // cerr << XHOST.sPID << "KBIN::XVASP_Afix_ROTMAT mode=" << mode << endl;
+    // cerr << XPID << "KBIN::XVASP_Afix_ROTMAT mode=" << mode << endl;
     // mode=1 put gamma and even
     // mode=2 put gamma and odd
     // mode=3 put max
@@ -5225,7 +5225,7 @@ namespace KBIN {
     nbands=OUTCAR_NBANDS.NBANDS;
 
     if(nbands==0) {                                            // GET BANDS FROM INCAR
-      if(VERBOSE) cerr << XHOST.sPID << "KBIN::XVASP_Afix_NBANDS: GET NBANDS FROM INCAR" << endl;
+      if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_NBANDS: GET NBANDS FROM INCAR" << endl;
       //aus_exec << "cat INCAR | grep -v \"\\#\" | grep NBANDS | sed \"s/=//g\" | sed \"s/NBANDS//g\" > aflow.tmp " << endl;
       aurostd::execute("cat "+xvasp.Directory+"/INCAR | grep -v \"\\#\" | grep NBANDS | sed \"s/=//g\" | sed \"s/NBANDS//g\" > "+xvasp.Directory+"/aflow.tmp");
       FileNameAUS=xvasp.Directory+"/aflow.tmp";
@@ -5235,13 +5235,13 @@ namespace KBIN {
       FileAUS.clear();FileAUS.close();
       aurostd::RemoveFile(xvasp.Directory+"/aflow.tmp");
     }
-    //  cerr << XHOST.sPID << "KBIN::XVASP_Afix_NBANDS: nbands=" << nbands << endl;
+    //  cerr << XPID << "KBIN::XVASP_Afix_NBANDS: nbands=" << nbands << endl;
     if(nbands<5) {
       nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,TRUE);
     } else {
       nbands=nbands+20+nbands/5; // why did I remove it ?
     }
-    //  cerr << XHOST.sPID << "KBIN::XVASP_Afix_NBANDS: nbands=" << nbands << endl;
+    //  cerr << XPID << "KBIN::XVASP_Afix_NBANDS: nbands=" << nbands << endl;
 
     // nbands++;
     //    cout << "DEBUG KBIN::XVASP_Afix_NBANDS nbands=" << nbands << " (20150602) directory=" << xvasp.Directory << endl;
@@ -5277,7 +5277,7 @@ namespace KBIN {
     xOUTCAR OUTCAR_POTIM(xvasp.Directory+"/OUTCAR");
     potim=OUTCAR_POTIM.POTIM;
     if(potim==0) {                                            // GET BANDS FROM INCAR
-      if(VERBOSE) cerr << XHOST.sPID << "KBIN::XVASP_Afix_POTIM: GET POTIM FROM INCAR" << endl;
+      if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_POTIM: GET POTIM FROM INCAR" << endl;
       aurostd::execute("cat "+xvasp.Directory+"/INCAR | grep -v \"\\#\" | grep POTIM | sed \"s/=//g\" | sed \"s/POTIM//g\" > "+xvasp.Directory+"/aflow.tmp");
       FileNameAUS=xvasp.Directory+"/aflow.tmp";
       FileAUS.open(FileNameAUS.c_str(),std::ios::in);
@@ -5286,10 +5286,10 @@ namespace KBIN {
       FileAUS.clear();FileAUS.close();
       aurostd::RemoveFile(xvasp.Directory+"/aflow.tmp");
     }
-    if(VERBOSE) cerr << XHOST.sPID << "KBIN::XVASP_Afix_POTIM: potim=" << potim << endl;
+    if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_POTIM: potim=" << potim << endl;
     potim=potim/2.0;
     if(potim<0.01) potim=0.01;
-    if(VERBOSE) cerr << XHOST.sPID << "KBIN::XVASP_Afix_POTIM: potim=" << potim << endl;
+    if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_POTIM: potim=" << potim << endl;
 
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "cat INCAR | sed \"s/POTIM/#POTIM/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl;
@@ -5314,7 +5314,7 @@ namespace KBIN {
     double out=0.0;
     bool rewrite_incar=FALSE,rewrite_poscar=FALSE,rewrite_kpoints=FALSE;
     bool reload_incar=FALSE,reload_poscar=FALSE,reload_kpoints=FALSE;
-    //  cerr << XHOST.sPID << "KBIN::XVASP_Afix_GENERIC=" << mode << endl;
+    //  cerr << XPID << "KBIN::XVASP_Afix_GENERIC=" << mode << endl;
 
     vflags.KBIN_VASP_INCAR_VERBOSE=TRUE; 
     aus_exec << "cd " << xvasp.Directory << endl; //CO
@@ -5848,9 +5848,21 @@ namespace KBIN {
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
     if(aurostd::FileExist(aflowin_path)) {
-      string aflowin = "";
-      aurostd::file2string(aflowin_path, aflowin);
-      system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::substring2string(aflowin, "[AFLOW]SYSTEM=", false));
+      // ME20200525 - Need to take potential white space between [AFLOW],
+      // SYSTEM, and = into account.
+      vector<string> aflowin;
+      aurostd::file2vectorstring(aflowin_path, aflowin);
+      uint nlines = aflowin.size();
+      string line = "";
+      for (uint iline = 0; iline < nlines && system_name.empty(); iline++) {
+        if (aflowin[iline].find("SYSTEM") != string::npos) {
+          line = aflowin[iline];
+          if (aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "[AFLOW]SYSTEM=")) {
+            string::size_type t = line.find_first_of("=");
+            system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line.substr(t + 1));
+          }
+        }
+      }
     } else {
       string function = "KBIN::ExtractSystemNameFromAFLOWIN():";
       string message = "Could not find file " + aflowin_path + ".";
@@ -5868,14 +5880,14 @@ namespace KBIN {
     directory=_directory; //Get directory
     if(directory=="") directory="."; // here
 
-    if(LDEBUG) {cerr << XHOST.sPID << "KBIN::ExtractSystemName: directory=" << directory << endl;}
+    if(LDEBUG) {cerr << XPID << "KBIN::ExtractSystemName: directory=" << directory << endl;}
 
     if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractSystemName: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
     bool found=FALSE;
 
     //READ DOSCAR.static; Firstly, we try to get SystemName from DOSCAR
-    if(LDEBUG) {cerr << XHOST.sPID << "KBIN::ExtractSystemName: [1]" << endl;}
+    if(LDEBUG) {cerr << XPID << "KBIN::ExtractSystemName: [1]" << endl;}
     string doscarfile_tmp=aurostd::TmpFileCreate("DOSCAR.tmp");
     if(aurostd::FileExist(directory+"/DOSCARfile.tmp")) aurostd::RemoveFile(directory+"/DOSCARfile.tmp");
     if(!found && aurostd::FileExist(directory+"/DOSCAR")) {

@@ -139,7 +139,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       //    Num_calculated=MaxNumberPOSCAR;
       //}
 
-      string soliloquy = XHOST.sPID + "iPOcc():";
+      string soliloquy = XPID + "iPOcc():";
       stringstream message;
       ostream& oss=cout;
       //ofstream FileMESSAGE;
@@ -3383,7 +3383,7 @@ namespace pocc {
 // ***************************************************************************
 void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_aflowin) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "ExtracAllPOSCARSFromAflowin():";
+  string soliloquy = XPID + "ExtracAllPOSCARSFromAflowin():";
   vxstr.clear();
   string POSCAR_START_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]START.";
   string POSCAR_STOP_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]STOP.";
@@ -3409,7 +3409,7 @@ void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_af
 // ***************************************************************************
 void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "GetDegeneracyFromVPOSCAR():";
+  string soliloquy = XPID + "GetDegeneracyFromVPOSCAR():";
   string title="";
   vector<string> vtitle,vtitle2;
   int DEI=1;
@@ -3453,7 +3453,7 @@ namespace pocc {
     //Warnning: DOS is absolute value, no shift, and the output DOS, it is format is Energy, s, p, d, f, TDOS, TDOS_sum
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "pocc::POCC_GENERATE_DOSDATA():";
+    string soliloquy = XPID + "pocc::POCC_GENERATE_DOSDATA():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     if(LDEBUG) {cerr << soliloquy << " directory=[" << directory << "]" << endl;}
 
@@ -3685,7 +3685,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO20190808 - one without IDOS and one with
-    string soliloquy = XHOST.sPID + "pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
+    string soliloquy = XPID + "pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
     if(TDOS.size()!=PDOS.size()) {cerr << " TDOS and PDOS have different size! Aborting! " << endl; exit(1);}
     vector<double> vtmp;
     if(TDOS.at(0).size()==3) { //non-spin
@@ -3805,7 +3805,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POCC_GENERATE_OUTPUT(const string& directory, const double& T, const double& DOS_Emin, double& DOS_Emax, const double& DOSSCALE) {
-    string soliloquy = XHOST.sPID + "pocc::POCC_GENERATE_OUTPUT():";
+    string soliloquy = XPID + "pocc::POCC_GENERATE_OUTPUT():";
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     //produce DOS data
     if(!XHOST.is_command("gnuplot")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR gnuplot is necessary." << endl;exit(1);}; 

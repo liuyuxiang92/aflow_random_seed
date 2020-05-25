@@ -26,7 +26,7 @@ namespace pflow {
     //
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::DEBYE: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::DEBYE: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
@@ -404,7 +404,7 @@ namespace pflow {
     if(thermofilename == "THERMO.gz") { aurostd::execute("gzip -9fq THERMO"); }
     if(thermofilename == "THERMO.xz") { aurostd::execute("xz -9fq THERMO"); }
     // END
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::DEBYE: END" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::DEBYE: END" << endl;
   }
 }
 

@@ -26,8 +26,6 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
-// [OBSOLETE] #include "aflow_aqe.h"
-#include "aflow_makefile.h"
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -153,7 +151,7 @@ bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
 bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO20190520
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy = XHOST.sPID + "gcdTest():";
+  string soliloquy = XPID + "gcdTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -216,7 +214,7 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
 bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO20190520
 bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy = XHOST.sPID + "smithTest():";
+  string soliloquy = XPID + "smithTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -302,7 +300,7 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 }
 
 int main(int _argc,char **_argv) {
-  string soliloquy = XHOST.sPID + "main():"; //CO20180419
+  string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
@@ -405,7 +403,7 @@ int main(int _argc,char **_argv) {
 
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO20190911
-      string soliloquy = XHOST.sPID + "test_xmatrix()::";
+      string soliloquy = XPID + "test_xmatrix()::";
       bool LDEBUG=TRUE;// TRUE;
       xmatrix<double> mat;
       mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
@@ -1212,7 +1210,7 @@ namespace aflow {
       oss << "----------------------------------------------------------------------------------------------------" << endl;
       return oss.str();
     }
-    cerr << XHOST.sPID << "aflow::Banner type=" << type << " not found..." << endl;
+    cerr << XPID << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
     //exit(0);
     return 0; //CO20180419
@@ -1239,13 +1237,13 @@ namespace aflow {
 #ifndef _AFLOW_AURO_CPP_
 namespace aflowlib {
   uint MOSFET(int mode,bool VERBOSE) {
-    if(VERBOSE) cerr << XHOST.sPID << "aflowlib::MOSFET mode=" << mode << endl;
+    if(VERBOSE) cerr << XPID << "aflowlib::MOSFET mode=" << mode << endl;
     return 0;
   }
 }
 namespace aflowlib {
   uint MAIL2SCAN(string library,bool VERBOSE) {
-    if(VERBOSE) cerr << XHOST.sPID << "aflowlib::MAIL2SCAN library=" << library << endl;
+    if(VERBOSE) cerr << XPID << "aflowlib::MAIL2SCAN library=" << library << endl;
     return 0;
   }
 }

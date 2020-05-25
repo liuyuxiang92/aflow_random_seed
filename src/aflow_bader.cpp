@@ -20,7 +20,7 @@
 namespace bader_functions {
   string BaderCalc(aurostd::xoption vpflow) {  //CO
     ostringstream oss;
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -97,7 +97,7 @@ namespace bader_functions {
       string& directory,
       ostream& oss) {
     //SECOND STOP FOR CALLS MADE FROM COMMAND_LINE
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
     string soliloquy_empty = "                                 ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -294,7 +294,7 @@ namespace bader_functions {
       ostream& oss) {
     //MAIN FUNCTION
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
     string soliloquy_empty = "                                 ";  // so you know who's speaking
 
     //CO20180220 moved up from below
@@ -1448,7 +1448,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   void FixDirectory(string& directory) {
-    string soliloquy = XHOST.sPID + "bader_functions::FixDirectory():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::FixDirectory():  ";  // so you know who's speaking
     string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     // translate "./" into a full path
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -1471,7 +1471,7 @@ namespace bader_functions {
     // Results for the Bader volume and net charge in the volume are stored in
     // the vectors passed into the function, volume and charge.
 
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalcFLAGS2COMMANDS():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalcFLAGS2COMMANDS():  ";  // so you know who's speaking
     // DEBUG
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -1832,7 +1832,7 @@ namespace bader_functions {
 namespace bader_functions {
   bool getPushCommand(const string& misc_option, string& push_command, ostream& oss) {
     //this converts aflow lists/ranges to bader lists/ranges
-    string soliloquy = XHOST.sPID + "bader_functions::getPushCommand():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::getPushCommand():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -1933,7 +1933,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool listORrange2vec(const string& misc_option, vector<int>& vout, ostream& oss) {
-    string soliloquy = XHOST.sPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
     int test_value;
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -2063,7 +2063,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   void adjust_header(string& new_header, stringstream& FileIN_ss) {
-    string soliloquy = XHOST.sPID + "bader_functions::adjust_header():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::adjust_header():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2100,7 +2100,7 @@ namespace bader_functions {
   string prepare_CHGCAR_4_Jmol(aurostd::xoption vpflow) {
     ostringstream oss;
     //adjust header of CHGCAR for reading in Jmol
-    string soliloquy = XHOST.sPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
     string usage_usage = "aflow --prep4jmol [options]";
@@ -2196,7 +2196,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool get_species_string(string& outcar_file, string& species_string, const string& dir_to_look, const string& file, ostream& oss) {
-    string soliloquy = XHOST.sPID + "bader_functions::get_species_string():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::get_species_string():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2253,7 +2253,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool prepare_CHGCAR_4_Jmol(const string& _chgcar_file, string& species_header, bool zip_file, ostream& oss) {
-    string soliloquy = XHOST.sPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2334,7 +2334,7 @@ namespace pflow {
   string CHGCAR2JVXL(aurostd::xoption& vpflow) {  //CO
     ostringstream oss;
     // handles flags for CHGCAR2JVXL
-    string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
+    string soliloquy = XPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
     string soliloquy_empty = "                       ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -2530,7 +2530,7 @@ namespace pflow {
       vector<string>& output_files,
       const bool& cyclic,
       ostream& oss) {                 //CO
-    string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";  // so you know who's speaking
+    string soliloquy = XPID + "pflow::CHGCAR2JVXL():  ";  // so you know who's speaking
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
@@ -2734,7 +2734,7 @@ namespace pflow {
 namespace pflow {
   bool CHGCAR2JVXL(string chgcar_file, const double cutoff, const int downsample_ratio, string output_file, ostream& oss) {
     //ACTUALLY HANDLES JMOL INTERACTION
-    string soliloquy = XHOST.sPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
+    string soliloquy = XPID + "pflow::CHGCAR2JVXL():  ";        // so you know who's speaking
     string soliloquy_empty = "                       ";  // so you know who's speaking
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;

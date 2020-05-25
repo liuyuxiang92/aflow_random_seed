@@ -300,12 +300,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID;               // aflow_init.cpp  PID number
-    int TID;               // aflow_init.cpp  TID number  //CO20200508
-    ostringstream ostrPID; // aflow_init.cpp  PID in ostringstream...
-    ostringstream ostrTID; // aflow_init.cpp  TID in ostringstream... //CO20200508
-    string sPID;           // aflow_init.cpp  [PID=12345678]
-    bool showPID;          // aflow_init.cpp  check if --showPID
+    int PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508
+    ostringstream ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508
+    string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -395,6 +393,9 @@ class _XHOST {
     void copy(const _XHOST& b);                            //
     void clear();                                          // free space
 };
+
+#define XPID XHOST.sPID
+#define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256
 #define XHOST_Library_HTQC                             XHOST.vGlobal_string.at(0)
@@ -4464,6 +4465,24 @@ xvector<double> wv(const double &x,const double &y,const double &z);
 void wa(_atom& a,xstructure &str);
 xstructure WyckoffPOSITIONS(uint spacegroup, xstructure strin);
 xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
+
+
+// ----------------------------------------------------------------------------
+// aflow_makefile.cpp
+
+namespace makefile {
+  void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles);
+  void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles,bool& mt_required);
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<string>& vdefinitions);
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const string& definitions,vector<string>& vdefinitions);
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const vector<string>& vdefinitions,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  void updateDependenciesAUROSTD(vector<string>& vdependencies);
+  void updateDependenciesVariable(const vector<string>& vdeps_var,const string& var,vector<string>& vdeps_replace);
+  void createMakefileAFLOW(const string& directory=".");
+}
 
 // ----------------------------------------------------------------------------
 // aflow_apennsy stuff

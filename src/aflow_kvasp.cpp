@@ -48,7 +48,7 @@ namespace KBIN {
 namespace KBIN {
   _vflags VASP_Get_Vflags_from_AflowIN(const string &_AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XHOST.sPID + "KBIN::VASP_Get_Vflags_from_AflowIN():"; //CO20181113
+    string soliloquy = XPID + "KBIN::VASP_Get_Vflags_from_AflowIN():"; //CO20181113
     _vflags vflags;
     string AflowIn=aurostd::RemoveComments(_AflowIn); // for safety //CO20180502
     vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn);
@@ -279,7 +279,7 @@ namespace KBIN {
       vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.push("STATIC");
       vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.isentry=TRUE;}
 
-    // cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN:  vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.xscheme="  <<  vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.xscheme << endl; exit(0);
+    // cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN:  vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.xscheme="  <<  vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.xscheme << endl; exit(0);
 
     // PRECISION AND PRIORITIES // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED
     vflags.KBIN_VASP_FORCE_OPTION_PREC.options2entry(AflowIn,_STROPT_+"PREC=",FALSE,DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME);
@@ -323,7 +323,7 @@ namespace KBIN {
     }
 
     // METAGGA AND PRIORITIES // TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: METAGGA" << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: METAGGA" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_METAGGA.options2entry(AflowIn,_STROPT_+"METAGGA=",FALSE,DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME);
     // vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme=KBIN_WRONG_ENTRY_STRING;
     // vflags.KBIN_VASP_FORCE_OPTION_METAGGA.scheme2scheme('T',"TPSS");
@@ -334,18 +334,18 @@ namespace KBIN {
       cerr << "ERROR: KBIN::VASP_Get_Vflags_from_AflowIN:  vflags.KBIN_VASP_FORCE_OPTION_METAGGA.content_string="  <<  vflags.KBIN_VASP_FORCE_OPTION_METAGGA.content_string << endl;
       exit(0);
     } 
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme << endl;
 
     // IVDW AND PRIORITIES // [number_for_VASP_see_manual_for_IVDW | 0] 
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: IVDW" << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: IVDW" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_IVDW.options2entry(AflowIn,_STROPT_+"IVDW=",FALSE,DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME);
     if(vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry && vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme==KBIN_WRONG_ENTRY_STRING) {
       cerr << "ERROR: KBIN::VASP_Get_Vflags_from_AflowIN:  vflags.KBIN_VASP_FORCE_OPTION_IVDW.content_string="  <<  vflags.KBIN_VASP_FORCE_OPTION_IVDW.content_string << endl;
       exit(0);
     } 
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme << endl;
 
     // NEGLECT_NOMIX
     vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.options2entry(AflowIn,string(_STROPT_+"NEGLECT_IMMISCIBLE"+"|"+_STROPT_+"NEGLECT_NOMIX"+"|"+_STROPT_+"SKIP_NOMIX"));
@@ -785,18 +785,18 @@ namespace KBIN {
     if(LDEBUG) cerr << soliloquy << " AFTER vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl; //ME20181113
 
     // DEBUG
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
+    if(LDEBUG) cerr << XPID << "KBIN::VASP_Get_Vflags_from_AflowIN: vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
 
     // VOLUMES
     // [OBSOLETE] vflags.KBIN_VASP_FORCE_OPTION_VOLUME_EQUAL_EQUAL      =    aurostd::substring2bool(AflowIn,_STROPT_+"VOLUME=",TRUE);
@@ -1017,7 +1017,7 @@ namespace KBIN {
         aus << "00000  MESSAGE START loop " << xvasp.POSCAR_index << "/" << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
-      if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [1]" << xvasp.str << endl; 
+      if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [1]" << xvasp.str << endl; 
       // ------------------------------------------
       // now start for each xvasp
       Krun=TRUE;  // guess everything is intelligent !
@@ -1056,7 +1056,7 @@ namespace KBIN {
       }
       // ------------------------------------------
       // do the flags
-      if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [2]" << xvasp.str << endl;
+      if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [2]" << xvasp.str << endl;
       vflags.KBIN_VASP_INCAR_VERBOSE=TRUE; // ALWAYS
       if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
       if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
@@ -1136,7 +1136,7 @@ namespace KBIN {
       // ***************************************************************************
       // READY TO RUN
       if(Krun) {
-        if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [3]" << endl;
+        if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [3]" << endl;
         if(LDEBUG) cerr << xvasp.str << endl;
         xvasp.NRELAX=0;
         bool Krun=true;
@@ -1325,7 +1325,7 @@ namespace KBIN {
           if(Krun) {   // survived all troubles
             // ***************************************************************************
             // START
-            if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [4]" << xvasp.str << endl;
+            if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [4]" << xvasp.str << endl;
             // ***************************************************************************
             // FIX BLANC SPECIES
             if(xvasp.str.species.size()>0) {
@@ -1375,13 +1375,13 @@ namespace KBIN {
             else if(kflags.KBIN_PHONONS_CALCULATION_AEL==TRUE) {KBIN::VASP_RunPhonons_AEL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);}
             else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {KBIN::VASP_RunPhonons_FROZSL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);}
             else {
-              if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [5] xvasp.str.species.size()=" << xvasp.str.species.size() << endl;
-              if(LDEBUG) for(uint i=0;i<xvasp.str.species.size();i++) cerr << XHOST.sPID << "KBIN::VASP_Directory: [5] xvasp.str.species.at(i)=[" << xvasp.str.species.at(i) << "]" << endl;
-              if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [5] xvasp.str.species_pp.size()=" << xvasp.str.species_pp.size() << endl;
-              if(LDEBUG) for(uint i=0;i<xvasp.str.species_pp.size();i++) cerr << XHOST.sPID << "KBIN::VASP_Directory: [5] xvasp.str.species_pp.at(i)=[" << xvasp.str.species_pp.at(i) << "]" << endl;
+              if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [5] xvasp.str.species.size()=" << xvasp.str.species.size() << endl;
+              if(LDEBUG) for(uint i=0;i<xvasp.str.species.size();i++) cerr << XPID << "KBIN::VASP_Directory: [5] xvasp.str.species.at(i)=[" << xvasp.str.species.at(i) << "]" << endl;
+              if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [5] xvasp.str.species_pp.size()=" << xvasp.str.species_pp.size() << endl;
+              if(LDEBUG) for(uint i=0;i<xvasp.str.species_pp.size();i++) cerr << XPID << "KBIN::VASP_Directory: [5] xvasp.str.species_pp.at(i)=[" << xvasp.str.species_pp.at(i) << "]" << endl;
               //	    KBIN::VASP_Write_INPUT(xvasp,vflags); // VASP VASP WRITE
               //	    cerr << xvasp.POTCAR.str() << endl;
-              if(LDEBUG) cerr << XHOST.sPID << "KBIN::VASP_Directory: [6]" << xvasp.str << endl;
+              if(LDEBUG) cerr << XPID << "KBIN::VASP_Directory: [6]" << xvasp.str << endl;
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
@@ -2192,7 +2192,7 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XHOST.sPID+"KBIN::VASP_Run():";
+    string soliloquy=XPID+"KBIN::VASP_Run():";
     if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  BEGIN" << endl;
 
     ostringstream aus_exec,aus;
@@ -3885,7 +3885,7 @@ namespace KBIN {
     string work_dir=aurostd::getPWD();  //CO20191112
 
     if(!aurostd::FileExist(outcar)) {
-      cout << XHOST.sPID << "KBIN::GetStatDiel: check filename || file missing" << endl ;
+      cout << XPID << "KBIN::GetStatDiel: check filename || file missing" << endl ;
       exit(0) ;
     } else {
       outcarpath = "/" + outcar ;
@@ -4007,7 +4007,7 @@ namespace KBIN {
     eigi(1)=0.00 ; eigi(2)=0.00 ; eigi(3)=0.00 ;
 
     if(!aurostd::FileExist(outcar)) {
-      cout << XHOST.sPID << "KBIN::GetDynaDiel: check filename || file missing" << endl ;
+      cout << XPID << "KBIN::GetDynaDiel: check filename || file missing" << endl ;
       exit(0) ;
     } else {
       outcarpath = "/" + outcar ;

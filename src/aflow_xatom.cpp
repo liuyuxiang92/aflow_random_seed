@@ -2634,7 +2634,7 @@ void xstructure::ClearSpecies() { //CO20180420 - helps with pocc, match with Add
 // print an xstructure in a variety of forms
 ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "XSTRUCTURE::operator<<():";
+  string soliloquy = XPID + "XSTRUCTURE::operator<<():";
   stringstream message;
   int a_iomode=a.iomode;
   //  DEBUG=TRUE;
@@ -3541,7 +3541,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 #define oss cout
   // this is also a constructor so everything should look well defined
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "XSTRUCTURE>>:";
+  string soliloquy = XPID + "XSTRUCTURE>>:";
   stringstream message;
 
   if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
@@ -6324,7 +6324,7 @@ bool xstructure::GetStoich(void) { //CO20171025
 // cluster together atoms by equivalent atoms
 bool xstructure::sortAtomsEquivalent(void) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
-  string soliloquy = XHOST.sPID + "xstructure::sortAtomsEquivalent():";
+  string soliloquy = XPID + "xstructure::sortAtomsEquivalent():";
   if(partial_occupation_flag==false){
     if(!(*this).iatoms_calculated){pflow::PerformFullSymmetry(*this);}
     if(!(*this).iatoms_calculated){return false;}
@@ -6684,7 +6684,7 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO20190520
   //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "xstructure::ReplaceAtoms():";
+  string soliloquy = XPID + "xstructure::ReplaceAtoms():";
   for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
     if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
     RemoveAtom(i);
@@ -6909,7 +6909,7 @@ string GetElementName(string stringin) {
 // GetSpaceGroupName
 // ***************************************************************************
 string GetSpaceGroupName(int spacegroupnumber, string directory) {
-  string soliloquy = XHOST.sPID + "aflow_xatom.cpp::GetSpaceGroupName()"; //DX20190708 - for xerror
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupName()"; //DX20190708 - for xerror
   stringstream message; //DX20190708 - for xerror
   string spacegroup=""; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
@@ -7388,7 +7388,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
 // ***************************************************************************
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   //DX20190708
-  string soliloquy = XHOST.sPID + "aflow_xatom.cpp::GetSpaceGroupNumber()";
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupNumber()";
   stringstream message;
   int spacegroupnumber=0;
   if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
@@ -7872,7 +7872,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
 // GetSpaceGroupSchoenflies
 // ***************************************************************************
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
-  string soliloquy = XHOST.sPID + "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX20190708 - for xerror
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX20190708 - for xerror
   stringstream message; //DX20190708 - for xerror
   string spacegroup=""; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
@@ -8353,7 +8353,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   //DX - Hall distinguishes space group setting.  This table assumes the first 
   //      setting that appears in the ITC.
   //      For more settings, they need to be hard-coded here.
-  string soliloquy = XHOST.sPID + "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX20190708 - for xerror
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX20190708 - for xerror
   stringstream message; //DX20190708 - for xerror
   string spacegroup=""; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
@@ -9681,7 +9681,7 @@ double RadiusSphereLattice(const xmatrix<double>& lattice,double scale) {
 xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radius,double scale) {
   // Adapted from AVDV routine
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "LatticeDimensionSphere():"; //CO20190520
+  string soliloquy = XPID + "LatticeDimensionSphere():"; //CO20190520
   xmatrix<double> lattice; lattice=scale*_lattice;
   int i,j,k;
   xmatrix<double> invlattice(3,3),normals(3,3),frac_normals(3,3);
@@ -9977,9 +9977,9 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
       // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
     }
     if(1) {
-      //    cerr << XHOST.sPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
+      //    cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
       LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
-      //  cerr << XHOST.sPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
+      //  cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
     }
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [4]" << endl;
     if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
@@ -10364,7 +10364,7 @@ string xstructure::SpeciesString(void) {
 // ***************************************************************************
 // Set the species  Stefano Curtarolo Nov 2014
 uint xstructure::SetSpecies(const deque<string>& vspecies) {
-  string soliloquy = XHOST.sPID + "xstructure::SetSpecies():"; //CO20190317
+  string soliloquy = XPID + "xstructure::SetSpecies():"; //CO20190317
   stringstream message; //CO20190317
   if(vspecies.size()!=species.size() ) {
     message << "vspecies.size()!=species.size()"; //CO20190317
@@ -11163,7 +11163,7 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 
 deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "foldAtomsInCell():";
+  string soliloquy = XPID + "foldAtomsInCell():";
 
   double volume_original=abs(aurostd::det(a.lattice));
   double volume_new=abs(aurostd::det(lattice_new));
@@ -11200,7 +11200,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
 
 deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX20190619 - added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "foldAtomsInCell():";
+  string soliloquy = XPID + "foldAtomsInCell():";
 
   deque<_atom> atoms_in_cell;
 
@@ -11331,13 +11331,13 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // double (change in place)
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
   if (component == INFINITY || component != component || component == -INFINITY) {
-    string function_name = XHOST.sPID + "BringInCellInPlace()";
+    string function_name = XPID + "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
   if (std::signbit(tolerance)) { //DX20191115 
-    string function_name = XHOST.sPID + "BringInCellInPlace()";
+    string function_name = XPID + "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
@@ -11380,13 +11380,13 @@ void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, 
 double BringInCell(double component_in, double tolerance, double upper_bound, double lower_bound) {
   double component_out = component_in;
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
-    string function_name = XHOST.sPID + "BringInCell()";
+    string function_name = XPID + "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
   if (std::signbit(tolerance)) { //DX20191115 
-    string function_name = XHOST.sPID + "BringInCell()";
+    string function_name = XPID + "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
@@ -12101,7 +12101,7 @@ void *_threaded_GetTvectors(void *ptr) {
           if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
             if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
               if(det(plattice)<det((*pparams->polattice))) {                    // better than before
-                if(LDEBUG) cout << XHOST.sPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+                if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
                 if(isdifferent(plattice,(*pparams->polattice),0.0001)) {
                   plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
                   plattice=NiggliUnitCellForm(plattice);           // Niggli Second
@@ -12238,7 +12238,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
             if(aurostd::isinteger(sstr_volume/det(plattice),0.0001)) {    // integer ratio of volumes
               //  cerr << sstr_volume/det(plattice) << " " << aurostd::isinteger(sstr_volume/det(plattice),0.001) << endl;
               if(det(plattice)<det(olattice)) {                    // better than before
-                if(LDEBUG) cout << XHOST.sPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+                if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
                 if(isdifferent(plattice,olattice,0.001)) {
                   plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
                   plattice=NiggliUnitCellForm(plattice);           // Niggli Second
@@ -12397,7 +12397,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
         if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
           if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
             if(det(plattice)<det(olattice)) {                    // better than before
-              if(LDEBUG) cout << XHOST.sPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+              if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
               if(isdifferent(plattice,olattice,0.0001)) {
                 plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
                 plattice=NiggliUnitCellForm(plattice);           // Niggli Second
@@ -13078,7 +13078,7 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
 // Function SetAutoVolume
 // ***************************************************************************
 void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
-  string soliloquy = XHOST.sPID + "xstructure::setAutoVolume():";
+  string soliloquy = XPID + "xstructure::setAutoVolume():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream message;
 
@@ -13322,7 +13322,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //#define _eps_scell_ 0.0
   // check for error
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XHOST.sPID + "GetSuperCell():";
+  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
   if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);} //exit(0)
@@ -13975,7 +13975,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
   }
   //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
   //[CO20190520 -OBSOLETE]exit(0);
-  string soliloquy = XHOST.sPID + "GetSuperCell():";
+  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
@@ -13998,7 +13998,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
   }
   //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
   //[CO20190520 -OBSOLETE]exit(0);
-  string soliloquy = XHOST.sPID + "GetSuperCell():";
+  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
@@ -14856,7 +14856,7 @@ string xstructure::findsym2print(double tolerance) {
 // positions.
 xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XHOST.sPID + "Rotate():"; //CO20190520
+  string soliloquy = XPID + "Rotate():"; //CO20190520
   if(LDEBUG) { //CO20190520
     cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO20190520
     cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
@@ -15166,7 +15166,7 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
 
 int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XHOST.sPID + "GenerateGridAtoms():"; //CO20190520
+  string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
     cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
     cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
@@ -15237,7 +15237,7 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
 
 int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XHOST.sPID + "GenerateGridAtoms():"; //CO20190520
+  string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
     cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
     cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520

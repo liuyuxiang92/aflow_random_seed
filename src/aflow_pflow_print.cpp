@@ -37,7 +37,7 @@ string _CleanElementName(const string& name) {
 namespace pflow {
   void PrintACE(const xstructure& str, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintACE: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintACE: BEGIN" << endl;
     // Print out data in ace format
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
@@ -85,7 +85,7 @@ namespace pflow {
 namespace pflow {
   void PrintAngles(xstructure str, const double& cutoff, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintAngles: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintAngles: BEGIN" << endl;
     uint MAX_NUM_ANGLE=21;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
@@ -193,7 +193,7 @@ namespace pflow {
 namespace pflow {
   void PrintBands(const pflow::projdata& pd) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintBands: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintBands: BEGIN" << endl;
     ofstream outf_up("band.up.out");
     outf_up.precision(5);
     outf_up.setf(std::ios::fixed,std::ios::floatfield);
@@ -247,7 +247,7 @@ namespace pflow {
       const string& output_name,
       ostream& oss) {  
 
-    string soliloquy = XHOST.sPID + "pflow::PrintCHGCAR():  ";     // so you know who's talking
+    string soliloquy = XPID + "pflow::PrintCHGCAR():  ";     // so you know who's talking
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) oss << soliloquy << "BEGIN" << endl;
@@ -389,7 +389,7 @@ namespace pflow {
   void PrintChgInt(vector<aurostd::matrix<double> >& rad_chg_int,
       aurostd::matrix<double>& vor_chg_int, ostream& oss) {  //CO20200404 pflow::matrix()->aurostd::matrix()  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintChgInt: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintChgInt: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
 
@@ -426,7 +426,7 @@ namespace pflow {
 namespace pflow {
   void PrintCIF(ostream& oss,const xstructure& str,int _spacegroupnumber, int setting) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintCIF: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintCIF: BEGIN" << endl;
     // Print out data in cif format
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
@@ -578,7 +578,7 @@ namespace pflow {
 namespace pflow {
   void PrintClat(const xvector<double>& data, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintClat: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
     if(data.rows!=6) {
       init::ErrorOption(cout,"","pflow::PrintClat",aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
       exit(0);
@@ -591,7 +591,7 @@ namespace pflow {
     oss << lattice(1,1) << " " << lattice(1,2) << " " << lattice(1,3) << endl;
     oss << lattice(2,1) << " " << lattice(2,2) << " " << lattice(2,3) << endl;
     oss << lattice(3,1) << " " << lattice(3,2) << " " << lattice(3,3) << endl;
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintClat: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
   }
 } // namespace pflow
 
@@ -603,7 +603,7 @@ namespace pflow {
 namespace pflow {
   void PrintCmpStr(const xstructure& str1, const xstructure& str2, const double& rcut, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintCmpStr: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintCmpStr: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     oss.precision(4);
@@ -943,7 +943,7 @@ namespace pflow {
 namespace pflow {
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { //CO20171027 //DX20180822 -added xoption
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintData: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintData: BEGIN" << endl;
     // smode=="DATA" or "EDATA"
     // Print out structural data
     stringstream oss;
@@ -1015,7 +1015,7 @@ namespace pflow {
           //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
           if(sym_eps_change_count != str_aus.sym_eps_change_count){
             if(LDEBUG) {
-              cerr << XHOST.sPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
+              cerr << XPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             sym_eps_change_count = str_aus.sym_eps_change_count;
             str_aus.ClearSymmetry();
@@ -1032,7 +1032,7 @@ namespace pflow {
           }
           else {
             if(LDEBUG) {
-              cerr << XHOST.sPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
+              cerr << XPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             str_aus.ClearSymmetry();
             oss.str("");
@@ -1040,7 +1040,7 @@ namespace pflow {
             if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan)){
               if(force_perform){
                 if(LDEBUG) {
-                  cerr << XHOST.sPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
+                  cerr << XPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
                 }
                 no_scan=true; //Force it to continue 
                 tolerance = orig_tolerance;
@@ -1255,7 +1255,7 @@ namespace pflow {
             //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
             if(sym_eps_change_count != str_aus.sym_eps_change_count){
               if(LDEBUG) {
-                cerr << XHOST.sPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
+                cerr << XPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
               }
               sym_eps_change_count = str_aus.sym_eps_change_count;
               str_aus.ClearSymmetry();
@@ -1273,7 +1273,7 @@ namespace pflow {
               symmetry_commensurate=true;
             } else { //CO20171027
               if(LDEBUG) {
-                cerr << XHOST.sPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
+                cerr << XPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
               }
               str_aus.ClearSymmetry();
               sscontent_json.str("");
@@ -1283,7 +1283,7 @@ namespace pflow {
               {   //CO20200106 - patching for auto-indenting
                 if(force_perform){
                   if(LDEBUG) {
-                    cerr << XHOST.sPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
+                    cerr << XPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
                   }
                   no_scan=true; //Force it to continue 
                   tolerance = orig_tolerance;
@@ -1514,7 +1514,7 @@ namespace pflow {
   namespace pflow {
     string PrintData1(const xstructure& str1, const double& rcut) {
       bool LDEBUG=(FALSE || XHOST.DEBUG);
-      if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintData1: BEGIN" << endl;
+      if(LDEBUG) cerr << XPID << "pflow::PrintData1: BEGIN" << endl;
       // LDEBUG=TRUE;
       stringstream oss;
       oss.setf(std::ios::left, std::ios::adjustfield);
@@ -1696,7 +1696,7 @@ namespace pflow {
 namespace pflow {
   void PrintData2(const xstructure& str, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintData2: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintData2: BEGIN" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(6);
     xvector<double> data(6);
@@ -1731,7 +1731,7 @@ namespace pflow {
 namespace pflow {
   void PrintDisplacements(xstructure str, const double cutoff, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintDisplacements: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintDisplacements: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1798,7 +1798,7 @@ namespace pflow {
 namespace pflow {
   void PrintDistances(xstructure str, const double cutoff, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintDistances: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintDistances: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1865,7 +1865,7 @@ namespace pflow {
       double& ereal, double& erecip, double& eewald,
       double& eta, const double& SUMTOL, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintEwald: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintEwald: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     aurostd::matrix<double> lat=pflow::GetScaledLat(in_str); //CO20200404 pflow::matrix()->aurostd::matrix()
@@ -1920,7 +1920,7 @@ namespace pflow {
 namespace pflow {
   void PrintGulp(const xstructure& str, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintGulp: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintGulp: BEGIN" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
     xstructure sstr=str;
@@ -2699,7 +2699,7 @@ namespace pflow {
 namespace pflow {
   bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XHOST.sPID << "pflow::PrintSGData: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintSGData: BEGIN" << endl;
     stringstream oss;
     // smode=="DATA" or "EDATA"
     // Print out structural data
