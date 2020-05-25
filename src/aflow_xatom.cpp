@@ -67,7 +67,7 @@ _atom::_atom() {
   cleanname="";
   info=0;  // (RHT)
   atomic_number=0;
-  number=0;
+  //[CO20200130 - number->basis]number=0;
   sd="";
   ijk.clear();
   isincell=FALSE;
@@ -113,7 +113,7 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
   cleanname=b.cleanname;
   info=b.info;  // (RHT)
   atomic_number=b.atomic_number;
-  number=b.number;
+  //[CO20200130 - number->basis]number=b.number;
   sd=b.sd;
   ijk=b.ijk;
   isincell=b.isincell;
@@ -167,7 +167,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "info=" << atom.info << endl;
       oss << "cleanname=" << atom.cleanname << endl;
       oss << "atomic_number=" << atom.atomic_number << endl;
-      oss << "number=" << atom.number << endl;
+      oss << "basis=" << atom.basis << endl;  //[CO20200130 - number->basis]oss << "number=" << atom.number << endl;
       oss << "name_is_given=" << atom.name_is_given << endl;
       oss << "sd=" <<  atom.sd << endl;
       oss << "print_cartesian" << atom.print_cartesian << endl;
@@ -200,7 +200,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
     }
     oss << " T=" << atom.type;
     oss << " B=" << atom.basis;
-    oss << " N=" << atom.number;
+    //[CO20200130 - number->basis]oss << " N=" << atom.number;
     //  oss << setw(1);
     oss << " ijk=[" << atom.ijk(1) << "," << atom.ijk(2) << "," << atom.ijk(3) << "]";
     if(atom.verbose) oss << " " << endl;
@@ -2896,7 +2896,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       if(a.write_DEBUG_flag) {
         oss << " s"<<a.atoms.at(iat).spin;
-        oss << " n"<<a.atoms.at(iat).number;
+        //[CO20200130 - number->basis]oss << " n"<<a.atoms.at(iat).number;
         oss << " b"<<a.atoms.at(iat).basis;
         oss << " N("<<a.atoms.at(iat).cleanname;
         oss << " "<<a.atoms.at(iat).atomic_number<<" "<<" ["<<a.atoms.at(iat).type<<"] ";
@@ -4365,7 +4365,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.cpos=v;
           atom.fpos=C2F(a.lattice,atom.cpos);
         }
-        atom.number=iat;    // reference position for convasp
+        //[CO20200130 - number->basis]atom.number=iat;    // reference position for convasp
         atom.basis=iat;     // position in the basis
         atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
         atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
@@ -4740,7 +4740,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atom.CleanSpin();
       atom.name_is_given=TRUE;
 
-      atom.number=a.atoms.size();    // reference position for convasp
+      //[CO20200130 - number->basis]atom.number=a.atoms.size();    // reference position for convasp
       atom.basis=a.atoms.size();     // position in the basis
       atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
       atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
@@ -5157,7 +5157,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atoms_temp[i].CleanSpin();
       atoms_temp[i].name_is_given=TRUE;
 
-      atoms_temp[i].number=atoms_temp.size();    // reference position for convasp
+      //[CO20200130 - number->basis]atoms_temp[i].number=atoms_temp.size();    // reference position for convasp
       atoms_temp[i].basis=atoms_temp.size();     // position in the basis
       atoms_temp[i].ijk(1)=0;atoms_temp[i].ijk(2)=0;atoms_temp[i].ijk(3)=0; // inside the zero cell...
       atoms_temp[i].corigin(1)=0.0;atoms_temp[i].corigin(2)=0.0;atoms_temp[i].corigin(3)=0.0; // inside the zero cell
@@ -5375,7 +5375,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.CleanSpin();
           atom.name_is_given=TRUE;
 
-          atom.number=a.atoms.size();    // reference position for convasp
+          //[CO20200130 - number->basis]atom.number=a.atoms.size();    // reference position for convasp
           atom.basis=a.atoms.size();     // position in the basis
           atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
           atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
@@ -6486,7 +6486,7 @@ void xstructure::MakeBasis(void) {
   // need to update NUMBER and BASIS, number seems restricted to convasp and largely OBSOLETE (CO20190226)
   for(uint iatom=0;iatom<atoms.size();iatom++) {
     atoms.at(iatom).basis=iatom;
-    atoms.at(iatom).number=iatom;
+    //[CO20200130 - number->basis]atoms.at(iatom).number=iatom;
   }
 }
 
@@ -15748,7 +15748,7 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
           _atom a;
           a=sstr.atoms.at(iat);
           a.name=sstr.atoms.at(iat).name;
-          a.number=iat;
+          a.basis=iat; //[CO20200130 - number->basis]a.number=iat;
           a.ijk=ijk;
           for(int ic=1;ic<=3;ic++)
             ctpos(ic)=sstr.atoms.at(iat).cpos(ic)+ijk(1)*lat(1,ic)+ijk(2)*lat(2,ic)+ijk(3)*lat(3,ic);
@@ -15818,7 +15818,7 @@ void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
     _atom a=sstr.atoms.at(iat);
     a.name=sstr.atoms.at(iat).name;
-    a.number=iat;
+    a.basis=iat; //[CO20200130 - number->basis]a.number=iat;
     a.ijk=sstr.atoms.at(iat).ijk;
     a.cpos=sstr.atoms.at(iat).cpos;
     a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;

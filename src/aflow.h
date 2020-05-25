@@ -1129,7 +1129,7 @@ class _atom { // simple class.. nothing fancy
     string cleanname;                                      // a chemical clean version of the name
     int info;                                              // container for misc. information  //RHT
     int    atomic_number;                                  // 0 by defauls
-    int    number;                                         // atom number reference for convasp, from zero to the sky
+    //[CO20200130 - number->basis]int    number;                                         // atom number reference for convasp, from zero to the sky
     string sd;                                             // ?
     xvector<int> ijk;                                      // xvector identifier of the lattice (but you must give str)
     bool   isincell;                                       // is in cell ? (i==j==k==0 ?)
