@@ -5848,9 +5848,21 @@ namespace KBIN {
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
     if(aurostd::FileExist(aflowin_path)) {
-      string aflowin = "";
-      aurostd::file2string(aflowin_path, aflowin);
-      system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::substring2string(aflowin, "[AFLOW]SYSTEM=", false));
+      // ME20200525 - Need to take potential white space between [AFLOW],
+      // SYSTEM, and = into account.
+      vector<string> aflowin;
+      aurostd::file2vectorstring(aflowin_path, aflowin);
+      uint nlines = aflowin.size();
+      string line = "";
+      for (uint iline = 0; iline < nlines && system_name.empty(); iline++) {
+        if (aflowin[iline].find("SYSTEM") != string::npos) {
+          line = aflowin[iline];
+          if (aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "[AFLOW]SYSTEM=")) {
+            string::size_type t = line.find_first_of("=");
+            system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line.substr(t + 1));
+          }
+        }
+      }
     } else {
       string function = "KBIN::ExtractSystemNameFromAFLOWIN():";
       string message = "Could not find file " + aflowin_path + ".";
