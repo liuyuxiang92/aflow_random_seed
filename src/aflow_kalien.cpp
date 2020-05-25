@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // this file contains the routines to run VASP in KBIN
@@ -20,15 +20,15 @@ namespace ALIEN {
       aurostd::substring2bool(AflowIn,"[ALIEN_COMMAND]STOP",TRUE);
     if(alienflags.KBIN_ALIEN_COMMAND_BINARY_START_STOP_FLAG==FALSE) {
       alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG =
-	aurostd::substring2bool(AflowIn,"[ALIEN_COMMAND]",TRUE);
+        aurostd::substring2bool(AflowIn,"[ALIEN_COMMAND]",TRUE);
       if(alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG)
-	alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE =
-	  aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]",FALSE);
+        alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE =
+          aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]",FALSE);
     } else {
       alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG = FALSE;
       alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE="";
       aurostd::ExtractToStringEXPLICIT(AflowIn,alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE,
-				       "[ALIEN_COMMAND]START","[ALIEN_COMMAND]STOP");
+          "[ALIEN_COMMAND]START","[ALIEN_COMMAND]STOP");
     }
     // HOW TO RUN
     // just run it
@@ -56,23 +56,23 @@ namespace ALIEN {
       aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE]FILE=",TRUE);
     if(alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG)
       alienflags.KBIN_ALIEN_INPUT_FILE_FILE_VALUE =
-	aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]FILE=",TRUE);
+        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]FILE=",TRUE);
     alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG    =
       aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE]COMMAND=",TRUE);
     if(alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG)
       alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_VALUE =
-	aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]COMMAND=",FALSE);
+        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]COMMAND=",FALSE);
     alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_FLAG    =
       aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_NAME]INPUT=",TRUE);
     if(alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_FLAG)
       alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_VALUE =
-	aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE_NAME]INPUT=",TRUE);
+        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE_NAME]INPUT=",TRUE);
     alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_FLAG    =
       aurostd::substring2bool(AflowIn,"[ALIEN_OUTPUT_FILE_NAME]OUTPUT=",TRUE);
     if(alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_FLAG)
       alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE =
-	aurostd::substring2string(AflowIn,"[ALIEN_OUTPUT_FILE_NAME]OUTPUT=",TRUE);
-  
+        aurostd::substring2string(AflowIn,"[ALIEN_OUTPUT_FILE_NAME]OUTPUT=",TRUE);
+
     alienflags.KBIN_ALIEN_INPUT_MODE_EXTERNAL=FALSE;
     if(alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG) alienflags.KBIN_ALIEN_INPUT_MODE_EXTERNAL=TRUE;
     if(alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG) alienflags.KBIN_ALIEN_INPUT_MODE_EXTERNAL=TRUE;
@@ -93,29 +93,29 @@ namespace ALIEN {
     _alienflags alienflags;
     _xalien xalien;
     xalien.clear();
-  
+
     ifstream FileAFLOWIN;
     string FileNameAFLOWIN;
     string AflowIn;
     FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_;
     FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
     FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
-    //DX 20190125 [OBSOLETE] - need to remove null bytes : AflowIn="";char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ AFLOW.IN and put into AflowIn
-    AflowIn="";char c; while (FileAFLOWIN.get(c)) if(c!='\0'){ AflowIn+=c; }               // READ AFLOW.IN and put into AflowIn //DX 20190125 - remove null bytes
+    //DX20190125 [OBSOLETE] - need to remove null bytes : AflowIn="";char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ AFLOW.IN and put into AflowIn
+    AflowIn="";char c; while (FileAFLOWIN.get(c)) if(c!='\0'){ AflowIn+=c; }               // READ AFLOW.IN and put into AflowIn //DX20190125 - remove null bytes
     FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
     if(!FileAFLOWIN) {                                                                                      // ******* Aflow.in does not exist
-      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
       return FALSE;
     }
     aflags.QUIET=FALSE;
     alienflags=ALIEN::Get_Alienflags_from_AflowIN(AflowIn);
     if(alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG) kflags.KBIN_BIN=alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE;
-  
+
     // ***************************************************************************
     // Get the KBIN_BIN name
     aurostd::StringstreamClean(aus);
-    aus << "00000  MESSAGE ALIEN::Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE ALIEN::Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // ***************************************************************************
     Krun=TRUE;  // guess everything is intelligent !
@@ -136,51 +136,51 @@ namespace ALIEN {
       ifstream DirectoryStream;
       DirectoryStream.open(xalien.Directory.c_str(),std::ios::in);
       if(!DirectoryStream) {
-	aus << "XXXXX  MAKING DIRECTORY = " << xalien.Directory << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET); // return FALSE;
-	string str="mkdir "+xalien.Directory;
-	system(str.c_str());
+        aus << "XXXXX  MAKING DIRECTORY = " << xalien.Directory << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET); // return FALSE;
+        string str="mkdir "+xalien.Directory;
+        system(str.c_str());
       }
       // ***************************************************************************
       // READY TO RUN
       if(Krun==TRUE) {   // survived all troubles
-	// ***************************************************************************
-	// START
-	// ***************************************************************************
-	// PRESCRIPT
-	if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
-	  KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
-	// ***************************************************************************
-	// RUN
-	ALIEN::Write_INPUT(xalien); // ALIEN WRITE INPUT
-	aus << "AAAAA  ALIEN RUN - " <<  xalien.Directory << " - \"" << kflags.KBIN_BIN << "\" - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	// single line command
-	if(alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG==TRUE) {
-	  aus_exec.clear();
-	  aus_exec << "cd " << xalien.Directory << endl;
-	  aus_exec << "rm -f " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
-	  aus_exec << kflags.KBIN_BIN << " >> " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
-	  //   cout << aus_exec.str()  << endl;
-	  aurostd::execute(aus_exec);
-	}
-	// start stop command
-	if(alienflags.KBIN_ALIEN_COMMAND_BINARY_START_STOP_FLAG==TRUE) {
-	  aus_exec.clear();
-	  aus_exec << "cd " << xalien.Directory << endl;
-	  aus_exec << "rm -f " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
-	  aurostd::string2file(alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE,xalien.Directory+"/alien.bin");
-	  aus_exec << "sh ./alien.bin >> " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
-	  aus_exec << "rm -f ./alien.bin" << endl;
-	  //   cout << aus_exec.str()  << endl;
-	  aurostd::execute(aus_exec);
+        // ***************************************************************************
+        // START
+        // ***************************************************************************
+        // PRESCRIPT
+        if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
+          KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
+        // ***************************************************************************
+        // RUN
+        ALIEN::Write_INPUT(xalien); // ALIEN WRITE INPUT
+        aus << "AAAAA  ALIEN RUN - " <<  xalien.Directory << " - \"" << kflags.KBIN_BIN << "\" - " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        // single line command
+        if(alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG==TRUE) {
+          aus_exec.clear();
+          aus_exec << "cd " << xalien.Directory << endl;
+          aus_exec << "rm -f " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
+          aus_exec << kflags.KBIN_BIN << " >> " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
+          //   cout << aus_exec.str()  << endl;
+          aurostd::execute(aus_exec);
         }
-	//   ALIEN::Run(xalien,aflags,kflags,alienflags,FileMESSAGE);
-	// ***************************************************************************
-	// POSTSCRIPT
-	if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
-	  KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
-	// ***************************************************************************
+        // start stop command
+        if(alienflags.KBIN_ALIEN_COMMAND_BINARY_START_STOP_FLAG==TRUE) {
+          aus_exec.clear();
+          aus_exec << "cd " << xalien.Directory << endl;
+          aus_exec << "rm -f " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
+          aurostd::string2file(alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE,xalien.Directory+"/alien.bin");
+          aus_exec << "sh ./alien.bin >> " << alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE << endl;
+          aus_exec << "rm -f ./alien.bin" << endl;
+          //   cout << aus_exec.str()  << endl;
+          aurostd::execute(aus_exec);
+        }
+        //   ALIEN::Run(xalien,aflags,kflags,alienflags,FileMESSAGE);
+        // ***************************************************************************
+        // POSTSCRIPT
+        if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
+          KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
+        // ***************************************************************************
       }
     }
     FileAFLOWIN.clear();FileAFLOWIN.close();
@@ -193,6 +193,6 @@ namespace ALIEN {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -38,8 +38,8 @@
 #include <string.h>
 #include <string>
 #include <sys/stat.h>
-#ifndef __CYGWIN__  // ME190327 - Cygwin support
-#include <sys/sysctl.h>
+#ifndef __CYGWIN__  //ME20190327 - Cygwin support
+//#include <sys/sysctl.h>
 #endif
 // #include <sys/sysinfo.h>
 #include <sys/time.h>
@@ -49,10 +49,23 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
-#include <signal.h>  // ME191125 - needed for AflowDB
+#include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
-#include <list> //CO 170806 - need for POCC
-#include <netdb.h>  //CO 180321 - frisco needs for AFLUX
+#include <list> //CO20170806 - need for POCC
+#include <netdb.h>  //CO20180321 - frisco needs for AFLUX
+
+#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
+
+//CO20200502 START - including gettid()
+#ifdef __GLIBC__
+#define GLIBC_VERSION (__GLIBC__ * 100 + __GLIBC_MINOR__)
+#if (GLIBC_VERSION < 230) //CO20200502 - apparently they patched at 230 - https://stackoverflow.com/questions/30680550/c-gettid-was-not-declared-in-this-scope
+//[CO20200502 - too many warnings]#warning "defining getid() with syscall(SYS_gettid)"
+#include <sys/syscall.h>  //CO20200502 - need for gettid()
+#define gettid() syscall(SYS_gettid)
+#endif  //GLIBC_VERSION
+#endif  //__GLIBC__
+//CO20200502 END - including gettid()
 
 #ifdef _USE_AFLOW_H_
 //#include "aflow.h"
@@ -90,40 +103,40 @@ using std::vector;
 #define AUROSTD_DEFAULT_PRECISION 20
 #endif
 
-//CO 171215 - more global control
+//CO20171215 - more global control
 //this is for PRINTING, not for algorithmic zeroing
 #ifndef AUROSTD_ROUNDOFF_TOL
 #define AUROSTD_ROUNDOFF_TOL 1e-6
 #endif
 
-//CO 171215 - more global control
+//CO20171215 - more global control
 //this is SMALLER than _ZERO_TOL_ in aflow.h 
 //(aurostd default is less conservative to match read/write roundoff error)
 #ifndef AUROSTD_IDENTITY_TOL
 #define AUROSTD_IDENTITY_TOL 1e-6
 #endif
 
-//CO 171002 - USEFUL!
+//CO20171002 - USEFUL!
 #ifndef AUROSTD_MAX_INT
 #define AUROSTD_MAX_INT std::numeric_limits<int>::max()
 #endif
 
-//CO 171002 - USEFUL!
+//CO20171002 - USEFUL!
 #ifndef AUROSTD_MAX_UINT
 #define AUROSTD_MAX_UINT std::numeric_limits<uint>::max()
 #endif
 
-//CO 171002 - USEFUL!
+//CO20171002 - USEFUL!
 #ifndef AUROSTD_MAX_ULLINT
 #define AUROSTD_MAX_ULLINT std::numeric_limits<unsigned long long int>::max()
 #endif
 
-//CO 171002 - USEFUL!
+//CO20171002 - USEFUL!
 #ifndef AUROSTD_MAX_DOUBLE
 #define AUROSTD_MAX_DOUBLE std::numeric_limits<double>::max()
 #endif
 
-//CO 180101 - stream2stream modes
+//CO20180101 - stream2stream modes
 #ifndef DEFAULT_STREAM
 #define DEFAULT_STREAM 'D'
 #endif
@@ -156,7 +169,7 @@ using std::vector;
 #include "aurostd_xoption.h"
 #include "aurostd_argv.h"
 #include "aurostd_xcombos.h"
-#include "aurostd_xerror.h" //ME 180627
+#include "aurostd_xerror.h" //ME20180627
 
 using aurostd::min;
 using aurostd::max;
@@ -171,13 +184,13 @@ using aurostd::xcomplex;
 using aurostd::xmatrix;
 using aurostd::clear;
 using aurostd::xvector;
-using aurostd::xtensor; //ME 180627
-//[ME 180627 OBSOLETE]using aurostd::xtensor3;
-//[ME 180627 OBSOLETE]using aurostd::xtensor4;
-//[ME 180627 OBSOLETE]using aurostd::xtensor5;
-//[ME 180627 OBSOLETE]using aurostd::xtensor6;
-//[ME 180627 OBSOLETE]using aurostd::xtensor7;
-//[ME 180627 OBSOLETE]using aurostd::xtensor8;
+using aurostd::xtensor; //ME20180627
+//[ME20180627 OBSOLETE]using aurostd::xtensor3;
+//[ME20180627 OBSOLETE]using aurostd::xtensor4;
+//[ME20180627 OBSOLETE]using aurostd::xtensor5;
+//[ME20180627 OBSOLETE]using aurostd::xtensor6;
+//[ME20180627 OBSOLETE]using aurostd::xtensor7;
+//[ME20180627 OBSOLETE]using aurostd::xtensor8;
 using aurostd::xoption;
 
 using aurostd::xvector;
@@ -216,8 +229,8 @@ typedef unsigned uint;
 
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
-#include "../aflow.h"
-//#include "../SQLITE/sqlite3.h"  // OBSOLETE ME191228 - not used
+#include "../aflow.h"     //needed for XHOST
+//#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
 template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<utype>&);// __xprototype;
@@ -235,13 +248,21 @@ namespace aurostd {
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
+  long double get_mseconds(void);
+  long double get_mseconds(long double reference_useconds);
+  long double get_delta_mseconds(long double& useconds_begin);
   long double get_useconds(void);
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
   string get_time(void);
   string get_datetime(void);
-  string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO 171215
+  string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
   bool beep(uint=2000,uint=100); // standard values
+}
+// ----------------------------------------------------------------------------
+// threadID stuff
+namespace aurostd {
+  unsigned long long int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
 namespace aurostd {
@@ -280,17 +301,17 @@ namespace aurostd {
   string tolower(const string& in)  __xprototype;
   char toupper(const char& in)  __xprototype;
   char tolower(const char& in)  __xprototype;
-  string getPWD();  //CO191112
+  string getPWD();  //CO20191112
   int GetNumFields(const string& s);
   string GetNextVal(const string& s,int& id);
   string PaddedNumString(const int num,const int ndigits);
-  int getZeroPadding(double num);  //CO191217
-  int getZeroPadding(int num);  //CO191217
-  int getZeroPadding(uint num); //CO191217
-  int getZeroPadding(long int num); //CO191217
-  int getZeroPadding(unsigned long int num);  //CO191217
-  int getZeroPadding(long long int num);  //CO191217
-  int getZeroPadding(unsigned long long int num);  // ME190108
+  int getZeroPadding(double num);  //CO20191217
+  int getZeroPadding(int num);  //CO20191217
+  int getZeroPadding(uint num); //CO20191217
+  int getZeroPadding(long int num); //CO20191217
+  int getZeroPadding(unsigned long int num);  //CO20191217
+  int getZeroPadding(long long int num);  //CO20191217
+  int getZeroPadding(unsigned long long int num);  //ME20190108
   template<class utype> string PaddedPRE(utype,int,string=" ");
   string PaddedPRE(string,int,string=" ");
   template<class utype> string PaddedPOST(utype,int,string=" ");
@@ -303,16 +324,16 @@ namespace aurostd {
   uint ProgressBar(std::ostream& oss,string prelim,double j,bool VERBOSE_PERCENTAGE,bool VERBOSE_ROLLER,bool VERBOSE_CURSOR);
   uint ProgressBar(std::ostream& oss,string prelim,double j);  
   //about cleaning up strings
-  bool RemoveControlCodeCharactersFromString(const string& in, string& out); //DX 20190516  //CO190620
-  bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out); //DX 20190516
-  bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file=true); //DX 20190516
-  bool isNullByte(char c); //DX190131
-  string removeNullBytes(string in); //DX190131
-  bool RemoveBinaryCharactersFromFile(string directory, string filename); //DX 20190211
+  bool RemoveControlCodeCharactersFromString(const string& in, string& out); //DX20190516  //CO20190620
+  bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out); //DX20190516
+  bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file=true); //DX20190516
+  bool isNullByte(char c); //DX20190131
+  string removeNullBytes(string in); //DX20190131
+  bool RemoveBinaryCharactersFromFile(string directory, string filename); //DX20190211
   string CleanStringASCII(const string& s) __xprototype;
-  string CleanStringASCII_190712(const string& s) __xprototype; //CO190712
-  string CleanStringASCII_190101(const string& s) __xprototype; //CO190712
-  void CleanStringASCII_InPlace(string& s) __xprototype;  //CO190712
+  string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
+  string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
+  void CleanStringASCII_InPlace(string& s) __xprototype;  //CO20190712
   string CGI_StringClean(const string& stringIN) __xprototype;
   string RemoveWhiteSpaces(const string& s) __xprototype;
   string RemoveWhiteSpaces(const string& s, const char toogle) __xprototype;
@@ -326,27 +347,29 @@ namespace aurostd {
   string RemoveTabs(const string& s, const char toogle) __xprototype;
   string RemoveTabsFromTheBack(const string& s) __xprototype;
   string RemoveComments(const string& s) __xprototype;
-  vector<string> RemoveComments(const vector<string>&) __xprototype;  // ME190614
+  vector<string> RemoveComments(const vector<string>&) __xprototype;  //ME20190614
+  deque<string> RemoveComments(const deque<string>&) __xprototype;  //ME20190614
   string RemoveCharacter(const string& s, const char character) __xprototype;
-  void RemoveCharacterInPlace(string& s, const char character) __xprototype;  //CO190712
-  string RemoveCharacterFromTheBack(const string& s, const char character); __xprototype; //DX 20190708
-  string RemoveCharacterFromTheFront(const string& s, const char character); __xprototype; //DX 20190708
-  string RemoveCharacterFromTheFrontAndBack(const string& s, const char character); __xprototype; //DX 20190708
-  string RemoveNumbers(const string& s) __xprototype; //CO190712
-  string RemoveNumbers_190712(const string& s) __xprototype;  //CO10712
-  string RemoveNumbers_190101(const string& s) __xprototype;  //CO190712
-  void RemoveNumbersInPlace(string& s) __xprototype;  //CO190712
+  void RemoveCharacterInPlace(string& s, const char character) __xprototype;  //CO20190712
+  string RemoveCharacterFromTheBack(const string& s, const char character); __xprototype; //DX20190708
+  string RemoveCharacterFromTheFront(const string& s, const char character); __xprototype; //DX20190708
+  string RemoveCharacterFromTheFrontAndBack(const string& s, const char character); __xprototype; //DX20190708
+  string RemoveNumbers(const string& s) __xprototype; //CO20190712
+  string RemoveNumbers_20190712(const string& s) __xprototype;  //CO10712
+  string RemoveNumbers_20190101(const string& s) __xprototype;  //CO20190712
+  void RemoveNumbersInPlace(string& s) __xprototype;  //CO20190712
   string RemoveRounding(const string& s) __xprototype;
   //string RemoveCharacter(const string& s, const char character, const char toogle) __xprototype;
   string RemoveSubStringFirst(const string& str_orig, const string& str_rm) __xprototype;
-  void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO190712
+  void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO20190712
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
-  void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO190712
+  void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
   bool DirectoryLS(string Directory,vector<string> &vfiles);
+  bool DirectoryLS(string Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -359,32 +382,33 @@ namespace aurostd {
   string ProperFileName(string fileIN);
   bool CopyFile(string file_from,string file_to);
   bool LinkFile(string file_from,string file_to);
-  //CO - START
+  //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
-  bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO 180220
+  bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
   bool IsCompressed(string FileNameIn,string& FileNameOut);
   bool IsCompressed(string FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
-  //CO - END
+  //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
   bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default
-  bool ZIP2ZIP(string dir,string from,string to,bool=TRUE);
-  bool BZ2XZ(string dir,bool=TRUE); bool GZ2XZ(string dir,bool=TRUE);
+  bool ZIP2ZIP(string dir,string from,string to,bool=TRUE,const string& = "");
+  bool BZ2XZ(string dir,bool=TRUE,const string& = "");
+  bool GZ2XZ(string dir,bool=TRUE,const string& = "");
   // [OBSOLETE]  bool BunzipFile(const string& FileName); bool BzipFile(const string& FileName);
   // [OBSOLETE]  bool GunzipFile(const string& FileName); bool GzipFile(const string& FileName); 
   // [OBSOLETE]  bool XunzipFile(const string& FileName); bool XzipFile(const string& FileName); 
   // [OBSOLETE]  bool UnzipFile(const string& FileName);  bool ZipFile(const string& FileName);
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
-  unsigned long long int FileSize(const string& FileName);  // ME191001
+  unsigned long long int FileSize(const string& FileName);  //ME20191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
-  bool EFileEmpty(const string& FileName); //CO190808
-  bool EFileNotEmpty(const string& FileName); //CO190808
-  long int FileModificationTime(const string&);  // ME181712
-  unsigned int getFileCheckSum(const string&, const string&);  // ME190219
-  unsigned int getFletcher32(unsigned short*, size_t);  // ME190219
+  bool EFileEmpty(const string& FileName); //CO20190808
+  bool EFileNotEmpty(const string& FileName); //CO20190808
+  long int FileModificationTime(const string&);  //ME20180712
+  unsigned int getFileCheckSum(const string&, const string&);  //ME20190219
+  unsigned int getFletcher32(unsigned short*, size_t);  //ME20190219
   string FileToString(const string& FileName);
   void InFileExistCheck(const string& routine,const string& filename,ifstream& file_to_check,std::ostream& outf);
   bool IsCommandAvailable(const string& command);
@@ -487,11 +511,11 @@ namespace aurostd {
   uint stream2vectorstring(std::istream& istreamIN,vector<string> &vstringout);
   uint stream2vectorstring(std::ifstream& ifstreamIN,vector<string> &vstringout);
   uint stream2vectorstring(stringstream& stringstreamIN,vector<string> &vstringout);
-  uint string2vectorstring(const string& stringIN,vector<string> &vstringout,bool consecutive=false,bool trim_edges=false); //CO 170613, defaults to usual string2tokens() behavior
+  uint string2vectorstring(const string& stringIN,vector<string> &vstringout,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
   vector<string> stream2vectorstring(std::istream& istreamIN);
   vector<string> stream2vectorstring(std::ifstream& ifstreamIN);
   vector<string> stream2vectorstring(stringstream& stringstreamIN);
-  vector<string> string2vectorstring(const string& stringIN,bool consecutive=false,bool trim_edges=false);  //CO 170613, defaults to usual string2tokens() behavior
+  vector<string> string2vectorstring(const string& stringIN,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior
   string liststring2string(string="",string="",string="",string="",string="",string="",string="",string="",
       string="",string="",string="",string="",string="",string="",string="",string="",
       string="",string="",string="",string="",string="",string="",string="",string="",
@@ -523,25 +547,28 @@ namespace aurostd {
   uint gzfile2string(string FileNameIN,string& StringIN);
   uint xzfile2string(string FileNameIN,string& StringIN);
   uint zipfile2string(string _FileNameIN,string& StringIN); //CO
-  uint efile2string(const string& FileNameIN,string& StringIN);  //CO191110
+  uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110
   // file2vectorstring  
-  uint file2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint efile2vectorstring(string FileNameIN,vector<string>& vlines);
+  uint file2vectorstring(string FileNameIN,vector<string>& vline);
+  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline);
+  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint efile2vectorstring(string FileNameIN,vector<string>& vline);
+  bool vectorstring2file(const vector<string>& vline,string FileNameOUT);
   // file2dequestring  
-  uint file2dequestring(string FileNameIN,deque<string>& vlines);
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vlines);
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vlines);
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vlines);
-  uint efile2dequestring(string FileNameIN,deque<string>& vlines);
+  uint file2dequestring(string FileNameIN,deque<string>& vline);
+  uint bz2file2dequestring(string FileNameIN,deque<string>& vline);
+  uint gzfile2dequestring(string FileNameIN,deque<string>& vline);
+  uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
+  uint efile2dequestring(string FileNameIN,deque<string>& vline);
+  bool dequestring2file(const deque<string>& vline,string FileNameOUT);
   // file2vectorstring overloading with deque
-  uint file2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint efile2vectorstring(string FileNameIN,deque<string>& vlines);  
+  uint file2vectorstring(string FileNameIN,deque<string>& vline);
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline);
+  uint efile2vectorstring(string FileNameIN,deque<string>& vline);  
+  bool vectorstring2file(const deque<string>& vline,string FileNameOUT);
   // file2stringstream
   bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
   bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);
@@ -557,13 +584,20 @@ namespace aurostd {
   string efile2string(string FileNameIN);
   // reading url to string/stringstream/tokens/vector/deque
   bool url2file(string url,string& fileIN,bool=FALSE)  __xprototype;   // bool = verbose
-  bool url2string(string url,string& stringIN,bool=FALSE)  __xprototype;   // bool = verbose
-  bool url2stringstream(string url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose
-  bool url2vectorstring(string url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
-  bool url2dequestring(string url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
-  template<typename utype> uint url2tokens(string url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype;
-  template<typename utype> uint url2tokens(string url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;
-  string url2string(string url)  __xprototype;
+  bool eurl2string(const string& url,string& stringIN,bool verbose=FALSE);  //CO20200223
+  bool url2string(const string& url,string& stringIN,bool=FALSE)  __xprototype;   // bool = verbose
+  bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose  //CO20200223
+  bool url2stringstream(const string& url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose
+  bool eurl2vectorstring(const string& url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose  //CO20200223
+  bool url2vectorstring(const string& url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
+  bool eurl2dequestring(const string& url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose  //CO20200223
+  bool url2dequestring(const string& url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
+  template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype; //CO20200223
+  template<typename utype> uint url2tokens(const string& url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype;
+  template<typename utype> uint eurl2tokens(const string& url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;  //CO20200223
+  template<typename utype> uint url2tokens(const string& url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;
+  string eurl2string(const string& url)  __xprototype; //CO20200223
+  string url2string(const string& url)  __xprototype;
   // about istream/ostream
   string ostream2string(std::ostream& oss);
   uint stream2string(std::istream& istreamIN,string &vstringout);
@@ -576,21 +610,23 @@ namespace aurostd {
   double getenv2double(const string& str);
   // about operating on files
   bool ChmodFile(string chmod_string,string FileNameOUTPUT);
-  //CO - START
+  //CO START
   bool file2directory(const string& _file,const string& destination);
   bool file2directory(const vector<string>& files,const string& destination);
-  bool file2file(const string& _file,const string& destination); //CO 171025
+  bool file2file(const string& _file,const string& destination); //CO20171025
+  string file2md5sum(const string& _file); //SC20200326
+  string file2auid(const string& _file); //SC20200326  
   bool IsDirectory(string path);
   bool IsFile(string path);
-  //CO - END
+  //CO END
   bool RemoveFile(string FileNameOUTPUT);
   bool RemoveFile(const vector<string>& files); //CO
   bool RemoveDirectory(const string& dir); //CO
   // about getting info from strings
-  uint string2tokens(const string& str,vector<string>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype;  //CO 170613, defaults to usual string2tokens() behavior
-  uint string2tokens(const string& str,deque<string>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype; //CO 170613, defaults to usual string2tokens() behavior
-  template<class utype> uint string2tokens(const string& str,std::vector<utype>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype;  //CO 170613, defaults to usual string2tokens() behavior
-  template<class utype> uint string2tokens(const string& str,std::deque<utype>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype; //CO 170613, defaults to usual string2tokens() behavior
+  uint string2tokens(const string& str,vector<string>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype;  //CO20170613, defaults to usual string2tokens() behavior
+  uint string2tokens(const string& str,deque<string>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype; //CO20170613, defaults to usual string2tokens() behavior
+  template<class utype> uint string2tokens(const string& str,std::vector<utype>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype;  //CO20170613, defaults to usual string2tokens() behavior
+  template<class utype> uint string2tokens(const string& str,std::deque<utype>& tokens,const string& delimiters = " ",bool consecutive=false) __xprototype; //CO20170613, defaults to usual string2tokens() behavior
   uint string2tokensAdd(const string& str,vector<string>& tokens,const string& delimiters = " ") __xprototype;
   uint string2tokensAdd(const string& str,deque<string>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters = " ") __xprototype;
@@ -638,6 +674,7 @@ namespace aurostd {
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
+  string bool2string(bool from);
   // string utype2string(const string& from) __xprototype;
   // [OBSOLETE]  template<class u1> string utype2string(u1) __xprototype;
   // [OBSOLETE]  template<class u1, class u2> string utype2string(u1,u2) __xprototype;
@@ -660,13 +697,13 @@ namespace aurostd {
   string GetLineString(const stringstream& strstream, const int& line) __xprototype;
   stringstream GetLineStringstream(const stringstream& strstream, const int& line) __xprototype;
   // substitute strings in strings and stringstreams
-  bool StringsAlphabetic(const string& A,const string& B,bool allow_identical=true); //CO 180801
-  bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO 180801
-  bool StringsAlphabetic(const deque<string>& input,bool allow_identical=true);  //CO 180801
+  bool StringsAlphabetic(const string& A,const string& B,bool allow_identical=true); //CO20180801
+  bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO20180801
+  bool StringsAlphabetic(const deque<string>& input,bool allow_identical=true);  //CO20180801
   string StringSubst(string &strstring, const string &strfind, const string &strreplace);
   //  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace);
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
-  void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  // ME190128 - fixed type declaration
+  void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
   bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN);
   bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN);
@@ -678,12 +715,14 @@ namespace aurostd {
   bool substring2bool(const vector<string>& vstrstream, const string& strsub1);
   bool substring2bool(const deque<string>& vstrstream, const string& strsub1);
   bool substring2bool(const stringstream& strstream, const string& strsub1);
-  bool withinList(const vector<string>& list,const string& input);  //CO181010
-  bool withinList(const vector<int>& list,int input); //CO181010
-  bool withinList(const vector<uint>& list,uint input); //CO181010
-  bool withinList(const vector<string>&, const string&, int&);  // ME190905
-  bool withinList(const vector<int>&, int, int&);  // ME190905
-  bool withinList(const vector<uint>&, uint, int&);  // ME190905
+  bool WithinList(const vector<string>& list,const string& input);  //CO20181010
+  bool WithinList(const vector<int>& list,int input); //CO20181010
+  bool WithinList(const vector<uint>& list,uint input); //CO20181010
+  bool WithinList(const vector<string>&, const string&, int&);  //ME20190905
+  bool WithinList(const vector<int>&, int, int&);  //ME20190905
+  bool WithinList(const vector<uint>&, uint, int&);  //ME20190905
+  bool EWithinList(const vector<string>& list,const string& input); //CO20200223
+  bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   bool substring_present_file(const string& FileName, const string& strsub1) ;
   bool substring_present_file_FAST(const string& FileName, const string& strsub1) ;
   // about present substrings and taking off the value
@@ -749,8 +788,9 @@ namespace aurostd {
   string string2latex(const string& str) __xprototype;
   string latex2html(const string& str) __xprototype;
   string latex2txt(const string& str) __xprototype;
-  string fixStringLatex(const string& input, bool double_back_slash=false,bool symmetry_string=false);  //CO190419
-  string dbl2frac(double a, bool sign_prefix=true); //DX 20190724
+  string fixStringLatex(const string& input, bool double_back_slash=false,bool symmetry_string=false);  //CO20190419
+  string dbl2frac(double a, bool sign_prefix=true); //DX20190724
+  double frac2dbl(const string& str); //DX20200313
 }
 
 
@@ -1104,8 +1144,8 @@ namespace aurostd {
   vector<vector<double> > Sum3DVectorAndReduce2D(const vector<vector<vector<double> > >& vvva);
   vector<vector<double> > Sum2DVectorExceptFirstColumn(const vector<vector<double> >& vva, const vector<vector<double> >& vvb);
   string vector2string(const vector<vector<double> >& vva);
-  template<typename utype> deque<utype> vector2deque(const vector<utype>& vin); //CO181226
-  template<typename utype> vector<utype> deque2vector(const deque<utype>& din); //CO181226
+  template<typename utype> deque<utype> vector2deque(const vector<utype>& vin); //CO20181226
+  template<typename utype> vector<utype> deque2vector(const deque<utype>& din); //CO20181226
   vector<vector<double> > ReduceVector(const vector<vector<double> >& vva, const int& n);
   double CalculateIntegrate(const vector<vector<double> >& vva, const int& n);
   double CalculateIntegrate(const vector<vector<double> >& vva, const int& n, const double& Emin, const double& Emax);
@@ -1240,19 +1280,19 @@ namespace aurostd {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-// DX 1/18/18 - Add xcomplex to json
+//DX20180118 - Add xcomplex to json
 namespace aurostd {
   template<typename utype> string _xcomplex2json(xcomplex<utype>& number) __xprototype;
   string xcomplex2json(xcomplex<double>& number);
 }
 
-// DX 8/3/17 - Add Matrix print out
+//DX20170803 - Add Matrix print out
 namespace aurostd {
   // [OBSOLETE] string xmatDouble2String(const xmatrix<double>& xmat_in, bool roff=false);
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
 }
 
-//CO 171215 - more json functionality
+//CO20171215 - more json functionality
 namespace aurostd {
   string wrapString(const string& input,const string& wrapper);
   string wrapString(const string& input,const string& wrapper_start,const string& wrapper_end);
@@ -1264,18 +1304,19 @@ namespace aurostd {
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
   vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff=false);
-  deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  deque<string> vecDouble2vecString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  // deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
 }
 
 namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap);
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap);
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap_start,string wrap_end);
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with ME
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with ME
 }
 
 //base64 stuff
-//CO - START
+//CO START
 namespace aurostd {
   //http://www.adp-gmbh.ch/cpp/common/base64.html for base64 encoding/decoding
   //http://stackoverflow.com/questions/535444/custom-manipulator-for-c-iostream for fancy stream manipulators
@@ -1355,12 +1396,12 @@ const std::string base64_chars =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"
 "0123456789+/";
-//CO - END
+//CO END
 
 #endif
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

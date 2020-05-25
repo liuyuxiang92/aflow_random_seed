@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo - Corey Oses
@@ -17,7 +17,7 @@ xAIMSOUT::xAIMSOUT() {
   content="";
   filename="";
   natoms=0;
-  ERROR="";
+  //[CO20200404 - OBSOLETE]ERROR="";
   free();
 }
 
@@ -83,7 +83,8 @@ bool xAIMSOUT::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUI
 }
 
 bool xAIMSOUT::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
-  string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
+  //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;  //CO20200502 - threadID
+  string tmpfile=aurostd::TmpFileCreate("xAIMSOUT_GetProperties"); //CO20200502 - threadID
   aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
   bool out=GetPropertiesFile(tmpfile);
   aurostd::RemoveFile(tmpfile);
@@ -171,6 +172,6 @@ bool xAIMSOUT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 #endif //  _AFLOW_OAIMS_CPP_
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

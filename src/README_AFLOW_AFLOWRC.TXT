@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -528,6 +528,11 @@ DEFAULT_PHONONS_KSCHEME
   choices: "M", "G"
   default: "G"
 
+DEFAULT_PHONONS_KPPRA
+  description: Number of k-points per reciprocal atom for phonon calculations.
+  type: integer
+  default: 3000
+
 DEFAULT_DOS_EMIN
   description: Minimum of the energy range over which the DOS is plotted.
   type: integer
@@ -989,6 +994,15 @@ DEFAULT_CHULL_PNG_RESOLUTION
   default: 300
 
 ####################################################################################################
+DEFAULTS CCE
+
+DEFAULT_CCE_OX_METHOD
+  description: Default method to determine oxidation numbers.
+  type: string
+  choices: "ELECTRONEGATIVITY_ALLEN", "BADER"
+  default: "ELECTRONEGATIVITY_ALLEN"
+
+####################################################################################################
 DEFAULTS GFA
 
 DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF
@@ -1231,6 +1245,11 @@ DEFAULT_APL_HARMIFC_FILE
   type: string
   default: "harmonicIFCs.xml"
 
+DEFAULT_APL_POLAR_FILE
+  description: Output file for the Born effective charge tensors and the dielectric tensor.
+  type: string
+  default: "polar.xml"
+
 DEFAULT_APL_HSKPTS_FILE
   description: Output file for the high-symmetry k-points in APL.
   type: string
@@ -1255,6 +1274,110 @@ DEFAULT_APL_PHEIGENVAL_FILE
   description: Output file for the phonon dispersion in VASP EIGENVAL format.
   type: string
   default: "PHEIGENVAL"
+
+DEFAULT_APL_STATE_FILE
+  description: Output file to save the state of the force constant calculators.
+  type: string
+  default: "fccalc_state.out"
+
+DEFAULT_APL_ADISP_SCENE_FORMAT
+  description: Default format to visualize atomic displacements for phonon modes.
+  type: string
+  default: "XCRYSDEN"
+
+DEFAULT_APL_ADISP_AMPLITUDE
+  description: Default amplitude for atomic displacements.
+  type: double
+  default: 0.25
+
+DEFAULT_APL_ADISP_NSTEPS
+  description: The number of steps per period in an XCRYSDEN animated structure file.
+  type: integer
+  default: 20
+
+DEFAULT_APL_ADISP_NPERIODS
+  description: The number of periods in an XCRYSDEN animated structure file.
+  type: integer
+  default: 1
+
+####################################################################################################
+DEFAULTS QHA
+
+DEFAULT_QHA_MODE
+  descriptions: Defines QHA mode to run (it is possible to run several modes simultaneously).
+  type: string
+  choices: "QHA", "QHA3P", "SCHQA" or their comma-separated combination
+  default: "QHA"
+
+DEFAULT_QHA_EOS
+  description: Runs equation of state (EOS) calculation (includes several APL runs) to obtain thermodynamic properties of material.
+  type: bool
+  default: 1
+
+DEFAULT_QHA_EOS_DISTORTION_RANGE
+  description: Sets the range of volumes and the volume increment for the set of EOS calculations.
+  type: string
+  default: "-12:16:3"
+
+DEFAULT_QHA_GP_DISTORTION
+  description: Sets the value of volume change (dV) for the calculation of the Grueneisen parameter using the finite difference method.
+  type: double
+  default: 1.0
+
+DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
+  description: Defines if electronic contribution to the free energy is included.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_SCQHA_PDIS_T
+  description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
+  type: string
+  default: "50,100,600"
+
+DEFAULT_QHA_GP_FINITE_DIFF
+  description: Defines if Grueneisen parameter is calculated using finite difference method.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_IGNORE_IMAGINARY
+  description: Defines if imaginary frequencies in phonon calculations are ignored.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_FILE_PREFIX
+  description: QHA file prefix. All QHA output files start with this prefix.
+  type: string
+  default: "aflow.qha."
+
+DEFAULT_QHA_GP_PATH_FILE
+  description: Output file for mode-resolved Grueneisen parameter dispersion curve.
+  type: string
+  default: "gp.disp.out"
+
+DEFAULT_QHA_GP_MESH_FILE
+  description: Output file for mode-resolved Grueneisen parameter calculated on q-points mesh.
+  type: string
+  default: "gp.mesh.out"
+
+DEFAULT_QHA_GP_AVG_FILE
+  description: Output file for temperature-dependent average Grueneisen parameter calculated using finite differences.
+  type: string
+  default: "gp.avg.out"
+
+DEFAULT_QHA_THERMO_FILE
+  description: Output file for thermal properties (equilibrium volume, free energy, bulk modulus, isobaric and isochoric specific heat, average Grueneisen parameter).
+  type: string
+  default: "gp.thermo.out"
+
+DEFAULT_QHA_FREQS_FILE
+  description: Output file for volume-dependent phonon frequencies.
+  type: string
+  default: "frequencies.out"
+
+DEFAULT_QHA_FVT_FILE
+  description: Output file for temperature- and volume-dependent free energy.
+  type:
+  default: "FVT.out"
 
 ####################################################################################################
 DEFAULTS AAPL
@@ -1286,7 +1409,7 @@ DEFAULT_AAPL_THERMALGRID
   description: q-point grid for thermal conductivity calculations.
   type: string
   format: "N1xN2xN3"
-  default: "26x26x26"
+  default: "21x21x21"
 
 DEFAULT_AAPL_TCT
   description: Temperature range (Tstart, Tend) and step size (Tstep) for the thermal conductivity calculations.
@@ -1707,7 +1830,7 @@ For additional information contact: Stefano Curtarolo (stefano@duke.edu) or
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

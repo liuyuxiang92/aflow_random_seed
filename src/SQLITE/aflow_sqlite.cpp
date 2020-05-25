@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -19,11 +19,11 @@ using std::vector;
 
 namespace sql {
 
-  // Execute command functions -------------------------------------------------
+  // Execute command functions -----------------------------------------------
   // These functions provide a framework to execute SQLite commands (including
-  // exception handling). The return types should all be void or string-typed to
-  // keep the number of functions to a minimum. Conversion to other data types
-  // should be handled outside these functions.
+  // exception handling). The return types should all be void or string-typed
+  // to keep the number of functions to a minimum. Conversion to other data
+  // types should be handled outside these functions.
 
   void SQLexecuteCommand(sqlite3* cursor, const string& command) {
     bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
@@ -31,7 +31,7 @@ namespace sql {
     char* sqlErrMsg = 0;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback, 0, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      std::string function = "sql::SQLexecuteCommand()";
+      std::string function = "sql::SQLexecuteCommand():";
       std::string message = string(sqlErrMsg) + " in command " + command;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
     }
@@ -44,7 +44,7 @@ namespace sql {
     string returnstring = "";
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackSCALAR, &returnstring, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommandSCALAR()";
+      string function = "sql::SQLexecuteCommandSCALAR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -60,7 +60,7 @@ namespace sql {
     vector<string> returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackVECTOR, &returnvector, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommandVECTOR()";
+      string function = "sql::SQLexecuteCommandVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -76,7 +76,7 @@ namespace sql {
     vector<vector<string> > returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback2DVECTOR, &returnvector, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommand2DVECTOR()";
+      string function = "sql::SQLexecuteCommand2DVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -85,9 +85,10 @@ namespace sql {
     }
   }
 
-  // Callback functions --------------------------------------------------------
-  // The following functions are the callback functions passed into sqlite_exec.
-  // Each executeCommand function should have its own callback function.
+  // Callback functions ------------------------------------------------------
+  // The following functions are the callback functions passed into
+  // sqlite_exec. Each executeCommand function should have its own callback
+  // function.
 
   int SQLcallback(void* data, int argc, char** argv, char** col) {
     bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
@@ -162,7 +163,7 @@ namespace sql {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

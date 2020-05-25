@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // functions written by KESONG YANG
@@ -24,10 +24,10 @@ namespace aurostd {
     string::iterator str_it;
     for (str_it = input.begin(); str_it < input.end(); str_it++) {
       if( ! (*str_it == ' ' || *str_it == '\t' || *str_it == '\n') ) {
-	number++;
-	while (str_it!=input.end() && !(*str_it == ' ' || *str_it == '\t' || *str_it == '\n') ) {
-	  str_it++;
-	}
+        number++;
+        while (str_it!=input.end() && !(*str_it == ' ' || *str_it == '\t' || *str_it == '\n') ) {
+          str_it++;
+        }
       }
     }
     return number;
@@ -56,10 +56,10 @@ namespace estructure {
     ss_gnuplot << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
     ss_gnuplot << "set output " << "\"" << plot_pdosname << ".eps" << "\"" << endl;
     ss_gnuplot << "set title \"" <<PEDOStitle << endl;
-    //ss_gnuplot << "set border lw 5" << endl; // CO 170830 - thick border
-    ss_gnuplot << "unset border" << endl; // CO 170830 - looks better
-    ss_gnuplot << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-    ss_gnuplot << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
+    //ss_gnuplot << "set border lw 5" << endl; //CO20170830 - thick border
+    ss_gnuplot << "unset border" << endl; //CO20170830 - looks better
+    ss_gnuplot << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    ss_gnuplot << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
     ss_gnuplot << endl;
 
     ss_gnuplot << "#DOS PLOT" << endl;
@@ -78,8 +78,8 @@ namespace estructure {
     ss_gnuplot << "set xlabel 'energy (eV)' offset graph 0.00" << endl;
     ss_gnuplot << "set ylabel 'peDOS (states/eV)' offset graph 0.00" << endl;
     ss_gnuplot << "set label '{/Helvetica-Oblique E}_F'  at 0.05, graph 0.95" << endl;
-    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl; // CO 170830 - originally lt 3 lw 1.5
-    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl; // CO 170830 - originally lt 3 lw 1.5
+    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl; //CO20170830 - originally lt 3 lw 1.5
+    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl; //CO20170830 - originally lt 3 lw 1.5
     ss_gnuplot << endl;
     ss_gnuplot << "plot[][] \\" << endl;
     if(PDOS[Natom_pdos].at(0).size()==4) { // Only works for s, p and d orbitals  
@@ -132,7 +132,7 @@ namespace estructure {
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:8 w l lt 1 lc rgb '#4C72B0' lw 6 title '{/Helvetica-Oblique d}_{z^2}', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:9 w l lt 1 lc rgb '#55A868' lw 6 title '{/Helvetica-Oblique d}_{xz}', \\"  << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:10 w l lt 1 lc rgb '#C44E52' lw 6 title '{/Helvetica-Oblique d}_{x^2-y^2}',\\" << endl;
-      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:11 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; // CO 170830 - originally lw 12 (why?)
+      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:11 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; //CO20170830 - originally lw 12 (why?)
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:12 w l lt 1 lc rgb '#CCB974' lw 6 title '{/Helvetica-Oblique f}_2', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:13 w l lt 1 lc rgb '#64B5CD' lw 6 title '{/Helvetica-Oblique f}_3', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:14 w l lt 1 lc rgb '#4C72B0' lw 6 title '{/Helvetica-Oblique f}_4', \\" << endl;
@@ -179,7 +179,7 @@ namespace estructure {
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:17 w l lt 1 lc rgb '#55A868' lw 6 notitle, \\"  << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:18 w l lt 1 lc rgb '#C44E52' lw 6 title '{/Helvetica-Oblique d}_{x^2-y^2}', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:19 w l lt 1 lc rgb '#C44E52' lw 6 notitle, \\" << endl;
-      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:20 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; // CO 170830 - originally lw 12 (why?)
+      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:20 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; //CO20170830 - originally lw 12 (why?)
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:21 w l lt 1 lc rgb '#8172B2' lw 6 notitle, \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:22 w l lt 1 lc rgb '#CCB974' lw 6 title '{/Helvetica-Oblique f}_2', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:23 w l lt 1 lc rgb '#CCB974' lw 6 notitle, \\" << endl;
@@ -212,16 +212,16 @@ namespace estructure {
     //  OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_DOS: tokens.at(i)=" << tokens.at(i) << endl;
-    
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOS: tokens.at(i)=" << tokens.at(i) << endl;
+
     double DOSMAX=0.0;
     string directory="./", ICSDName, DOSCARfile, OUTCARfile,  stmp, line;
     stringstream straus, strline, dosfile, ss_outcar, ss_doscar; //, stringstreamtmp, strline;  
@@ -234,15 +234,13 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-        
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: DOSSCALE=" << DOSSCALE << endl;
-    
-    cout << "estructure::PLOT_DOS: working in directory=" << directory << endl;
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: DOSSCALE=" << DOSSCALE << endl;
+
+    cout << XPID << "estructure::PLOT_DOS: working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
@@ -254,7 +252,7 @@ namespace estructure {
     vector<vector<double> > TDOS;
     vector<vector<double> >  TOTALPDOS;
     double Efermi;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -282,10 +280,10 @@ namespace estructure {
     fin << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
     fin << "set output " << "\"" << ICSDName <<"_DOS.eps" << "\"" << endl;
     fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << "\""<< endl;
-    //fin << "set border lw 5" << endl; // CO 170830 - thick border
-    fin << "unset border" << endl; // CO 170830 - looks better
-    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
+    //fin << "set border lw 5" << endl; //CO20170830 - thick border
+    fin << "unset border" << endl; //CO20170830 - looks better
+    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
     fin << endl;
 
     fin << "#DOS PLOT" << endl;
@@ -294,15 +292,15 @@ namespace estructure {
     fin << "set xrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     if(TOTALPDOS.at(0).size()==9||(TOTALPDOS.at(0).size()==7)) { 	
       if(DOSMAX*DOSSCALE!=0) {
-	fin << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
+        fin << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
       }
       else {
-	fin << "set yrange [0:2]" << endl;
+        fin << "set yrange [0:2]" << endl;
       }
     }
     if(TOTALPDOS.at(0).size()==4||(TOTALPDOS.at(0).size()==5)) {
       if(DOSMAX*DOSSCALE!=0) {
-	fin << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
+        fin << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
       }
     }
     fin << endl;
@@ -310,8 +308,8 @@ namespace estructure {
     fin << "set xlabel 'energy (eV)' offset graph 0.00" << endl;
     fin << "set ylabel 'eDOS (states/eV)' offset graph 0.00" << endl;
     fin << "set label '{/Helvetica-Oblique E}_F' at 0.05, graph 0.95" << endl;
-    fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
-    fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << endl;
     fin << "plot[][] \\" << endl;
     if(TOTALPDOS.at(0).size()==4) { // Only works for s, p and d orbitals	a
@@ -364,7 +362,7 @@ namespace estructure {
     }
     // aurostd::RemoveFile(ICSDName + "_DOS.eps"); // [CORMAC]
     if(aurostd::FileExist(ICSDName+"_DOS.eps"))  aurostd::execute(DEFAULT_KZIP_BIN+" -9f " + ICSDName + "_DOS.eps"); // [CORMAC]
-    if(LDEBUG) cerr << "estructure::PLOT_DOS: END" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: END" << endl;
   }
 }
 
@@ -384,16 +382,16 @@ namespace estructure {
     string directory="./", ICSDName="AFLOW_DOS_WEB",  stmp, line;
     stringstream straus, strline, dosfile; //, stringstreamtmp, strline;  
 
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: BEGIN" << endl;
-    
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: BEGIN" << endl;
+
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
-    
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
+
     if(tokens.size()<1) {
       init::ErrorOption(cout,options,"estructure::PLOT_DOSWEB","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
@@ -402,30 +400,28 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-     
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: DOSSCALE=" << DOSSCALE << endl;
-    
-    cout << "estructure::PLOT_DOSWEB: working in directory=" << directory << endl;
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: DOSSCALE=" << DOSSCALE << endl;
+
+    cout << XPID << "estructure::PLOT_DOSWEB: working in directory=" << directory << endl;
 
     //READ DOSCAR.static
     bool found=FALSE;
 
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/DOSCAR.static"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/DOSCAR.static"+vext.at(iext),dosfile);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/DOSCAR.static"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/DOSCAR.static"+XHOST.vext.at(iext),dosfile);
     }
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/DOSCAR"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/DOSCAR"+vext.at(iext),dosfile);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/DOSCAR"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/DOSCAR"+XHOST.vext.at(iext),dosfile);
     }
-     
+
     if(!found) {
-      cerr<<"ERROR: estructure::PLOT_DOSWEB: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
+      cerr << XPID << "ERROR: estructure::PLOT_DOSWEB: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
       exit(0);
     }
 
@@ -448,7 +444,7 @@ namespace estructure {
     //Dealing with spin-polarized calculations
     if(aurostd::CountWordsinString_web(line)==5) {
       for (int i=0; i<DOSGRID; i++) {
-	TDOS[i].resize(5);
+        TDOS[i].resize(5);
       }
       strline.clear();
       strline.str(line);
@@ -456,10 +452,10 @@ namespace estructure {
       strline >> TDOS[0][1] >> TDOS[0][2]; //Spin_up & Spin_dn
       strline >> TDOS[0][3] >> TDOS[0][4]; //Sum_up & Sum_dn
       for (int j=1; j<DOSGRID; j++) {
-	dosfile >> TDOS[j][0]; //Energy
-	dosfile >> TDOS[j][1] >> TDOS[j][2]; //Spin_up & Spin_dn
-	dosfile >> TDOS[j][3] >> TDOS[j][4]; //Sum_up & Sum_dn
-	getline(dosfile, stmp);
+        dosfile >> TDOS[j][0]; //Energy
+        dosfile >> TDOS[j][1] >> TDOS[j][2]; //Spin_up & Spin_dn
+        dosfile >> TDOS[j][3] >> TDOS[j][4]; //Sum_up & Sum_dn
+        getline(dosfile, stmp);
       }	
     }
 
@@ -468,7 +464,7 @@ namespace estructure {
     //Dealing with non-spin-polarized calculations
     if(aurostd::CountWordsinString_web(line)==3) {
       for (int i=0; i<DOSGRID; i++) {
-	TDOS[i].resize(3);
+        TDOS[i].resize(3);
       }
       strline.clear();
       strline.str(line);
@@ -476,10 +472,10 @@ namespace estructure {
       strline >> TDOS[0][1]; //DOS
       strline >> TDOS[0][2]; //Sum
       for (int j=1; j<DOSGRID; j++) {
-	dosfile >> TDOS[j][0];
-	dosfile >> TDOS[j][1];
-	dosfile >> TDOS[j][2];
-	getline(dosfile, stmp);
+        dosfile >> TDOS[j][0];
+        dosfile >> TDOS[j][1];
+        dosfile >> TDOS[j][2];
+        getline(dosfile, stmp);
       }	
     }
     //-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -496,387 +492,387 @@ namespace estructure {
 
       //--------------------s, p , d-----------------------
       if(Ncolumns==4) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(4);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0]; //Energy
-	strline >> PDOS[0][0][1]; //s
-	strline >> PDOS[0][0][2]; //p
-	strline >> PDOS[0][0][3]; //d
-	for (int j=1; j<DOSGRID; j++) {
-	  //                dosfile >> PDOS[0][j][0] >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3];
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1];
-	  dosfile >> PDOS[0][j][2];
-	  dosfile >> PDOS[0][j][3];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(4);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0]; //Energy
+        strline >> PDOS[0][0][1]; //s
+        strline >> PDOS[0][0][2]; //p
+        strline >> PDOS[0][0][3]; //d
+        for (int j=1; j<DOSGRID; j++) {
+          //                dosfile >> PDOS[0][j][0] >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3];
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1];
+          dosfile >> PDOS[0][j][2];
+          dosfile >> PDOS[0][j][3];
+          getline(dosfile, stmp);
+        }
 
-	//Storing the DOSDATA of the left atoms	
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1];
-	    dosfile >> PDOS[i][j][2];
-	    dosfile >> PDOS[i][j][3];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        //Storing the DOSDATA of the left atoms	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1];
+            dosfile >> PDOS[i][j][2];
+            dosfile >> PDOS[i][j][3];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------s, p , d-----------------------
 
       //--------------------s, p , d, f-----------------------
       if(Ncolumns==5) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(5);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0];
-	strline >> PDOS[0][0][1];
-	strline >> PDOS[0][0][2];
-	strline >> PDOS[0][0][3];
-	strline >> PDOS[0][0][4];
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1];
-	  dosfile >> PDOS[0][j][2];
-	  dosfile >> PDOS[0][j][3];
-	  dosfile >> PDOS[0][j][4];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(5);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0];
+        strline >> PDOS[0][0][1];
+        strline >> PDOS[0][0][2];
+        strline >> PDOS[0][0][3];
+        strline >> PDOS[0][0][4];
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1];
+          dosfile >> PDOS[0][j][2];
+          dosfile >> PDOS[0][j][3];
+          dosfile >> PDOS[0][j][4];
+          getline(dosfile, stmp);
+        }
 
-	//Storing the DOSDATA of the left atoms	
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1];
-	    dosfile >> PDOS[i][j][2];
-	    dosfile >> PDOS[i][j][3];
-	    dosfile >> PDOS[i][j][4];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        //Storing the DOSDATA of the left atoms	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1];
+            dosfile >> PDOS[i][j][2];
+            dosfile >> PDOS[i][j][3];
+            dosfile >> PDOS[i][j][4];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------s, p , d, f-----------------------
       //--------------------s, p , d (spin-polarized)-----
       if(Ncolumns==7) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(7);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	//            strline >> PDOS[0][0][0] >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4] >> PDOS[0][0][5] >> PDOS[0][0][6];
-	strline >> PDOS[0][0][0];  //Energy
-	strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s
-	strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1] >> PDOS[0][j][2]; //s
-	  dosfile >> PDOS[0][j][3] >> PDOS[0][j][4]; //p
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6]; //d
-	  getline(dosfile, stmp);
-	}
-	//Storing the DOSDATA of the left atoms	
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1] >> PDOS[i][j][2]; //s
-	    dosfile >> PDOS[i][j][3] >> PDOS[i][j][4]; //p
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6]; //d
-	    getline(dosfile, stmp);
-	  }
-	}	
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(7);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        //            strline >> PDOS[0][0][0] >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4] >> PDOS[0][0][5] >> PDOS[0][0][6];
+        strline >> PDOS[0][0][0];  //Energy
+        strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s
+        strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1] >> PDOS[0][j][2]; //s
+          dosfile >> PDOS[0][j][3] >> PDOS[0][j][4]; //p
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6]; //d
+          getline(dosfile, stmp);
+        }
+        //Storing the DOSDATA of the left atoms	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1] >> PDOS[i][j][2]; //s
+            dosfile >> PDOS[i][j][3] >> PDOS[i][j][4]; //p
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6]; //d
+            getline(dosfile, stmp);
+          }
+        }	
       }
 
       //--------------------s, p , d , f(spin-polarized)-----
       if(Ncolumns==9) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(9);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0];
-	strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s
-	strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
-	strline >> PDOS[0][0][7] >> PDOS[0][0][8]; //f
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
-	  dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
-	  dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(9);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0];
+        strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s
+        strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
+        strline >> PDOS[0][0][7] >> PDOS[0][0][8]; //f
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
+          dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
+          dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
+          getline(dosfile, stmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  //cout << line << "hi" << endl;
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
-	    dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
-	    dosfile >>PDOS[i][j][7] >> PDOS[i][j][8];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          //cout << line << "hi" << endl;
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
+            dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
+            dosfile >>PDOS[i][j][7] >> PDOS[i][j][8];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------s, p , d (spin-polarized)-----
 
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
       if(Ncolumns==10) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(10);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0]; //Energy
-	strline >> PDOS[0][0][1]; //s
-	strline >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //py, pz, px
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9]; //dxy, dyz, dz2, dxz, dx2-y2
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1];
-	  dosfile >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(10);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0]; //Energy
+        strline >> PDOS[0][0][1]; //s
+        strline >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //py, pz, px
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9]; //dxy, dyz, dz2, dxz, dx2-y2
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1];
+          dosfile >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9];
+          getline(dosfile, stmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1];
-	    dosfile >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8] >> PDOS[i][j][9];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1];
+            dosfile >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8] >> PDOS[i][j][9];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
       if(Ncolumns==13) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(13);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0]; //Energy
-	strline >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //stotal, sx, sy, sz
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //ptotal, px, py, pz
-	strline >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //dtotal, dx, dy, dz
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(13);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0]; //Energy
+        strline >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //stotal, sx, sy, sz
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //ptotal, px, py, pz
+        strline >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //dtotal, dx, dy, dz
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
+          dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
+          getline(dosfile, stmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0]; //Energy
-	    dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0]; //Energy
+            dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
+            dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal, fx, fy, fz (LS COUPLINT)------------
       if(Ncolumns==17) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(17);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0]; //Energy
-	strline >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //s
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //p
-	strline >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //d
-	strline >> PDOS[0][0][13] >> PDOS[0][0][14] >> PDOS[0][0][15] >> PDOS[0][0][16]; //f
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
-	  dosfile >> PDOS[0][j][13] >> PDOS[0][j][14] >>PDOS[0][j][15] >> PDOS[0][j][16];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(17);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0]; //Energy
+        strline >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //s
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //p
+        strline >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //d
+        strline >> PDOS[0][0][13] >> PDOS[0][0][14] >> PDOS[0][0][15] >> PDOS[0][0][16]; //f
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
+          dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
+          dosfile >> PDOS[0][j][13] >> PDOS[0][j][14] >>PDOS[0][j][15] >> PDOS[0][j][16];
+          getline(dosfile, stmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    dosfile >> PDOS[i][j][13] >> PDOS[i][j][14] >> PDOS[i][j][15] >> PDOS[i][j][16];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
+            dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
+            dosfile >> PDOS[i][j][13] >> PDOS[i][j][14] >> PDOS[i][j][15] >> PDOS[i][j][16];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal, fx, fy, fz (LS COUPLINT)------------
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
       if(Ncolumns==19) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(19);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	//
-	//KESONG UNFISNISHED
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0]; //Energy
-	strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
-	strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
-	strline >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
-	strline >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
-	strline >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
-	strline >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
-	strline >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
-	strline >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
-	  dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
-	  dosfile >> PDOS[0][0][7] >> PDOS[0][0][8];
-	  dosfile >> PDOS[0][0][9] >> PDOS[0][0][10];
-	  dosfile >> PDOS[0][0][11] >> PDOS[0][0][12];
-	  dosfile >> PDOS[0][0][13] >> PDOS[0][0][14];
-	  dosfile >> PDOS[0][0][15] >> PDOS[0][0][16];
-	  dosfile >> PDOS[0][0][17] >> PDOS[0][0][18];
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(19);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        //
+        //KY UNFISNISHED
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0]; //Energy
+        strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
+        strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
+        strline >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
+        strline >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
+        strline >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
+        strline >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
+        strline >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
+        strline >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
+          dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
+          dosfile >> PDOS[0][0][7] >> PDOS[0][0][8];
+          dosfile >> PDOS[0][0][9] >> PDOS[0][0][10];
+          dosfile >> PDOS[0][0][11] >> PDOS[0][0][12];
+          dosfile >> PDOS[0][0][13] >> PDOS[0][0][14];
+          dosfile >> PDOS[0][0][15] >> PDOS[0][0][16];
+          dosfile >> PDOS[0][0][17] >> PDOS[0][0][18];
+          getline(dosfile, stmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
-	    dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
-	    dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
-	    dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
-	    dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
-	    dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
-	    getline(dosfile, stmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
+            dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
+            dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
+            dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
+            dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
+            dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
+            dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
+            dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
+            getline(dosfile, stmp);
+          }
+        }	
       }
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn, f1, f2, f3, f4, f5, f6, f7 (spin-polarized)-----
       if(Ncolumns==33) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(33);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	//
-	//KESONG UNFISNISHED
-	strline.clear();
-	strline.str(line);
-	strline >> PDOS[0][0][0]; //Energy
-	strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
-	strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
-	strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
-	strline >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
-	strline >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
-	strline >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
-	strline >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
-	strline >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
-	strline >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
-	strline >> PDOS[0][0][19] >> PDOS[0][0][20]; //f1_up & f1_dn
-	strline >> PDOS[0][0][21] >> PDOS[0][0][22]; //f2_up & f2_dn
-	strline >> PDOS[0][0][23] >> PDOS[0][0][24]; //f3_up & f3_dn
-	strline >> PDOS[0][0][25] >> PDOS[0][0][26]; //f4_up & f4_dn
-	strline >> PDOS[0][0][27] >> PDOS[0][0][28]; //f5_up & f5_dn
-	strline >> PDOS[0][0][29] >> PDOS[0][0][30]; //f6_up & f6_dn
-	strline >> PDOS[0][0][31] >> PDOS[0][0][32]; //f7_up & f7_dn
-	for (int j=1; j<DOSGRID; j++) {
-	  dosfile >> PDOS[0][j][0];
-	  dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
-	  dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
-	  dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  dosfile >> PDOS[0][j][9] >> PDOS[0][j][10];
-	  dosfile >> PDOS[0][j][11] >> PDOS[0][j][12];
-	  dosfile >> PDOS[0][j][13] >> PDOS[0][j][14];
-	  dosfile >> PDOS[0][j][15] >> PDOS[0][j][16];
-	  dosfile >> PDOS[0][j][17] >> PDOS[0][j][18];
-	  dosfile >> PDOS[0][j][19] >> PDOS[0][j][20]; //f1_up & f1_dn
-	  dosfile >> PDOS[0][j][21] >> PDOS[0][j][22]; //f2_up & f2_dn
-	  dosfile >> PDOS[0][j][23] >> PDOS[0][j][24]; //f3_up & f3_dn
-	  dosfile >> PDOS[0][j][25] >> PDOS[0][j][26]; //f4_up & f4_dn
-	  dosfile >> PDOS[0][j][27] >> PDOS[0][j][28]; //f5_up & f5_dn
-	  dosfile >> PDOS[0][j][29] >> PDOS[0][j][30]; //f6_up & f6_dn
-	  dosfile >> PDOS[0][j][31] >> PDOS[0][j][32]; //f7_up & f7_dn
-	  getline(dosfile, stmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(33);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        //
+        //KY UNFISNISHED
+        strline.clear();
+        strline.str(line);
+        strline >> PDOS[0][0][0]; //Energy
+        strline >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
+        strline >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
+        strline >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
+        strline >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
+        strline >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
+        strline >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
+        strline >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
+        strline >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
+        strline >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
+        strline >> PDOS[0][0][19] >> PDOS[0][0][20]; //f1_up & f1_dn
+        strline >> PDOS[0][0][21] >> PDOS[0][0][22]; //f2_up & f2_dn
+        strline >> PDOS[0][0][23] >> PDOS[0][0][24]; //f3_up & f3_dn
+        strline >> PDOS[0][0][25] >> PDOS[0][0][26]; //f4_up & f4_dn
+        strline >> PDOS[0][0][27] >> PDOS[0][0][28]; //f5_up & f5_dn
+        strline >> PDOS[0][0][29] >> PDOS[0][0][30]; //f6_up & f6_dn
+        strline >> PDOS[0][0][31] >> PDOS[0][0][32]; //f7_up & f7_dn
+        for (int j=1; j<DOSGRID; j++) {
+          dosfile >> PDOS[0][j][0];
+          dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
+          dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
+          dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
+          dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
+          dosfile >> PDOS[0][j][9] >> PDOS[0][j][10];
+          dosfile >> PDOS[0][j][11] >> PDOS[0][j][12];
+          dosfile >> PDOS[0][j][13] >> PDOS[0][j][14];
+          dosfile >> PDOS[0][j][15] >> PDOS[0][j][16];
+          dosfile >> PDOS[0][j][17] >> PDOS[0][j][18];
+          dosfile >> PDOS[0][j][19] >> PDOS[0][j][20]; //f1_up & f1_dn
+          dosfile >> PDOS[0][j][21] >> PDOS[0][j][22]; //f2_up & f2_dn
+          dosfile >> PDOS[0][j][23] >> PDOS[0][j][24]; //f3_up & f3_dn
+          dosfile >> PDOS[0][j][25] >> PDOS[0][j][26]; //f4_up & f4_dn
+          dosfile >> PDOS[0][j][27] >> PDOS[0][j][28]; //f5_up & f5_dn
+          dosfile >> PDOS[0][j][29] >> PDOS[0][j][30]; //f6_up & f6_dn
+          dosfile >> PDOS[0][j][31] >> PDOS[0][j][32]; //f7_up & f7_dn
+          getline(dosfile, stmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    dosfile >> PDOS[i][j][0];
-	    dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
-	    dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
-	    dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
-	    dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
-	    dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
-	    dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
-	    dosfile >> PDOS[i][j][19] >> PDOS[i][j][20]; //f1_up & f1_dn
-	    dosfile >> PDOS[i][j][21] >> PDOS[i][j][22]; //f2_up & f2_dn
-	    dosfile >> PDOS[i][j][23] >> PDOS[i][j][24]; //f3_up & f3_dn
-	    dosfile >> PDOS[i][j][25] >> PDOS[i][j][26]; //f4_up & f4_dn
-	    dosfile >> PDOS[i][j][27] >> PDOS[i][j][28]; //f5_up & f5_dn
-	    dosfile >> PDOS[i][j][29] >> PDOS[i][j][30]; //f6_up & f6_dn
-	    dosfile >> PDOS[i][j][31] >> PDOS[i][j][32]; //f7_up & f7_dn
-	    getline(dosfile, stmp);
-	  }
-	}
+        for (int i=1; i<NIONS; i++) {
+          getline(dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            dosfile >> PDOS[i][j][0];
+            dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
+            dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
+            dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
+            dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
+            dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
+            dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
+            dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
+            dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
+            dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
+            dosfile >> PDOS[i][j][19] >> PDOS[i][j][20]; //f1_up & f1_dn
+            dosfile >> PDOS[i][j][21] >> PDOS[i][j][22]; //f2_up & f2_dn
+            dosfile >> PDOS[i][j][23] >> PDOS[i][j][24]; //f3_up & f3_dn
+            dosfile >> PDOS[i][j][25] >> PDOS[i][j][26]; //f4_up & f4_dn
+            dosfile >> PDOS[i][j][27] >> PDOS[i][j][28]; //f5_up & f5_dn
+            dosfile >> PDOS[i][j][29] >> PDOS[i][j][30]; //f6_up & f6_dn
+            dosfile >> PDOS[i][j][31] >> PDOS[i][j][32]; //f7_up & f7_dn
+            getline(dosfile, stmp);
+          }
+        }
       }
       //************************************************************************************************************************
 
@@ -884,212 +880,212 @@ namespace estructure {
       vector<vector<double> > TOTALPDOS(DOSGRID);
       //--------------------s, p , d-----------------------
       if(Ncolumns==4) {
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(4);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
-	  }
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(4);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
+          }
+        }
       }
       //--------------------s, p , d-----------------------
 
       //--------------------s, p , d, f-----------------------
       if(Ncolumns==5) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(5);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
-	    TOTALPDOS[i][4]+=PDOS[j][i][4]; //sum of f orbitals
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(5);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
+            TOTALPDOS[i][4]+=PDOS[j][i][4]; //sum of f orbitals
+          }
+        }
       }
       //--------------------s, p , d, f-----------------------
 
       //--------------------s, p , d (spin-polarized)-----
       if(Ncolumns==7) {
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(7);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  TOTALPDOS[i][4]=0.0;
-	  TOTALPDOS[i][5]=0.0;
-	  TOTALPDOS[i][6]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
-	    TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
-	    TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
-	    TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
-	  }    
-	}    
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(7);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          TOTALPDOS[i][4]=0.0;
+          TOTALPDOS[i][5]=0.0;
+          TOTALPDOS[i][6]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
+            TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
+            TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
+            TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
+          }    
+        }    
       }
 
       //--------------------s, p , d (spin-polarized)-----
 
       //--------------------s, p , d, f(spin-polarized)-----
       if(Ncolumns==9) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(9);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  TOTALPDOS[i][4]=0.0;
-	  TOTALPDOS[i][5]=0.0;
-	  TOTALPDOS[i][6]=0.0;
-	  TOTALPDOS[i][7]=0.0;
-	  TOTALPDOS[i][8]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
-	    TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
-	    TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
-	    TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
-	    TOTALPDOS[i][7]+=PDOS[j][i][7]; //sum of f_up
-	    TOTALPDOS[i][8]+=PDOS[j][i][8]*(-1); //sum of f_dn
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(9);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          TOTALPDOS[i][4]=0.0;
+          TOTALPDOS[i][5]=0.0;
+          TOTALPDOS[i][6]=0.0;
+          TOTALPDOS[i][7]=0.0;
+          TOTALPDOS[i][8]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
+            TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
+            TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
+            TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
+            TOTALPDOS[i][7]+=PDOS[j][i][7]; //sum of f_up
+            TOTALPDOS[i][8]+=PDOS[j][i][8]*(-1); //sum of f_dn
+          }
+        }
       }
 
       //--------------------s, p , d, f(spin-polarized)-----
 
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
       if(Ncolumns==10) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(4);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;  //s
-	  TOTALPDOS[i][2]=0.0;  //p
-	  TOTALPDOS[i][3]=0.0;  //d
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
-	    TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(4);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;  //s
+          TOTALPDOS[i][2]=0.0;  //p
+          TOTALPDOS[i][3]=0.0;  //d
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
+            TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
+          }
+        }
       }
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
 
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2, f1, f2, f3, f4, f5, f6, f7 (non-spin-polarized)-----
       if(Ncolumns==17 && (!isLSCOUPLING)) {
-	//Storing the DOSDATA of the s , p, d , f
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(5);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;  //s
-	  TOTALPDOS[i][2]=0.0;  //p
-	  TOTALPDOS[i][3]=0.0;  //d
-	  TOTALPDOS[i][4]=0.0;  //f
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
-	    TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][4]+=(PDOS[j][i][10]+PDOS[j][i][11]+PDOS[j][i][12]+PDOS[j][i][13]+PDOS[j][i][14]+PDOS[j][i][15]+PDOS[j][i][16]); //sum of f orbital
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d , f
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(5);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;  //s
+          TOTALPDOS[i][2]=0.0;  //p
+          TOTALPDOS[i][3]=0.0;  //d
+          TOTALPDOS[i][4]=0.0;  //f
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
+            TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][4]+=(PDOS[j][i][10]+PDOS[j][i][11]+PDOS[j][i][12]+PDOS[j][i][13]+PDOS[j][i][14]+PDOS[j][i][15]+PDOS[j][i][16]); //sum of f orbital
+          }
+        }
       }
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2, f1, f2, f3, f4, f5, f6, f7 (non-spin-polarized)-----
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
       if(Ncolumns==19) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(7);
-	  TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
-	  TOTALPDOS[i][1]=0.0;  //s_up
-	  TOTALPDOS[i][2]=0.0;  //s_dn
-	  TOTALPDOS[i][3]=0.0;  //p_up
-	  TOTALPDOS[i][4]=0.0;  //p_dn
-	  TOTALPDOS[i][5]=0.0;  //d_up
-	  TOTALPDOS[i][6]=0.0;  //d_dn
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
-	    TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
-	    TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(7);
+          TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
+          TOTALPDOS[i][1]=0.0;  //s_up
+          TOTALPDOS[i][2]=0.0;  //s_dn
+          TOTALPDOS[i][3]=0.0;  //p_up
+          TOTALPDOS[i][4]=0.0;  //p_dn
+          TOTALPDOS[i][5]=0.0;  //d_up
+          TOTALPDOS[i][6]=0.0;  //d_dn
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
+            TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
+            TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+          }
+        }
       }
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn, (f1, f2, f3...) (spin-polarized)-----
       if(Ncolumns==33) {
-	//Storing the DOSDATA of the s , p, d, f
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(9);
-	  TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
-	  TOTALPDOS[i][1]=0.0;  //s_up
-	  TOTALPDOS[i][2]=0.0;  //s_dn
-	  TOTALPDOS[i][3]=0.0;  //p_up
-	  TOTALPDOS[i][4]=0.0;  //p_dn
-	  TOTALPDOS[i][5]=0.0;  //d_up
-	  TOTALPDOS[i][6]=0.0;  //d_dn
-	  TOTALPDOS[i][7]=0.0;  //f_dn
-	  TOTALPDOS[i][8]=0.0;  //f_dn
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
-	    TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
-	    TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][7]+=(PDOS[j][i][19]+PDOS[j][i][21]+PDOS[j][i][23]+PDOS[j][i][25]+PDOS[j][i][27]+PDOS[j][i][29]+PDOS[j][i][31]); //sum of f_up
-	    TOTALPDOS[i][8]+=(PDOS[j][i][20]+PDOS[j][i][22]+PDOS[j][i][24]+PDOS[j][i][26]+PDOS[j][i][28]+PDOS[j][i][30]+PDOS[j][i][32])*(-1); //sum of f_dn
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d, f
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(9);
+          TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
+          TOTALPDOS[i][1]=0.0;  //s_up
+          TOTALPDOS[i][2]=0.0;  //s_dn
+          TOTALPDOS[i][3]=0.0;  //p_up
+          TOTALPDOS[i][4]=0.0;  //p_dn
+          TOTALPDOS[i][5]=0.0;  //d_up
+          TOTALPDOS[i][6]=0.0;  //d_dn
+          TOTALPDOS[i][7]=0.0;  //f_dn
+          TOTALPDOS[i][8]=0.0;  //f_dn
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
+            TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
+            TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][7]+=(PDOS[j][i][19]+PDOS[j][i][21]+PDOS[j][i][23]+PDOS[j][i][25]+PDOS[j][i][27]+PDOS[j][i][29]+PDOS[j][i][31]); //sum of f_up
+            TOTALPDOS[i][8]+=(PDOS[j][i][20]+PDOS[j][i][22]+PDOS[j][i][24]+PDOS[j][i][26]+PDOS[j][i][28]+PDOS[j][i][30]+PDOS[j][i][32])*(-1); //sum of f_dn
+          }
+        }
       }
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
       if(Ncolumns==13 && isLSCOUPLING) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(4);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up & s_dn orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p_up & p_dn orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d_up & d_dn orbitals
-	  }
-	}	
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(4);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up & s_dn orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p_up & p_dn orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d_up & d_dn orbitals
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal ...(LS COUPLINT)------------
       if(Ncolumns==17 && isLSCOUPLING) {
-	//Storing the DOSDATA of the s , p, d, f
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(5);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  TOTALPDOS[i][4]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d orbitals
-	    TOTALPDOS[i][4]+=PDOS[j][i][13]; //sum of f orbitals
-	  }
-	}	
+        //Storing the DOSDATA of the s , p, d, f
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(5);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          TOTALPDOS[i][4]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d orbitals
+            TOTALPDOS[i][4]+=PDOS[j][i][13]; //sum of f orbitals
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal ...(LS COUPLINT)------------
 
@@ -1097,24 +1093,24 @@ namespace estructure {
       //-------------------------------------------------------------------------------------------------------------------------------------------------
       //Shifting the Energy to Fermi level
       for (int i=0; i< DOSGRID; i++) {
-	TOTALPDOS[i][0]=TOTALPDOS[i][0]-Efermi;
-	TDOS[i][0]=TDOS[i][0]-Efermi;
+        TOTALPDOS[i][0]=TOTALPDOS[i][0]-Efermi;
+        TDOS[i][0]=TDOS[i][0]-Efermi;
       }
 
       //Finding the maxmium value of TOTALPDOS including s, p, d or f orbitals
       //-----------------------------------------------------------------------
       for (int i=0; i< DOSGRID; i++) {
-	if(TDOS.at(0).size()==3) {
-	  if(TOTALPDOS[i][0]>=DOS_Emin && TOTALPDOS[i][0]<=DOS_Emax) {
-	    if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
-	  }
-	}
-	if(TDOS.at(0).size()==5) {
-	  if(TOTALPDOS[i][0]>=DOS_Emin && TOTALPDOS[i][0]<=DOS_Emax) {
-	    if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
-	    if(TDOS[i][2]>=DOSMAX) DOSMAX=TDOS[i][2];
-	  }
-	}
+        if(TDOS.at(0).size()==3) {
+          if(TOTALPDOS[i][0]>=DOS_Emin && TOTALPDOS[i][0]<=DOS_Emax) {
+            if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
+          }
+        }
+        if(TDOS.at(0).size()==5) {
+          if(TOTALPDOS[i][0]>=DOS_Emin && TOTALPDOS[i][0]<=DOS_Emax) {
+            if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
+            if(TDOS[i][2]>=DOSMAX) DOSMAX=TDOS[i][2];
+          }
+        }
       }
 
       //Wringting into file
@@ -1125,47 +1121,47 @@ namespace estructure {
       fin.precision(6);
       //Non-spin-polarized calculations  Format: Energy, s, p, d, Total
       if(TOTALPDOS.at(0).size()==4) {	
-	for (int i=0; i< DOSGRID; i++) {
-	  for (int j=0; j<4; j++) {
-	    fin << TOTALPDOS[i][j] << "  ";
-	  }
-	  fin << TDOS[i][1];
-	  fin << endl;
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          for (int j=0; j<4; j++) {
+            fin << TOTALPDOS[i][j] << "  ";
+          }
+          fin << TDOS[i][1];
+          fin << endl;
+        }
       }
       //Non-spin-polarized calculations  Format: Energy, s, p, d, f, Total
       else if(TOTALPDOS.at(0).size()==5) {
-	for (int i=0; i< DOSGRID; i++) {
-	  for (int j=0; j<5; j++) {
-	    fin << TOTALPDOS[i][j] << "  ";
-	  }
-	  fin << TDOS[i][1];
-	  fin << endl;
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          for (int j=0; j<5; j++) {
+            fin << TOTALPDOS[i][j] << "  ";
+          }
+          fin << TDOS[i][1];
+          fin << endl;
+        }
       }
       //Spin-polarized calculations Format: Energy, s_up, s_dn, p_up, p_dn, d_up, d_dn, Total_up, Total_dn
       else if(TOTALPDOS.at(0).size()==7) {
-	for (int i=0; i< DOSGRID; i++) {
-	  for (int j=0; j<7; j++) {
-	    fin << TOTALPDOS[i][j] << "  ";
-	  }
-	  fin << TDOS[i][1] << "  " << TDOS[i][2]*(-1);
-	  fin << endl;
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          for (int j=0; j<7; j++) {
+            fin << TOTALPDOS[i][j] << "  ";
+          }
+          fin << TDOS[i][1] << "  " << TDOS[i][2]*(-1);
+          fin << endl;
+        }
       }
       //Spin-polarized calculations Format: Energy, s_up, s_dn, p_up, p_dn, d_up, d_dn, f_up, f_dn, Total_up, Total_dn
       else if(TOTALPDOS.at(0).size()==9) {
-	for (int i=0; i< DOSGRID; i++) {
-	  for (int j=0; j<9; j++) {
-	    fin << TOTALPDOS[i][j] << "  ";
-	  }
-	  fin << TDOS[i][1] << "  " << TDOS[i][2]*(-1);
-	  fin << endl;
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          for (int j=0; j<9; j++) {
+            fin << TOTALPDOS[i][j] << "  ";
+          }
+          fin << TDOS[i][1] << "  " << TDOS[i][2]*(-1);
+          fin << endl;
+        }
       }
       else {
-	cout << "ERROR..., PLS. CHECK TOTALPDOS! Aborting!" << endl;
-	exit(0);
+        cout << "ERROR..., PLS. CHECK TOTALPDOS! Aborting!" << endl;
+        exit(0);
       }
       fin.close();
 
@@ -1179,10 +1175,10 @@ namespace estructure {
       fin << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
       fin << "set output " << "\"" << ICSDName <<"_DOS.eps" << "\"" << endl;
       fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << "\""<< endl;
-      //fin << "set border lw 5" << endl; // CO 170830 - thick border
-      fin << "unset border" << endl; // CO 170830 - looks better
-      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
+      //fin << "set border lw 5" << endl; //CO20170830 - thick border
+      fin << "unset border" << endl; //CO20170830 - looks better
+      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       fin << endl;
 
       fin << "#DOS PLOT" << endl;
@@ -1190,17 +1186,17 @@ namespace estructure {
       fin << "set ytics" << endl;
       fin << "set xrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       if(TOTALPDOS.at(0).size()==9||(TOTALPDOS.at(0).size()==7)) { 	
-	if(DOSMAX*DOSSCALE!=0) {
-	  fin << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
-	}
-	else {
-	  fin << "set yrange [0:2]" << endl;
-	}
+        if(DOSMAX*DOSSCALE!=0) {
+          fin << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
+        }
+        else {
+          fin << "set yrange [0:2]" << endl;
+        }
       }
       if(TOTALPDOS.at(0).size()==4||(TOTALPDOS.at(0).size()==5)) {
-	if(DOSMAX*DOSSCALE!=0) {
-	  fin << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
-	}
+        if(DOSMAX*DOSSCALE!=0) {
+          fin << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
+        }
       }
       fin << endl;
       fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.70, 0.02 font \"Helvetica, 32\"" << endl;
@@ -1208,8 +1204,8 @@ namespace estructure {
       fin << "set ylabel 'eDOS (states/eV)' offset graph 0.00" << endl;
       //fin << "set label 'Written by Kesong Yang [kesong.yang@gmail.com]' at graph 0.02, graph 0.98 font \"Helvetica, 28\" tc rgb 'white'" << endl;
       fin << "set label '{/Helvetica-Oblique E}_F' at 0.05, graph 0.95" << endl;
-      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
-      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       fin << endl;
       fin << "plot[][] \\" << endl;
       if(TOTALPDOS.at(0).size()==4) { // Only works for s, p and d orbitals	
@@ -1260,22 +1256,22 @@ namespace estructure {
       //Only works for total dos
       //Shifting the Energy to Fermi level
       for (int i=0; i< DOSGRID; i++) {
-	TDOS[i][0]=TDOS[i][0]-Efermi;
+        TDOS[i][0]=TDOS[i][0]-Efermi;
       }
       //Finding the maxmium value of TOTALPDOS including s, p, d or f orbitals
       //-----------------------------------------------------------------------
       for (int i=0; i< DOSGRID; i++) {
-	if(TDOS.at(0).size()==3) {
-	  if(TDOS[i][0]>=DOS_Emin && TDOS[i][0]<=DOS_Emax) {
-	    if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
-	  }
-	}
-	if(TDOS.at(0).size()==5) {
-	  if(TDOS[i][0]>=DOS_Emin && TDOS[i][0]<=DOS_Emax) {
-	    if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
-	    if(TDOS[i][2]>=DOSMAX) DOSMAX=TDOS[i][2];
-	  }
-	}
+        if(TDOS.at(0).size()==3) {
+          if(TDOS[i][0]>=DOS_Emin && TDOS[i][0]<=DOS_Emax) {
+            if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
+          }
+        }
+        if(TDOS.at(0).size()==5) {
+          if(TDOS[i][0]>=DOS_Emin && TDOS[i][0]<=DOS_Emax) {
+            if(TDOS[i][1]>=DOSMAX) DOSMAX=TDOS[i][1];
+            if(TDOS[i][2]>=DOSMAX) DOSMAX=TDOS[i][2];
+          }
+        }
       }
       //Wringting into file
       string dosdatafile = ICSDName + "_TDOS.dat";
@@ -1285,24 +1281,24 @@ namespace estructure {
       fin.precision(6);
       //Non-spin-polarized calculations  Format: Energy, DOS, SUM
       if(TDOS.at(0).size()==3) {	
-	for (int i=0; i< DOSGRID; i++) {
-	  for (int j=0; j<3; j++) {
-	    fin << TDOS[i][j] << "  ";
-	  }
-	  fin << endl;
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          for (int j=0; j<3; j++) {
+            fin << TDOS[i][j] << "  ";
+          }
+          fin << endl;
+        }
       }
       //Spin-polarized calculations  Format: Energy,DOS_UP, DOS_DN, SUM_UP, SUM_DN
       else if(TDOS.at(0).size()==5) {
-	for (int i=0; i< DOSGRID; i++) {
-	  for (int j=0; j<2; j++) {
-	    fin << TDOS[i][j] << "  ";
-	  }
-	  fin << TDOS[i][2]*(-1) << " ";
-	  fin << TDOS[i][3] << " ";
-	  fin << TDOS[i][4]*(-1) << " ";
-	  fin << endl;
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          for (int j=0; j<2; j++) {
+            fin << TDOS[i][j] << "  ";
+          }
+          fin << TDOS[i][2]*(-1) << " ";
+          fin << TDOS[i][3] << " ";
+          fin << TDOS[i][4]*(-1) << " ";
+          fin << endl;
+        }
       }
       fin.close();
       //***********************************GENERATING GNUPLOT SCRIPT**************************************************************
@@ -1314,10 +1310,10 @@ namespace estructure {
       fin << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
       fin << "set output " << "\"" << ICSDName <<"_DOS.eps" << "\"" << endl;
       fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << "\""<< endl;
-      //fin << "set border lw 5" << endl; // CO 170830 - thick border
-      fin << "unset border" << endl; // CO 170830 - looks better
-      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
+      //fin << "set border lw 5" << endl; //CO20170830 - thick border
+      fin << "unset border" << endl; //CO20170830 - looks better
+      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       fin << endl;
 
       fin << "#DOS PLOT" << endl;
@@ -1325,18 +1321,18 @@ namespace estructure {
       fin << "set ytics" << endl;
       fin << "set xrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       if(TDOS.at(0).size()==5) { 	
-	if(DOSMAX*DOSSCALE!=0) {
-	  fin << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
-	}
-	else {
-	  fin << "set yrange [0:2]" << endl;
-	}
-	fin << "set arrow from graph 0,first 0 to graph 1,first 0 nohead lt -1 lw 10" << endl;
+        if(DOSMAX*DOSSCALE!=0) {
+          fin << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
+        }
+        else {
+          fin << "set yrange [0:2]" << endl;
+        }
+        fin << "set arrow from graph 0,first 0 to graph 1,first 0 nohead lt -1 lw 10" << endl;
       }
       if(TDOS.at(0).size()==3) {
-	if(DOSMAX*DOSSCALE!=0) {
-	  fin << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
-	}
+        if(DOSMAX*DOSSCALE!=0) {
+          fin << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
+        }
       }
       fin << endl;
       fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.70, 0.02 font \"Helvetica, 32\"" << endl;
@@ -1344,18 +1340,18 @@ namespace estructure {
       fin << "set ylabel 'eDOS (states/eV)' offset graph 0.00" << endl;
       //fin << "set label 'Written by Kesong Yang [kesong.yang@gmail.com]' at graph 0.02, graph 0.98 font \"Helvetica, 28\" tc rgb 'white'" << endl;
       fin << "set label '{/Helvetica-Oblique E}_F' at 0.05, graph 0.95" << endl;
-      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
-      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       fin << endl;
       fin << "plot[][] \\" << endl;
       if(TDOS.at(0).size()==3) { // non-spin-polarized
-	//fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total'" << endl;  // CO 170830 - MAKE DOS DISTINCT
-	fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total'" << endl;
+        //fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total'" << endl;  //CO20170830 - MAKE DOS DISTINCT
+        fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total'" << endl;
       }
       if(TDOS.at(0).size()==5) { // spin-polarized
-	//fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total spin up', \\" << endl;                // CO 170830 - MAKE SPIN UP DISTINCT
-	fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total spin up', \\" << endl;                // CO 170830 - total spin\\_UP
-	fin << "\"" << dosdatafile << "\"" << " u 1:3 w l lt 1 lc rgb '#C44E52' lw 6 title 'total spin down'" << endl;  // CO 170830 - total spin\\_DN
+        //fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total spin up', \\" << endl;                //CO20170830 - MAKE SPIN UP DISTINCT
+        fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total spin up', \\" << endl;                //CO20170830 - total spin\\_UP
+        fin << "\"" << dosdatafile << "\"" << " u 1:3 w l lt 1 lc rgb '#C44E52' lw 6 title 'total spin down'" << endl;  //CO20170830 - total spin\\_DN
       }
       fin << endl;
       fin << endl;
@@ -1365,7 +1361,7 @@ namespace estructure {
       aurostd::execute(XHOST.command("convert")+" -background white ./" + ICSDName + "_DOS.eps ./" + ICSDName + "_DOS.png");
       aurostd::execute(XHOST.command("epstopdf")+" ./" + ICSDName + "_DOS.eps ");
     }
-    if(LDEBUG) cerr << "estructure::PLOT_DOSWEB: END" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: END" << endl;
   }
 } // namespace estructure
 
@@ -1381,18 +1377,18 @@ namespace estructure {
     //  DOSCAR.static
     //  OUTCAR.static
     //  POSCAR.static
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: BEGIN" << endl;
-    
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: BEGIN" << endl;
+
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: tokens.at(i)=" << tokens.at(i) << endl;
-    
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: tokens.at(i)=" << tokens.at(i) << endl;
+
     int NIONS, Natom;
     string directory="./", ICSDName, DOSCARfile, OUTCARfile, POSCARfile, stmp, line;
     stringstream straus, strline; //, stringstreamtmp, strline;  
@@ -1406,13 +1402,13 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-     
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOSSCALE=" << DOSSCALE << endl;
-    
-    cout << "estructure::PLOT_PEDOSALL_AFLOWLIB: working in directory=" << directory << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOSSCALE=" << DOSSCALE << endl;
+
+    cout << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: working in directory=" << directory << endl;
 
     //Get the atomic lable for each atom
     vector<string> AtomicName=KBIN::ExtractAtomicSpecies(directory);
@@ -1429,15 +1425,15 @@ namespace estructure {
     ofstream File("/dev/null");
     //bool verbose=FALSE;
 
-    // DX and corey START
+    //DX+CO START
     if(xstr_bands.iatoms_calculated==FALSE){
       _kflags kflags;
       pflow::PerformFullSymmetry(xstr_bands,File,aflags,kflags,WRITE,cout);
     }
-    //SYM::CalculateInequivalentAtoms(File,xstr_bands,aflags,WRITE,verbose,cout); // new symmetry DX and corey
-    // DX and corey END
+    //SYM::CalculateInequivalentAtoms(File,xstr_bands,aflags,WRITE,verbose,cout); // new symmetry DX+CO
+    //DX+CO END
     xstr_bands.write_inequivalent_flag=TRUE;
-  
+
     // cerr << xstr_bands << endl;
     // cerr << xstr_bands.atoms.size() << endl;
 
@@ -1450,7 +1446,7 @@ namespace estructure {
     for (int i=0; i<n;i++) {
       bool matching=false;
       for(int j = 0; (j < i) && (matching == false); j++ )
-	if(InequivalentAtomType[i]==InequivalentAtomType[j]) matching = true;
+        if(InequivalentAtomType[i]==InequivalentAtomType[j]) matching = true;
       if(!matching)  InequiAtomTypePlot.push_back(InequivalentAtomType[i]);
     }
 
@@ -1463,7 +1459,7 @@ namespace estructure {
       cerr << "Not working on isLSCOUPLING now!"; exit(0);} 
     NIONS = pedos_outcar.NIONS;
     //Efermi = pedos_outcar.Efermi;
-  
+
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     aflowlib::vaspfile2stringstream(directory, "DOSCAR", ss_doscar);
@@ -1475,84 +1471,84 @@ namespace estructure {
     for (unsigned int i=0; i<InequiAtomTypePlot.size(); i++) {
       Natom= InequiAtomTypePlot[i]+1;
       string str_out = aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "/" 
-	+ aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "/"
-	+ AtomicName[Natom-1] + " atom!";
-      cout << "estructure::PLOT_PEDOSALL_AFLOWLIB: working on " << str_out << endl;
-    
+        + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "/"
+        + AtomicName[Natom-1] + " atom!";
+      cout << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: working on " << str_out << endl;
+
       // cerr << "i=" << i << endl;
       // cerr << "InequiAtomTypePlot.size()=" << InequiAtomTypePlot.size() << endl;
       // cerr << "Natom=" << Natom << endl;
       // cerr << "NIONS=" << NIONS << endl;
-    
+
 
       //************************************************************************************************************************
       //Get PDOS
       //************************************************************************************************************************
       //----------------------GETTING PDOS DATA-------------------------
       if(Natom>0 && Natom<=NIONS) {
-	if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: [1]" << endl;
-	//Generate the Name for PDOS
-	string PDOSNAME = "PEDOS_"+aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+
-	  "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "_" 
-	  + AtomicName[Natom-1];
+        if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: [1]" << endl;
+        //Generate the Name for PDOS
+        string PDOSNAME = "PEDOS_"+aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+
+          "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "_" 
+          + AtomicName[Natom-1];
 
-	//************************************************************************************************************************
-	//************************************************************************************************************************
-	//Finding the maxmium value of PDOS
-	int Natom_pdos=Natom-1;  //Make the Nth atom corespond to the (Nth-1) data in PDOS data array.
-	DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(PDOS[Natom_pdos], DOS_Emin, DOS_Emax);
-	//************************************************************************************************************************
+        //************************************************************************************************************************
+        //************************************************************************************************************************
+        //Finding the maxmium value of PDOS
+        int Natom_pdos=Natom-1;  //Make the Nth atom corespond to the (Nth-1) data in PDOS data array.
+        DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(PDOS[Natom_pdos], DOS_Emin, DOS_Emax);
+        //************************************************************************************************************************
 
-	//Writing PEDOS data into file
-	string pdosdatafile = ICSDName + "_PEDOS_" + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")
-	  + "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".dat";
+        //Writing PEDOS data into file
+        string pdosdatafile = ICSDName + "_PEDOS_" + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")
+          + "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".dat";
 
-	ofstream fin;
-	fin.open(pdosdatafile.c_str());
-	fin.setf(ios_base::fixed,ios_base::floatfield);
-	fin.precision(6);
-	string str_pdos = aurostd::vector2string(PDOS[Natom_pdos]);
-	fin << str_pdos;
-	fin.close();
+        ofstream fin;
+        fin.open(pdosdatafile.c_str());
+        fin.setf(ios_base::fixed,ios_base::floatfield);
+        fin.precision(6);
+        string str_pdos = aurostd::vector2string(PDOS[Natom_pdos]);
+        fin << str_pdos;
+        fin.close();
 
-	//
-	//***********************************GENERATING GNUPLOT SCRIPT************************************
-	//Writing Gnuplot Script
-	string gnuplotscript = aurostd::ProperFileName("GNUPLOT_" + ICSDName + "_PEDOS_" 
-						       + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "_" 
-						       + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".gp");
+        //
+        //***********************************GENERATING GNUPLOT SCRIPT************************************
+        //Writing Gnuplot Script
+        string gnuplotscript = aurostd::ProperFileName("GNUPLOT_" + ICSDName + "_PEDOS_" 
+            + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "_" 
+            + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".gp");
 
-	string plot_pdosname = ICSDName + "_" + PDOSNAME;
+        string plot_pdosname = ICSDName + "_" + PDOSNAME;
 
-	string PEDOStitle=estructure::changeICSDNameGunplot(ICSDName) + "\\\\_" + "PEDOS\\\\_" 
-	  + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+"\\\\_"
-	  + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "\\\\_" 
-	  + AtomicName[Natom-1] +"(" + aurostd::utype2string(InequivalentAtomType[Natom-1])+") \"";
+        string PEDOStitle=estructure::changeICSDNameGunplot(ICSDName) + "\\\\_" + "PEDOS\\\\_" 
+          + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+"\\\\_"
+          + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "\\\\_" 
+          + AtomicName[Natom-1] +"(" + aurostd::utype2string(InequivalentAtomType[Natom-1])+") \"";
 
-	ofstream gscript_fin;
-	gscript_fin.open(gnuplotscript.c_str());
-	string gscript = estructure::PEDOS_GENERATE_GNUPLOTSCRIPT(plot_pdosname, PEDOStitle, DOS_Emin, DOS_Emax, DOSMAX, DOSSCALE, Natom_pdos, PDOS, pdosdatafile);
-	gscript_fin << gscript;
-	gscript_fin.close();
-	//Call gnuplot to plot the PDOS
+        ofstream gscript_fin;
+        gscript_fin.open(gnuplotscript.c_str());
+        string gscript = estructure::PEDOS_GENERATE_GNUPLOTSCRIPT(plot_pdosname, PEDOStitle, DOS_Emin, DOS_Emax, DOSMAX, DOSSCALE, Natom_pdos, PDOS, pdosdatafile);
+        gscript_fin << gscript;
+        gscript_fin.close();
+        //Call gnuplot to plot the PDOS
 
-	aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
-	aurostd::execute(XHOST.command("convert")+" -background white ./" + plot_pdosname + ".eps ./" + plot_pdosname + ".png");
-	if(aurostd::FileExist(plot_pdosname+".eps"))  aurostd::execute(DEFAULT_KZIP_BIN+" -9f " + plot_pdosname + ".eps"); // [CORMAC]
-	//Postprocess
-	if(!XHOST.vflag_control.flag("KEEP::GPL")) { 
-	  aurostd::RemoveFile(pdosdatafile);
-	  aurostd::RemoveFile(gnuplotscript);
-	}
-	if(!XHOST.vflag_control.flag("KEEP::EPS")) { 
-	  aurostd::RemoveFile(plot_pdosname + ".eps ");
-	}
+        aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
+        aurostd::execute(XHOST.command("convert")+" -background white ./" + plot_pdosname + ".eps ./" + plot_pdosname + ".png");
+        if(aurostd::FileExist(plot_pdosname+".eps"))  aurostd::execute(DEFAULT_KZIP_BIN+" -9f " + plot_pdosname + ".eps"); // [CORMAC]
+        //Postprocess
+        if(!XHOST.vflag_control.flag("KEEP::GPL")) { 
+          aurostd::RemoveFile(pdosdatafile);
+          aurostd::RemoveFile(gnuplotscript);
+        }
+        if(!XHOST.vflag_control.flag("KEEP::EPS")) { 
+          aurostd::RemoveFile(plot_pdosname + ".eps ");
+        }
       } //If loop
       //PostProcess
       ss_doscar.seekg (0, ios_base::beg);
     }
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL_AFLOWLIB: END" << endl;
-    cout << "estructure::PLOT_PEDOSALL_AFLOWLIB: END" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: END" << endl;
+    cout << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: END" << endl;
   } // function
 }
 
@@ -1567,7 +1563,7 @@ namespace estructure {
     //  DOSCAR.static
     //  OUTCAR.static
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: BEGIN" << endl;
     int  NIONS;
     string OUTCARfile, stmp, line, directory;
     stringstream straus, strline, ss_outcar; //, stringstreamtmp, strline;  
@@ -1575,11 +1571,11 @@ namespace estructure {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
-    
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_PEDOSALL: tokens.at(i)=" << tokens.at(i) << endl;
- 
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOSALL: tokens.at(i)=" << tokens.at(i) << endl;
+
     if(tokens.size()<1) {
       init::ErrorOption(cout,options,"estructure::PLOT_PEDOSALL","aflow --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
       exit(0);
@@ -1588,23 +1584,23 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-        
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: DOSSCALE=" << DOSSCALE << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: DOSSCALE=" << DOSSCALE << endl;
 
     string command_postfix="";
     if(tokens.size()>=2) command_postfix+=","+tokens.at(1);
     if(tokens.size()>=3) command_postfix+=","+tokens.at(2);
     if(tokens.size()>=4) command_postfix+=","+tokens.at(3);
-   
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     xOUTCAR pedos_outcar; pedos_outcar.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory,"OUTCAR"));
 
 
     NIONS = pedos_outcar.NIONS;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: NIONS=" << NIONS << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: NIONS=" << NIONS << endl;
 
     string command_local;
     for (int i=1; i<=NIONS; i++) {
@@ -1612,12 +1608,12 @@ namespace estructure {
       command_local+=","+aurostd::utype2string(i);
       command_local+=command_postfix;
       estructure::PLOT_PEDOS(command_local);
-      cout << "estructure::estructure::PLOT_PEDOSALL: working on " 
-	   << aurostd::PaddedPRE(aurostd::utype2string(i),(uint) (1+log10(NIONS)),"0")
-	   << "/" << aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") << " atom!" <<  endl;
+      cout << XPID << "estructure::estructure::PLOT_PEDOSALL: working on " 
+        << aurostd::PaddedPRE(aurostd::utype2string(i),(uint) (1+log10(NIONS)),"0")
+        << "/" << aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") << " atom!" <<  endl;
     }
     // done now exit
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOSALL: END" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: END" << endl;
   }
 }
 
@@ -1634,17 +1630,17 @@ namespace estructure {
     //  OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: BEGIN" << endl;
-    
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: BEGIN" << endl;
+
     string numatom="1",directory="./";  // some defaults 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
-    
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_PEDOS: tokens.at(i)=" << tokens.at(i) << endl;
- 
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOS: tokens.at(i)=" << tokens.at(i) << endl;
+
     if(tokens.size()<1) {
       init::ErrorOption(cout,options,"estructure::PLOT_PEDOS","aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
@@ -1654,12 +1650,12 @@ namespace estructure {
     if(tokens.size()>=3) DOS_Emin = aurostd::string2utype<double>(tokens.at(2)); 
     if(tokens.size()>=4) DOS_Emax = aurostd::string2utype<double>(tokens.at(3));
     if(tokens.size()>=5) DOSSCALE = aurostd::string2utype<double>(tokens.at(4));
-     
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: numatom=[" << numatom << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: DOSSCALE=" << DOSSCALE << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: numatom=[" << numatom << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: DOSSCALE=" << DOSSCALE << endl;
 
     int NIONS, Natom;
     //double Emax, Emin;
@@ -1667,7 +1663,7 @@ namespace estructure {
     string ICSDName, DOSCARfile, OUTCARfile, POSCARfile, stmp, line;
     stringstream straus, strline, dosfile, ss_outcar, ss_doscar; //, stringstreamtmp, strline;  
 
-    cout << "estructure::PLOT_PEDOS: working in directory=" << directory << endl;
+    cout << XPID << "estructure::PLOT_PEDOS: working in directory=" << directory << endl;
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
     //Get the atomic lable for each atom
     vector<string> AtomicName= KBIN::ExtractAtomicSpecies(directory);
@@ -1683,7 +1679,7 @@ namespace estructure {
     //Judge whether a proper parameter is input
     if(!( numatom[0] >= '0' && numatom[0] <= '9')) {
       cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
-      // CO 170830 - let's not insult the user?
+      //CO20170830 - let's not insult the user?
       //cout << "I HOPE YOU KNOW, WHAT YOU ARE  DOING! You had better read the manual of aconvasp carefully!" << endl;
       //cout << "I REFUSE TO CONTINUE WITH THIS SICK JOB...,BYE!!!<----" << endl;
       //cout << "Anyway, I still give you a promot, the second input must be a digit!"<< endl;
@@ -1694,7 +1690,7 @@ namespace estructure {
     if(Natom > NIONS) {
       cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
       cout << "The number you put excceds the number of ions (" << NIONS << ")!" << endl;
-      // CO 170830 - let's not insult the user?
+      //CO20170830 - let's not insult the user?
       //cout << "The number you put excceds the number of ions (" << NIONS << ")!!" << endl;
       //cout << "How silly you are!!!" << endl;
       exit(0);
@@ -1702,7 +1698,7 @@ namespace estructure {
     if(Natom==0) {
       cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
       cout << "No input! If you want to plot TDOS, use 'aflow --plotdos " + directory +"'" << endl;
-      // CO 170830 - let's not insult the user?
+      //CO20170830 - let's not insult the user?
       //cout << "You input 0! I guess you want to plot TDOS, so I recommend you to use 'aflow --plotdos " + directory +"'" << endl;
       //cout << "I do not want to produce TDOS in this way! BYE!!!..." << endl;
       exit(0);
@@ -1717,7 +1713,7 @@ namespace estructure {
     string str_out = aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "/" 
       + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "/"
       + AtomicName[Natom-1] + " atom!";
-    cerr << "estructure::PLOT_PEDOS: working on " << str_out << endl;
+    cerr << XPID << "estructure::PLOT_PEDOS: working on " << str_out << endl;
 
     //************************************************************************************************************************
     // Get PDOS
@@ -1726,8 +1722,8 @@ namespace estructure {
     if(Natom>0 && Natom<=NIONS) {
       //Generate the Name for PDOS
       string PDOSNAME = "PEDOS_"+aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+
-	"_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "_" 
-	+ AtomicName[Natom-1];
+        "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "_" 
+        + AtomicName[Natom-1];
 
       //************************************************************************************************************************
       //Finding the maxmium value of PDOS
@@ -1737,7 +1733,7 @@ namespace estructure {
 
       //Writing PEDOS data into file
       string pdosdatafile = ICSDName + "_PEDOS_" + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")
-	+ "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".dat";
+        + "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".dat";
 
       ofstream fin;
       fin.open(pdosdatafile.c_str());
@@ -1751,14 +1747,14 @@ namespace estructure {
       //***********************************GENERATING GNUPLOT SCRIPT************************************
       //Writing Gnuplot Script
       string gnuplotscript = aurostd::ProperFileName("GNUPLOT_" + ICSDName + "_PEDOS_" 
-						     + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "_" 
-						     + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".gp");
+          + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "_" 
+          + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0")+"_"+AtomicName[Natom-1] + ".gp");
 
       string plot_pdosname = ICSDName + "_" + PDOSNAME;
 
       string PEDOStitle=estructure::changeICSDNameGunplot(ICSDName) + "\\\\_" + "PEDOS\\\\_" 
-	+ aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+"\\\\_"
-	+ aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "\\\\_" + AtomicName[Natom-1];
+        + aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+"\\\\_"
+        + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "\\\\_" + AtomicName[Natom-1];
 
       ofstream gscript_fin;
       gscript_fin.open(gnuplotscript.c_str());
@@ -1771,16 +1767,16 @@ namespace estructure {
       aurostd::execute(XHOST.command("convert")+" -background white ./" + plot_pdosname + ".eps ./" + plot_pdosname + ".png");
       //Postprocess
       if(!XHOST.vflag_control.flag("KEEP::GPL")) { 
-	aurostd::RemoveFile(pdosdatafile);
-	aurostd::RemoveFile(gnuplotscript);
+        aurostd::RemoveFile(pdosdatafile);
+        aurostd::RemoveFile(gnuplotscript);
       }
       if(!XHOST.vflag_control.flag("KEEP::EPS")) { 
-	aurostd::RemoveFile(plot_pdosname + ".eps ");
+        aurostd::RemoveFile(plot_pdosname + ".eps ");
       }
     } //If loop
     dosfile.seekg (0, ios_base::beg);
     //PostProcess
-    if(LDEBUG) cerr << "estructure::PLOT_PEDOS: END" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: END" << endl;
   } // function
 }
 
@@ -1799,8 +1795,8 @@ namespace estructure {
     return false;
   }
   string fixSpecialKPOINT_GNUPLOT(string kpoint,bool json){
-    if(kpoint.compare("\\Gamma")==0){return "{"+(json?string("\\"):"")+"/Symbol G}";} //NO ITALICS, Gamma is from GOD -- says Stefano
-    if(kpoint.compare("Gamma")==0){return "{"+(json?string("\\"):"")+"/Symbol G}";} //NO ITALICS, Gamma is from GOD -- says Stefano
+    if(kpoint.compare("\\Gamma")==0){return "{"+(json?string("\\"):"")+"/Symbol G}";} //NO ITALICS, Gamma is from GOD -- says SC
+    if(kpoint.compare("Gamma")==0){return "{"+(json?string("\\"):"")+"/Symbol G}";} //NO ITALICS, Gamma is from GOD -- says SC
     if(kpoint.compare("\\Sigma_1")==0){return "{"+(json?string("\\"):"")+"/Symbol-Oblique S}_1";}
     if(kpoint.compare("Sigma_1")==0){return "{"+(json?string("\\"):"")+"/Symbol-Oblique S}_1";}
     if(kpoint.compare("\\Sigma")==0){return "{"+(json?string("\\"):"")+"/Symbol-Oblique S}";}
@@ -1808,8 +1804,8 @@ namespace estructure {
     return kpoint;
   }
   string fixSpecialKPOINT_HTML(string kpoint){
-    if(kpoint.compare("\\Gamma")==0){return "&Gamma;";} //NO ITALICS, Gamma is from GOD -- says Stefano
-    if(kpoint.compare("Gamma")==0){return "&Gamma;";} //NO ITALICS, Gamma is from GOD -- says Stefano
+    if(kpoint.compare("\\Gamma")==0){return "&Gamma;";} //NO ITALICS, Gamma is from GOD -- says SC
+    if(kpoint.compare("Gamma")==0){return "&Gamma;";} //NO ITALICS, Gamma is from GOD -- says SC
     if(kpoint.compare("\\Sigma_1")==0){return "<i>&Sigma;<\\/i><sub>1<\\/sub>";}
     if(kpoint.compare("Sigma_1")==0){return "<i>&Sigma;<\\/i><sub>1<\\/sub>";}
     if(kpoint.compare("\\Sigma")==0){return "<i>&Sigma;<\\/i>";}
@@ -1817,8 +1813,8 @@ namespace estructure {
     return kpoint;
   }
   string fixSpecialKPOINT_LATEX(string kpoint){
-    if(kpoint.compare("\\Gamma")==0){return "$\\Gamma$";} //NO ITALICS, Gamma is from GOD -- says Stefano
-    if(kpoint.compare("Gamma")==0){return "$\\Gamma$";} //NO ITALICS, Gamma is from GOD -- says Stefano
+    if(kpoint.compare("\\Gamma")==0){return "$\\Gamma$";} //NO ITALICS, Gamma is from GOD -- says SC
+    if(kpoint.compare("Gamma")==0){return "$\\Gamma$";} //NO ITALICS, Gamma is from GOD -- says SC
     if(kpoint.compare("\\Sigma_1")==0){return "$\\mathit{\\Sigma}_{1}$";}
     if(kpoint.compare("Sigma_1")==0){return "$\\mathit{\\Sigma}_{1}$";}
     if(kpoint.compare("\\Sigma")==0){return "$\\mathit{\\Sigma}$";}
@@ -1892,16 +1888,16 @@ namespace estructure {
     //   EIGENVAL.bands
     //   KPOINTS.bands
     //   OUTCAR.static
-  
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_BAND: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_BAND: tokens.at(i)=" << tokens.at(i) << endl;
 
     //bool isLSCOUPLING=FALSE;
     int ISPIN=1,NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
@@ -1909,7 +1905,7 @@ namespace estructure {
     double DOSMAX=0.0;
     string directory="./", LattName, ICSDName, DOSCARfile, OUTCARfile, EIGENVALfile, POSCARfile, KPOINTSfile, stmp, line;
     stringstream straus, stringstreamtmp, strline, dosfile, ss_outcar, ss_doscar, ss_engenval, ss_kpoints; 
-  
+
     if(tokens.size()<1) {
       init::ErrorOption(cout,options,"estructure::PLOT_BAND","aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
@@ -1918,22 +1914,22 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-    
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND: DOSSCALE=" << DOSSCALE << endl;
-    
-    cout << "estructure::PLOT_BAND: working in directory=" << directory << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: DOSSCALE=" << DOSSCALE << endl;
+
+    cout << XPID << "estructure::PLOT_BAND: working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
-  
-    if(LDEBUG) cerr << "estructure::PLOT_BAND [2]" << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [2]" << endl;
     // cout << aurostd::execute2string("ls "+s) << endl;
     aflowlib::vaspfile2stringstream(directory, "OUTCAR", ss_outcar);
-  
-    if(LDEBUG) cerr << "estructure::PLOT_BAND [3]" << endl;
-  
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [3]" << endl;
+
     //GET Fermi Level, Number of IONS
     //GET lattice vector and reciprocal lattice vectors
     string anchor_word_Efermi = "E-fermi";
@@ -1944,65 +1940,65 @@ namespace estructure {
     xvector<double> b1(3); xvector<double> b2(3); xvector<double> b3(3);
     while(getline(ss_outcar, line)) {
       if(line.find(anchor_word_Efermi) !=string::npos) {
-	strline.clear();	
-	strline.str(line);
-	strline >> stmp >> stmp >> Efermi;
+        strline.clear();	
+        strline.str(line);
+        strline >> stmp >> stmp >> Efermi;
       }
       if(line.find(anchor_word_NIONS) !=string::npos) {
-	strline.clear();	
-	strline.str(line);
-	strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
+        strline.clear();	
+        strline.str(line);
+        strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
       }
       if(line.find(anchor_word_vc) !=string::npos) {
-	getline(ss_outcar, line); ss_outcar >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
-	getline(ss_outcar, line); ss_outcar >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
-	getline(ss_outcar, line); ss_outcar >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];	
+        getline(ss_outcar, line); ss_outcar >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
+        getline(ss_outcar, line); ss_outcar >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
+        getline(ss_outcar, line); ss_outcar >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];	
       }
     }
-  
-    if(LDEBUG) cerr << "estructure::PLOT_BAND [4]" << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [4]" << endl;
     aflowlib::vaspfile2stringstream(directory, "DOSCAR", ss_doscar);
-    if(LDEBUG) cerr << "estructure::PLOT_BAND [4b]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [4b]" << endl;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
     }
-  
+
     vector<vector<double> > vvDOS;
     CombineTDOSAndTOTALPDOS(TDOS, TOTALPDOS, vvDOS);
     DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(vvDOS, DOS_Emin, DOS_Emax);
-    
-    if(LDEBUG) cerr << "estructure::PLOT_BAND [5]" << endl;
-  
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [5]" << endl;
+
     //Writing into file
-    string str_PDOS = aurostd::vector2string(vvDOS); //TOTALPDOS);  // CO 170830 - plot both tdos and pdos!
+    string str_PDOS = aurostd::vector2string(vvDOS); //TOTALPDOS);  //CO20170830 - plot both tdos and pdos!
     string dosdatafile = ICSDName + "_DOS.dat";
     ofstream dosfin;
     dosfin.open(dosdatafile.c_str());
     dosfin << str_PDOS;
     dosfin.close();
-  
+
     //Finding the maxmium value of s, p, d or f orbitals
     //-----------------------------------------------------------------------
-    //DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(TOTALPDOS, DOS_Emin, DOS_Emax);  // CO 170830 - we want max for TOTAL now
+    //DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(TOTALPDOS, DOS_Emin, DOS_Emax);  //CO20170830 - we want max for TOTAL now
     //-------------------------------------------------------------------------------------------------------------------------------------------------
-    if(LDEBUG) cerr << "estructure::PLOT_BAND [6]" << endl;
-  
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [6]" << endl;
+
     //***********************************DEALING WITH BANDSDATA**************************************************************
     aflowlib::vaspfile2stringstream(directory, "EIGENVAL", ss_engenval);
     //  cout << ss_engenval.str() << endl;exit(0);
-  
+
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     ss_engenval >> stmp >> stmp >> stmp >> ISPIN;	
-  
+
     //Read the headfile of EIGENVAL	
     for(int i=0; i< 5; i++) getline(ss_engenval, stmp);
     ss_engenval >> NELECT >> NKPOINTS >> Nbands;
     getline(ss_engenval, stmp);  //Read the line containing NELECT, NKPOINTS, NBANDS
-  
+
     //Creating data to store bands data
     vector<vector<double> > datakpoints(NKPOINTS);
     vector<vector<double> > dataup(NKPOINTS); //Define two-dimensional arrary
@@ -2016,31 +2012,31 @@ namespace estructure {
     //Obtain the bands data and store them into dataup and datadn, respectively
     if(ISPIN==1) {
       for(int ik=0; ik< NKPOINTS; ik++) {
-	getline(ss_engenval, stmp); //Negelecting empty line
-	ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
-	getline(ss_engenval, stmp); //Negelecting kpoint coordinate
-	int ib=-1;	
-	for(int i=0; i<Nbands; i++) {
-	  ss_engenval>>ftmp>>ftmp;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmp;
-	}
-	getline(ss_engenval,stmp);
+        getline(ss_engenval, stmp); //Negelecting empty line
+        ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
+        getline(ss_engenval, stmp); //Negelecting kpoint coordinate
+        int ib=-1;	
+        for(int i=0; i<Nbands; i++) {
+          ss_engenval>>ftmp>>ftmp;
+          ib=ib+1;
+          dataup[ik][ib]=ftmp;
+        }
+        getline(ss_engenval,stmp);
       }
     }
     else if(ISPIN==2) {
       for(int ik=0; ik< NKPOINTS; ik++) {
-	getline(ss_engenval, stmp); //Negelecting empty line
-	ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
-	getline(ss_engenval, stmp); //Negelecting kpoint coordinate
-	int ib=-1;	
-	for(int i=0; i<Nbands; i++) {
-	  ss_engenval>>ftmp>>ftmpup>>ftmpdn;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmpup;
-	  datadn[ik][ib]=ftmpdn;
-	}
-	getline(ss_engenval,stmp);
+        getline(ss_engenval, stmp); //Negelecting empty line
+        ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
+        getline(ss_engenval, stmp); //Negelecting kpoint coordinate
+        int ib=-1;	
+        for(int i=0; i<Nbands; i++) {
+          ss_engenval>>ftmp>>ftmpup>>ftmpdn;
+          ib=ib+1;
+          dataup[ik][ib]=ftmpup;
+          datadn[ik][ib]=ftmpdn;
+        }
+        getline(ss_engenval,stmp);
       }
     }
     else {
@@ -2064,37 +2060,36 @@ namespace estructure {
     // cout << ss_kpoints.str() << endl;
     while(getline(ss_kpoints, line)) {
       if(aurostd::CountWordsinString(line)>=3) {
-	vector<double> kpt_tmp;
-	double a1, a2, a3;
-	string a5;
-	strline.clear();
-	strline.str(line);
-	strline >> a1 >> a2 >> a3 >> stmp >> a5;
-	kpt_tmp.push_back(a1);
-	kpt_tmp.push_back(a2);
-	kpt_tmp.push_back(a3);
-	kpoints.push_back(kpt_tmp);
-	kpointslabel.push_back(a5);
-	j++;
+        vector<double> kpt_tmp;
+        double a1, a2, a3;
+        string a5;
+        strline.clear();
+        strline.str(line);
+        strline >> a1 >> a2 >> a3 >> stmp >> a5;
+        kpt_tmp.push_back(a1);
+        kpt_tmp.push_back(a2);
+        kpt_tmp.push_back(a3);
+        kpoints.push_back(kpt_tmp);
+        kpointslabel.push_back(a5);
+        j++;
       }
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  // CO 170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]  if(kpointslabel[i].compare("Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma_1")==0) kpointslabel[i]="Sigm_1";
     //[OBSOLETE]  if(kpointslabel[i].compare("Sigma_1")==0) kpointslabel[i]="Sigm_1";
-    //[OBSOLETE]}
     //Combine the Labels of special kpoints	
     for (int i=1; i< (count-1); i=i+2) {
       if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO 170830 - if subscript, extra space looks ODD!
-        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel[i] = newlabel;
-	kpointslabel[i+1] = newlabel;
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel[i] = newlabel;
+        kpointslabel[i+1] = newlabel;
       }
     }
     //*******************************Redefine the symbols of special kpoints
@@ -2116,7 +2111,7 @@ namespace estructure {
     //Check number of kpoints
 
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
-      if(LDEBUG) cerr << "estructure::PLOT_BAND [16]" << endl;
+      if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [16]" << endl;
       cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
       cout << "KPOINTSGRID=" << KPOINTSGRID << endl;
       cout << "count=" << count << endl;
@@ -2140,14 +2135,14 @@ namespace estructure {
       dk= (sqrt(dkx*dkx + dky*dky +dkz*dkz))/(KPOINTSGRID-1);
       klinecart[ind]=koffset; ind++;
       for (int ii=1; ii<KPOINTSGRID; ii++) {
-	klinecart[ind]= koffset + ii*dk;
-	ind++;
+        klinecart[ind]= koffset + ii*dk;
+        ind++;
       }
       koffset = koffset + dk*(KPOINTSGRID-1);
     }
 
     //*******************************Redefine the symbols of special kpoints
-    // CO 170830 - already done above ?? - not sure why we do twice...
+    //CO20170830 - already done above ?? - not sure why we do twice...
     //[OBSOLETE]for (int i=0; i< count; i++) {
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
@@ -2159,12 +2154,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints	
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO 170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO 170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO 170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -2178,7 +2173,7 @@ namespace estructure {
       SPKPOINTScart[i]=klinecart[(i/2)*(KPOINTSGRID)];
       SPKPOINTScart[i+1]=klinecart[(i/2+1)*(KPOINTSGRID)-1];
     }
-    //NO SHIFT - CO 170830
+    //NO SHIFT - CO20170830
     for (int i=0; i< count; i=i+2) {SPKPOINTScart_LABEL[i]=SPKPOINTScart[i];}
     SPKPOINTScart_LABEL[count-1]=SPKPOINTScart[count-1];
     //Shifting the cartesian coordinates of special KPOINTS;
@@ -2200,40 +2195,40 @@ namespace estructure {
     //Writing bands data into file
     if(ISPIN==1) {	
       for (int i=0; i<NKPOINTS; i++) {
-	bandsdata[i].resize(Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
 
       for (int ik=0;ik<NKPOINTS;ik++) {
-        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  // CO 170831 - make sure there is NO continuation between KPOINTS, not valid assumption
-	for (int ib=0; ib<Nbands+1; ib++) {
-	  bandsfin << bandsdata[ik][ib] << "  " ;
-	}
-	bandsfin << endl;
+        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  //CO20170831 - make sure there is NO continuation between KPOINTS, not valid assumption
+        for (int ib=0; ib<Nbands+1; ib++) {
+          bandsfin << bandsdata[ik][ib] << "  " ;
+        }
+        bandsfin << endl;
       }
       bandsfin.close();
     }
     //Spin-polarized
     if(ISPIN==2) {	
       for (int i=0; i<NKPOINTS; i++) {
-	bandsdata[i].resize(2*Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(2*Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][2*ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	  bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][2*ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+          bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
       for (int ik=0;ik<NKPOINTS;ik++) {
-        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  // CO 170831 - make sure there is NO continuation between KPOINTS, not valid assumption
-	for (int ib=0; ib<2*Nbands+1; ib++) {
-	  bandsfin << bandsdata[ik][ib] << "  " ;
-	}
-	bandsfin << endl;
+        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  //CO20170831 - make sure there is NO continuation between KPOINTS, not valid assumption
+        for (int ib=0; ib<2*Nbands+1; ib++) {
+          bandsfin << bandsdata[ik][ib] << "  " ;
+        }
+        bandsfin << endl;
       }
       bandsfin.close();
     }
@@ -2248,11 +2243,11 @@ namespace estructure {
     fin << "set output " << "\"" << ICSDName <<".eps" << "\"" << endl;
     fin << "set multiplot title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ")" << "\""<< endl;
     fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-    //fin << "set border lw 5" << endl; // CO 170830 - thick border
-    fin << "unset border" << endl; // CO 170830 - looks better
-    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
-    //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
+    //fin << "set border lw 5" << endl; //CO20170830 - thick border
+    fin << "unset border" << endl; //CO20170830 - looks better
+    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
+    //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Curtarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
     fin << endl;
 
     fin << "#DOS PLOT" << endl;
@@ -2264,24 +2259,24 @@ namespace estructure {
     fin << "set xtics " << endl;
     //fin << "unset ytics" << endl;
     fin << "set ytics " << endl;
-    fin << "set format y \"\"" << endl; // CO 170830 - keep grid
+    fin << "set format y \"\"" << endl; //CO20170830 - keep grid
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     if(TOTALPDOS.at(0).size()==9||(TOTALPDOS.at(0).size()==7)) {
       if(DOSMAX*DOSSCALE!=0) {
-	fin << "set xrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
+        fin << "set xrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
       }
       else {
-	fin << "set xrange [0:2]" << endl;
+        fin << "set xrange [0:2]" << endl;
       }
     }
     if(TOTALPDOS.at(0).size()==4||(TOTALPDOS.at(0).size()==5)) {
       if(DOSMAX*DOSSCALE!=0) {
-	fin << "set xrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
+        fin << "set xrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
       }
     }
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
-    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << "set key font \"Helvetica, 40\"" << endl; 	
     fin << endl;
     fin << "plot[][] \\" << endl;
@@ -2332,7 +2327,7 @@ namespace estructure {
     fin << "unset title" << endl;
     fin << "unset key" << endl;
     fin << "unset xtics" << endl;
-    // CO 170830 - add tics at the right spot, but leave labels out - START
+    //CO20170830 - add tics at the right spot, but leave labels out - START
     fin << "set xtics (";
     for (int i=0; i< count; i=i+2) {
       fin << "\"" << kpointslabel[i] <<"\"";
@@ -2342,13 +2337,13 @@ namespace estructure {
     fin << " " << std::setprecision(BANDS_PRECISION) << SPKPOINTScart_LABEL[count-1] << ")" << endl;  //needs to match bandsdatafile
     fin << "set format x \"\"" << endl;
     fin << "unset format y" << endl;
-    // CO 170830 - add tics at the right spot, but leave labels out - STOP
+    //CO20170830 - add tics at the right spot, but leave labels out - STOP
     fin << "set ytics" << endl;
     fin << "set xrange [* : *]" << endl;
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     fin << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
     fin << endl;
-    // CO 170831 - now we do with xtics - START
+    //CO20170831 - now we do with xtics - START
     //[OBSOLETE]for (int i=0; i< count; i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare("G")==0) {
     //[OBSOLETE]fin << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -2364,26 +2359,26 @@ namespace estructure {
     //[OBSOLETE]}
     //[OBSOLETE]}
     //[OBSOLETE]fin << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-    // CO 170831 - now we do with xtics - STOP
-    // CO 170830 - manual grid not needed - START
+    //CO20170831 - now we do with xtics - STOP
+    //CO20170830 - manual grid not needed - START
     //for (int i=0; i< count; i=i+2) {
     //  fin << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
     //}
-    // CO 170830 - manual grid not needed - STOP
+    //CO20170830 - manual grid not needed - STOP
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << endl;
     fin << "plot[][] \\" << endl;
     if(ISPIN==1) {
       for (unsigned int i=1; i<(bandsdata.at(0).size()-1); i++) {
-	fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
+        fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
       }
       fin << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size() << " w l lt -1 lw 3" << endl;
     }
     if(ISPIN==2) {
       for (unsigned int i=1; i<(bandsdata.at(0).size()-2); i=i+2) {
-	fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
-	fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+2 << " w l lt 1 lc rgb '#C44E52' lw 3, \\" << endl;
+        fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
+        fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+2 << " w l lt 1 lc rgb '#C44E52' lw 3, \\" << endl;
       }
       fin << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size()-1 << " w l lt -1 lw 3, \\" << endl;
       fin << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size() << " w l lt 1 lc rgb '#C44E52' lw 3" << endl;
@@ -2393,7 +2388,7 @@ namespace estructure {
     //Call gnuplot to plot the bands structure	
     aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
     aurostd::execute(XHOST.command("convert")+" -background white ./" + ICSDName + ".eps  ./" + ICSDName + ".png");
-    // KESONG in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
+    //KY in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
     if(aurostd::FileExist("bz_.eps")) aurostd::file2file("bz_.eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_.png")) aurostd::file2file("bz_.png",ICSDName+"_BZ.png");
     if(aurostd::FileExist("bz_"+ICSDName+".eps")) aurostd::file2file("bz_"+ICSDName+".eps",ICSDName+"_BZ.eps");
@@ -2401,7 +2396,7 @@ namespace estructure {
     //if(aurostd::FileExist(ICSDName+"_BZ.eps")) aurostd::execute(DEFAULT_KZIP_BIN+" -9f \"" + ICSDName + "_BZ.eps\"");
     // REMOVE if(aurostd::FileExist(ICSDName+"_BZ.eps")) aurostd::RemoveFile(ICSDName + \""_BZ.eps\"");  [CORMAC]
     if(aurostd::FileExist(ICSDName+"_BZ.eps"))  aurostd::execute(DEFAULT_KZIP_BIN+" -9f \"" + ICSDName + "_BZ.eps\"");
-                         
+
     //Postprocess
     if(!XHOST.vflag_control.flag("KEEP::GPL")) { 
       aurostd::RemoveFile(bandsdatafile);
@@ -2428,14 +2423,14 @@ namespace estructure {
     //  OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_BAND2: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_BAND2: tokens.at(i)=" << tokens.at(i) << endl;
 
     //bool isLSCOUPLING=FALSE;
     int ISPIN=1,NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
@@ -2452,18 +2447,18 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-    
+
     // [OBSOLETE]    if(directory=="") directory="./";
     // [OBSOLETE]    if(DOS_Emin<=-999.9) DOS_Emin=DEFAULT_DOS_EMIN;
     // [OBSOLETE]    if(DOS_Emax<=-999.9) DOS_Emax=DEFAULT_DOS_EMAX;
     // [OBSOLETE]    if(DOSSCALE<=-999.9) DOSSCALE=DEFAULT_DOS_SCALE;
-    
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: DOSSCALE=" << DOSSCALE << endl;
-    
-    cerr << "estructure::PLOT_BAND2: working in directory=" << directory << endl;
+
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: DOSSCALE=" << DOSSCALE << endl;
+
+    cerr << XPID << "estructure::PLOT_BAND2: working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
@@ -2479,53 +2474,53 @@ namespace estructure {
     xvector<double> b1(3); xvector<double> b2(3); xvector<double> b3(3);
     while(getline(ss_outcar, line)) {
       if(line.find(anchor_word_Efermi) !=string::npos) {
-	strline.clear();	
-	strline.str(line);
-	strline >> stmp >> stmp >> Efermi;
+        strline.clear();	
+        strline.str(line);
+        strline >> stmp >> stmp >> Efermi;
       }
       if(line.find(anchor_word_NIONS) !=string::npos) {
-	strline.clear();	
-	strline.str(line);
-	strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
+        strline.clear();	
+        strline.str(line);
+        strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
       }
       if(line.find(anchor_word_vc) !=string::npos) {
-	getline(ss_outcar, line); ss_outcar >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
-	getline(ss_outcar, line); ss_outcar >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
-	getline(ss_outcar, line); ss_outcar >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];	
+        getline(ss_outcar, line); ss_outcar >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
+        getline(ss_outcar, line); ss_outcar >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
+        getline(ss_outcar, line); ss_outcar >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];	
       }
     }
 
     aflowlib::vaspfile2stringstream(directory, "DOSCAR", ss_doscar);
     vector<vector<double> > TDOS;
     vector<vector<double> >  TOTALPDOS_SPIN;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS_SPIN) && TOTALPDOS_SPIN.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
     }
-    
+
     vector<vector<double> >  TOTALPDOS;
     if(TOTALPDOS_SPIN.at(0).size() == 4) TOTALPDOS = TOTALPDOS_SPIN;
     else if(TOTALPDOS_SPIN.at(0).size() == 5) TOTALPDOS = TOTALPDOS_SPIN;
     else if(TOTALPDOS_SPIN.at(0).size() == 7) {
       for (uint i=0; i<TOTALPDOS_SPIN.size();i++) {
-	vector<double> vtmp; vtmp.clear();
-	vtmp.push_back(TOTALPDOS_SPIN[i][0]); //Energy
-	vtmp.push_back(TOTALPDOS_SPIN[i][1] + TOTALPDOS_SPIN[i][2]); //s_up + s_dn
-	vtmp.push_back(TOTALPDOS_SPIN[i][3] + TOTALPDOS_SPIN[i][4]); //p_up + p_dn
-	vtmp.push_back(TOTALPDOS_SPIN[i][5] + TOTALPDOS_SPIN[i][6]); //d_up + d_dn
-	TOTALPDOS.push_back(vtmp);
+        vector<double> vtmp; vtmp.clear();
+        vtmp.push_back(TOTALPDOS_SPIN[i][0]); //Energy
+        vtmp.push_back(TOTALPDOS_SPIN[i][1] + TOTALPDOS_SPIN[i][2]); //s_up + s_dn
+        vtmp.push_back(TOTALPDOS_SPIN[i][3] + TOTALPDOS_SPIN[i][4]); //p_up + p_dn
+        vtmp.push_back(TOTALPDOS_SPIN[i][5] + TOTALPDOS_SPIN[i][6]); //d_up + d_dn
+        TOTALPDOS.push_back(vtmp);
       }
     }
     else if(TOTALPDOS_SPIN.at(0).size() == 9) {
       for (uint i=0; i<TOTALPDOS_SPIN.size();i++) {
-	vector<double> vtmp; vtmp.clear();
-	vtmp.push_back(TOTALPDOS_SPIN[i][0]); //Energy
-	vtmp.push_back(TOTALPDOS_SPIN[i][1] + TOTALPDOS_SPIN[i][2]); //s_up + s_dn
-	vtmp.push_back(TOTALPDOS_SPIN[i][3] + TOTALPDOS_SPIN[i][4]); //p_up + p_dn
-	vtmp.push_back(TOTALPDOS_SPIN[i][5] + TOTALPDOS_SPIN[i][6]); //d_up + d_dn
-	vtmp.push_back(TOTALPDOS_SPIN[i][7] + TOTALPDOS_SPIN[i][8]); //f_up + f_dn
-	TOTALPDOS.push_back(vtmp);
+        vector<double> vtmp; vtmp.clear();
+        vtmp.push_back(TOTALPDOS_SPIN[i][0]); //Energy
+        vtmp.push_back(TOTALPDOS_SPIN[i][1] + TOTALPDOS_SPIN[i][2]); //s_up + s_dn
+        vtmp.push_back(TOTALPDOS_SPIN[i][3] + TOTALPDOS_SPIN[i][4]); //p_up + p_dn
+        vtmp.push_back(TOTALPDOS_SPIN[i][5] + TOTALPDOS_SPIN[i][6]); //d_up + d_dn
+        vtmp.push_back(TOTALPDOS_SPIN[i][7] + TOTALPDOS_SPIN[i][8]); //f_up + f_dn
+        TOTALPDOS.push_back(vtmp);
       }
     }
 
@@ -2566,31 +2561,31 @@ namespace estructure {
     //Obtain the bands data and store them into dataup and datadn, respectively
     if(ISPIN==1) {
       for(int ik=0; ik< NKPOINTS; ik++) {
-	getline(ss_engenval, stmp); //Negelecting empty line
-	ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
-	getline(ss_engenval, stmp); //Negelecting kpoint coordinate
-	int ib=-1;	
-	for(int i=0; i<Nbands; i++) {
-	  ss_engenval>>ftmp>>ftmp;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmp;
-	}
-	getline(ss_engenval,stmp);
+        getline(ss_engenval, stmp); //Negelecting empty line
+        ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
+        getline(ss_engenval, stmp); //Negelecting kpoint coordinate
+        int ib=-1;	
+        for(int i=0; i<Nbands; i++) {
+          ss_engenval>>ftmp>>ftmp;
+          ib=ib+1;
+          dataup[ik][ib]=ftmp;
+        }
+        getline(ss_engenval,stmp);
       }
     }
     else if(ISPIN==2) {
       for(int ik=0; ik< NKPOINTS; ik++) {
-	getline(ss_engenval, stmp); //Negelecting empty line
-	ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
-	getline(ss_engenval, stmp); //Negelecting kpoint coordinate
-	int ib=-1;	
-	for(int i=0; i<Nbands; i++) {
-	  ss_engenval>>ftmp>>ftmpup>>ftmpdn;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmpup;
-	  datadn[ik][ib]=ftmpdn;
-	}
-	getline(ss_engenval,stmp);
+        getline(ss_engenval, stmp); //Negelecting empty line
+        ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
+        getline(ss_engenval, stmp); //Negelecting kpoint coordinate
+        int ib=-1;	
+        for(int i=0; i<Nbands; i++) {
+          ss_engenval>>ftmp>>ftmpup>>ftmpdn;
+          ib=ib+1;
+          dataup[ik][ib]=ftmpup;
+          datadn[ik][ib]=ftmpdn;
+        }
+        getline(ss_engenval,stmp);
       }
     }
     else {
@@ -2613,37 +2608,36 @@ namespace estructure {
     int count=0, j=0; //count is the number of rows of kpoints
     while(getline(ss_kpoints, line)) {
       if(aurostd::CountWordsinString(line)>=3) {
-	vector<double> kpt_tmp;
-	double a1, a2, a3;
-	string a5;
-	strline.clear();
-	strline.str(line);
-	strline >> a1 >> a2 >> a3 >> stmp >> a5;
-	kpt_tmp.push_back(a1);
-	kpt_tmp.push_back(a2);
-	kpt_tmp.push_back(a3);
-	kpoints.push_back(kpt_tmp);
-	kpointslabel.push_back(a5);
-	j++;
+        vector<double> kpt_tmp;
+        double a1, a2, a3;
+        string a5;
+        strline.clear();
+        strline.str(line);
+        strline >> a1 >> a2 >> a3 >> stmp >> a5;
+        kpt_tmp.push_back(a1);
+        kpt_tmp.push_back(a2);
+        kpt_tmp.push_back(a3);
+        kpoints.push_back(kpt_tmp);
+        kpointslabel.push_back(a5);
+        j++;
       }
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  // CO 170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]  if(kpointslabel[i].compare("Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma_1")==0) kpointslabel[i]="Sigm_1";
     //[OBSOLETE]  if(kpointslabel[i].compare("Sigma_1")==0) kpointslabel[i]="Sigm_1";
-    //[OBSOLETE]}
     //Combine the Labels of special kpoints	
     for (int i=1; i< (count-1); i=i+2) {
       if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO 170830 - if subscript, extra space looks ODD!
-        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel[i] = newlabel;
-	kpointslabel[i+1] = newlabel;
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel[i] = newlabel;
+        kpointslabel[i+1] = newlabel;
       }
     }
     //*******************************Redefine the symbols of special kpoints
@@ -2664,7 +2658,7 @@ namespace estructure {
 
     //Check number of kpoints
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
-      //  if(LDEBUG) cerr << "estructure::PLOT_BAND [26]" << endl;
+      //  if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [26]" << endl;
       cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
       exit(0);
     }
@@ -2684,14 +2678,14 @@ namespace estructure {
       dk= (sqrt(dkx*dkx + dky*dky +dkz*dkz))/(KPOINTSGRID-1);
       klinecart[ind]=koffset; ind++;
       for (int ii=1; ii<KPOINTSGRID; ii++) {
-	klinecart[ind]= koffset + ii*dk;
-	ind++;
+        klinecart[ind]= koffset + ii*dk;
+        ind++;
       }
       koffset = koffset + dk*(KPOINTSGRID-1);
     }
 
     //*******************************Redefine the symbols of special kpoints
-    // CO 170830 - already done above ?? - not sure why we do twice...
+    //CO20170830 - already done above ?? - not sure why we do twice...
     //[OBSOLETE]for (int i=0; i< count; i++) {
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
@@ -2703,12 +2697,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints	
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO 170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO 170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO 170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -2722,7 +2716,7 @@ namespace estructure {
       SPKPOINTScart[i]=klinecart[(i/2)*(KPOINTSGRID)];
       SPKPOINTScart[i+1]=klinecart[(i/2+1)*(KPOINTSGRID)-1];
     }
-    //NO SHIFT - CO 170830
+    //NO SHIFT - CO20170830
     for (int i=0; i< count; i=i+2) {SPKPOINTScart_LABEL[i]=SPKPOINTScart[i];}
     SPKPOINTScart_LABEL[count-1]=SPKPOINTScart[count-1];
     //Shifting the cartesian coordinates of special KPOINTS;
@@ -2744,38 +2738,38 @@ namespace estructure {
     //Writing bands data into file
     if(ISPIN==1) {	
       for (int i=0; i<NKPOINTS; i++) {
-	bandsdata[i].resize(Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
 
       for (int ik=0;ik<NKPOINTS;ik++) {
-	for (int ib=0; ib<Nbands+1; ib++) {
-	  bandsfin << bandsdata[ik][ib] << "  " ;
-	}
-	bandsfin << endl;
+        for (int ib=0; ib<Nbands+1; ib++) {
+          bandsfin << bandsdata[ik][ib] << "  " ;
+        }
+        bandsfin << endl;
       }
       bandsfin.close();
     }
     //Spin-polarized
     if(ISPIN==2) {	
       for (int i=0; i<NKPOINTS; i++) {
-	bandsdata[i].resize(2*Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(2*Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][2*ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	  bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][2*ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+          bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
       for (int ik=0;ik<NKPOINTS;ik++) {
-	for (int ib=0; ib<2*Nbands+1; ib++) {
-	  bandsfin << bandsdata[ik][ib] << "  " ;
-	}
-	bandsfin << endl;
+        for (int ib=0; ib<2*Nbands+1; ib++) {
+          bandsfin << bandsdata[ik][ib] << "  " ;
+        }
+        bandsfin << endl;
       }
       bandsfin.close();
     }
@@ -2790,11 +2784,11 @@ namespace estructure {
     fin << "set output " << "\"" << ICSDName <<".eps" << "\"" << endl;
     fin << "set multiplot title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ")" << "\""<< endl;
     fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-    //fin << "set border lw 5" << endl; // CO 170830 - thick border
-    fin << "unset border" << endl; // CO 170830 - looks better
-    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
-    //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
+    //fin << "set border lw 5" << endl; //CO20170830 - thick border
+    fin << "unset border" << endl; //CO20170830 - looks better
+    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
+    //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Curtarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
     fin << endl;
 
     fin << "#DOS PLOT" << endl;
@@ -2806,24 +2800,24 @@ namespace estructure {
     fin << "set xtics " << endl;
     //fin << "unset ytics" << endl;
     fin << "set ytics " << endl;
-    fin << "set format y \"\"" << endl; // CO 170830 - keep grid
+    fin << "set format y \"\"" << endl; //CO20170830 - keep grid
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     if(TOTALPDOS.at(0).size()==9||(TOTALPDOS.at(0).size()==7)) {
       if(DOSMAX*DOSSCALE!=0) {
-	fin << "set xrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
+        fin << "set xrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
       }
       else {
-	fin << "set xrange [0:2]" << endl;
+        fin << "set xrange [0:2]" << endl;
       }
     }
     if(TOTALPDOS.at(0).size()==4||(TOTALPDOS.at(0).size()==5)) {
       if(DOSMAX*DOSSCALE!=0) {
-	fin << "set xrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
+        fin << "set xrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
       }
     }
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
-    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << "set key font \"Helvetica, 40\"" << endl; 	
     fin << endl;
     fin << "plot[][] \\" << endl;
@@ -2850,7 +2844,7 @@ namespace estructure {
     fin << "unset title" << endl;
     fin << "unset key" << endl;
     fin << "unset xtics" << endl;
-    // CO 170830 - add tics at the right spot, but leave labels out - START
+    //CO20170830 - add tics at the right spot, but leave labels out - START
     fin << "set xtics (";
     for (int i=0; i< count; i=i+2) {
       fin << "\"" << kpointslabel[i] <<"\"";
@@ -2860,13 +2854,13 @@ namespace estructure {
     fin << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
     fin << "set format x \"\"" << endl;
     fin << "unset format y" << endl;
-    // CO 170830 - add tics at the right spot, but leave labels out - STOP
+    //CO20170830 - add tics at the right spot, but leave labels out - STOP
     fin << "set ytics" << endl;
     fin << "set xrange [* : *]" << endl;
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     fin << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
     fin << endl;
-    // CO 170831 - now we do with xtics - START
+    //CO20170831 - now we do with xtics - START
     //[OBSOLETE]for (int i=0; i< count; i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare("G")==0) {
     //[OBSOLETE]fin << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -2882,14 +2876,14 @@ namespace estructure {
     //[OBSOLETE]}
     //[OBSOLETE]}
     //[OBSOLETE]fin << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-    // CO 170831 - now we do with xtics - STOP
-    // CO 170830 - manual grid not needed - START
+    //CO20170831 - now we do with xtics - STOP
+    //CO20170830 - manual grid not needed - START
     //for (int i=0; i< count; i=i+2) {
     //  fin << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
     //}
-    // CO 170830 - manual grid not needed - STOP
+    //CO20170830 - manual grid not needed - STOP
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << endl;
     fin << "plot[][] \\" << endl;
     for (unsigned int i=1; i<(bandsdata.at(0).size()-1); i++) {
@@ -2902,7 +2896,7 @@ namespace estructure {
     //Call gnuplot to plot the bands structure	
     aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
     aurostd::execute(XHOST.command("convert")+" -background white ./" + ICSDName + ".eps  ./" + ICSDName + ".png");
-    // KESONG in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
+    //KY in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
     if(aurostd::FileExist("bz_.eps")) aurostd::file2file("bz_.eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_.png")) aurostd::file2file("bz_.png",ICSDName+"_BZ.png");
     if(aurostd::FileExist("bz_"+ICSDName+".eps")) aurostd::file2file("bz_"+ICSDName+".eps",ICSDName+"_BZ.eps");
@@ -2919,7 +2913,7 @@ namespace estructure {
     if(!XHOST.vflag_control.flag("KEEP::EPS")) { 
       aurostd::RemoveFile(ICSDName + ".eps");
     }
-    if(LDEBUG) cerr << "estructure::PLOT_BAND2: END" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: END" << endl;
   }
 }
 
@@ -2937,15 +2931,15 @@ namespace estructure {
     //  OUTCAR.bands
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_BAND_SPINSPLIT: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: tokens.at(i)=" << tokens.at(i) << endl;
 
     int ISPIN=1,NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
     double Efermi, ftmp, ftmpup, ftmpdn;
@@ -2954,7 +2948,7 @@ namespace estructure {
     bool found=FALSE;
 
     stringstream straus, stringstreamtmp, strline; //, dosfile; //, stringstreamtmp, strline;  
- 
+
     if(tokens.size()<1) {
       init::ErrorOption(cout,options,"estructure::PLOT_BAND_SPINSPLIT","aflow -plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
       exit(0);
@@ -2963,29 +2957,27 @@ namespace estructure {
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
-        
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::PLOT_BAND_SPINSPLIT: DOSSCALE=" << DOSSCALE << endl;
-    
-    cout << "estructure::PLOT_BAND_SPINSPLIT: working in directory=" << directory << endl;
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: DOSSCALE=" << DOSSCALE << endl;
+
+    cout << XPID << "estructure::PLOT_BAND_SPINSPLIT: working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
     found=FALSE;
 
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/OUTCAR.bands"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/OUTCAR.bands"+vext.at(iext),straus);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/OUTCAR.bands"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/OUTCAR.bands"+XHOST.vext.at(iext),straus);
     }
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/OUTCAR"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/OUTCAR"+vext.at(iext),straus);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/OUTCAR"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/OUTCAR"+XHOST.vext.at(iext),straus);
     }  
-    if(!found) {cerr<<"ERROR: estructure::PLOT_BAND_SPINSPLI: OUTCAR[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
+    if(!found) {cerr << XPID << "ERROR: estructure::PLOT_BAND_SPINSPLI: OUTCAR[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
 
     //GET Fermi Level, Number of IONS
     //GET lattice vector and reciprocal lattice vectors
@@ -2997,35 +2989,35 @@ namespace estructure {
     xvector<double> b1(3); xvector<double> b2(3); xvector<double> b3(3);
     while(getline(straus, line)) {
       if(line.find(anchor_word_Efermi) !=string::npos) {
-	strline.clear();	
-	strline.str(line);
-	strline >> stmp >> stmp >> Efermi;
+        strline.clear();	
+        strline.str(line);
+        strline >> stmp >> stmp >> Efermi;
       }
       if(line.find(anchor_word_NIONS) !=string::npos) {
-	strline.clear();	
-	strline.str(line);
-	strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
+        strline.clear();	
+        strline.str(line);
+        strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
       }
       if(line.find(anchor_word_vc) !=string::npos) {
-	getline(straus, line); straus >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
-	getline(straus, line); straus >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
-	getline(straus, line); straus >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];	
+        getline(straus, line); straus >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
+        getline(straus, line); straus >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
+        getline(straus, line); straus >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];	
       }
     }
 
     //***********************************DEALING WITH BANDSDATA**************************************************************
     //READ EIGENVAL    
     found=FALSE;
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/EIGENVAL.bands"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/EIGENVAL.bands"+vext.at(iext),straus);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/EIGENVAL.bands"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/EIGENVAL.bands"+XHOST.vext.at(iext),straus);
     }
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/EIGENVAL"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/EIGENVAL"+vext.at(iext),straus);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/EIGENVAL"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/EIGENVAL"+XHOST.vext.at(iext),straus);
     }
-    if(!found) {cerr<<"ERROR: estructure::PLOT_BAND_SPINSPLI: EIGENVAL[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
-    
+    if(!found) {cerr << XPID << "ERROR: estructure::PLOT_BAND_SPINSPLI: EIGENVAL[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
+
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     straus >> stmp >> stmp >> stmp >> ISPIN;	
 
@@ -3047,31 +3039,31 @@ namespace estructure {
     //Obtain the bands data and store them into dataup and datadn, respectively
     if(ISPIN==1) {
       for(int ik=0; ik< NKPOINTS; ik++) {
-	getline(straus, stmp); //Negelecting empty line
-	straus >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
-	getline(straus, stmp); //Negelecting kpoint coordinate
-	int ib=-1;	
-	for(int i=0; i<Nbands; i++) {
-	  straus>>ftmp>>ftmp;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmp;
-	}
-	getline(straus,stmp);
+        getline(straus, stmp); //Negelecting empty line
+        straus >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
+        getline(straus, stmp); //Negelecting kpoint coordinate
+        int ib=-1;	
+        for(int i=0; i<Nbands; i++) {
+          straus>>ftmp>>ftmp;
+          ib=ib+1;
+          dataup[ik][ib]=ftmp;
+        }
+        getline(straus,stmp);
       }
     }
     else if(ISPIN==2) {
       for(int ik=0; ik< NKPOINTS; ik++) {
-	getline(straus, stmp); //Negelecting empty line
-	straus >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
-	getline(straus, stmp); //Negelecting kpoint coordinate
-	int ib=-1;	
-	for(int i=0; i<Nbands; i++) {
-	  straus>>ftmp>>ftmpup>>ftmpdn;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmpup;
-	  datadn[ik][ib]=ftmpdn;
-	}
-	getline(straus,stmp);
+        getline(straus, stmp); //Negelecting empty line
+        straus >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];	
+        getline(straus, stmp); //Negelecting kpoint coordinate
+        int ib=-1;	
+        for(int i=0; i<Nbands; i++) {
+          straus>>ftmp>>ftmpup>>ftmpdn;
+          ib=ib+1;
+          dataup[ik][ib]=ftmpup;
+          datadn[ik][ib]=ftmpdn;
+        }
+        getline(straus,stmp);
       }
     }
     else {
@@ -3081,15 +3073,15 @@ namespace estructure {
 
     //READ KPOINTS	
     found=FALSE;
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/KPOINTS.bands"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/KPOINTS.bands"+vext.at(iext),straus);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/KPOINTS.bands"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/KPOINTS.bands"+XHOST.vext.at(iext),straus);
     }
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/KPOINTS"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/KPOINTS"+vext.at(iext),straus);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/KPOINTS"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/KPOINTS"+XHOST.vext.at(iext),straus);
     }
-    if(!found) {cerr<<"ERROR: estructure::PLOT_BAND_SPINSPLI: KPOINTS[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
+    if(!found) {cerr << XPID << "ERROR: estructure::PLOT_BAND_SPINSPLI: KPOINTS[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
 
     straus >> LattName >> stmp; getline(straus, stmp);
     straus >> KPOINTSGRID >> stmp >> stmp >> stmp; getline(straus, stmp);
@@ -3103,37 +3095,36 @@ namespace estructure {
     int count=0, j=0; //count is the number of rows of kpoints
     while(getline(straus, line)) {
       if(aurostd::CountWordsinString(line)>=3) {
-	vector<double> kpt_tmp;
-	double a1, a2, a3;
-	string a5;
-	strline.clear();
-	strline.str(line);
-	strline >> a1 >> a2 >> a3 >> stmp >> a5;
-	kpt_tmp.push_back(a1);
-	kpt_tmp.push_back(a2);
-	kpt_tmp.push_back(a3);
-	kpoints.push_back(kpt_tmp);
-	kpointslabel.push_back(a5);
-	j++;
+        vector<double> kpt_tmp;
+        double a1, a2, a3;
+        string a5;
+        strline.clear();
+        strline.str(line);
+        strline >> a1 >> a2 >> a3 >> stmp >> a5;
+        kpt_tmp.push_back(a1);
+        kpt_tmp.push_back(a2);
+        kpt_tmp.push_back(a3);
+        kpoints.push_back(kpt_tmp);
+        kpointslabel.push_back(a5);
+        j++;
       }
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  // CO 170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]  if(kpointslabel[i].compare("Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma_1")==0) kpointslabel[i]="Sigm_1";
     //[OBSOLETE]  if(kpointslabel[i].compare("Sigma_1")==0) kpointslabel[i]="Sigm_1";
-    //[OBSOLETE]}
     //Combine the Labels of special kpoints	
     for (int i=1; i< (count-1); i=i+2) {
       if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO 170830 - if subscript, extra space looks ODD!
-        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel[i] = newlabel;
-	kpointslabel[i+1] = newlabel;
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel[i] = newlabel;
+        kpointslabel[i+1] = newlabel;
       }
     }
     //*******************************Redefine the symbols of special kpoints
@@ -3154,7 +3145,7 @@ namespace estructure {
 
     //Check number of kpoints
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
-      //    if(LDEBUG) cerr << "estructure::PLOT_BAND [36]" << endl;
+      //    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [36]" << endl;
       cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
       cout << "KPOINTSGRID=" << KPOINTSGRID << endl;
       cout << "NKPOINTS=" << NKPOINTS << endl;
@@ -3176,14 +3167,14 @@ namespace estructure {
       dk= (sqrt(dkx*dkx + dky*dky +dkz*dkz))/(KPOINTSGRID-1);
       klinecart[ind]=koffset; ind++;
       for (int ii=1; ii<KPOINTSGRID; ii++) {
-	klinecart[ind]= koffset + ii*dk;
-	ind++;
+        klinecart[ind]= koffset + ii*dk;
+        ind++;
       }
       koffset = koffset + dk*(KPOINTSGRID-1);
     }
 
     //*******************************Redefine the symbols of special kpoints
-    // CO 170830 - already done above ?? - not sure why we do twice...
+    //CO20170830 - already done above ?? - not sure why we do twice...
     //[OBSOLETE]for (int i=0; i< count; i++) {
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
@@ -3195,12 +3186,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints	
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO 170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO 170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO 170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -3214,7 +3205,7 @@ namespace estructure {
       SPKPOINTScart[i]=klinecart[(i/2)*(KPOINTSGRID)];
       SPKPOINTScart[i+1]=klinecart[(i/2+1)*(KPOINTSGRID)-1];
     }
-    //NO SHIFT - CO 170830
+    //NO SHIFT - CO20170830
     for (int i=0; i< count; i=i+2) {SPKPOINTScart_LABEL[i]=SPKPOINTScart[i];}
     SPKPOINTScart_LABEL[count-1]=SPKPOINTScart[count-1];
     //Shifting the cartesian coordinates of special KPOINTS;
@@ -3236,38 +3227,38 @@ namespace estructure {
     //Writing bands data into file
     if(ISPIN==1) {	
       for (int i=0; i<NKPOINTS; i++) {
-	bandsdata[i].resize(Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
 
       for (int ik=0;ik<NKPOINTS;ik++) {
-	for (int ib=0; ib<Nbands+1; ib++) {
-	  bandsfin << bandsdata[ik][ib] << "  " ;
-	}
-	bandsfin << endl;
+        for (int ib=0; ib<Nbands+1; ib++) {
+          bandsfin << bandsdata[ik][ib] << "  " ;
+        }
+        bandsfin << endl;
       }
       bandsfin.close();
     }
     //Spin-polarized
     if(ISPIN==2) {	
       for (int i=0; i<NKPOINTS; i++) {
-	bandsdata[i].resize(2*Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(2*Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][2*ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	  bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][2*ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+          bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
       for (int ik=0;ik<NKPOINTS;ik++) {
-	for (int ib=0; ib<2*Nbands+1; ib++) {
-	  bandsfin << bandsdata[ik][ib] << "  " ;
-	}
-	bandsfin << endl;
+        for (int ib=0; ib<2*Nbands+1; ib++) {
+          bandsfin << bandsdata[ik][ib] << "  " ;
+        }
+        bandsfin << endl;
       }
       bandsfin.close();
     }
@@ -3284,18 +3275,18 @@ namespace estructure {
       fin << "set output " << "\"" << ICSDName <<"_BANDS.eps" << "\"" << endl;
       fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ") " << "\""<< endl;
       fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-      //fin << "set border lw 5" << endl; // CO 170830 - thick border
-      fin << "unset border" << endl; // CO 170830 - looks better
-      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
-      //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
+      //fin << "set border lw 5" << endl; //CO20170830 - thick border
+      fin << "unset border" << endl; //CO20170830 - looks better
+      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
+      //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Curtarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
       fin << endl;
       fin << "set tmargin at screen 0.94" << endl;
       fin << "set bmargin at screen 0.08" << endl;
 
       fin << "unset key" << endl;
       fin << "unset xtics" << endl;
-      // CO 170830 - add tics at the right spot, but leave labels out - START
+      //CO20170830 - add tics at the right spot, but leave labels out - START
       fin << "set xtics (";
       for (int i=0; i< count; i=i+2) {
         fin << "\"" << kpointslabel[i] <<"\"";
@@ -3305,13 +3296,13 @@ namespace estructure {
       fin << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
       fin << "set format x \"\"" << endl;
       fin << "unset format y" << endl;
-      // CO 170830 - add tics at the right spot, but leave labels out - STOP
+      //CO20170830 - add tics at the right spot, but leave labels out - STOP
       fin << "set ytics" << endl;
       fin << "set xrange [* : *]" << endl;
       fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       fin << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
       fin << endl;
-      // CO 170831 - now we do with xtics - START
+      //CO20170831 - now we do with xtics - START
       //[OBSOLETE]for (int i=0; i< count; i=i+2) {
       //[OBSOLETE]if(kpointslabel[i].compare("G")==0) {
       //[OBSOLETE]fin << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -3327,18 +3318,18 @@ namespace estructure {
       //[OBSOLETE]}
       //[OBSOLETE]}
       //[OBSOLETE]fin << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-      // CO 170831 - now we do with xtics - STOP
-      // CO 170830 - manual grid not needed - START
+      //CO20170831 - now we do with xtics - STOP
+      //CO20170830 - manual grid not needed - START
       //for (int i=0; i< count; i=i+2) {
       //  fin << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
       //}
-      // CO 170830 - manual grid not needed - STOP
+      //CO20170830 - manual grid not needed - STOP
       fin << endl;
-      fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       fin << endl;
       fin << "plot[][] \\" << endl;
       for (unsigned int i=1; i<(bandsdata.at(0).size()-1); i++) {
-	fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
+        fin << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
       }
       fin << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size() << " w l lt -1 lw 3" << endl;
       fin.close();
@@ -3357,18 +3348,18 @@ namespace estructure {
       finup << "set output " << "\"" << ICSDName <<"_BANDS_UP.eps" << "\"" << endl;
       finup << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ") BANDS\\\\_UP" << "\""<< endl;
       finup << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-      //finup << "set border lw 5" << endl; // CO 170830 - thick border
-      finup << "unset border" << endl; // CO 170830 - looks better
-      finup << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-      finup << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
-      //finup << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
+      //finup << "set border lw 5" << endl; //CO20170830 - thick border
+      finup << "unset border" << endl; //CO20170830 - looks better
+      finup << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      finup << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
+      //finup << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Curtarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
       finup << endl;
       finup << "set tmargin at screen 0.94" << endl;
       finup << "set bmargin at screen 0.08" << endl;
 
       finup << "unset key" << endl;
       finup << "unset xtics" << endl;
-      // CO 170830 - add tics at the right spot, but leave labels out - START
+      //CO20170830 - add tics at the right spot, but leave labels out - START
       finup << "set xtics (";
       for (int i=0; i< count; i=i+2) {
         finup << "\"" << kpointslabel[i] <<"\"";
@@ -3378,13 +3369,13 @@ namespace estructure {
       finup << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
       finup << "set format x \"\"" << endl;
       finup << "unset format y" << endl;
-      // CO 170830 - add tics at the right spot, but leave labels out - STOP
+      //CO20170830 - add tics at the right spot, but leave labels out - STOP
       finup << "set ytics" << endl;
       finup << "set xrange [* : *]" << endl;
       finup << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       finup << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
       finup << endl;
-      // CO 170831 - now we do with xtics - START
+      //CO20170831 - now we do with xtics - START
       //[OBSOLETE]for (int i=0; i< count; i=i+2) {
       //[OBSOLETE]if(kpointslabel[i].compare("G")==0) {
       //[OBSOLETE]finup << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -3400,18 +3391,18 @@ namespace estructure {
       //[OBSOLETE]}
       //[OBSOLETE]}
       //[OBSOLETE]finup << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-      // CO 170831 - now we do with xtics - STOP
-      // CO 170830 - manual grid not needed - START
+      //CO20170831 - now we do with xtics - STOP
+      //CO20170830 - manual grid not needed - START
       //for (int i=0; i< count; i=i+2) {
       //  finup << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
       //}
-      // CO 170830 - manual grid not needed - STOP
+      //CO20170830 - manual grid not needed - STOP
       finup << endl;
-      finup << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+      finup << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       finup << endl;
       finup << "plot[][] \\" << endl;
       for (unsigned int i=1; i<(bandsdata.at(0).size()-2); i=i+2) {
-	finup << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
+        finup << "\"" << bandsdatafile << "\"" << " u 1:" << i+1 << " w l lt -1 lw 3, \\" << endl;
       }
       finup << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size()-1 << " w l lt -1 lw 3" << endl;
       finup.close();
@@ -3425,18 +3416,18 @@ namespace estructure {
       findn << "set output " << "\"" << ICSDName <<"_BANDS_DN.eps" << "\"" << endl;
       findn << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ") BANDS\\\\_DN" << "\""<< endl;
       findn << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-      //findn << "set border lw 5" << endl; // CO 170830 - thick border
-      findn << "unset border" << endl; // CO 170830 - looks better
-      findn << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO 170830 - gray background
-      findn << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO 170830 - white grid
-      //findn << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
+      //findn << "set border lw 5" << endl; //CO20170830 - thick border
+      findn << "unset border" << endl; //CO20170830 - looks better
+      findn << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      findn << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
+      //findn << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Curtarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
       findn << endl;
 
       findn << "set tmargin at screen 0.94" << endl;
       findn << "set bmargin at screen 0.08" << endl;
       findn << "unset key" << endl;
       findn << "unset xtics" << endl;
-      // CO 170830 - add tics at the right spot, but leave labels out - START
+      //CO20170830 - add tics at the right spot, but leave labels out - START
       findn << "set xtics (";
       for (int i=0; i< count; i=i+2) {
         findn << "\"" << kpointslabel[i] <<"\"";
@@ -3446,13 +3437,13 @@ namespace estructure {
       findn << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
       findn << "set format x \"\"" << endl;
       findn << "unset format y" << endl;
-      // CO 170830 - add tics at the right spot, but leave labels out - STOP
+      //CO20170830 - add tics at the right spot, but leave labels out - STOP
       findn << "set ytics" << endl;
       findn << "set xrange [* : *]" << endl;
       findn << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       findn << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
       findn << endl;
-      // CO 170831 - now we do with xtics - START
+      //CO20170831 - now we do with xtics - START
       //[OBSOLETE]for (int i=0; i< count; i=i+2) {
       //[OBSOLETE]if(kpointslabel[i].compare("G")==0) {
       //[OBSOLETE]findn << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -3465,24 +3456,24 @@ namespace estructure {
       //[OBSOLETE]}
       //[OBSOLETE]}
       //[OBSOLETE]findn << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-      // CO 170831 - now we do with xtics - STOP
-      // CO 170830 - manual grid not needed - START
+      //CO20170831 - now we do with xtics - STOP
+      //CO20170830 - manual grid not needed - START
       //for (int i=0; i< count; i=i+2) {
       //  findn << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
       //}
-      // CO 170830 - manual grid not needed - STOP
+      //CO20170830 - manual grid not needed - STOP
       findn << endl;
-      findn << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO 170830 - originally lt 3 lw 1.5
+      findn << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       findn << endl;
       findn << "plot[][] \\" << endl;
       if(ISPIN==2) {
-	for (unsigned int i=1; i<(bandsdata.at(0).size()-2); i=i+2) {
-	  findn << "\"" << bandsdatafile << "\"" << " u 1:" << i+2 << " w l lt -1 lw 3, \\" << endl;
-	}
-	findn << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size() << " w l lt -1 lw 3" << endl;
+        for (unsigned int i=1; i<(bandsdata.at(0).size()-2); i=i+2) {
+          findn << "\"" << bandsdatafile << "\"" << " u 1:" << i+2 << " w l lt -1 lw 3, \\" << endl;
+        }
+        findn << "\"" << bandsdatafile << "\"" << " u 1:" << bandsdata.at(0).size() << " w l lt -1 lw 3" << endl;
       }
       findn.close();
-      
+
       //Call gnuplot to plot the bands structure	
       aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscriptup);
       aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscriptdn);
@@ -3491,30 +3482,30 @@ namespace estructure {
 
       //Postprocess
       if(!XHOST.vflag_control.flag("KEEP::GPL")) { 
-	aurostd::RemoveFile(bandsdatafile);
-	aurostd::RemoveFile(gnuplotscriptup); //Delete the gnuplot script
-	aurostd::RemoveFile(gnuplotscriptdn); //Delete the gnuplot script
+        aurostd::RemoveFile(bandsdatafile);
+        aurostd::RemoveFile(gnuplotscriptup); //Delete the gnuplot script
+        aurostd::RemoveFile(gnuplotscriptdn); //Delete the gnuplot script
       }
     }
 
-    // KESONG in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
+    //KY in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
     if(aurostd::FileExist("bz_.eps")) aurostd::file2file("bz_.eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_.png")) aurostd::file2file("bz_.png",ICSDName+"_BZ.png");
     if(aurostd::FileExist("bz_"+ICSDName+".eps")) aurostd::file2file("bz_"+ICSDName+".eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_"+ICSDName+".png")) aurostd::file2file("bz_"+ICSDName+".png",ICSDName+"_BZ.png");
     //if(aurostd::FileExist(ICSDName+"_BZ.eps")) aurostd::execute(DEFAULT_KZIP_BIN+" -9f \"" + ICSDName + "_BZ.eps\"");
-    
+
     if(!XHOST.vflag_control.flag("KEEP::EPS")) { 
       if(aurostd::FileExist(ICSDName+"_BZ.eps")) 
-	aurostd::RemoveFile(ICSDName + "_BZ.eps");
+        aurostd::RemoveFile(ICSDName + "_BZ.eps");
       if(ISPIN==1) 
-	aurostd::RemoveFile(ICSDName + ".eps");
+        aurostd::RemoveFile(ICSDName + ".eps");
       if(ISPIN==2) {
-	aurostd::RemoveFile(ICSDName + "_BANDS_UP.eps");
-	aurostd::RemoveFile(ICSDName + "_BANDS_DN.eps");
+        aurostd::RemoveFile(ICSDName + "_BANDS_UP.eps");
+        aurostd::RemoveFile(ICSDName + "_BANDS_DN.eps");
       }
     }
-    
+
     // [OBSOLETE] if(aurostd::FileExist(kpointsfile_tmp)) aurostd::RemoveFile(kpointsfile_tmp);
     // [OBSOLETE] if(aurostd::FileExist(eigenvalfile_tmp)) aurostd::RemoveFile(eigenvalfile_tmp);
     // [OBSOLETE] if(aurostd::FileExist(outcarfile_tmp)) aurostd::RemoveFile(outcarfile_tmp);
@@ -3530,11 +3521,11 @@ namespace estructure {
     for (uint i=0; i<ICSDName.size(); i++) {
       char ch = ICSDName.at(i);
       if( ch != '_') {
-	ICSDNameNew.push_back(ch);
+        ICSDNameNew.push_back(ch);
       } else {
-	ICSDNameNew.push_back('\\');
-	ICSDNameNew.push_back('\\');
-	ICSDNameNew.push_back(ch);
+        ICSDNameNew.push_back('\\');
+        ICSDNameNew.push_back('\\');
+        ICSDNameNew.push_back(ch);
       }
     }
     return ICSDNameNew;
@@ -3553,16 +3544,16 @@ namespace estructure {
     for (uint i=0; i<TOTALPDOS.size();i++) {
       vector<double> vtmp;
       for (int j=0; j<Ncolumns; j++) {
-	vtmp.push_back(TOTALPDOS.at(i).at(j));
+        vtmp.push_back(TOTALPDOS.at(i).at(j));
       }
       if((Ncolumns == 4) || (Ncolumns ==5)) vtmp.push_back(TDOS[i][1]);
       else if((Ncolumns == 7) || (Ncolumns ==9)) {
-	vtmp.push_back(TDOS[i][1]);
-	vtmp.push_back(TDOS[i][2]);
+        vtmp.push_back(TDOS[i][1]);
+        vtmp.push_back(TDOS[i][2]);
       }
       else {
-	cout << "ERROR..., PLS. CHECK TOTALPDOS! Aborting!" << endl;
-	exit(0);
+        cout << "ERROR..., PLS. CHECK TOTALPDOS! Aborting!" << endl;
+        exit(0);
       }
       vvDOS.push_back(vtmp);
     }
@@ -3577,7 +3568,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3594,7 +3585,7 @@ namespace estructure {
     double  Efermi;
     vector<vector<double> > TDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3611,7 +3602,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3628,7 +3619,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3645,7 +3636,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3662,7 +3653,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO 180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3703,19 +3694,19 @@ namespace estructure {
     bool isLSCOUPLING = false;
     double Emax=0.0, Emin=0.0;
     Efermi=0;
-    // CO 180216 - reset EVERYTHING, so if we return false, there's no garbage inside
+    //CO20180216 - reset EVERYTHING, so if we return false, there's no garbage inside
     for(uint i=0;i<TDOS.size();i++){TDOS[i].clear();} TDOS.clear();
     for(uint i=0;i<TOTALPDOS.size();i++){TOTALPDOS[i].clear();} TOTALPDOS.clear();
     for(uint i=0;i<PDOS.size();i++){for(uint j=0;j<PDOS[i].size();j++){PDOS[i][j].clear();} PDOS[i].clear();} PDOS.clear();
-    
+
     // ***************************************************************************
     //READ OUTCAR, get the number of IONS, Fermi Level  
     string anchor_word_NIONS = "NIONS";
     string anchor_word_LSORBIT="LSORBIT =      T";
     while(getline(ss_outfile, line)) {
       if(line.find(anchor_word_NIONS) !=string::npos) {
-	ss_line.clear(); ss_line.str(line);
-	ss_line >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> NIONS;
+        ss_line.clear(); ss_line.str(line);
+        ss_line >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> strtmp >> NIONS;
       }
       if(line.find(anchor_word_LSORBIT) !=string::npos) isLSCOUPLING = true;
     }
@@ -3726,16 +3717,16 @@ namespace estructure {
 
     int TotNoDOSCAR = aurostd::GetNLinesString(ss_dosfile);
     //int TotNoDOSCAR = CountofLinesinStringstream(ss_dosfile);
-    // CO 180217 - I added the (-6) because header is 6 lines
+    //CO20180217 - I added the (-6) because header is 6 lines
     //usually, DOSGRID is 301, and TotNoDOSCAR is 307, so 307-6 == 301 ! conservation of lines
     //therefore TotNoDOSCAR-6 should never be less than DOSGRID, but at least equal
-    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; /*exit(1)*/return false;}  // CO 180216
+    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; /*exit(1)*/return false;  //CO20180216
     bool FLAG_PDOS = false;
     if(NIONS==0) NIONS = (int (TotNoDOSCAR-5)/(DOSGRID+1))-1; //if OUTCAR does not exist
-    // CO 180217
+    //CO20180217
     //DOSGRID 301, and TotNoDOSCAR is 301*2+6+1=609, the +1 is for the next DOSGRID line
     //because of +1 line, TotNoDOSCAR-6 must be greater, never equal
-    if(TotNoDOSCAR-6 > 2*DOSGRID) FLAG_PDOS = true; // CO 180217
+    if(TotNoDOSCAR-6 > 2*DOSGRID) FLAG_PDOS = true; //CO20180217
 
     //----------------------GETTING TDOS DATA-----------------------
     TDOS.resize(DOSGRID);
@@ -3744,7 +3735,7 @@ namespace estructure {
     //Dealing with spin-polarized calculations
     if(aurostd::CountWordsinString(line)==5) {
       for (int i=0; i<DOSGRID; i++) {
-	TDOS[i].resize(5);
+        TDOS[i].resize(5);
       }
       ss_line.clear();
       ss_line.str(line);
@@ -3752,10 +3743,10 @@ namespace estructure {
       ss_line >> TDOS[0][1] >> TDOS[0][2]; TDOS[0][2] *= (-1); //Spin_up & Spin_dn
       ss_line >> TDOS[0][3] >> TDOS[0][4]; TDOS[0][4] *= (-1); //Sum_up & Sum_dn
       for (int j=1; j<DOSGRID; j++) {
-	ss_dosfile >> TDOS[j][0]; //Energy
-	ss_dosfile >> TDOS[j][1] >> TDOS[j][2];  TDOS[j][2] *= (-1); //Spin_up & Spin_dn
-	ss_dosfile >> TDOS[j][3] >> TDOS[j][4];  TDOS[j][4] *= (-1); //Sum_up & Sum_dn
-	getline(ss_dosfile, strtmp);
+        ss_dosfile >> TDOS[j][0]; //Energy
+        ss_dosfile >> TDOS[j][1] >> TDOS[j][2];  TDOS[j][2] *= (-1); //Spin_up & Spin_dn
+        ss_dosfile >> TDOS[j][3] >> TDOS[j][4];  TDOS[j][4] *= (-1); //Sum_up & Sum_dn
+        getline(ss_dosfile, strtmp);
       }	
     }
 
@@ -3764,7 +3755,7 @@ namespace estructure {
     //Dealing with non-spin-polarized calculations
     if(aurostd::CountWordsinString(line)==3) {
       for (int i=0; i<DOSGRID; i++) {
-	TDOS[i].resize(3);
+        TDOS[i].resize(3);
       }
       ss_line.clear();
       ss_line.str(line);
@@ -3772,10 +3763,10 @@ namespace estructure {
       ss_line >> TDOS[0][1]; //DOS
       ss_line >> TDOS[0][2]; //Sum
       for (int j=1; j<DOSGRID; j++) {
-	ss_dosfile >> TDOS[j][0];
-	ss_dosfile >> TDOS[j][1];
-	ss_dosfile >> TDOS[j][2];
-	getline(ss_dosfile, strtmp);
+        ss_dosfile >> TDOS[j][0];
+        ss_dosfile >> TDOS[j][1];
+        ss_dosfile >> TDOS[j][2];
+        getline(ss_dosfile, strtmp);
       }	
     }
     //-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3789,7 +3780,7 @@ namespace estructure {
     //************************************************************************************************************************
     //----------------------GETTING PDOS DATA-------------------------
     //vector<vector<vector<double> > > PDOS(NIONS);
-    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; /*exit(1)*/return false;} // CO 180216 //we may not have PDOS in static anymore, see AGL
+    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; /*exit(1)*/return false;} //CO20180216 //we may not have PDOS in static anymore, see AGL
     if(FLAG_PDOS) {
       PDOS.resize(NIONS);
       getline(ss_dosfile, line); //Negelecting the title line after the TDOS
@@ -3799,388 +3790,388 @@ namespace estructure {
 
       //--------------------s, p , d-----------------------
       if(Ncolumns==4) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(4);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	//            ss_line >> PDOS[0][0][0] >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3];
-	ss_line >> PDOS[0][0][0]; //Energy
-	ss_line >> PDOS[0][0][1]; //s
-	ss_line >> PDOS[0][0][2]; //p
-	ss_line >> PDOS[0][0][3]; //d
-	for (int j=1; j<DOSGRID; j++) {
-	  //                ss_dosfile >> PDOS[0][j][0] >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3];
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1];
-	  ss_dosfile >> PDOS[0][j][2];
-	  ss_dosfile >> PDOS[0][j][3];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(4);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        //            ss_line >> PDOS[0][0][0] >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3];
+        ss_line >> PDOS[0][0][0]; //Energy
+        ss_line >> PDOS[0][0][1]; //s
+        ss_line >> PDOS[0][0][2]; //p
+        ss_line >> PDOS[0][0][3]; //d
+        for (int j=1; j<DOSGRID; j++) {
+          //                ss_dosfile >> PDOS[0][j][0] >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3];
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1];
+          ss_dosfile >> PDOS[0][j][2];
+          ss_dosfile >> PDOS[0][j][3];
+          getline(ss_dosfile, strtmp);
+        }
 
-	//Storing the DOSDATA of the left atoms	
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1];
-	    ss_dosfile >> PDOS[i][j][2];
-	    ss_dosfile >> PDOS[i][j][3];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        //Storing the DOSDATA of the left atoms	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1];
+            ss_dosfile >> PDOS[i][j][2];
+            ss_dosfile >> PDOS[i][j][3];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------s, p , d-----------------------
 
       //--------------------s, p , d, f-----------------------
       if(Ncolumns==5) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(5);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0];
-	ss_line >> PDOS[0][0][1];
-	ss_line >> PDOS[0][0][2];
-	ss_line >> PDOS[0][0][3];
-	ss_line >> PDOS[0][0][4];
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1];
-	  ss_dosfile >> PDOS[0][j][2];
-	  ss_dosfile >> PDOS[0][j][3];
-	  ss_dosfile >> PDOS[0][j][4];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(5);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0];
+        ss_line >> PDOS[0][0][1];
+        ss_line >> PDOS[0][0][2];
+        ss_line >> PDOS[0][0][3];
+        ss_line >> PDOS[0][0][4];
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1];
+          ss_dosfile >> PDOS[0][j][2];
+          ss_dosfile >> PDOS[0][j][3];
+          ss_dosfile >> PDOS[0][j][4];
+          getline(ss_dosfile, strtmp);
+        }
 
-	//Storing the DOSDATA of the left atoms	
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1];
-	    ss_dosfile >> PDOS[i][j][2];
-	    ss_dosfile >> PDOS[i][j][3];
-	    ss_dosfile >> PDOS[i][j][4];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        //Storing the DOSDATA of the left atoms	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1];
+            ss_dosfile >> PDOS[i][j][2];
+            ss_dosfile >> PDOS[i][j][3];
+            ss_dosfile >> PDOS[i][j][4];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------s, p , d, f-----------------------
       //--------------------s, p , d (spin-polarized)-----
       if(Ncolumns==7) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(7);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	//            ss_line >> PDOS[0][0][0] >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4] >> PDOS[0][0][5] >> PDOS[0][0][6];
-	ss_line >> PDOS[0][0][0];  //Energy
-	ss_line >> PDOS[0][0][1] >> PDOS[0][0][2];  //s
-	ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2]; //s
-	  ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4]; //p
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6]; //d
-	  getline(ss_dosfile, strtmp);
-	}
-	//Storing the DOSDATA of the left atoms	
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2]; //s
-	    ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4]; //p
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6]; //d
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(7);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        //            ss_line >> PDOS[0][0][0] >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4] >> PDOS[0][0][5] >> PDOS[0][0][6];
+        ss_line >> PDOS[0][0][0];  //Energy
+        ss_line >> PDOS[0][0][1] >> PDOS[0][0][2];  //s
+        ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2]; //s
+          ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4]; //p
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6]; //d
+          getline(ss_dosfile, strtmp);
+        }
+        //Storing the DOSDATA of the left atoms	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2]; //s
+            ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4]; //p
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6]; //d
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
 
       //--------------------s, p , d , f(spin-polarized)-----
       if(Ncolumns==9) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(9);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0];
-	ss_line >> PDOS[0][0][1] >> PDOS[0][0][2]; //s
-	ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
-	ss_line >> PDOS[0][0][7] >> PDOS[0][0][8]; //f
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
-	  ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
-	  ss_dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(9);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0];
+        ss_line >> PDOS[0][0][1] >> PDOS[0][0][2]; //s
+        ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //p
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //d
+        ss_line >> PDOS[0][0][7] >> PDOS[0][0][8]; //f
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
+          ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
+          ss_dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
+          getline(ss_dosfile, strtmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  //cout << line << "hi" << endl;
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
-	    ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
-	    ss_dosfile >>PDOS[i][j][7] >> PDOS[i][j][8];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          //cout << line << "hi" << endl;
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
+            ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
+            ss_dosfile >>PDOS[i][j][7] >> PDOS[i][j][8];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------s, p , d (spin-polarized)-----
 
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
       if(Ncolumns==10) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(10);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0]; //Energy
-	ss_line >> PDOS[0][0][1]; //s
-	ss_line >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //py, pz, px
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9]; //dxy, dyz, dz2, dxz, dx2-y2
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1];
-	  ss_dosfile >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(10);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0]; //Energy
+        ss_line >> PDOS[0][0][1]; //s
+        ss_line >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //py, pz, px
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9]; //dxy, dyz, dz2, dxz, dx2-y2
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1];
+          ss_dosfile >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][0][7] >> PDOS[0][0][8] >> PDOS[0][0][9];
+          getline(ss_dosfile, strtmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1];
-	    ss_dosfile >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8] >> PDOS[i][j][9];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1];
+            ss_dosfile >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8] >> PDOS[i][j][9];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
       if(Ncolumns==13) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(13);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0]; //Energy
-	ss_line >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //stotal, sx, sy, sz
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //ptotal, px, py, pz
-	ss_line >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //dtotal, dx, dy, dz
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  ss_dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(13);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0]; //Energy
+        ss_line >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //stotal, sx, sy, sz
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //ptotal, px, py, pz
+        ss_line >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //dtotal, dx, dy, dz
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
+          ss_dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
+          getline(ss_dosfile, strtmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0]; //Energy
-	    ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0]; //Energy
+            ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
+            ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal, fx, fy, fz (LS COUPLINT)------------
       if(Ncolumns==17) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(17);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0]; //Energy
-	ss_line >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //s
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //p
-	ss_line >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //d
-	ss_line >> PDOS[0][0][13] >> PDOS[0][0][14] >> PDOS[0][0][15] >> PDOS[0][0][16]; //f
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  ss_dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
-	  ss_dosfile >> PDOS[0][j][13] >> PDOS[0][j][14] >>PDOS[0][j][15] >> PDOS[0][j][16];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(17);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0]; //Energy
+        ss_line >> PDOS[0][0][1] >> PDOS[0][0][2] >> PDOS[0][0][3] >> PDOS[0][0][4]; //s
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6] >> PDOS[0][0][7] >> PDOS[0][0][8]; //p
+        ss_line >> PDOS[0][0][9] >> PDOS[0][0][10] >> PDOS[0][0][11] >> PDOS[0][0][12]; //d
+        ss_line >> PDOS[0][0][13] >> PDOS[0][0][14] >> PDOS[0][0][15] >> PDOS[0][0][16]; //f
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2] >> PDOS[0][j][3] >> PDOS[0][j][4];
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6] >> PDOS[0][j][7] >> PDOS[0][j][8];
+          ss_dosfile >> PDOS[0][j][9] >> PDOS[0][j][10] >> PDOS[0][j][11] >> PDOS[0][j][12];
+          ss_dosfile >> PDOS[0][j][13] >> PDOS[0][j][14] >>PDOS[0][j][15] >> PDOS[0][j][16];
+          getline(ss_dosfile, strtmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    ss_dosfile >> PDOS[i][j][13] >> PDOS[i][j][14] >> PDOS[i][j][15] >> PDOS[i][j][16];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2] >> PDOS[i][j][3] >> PDOS[i][j][4];
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6] >> PDOS[i][j][7] >> PDOS[i][j][8];
+            ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10] >> PDOS[i][j][11] >> PDOS[i][j][12];
+            ss_dosfile >> PDOS[i][j][13] >> PDOS[i][j][14] >> PDOS[i][j][15] >> PDOS[i][j][16];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal, fx, fy, fz (LS COUPLINT)------------
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
       if(Ncolumns==19) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(19);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	//
-	//KESONG UNFISNISHED
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0]; //Energy
-	ss_line >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
-	ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
-	ss_line >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
-	ss_line >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
-	ss_line >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
-	ss_line >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
-	ss_line >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
-	ss_line >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
-	  ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
-	  ss_dosfile >> PDOS[0][0][7] >> PDOS[0][0][8];
-	  ss_dosfile >> PDOS[0][0][9] >> PDOS[0][0][10];
-	  ss_dosfile >> PDOS[0][0][11] >> PDOS[0][0][12];
-	  ss_dosfile >> PDOS[0][0][13] >> PDOS[0][0][14];
-	  ss_dosfile >> PDOS[0][0][15] >> PDOS[0][0][16];
-	  ss_dosfile >> PDOS[0][0][17] >> PDOS[0][0][18];
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(19);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        //
+        //KY UNFISNISHED
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0]; //Energy
+        ss_line >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
+        ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
+        ss_line >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
+        ss_line >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
+        ss_line >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
+        ss_line >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
+        ss_line >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
+        ss_line >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
+          ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
+          ss_dosfile >> PDOS[0][0][7] >> PDOS[0][0][8];
+          ss_dosfile >> PDOS[0][0][9] >> PDOS[0][0][10];
+          ss_dosfile >> PDOS[0][0][11] >> PDOS[0][0][12];
+          ss_dosfile >> PDOS[0][0][13] >> PDOS[0][0][14];
+          ss_dosfile >> PDOS[0][0][15] >> PDOS[0][0][16];
+          ss_dosfile >> PDOS[0][0][17] >> PDOS[0][0][18];
+          getline(ss_dosfile, strtmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
-	    ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
-	    ss_dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
-	    ss_dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    ss_dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
-	    ss_dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
-	    ss_dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
-	    getline(ss_dosfile, strtmp);
-	  }
-	}	
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
+            ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
+            ss_dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
+            ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
+            ss_dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
+            ss_dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
+            ss_dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
+            ss_dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
+            getline(ss_dosfile, strtmp);
+          }
+        }	
       }
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn, f1, f2, f3, f4, f5, f6, f7 (spin-polarized)-----
       if(Ncolumns==33) {
-	for (int i=0; i<NIONS; i++) {
-	  PDOS[i].resize(DOSGRID);
-	  for (int j=0; j<DOSGRID; j++)
-	    PDOS[i][j].resize(33);
-	}
-	//Storing the DOSDATA of the 1st atom	
-	//
-	//KESONG UNFISNISHED
-	ss_line.clear();
-	ss_line.str(line);
-	ss_line >> PDOS[0][0][0]; //Energy
-	ss_line >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
-	ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
-	ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
-	ss_line >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
-	ss_line >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
-	ss_line >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
-	ss_line >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
-	ss_line >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
-	ss_line >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
-	ss_line >> PDOS[0][0][19] >> PDOS[0][0][20]; //f1_up & f1_dn
-	ss_line >> PDOS[0][0][21] >> PDOS[0][0][22]; //f2_up & f2_dn
-	ss_line >> PDOS[0][0][23] >> PDOS[0][0][24]; //f3_up & f3_dn
-	ss_line >> PDOS[0][0][25] >> PDOS[0][0][26]; //f4_up & f4_dn
-	ss_line >> PDOS[0][0][27] >> PDOS[0][0][28]; //f5_up & f5_dn
-	ss_line >> PDOS[0][0][29] >> PDOS[0][0][30]; //f6_up & f6_dn
-	ss_line >> PDOS[0][0][31] >> PDOS[0][0][32]; //f7_up & f7_dn
-	for (int j=1; j<DOSGRID; j++) {
-	  ss_dosfile >> PDOS[0][j][0];
-	  ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
-	  ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
-	  ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
-	  ss_dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
-	  ss_dosfile >> PDOS[0][j][9] >> PDOS[0][j][10];
-	  ss_dosfile >> PDOS[0][j][11] >> PDOS[0][j][12];
-	  ss_dosfile >> PDOS[0][j][13] >> PDOS[0][j][14];
-	  ss_dosfile >> PDOS[0][j][15] >> PDOS[0][j][16];
-	  ss_dosfile >> PDOS[0][j][17] >> PDOS[0][j][18];
-	  ss_dosfile >> PDOS[0][j][19] >> PDOS[0][j][20]; //f1_up & f1_dn
-	  ss_dosfile >> PDOS[0][j][21] >> PDOS[0][j][22]; //f2_up & f2_dn
-	  ss_dosfile >> PDOS[0][j][23] >> PDOS[0][j][24]; //f3_up & f3_dn
-	  ss_dosfile >> PDOS[0][j][25] >> PDOS[0][j][26]; //f4_up & f4_dn
-	  ss_dosfile >> PDOS[0][j][27] >> PDOS[0][j][28]; //f5_up & f5_dn
-	  ss_dosfile >> PDOS[0][j][29] >> PDOS[0][j][30]; //f6_up & f6_dn
-	  ss_dosfile >> PDOS[0][j][31] >> PDOS[0][j][32]; //f7_up & f7_dn
-	  getline(ss_dosfile, strtmp);
-	}
+        for (int i=0; i<NIONS; i++) {
+          PDOS[i].resize(DOSGRID);
+          for (int j=0; j<DOSGRID; j++)
+            PDOS[i][j].resize(33);
+        }
+        //Storing the DOSDATA of the 1st atom	
+        //
+        //KY UNFISNISHED
+        ss_line.clear();
+        ss_line.str(line);
+        ss_line >> PDOS[0][0][0]; //Energy
+        ss_line >> PDOS[0][0][1] >> PDOS[0][0][2]; //s_up & s_dn
+        ss_line >> PDOS[0][0][3] >> PDOS[0][0][4]; //py_up & py_dn
+        ss_line >> PDOS[0][0][5] >> PDOS[0][0][6]; //pz_up & pz_dn
+        ss_line >> PDOS[0][0][7] >> PDOS[0][0][8]; //px_up & px_dn
+        ss_line >> PDOS[0][0][9] >> PDOS[0][0][10]; //dxy_up & dxy_dn
+        ss_line >> PDOS[0][0][11] >> PDOS[0][0][12]; //dyz_up & dyz_dn
+        ss_line >> PDOS[0][0][13] >> PDOS[0][0][14]; //dz2_up & dz2_dn
+        ss_line >> PDOS[0][0][15] >> PDOS[0][0][16]; //dxz_up & dxz_dn
+        ss_line >> PDOS[0][0][17] >> PDOS[0][0][18]; //dx2-y2_up & dx2-y2_dn
+        ss_line >> PDOS[0][0][19] >> PDOS[0][0][20]; //f1_up & f1_dn
+        ss_line >> PDOS[0][0][21] >> PDOS[0][0][22]; //f2_up & f2_dn
+        ss_line >> PDOS[0][0][23] >> PDOS[0][0][24]; //f3_up & f3_dn
+        ss_line >> PDOS[0][0][25] >> PDOS[0][0][26]; //f4_up & f4_dn
+        ss_line >> PDOS[0][0][27] >> PDOS[0][0][28]; //f5_up & f5_dn
+        ss_line >> PDOS[0][0][29] >> PDOS[0][0][30]; //f6_up & f6_dn
+        ss_line >> PDOS[0][0][31] >> PDOS[0][0][32]; //f7_up & f7_dn
+        for (int j=1; j<DOSGRID; j++) {
+          ss_dosfile >> PDOS[0][j][0];
+          ss_dosfile >> PDOS[0][j][1] >> PDOS[0][j][2];
+          ss_dosfile >> PDOS[0][j][3] >> PDOS[0][j][4];
+          ss_dosfile >> PDOS[0][j][5] >> PDOS[0][j][6];
+          ss_dosfile >> PDOS[0][j][7] >> PDOS[0][j][8];
+          ss_dosfile >> PDOS[0][j][9] >> PDOS[0][j][10];
+          ss_dosfile >> PDOS[0][j][11] >> PDOS[0][j][12];
+          ss_dosfile >> PDOS[0][j][13] >> PDOS[0][j][14];
+          ss_dosfile >> PDOS[0][j][15] >> PDOS[0][j][16];
+          ss_dosfile >> PDOS[0][j][17] >> PDOS[0][j][18];
+          ss_dosfile >> PDOS[0][j][19] >> PDOS[0][j][20]; //f1_up & f1_dn
+          ss_dosfile >> PDOS[0][j][21] >> PDOS[0][j][22]; //f2_up & f2_dn
+          ss_dosfile >> PDOS[0][j][23] >> PDOS[0][j][24]; //f3_up & f3_dn
+          ss_dosfile >> PDOS[0][j][25] >> PDOS[0][j][26]; //f4_up & f4_dn
+          ss_dosfile >> PDOS[0][j][27] >> PDOS[0][j][28]; //f5_up & f5_dn
+          ss_dosfile >> PDOS[0][j][29] >> PDOS[0][j][30]; //f6_up & f6_dn
+          ss_dosfile >> PDOS[0][j][31] >> PDOS[0][j][32]; //f7_up & f7_dn
+          getline(ss_dosfile, strtmp);
+        }
 
-	for (int i=1; i<NIONS; i++) {
-	  getline(ss_dosfile, line);
-	  for (int j=0; j<DOSGRID; j++) {
-	    ss_dosfile >> PDOS[i][j][0];
-	    ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
-	    ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
-	    ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
-	    ss_dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
-	    ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
-	    ss_dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
-	    ss_dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
-	    ss_dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
-	    ss_dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
-	    ss_dosfile >> PDOS[i][j][19] >> PDOS[i][j][20]; //f1_up & f1_dn
-	    ss_dosfile >> PDOS[i][j][21] >> PDOS[i][j][22]; //f2_up & f2_dn
-	    ss_dosfile >> PDOS[i][j][23] >> PDOS[i][j][24]; //f3_up & f3_dn
-	    ss_dosfile >> PDOS[i][j][25] >> PDOS[i][j][26]; //f4_up & f4_dn
-	    ss_dosfile >> PDOS[i][j][27] >> PDOS[i][j][28]; //f5_up & f5_dn
-	    ss_dosfile >> PDOS[i][j][29] >> PDOS[i][j][30]; //f6_up & f6_dn
-	    ss_dosfile >> PDOS[i][j][31] >> PDOS[i][j][32]; //f7_up & f7_dn
-	    getline(ss_dosfile, strtmp);
-	  }
-	}
+        for (int i=1; i<NIONS; i++) {
+          getline(ss_dosfile, line);
+          for (int j=0; j<DOSGRID; j++) {
+            ss_dosfile >> PDOS[i][j][0];
+            ss_dosfile >> PDOS[i][j][1] >> PDOS[i][j][2];
+            ss_dosfile >> PDOS[i][j][3] >> PDOS[i][j][4];
+            ss_dosfile >> PDOS[i][j][5] >> PDOS[i][j][6];
+            ss_dosfile >> PDOS[i][j][7] >> PDOS[i][j][8];
+            ss_dosfile >> PDOS[i][j][9] >> PDOS[i][j][10];
+            ss_dosfile >> PDOS[i][j][11] >> PDOS[i][j][12];
+            ss_dosfile >> PDOS[i][j][13] >> PDOS[i][j][14];
+            ss_dosfile >> PDOS[i][j][15] >> PDOS[i][j][16];
+            ss_dosfile >> PDOS[i][j][17] >> PDOS[i][j][18];
+            ss_dosfile >> PDOS[i][j][19] >> PDOS[i][j][20]; //f1_up & f1_dn
+            ss_dosfile >> PDOS[i][j][21] >> PDOS[i][j][22]; //f2_up & f2_dn
+            ss_dosfile >> PDOS[i][j][23] >> PDOS[i][j][24]; //f3_up & f3_dn
+            ss_dosfile >> PDOS[i][j][25] >> PDOS[i][j][26]; //f4_up & f4_dn
+            ss_dosfile >> PDOS[i][j][27] >> PDOS[i][j][28]; //f5_up & f5_dn
+            ss_dosfile >> PDOS[i][j][29] >> PDOS[i][j][30]; //f6_up & f6_dn
+            ss_dosfile >> PDOS[i][j][31] >> PDOS[i][j][32]; //f7_up & f7_dn
+            getline(ss_dosfile, strtmp);
+          }
+        }
       }
       //************************************************************************************************************************
 
@@ -4189,224 +4180,224 @@ namespace estructure {
       TOTALPDOS.resize(DOSGRID);
       //--------------------s, p , d-----------------------
       if(Ncolumns==4) {
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(4);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
-	  }
-	}
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(4);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
+          }
+        }
       }
       //--------------------s, p , d-----------------------
 
       //--------------------s, p , d, f-----------------------
       if(Ncolumns==5) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(5);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
-	    TOTALPDOS[i][4]+=PDOS[j][i][4]; //sum of f orbitals
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(5);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][2]; //sum of p orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of d orbitals
+            TOTALPDOS[i][4]+=PDOS[j][i][4]; //sum of f orbitals
+          }
+        }
       }
       //--------------------s, p , d, f-----------------------
 
       //--------------------s, p , d (spin-polarized)-----
       if(Ncolumns==7) {
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(7);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  TOTALPDOS[i][4]=0.0;
-	  TOTALPDOS[i][5]=0.0;
-	  TOTALPDOS[i][6]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
-	    TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
-	    TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
-	    TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
-	  }    
-	}    
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(7);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          TOTALPDOS[i][4]=0.0;
+          TOTALPDOS[i][5]=0.0;
+          TOTALPDOS[i][6]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
+            TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
+            TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
+            TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
+          }    
+        }    
       }
 
       //--------------------s, p , d (spin-polarized)-----
 
       //--------------------s, p , d, f(spin-polarized)-----
       if(Ncolumns==9) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(9);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  TOTALPDOS[i][4]=0.0;
-	  TOTALPDOS[i][5]=0.0;
-	  TOTALPDOS[i][6]=0.0;
-	  TOTALPDOS[i][7]=0.0;
-	  TOTALPDOS[i][8]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
-	    TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
-	    TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
-	    TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
-	    TOTALPDOS[i][7]+=PDOS[j][i][7]; //sum of f_up
-	    TOTALPDOS[i][8]+=PDOS[j][i][8]*(-1); //sum of f_dn
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(9);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          TOTALPDOS[i][4]=0.0;
+          TOTALPDOS[i][5]=0.0;
+          TOTALPDOS[i][6]=0.0;
+          TOTALPDOS[i][7]=0.0;
+          TOTALPDOS[i][8]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=PDOS[j][i][3]; //sum of p_up
+            TOTALPDOS[i][4]+=PDOS[j][i][4]*(-1); //sum of p_dn
+            TOTALPDOS[i][5]+=PDOS[j][i][5]; //sum of d_up
+            TOTALPDOS[i][6]+=PDOS[j][i][6]*(-1); //sum of d_dn
+            TOTALPDOS[i][7]+=PDOS[j][i][7]; //sum of f_up
+            TOTALPDOS[i][8]+=PDOS[j][i][8]*(-1); //sum of f_dn
+          }
+        }
       }
 
       //--------------------s, p , d, f(spin-polarized)-----
 
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
       if(Ncolumns==10) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(4);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;  //s
-	  TOTALPDOS[i][2]=0.0;  //p
-	  TOTALPDOS[i][3]=0.0;  //d
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
-	    TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(4);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;  //s
+          TOTALPDOS[i][2]=0.0;  //p
+          TOTALPDOS[i][3]=0.0;  //d
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
+            TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
+          }
+        }
       }
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
 
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2, f1, f2, f3, f4, f5, f6, f7 (non-spin-polarized)-----
       if(Ncolumns==17 && (!isLSCOUPLING)) {
-	//Storing the DOSDATA of the s , p, d , f
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(5);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;  //s
-	  TOTALPDOS[i][2]=0.0;  //p
-	  TOTALPDOS[i][3]=0.0;  //d
-	  TOTALPDOS[i][4]=0.0;  //f
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
-	    TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][4]+=(PDOS[j][i][10]+PDOS[j][i][11]+PDOS[j][i][12]+PDOS[j][i][13]+PDOS[j][i][14]+PDOS[j][i][15]+PDOS[j][i][16]); //sum of f orbital
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d , f
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(5);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;  //s
+          TOTALPDOS[i][2]=0.0;  //p
+          TOTALPDOS[i][3]=0.0;  //d
+          TOTALPDOS[i][4]=0.0;  //f
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=(PDOS[j][i][2]+PDOS[j][i][3]+PDOS[j][i][4]); //sum of py, pz, and px
+            TOTALPDOS[i][3]+=(PDOS[j][i][5]+PDOS[j][i][6]+PDOS[j][i][7]+PDOS[j][i][8]+PDOS[j][i][9]); //sum of dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][4]+=(PDOS[j][i][10]+PDOS[j][i][11]+PDOS[j][i][12]+PDOS[j][i][13]+PDOS[j][i][14]+PDOS[j][i][15]+PDOS[j][i][16]); //sum of f orbital
+          }
+        }
       }
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2, f1, f2, f3, f4, f5, f6, f7 (non-spin-polarized)-----
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
       if(Ncolumns==19) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(7);
-	  TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
-	  TOTALPDOS[i][1]=0.0;  //s_up
-	  TOTALPDOS[i][2]=0.0;  //s_dn
-	  TOTALPDOS[i][3]=0.0;  //p_up
-	  TOTALPDOS[i][4]=0.0;  //p_dn
-	  TOTALPDOS[i][5]=0.0;  //d_up
-	  TOTALPDOS[i][6]=0.0;  //d_dn
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
-	    TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
-	    TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(7);
+          TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
+          TOTALPDOS[i][1]=0.0;  //s_up
+          TOTALPDOS[i][2]=0.0;  //s_dn
+          TOTALPDOS[i][3]=0.0;  //p_up
+          TOTALPDOS[i][4]=0.0;  //p_dn
+          TOTALPDOS[i][5]=0.0;  //d_up
+          TOTALPDOS[i][6]=0.0;  //d_dn
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
+            TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
+            TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+          }
+        }
       }
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn, (f1, f2, f3...) (spin-polarized)-----
       if(Ncolumns==33) {
-	//Storing the DOSDATA of the s , p, d, f
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(9);
-	  TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
-	  TOTALPDOS[i][1]=0.0;  //s_up
-	  TOTALPDOS[i][2]=0.0;  //s_dn
-	  TOTALPDOS[i][3]=0.0;  //p_up
-	  TOTALPDOS[i][4]=0.0;  //p_dn
-	  TOTALPDOS[i][5]=0.0;  //d_up
-	  TOTALPDOS[i][6]=0.0;  //d_dn
-	  TOTALPDOS[i][7]=0.0;  //f_dn
-	  TOTALPDOS[i][8]=0.0;  //f_dn
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
-	    TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
-	    TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
-	    TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
-	    TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
-	    TOTALPDOS[i][7]+=(PDOS[j][i][19]+PDOS[j][i][21]+PDOS[j][i][23]+PDOS[j][i][25]+PDOS[j][i][27]+PDOS[j][i][29]+PDOS[j][i][31]); //sum of f_up
-	    TOTALPDOS[i][8]+=(PDOS[j][i][20]+PDOS[j][i][22]+PDOS[j][i][24]+PDOS[j][i][26]+PDOS[j][i][28]+PDOS[j][i][30]+PDOS[j][i][32])*(-1); //sum of f_dn
-	  }
-	}
+        //Storing the DOSDATA of the s , p, d, f
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(9);
+          TOTALPDOS[i][0]=PDOS[0][i][0]; //Energy
+          TOTALPDOS[i][1]=0.0;  //s_up
+          TOTALPDOS[i][2]=0.0;  //s_dn
+          TOTALPDOS[i][3]=0.0;  //p_up
+          TOTALPDOS[i][4]=0.0;  //p_dn
+          TOTALPDOS[i][5]=0.0;  //d_up
+          TOTALPDOS[i][6]=0.0;  //d_dn
+          TOTALPDOS[i][7]=0.0;  //f_dn
+          TOTALPDOS[i][8]=0.0;  //f_dn
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up
+            TOTALPDOS[i][2]+=PDOS[j][i][2]*(-1); //sum of s_dn
+            TOTALPDOS[i][3]+=(PDOS[j][i][3]+PDOS[j][i][5]+PDOS[j][i][7]); //sum of p_up // py, pz, and px
+            TOTALPDOS[i][4]+=(PDOS[j][i][4]+PDOS[j][i][6]+PDOS[j][i][8])*(-1); //sum of p_dn // py, pz, and px
+            TOTALPDOS[i][5]+=(PDOS[j][i][9]+PDOS[j][i][11]+PDOS[j][i][13]+PDOS[j][i][15]+PDOS[j][i][17]); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][6]+=(PDOS[j][i][10]+PDOS[j][i][12]+PDOS[j][i][14]+PDOS[j][i][16]+PDOS[j][i][18])*(-1); //sum of d_up //dxy, dyz, dz2, dxz, dx2-y2
+            TOTALPDOS[i][7]+=(PDOS[j][i][19]+PDOS[j][i][21]+PDOS[j][i][23]+PDOS[j][i][25]+PDOS[j][i][27]+PDOS[j][i][29]+PDOS[j][i][31]); //sum of f_up
+            TOTALPDOS[i][8]+=(PDOS[j][i][20]+PDOS[j][i][22]+PDOS[j][i][24]+PDOS[j][i][26]+PDOS[j][i][28]+PDOS[j][i][30]+PDOS[j][i][32])*(-1); //sum of f_dn
+          }
+        }
       }
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
       if(Ncolumns==13 && isLSCOUPLING) {
-	//Storing the DOSDATA of the s , p, d
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(4);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up & s_dn orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p_up & p_dn orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d_up & d_dn orbitals
-	  }
-	}	
+        //Storing the DOSDATA of the s , p, d
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(4);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s_up & s_dn orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p_up & p_dn orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d_up & d_dn orbitals
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
 
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal ...(LS COUPLINT)------------
       if(Ncolumns==17 && isLSCOUPLING) {
-	//Storing the DOSDATA of the s , p, d, f
-	for (int i=0; i< DOSGRID; i++) {
-	  TOTALPDOS[i].resize(5);
-	  TOTALPDOS[i][0]=PDOS[0][i][0];
-	  TOTALPDOS[i][1]=0.0;
-	  TOTALPDOS[i][2]=0.0;
-	  TOTALPDOS[i][3]=0.0;
-	  TOTALPDOS[i][4]=0.0;
-	  for (int j=0; j< NIONS; j++) {
-	    TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
-	    TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p orbitals
-	    TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d orbitals
-	    TOTALPDOS[i][4]+=PDOS[j][i][13]; //sum of f orbitals
-	  }
-	}	
+        //Storing the DOSDATA of the s , p, d, f
+        for (int i=0; i< DOSGRID; i++) {
+          TOTALPDOS[i].resize(5);
+          TOTALPDOS[i][0]=PDOS[0][i][0];
+          TOTALPDOS[i][1]=0.0;
+          TOTALPDOS[i][2]=0.0;
+          TOTALPDOS[i][3]=0.0;
+          TOTALPDOS[i][4]=0.0;
+          for (int j=0; j< NIONS; j++) {
+            TOTALPDOS[i][1]+=PDOS[j][i][1]; //sum of s orbitals
+            TOTALPDOS[i][2]+=PDOS[j][i][5]; //sum of p orbitals
+            TOTALPDOS[i][3]+=PDOS[j][i][9]; //sum of d orbitals
+            TOTALPDOS[i][4]+=PDOS[j][i][13]; //sum of f orbitals
+          }
+        }	
       }
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal ...(LS COUPLINT)------------
       //-------------------------------------------------------------------------------------------------------------------------------------------------
       //-------------------------------------------------------------------------------------------------------------------------------------------------
       //Shifting the Energy to Fermi level
       for (int i=0; i< DOSGRID; i++) {
-	TOTALPDOS[i][0]=TOTALPDOS[i][0]-Efermi;
+        TOTALPDOS[i][0]=TOTALPDOS[i][0]-Efermi;
       }
       for (int i=0; i<NIONS;i++) {
-	for (int j=0; j< DOSGRID; j++) {
-	  PDOS[i][j][0]=PDOS[i][j][0]-Efermi;
-	}
+        for (int j=0; j< DOSGRID; j++) {
+          PDOS[i][j][0]=PDOS[i][j][0]-Efermi;
+        }
       }
       estructure::FormatSpinofPDOS(PDOS);
     }
@@ -4423,46 +4414,46 @@ namespace estructure {
     int DOSGRID = vvva.at(0).size();
     for (uint i=0; i<vvva.size();i++) {
       for (int j=0; j<DOSGRID; j++) {
-	if(vvva[i].at(0).size()==7) {
-	  vvva[i][j][2] *=(-1);
-	  vvva[i][j][4] *=(-1);
-	  vvva[i][j][6] *=(-1);
-	}
-	if(vvva[i].at(0).size()==9) {
-	  vvva[i][j][2] *=(-1);
-	  vvva[i][j][4] *=(-1);
-	  vvva[i][j][6] *=(-1);
-	  vvva[i][j][8] *=(-1);
-	}
-	if(vvva[i].at(0).size()==19) {
-	  vvva[i][j][2] *=(-1);
-	  vvva[i][j][4] *=(-1);
-	  vvva[i][j][6] *=(-1);
-	  vvva[i][j][8] *=(-1);
-	  vvva[i][j][10]*=(-1);
-	  vvva[i][j][12]*=(-1);
-	  vvva[i][j][14]*=(-1);
-	  vvva[i][j][16]*=(-1);
-	  vvva[i][j][18]*=(-1);
-	}
-	if(vvva[i].at(0).size()==33) {
-	  vvva[i][j][2]*=(-1);
-	  vvva[i][j][4]*=(-1);
-	  vvva[i][j][6]*=(-1);
-	  vvva[i][j][8]*=(-1);
-	  vvva[i][j][10]*=(-1);
-	  vvva[i][j][12]*=(-1);
-	  vvva[i][j][14]*=(-1);
-	  vvva[i][j][16]*=(-1);
-	  vvva[i][j][18]*=(-1);
-	  vvva[i][j][20]*=(-1);
-	  vvva[i][j][22]*=(-1);
-	  vvva[i][j][24]*=(-1);
-	  vvva[i][j][26]*=(-1);
-	  vvva[i][j][28]*=(-1);
-	  vvva[i][j][30]*=(-1);
-	  vvva[i][j][32]*=(-1);
-	}
+        if(vvva[i].at(0).size()==7) {
+          vvva[i][j][2] *=(-1);
+          vvva[i][j][4] *=(-1);
+          vvva[i][j][6] *=(-1);
+        }
+        if(vvva[i].at(0).size()==9) {
+          vvva[i][j][2] *=(-1);
+          vvva[i][j][4] *=(-1);
+          vvva[i][j][6] *=(-1);
+          vvva[i][j][8] *=(-1);
+        }
+        if(vvva[i].at(0).size()==19) {
+          vvva[i][j][2] *=(-1);
+          vvva[i][j][4] *=(-1);
+          vvva[i][j][6] *=(-1);
+          vvva[i][j][8] *=(-1);
+          vvva[i][j][10]*=(-1);
+          vvva[i][j][12]*=(-1);
+          vvva[i][j][14]*=(-1);
+          vvva[i][j][16]*=(-1);
+          vvva[i][j][18]*=(-1);
+        }
+        if(vvva[i].at(0).size()==33) {
+          vvva[i][j][2]*=(-1);
+          vvva[i][j][4]*=(-1);
+          vvva[i][j][6]*=(-1);
+          vvva[i][j][8]*=(-1);
+          vvva[i][j][10]*=(-1);
+          vvva[i][j][12]*=(-1);
+          vvva[i][j][14]*=(-1);
+          vvva[i][j][16]*=(-1);
+          vvva[i][j][18]*=(-1);
+          vvva[i][j][20]*=(-1);
+          vvva[i][j][22]*=(-1);
+          vvva[i][j][24]*=(-1);
+          vvva[i][j][26]*=(-1);
+          vvva[i][j][28]*=(-1);
+          vvva[i][j][30]*=(-1);
+          vvva[i][j][32]*=(-1);
+        }
 
       }
     }
@@ -4483,7 +4474,7 @@ namespace estructure {
  *
  ****************************************************************/
 namespace estructure{
-  // Added by ERIC G 
+  // Added by EG 
   // Converts a DOSCAR.static file into json format.
   bool DOSDATA_JSON(aurostd::xoption& vpflow,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -4495,8 +4486,8 @@ namespace estructure{
     for(uint i=0;i<tokens.size();i++){
       directory = aurostd::CleanFileName(tokens[i]);
       if(!aurostd::IsDirectory(directory)){
-	cerr << "estructure::DOSDATA_JSON: directory does not exist = " << directory << endl;
-	continue;
+        cerr << XPID << "estructure::DOSDATA_JSON: directory does not exist = " << directory << endl;
+        continue;
       }
       directories.push_back(directory);
     }
@@ -4505,20 +4496,20 @@ namespace estructure{
     if(directories.size()>1){oss << "[" << std::endl;}
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
-      if(LDEBUG) cerr << "estructure::DOSDATA_JSON: working in directory=" << directory << endl;
-      //oss << "{" << std::endl;  // CO 171025
-      SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); // CO 171025
+      if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: working in directory=" << directory << endl;
+      //oss << "{" << std::endl;  //CO20171025
+      SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
-      //oss <<std::endl  << "}"; // CO 171025
+      //oss <<std::endl  << "}"; //CO20171025
       if(i!=directories.size()-1){oss<<",";}
       oss << std::endl;
     }
     if(directories.size()>1){oss << "]" << std::endl;}
     return SUCCESS;
   }
-    
+
   //Takes in a ofstream and spits out the revelevent JSON about the DOS. 
-  bool DOSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ // CO 171025
+  bool DOSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ //CO20171025
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     //bool isLSCOUPLING=FALSE;
     int DOSGRID; //, NIONS;
@@ -4527,20 +4518,20 @@ namespace estructure{
     //string directory="./";
     string ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
     string stmp;//, line;
-        
+
     //stringstream straus, strline, dosfile; //, stringstreamtmp, strline; 
     stringstream dosfile;//,iatomsfile;
-               
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: BEGIN" << endl;
-        
+
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: BEGIN" << endl;
+
     vector<string> tokens;
     aurostd::string2tokens(vpflow.getattachedscheme("DOSDATA2JSON::PARAMS"),tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: options=[" << vpflow.getattachedscheme("DOSDATA2JSON::PARAMS") << "]" << endl;
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
-        
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: options=[" << vpflow.getattachedscheme("DOSDATA2JSON::PARAMS") << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
+
     //if(tokens.size()>0) {
     //  init::ErrorOption(cout,options,"estructure::DOSDATA_JSON","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     //  exit(0);
@@ -4549,57 +4540,55 @@ namespace estructure{
     if(tokens.size()>=1) DOS_Emin = aurostd::string2utype<double>(tokens.at(0)); 
     if(tokens.size()>=2) DOS_Emax = aurostd::string2utype<double>(tokens.at(1));
     if(tokens.size()>=3) DOSSCALE = aurostd::string2utype<double>(tokens.at(2));
-        
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << "estructure::DOSDATA_JSON: DOSSCALE=" << DOSSCALE << endl;
-        
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
+
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: DOSSCALE=" << DOSSCALE << endl;
 
     //READ DOSCAR.static
     bool found=FALSE;
 
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/DOSCAR.static"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/DOSCAR.static"+vext.at(iext),dosfile);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/DOSCAR.static"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/DOSCAR.static"+XHOST.vext.at(iext),dosfile);
     }
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(!found&&aurostd::FileExist(directory+"/DOSCAR"+vext.at(iext)))
-	found=aurostd::efile2stringstream(directory+"/DOSCAR"+vext.at(iext),dosfile);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(!found&&aurostd::FileExist(directory+"/DOSCAR"+XHOST.vext.at(iext)))
+        found=aurostd::efile2stringstream(directory+"/DOSCAR"+XHOST.vext.at(iext),dosfile);
     }
-    
+
     if(!found) {
-      cerr<<"ERROR: estructure::DOSDATA_JSON: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
+      cerr << XPID << "ERROR: estructure::DOSDATA_JSON: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
       return FALSE;
       //exit(0);
     }
-        
-    // CO 171025 - START
+
+    //CO20171025 START
     //READ POSCAR.static
     string POSCAR_file="";
 
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(POSCAR_file.empty()&&aurostd::FileExist(directory+"/POSCAR.static"+vext.at(iext)))
-	POSCAR_file=directory+"/POSCAR.static"+vext.at(iext);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(POSCAR_file.empty()&&aurostd::FileExist(directory+"/POSCAR.static"+XHOST.vext.at(iext)))
+        POSCAR_file=directory+"/POSCAR.static"+XHOST.vext.at(iext);
     }
-    for(uint iext=0;iext<vext.size();iext++) { 
-      if(POSCAR_file.empty()&&aurostd::FileExist(directory+"/POSCAR"+vext.at(iext)))
-	POSCAR_file=directory+"/POSCAR"+vext.at(iext);
+    for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+      if(POSCAR_file.empty()&&aurostd::FileExist(directory+"/POSCAR"+XHOST.vext.at(iext)))
+        POSCAR_file=directory+"/POSCAR"+XHOST.vext.at(iext);
     }
-	
+
     if(POSCAR_file.empty()) {
-      cerr<<"ERROR: estructure::DOSDATA_JSON: POSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
+      cerr << XPID << "ERROR: estructure::DOSDATA_JSON: POSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
       return FALSE;
       //exit(0);
     }
-       
+
     xstructure xstr(POSCAR_file,IOVASP_POSCAR);
     if(!xstr.CalculateSymmetry()){
-      cerr<<"ERROR: estructure::DOSDATA_JSON: Unable to calculate symmetry of structure found in POSCAR, aborting." << endl;
+      cerr << XPID << "ERROR: estructure::DOSDATA_JSON: Unable to calculate symmetry of structure found in POSCAR, aborting." << endl;
       return FALSE;
     }
-        
+
     vector<int> iatoms;
     for(uint i=0;i<xstr.iatoms.size();i++){iatoms.push_back(xstr.iatoms[i][0]);}
 
@@ -4610,13 +4599,13 @@ namespace estructure{
     vector<double> number;
     for(uint i=0;i<xstr.num_each_type.size();i++){number.push_back(xstr.num_each_type[i]);}
 
-    // CO 171018 - do NOT read iatoms file, this comes pre-relaxation
+    //CO20171018 - do NOT read iatoms file, this comes pre-relaxation
     //aflow has a habit of shrinking the structure between relax2 and static IF POSSIBLE
     //[OBSOLETE]  //READ iatoms.out file
     //[OBSOLETE]  bool iatomsfound=FALSE;
-    //[OBSOLETE]  if(!iatomsfound&&aurostd::FileExist(directory+"/aflow.iatoms.out"+vext.at(iext))) iatomsfound=aurostd::efile2stringstream(directory+"/aflow.iatoms.out"+vext.at(iext),iatomsfile);
+    //[OBSOLETE]  if(!iatomsfound&&aurostd::FileExist(directory+"/aflow.iatoms.out"+XHOST.vext.at(iext))) iatomsfound=aurostd::efile2stringstream(directory+"/aflow.iatoms.out"+XHOST.vext.at(iext),iatomsfile);
     //[OBSOLETE]  if(!iatomsfound) {
-    //[OBSOLETE]    cerr<<"ERROR: estructure::DOSDATA_JSON: aflow.iatoms.out"+vext.at(iext)+" not found in the directory, aborting."<< endl;
+    //[OBSOLETE]    cerr << XPID << "ERROR: estructure::DOSDATA_JSON: aflow.iatoms.out"+XHOST.vext.at(iext)+" not found in the directory, aborting."<< endl;
     //[OBSOLETE]    return FALSE;
     //[OBSOLETE]    //exit(0);
     //[OBSOLETE]  }
@@ -4652,89 +4641,89 @@ namespace estructure{
     //[OBSOLETE]  //for(uint i=0;i<number.size();i++) cerr << number.at(i) << endl;
     //[OBSOLETE]  //cerr << "inequilvent atoms : " << endl;
     //[OBSOLETE]  //for(uint i=0;i<iatoms.size();i++) cerr << iatoms.at(i) << endl;
-    // CO 171025 - STOP
+    //CO20171025 STOP
 
     vector<vector<double> > TDOS, TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
     GET_DOS_DATA(directory, Efermi, TDOS, TOTALPDOS, PDOS);       
- 
-    // CO 180216
+
+    //CO20180216
     bool found_TDOS=(TDOS.size()>0 && TDOS[0].size()>0);
     bool found_PDOS=(PDOS.size()>0 && PDOS[0].size()>0 && PDOS[0][0].size()>0);
 
     for(int i=0;i<4;i++) getline(dosfile,stmp);
     /*dosfile >> ICSDName;*/ getline(dosfile,stmp);
     dosfile >> Emax >> Emin >> DOSGRID >> Efermi >> stmp; getline(dosfile, stmp);
-        
-    if(wrapping_brackets){json << "{" << std::endl;}  // CO 171025
+
+    if(wrapping_brackets){json << "{" << std::endl;}  //CO20171025
     json << "     \"name\": " << "\"" << name << "\"," <<endl;
     json << "     \"species\": [" << "\"" << vspecies[0] << "\"";
     for(uint i=1;i<vspecies.size();i++) json << ", \"" << vspecies[i] << "\"";
     json << "]," << endl;
-    json << "     \"composition\": [" << number[0]; // CO 171025
+    json << "     \"composition\": [" << number[0]; //CO20171025
     for(uint i=1;i<number.size();i++) json << ", " << number[i];
     json << "]," << endl;
     json << "     \"Emin\": " << Emin << "," << std::endl;
     json << "     \"Emax\": " << Emax << "," << std::endl;
     json << "     \"Efermi\": " << Efermi << "," << std::endl;
-    json << "     \"DOS_grid\": " << DOSGRID << ((found_TDOS||found_PDOS)?string(","):string("")) << std::endl; // CO 171025
+    json << "     \"DOS_grid\": " << DOSGRID << ((found_TDOS||found_PDOS)?string(","):string("")) << std::endl; //CO20171025
     //*******************************************************************
     //********************          DOS           ***********************
     //*******************************************************************
-       
-    //--------------------    (non-polarized)     -----------------------
-    if(found_TDOS){  // CO 180216
-      if(TDOS[0].size() == 3){
-	json << "     \"tDOS_data\": {" << std::endl; // CO 171025
-	json << "          \"energy\": [";
-	json << TDOS[0][0];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][0];    
-	json << "]," << std::endl;
 
-	json << "          \"tDOS\": ["; // CO 171025
-	json << TDOS[0][1];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][1];    
-	json << "]," << std::endl;
-            
-	json << "          \"sum\": [";
-	json << TDOS[0][2];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][2];    
-	json << "]" << std::endl;
-	json << "     }" << (found_PDOS?string(","):string("")) << std::endl; // CO 180216
+    //--------------------    (non-polarized)     -----------------------
+    if(found_TDOS){  //CO20180216
+      if(TDOS[0].size() == 3){
+        json << "     \"tDOS_data\": {" << std::endl; //CO20171025
+        json << "          \"energy\": [";
+        json << TDOS[0][0];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][0];    
+        json << "]," << std::endl;
+
+        json << "          \"tDOS\": ["; //CO20171025
+        json << TDOS[0][1];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][1];    
+        json << "]," << std::endl;
+
+        json << "          \"sum\": [";
+        json << TDOS[0][2];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][2];    
+        json << "]" << std::endl;
+        json << "     }" << (found_PDOS?string(","):string("")) << std::endl; //CO20180216
       }
 
       //--------------------      (polarized)       -----------------------
       if(TDOS[0].size() == 5){
-	json << "     \"tDOS_data\": {" << std::endl; // CO 171025
-	json << "          \"energy\": [";
-	json << TDOS[0][0];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][0];    
-	json << "]," << std::endl;
-            
-	json << "          \"spin_majority\": [";
-	json << TDOS[0][1];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][1];    
-	json << "]," << std::endl;
-            
-	json << "          \"spin_minority\": [";
-	json << TDOS[0][2];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][2];    
-	json << "]," << std::endl;
-            
-	json << "          \"sum_spin_majority\": [";
-	json << TDOS[0][3];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][3];    
-	json << "]," << std::endl;
-            
-	json << "          \"sum_spin_minority\": [";
-	json << TDOS[0][4];
-	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][4];    
-	json << "]" << std::endl;
+        json << "     \"tDOS_data\": {" << std::endl; //CO20171025
+        json << "          \"energy\": [";
+        json << TDOS[0][0];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][0];    
+        json << "]," << std::endl;
 
-	json << "     }" << (found_PDOS?string(","):string("")) << std::endl;   // CO 180216
+        json << "          \"spin_majority\": [";
+        json << TDOS[0][1];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][1];    
+        json << "]," << std::endl;
+
+        json << "          \"spin_minority\": [";
+        json << TDOS[0][2];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][2];    
+        json << "]," << std::endl;
+
+        json << "          \"sum_spin_majority\": [";
+        json << TDOS[0][3];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][3];    
+        json << "]," << std::endl;
+
+        json << "          \"sum_spin_minority\": [";
+        json << TDOS[0][4];
+        for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][4];    
+        json << "]" << std::endl;
+
+        json << "     }" << (found_PDOS?string(","):string("")) << std::endl;   //CO20180216
       }
     }
-        
+
     //*******************************************************************
     //********************          PDOS          ***********************
     //*******************************************************************
@@ -4742,331 +4731,331 @@ namespace estructure{
     //--------------------s, p , d (non-polarized)-----------------------
     if(found_PDOS){
       if(PDOS[0][0].size()==4){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
-	json << "          \"spin_polarized\": false," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
+        json << "          \"spin_polarized\": false," << std::endl;
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
-            
-	json << "          \"sum_s\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]" << std::endl;
-                        
-	json << "     }";
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
-        
+
       //--------------------s, p, d, f (non-polarized)-----------------------
       if(PDOS[0][0].size()==5){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
-	json << "          \"spin_polarized\": false," << std::endl;
- 
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
-            
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
-           
-	json << "          \"sum_s\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_f\": [" << TOTALPDOS[0][4];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
-	json << "]" << std::endl;
-            
-	json << "     }";
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
+
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
+        json << "          \"spin_polarized\": false," << std::endl;
+
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "          \"sum_f\": [" << TOTALPDOS[0][4];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
-        
+
       //--------------------s, p , d (polarized)-----------------------
       if(PDOS[0][0].size()==7){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
-	json << "          \"spin_polarized\": true," << std::endl;
-            
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
+        json << "          \"spin_polarized\": true," << std::endl;
 
-	json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
-	json << "]" << std::endl;
-            
-	json << "     }";
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
-       
+
       //--------------------s, p, d, f (polarized)-----------------------
       if(PDOS[0][0].size()==9){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
-	json << "          \"spin_polarized\": true," << std::endl;
-            
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
+        json << "          \"spin_polarized\": true," << std::endl;
 
-	json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_f_majority\": [" << TOTALPDOS[0][7];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][7];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_f_minority\": [" << TOTALPDOS[0][8];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][8];
-	json << "]" << std::endl;
-            
-	json << "     }";
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
+        json << "]," << std::endl;
+
+        json << "          \"sum_f_majority\": [" << TOTALPDOS[0][7];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][7];
+        json << "]," << std::endl;
+
+        json << "          \"sum_f_minority\": [" << TOTALPDOS[0][8];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][8];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
-        
+
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
       if(PDOS[0][0].size()==10){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
-	json << "          \"spin_polarized\": false," << std::endl;
-             
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
+        json << "          \"spin_polarized\": false," << std::endl;
 
-	json << "          \"sum_s\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-                
-	json << "     }";
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "     }";
       }
-        
+
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
       if(PDOS[0][0].size()==13){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
-	json << "          \"spin_polarized\": false," << std::endl;
-             
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
+        json << "          \"spin_polarized\": false," << std::endl;
 
-	json << "          \"sum_s\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]" << std::endl;
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
 
-	json << "     }";
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
-        
+
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2, f1 to f7 (non-spin-polarized)-----
       //--------------------                        OR                           ------------------------
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal ..(LS COUPLINT)------------
       if(PDOS[0][0].size()==17){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
-	json << "          \"spin_polarized\": false," << std::endl;
-             
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
-            
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
-            
-	json << "          \"sum_s\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_f\": [" << TOTALPDOS[0][4];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
-	json << "]" << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	json << "     }";
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
+        json << "          \"spin_polarized\": false," << std::endl;
+
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "          \"sum_f\": [" << TOTALPDOS[0][4];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
-        
+
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
       if(PDOS[0][0].size()==19){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
-	json << "          \"spin_polarized\": true," << std::endl;
-            
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
-            
-	json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
-	json << "]" << std::endl;
-                       
-	json << "     }";
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
+        json << "          \"spin_polarized\": true," << std::endl;
+
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn, (f1, f2, f3...) (spin-polarized)-----
       if(PDOS[0][0].size()==33){
-	json << "     \"pDOS_data\": {" << std::endl; // CO 171025
-            
-	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
-	json << "          \"spin_polarized\": true," << std::endl;
-            
-	json << "          \"energy\": [" << TOTALPDOS[0][0];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
-	json << "]," << std::endl;
+        json << "     \"pDOS_data\": {" << std::endl; //CO20171025
 
-	inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+        json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
+        json << "          \"spin_polarized\": true," << std::endl;
 
-	json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_f_majority\": [" << TOTALPDOS[0][7];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][7];
-	json << "]," << std::endl;
-            
-	json << "          \"sum_f_minority\": [" << TOTALPDOS[0][8];
-	for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][8];
-	json << "]" << std::endl;
-            
-	json << "     }";
+        json << "          \"energy\": [" << TOTALPDOS[0][0];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][0];
+        json << "]," << std::endl;
+
+        inequivalentAtomsJSON(PDOS,iatoms,number,vspecies,json);
+
+        json << "          \"sum_s_majority\": [" << TOTALPDOS[0][1];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][1];
+        json << "]," << std::endl;
+
+        json << "          \"sum_s_minority\": [" << TOTALPDOS[0][2];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][2];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_majority\": [" << TOTALPDOS[0][3];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][3];
+        json << "]," << std::endl;
+
+        json << "          \"sum_p_minority\": [" << TOTALPDOS[0][4];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][4];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_majority\": [" << TOTALPDOS[0][5];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][5];
+        json << "]," << std::endl;
+
+        json << "          \"sum_d_minority\": [" << TOTALPDOS[0][6];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][6];
+        json << "]," << std::endl;
+
+        json << "          \"sum_f_majority\": [" << TOTALPDOS[0][7];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][7];
+        json << "]," << std::endl;
+
+        json << "          \"sum_f_minority\": [" << TOTALPDOS[0][8];
+        for(int i=1;i<DOSGRID;i++) json << "," << TOTALPDOS[i][8];
+        json << "]" << std::endl;
+
+        json << "     }";
       }
     }
-    if(wrapping_brackets){json << std::endl << "}";} // CO 171025
+    if(wrapping_brackets){json << std::endl << "}";} //CO20171025
     return TRUE; //tokens.size();    
   }
 
@@ -5089,31 +5078,31 @@ namespace estructure{
       json << "          \"" << vspecies.at(i) << "\": {" << endl;
       int comma = false; 
       for(uint j=0;j<iatoms.size();j++){ 
-	if(i){
-	  if(iatoms.at(j)>=sum_numbers.at(i-1) && iatoms.at(j)<sum_numbers.at(i)){
-	    if(comma) json << "," << endl;
-	    json << "               \"" << iatoms.at(j) << "\": {" << endl;
-	    constructInequivalentAtomPDOSJSON(PDOS,iatoms.at(j),json);
-	    json << "               }";
-	    comma=true;
-	  }
-	} else {
-	  if(iatoms.at(j)<sum_numbers.at(i)){
-	    //cerr << sum_numbers.at(i) << endl;
-	    if(comma) json << "," << endl; 
-	    json << "               \"" << iatoms.at(j) << "\": {" << endl;
-	    constructInequivalentAtomPDOSJSON(PDOS,iatoms.at(j),json);
-	    json << "               }";
-	    comma=true; 
-	  }
-	}
+        if(i){
+          if(iatoms.at(j)>=sum_numbers.at(i-1) && iatoms.at(j)<sum_numbers.at(i)){
+            if(comma) json << "," << endl;
+            json << "               \"" << iatoms.at(j) << "\": {" << endl;
+            constructInequivalentAtomPDOSJSON(PDOS,iatoms.at(j),json);
+            json << "               }";
+            comma=true;
+          }
+        } else {
+          if(iatoms.at(j)<sum_numbers.at(i)){
+            //cerr << sum_numbers.at(i) << endl;
+            if(comma) json << "," << endl; 
+            json << "               \"" << iatoms.at(j) << "\": {" << endl;
+            constructInequivalentAtomPDOSJSON(PDOS,iatoms.at(j),json);
+            json << "               }";
+            comma=true; 
+          }
+        }
       }
       json << endl << "          }," << endl;
     } 
     return PDOS.size();
   }
 
-    
+
   /*------------------------------------------------------------------------------------/
    * constructInequivalentAtomsPDOSJSON                                                /
    *                                                                                  /
@@ -5135,7 +5124,7 @@ namespace estructure{
       json << "                    \"total\": [" << PDOS[iatom][0][1]+PDOS[iatom][0][2]+PDOS[iatom][0][3];
       for(uint k=1;k<PDOS[0].size();k++) json << "," << PDOS[iatom][k][1]+PDOS[iatom][k][2]+PDOS[iatom][k][3];
       json << "]" << endl;
-            
+
     }
     //--------------------s, p , d, f (non-polarized)-----------------------
     if(PDOS[0][0].size()==5){
@@ -5472,7 +5461,7 @@ namespace estructure{
  *
  *********************************************************/
 namespace estructure {
-    
+
   bool BANDSDATA_JSON(aurostd::xoption& vpflow,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<string> tokens;
@@ -5483,8 +5472,8 @@ namespace estructure {
     for(uint i=0;i<tokens.size();i++){
       directory = aurostd::CleanFileName(tokens[i]);
       if(!aurostd::IsDirectory(directory)){
-	cerr << "estructure::BANDSDATA_JSON: directory does not exist = " << directory << endl;
-	continue;
+        cerr << XPID << "estructure::BANDSDATA_JSON: directory does not exist = " << directory << endl;
+        continue;
       }
       directories.push_back(directory);
     }
@@ -5493,11 +5482,11 @@ namespace estructure {
     if(directories.size()>1){oss << "[" << std::endl;}
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
-      if(LDEBUG) cerr << "estructure::BANDSDATA_JSON: working in directory=" << directory << endl;
-      //oss << "{" << std::endl; // CO 171025
-      SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); // CO 171025
+      if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: working in directory=" << directory << endl;
+      //oss << "{" << std::endl; //CO20171025
+      SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
-      //oss <<std::endl  << "}"; // CO 171025
+      //oss <<std::endl  << "}"; //CO20171025
       if(i!=directories.size()-1){oss<<",";}
       oss << std::endl;
     }
@@ -5505,31 +5494,31 @@ namespace estructure {
     return SUCCESS;
   }
 
-  bool BANDSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ // CO 171025
+  bool BANDSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ //CO20171025
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "estructure::BANDSDATA_JSON: BEGIN" << endl;
-        
+    if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: BEGIN" << endl;
+
     if(vpflow.flag("BANDSDATA2JSON")){;} //dummy load
 
     //ofstream json(json_dir.c_str());
     //json.precision(6);
-        
+
     //vector<string> tokens;
     //aurostd::string2tokens(options,tokens,",");
 
-    //if(LDEBUG) cerr << "estructure::BANDSDATA_JSON: options=[" << options << "]" << endl;
-        
+    //if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: options=[" << options << "]" << endl;
+
     int ISPIN=1, NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
     double Efermi, ftmp, ftmpup, ftmpdn;
     string LattName, ICSDName, DOSCARfile, OUTCARfile, EIGENVALfile, POSCARfile, KPOINTSfile, stmp, line;
     stringstream straus, stringstreamtmp, strline, dosfile, ss_outcar, ss_doscar, ss_engenval, ss_kpoints;
     stringstream ss_eigenval;
-        
+
     //if(tokens.size()>=1) directory= tokens.at(0);
-    if(LDEBUG) cerr << "estructure::BANDSDATA_JSON: working in directory= " << directory << endl;
+    if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: working in directory= " << directory << endl;
 
     ICSDName= KBIN::ExtractSystemName(directory); //Get SystemName
-        
+
     string anchor_word_Efermi = "E-fermi";
     string anchor_word_NIONS = "NIONS";
     string anchor_word_vc = "volume of cell";
@@ -5538,23 +5527,23 @@ namespace estructure {
     aflowlib::vaspfile2stringstream(directory, "OUTCAR", ss_outcar);
     xvector<double> a1(3); xvector<double> a2(3); xvector<double> a3(3);
     xvector<double> b1(3); xvector<double> b2(3); xvector<double> b3(3);
-       
-        
+
+
     while(getline(ss_outcar, line)) {
       if (line.find(anchor_word_Efermi) !=string::npos) {
-	strline.clear();    
-	strline.str(line);
-	strline >> stmp >> stmp >> Efermi;
+        strline.clear();    
+        strline.str(line);
+        strline >> stmp >> stmp >> Efermi;
       }
       if (line.find(anchor_word_NIONS) !=string::npos) {
-	strline.clear();    
-	strline.str(line);
-	strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
+        strline.clear();    
+        strline.str(line);
+        strline >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> stmp >> NIONS;
       }
       if (line.find(anchor_word_vc) !=string::npos) {
-	getline(ss_outcar, line); ss_outcar >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
-	getline(ss_outcar, line); ss_outcar >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
-	getline(ss_outcar, line); ss_outcar >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];  
+        getline(ss_outcar, line); ss_outcar >> a1[1] >> a1[2] >> a1[3] >> b1[1] >> b1[2] >> b1[3];
+        getline(ss_outcar, line); ss_outcar >> a2[1] >> a2[2] >> a2[3] >> b2[1] >> b2[2] >> b2[3];
+        getline(ss_outcar, line); ss_outcar >> a3[1] >> a3[2] >> a3[3] >> b3[1] >> b3[2] >> b3[3];  
       }
     }
 
@@ -5562,15 +5551,15 @@ namespace estructure {
 
     aflowlib::vaspfile2stringstream(directory, "EIGENVAL", ss_engenval);
     //cout << ss_engenval.str() << endl;exit(0);
-  
+
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     ss_engenval >> stmp >> stmp >> stmp >> ISPIN;   
-  
+
     //Read the headfile of EIGENVAL 
     for(int i=0; i< 5; i++) getline(ss_engenval, stmp);
     ss_engenval >> NELECT >> NKPOINTS >> Nbands;
     getline(ss_engenval, stmp);  //Read the line containing NELECT, NKPOINTS, NBANDS
-  
+
     //Creating data to store bands data
     vector<vector<double> > datakpoints(NKPOINTS);
     vector<vector<double> > dataup(NKPOINTS); //Define two-dimensional arrary
@@ -5584,31 +5573,31 @@ namespace estructure {
     //Obtain the bands data and store them into dataup and datadn, respectively
     if(ISPIN==1){
       for(int ik=0; ik< NKPOINTS; ik++){
-	getline(ss_engenval, stmp); //Negelecting empty line
-	ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];  
-	getline(ss_engenval, stmp); //Negelecting kpoint coordinate
-	int ib=-1;  
-	for(int i=0; i<Nbands; i++){
-	  ss_engenval>>ftmp>>ftmp;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmp;
-	}
-	getline(ss_engenval,stmp);
+        getline(ss_engenval, stmp); //Negelecting empty line
+        ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];  
+        getline(ss_engenval, stmp); //Negelecting kpoint coordinate
+        int ib=-1;  
+        for(int i=0; i<Nbands; i++){
+          ss_engenval>>ftmp>>ftmp;
+          ib=ib+1;
+          dataup[ik][ib]=ftmp;
+        }
+        getline(ss_engenval,stmp);
       }
     }
     else if(ISPIN==2){
       for(int ik=0; ik< NKPOINTS; ik++){
-	getline(ss_engenval, stmp); //Negelecting empty line
-	ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];  
-	getline(ss_engenval, stmp); //Negelecting kpoint coordinate
-	int ib=-1;  
-	for(int i=0; i<Nbands; i++){
-	  ss_engenval>>ftmp>>ftmpup>>ftmpdn;
-	  ib=ib+1;
-	  dataup[ik][ib]=ftmpup;
-	  datadn[ik][ib]=ftmpdn;
-	}
-	getline(ss_engenval,stmp);
+        getline(ss_engenval, stmp); //Negelecting empty line
+        ss_engenval >> datakpoints[ik][0] >> datakpoints[ik][1] >> datakpoints[ik][2];  
+        getline(ss_engenval, stmp); //Negelecting kpoint coordinate
+        int ib=-1;  
+        for(int i=0; i<Nbands; i++){
+          ss_engenval>>ftmp>>ftmpup>>ftmpdn;
+          ib=ib+1;
+          dataup[ik][ib]=ftmpup;
+          datadn[ik][ib]=ftmpdn;
+        }
+        getline(ss_engenval,stmp);
       }
     }
     else {
@@ -5627,61 +5616,60 @@ namespace estructure {
     // Get special kpoints from KPOINTS.bands
     // Get Lables of KPOINTS from KPOINTS.bands
     vector<vector<double> > kpoints;  
-    vector<string> kpointslabel,kpointslabel_html,kpointslabel_gnuplot,kpointslabel_latex; // CO 171025
+    vector<string> kpointslabel,kpointslabel_html,kpointslabel_gnuplot,kpointslabel_latex; //CO20171025
     int count=0, j=0; //count is the number of rows of kpoints
     // cout << ss_kpoints.str() << endl;
     while(getline(ss_kpoints, line)){
       if(aurostd::CountWordsinString(line)>=3){
-	vector<double> kpt_tmp;
-	double a1, a2, a3;
-	string a5;
-	strline.clear();
-	strline.str(line);
-	strline >> a1 >> a2 >> a3 >> stmp >> a5;
-	kpt_tmp.push_back(a1);
-	kpt_tmp.push_back(a2);
-	kpt_tmp.push_back(a3);
-	kpoints.push_back(kpt_tmp);
-	kpointslabel.push_back(a5);
-	kpointslabel_html.push_back(a5); // CO 171025
-	kpointslabel_gnuplot.push_back(a5); // CO 171025
-	kpointslabel_latex.push_back(a5); // CO 171025
-	j++;
+        vector<double> kpt_tmp;
+        double a1, a2, a3;
+        string a5;
+        strline.clear();
+        strline.str(line);
+        strline >> a1 >> a2 >> a3 >> stmp >> a5;
+        kpt_tmp.push_back(a1);
+        kpt_tmp.push_back(a2);
+        kpt_tmp.push_back(a3);
+        kpoints.push_back(kpt_tmp);
+        kpointslabel.push_back(a5);
+        kpointslabel_html.push_back(a5); //CO20171025
+        kpointslabel_gnuplot.push_back(a5); //CO20171025
+        kpointslabel_latex.push_back(a5); //CO20171025
+        j++;
       }
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_SPECIALONLY(kpointslabel[i]);}//fixKPOINT(kpointslabel[i]);}  // CO 170831 - fix all at once
-    for (int i=0; i< count; i++) {kpointslabel_html[i]=fixKPOINT_HTML(kpointslabel_html[i]);}//fixKPOINT(kpointslabel[i]);}  // CO 170831 - fix all at once
-    for (int i=0; i< count; i++) {kpointslabel_gnuplot[i]=fixKPOINT_SPECIALONLY(fixKPOINT_GNUPLOT(kpointslabel_gnuplot[i],true));}//fixKPOINT(kpointslabel[i]);}  // CO 170831 - fix all at once
-    for (int i=0; i< count; i++) {kpointslabel_latex[i]=fixKPOINT_SPECIALONLY(fixKPOINT_LATEX(kpointslabel_latex[i]));}//fixKPOINT(kpointslabel[i]);}  // CO 170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_SPECIALONLY(kpointslabel[i]);}//fixKPOINT(kpointslabel[i]);  //CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel_html[i]=fixKPOINT_HTML(kpointslabel_html[i]);}//fixKPOINT(kpointslabel[i]);  //CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel_gnuplot[i]=fixKPOINT_SPECIALONLY(fixKPOINT_GNUPLOT(kpointslabel_gnuplot[i],true));}//fixKPOINT(kpointslabel[i]);  //CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel_latex[i]=fixKPOINT_SPECIALONLY(fixKPOINT_LATEX(kpointslabel_latex[i]));}//fixKPOINT(kpointslabel[i]);  //CO20170831 - fix all at once
     //[OBSOLETE]    if (kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]    if (kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]    if (kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]    if (kpointslabel[i].compare("Sigma")==0) kpointslabel[i]="Sigm";
     //[OBSOLETE]    if (kpointslabel[i].compare("\\Sigma_1")==0) kpointslabel[i]="Sigm_1";
     //[OBSOLETE]    if (kpointslabel[i].compare("Sigma_1")==0) kpointslabel[i]="Sigm_1";
-    //[OBSOLETE]}
     //Combine the Labels of special kpoints 
     string newlabel;
     for (int i=1; i< (count-1); i=i+2){
       if (kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-	bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO 170830 - if subscript, extra space looks ODD!
-	//string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO 170830 - italics and make space for first italics
-	newlabel = aurostd::attach(kpointslabel[i],kpointslabel[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel[i] = newlabel;
-	kpointslabel[i+1] = newlabel;
-	// CO 171025 - START
-	newlabel = aurostd::attach(kpointslabel_html[i]+(need_space?" ":""),kpointslabel_html[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel_html[i] = newlabel;
-	kpointslabel_html[i+1] = newlabel;
-	newlabel = aurostd::attach(kpointslabel_gnuplot[i]+(need_space?" ":""),kpointslabel_gnuplot[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel_gnuplot[i] = newlabel;
-	kpointslabel_gnuplot[i+1] = newlabel;
-	newlabel = aurostd::attach(kpointslabel_latex[i]+(need_space?" ":""),kpointslabel_latex[i+1]);  // CO 170830 - italics and make space for first italics
-	kpointslabel_latex[i] = newlabel;
-	kpointslabel_latex[i+1] = newlabel;
-	// CO 171025 - STOP
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        //string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
+        newlabel = aurostd::attach(kpointslabel[i],kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel[i] = newlabel;
+        kpointslabel[i+1] = newlabel;
+        //CO20171025 START
+        newlabel = aurostd::attach(kpointslabel_html[i]+(need_space?" ":""),kpointslabel_html[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel_html[i] = newlabel;
+        kpointslabel_html[i+1] = newlabel;
+        newlabel = aurostd::attach(kpointslabel_gnuplot[i]+(need_space?" ":""),kpointslabel_gnuplot[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel_gnuplot[i] = newlabel;
+        kpointslabel_gnuplot[i+1] = newlabel;
+        newlabel = aurostd::attach(kpointslabel_latex[i]+(need_space?" ":""),kpointslabel_latex[i+1]);  //CO20170830 - italics and make space for first italics
+        kpointslabel_latex[i] = newlabel;
+        kpointslabel_latex[i+1] = newlabel;
+        //CO20171025 STOP
       }
     }
     //*******************************Redefine the symbols of special kpoints
@@ -5703,7 +5691,7 @@ namespace estructure {
     //Check number of kpoints
 
     if ((count/2)*KPOINTSGRID!=NKPOINTS) {
-      if(LDEBUG) cerr << "estructure::PLOT_BAND [16]" << endl;
+      if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [16]" << endl;
       cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
       cout << "KPOINTSGRID=" << KPOINTSGRID << endl;
       cout << "count=" << count << endl;
@@ -5727,8 +5715,8 @@ namespace estructure {
       dk= (sqrt(dkx*dkx + dky*dky +dkz*dkz))/(KPOINTSGRID-1);
       klinecart[ind]=koffset; ind++;
       for (int ii=1; ii<KPOINTSGRID; ii++){
-	klinecart[ind]= koffset + ii*dk;
-	ind++;
+        klinecart[ind]= koffset + ii*dk;
+        ind++;
       }
       koffset = koffset + dk*(KPOINTSGRID-1);
     }
@@ -5745,12 +5733,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints 
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO 170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO 170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO 170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -5764,7 +5752,7 @@ namespace estructure {
       SPKPOINTScart[i]=klinecart[(i/2)*(KPOINTSGRID)];
       SPKPOINTScart[i+1]=klinecart[(i/2+1)*(KPOINTSGRID)-1];
     }
-    //NO SHIFT - CO 170830
+    //NO SHIFT - CO20170830
     for (int i=0; i< count; i=i+2) {SPKPOINTScart_LABEL[i]=SPKPOINTScart[i];}
     SPKPOINTScart_LABEL[count-1]=SPKPOINTScart[count-1];
     //Shifting the cartesian coordinates of special KPOINTS;
@@ -5783,44 +5771,42 @@ namespace estructure {
     // bandsfin.setf(ios_base::fixed,ios_base::floatfield);  //Formating output
     //bandsfin.precision(4);
     vector<vector<double> > bandsdata(NKPOINTS);
-    if(wrapping_brackets){json << "{" << std::endl;} // CO 171025
+    if(wrapping_brackets){json << "{" << std::endl;} //CO20171025
     //Writing bands data into file
     if (ISPIN==1) { 
       for (int i=0; i<NKPOINTS; i++){
-	bandsdata[i].resize(Nbands+1);
-	bandsdata[i][0]=klinecart[i];
+        bandsdata[i].resize(Nbands+1);
+        bandsdata[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
       //json << "{" << endl;
-      DOSDATA_JSON(vpflow,directory,json,false); // CO 171025
+      DOSDATA_JSON(vpflow,directory,json,false); //CO20171025
       json << "," << endl;
-      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; // CO 171025
-      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; // CO 171025
-      json << "     \"n_bands\": " << Nbands << "," << endl; // CO 171025
-            
-      json << "     \"kpoint_labels\": ["; // CO 171025
+      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; //CO20171025
+      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; //CO20171025
+      json << "     \"n_bands\": " << Nbands << "," << endl; //CO20171025
+
+      json << "     \"kpoint_labels\": ["; //CO20171025
       json << "\"" << kpointslabel[0] << "\"";
       for(int i=2;i<count;i=i+2) json << ",\"" <<  kpointslabel[i] << "\"";
       json << ",\"" << kpointslabel[count-1] << "\"";
       json << "]," << endl;
-            
-      /*
-	json << "     \"kpoint_labels_html\": ["; // CO 171025
-	if(kpointslabel[0]=="G") json << "\"&Gamma;\""; else if(kpointslabel[0]=="Sigm") json << "\"&Sigma;\""; else if(kpointslabel[0]=="Sigm_1") json << "\"&Sigma;<sub>1</sub>\""; else if(kpointslabel[0]=="Y_1") json << "\"Y<sub>1</sub>\""; else if(kpointslabel[0]=="Z_1") json << "\"Z<sub>1</sub>\""; else json << "\"" << kpointslabel[0] << "\"";
-	for(int i=2;i<count;i=i+2) if(kpointslabel[i]=="G") json << ",\"&Gamma;\""; else if(kpointslabel[i]=="Sigm") json << ",\"&Sigma;\""; else if(kpointslabel[i]=="Sigm_1") json << ",\"&Sigma;<sub>1</sub>\""; else if(kpointslabel[i]=="Y_1") json << ",\"Y<sub>1</sub>\""; else if(kpointslabel[i]=="Z_1") json << ",\"Z<sub>1</sub>\""; else json << ",\"" << kpointslabel[i] << "\"";
-	json << "]," << endl;
-      */
 
-      json << "     \"kpoint_labels_latex\": ["; // CO 171025
-      json << "\"" << kpointslabel_latex[0] << "\""; // CO 171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i] <<"\""; // CO 171025
-      json << ",\"" << kpointslabel_latex[count-1] << "\""; // CO 171025
+      //   json << "     \"kpoint_labels_html\": ["; //CO20171025
+      //   if(kpointslabel[0]=="G") json << "\"&Gamma;\""; else if(kpointslabel[0]=="Sigm") json << "\"&Sigma;\""; else if(kpointslabel[0]=="Sigm_1") json << "\"&Sigma;<sub>1</sub>\""; else if(kpointslabel[0]=="Y_1") json << "\"Y<sub>1</sub>\""; else if(kpointslabel[0]=="Z_1") json << "\"Z<sub>1</sub>\""; else json << "\"" << kpointslabel[0] << "\"";
+      //   for(int i=2;i<count;i=i+2) if(kpointslabel[i]=="G") json << ",\"&Gamma;\""; else if(kpointslabel[i]=="Sigm") json << ",\"&Sigma;\""; else if(kpointslabel[i]=="Sigm_1") json << ",\"&Sigma;<sub>1</sub>\""; else if(kpointslabel[i]=="Y_1") json << ",\"Y<sub>1</sub>\""; else if(kpointslabel[i]=="Z_1") json << ",\"Z<sub>1</sub>\""; else json << ",\"" << kpointslabel[i] << "\"";
+      //   json << "]," << endl;
+
+      json << "     \"kpoint_labels_latex\": ["; //CO20171025
+      json << "\"" << kpointslabel_latex[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i] <<"\""; //CO20171025
+      json << ",\"" << kpointslabel_latex[count-1] << "\""; //CO20171025
       json << "]," << endl;
 
-      // CO 171025 - START
+      //CO20171025 START
       json << "     \"kpoint_labels_gnuplot\": [";
       json << "\"" << kpointslabel_gnuplot[0] << "\"";
       for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_gnuplot[i] <<"\"";
@@ -5832,7 +5818,7 @@ namespace estructure {
       for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_html[i] <<"\"";
       json << ",\"" << kpointslabel_html[count-1] << "\"";
       json << "]," << endl;
-            
+
       json << "     \"kpoint_positions\": [";
       json <<  SPKPOINTScart[0];
       for(int i=2;i<count;i=i+2) json << "," <<  SPKPOINTScart[i];
@@ -5843,16 +5829,16 @@ namespace estructure {
       json << "[" << bandsdata[0][0];
       for(int i=1; i<Nbands+1;i++) json <<"," <<  bandsdata[0][i];
       json << "]," << endl;
-      // CO 171025 - STOP
+      //CO20171025 STOP
 
       for (int ik=1;ik<NKPOINTS;ik++){
-	json << "          [";
-	for (int ib=0; ib<Nbands+1; ib++){
-	  if(ib!=0) json << "," <<  bandsdata[ik][ib];
-	  else json << bandsdata[ik][ib];
-	}
-	if(ik!=NKPOINTS-1) json << "]," << endl;
-	else json << "]"  << endl;
+        json << "          [";
+        for (int ib=0; ib<Nbands+1; ib++){
+          if(ib!=0) json << "," <<  bandsdata[ik][ib];
+          else json << bandsdata[ik][ib];
+        }
+        if(ik!=NKPOINTS-1) json << "]," << endl;
+        else json << "]"  << endl;
       }
       json << "     ]"; //<< endl;
       //json << "}" << endl;
@@ -5860,93 +5846,93 @@ namespace estructure {
     //Spin-polarized
     if (ISPIN==2) { 
       vector<vector<double> > bandsdata_dn(NKPOINTS);
-            
+
       for (int i=0; i<NKPOINTS; i++){
-	bandsdata[i].resize(Nbands+1);
-	bandsdata_dn[i].resize(Nbands+1);
-	bandsdata[i][0]=klinecart[i];
-	bandsdata_dn[i][0]=klinecart[i];
+        bandsdata[i].resize(Nbands+1);
+        bandsdata_dn[i].resize(Nbands+1);
+        bandsdata[i][0]=klinecart[i];
+        bandsdata_dn[i][0]=klinecart[i];
       }
       for (int i=0; i<NKPOINTS; i++)
-	for (int ib=0; ib<Nbands; ib++) {
-	  bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	  bandsdata_dn[i][ib+1]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
-	}
-            
+        for (int ib=0; ib<Nbands; ib++) {
+          bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
+          bandsdata_dn[i][ib+1]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
+        }
+
       //json << "{" << endl;
-      DOSDATA_JSON(vpflow,directory,json,false);  // CO 180216 - removed erroneous wrapping brackets
+      DOSDATA_JSON(vpflow,directory,json,false);  //CO20180216 - removed erroneous wrapping brackets
       json << "," << endl;
-      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; // CO 171025
-      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; // CO 171025
-      json << "     \"n_bands\": " << Nbands << "," << endl; // CO 171025
-            
-      json << "     \"kpoint_labels\": ["; // CO 171025
+      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; //CO20171025
+      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; //CO20171025
+      json << "     \"n_bands\": " << Nbands << "," << endl; //CO20171025
+
+      json << "     \"kpoint_labels\": ["; //CO20171025
       json << "\"" << kpointslabel[0] << "\"";
       for(int i=2;i<count;i=i+2) json << ",\"" <<  kpointslabel[i] << "\"";
       json << ",\"" << kpointslabel[count-1] << "\"";
       json << "]," << endl;
-           
-      json << "     \"kpoint_labels_latex\": ["; // CO 171025
-      json << "\"" << kpointslabel_latex[0] << "\""; // CO 171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i]<<"\""; // CO 171025
-      json << ",\"" << kpointslabel_latex[count-1] << "\""; // CO 171025
-      json << "]," << endl; // CO 171025
-        
-      json << "     \"kpoint_labels_gnuplot\": ["; // CO 171025
-      json << "\"" << kpointslabel_gnuplot[0] << "\""; // CO 171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_gnuplot[i]<<"\""; // CO 171025
-      json << ",\"" << kpointslabel_gnuplot[count-1] << "\""; // CO 171025
-      json << "]," << endl; // CO 171025
-        
-      json << "     \"kpoint_labels_html\": ["; // CO 171025
-      json << "\"" << kpointslabel_html[0] << "\""; // CO 171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_html[i]<<"\""; // CO 171025
-      json << ",\"" << kpointslabel_html[count-1] << "\""; // CO 171025
+
+      json << "     \"kpoint_labels_latex\": ["; //CO20171025
+      json << "\"" << kpointslabel_latex[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i]<<"\""; //CO20171025
+      json << ",\"" << kpointslabel_latex[count-1] << "\""; //CO20171025
+      json << "]," << endl; //CO20171025
+
+      json << "     \"kpoint_labels_gnuplot\": ["; //CO20171025
+      json << "\"" << kpointslabel_gnuplot[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_gnuplot[i]<<"\""; //CO20171025
+      json << ",\"" << kpointslabel_gnuplot[count-1] << "\""; //CO20171025
+      json << "]," << endl; //CO20171025
+
+      json << "     \"kpoint_labels_html\": ["; //CO20171025
+      json << "\"" << kpointslabel_html[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_html[i]<<"\""; //CO20171025
+      json << ",\"" << kpointslabel_html[count-1] << "\""; //CO20171025
       json << "]," << endl;
-        
-      json << "     \"kpoint_positions\": ["; // CO 171025
+
+      json << "     \"kpoint_positions\": ["; //CO20171025
       json <<  SPKPOINTScart[0];
       for(int i=2;i<count;i=i+2) json << "," <<  SPKPOINTScart[i];
       json << "," << SPKPOINTScart[count-1];
       json << "]," << endl;
 
-      json << "     \"bands_data_majority\": ["; // CO 171025
+      json << "     \"bands_data_majority\": ["; //CO20171025
       json << "[" << bandsdata[0][0];
       for(int i=1; i<Nbands+1;i++) json <<"," <<  bandsdata[0][i];
       json << "]," << endl;
 
       for (int ik=1;ik<NKPOINTS;ik++){
-	json << "          [";
-	for (int ib=0; ib<Nbands+1; ib++){
-	  if(ib!=0) json << "," <<  bandsdata[ik][ib];
-	  else json << bandsdata[ik][ib];
-	}
-	if(ik!=NKPOINTS-1) json << "]," << endl;
-	else json << "]"  << endl;
+        json << "          [";
+        for (int ib=0; ib<Nbands+1; ib++){
+          if(ib!=0) json << "," <<  bandsdata[ik][ib];
+          else json << bandsdata[ik][ib];
+        }
+        if(ik!=NKPOINTS-1) json << "]," << endl;
+        else json << "]"  << endl;
       }
       json << "     ]," << endl;
-            
-      json << "     \"bands_data_minority\": ["; // CO 171025
+
+      json << "     \"bands_data_minority\": ["; //CO20171025
       json << "[" << bandsdata_dn[0][0];
       for(int i=1; i<Nbands+1;i++) json <<"," <<  bandsdata_dn[0][i];
       json << "]," << endl;
 
       for (int ik=1;ik<NKPOINTS;ik++){
-	json << "          [";
-	for (int ib=0; ib<Nbands+1; ib++){
-	  if(ib!=0) json << "," <<  bandsdata_dn[ik][ib];
-	  else json << bandsdata_dn[ik][ib];
-	}
-	if(ik!=NKPOINTS-1) json << "]," << endl;
-	else json << "]"  << endl;
+        json << "          [";
+        for (int ib=0; ib<Nbands+1; ib++){
+          if(ib!=0) json << "," <<  bandsdata_dn[ik][ib];
+          else json << bandsdata_dn[ik][ib];
+        }
+        if(ik!=NKPOINTS-1) json << "]," << endl;
+        else json << "]"  << endl;
       }
       json << "     ]"; // << endl;
       //json << "}" << endl;
     }
-    if(wrapping_brackets){json << std::endl << "}";} // CO 171025
+    if(wrapping_brackets){json << std::endl << "}";} //CO20171025
     return TRUE;//tokens.size();
   }
-   
+
 
   // Function converts labels to their HTML code.. Sorry for the ugly if-else-if chain.
   string linelabel2HTML(string linelabel){
@@ -6007,6 +5993,6 @@ namespace estructure {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

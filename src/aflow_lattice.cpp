@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo, Wahyu Setyawan - 2007-2011 Duke
@@ -16,7 +16,7 @@
 // ***************************************************************************
 namespace LATTICE {
   bool lattice_is_working(string lat) {
-    if(lat.empty()){cerr << "LATTICE::lattice_is_working(): " << "ERROR: input lattice string is empty" << endl;exit(0);} //CO 180622
+    if(lat.empty()){cerr << XPID << "LATTICE::lattice_is_working(): " << "ERROR: input lattice string is empty" << endl;exit(0);} //CO20180622
     if(lat=="CUB" || lat=="cP") return TRUE;
     if(lat=="BCC" || lat=="cI") return TRUE;
     if(lat=="FCC" || lat=="cF") return TRUE;
@@ -38,7 +38,7 @@ namespace LATTICE {
   }
 }
 
-//DX 20191031 - START
+//DX20191031 START
 namespace LATTICE {
   string Lattice2TypeAndCentering(const string& lattice_type) {
 
@@ -57,33 +57,32 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
-    string function_name = "LATTICE::lattice2typeAndCentering()";
+    string function_name = XPID + "LATTICE::lattice2typeAndCentering()";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
   }
 }
-//DX 20191031 - END
+//DX20191031 END
 
 // ***************************************************************************
 namespace LATTICE {
   bool SpaceGroup2Lattice(uint sg,string &lattice_type,string& lattice_system) {
-    /* FROM SAXENA BOOK
-       1 TRI  (triclinic)
-       2 MCL  (monoclinic)
-       3 MCLC (C-centered monoclinic)
-       4 ORC  (orthorhombic)
-       5 ORCC (C-centered orthorhombic)
-       6 ORCF (face-centered orthorhombic)
-       7 ORCI (body-centered orthorhombic)
-       8 TET  (tetragonal)
-       9 BCT  (body-centered tetragonal)
-       10 RHL  (rhombohedral/trigonal)
-       11 HEX  (hexagonal)
-       12 CUB  (simple cubic)
-       13 FCC  (face-centered cubic)
-       14 BCC  (body-centered cubic)
-       */
+    // FROM SAXENA BOOK
+    //   1 TRI  (triclinic)
+    //   2 MCL  (monoclinic)
+    //   3 MCLC (C-centered monoclinic)
+    //   4 ORC  (orthorhombic)
+    //   5 ORCC (C-centered orthorhombic)
+    //   6 ORCF (face-centered orthorhombic)
+    //   7 ORCI (body-centered orthorhombic)
+    //   8 TET  (tetragonal)
+    //   9 BCT  (body-centered tetragonal)
+    //   10 RHL  (rhombohedral/trigonal)
+    //   11 HEX  (hexagonal)
+    //   12 CUB  (simple cubic)
+    //   13 FCC  (face-centered cubic)
+    //   14 BCC  (body-centered cubic)
     lattice_type="";lattice_system="";
     // tri
     if(sg==1 || sg==2) lattice_type="TRI";
@@ -133,7 +132,7 @@ namespace LATTICE {
   }
 }
 
-//DX 20191031 - START
+//DX20191031 START
 namespace LATTICE {
   string SpaceGroup2LatticeTypeAndCentering(uint sg) {
     string lattice_type,lattice_system, type_and_centering;
@@ -141,7 +140,7 @@ namespace LATTICE {
     return LATTICE::Lattice2TypeAndCentering(lattice_type);
   }
 }
-//DX 20191031 - END
+//DX20191031 END
 
 namespace LATTICE {
   string Lattice_System_SpaceGroup(uint sg) {
@@ -158,7 +157,7 @@ namespace LATTICE {
     string lattice_type,lattice_system;
     for(uint sg=1;sg<=230;sg++) {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
-      if(lattice_type=="error") {cerr << "LATTICE::Lattice2SpaceGroup error" << endl; exit(0);}
+      if(lattice_type=="error") {cerr << XPID << "LATTICE::Lattice2SpaceGroup error" << endl; exit(0);}
       if(lattice_type==lattice) vsgn.push_back(sg);
     }
     return vsgn.size();  // if zero, error
@@ -218,7 +217,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"TRI") || aurostd::substring2bool(lattice,"aP")) return lattice;
         else {
           return "TRI";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of TRI for sg "<<sg<<endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of TRI for sg " << sg << endl;
         }
       }
       else return "TRI";
@@ -233,7 +232,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"MCLC") || aurostd::substring2bool(lattice,"mS")) return lattice;
         else {
           return "MCLC";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of MCLC for sg "<<sg<<endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of MCLC for sg " << sg << endl;
         }
       }
       else return "MCLC";
@@ -252,7 +251,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"ORCF") || aurostd::substring2bool(lattice,"oF")) return lattice;
         else {
           return "ORCF";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of ORCF for sg "<<sg<<endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of ORCF for sg " << sg << endl;
         }
       }
       else return "ORCF";
@@ -269,7 +268,7 @@ namespace LATTICE {
         if(aurostd::substring2bool(lattice,"BCT") || aurostd::substring2bool(lattice,"tI")) return lattice;
         else {
           return "BCT";
-          cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of BCT for sg "<<sg<<endl;
+          cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of BCT for sg " << sg << endl;
         }
       }
       else return "BCT";
@@ -283,7 +282,7 @@ namespace LATTICE {
           if(aurostd::substring2bool(lattice,"RHL") || aurostd::substring2bool(lattice,"hR")) return lattice;
           else {
             return "RHL";
-            cerr<<"WARNING LATTICE::Standard_Lattice_Structure found "<<lattice<<" instead of RHL for sg "<<sg<<endl;
+            cerr << XPID << "WARNING LATTICE::Standard_Lattice_Structure found " << lattice << " instead of RHL for sg " << sg << endl;
           }
         }
         else return "RHL";
@@ -340,7 +339,7 @@ namespace LATTICE {
       //However, this function needs lattice vectors to determine alpha,kgamma,testphi
       //and to return the proper variation, for now it will return "MCLC".
       return "MCLC";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in MCLCC" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in MCLCC" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -349,7 +348,7 @@ namespace LATTICE {
     // 5. ORCC
     if(sg==20 || sg==21 || (sg>=35 && sg<=41) || (sg>=63 && sg<=68)) {
       return "ORCC";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCC" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCC" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -360,7 +359,7 @@ namespace LATTICE {
       if(mismatch>1+eps/5.0) return "ORCF1";
       if(mismatch<1-eps/5.0) return "ORCF2";
       if(aurostd::isequal(mismatch,1.0,eps/5.0)) return "ORCF3";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCF" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in ORCF" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -374,7 +373,7 @@ namespace LATTICE {
       if(a<c)  return "BCT2";
       // test if a=b=c
       if(aurostd::isequal(a,b,eps) && aurostd::isequal(a,c,eps)) return "BCT2";
-      cerr << "LATTICE::ConventionalLattice_SpaceGroup: error in BCT" << endl;
+      cerr << XPID << "LATTICE::ConventionalLattice_SpaceGroup: error in BCT" << endl;
       cerr << a << " " << b << " " << c << " " << endl << endl;
       exit(0);
     }
@@ -525,7 +524,7 @@ namespace LATTICE {
       return clattice;
     }
     else {
-      cerr<<"ERROR: lattice "<<lattice<<" not found in function LATTICE::sp2sc."<<endl; abort();
+      cerr << XPID << "ERROR: lattice " << lattice << " not found in function LATTICE::sp2sc." << endl; abort();
     }
   }
 }
@@ -674,7 +673,7 @@ namespace LATTICE {
 }
 
 // ***************************************************************************
-// DX - START
+//DX START
 namespace LATTICE {
   bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     return LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym);
@@ -687,31 +686,31 @@ namespace LATTICE {
 //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
 //return LATTICE::Standard_Lattice_StructureNormal(str_in,str_sp,str_sc);}
 //}
-// DX - END
+//DX END
 
-//**************************JUNKAI EDITED START****************************
+//**************************JX EDITED START****************************
 namespace LATTICE {
   bool Standard_Lattice_StructureDefault(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {
-    // DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);}
-    return LATTICE::Standard_Lattice_Structure_20170718(str_in,str_sp,str_sc,full_sym);} // DX
-    //bool Standard_Lattice_StructureCoarse(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
-    ////  return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.1,1.0,time,_EPS_);}
-    //bool Standard_Lattice_StructureNormal(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
-    //bool Standard_Lattice_StructureMedium(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.01,0.1,time,_EPS_);}
-    //bool Standard_Lattice_StructurePrecise(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.002,0.02,time,_EPS_);}
-    //bool Standard_Lattice_StructureUltra(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
-    //int time=0;
-    //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0004,0.004,time,_EPS_);} // epsabc //epsang
-    }
-//**************************JUNKAI EDITED END****************************
+    //DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);
+    return LATTICE::Standard_Lattice_Structure_20170718(str_in,str_sp,str_sc,full_sym);} //DX
+  //bool Standard_Lattice_StructureCoarse(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
+  ////  return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.1,1.0,time,_EPS_);
+  //bool Standard_Lattice_StructureNormal(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
+  //bool Standard_Lattice_StructureMedium(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.01,0.1,time,_EPS_);}
+  //bool Standard_Lattice_StructurePrecise(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.002,0.02,time,_EPS_);}
+  //bool Standard_Lattice_StructureUltra(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
+  //int time=0;
+  //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0004,0.004,time,_EPS_);} // epsabc //epsang
+}
+//**************************JX EDITED END****************************
 
 namespace LATTICE {
   //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram) ;
@@ -725,35 +724,40 @@ namespace LATTICE {
 
 namespace LATTICE {
   // transformation to standardization
-  bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JUNKAI EDITED*****************
+  bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JX EDITED*****************
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    double eps = 0.001;
-    if(str_in.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
-      eps=str_in.sym_eps;
-    }
-
-    bool is_deg = true; // DX
+    bool is_deg = true; //DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
     //  LDEBUG=TRUE;
     // starting from a str_in (whatever lattices) this routine returns a standard primitive (str_sp)
-    // and a standard conventional (str_sc) following the ideas of stefano and wahyu
+    // and a standard conventional (str_sc) following the ideas of SC+WSETYAWAN
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
 
-    //DX 20190304 - moved above GetPrimitive - START
-    str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX 20181024  //CO190520
-    str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX 20181024  //CO190520
-    //DX 20190304 - moved above GetPrimitive - END
+    //DX20200217 - move tolerance info after copying, otherwise we may overwrite
+    double eps = 0.001;
+    if(str_sp.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
+      eps=str_sp.sym_eps;
+    }
+    else if(str_sp.sym_eps==AUROSTD_NAN){ //DX20200217 - calculate if not done so already
+      eps=SYM::defaultTolerance(str_sp);
+      str_sp.sym_eps = eps;
+    }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    //DX20190304 - moved above GetPrimitive - START
+    str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
+    str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
+    //DX20190304 - moved above GetPrimitive - END
+
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     str_sp.GetPrimitive(0.005);
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 
-    //DX 20190304 - save transformation between orig and get prim (may have rotated) - START
+    //DX20190304 - save transformation between orig and get prim (may have rotated) - START
     xmatrix<double> original_metric_tensor = MetricTensor(str_in.scale*str_in.lattice);
     xmatrix<double> prim_lattice = str_sp.scale*str_sp.lattice;
     xmatrix<double> prim_metric_tensor = MetricTensor(prim_lattice);
@@ -763,32 +767,32 @@ namespace LATTICE {
     else {
       str_sp.rotate_lattice_original2new=aurostd::inverse(str_in.scale*str_in.lattice)*prim_lattice; 
     }
-    //DX 20181024 - save transformation between orig and get prim (may have rotated) - END
+    //DX20181024 - save transformation between orig and get prim (may have rotated) - END
 
     double str_sp_volume=str_sp.Volume();    // backups
     bool str_sp_neg_scale=str_sc.neg_scale;  // backups
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
-    //[DX190307 - moved up]str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX 20181024  //CO190520
-    //[DX190307 - moved up]str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX 20181024  //CO190520
+    //[DX20190307 - moved up]str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
+    //[DX20190307 - moved up]str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
 
     str_sp.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sp.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
-    //DX 20190304 [OBSOLETE] xmatrix<double> orig_lattice = str_sp.lattice; //DX 20181024 - save original lattice to find transformation
-    //DX 20190304 [OBSOLETE] xmatrix<double> original_metric_tensor = MetricTensor(orig_lattice);
+    //DX20190304 [OBSOLETE] xmatrix<double> orig_lattice = str_sp.lattice; //DX20181024 - save original lattice to find transformation
+    //DX20190304 [OBSOLETE] xmatrix<double> original_metric_tensor = MetricTensor(orig_lattice);
     {str_sp.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
-    //DX 20181024 - save transformation - START
+    //DX20181024 - save transformation - START
     xmatrix<double> minkowski_metric_tensor = MetricTensor(str_sp.lattice);
-    if(!aurostd::identical(prim_metric_tensor,minkowski_metric_tensor)){ //DX 20190304 = changed from original_metric_tensor to prim_metric_tensor
+    if(!aurostd::identical(prim_metric_tensor,minkowski_metric_tensor)){ //DX20190304 = changed from original_metric_tensor to prim_metric_tensor
       str_sp.transform_coordinates_original2new=str_sp.lattice*aurostd::inverse(prim_lattice); 
     }
     else {
-      str_sp.rotate_lattice_original2new=aurostd::inverse(prim_lattice)*str_sp.lattice;   //DX190307
+      str_sp.rotate_lattice_original2new=aurostd::inverse(prim_lattice)*str_sp.lattice;   //DX20190307
     }
-    //DX 20181024 - save transformation - END
+    //DX20181024 - save transformation - END
 
-    //DX 5/22/18 TEST (why do we use the original, why not use the smaller one (i.e., primitive)?!?) str_sc=str_in; // copy it
+    //DX20180522 TEST (why do we use the original, why not use the smaller one (i.e., primitive)?!?) str_sc=str_in; // copy it
     str_sc=str_sp; // copy it
     str_sc.FixLattices();
     str_sc.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
@@ -798,8 +802,8 @@ namespace LATTICE {
 
     string crystal_system="none";
     bool SYS_VERBOSE=FALSE;
-    // DX - START
-    // DX 8/14/17 - if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {  //[CO200106 - close bracket for indenting]}
+    //DX START
+    //DX20170814 - if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {  //[CO20200106 - close bracket for indenting]}
     if(str_sp.crystal_system=="") {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
@@ -807,27 +811,27 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE; // DX 12/7/17 - was mising before
-      kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE; // DX 12/7/17 - added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE; //DX20171207 - was mising before
+      kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE; //DX20171207 - added pgroupk_xtal
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
-      if(LDEBUG) { cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
+      if(LDEBUG) { cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       //pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
       string format="out";
-      if(str_sp.pgroup_xtal_calculated==TRUE) { // DX 8/14/17 - Speed increase, if already calculated just look use look-up table
-        SYM::PointGroupLookUpTable(FileDevNull,str_sp,aflags,kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE,SYS_VERBOSE,cout,format); // DX 8/14/17
+      if(str_sp.pgroup_xtal_calculated==TRUE) { //DX20170814 - Speed increase, if already calculated just look use look-up table
+        SYM::PointGroupLookUpTable(FileDevNull,str_sp,aflags,kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE,SYS_VERBOSE,cout,format); //DX20170814
       }
       else if(str_sp.pgroup_xtal_calculated==FALSE) {
-        // DX Calculate up to pgroup_xtal only
+        //DX Calculate up to pgroup_xtal only
         if(full_sym){
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE; // DX 12/7/17 - added pgroupk_xtal
+          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE; //DX20171207 - added pgroupk_xtal
           kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=TRUE;
@@ -837,7 +841,7 @@ namespace LATTICE {
           kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; // DX 12/7/17 - added pgroupk_xtal // DX 12/18/17 - missing the "K" in "PGROUPK_XTAL"
+          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20171207 - added pgroupk_xtal //DX20171218 - missing the "K" in "PGROUPK_XTAL"
           kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;
@@ -849,7 +853,7 @@ namespace LATTICE {
 
     eps = str_sp.sym_eps;
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
     xvector<int> dims(3);    // to scan
     dims=LatticeDimensionSphere(str_sp.lattice,RadiusSphereLattice(str_sp.lattice)/1.0);
@@ -861,12 +865,12 @@ namespace LATTICE {
     bool found=FALSE;
     vector<xmatrix<double> > vrlattice1,vrlattice1_aaa;
     vector<xvector<double> > vvectors;
-    double amin=min(aurostd::modulus(str_sp.lattice(1)),aurostd::modulus(str_sp.lattice(2)),aurostd::modulus(str_sp.lattice(3))); // DX
+    double amin=min(aurostd::modulus(str_sp.lattice(1)),aurostd::modulus(str_sp.lattice(2)),aurostd::modulus(str_sp.lattice(3))); //DX
     volume=det(str_sp.lattice);
-    double eps_volume = eps*amin*amin*amin; // DX
+    double eps_volume = eps*amin*amin*amin; //DX
     vrlattice1.push_back(str_sp.lattice);
 
-    //CO 180627 nndist=1.0e6;
+    //CO20180627 nndist=1.0e6;
     cutoff=1.0e6;
 
     // find NN distance
@@ -877,10 +881,10 @@ namespace LATTICE {
     //DX [OBSOLETE] - nndist is not used anywhere      if(modulus(aus)>eps && modulus(aus)<=nndist) nndist=modulus(aus);
     //DX [OBSOLETE] - nndist is not used anywhere    }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
 
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
 
     if(LDEBUG) {
       cerr << "str_sp.atoms.size()=" << str_sp.atoms.size() << endl;
@@ -903,7 +907,7 @@ namespace LATTICE {
     //  if(crystal_system=="tetragonal") {cutoff=(2.0/sqrt(3.0))*max(rdata[1],rdata[2],rdata[3]);}
     if(crystal_system=="tetragonal") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);}
     if(crystal_system=="trigonal") {cutoff=max(rdata[1],rdata[2],rdata[3]);} // the primitives always get the max of the lenghts
-    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //stefano recipe
+    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //SC recipe
     if(crystal_system=="orthorhombic") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);}
     if(crystal_system=="monoclinic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);} //sqrt(2) catches the centered face
     if(crystal_system=="triclinic") {cutoff=max(rdata[1],rdata[2],rdata[3]);} // the primitives always get the max of the lenghts
@@ -927,21 +931,21 @@ namespace LATTICE {
           vaus=rlattice[1][1]*rlattice[2][2]*rlattice[3][3]+rlattice[1][2]*rlattice[2][3]*rlattice[3][1]+        // FAST
             rlattice[1][3]*rlattice[2][1]*rlattice[3][2]-rlattice[1][3]*rlattice[2][2]*rlattice[3][1]-        // FAST
             rlattice[1][2]*rlattice[2][1]*rlattice[3][3]-rlattice[1][1]*rlattice[2][3]*rlattice[3][2];        // FAST
-          if(abs(vaus)>eps_volume){ // DX 9/4/17 - Otherwise, Getabc_angles may fail if vaus=0.0
-            if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { // DX
-              //DX ORIG 5/22/18 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-              // DX if(abs(vaus-volume)<eps)
-              if(abs(vaus-volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+          if(abs(vaus)>eps_volume){ //DX20170904 - Otherwise, Getabc_angles may fail if vaus=0.0
+            if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { //DX
+              //DX ORIG 20180522 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+              //DX if(abs(vaus-volume)<eps)
+              if(abs(vaus-volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 vrlattice1.push_back(rlattice);
-                //DX 5/22/18 - only calculate vrlattice1_aaa if cubic or trigonal (rhl); no other lattice types require it - save time
+                //DX20180522 - only calculate vrlattice1_aaa if cubic or trigonal (rhl); no other lattice types require it - save time
                 if(crystal_system=="cubic" || crystal_system=="trigonal"){
-                  rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6]; //DX 5/22/18 - only calculate the parameters when necessary
+                  rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6]; //DX20180522 - only calculate the parameters when necessary
                   if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps)){
                     vrlattice1_aaa.push_back(rlattice);
                   }
-                } //DX 5/22/18
-              } // DX 9/4/17
+                } //DX20180522
+              } //DX20170904
             }
           }
         }
@@ -968,10 +972,10 @@ namespace LATTICE {
     //  bool VERBOSE_PROGRESS=TRUE;
     // try different solutions
     for (uint choice=0;choice<=2&&!found;choice++) {
-      if(VERBOSE_PROGRESS) if(choice==0) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
-      if(VERBOSE_PROGRESS) if(choice==1) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
-      if(VERBOSE_PROGRESS) if(choice==2) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
-      if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
+      if(VERBOSE_PROGRESS) if(choice==0) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
+      if(VERBOSE_PROGRESS) if(choice==1) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
+      if(VERBOSE_PROGRESS) if(choice==2) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
+      if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
 
       // ***************************************************************************************************
       // CUBIC CRYSTAL SYSTEM
@@ -987,11 +991,11 @@ namespace LATTICE {
           if((choice==0 && (aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps)))) // just to help not necessary
             // CUB: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 a]: a a a 90 90 90  primitive
             // CUB: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 a]: a a a 90 90 90  conventional
-            // DX if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
-            // DX   aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          { //CO200106 - patching for auto-indenting
-            if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) && // DX
-                SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) { // DX 
+            //DX if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
+            //DX   aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          { //CO20200106 - patching for auto-indenting
+            if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) && //DX
+                SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) { //DX 
               found=TRUE;
               //check for coordinate system transformation 
               xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1029,9 +1033,9 @@ namespace LATTICE {
             // BCC:  a1=[-a/2 a/2 a/2] a2=[a/2 -a/2 a/2]/ a3=[a/2 a/2 -a/2]     a a a 109.471 109.471 109.471 primitive
             // BCC:  [a 0 0] [0 a 0] [0 0 a] with 0,0,0 and 1/2 1/2 1/2 basis
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
-                SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && SYM::checkAngle(a,c,beta,109.471,is_deg,eps) && SYM::checkAngle(a,b,gamma,109.471,is_deg,eps)) // DX
+                SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && SYM::checkAngle(a,c,beta,109.471,is_deg,eps) && SYM::checkAngle(a,b,gamma,109.471,is_deg,eps)) //DX
               //aurostd::isequal(alpha,109.471,epsang) && aurostd::isequal(beta,109.471,epsang) && aurostd::isequal(gamma,109.471,epsang))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               found=TRUE;
               //check for coordinate system transformation 
               xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1075,9 +1079,9 @@ namespace LATTICE {
             // FCC:  a1=[0 a/2 a/2]  a2=[a/2 0 a/2]  a3=[a/2 a/2 0] a a a 60.0 60.0 60.0
             // FCC:  [a 0 0] [0 a 0] [0 0 a] with 0,0,0 and 0 1/2 1/2 + 1/2 0 1/2 + 1/2 1/2 0 basis
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
-                SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && SYM::checkAngle(a,c,beta,60.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,60.0,is_deg,eps)) // DX
-              // DX aurostd::isequal(alpha,60.0,epsang) && aurostd::isequal(beta,60.0,epsang) && aurostd::isequal(gamma,60.0,epsang))
-            { //CO200106 - patching for auto-indenting
+                SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && SYM::checkAngle(a,c,beta,60.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,60.0,is_deg,eps)) //DX
+              //DX aurostd::isequal(alpha,60.0,epsang) && aurostd::isequal(beta,60.0,epsang) && aurostd::isequal(gamma,60.0,epsang))
+            { //CO20200106 - patching for auto-indenting
               found=TRUE;
               //check for coordinate system transformation 
               xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1123,19 +1127,19 @@ namespace LATTICE {
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
           //   cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << endl;
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             // cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << endl;
             if((choice==0 && ((aurostd::isequal(a,b,eps)&&aurostd::isdifferent(b,c,eps))||(aurostd::isequal(b,c,eps)&&aurostd::isdifferent(c,a,eps))||(aurostd::isequal(c,a,eps)&&aurostd::isdifferent(a,b,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps)&&aurostd::isequal(b,c,eps)))))
               // if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
 
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  primitive
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  conventional
               // ordering vectors to a a c
-              xmatrix<double> orig_rlattice = rlattice; //DX 20181025 - save before swapping rows
+              xmatrix<double> orig_rlattice = rlattice; //DX20181025 - save before swapping rows
               xmatrix<double> orig_rlattice_metric_tensor = MetricTensor(orig_rlattice);
               if(!aurostd::identical(minkowski_metric_tensor,orig_rlattice_metric_tensor)){
                 str_sp.transform_coordinates_original2new=orig_rlattice*aurostd::inverse(str_sp.lattice)*str_sp.transform_coordinates_original2new;
@@ -1192,13 +1196,13 @@ namespace LATTICE {
           // STD_PRIM: a1=[-a/2 a/2 c/2] a2=[a/2 -a/2 c/2] a3=[a/2 a/2 -c/2]
           //if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
           if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps))
-          { //CO200106 - patching for auto-indenting
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && ((aurostd::isequal(a,b,eps)&&aurostd::isdifferent(b,c,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps)&&aurostd::isequal(b,c,eps))))) {
               ac=a;cc=c;
-              // DX if(abs(ac*ac*cc-2.0*volume)<eps)
-              if(abs(ac*ac*cc-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*ac*cc-2.0*volume)<eps)
+              if(abs(ac*ac*cc-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1217,8 +1221,8 @@ namespace LATTICE {
                 plattice[3][1]= ac/2.0;plattice[3][2]= ac/2.0;plattice[3][3]=-cc/2.0; // make the standard primitive bct
                 LATTICE::fix_sts_sp(str_sp,rlattice,plattice);  // project out of rlattice and in plattice
                 if(cc<ac) {str_sp.bravais_lattice_variation_type="BCT1";}
-                // DX - 9/7/17 - Need to include a=c if(ac<cc) {str_sp.bravais_lattice_variation_type="BCT2";}
-                if(ac<=cc) {str_sp.bravais_lattice_variation_type="BCT2";} // DX 9/7/17 - Add a=c case; pick BCT2 since less high sym points 
+                //DX20170907 - Need to include a=c if(ac<cc) {str_sp.bravais_lattice_variation_type="BCT2";}
+                if(ac<=cc) {str_sp.bravais_lattice_variation_type="BCT2";} //DX20170907 - Add a=c case; pick BCT2 since less high sym points 
                 // do the STANDARD CONVENTIONAL
                 // C=supercell*P => supercell = C*inv(P)
                 str_sc=GetSuperCell(str_sp,bct);
@@ -1238,7 +1242,7 @@ namespace LATTICE {
       // TRIGONAL CRYSTAL SYSTEM                          
       if(found==FALSE && (crystal_system=="all" || crystal_system=="trigonal")) {  // trigonal can be rhl or hex
         if(VERBOSE_PROGRESS) cerr << "RHL SYSTEMS looking for lattices a a a alpha alpha alpha" << endl;
-        // DX double rhl_ratio=1.0; // you might need to reduce this to reproduce tiny distortions... insted of increasing eps, you reduce it
+        //DX double rhl_ratio=1.0; // you might need to reduce this to reproduce tiny distortions... insted of increasing eps, you reduce it
         xmatrix<double> rhl(3,3);
         rhl[1][1]=1.0;rhl[1][2]=-1.0;rhl[1][3]= 0.0;
         rhl[2][1]=0.0;rhl[2][2]= 1.0;rhl[2][3]=-1.0;
@@ -1252,16 +1256,16 @@ namespace LATTICE {
           if(choice==0) { // only pristine
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps)) {  // aaa
               //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
-              // DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
-              if(SYM::checkAngle(b,c,alpha,beta,is_deg,eps) && SYM::checkAngle(a,c,beta,gamma,is_deg,eps)) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
+              if(SYM::checkAngle(b,c,alpha,beta,is_deg,eps) && SYM::checkAngle(a,c,beta,gamma,is_deg,eps)) //DX
+              { //CO20200106 - patching for auto-indenting
                 //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
-                // DX if(aurostd::isdifferent(alpha,90.0,epsang/rhl_ratio) && // no cubic
-                // DX    aurostd::isdifferent(alpha,60.0,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-60.0,epsang/rhl_ratio) && // no fcc (60 and 120)
-                // DX   aurostd::isdifferent(alpha,109.471,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-109.471,epsang/rhl_ratio)) {  // no bcc stuff  //[CO200106 - close bracket for indenting]}
-                // DX 9/6/17 [OBSOLETE] if(!SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && // no cubic
-                // DX 9/6/17 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && !SYM::checkAngle(b,c,alpha,120.0,is_deg,eps) && // no fcc (60 and 120)
-                // DX 9/6/17 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && !SYM::checkAngle(b,c,alpha,180.0-109.471,is_deg,eps)) {  // no bcc stuff
+                //DX if(aurostd::isdifferent(alpha,90.0,epsang/rhl_ratio) && // no cubic
+                //DX    aurostd::isdifferent(alpha,60.0,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-60.0,epsang/rhl_ratio) && // no fcc (60 and 120)
+                //DX   aurostd::isdifferent(alpha,109.471,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-109.471,epsang/rhl_ratio)) {  // no bcc stuff  //[CO20200106 - close bracket for indenting]}
+                //DX20170906 [OBSOLETE] if(!SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && // no cubic
+                //DX20170906 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && !SYM::checkAngle(b,c,alpha,120.0,is_deg,eps) && // no fcc (60 and 120)
+                //DX20170906 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && !SYM::checkAngle(b,c,alpha,180.0-109.471,is_deg,eps)) {  // no bcc stuff
                 //   cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
                 // make standard primitive
                 // RHL: a1=[a*cos(alpha/2) -a*sin(alpha/2) 0]
@@ -1276,12 +1280,12 @@ namespace LATTICE {
                 } else {
                   str_sp.bravais_lattice_variation_type="RHL2";
                 }
-                alpha=alpha*pi/180.0; // change to RADIANTS !
+                alpha=alpha*pi/180.0; // change to RADIANS !
                 plattice[1][1]=a*cos(alpha/2.0);plattice[1][2]=-a*sin(alpha/2.0);plattice[1][3]=0.0; // make the standard primitive rhl
                 plattice[2][1]=a*cos(alpha/2.0);plattice[2][2]= a*sin(alpha/2.0);plattice[2][3]=0.0; // make the standard primitive rhl
                 plattice[3][1]=a*cos(alpha)/cos(alpha/2.0);plattice[3][2]=0.0;
                 plattice[3][3]=a*sqrt(1.0-cos(alpha)*cos(alpha)/cos(alpha/2.0)/cos(alpha/2.0));      // make the standard primitive rhl
-                // DX 9/29/17 - check if sqrt results in nan - START 
+                //DX20170929 - check if sqrt results in nan - START 
                 if(std::isnan(plattice[3][3])){
                   found=FALSE;
                   continue;
@@ -1295,7 +1299,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
-                // DX 9/29/17 - check if sqrt results in nan - END
+                //DX20170929 - check if sqrt results in nan - END
                 LATTICE::fix_sts_sp(str_sp,rlattice,plattice);
                 // make the STANDARD CONVENTIONAL
 #ifndef _RHL_HEX_SC_
@@ -1310,7 +1314,7 @@ namespace LATTICE {
                 str_sc.pearson_symbol="hP"+aurostd::utype2string(str_sc.atoms.size());
 #endif
                 if(VERBOSE_PROGRESS) cerr << str_sp.bravais_lattice_type << " found" << endl;
-                // DX 9/6/17 [OBSOLETE]}
+                //DX20170906 [OBSOLETE]}
               }
             }
           }
@@ -1330,12 +1334,12 @@ namespace LATTICE {
           // HEX a1=[a/2 -a/2*sqrt(3) 0]  a2=[a/2 a/2*sqrt(3) 0]  a3=[0 0 c]   a a c 90 90 120 primitive
           // HEX a1=[a/2 -a/2*sqrt(3) 0]  a2=[a/2 a/2*sqrt(3) 0]  a3=[0 0 c]   a a c 90 90 120 conventional
           if(choice==0) { // only pristine
-            // DX if((aurostd::isequal(a,b,eps) && aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang)) &&
-            // DX    (aurostd::isequal(gamma,120.0,epsang) || aurostd::isequal(gamma,60.0,epsang)))
-            // DX   if(aurostd::isequal(gamma,60.0,epsang))
+            //DX if((aurostd::isequal(a,b,eps) && aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang)) &&
+            //DX    (aurostd::isequal(gamma,120.0,epsang) || aurostd::isequal(gamma,60.0,epsang)))
+            //DX   if(aurostd::isequal(gamma,60.0,epsang))
             if((aurostd::isequal(a,b,eps) && SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps)) &&
                 (SYM::checkAngle(a,b,gamma,120.0,is_deg,eps) || SYM::checkAngle(a,b,gamma,60.0,is_deg,eps)))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               xmatrix<double> orig_rlattice = rlattice;
               xmatrix<double> orig_rlattice_metric_tensor = MetricTensor(orig_rlattice);
               if(!aurostd::identical(minkowski_metric_tensor,orig_rlattice_metric_tensor)){
@@ -1387,15 +1391,15 @@ namespace LATTICE {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && ((aurostd::isdifferent(a,b,eps) && aurostd::isdifferent(b,c,eps) && aurostd::isdifferent(c,a,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps) || aurostd::isequal(b,c,eps) || aurostd::isequal(c,a,eps))))) {
               // ORC: a1=[a 0 0]  a2=[0 b 0]  a3=[0 0 c]: a<b<c 90 90 90  primitive
               // ORC: a1=[a 0 0]  a2=[0 b 0]  a3=[0 0 c]: a<b<c 90 90 90  conventional
               // ordering vectors to get a<b<c
-              xmatrix<double> orig_rlattice = rlattice; //DX 20181024
+              xmatrix<double> orig_rlattice = rlattice; //DX20181024
               xmatrix<double> orig_rlattice_metric_tensor = MetricTensor(orig_rlattice);
               if(!aurostd::identical(minkowski_metric_tensor,orig_rlattice_metric_tensor)){
                 str_sp.transform_coordinates_original2new=orig_rlattice*aurostd::inverse(str_sp.lattice)*str_sp.transform_coordinates_original2new;
@@ -1468,16 +1472,16 @@ namespace LATTICE {
           // a1=[0 bc/2 cc/2]
           // a2=[ac/2 0 cc/2]
           // a3=[ac/2 bc/2 0]
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && (a<b && b<c)) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps) && b<c) || (a<b && aurostd::isequal(b,c,eps)))) ||
                 (choice==2 && ((aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps))))) {
               ac=a;bc=b;cc=c;
-              // DX if(abs(ac*bc*cc-4.0*volume)<eps)
-              if(abs(ac*bc*cc-4.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*bc*cc-4.0*volume)<eps)
+              if(abs(ac*bc*cc-4.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1531,16 +1535,16 @@ namespace LATTICE {
           // a1=[-a/2 b/2 c/2]
           // a2=[a/2 -b/2 c/2]
           // a3=[a/2 b/2 -c/2]
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && (a<b && b<c)) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps) && b<c) || (a<b && aurostd::isequal(b,c,eps)))) ||
                 (choice==2 && ((aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps))))) {
               ac=a;bc=b;cc=c;
-              // DX if(abs(ac*bc*cc-2.0*volume)<eps)
-              if(abs(ac*bc*cc-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*bc*cc-2.0*volume)<eps)
+              if(abs(ac*bc*cc-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1590,14 +1594,14 @@ namespace LATTICE {
           // a2=[a/2 b/2 0]
           // a3=[0 0 c]
           // pick only the case when a<b
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && (a<b)) || (choice==1 && (aurostd::isequal(a,b,eps)))) {
               ac=a;bc=b;cc=c;
-              // DX if(abs(ac*bc*cc-2.0*volume)<eps)
-              if(abs(ac*bc*cc-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*bc*cc-2.0*volume)<eps)
+              if(abs(ac*bc*cc-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1643,9 +1647,9 @@ namespace LATTICE {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          // DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && b<c)|| (choice==1 && aurostd::isequal(b,c,eps))) {  // && not necessary aurostd::isdifferent(a,b,eps) && aurostd::isdifferent(b,c,eps) && aurostd::isdifferent(c,a,eps)
               if(alpha>MCL_alpha_max) MCL_alpha_max=alpha;
             }
@@ -1656,9 +1660,9 @@ namespace LATTICE {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          // DX if(aurostd::isequal(alpha,MCL_alpha_max,epsang)  && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,MCL_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,MCL_alpha_max,epsang)  && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,MCL_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && b<c)|| (choice==1 && aurostd::isequal(b,c,eps))) {  // && not necessary aurostd::isdifferent(a,b,eps) && aurostd::isdifferent(b,c,eps) && aurostd::isdifferent(c,a,eps)
               // MCL: a1=[a 0 0]  a2=[0 b 0]  a3=[0 c*cos(alpha) c*sin(alpha)]: a b<c alpha<90 90 90  primitive
               // MCL: a1=[a 0 0]  a2=[0 b 0]  a3=[0 c*cos(alpha) c*sin(alpha)]: a b<c alpha<90 90 90  conventional
@@ -1702,13 +1706,13 @@ namespace LATTICE {
             rlattice=vrlattice1.at(i);
             rdata=Getabc_angles(mclc*rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-            // DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+            if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               ac=a;bc=b;cc=c;
-              // DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
-              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
+              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 if(alpha>MCLC_alpha_max) MCLC_alpha_max=alpha;
               }
             }
@@ -1723,13 +1727,13 @@ namespace LATTICE {
             // [ac 0 0] [0 bc 0] [0 cc*cos(alpha) cc*sin(alpha) ]    Conventional direct lattice:
             // Direct Lattice (VASP and Bilbao):
             // a1=[ a/2 b/2 0] a2=[-a/2 b/2 0] a3=[0 c*cos(alpha) c*sin(alpha)]
-            // DX if(aurostd::isequal(alpha,MCLC_alpha_max,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            if(SYM::checkAngle(b,c,alpha,MCLC_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(aurostd::isequal(alpha,MCLC_alpha_max,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+            if(SYM::checkAngle(b,c,alpha,MCLC_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               ac=a;bc=b;cc=c;
-              // DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
-              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
+              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
                 if(!aurostd::identical(minkowski_metric_tensor,rlattice_metric_tensor)){
@@ -1751,9 +1755,9 @@ namespace LATTICE {
                 str_sp.FixLattices();
                 klattice=str_sp.klattice;
                 kdata=Getabc_angles(klattice,DEGREES);kalpha=kdata[4];kbeta=kdata[5];kgamma=kdata[6];
-                // DX if(aurostd::isequal(kgamma,90.0,epsang))
-                if(SYM::checkAngle(kdata[1],kdata[2],kgamma,90.0,is_deg,eps)) // DX
-                { //CO200106 - patching for auto-indenting
+                //DX if(aurostd::isequal(kgamma,90.0,epsang))
+                if(SYM::checkAngle(kdata[1],kdata[2],kgamma,90.0,is_deg,eps)) //DX
+                { //CO20200106 - patching for auto-indenting
                   found=TRUE; str_sp.bravais_lattice_variation_type="MCLC2";
                 } else {
                   if(kgamma>90.0) {
@@ -1762,7 +1766,7 @@ namespace LATTICE {
                     // kgamma<90
                     alpharad=alpha*PI/180.0;
                     testphi=0.75-0.25*b*b/a/a-0.25*b/tan(alpharad)*(1/c/sin(alpharad)-1/b/tan(alpharad));
-                    if(aurostd::isequal(testphi,0.5,1e-2)) { // DX: This is a normalized quantity, so we do not need to use checkAngle, should be approximately 0.5
+                    if(aurostd::isequal(testphi,0.5,1e-2)) { //DX: This is a normalized quantity, so we do not need to use checkAngle, should be approximately 0.5
                       found=TRUE; str_sp.bravais_lattice_variation_type="MCLC4";
                     } else {
                       if(testphi>0.5) {
@@ -1804,17 +1808,17 @@ namespace LATTICE {
             if(kalpha>90.0 && kbeta>90.0 && kgamma>90.0) {
               if((kalpha-90.0)+(kbeta-90.0)+(kgamma-90.0)<weight_TRI1a) {
                 weight_TRI1a=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI1a=rlattice; } }
-            // DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
-            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               if((kalpha-90.0)+(kbeta-90.0)<weight_TRI2a) {
                 weight_TRI2a=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI2a=rlattice; } }
             if(kalpha<90.0 && kbeta<90.0 && kgamma<90.0) {
               if((90.0-kalpha)+(90.0-kbeta)+(90.0-kgamma)<weight_TRI1b) {
                 weight_TRI1b=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI1b=rlattice; } }
-            // DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            //DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
             if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               if((90.0-kalpha)+(90.0-kbeta)<weight_TRI2b) {
                 weight_TRI2b=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI2b=rlattice; } }
           }
@@ -1830,7 +1834,7 @@ namespace LATTICE {
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //2-17-16 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
+            //CO20160217 Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
             //Interestingly, this system has weight_TRIa==weight_TRIb, so the check above (TRI1a before TRI1b) is very important.
             klattice=ReciprocalLattice(rlattice);
@@ -1841,17 +1845,17 @@ namespace LATTICE {
             if(kalpha>90.0 && kbeta>90.0 && kgamma>90.0) {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI1a";
             }
-            // DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
-            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) // DX
+            //DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
             {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI2a";
             }
             if(kalpha<90.0 && kbeta<90.0 && kgamma<90.0) {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI1b";
             }
-            // DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
-            if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI2b";
             }
             // found=false;
@@ -1901,7 +1905,7 @@ namespace LATTICE {
     }
     // DONE
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -1915,6 +1919,9 @@ namespace LATTICE {
       str_sp.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
       str_sc=str_in; // copy it
       str_sc.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
+
+      // copy eps information despite failure (for tolerance scan)
+      str_sp.sym_eps = str_sc.sym_eps = eps; //DX20200217
 
       //    if(str_in.title!="NO_RECURSION")
       /*
@@ -1932,7 +1939,7 @@ namespace LATTICE {
          }
          */
     }
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
 
     if(found==TRUE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -1951,14 +1958,14 @@ namespace LATTICE {
       str_reciprocal_in.lattice=str_sp.klattice;str_reciprocal_in.FixLattices();
       str_reciprocal_in.title="NO_RECURSION";
       _atom atom;str_reciprocal_in.AddAtom(atom);
-      // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //STEFANO OLD VERSION
-      int ss=0; //JUNKAI
-      LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JUNKAI
+      // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
+      int ss=0; //JX
+      LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
       str_sp.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-      str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//wahyu mod
+      str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//WSETYAWAN mod
       //str_sp.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
       str_sc.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-      str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//wahyu mod
+      str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//WSETYAWAN mod
       //str_sc.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
       // SUPERLATTICE
       xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
@@ -1966,9 +1973,9 @@ namespace LATTICE {
       str_superlattice_in.title="NO_RECURSION";
       str_superlattice_in.IdenticalAtoms();
       str_superlattice_in.Minkowski_calculated=FALSE;
-      //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //STEFANO OLD VERSION
-      ss=0; //JUNKAI
-      LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JUNKAI
+      //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //SC OLD VERSION
+      ss=0; //JX
+      LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JX
       str_sp.bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
       str_sp.bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
       str_sp.bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -1993,7 +2000,7 @@ namespace LATTICE {
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
     /* STEFANO OLD VERSION
@@ -2017,7 +2024,7 @@ namespace LATTICE {
 
     //  cerr << "OK=" << str_sp.bravais_lattice_type << endl;
 
-    //DX 20181105 - check if transformations are valid - START
+    //DX20181105 - check if transformations are valid - START
     if(found){
       xmatrix<double> metric_tensor_orig = MetricTensor(str_in.scale*str_in.lattice);
       xmatrix<double> metric_tensor_new = MetricTensor(str_sp.scale*str_sp.lattice);
@@ -2047,13 +2054,13 @@ namespace LATTICE {
           cerr << aurostd::det(str_in.scale*str_in.lattice) << " vs " << aurostd::det(str_sp.scale*str_sp.lattice) << " eps vol: " << eps_volume << endl;
         }
         str_sp.volume_changed_original2new = true;
-        str_sp.transform_coordinates_new2original = aurostd::eye<double>(); //CO190520
-        str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //CO190520
-        str_sp.rotate_lattice_new2original = aurostd::eye<double>(); //CO190520
-        str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //CO190520
+        str_sp.transform_coordinates_new2original = aurostd::eye<double>(); //CO20190520
+        str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //CO20190520
+        str_sp.rotate_lattice_new2original = aurostd::eye<double>(); //CO20190520
+        str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //CO20190520
       }
     }
-    //DX 20181105 - check if transformations are valid - END
+    //DX20181105 - check if transformations are valid - END
     return found;
   }
 }
@@ -2062,32 +2069,32 @@ namespace LATTICE {
 
 namespace LATTICE {
   // transformation to standardization
-  bool Standard_Lattice_Structure_20170101(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram)  //**************************JUNKAI EDITED*****************
-    //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //STEFANO OLD VERSION
-  { //CO200106 - patching for auto-indenting
+  bool Standard_Lattice_Structure_20170101(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram)  //**************************JX EDITED*****************
+    //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //SC OLD VERSION
+  { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
     //  LDEBUG=TRUE;
     // starting from a str_in (whatever lattices) this routine returns a standard primitive (str_sp)
-    // and a standard conventional (str_sc) following the ideas of stefano and wahyu
+    // and a standard conventional (str_sc) following the ideas of SC+WSETYAWAN
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     str_sp.GetPrimitive(0.005);
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 
     double str_sp_volume=str_sp.Volume();    // backups
     bool str_sp_neg_scale=str_sc.neg_scale;  // backups
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
     str_sp.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sp.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
     //   if(aurostd::isequal(str_sp.a,str_sp.b,eps) && aurostd::isequal(str_sp.b,str_sp.c,eps) && aurostd::isequal(str_sp.c,str_sp.a,eps)) {
-    //     cerr << "LATTICE::Standard_Lattice_Structure: skipping str_sp.MinkowskiBasisReduction()" << endl;
+    //     cerr << XPID << "LATTICE::Standard_Lattice_Structure: skipping str_sp.MinkowskiBasisReduction()" << endl;
     //   } else
     {str_sp.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
 
@@ -2096,12 +2103,12 @@ namespace LATTICE {
     str_sc.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sc.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
     //   if(aurostd::isequal(str_sc.a,str_sc.b,eps) && aurostd::isequal(str_sc.b,str_sc.c,eps) && aurostd::isequal(str_sc.c,str_sc.a,eps)) {
-    //     cerr << "LATTICE::Standard_Lattice_Structure: skipping str_sc.MinkowskiBasisReduction()" << endl;
+    //     cerr << XPID << "LATTICE::Standard_Lattice_Structure: skipping str_sc.MinkowskiBasisReduction()" << endl;
     //   } else
     {str_sc.MinkowskiBasisReduction();} // shorten the vectors as much as possible and as perpendicular as possible
     str_sc.ClearSymmetry();
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
     xvector<int> dims(3);    // to scan
     dims=LatticeDimensionSphere(str_sp.lattice,RadiusSphereLattice(str_sp.lattice)/1.0);
@@ -2126,7 +2133,7 @@ namespace LATTICE {
           if(modulus(aus)>eps && modulus(aus)<=nndist) nndist=modulus(aus);
         }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4a]" << endl;
 
     string crystal_system="none";
     bool lattice_found=FALSE;
@@ -2138,7 +2145,7 @@ namespace LATTICE {
        if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(SYS_VERBOSE);
        */
 
-    // DX - START
+    //DX START
     if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
@@ -2151,13 +2158,13 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
-      if(LDEBUG) { cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
+      if(LDEBUG) { cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
     }
 
-    //**************************JUNKAI EDITED START****************************
+    //**************************JX EDITED START****************************
     /* OLD (DX)
-    // JUNKAI CHECK THE POSCAR OF KESONG it has 1.21% strain and finds it cubic but is it tet ?
+    //JX CHECK THE POSCAR OF KY it has 1.21% strain and finds it cubic but is it tet ?
     //  cerr << "[1]" << endl;
     if(str_sp.pgroup_calculated==FALSE) {
     //   cerr << "str_sp.pgroup_calculated" << endl;
@@ -2165,12 +2172,12 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
-    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
+    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
     //  cerr << "[2]" << endl;
     if(str_sp.fgroup_calculated==FALSE) {
     //  cerr << "str_sp.fgroup_calculated" << endl;
@@ -2178,15 +2185,15 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
-    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
-    // DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
+    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
+    //DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
     //  cerr << "[3]" << endl;
     if(str_sp.pgroup_xtal_calculated==FALSE) {
     //  cerr << "str_sp.pgroup_xtal_calculated" << endl;
@@ -2195,23 +2202,23 @@ namespace LATTICE {
     _aflags aflags;
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
-    // DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
-    // DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
-    // DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
+    //DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
+    //DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
+    //DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
     }
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
     //  cerr << "[4]" << endl;
     */ //OLD (DX)
-    // DX - END
-    //**************************JUNKAI EDITED END****************************
+    //DX END
+    //**************************JX EDITED END****************************
 
     // http://en.wikipedia.org/wiki/Crystal_system  table from bottom to top
     //  if(str_sp.pgroup.size()==24 && str_sp.crystal_system=="") str_sp.crystal_system="hexagonal";
@@ -2241,7 +2248,7 @@ namespace LATTICE {
     }
     */
 
-    if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
 
     if(LDEBUG) {
       cerr << "str_sp.atoms.size()=" << str_sp.atoms.size() << endl;
@@ -2264,7 +2271,7 @@ namespace LATTICE {
     //  if(crystal_system=="tetragonal") {cutoff=(2.0/sqrt(3.0))*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;}
     if(crystal_system=="tetragonal") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);lattice_found=TRUE;}
     if(crystal_system=="trigonal") {cutoff=max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} // the primitives always get the max of the lenghts
-    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //stefano recipe
+    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //SC recipe
     if(crystal_system=="orthorhombic") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);lattice_found=TRUE;}
     if(crystal_system=="monoclinic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //sqrt(2) catches the centered face
     if(crystal_system=="triclinic") {cutoff=max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} // the primitives always get the max of the lenghts
@@ -2283,7 +2290,7 @@ namespace LATTICE {
        }
        */
 
-    //**************************JUNKAI EDITED START****************************
+    //**************************JX EDITED START****************************
     if((lattice_found==FALSE || crystal_system=="none" || cutoff<=0.01)&&!histogram) {
       vector<double> tolerance;
       int ij;
@@ -2297,7 +2304,7 @@ namespace LATTICE {
       //   return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,aeps);
     }
 
-    //**************************JUNKAI EDITED END****************************  
+    //**************************JX EDITED END****************************  
 
     // crystal_system="all";cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);
 
@@ -2349,10 +2356,10 @@ namespace LATTICE {
     //  bool VERBOSE_PROGRESS=TRUE;
     // try different solutions
     for (uint choice=0;choice<=2&&!found;choice++) {
-      if(VERBOSE_PROGRESS) if(choice==0) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
-      if(VERBOSE_PROGRESS) if(choice==1) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
-      if(VERBOSE_PROGRESS) if(choice==2) cerr << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
-      if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
+      if(VERBOSE_PROGRESS) if(choice==0) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION PRISTINE" << endl;
+      if(VERBOSE_PROGRESS) if(choice==1) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX1" << endl; // locura
+      if(VERBOSE_PROGRESS) if(choice==2) cerr << XPID << "LATTICE::Standard_Lattice_Structure: DEFINITION RELAX2" << endl; // locura
+      if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: crystal_system=" << crystal_system << endl;
 
       // ***************************************************************************************************
       // CUBIC CRYSTAL SYSTEM
@@ -2478,7 +2485,7 @@ namespace LATTICE {
             if((choice==0 && ((aurostd::isequal(a,b,eps)&&aurostd::isdifferent(b,c,eps))||(aurostd::isequal(b,c,eps)&&aurostd::isdifferent(c,a,eps))||(aurostd::isequal(c,a,eps)&&aurostd::isdifferent(a,b,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps)&&aurostd::isequal(b,c,eps)))))
               // if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
 
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  primitive
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  conventional
@@ -2590,7 +2597,7 @@ namespace LATTICE {
                   } else {
                     str_sp.bravais_lattice_variation_type="RHL2";
                   }
-                  alpha=alpha*pi/180.0; // change to RADIANTS !
+                  alpha=alpha*pi/180.0; // change to RADIANS !
                   plattice[1][1]=a*cos(alpha/2.0);plattice[1][2]=-a*sin(alpha/2.0);plattice[1][3]=0.0; // make the standard primitive rhl
                   plattice[2][1]=a*cos(alpha/2.0);plattice[2][2]= a*sin(alpha/2.0);plattice[2][3]=0.0; // make the standard primitive rhl
                   plattice[3][1]=a*cos(alpha)/cos(alpha/2.0);plattice[3][2]=0.0;
@@ -3021,7 +3028,7 @@ namespace LATTICE {
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //2-17-16 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
+            //CO20160217 Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
             //Interestingly, this system has weight_TRIa==weight_TRIb, so the check above (TRI1a before TRI1b) is very important.
             klattice=ReciprocalLattice(rlattice);
@@ -3080,7 +3087,7 @@ namespace LATTICE {
     }
     // DONE
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -3110,7 +3117,7 @@ namespace LATTICE {
       }
     }
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X2 found=" << found << endl;
 
     if(found==TRUE) {
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
@@ -3128,14 +3135,14 @@ namespace LATTICE {
         str_reciprocal_in.lattice=str_sp.klattice;str_reciprocal_in.FixLattices();
         str_reciprocal_in.title="NO_RECURSION";
         _atom atom;str_reciprocal_in.AddAtom(atom);
-        // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //STEFANO OLD VERSION
-        int ss=0; //JUNKAI
-        LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JUNKAI
+        // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
+        int ss=0; //JX
+        LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
         str_sp.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-        str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//wahyu mod
+        str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//WSETYAWAN mod
         //str_sp.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
         str_sc.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-        str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//wahyu mod
+        str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//WSETYAWAN mod
         //str_sc.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
         // SUPERLATTICE
         xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
@@ -3143,9 +3150,9 @@ namespace LATTICE {
         str_superlattice_in.title="NO_RECURSION";
         str_superlattice_in.IdenticalAtoms();
         str_superlattice_in.Minkowski_calculated=FALSE;
-        //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //STEFANO OLD VERSION
-        ss=0; //JUNKAI
-        LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JUNKAI
+        //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //SC OLD VERSION
+        ss=0; //JX
+        LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JX
         str_sp.bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
         str_sp.bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
         str_sp.bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -3162,10 +3169,10 @@ namespace LATTICE {
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }
 
-    if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
+    if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
-    // STEFANO OLD VERSION
+    //SC OLD VERSION
     //   if(abs(NearestNeighbour(str_in)-NearestNeighbour(str_sp))>0.01) {
     //   cerr << "ERROR:  LATTICE::Standard_Lattice_Structure" << endl;
     //   cerr << "ERROR:  str_in.title=" << str_in.title << endl;
@@ -3195,8 +3202,8 @@ void CheckLatticeHistogram(xstructure& a) {
   tolerance=PointGroupHistogramCheck(str_in);
   for(uint i=0;i<tolerance.size();i++) {
     LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,ss,tolerance.at(i),true);
-    cout<<"TOLERANCE: "<<tolerance.at(i);
-    cout<<"  LATTICETYPE: "<<str_sp.bravais_lattice_type<<endl;
+    cout << "TOLERANCE: " << tolerance.at(i);
+    cout << "  LATTICETYPE: " << str_sp.bravais_lattice_type << endl;
   }
 }
 
@@ -3246,18 +3253,18 @@ namespace LATTICE {
 // ***************************************************************************
 namespace LATTICE {
   bool Bravais_Lattice_Structure(xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang) {
-    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang);// STEFANO OLD VERSION
-    int ss=0; //JUNKAI                                                                                                                                                                                                                                                
-    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JUNKAI
+    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang);//SC OLD VERSION
+    int ss=0; //JX                                                                                                                                                                                                                                                
+    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JX
     str_in.bravais_lattice_type=str_sp.bravais_lattice_type;
     str_in.bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
     str_in.bravais_lattice_system=str_sp.bravais_lattice_system;
     xstructure _str_in,_str_sp,_str_sc;
     _str_in.lattice=str_in.lattice; _str_in.scale=1.0;
     _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
-    //  LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang); //STEFANO OLD VERSION
-    ss=0; //JUNKAI                                        
-    LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JUNKAI
+    //  LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
+    ss=0; //JX                                        
+    LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JX
     str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
     str_in.bravais_lattice_lattice_variation_type=_str_sp.bravais_lattice_variation_type;
     str_in.bravais_lattice_lattice_system=_str_sp.bravais_lattice_system;
@@ -3265,7 +3272,7 @@ namespace LATTICE {
   }
 }
 
-// DX - START 
+//DX START 
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     return Bravais_Lattice_StructureDefault_20170401(str_in,str_sp,str_sc,full_sym);
@@ -3273,8 +3280,8 @@ namespace LATTICE {
 }
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20170401(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); // DX 4/26/18 - added LDEBUG
-    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory 
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //DX20180426 - added LDEBUG
+    string directory=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd"); //DX20180426 - added current working directory 
     bool same_eps = false;
     bool no_scan = false;
     bool ignore_checks = false;
@@ -3284,13 +3291,13 @@ namespace LATTICE {
         same_eps = true; //force single while loop, no check
       }
       if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym)){
-        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} // DX 4/26/18 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << XPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
-          cerr << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
+          cerr << XPID << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
           ignore_checks = true;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
-        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
+        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
         continue;
       }
       str_in.bravais_lattice_type=str_sp.bravais_lattice_type;
@@ -3301,27 +3308,27 @@ namespace LATTICE {
       str_sp.bravais_lattice_system=str_sp.bravais_lattice_system;
       xstructure _str_in,_str_sp,_str_sc;
       _str_in.lattice=str_in.lattice; _str_in.scale=1.0;
-      _str_in.sym_eps=_str_sp.sym_eps=_str_sc.sym_eps=str_sp.sym_eps; // DX
-      _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; // DX
-      _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
+      _str_in.sym_eps=_str_sp.sym_eps=_str_sc.sym_eps=str_sp.sym_eps; //DX
+      _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+      _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
-      // DX 8/14/17 - START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-      // DX 8/14/17 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-      // DX 8/14/17 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
-      // DX 4/26/18 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
-      // DX 4/26/18 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
-      // DX 4/26/18 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
-      // DX 4/26/18 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
-      // DX 8/14/17 - END
-      // DX 2/26/18 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
-      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) // DX 2/26/18 - do not need to do full sym on lattice
-      { //CO200106 - patching for auto-indenting
-        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} // DX 4/26/18 - added directory info and put in LDEBUG
+      //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+      //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+      //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
+      //DX20170814 END
+      //DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
+      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) //DX20180226 - do not need to do full sym on lattice
+      { //CO20200106 - patching for auto-indenting
+        if(LDEBUG) {cerr << XPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
-          cerr << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
+          cerr << XPID << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
-        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
+        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
         continue;
       }
       str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
@@ -3335,7 +3342,7 @@ namespace LATTICE {
       }
       else { 
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = _str_sp.sym_eps;
-        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = _str_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
+        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = _str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       }
     }
     if(count==100){
@@ -3345,9 +3352,9 @@ namespace LATTICE {
     return TRUE;
   }
 }
-// DX - END
+//DX END
 
-// DX - START
+//DX START
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20160101(xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
     LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
@@ -3370,16 +3377,16 @@ namespace LATTICE {
     return TRUE;
   }
 }
-// DX - END
+//DX END
 
 namespace LATTICE {
   bool Lattice(const xmatrix<double>& lattice,xmatrix<double>& lattice_sp,xmatrix<double>& lattice_sc,string& bravais_lattice_type,string& bravais_lattice_variation_type,string& bravais_lattice_system,double eps,double epsang) {
     xstructure str_in,str_sp,str_sc;
     str_in.lattice=lattice; str_in.scale=1.0;
     _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; str_in.AddAtom(atom);
-    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); // STEFANO OLD VERSION
-    int ss=0; //JUNKAI                                                                                                                                                                                                                                                
-    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JUNKAI
+    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
+    int ss=0; //JX                                                                                                                                                                                                                                                
+    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JX
     lattice_sp=str_sp.lattice;lattice_sc=str_sc.lattice;
     bravais_lattice_type=str_sp.bravais_lattice_type;
     bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
@@ -3494,7 +3501,7 @@ xvector<double> Vrotate(xvector<double> V, xvector<double> Vaxis, double zzeta) 
 }
 
 // ***************************************************************************
-// lattice::BZPLOTDATA
+// LATTICE::BZPLOTDATA
 // ***************************************************************************
 namespace LATTICE {
   void BZPLOTDATA(string options,istream& poscar, int mode) {
@@ -3525,28 +3532,28 @@ namespace LATTICE {
     //analogous to --bzplotdatauseKPOINTS but for --bzplot.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
 
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: options=" << options << endl;
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) cerr << "lattice::BZPLOTDATA: mode=" << mode << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: options=" << options << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: mode=" << mode << endl;
 
     if(mode==0 && tokens.size()!=0) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
       exit(0);
     }
     if(mode==10 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplotdatauseKPOINTS=KPOINTS < POSCAR > plotbz.dat");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdatauseKPOINTS=KPOINTS < POSCAR > plotbz.dat");
       exit(0);
     }
     if(mode==1 && tokens.size()!=0) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplot < POSCAR");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplot < POSCAR");
       exit(0);
     }
     if(mode==11 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"lattice::BZPLOTDATA","aflow --bzplotuseKPOINTS=KPOINTS < POSCAR");
+      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotuseKPOINTS=KPOINTS < POSCAR");
       exit(0);
     }
 
@@ -3554,7 +3561,7 @@ namespace LATTICE {
     if(mode==10) filename=tokens.at(0);
     if(mode==11) filename=tokens.at(0);
 
-#define bzsetf std::setw(8)<<std::fixed<<setprecision(4)
+#define bzsetf std::setw(8) << std::fixed << setprecision(4)
 
     bool found=false;
     int i,j;
@@ -3569,7 +3576,7 @@ namespace LATTICE {
       if(aurostd::FileExist(filename)) {
         aurostd::efile2vectorstring(filename,tokens);
       } else {
-        cerr<<"ERROR: lattice::BZPLOTDATA: "<<filename<<" can not be opened. aborted.";abort();
+        cerr << XPID << "ERROR: LATTICE::BZPLOTDATA: " << filename << " can not be opened. aborted.";abort();
       }
       if(tokens.size()>0) str_sp.bravais_lattice_variation_type=tokens.at(0);
       aurostd::string2tokens(string(tokens.at(0)),tokens," ");
@@ -3579,7 +3586,8 @@ namespace LATTICE {
           str_sp.bravais_lattice_variation_type=tokens.at(1);
       }
     }
-    cerr << "LATTICE TYPE="<<str_sp.bravais_lattice_variation_type<<endl;
+    //    cout << XPID << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
+    cerr << "LATTICE TYPE=" << str_sp.bravais_lattice_variation_type << endl;
     xvector<double> data(6),a1(3),a2(3),a3(3),b1(3),b2(3),b3(3),pL(3),
       pLaxis(3),pz(3),ptmp(3),tmpb1(3),tmpb2(3),tmpb3(3);
     xmatrix<double> klattice(3,3);
@@ -5826,10 +5834,10 @@ namespace LATTICE {
       conback(1,i)=23; conback(2,i)=24;  Nconback=i;
     }
     //----------- TRI1a or TRI2a --------------------------
-    if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a" || LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a") {	//corey and david
+    if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a" || LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a") {	//CO+DX
       found=true;
-      if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a")    glatt="TRI_1_a";	//corey and david
-      if(LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a")    glatt="TRI_2_a";	//corey and david
+      if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a")    glatt="TRI_1_a";	//CO+DX
+      if(LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a")    glatt="TRI_2_a";	//CO+DX
       xrotview=75; zrotview=140;
       azview=120; elview=10;
       b1arrow=0.25; b2arrow=0.25; b3arrow=0.25;
@@ -5948,10 +5956,10 @@ namespace LATTICE {
       conback(1,i)=28; conback(2,i)=27;  Nconback=i;
     }
     //----------- TRI1b or TRI2b --------------------------
-    if( LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b" || LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b") {	//corey and david
+    if( LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b" || LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b") {	//CO+DX
       found=true;
-      if(LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b")    glatt="TRI_1_b";	//corey and david
-      if(LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b")    glatt="TRI_2_b";	//corey and david
+      if(LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b")    glatt="TRI_1_b";	//CO+DX
+      if(LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b")    glatt="TRI_2_b";	//CO+DX
       xrotview=75; zrotview=55;
       azview=120; elview=10;
       b1arrow=0.25; b2arrow=0.25; b3arrow=0.25;
@@ -6103,341 +6111,341 @@ namespace LATTICE {
 
     //output
     if(mode==0) {
-      cout<<glatt<<endl
-        <<gpath<<endl
-        <<bzsetf<<xrotview<<" "<<bzsetf<<zrotview<<"  xrot and zrot view in degrees (gnuplot)"<<endl
-        <<bzsetf<<azview<<" "<<bzsetf<<elview<<"  azimuth and elevation view in degrees (matlab)"<<endl
-        <<bzsetf<<b1arrow<<" "<<bzsetf<<b2arrow<<" "<<bzsetf<<b3arrow
-        <<"  lenght of recip. vec. arrow in fractions of recip vec norm"<<endl
-        <<bzsetf<<b1text<<" "<<bzsetf<<b2text<<" "<<bzsetf<<b3text
-        <<"  arrow label position in fractions of recip. vec. norm"<<endl
-        <<"Reciprocal lattice vectors:"<<endl
-        <<klattice<<endl;
-      cout<<Nirbz<<" #kpoints in kpath (cartesian coordinates)"<<endl;
+      cout << glatt << endl
+        << gpath << endl
+        << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
+        << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
+        << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
+        << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
+        << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
+        << "  arrow label position in fractions of recip. vec. norm" << endl
+        << "Reciprocal lattice vectors:" << endl
+        << klattice << endl;
+      cout << Nirbz << " #kpoints in kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        cout<<bzsetf<<cirbz(i,1)<<" "
-          <<bzsetf<<cirbz(i,2)<<" "
-          <<bzsetf<<cirbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        cout << bzsetf << cirbz(i,1) << " "
+          << bzsetf << cirbz(i,2) << " "
+          << bzsetf << cirbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      cout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z."<<endl;
-      cout<<Nircon<<" #segments for kpath (cartesian coordinates)"<<endl;
+      cout << "Each line represents a line segment p1 to p2, " << endl
+        << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
+      cout << Nircon << " #segments for kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        cout<<bzsetf<<cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),3)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3)<<endl;
+        cout << bzsetf << cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(1,i),3) << " "
+          << bzsetf << cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3) << endl;
       }
-      cout<<Nirconback<<" #segments for irbz non kpath (cartesian coordinates)"<<endl;
+      cout << Nirconback << " #segments for irbz non kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        cout<<bzsetf<<cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),3)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3)<<endl;
+        cout << bzsetf << cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(1,i),3) << " "
+          << bzsetf << cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3) << endl;
       }
-      cout<<Ncon<<" #segments for front bz (cartesian coordinates)"<<endl;
+      cout << Ncon << " #segments for front bz (cartesian coordinates)" << endl;
       for(i=1;i<Ncon+1;i++) {
-        cout<<bzsetf<<cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(1,i),3)<<" "
-          <<bzsetf<<cbz(con(2,i),1)-cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(2,i),2)-cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(2,i),3)-cbz(con(1,i),3)<<endl;
+        cout << bzsetf << cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(1,i),3) << " "
+          << bzsetf << cbz(con(2,i),1)-cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(2,i),2)-cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(2,i),3)-cbz(con(1,i),3) << endl;
       }
-      cout<<Nconback<<" #segments for back bz (cartesian coordinates)"<<endl;
+      cout << Nconback << " #segments for back bz (cartesian coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        cout<<bzsetf<<cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(1,i),3)<<" "
-          <<bzsetf<<cbz(conback(2,i),1)-cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(2,i),2)-cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(2,i),3)-cbz(conback(1,i),3)<<endl;
+        cout << bzsetf << cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(1,i),3) << " "
+          << bzsetf << cbz(conback(2,i),1)-cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(2,i),2)-cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(2,i),3)-cbz(conback(1,i),3) << endl;
       }
-      cout<<Nirbz<<" #kpoints in kpath (fractional coordinates)"<<endl;
+      cout << Nirbz << " #kpoints in kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        cout<<bzsetf<<irbz(i,1)<<" "
-          <<bzsetf<<irbz(i,2)<<" "
-          <<bzsetf<<irbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        cout << bzsetf << irbz(i,1) << " "
+          << bzsetf << irbz(i,2) << " "
+          << bzsetf << irbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      cout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)."<<endl;
-      cout<<Nircon<<" #segments for kpath (fractional coordinates)"<<endl;
+      cout << "Each line represents a line segment p1 to p2, " << endl
+        << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
+      cout << Nircon << " #segments for kpath (fractional coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        cout<<bzsetf<<irbz(ircon(1,i),1)<<" "
-          <<bzsetf<<irbz(ircon(1,i),2)<<" "
-          <<bzsetf<<irbz(ircon(1,i),3)<<"  to "
-          <<bzsetf<<irbz(ircon(2,i),1)<<" "
-          <<bzsetf<<irbz(ircon(2,i),2)<<" "
-          <<bzsetf<<irbz(ircon(2,i),3)<<endl;
+        cout << bzsetf << irbz(ircon(1,i),1) << " "
+          << bzsetf << irbz(ircon(1,i),2) << " "
+          << bzsetf << irbz(ircon(1,i),3) << "  to "
+          << bzsetf << irbz(ircon(2,i),1) << " "
+          << bzsetf << irbz(ircon(2,i),2) << " "
+          << bzsetf << irbz(ircon(2,i),3) << endl;
       }
-      cout<<Nirconback<<" #segments for irbz non kpath (fractional coordinates)"<<endl;
+      cout << Nirconback << " #segments for irbz non kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        cout<<bzsetf<<irbz(irconback(1,i),1)<<" "
-          <<bzsetf<<irbz(irconback(1,i),2)<<" "
-          <<bzsetf<<irbz(irconback(1,i),3)<<"  to "
-          <<bzsetf<<irbz(irconback(2,i),1)<<" "
-          <<bzsetf<<irbz(irconback(2,i),2)<<" "
-          <<bzsetf<<irbz(irconback(2,i),3)<<endl;
+        cout << bzsetf << irbz(irconback(1,i),1) << " "
+          << bzsetf << irbz(irconback(1,i),2) << " "
+          << bzsetf << irbz(irconback(1,i),3) << "  to "
+          << bzsetf << irbz(irconback(2,i),1) << " "
+          << bzsetf << irbz(irconback(2,i),2) << " "
+          << bzsetf << irbz(irconback(2,i),3) << endl;
       }
-      cout<<Ncon<<" #segments for front bz"<<endl;
+      cout << Ncon << " #segments for front bz" << endl;
       for(i=1;i<Ncon+1;i++) {
-        cout<<bzsetf<<bz(con(1,i),1)<<" "
-          <<bzsetf<<bz(con(1,i),2)<<" "
-          <<bzsetf<<bz(con(1,i),3)<<"  to "
-          <<bzsetf<<bz(con(2,i),1)<<" "
-          <<bzsetf<<bz(con(2,i),2)<<" "
-          <<bzsetf<<bz(con(2,i),3)<<endl;
+        cout << bzsetf << bz(con(1,i),1) << " "
+          << bzsetf << bz(con(1,i),2) << " "
+          << bzsetf << bz(con(1,i),3) << "  to "
+          << bzsetf << bz(con(2,i),1) << " "
+          << bzsetf << bz(con(2,i),2) << " "
+          << bzsetf << bz(con(2,i),3) << endl;
       }
-      cout<<Nconback<<" #segments for back bz (fractional coordinates)"<<endl;
+      cout << Nconback << " #segments for back bz (fractional coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        cout<<bzsetf<<bz(conback(1,i),1)<<" "
-          <<bzsetf<<bz(conback(1,i),2)<<" "
-          <<bzsetf<<bz(conback(1,i),3)<<"  to "
-          <<bzsetf<<bz(conback(2,i),1)<<" "
-          <<bzsetf<<bz(conback(2,i),2)<<" "
-          <<bzsetf<<bz(conback(2,i),3)<<endl;
+        cout << bzsetf << bz(conback(1,i),1) << " "
+          << bzsetf << bz(conback(1,i),2) << " "
+          << bzsetf << bz(conback(1,i),3) << "  to "
+          << bzsetf << bz(conback(2,i),1) << " "
+          << bzsetf << bz(conback(2,i),2) << " "
+          << bzsetf << bz(conback(2,i),3) << endl;
       }
     }
     if(mode==1) {
       ofstream fout;
       fout.open("bzplot.dat");
-      cerr<<"Generating plotbz.dat file"<<endl;
-      fout<<glatt<<endl
-        <<gpath<<endl
-        <<bzsetf<<xrotview<<" "<<bzsetf<<zrotview<<"  xrot and zrot view in degrees (gnuplot)"<<endl
-        <<bzsetf<<azview<<" "<<bzsetf<<elview<<"  azimuth and elevation view in degrees (matlab)"<<endl
-        <<bzsetf<<b1arrow<<" "<<bzsetf<<b2arrow<<" "<<bzsetf<<b3arrow
-        <<"  lenght of recip. vec. arrow in fractions of recip vec norm"<<endl
-        <<bzsetf<<b1text<<" "<<bzsetf<<b2text<<" "<<bzsetf<<b3text
-        <<"  arrow label position in fractions of recip. vec. norm"<<endl
-        <<"Reciprocal lattice vectors:"<<endl
-        <<klattice<<endl;
-      fout<<Nirbz<<" #kpoints in kpath (cartesian coordinates)"<<endl;
+      cerr << "Generating plotbz.dat file" << endl;
+      fout << glatt << endl
+        << gpath << endl
+        << bzsetf << xrotview << " " << bzsetf << zrotview << "  xrot and zrot view in degrees (gnuplot)" << endl
+        << bzsetf << azview << " " << bzsetf << elview << "  azimuth and elevation view in degrees (matlab)" << endl
+        << bzsetf << b1arrow << " " << bzsetf << b2arrow << " " << bzsetf << b3arrow
+        << "  lenght of recip. vec. arrow in fractions of recip vec norm" << endl
+        << bzsetf << b1text << " " << bzsetf << b2text << " " << bzsetf << b3text
+        << "  arrow label position in fractions of recip. vec. norm" << endl
+        << "Reciprocal lattice vectors:" << endl
+        << klattice << endl;
+      fout << Nirbz << " #kpoints in kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        fout<<bzsetf<<cirbz(i,1)<<" "
-          <<bzsetf<<cirbz(i,2)<<" "
-          <<bzsetf<<cirbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        fout << bzsetf << cirbz(i,1) << " "
+          << bzsetf << cirbz(i,2) << " "
+          << bzsetf << cirbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      fout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z."<<endl;
-      fout<<Nircon<<" #segments for kpath (cartesian coordinates)"<<endl;
+      fout << "Each line represents a line segment p1 to p2, " << endl
+        << "with format p1x p1y p1z p2x-p1x p2y-p1y p2z-p1z." << endl;
+      fout << Nircon << " #segments for kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        fout<<bzsetf<<cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(1,i),3)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2)<<" "
-          <<bzsetf<<cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3)<<endl;
+        fout << bzsetf << cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(1,i),3) << " "
+          << bzsetf << cirbz(ircon(2,i),1)-cirbz(ircon(1,i),1) << " "
+          << bzsetf << cirbz(ircon(2,i),2)-cirbz(ircon(1,i),2) << " "
+          << bzsetf << cirbz(ircon(2,i),3)-cirbz(ircon(1,i),3) << endl;
       }
-      fout<<Nirconback<<" #segments for irbz non kpath (cartesian coordinates)"<<endl;
+      fout << Nirconback << " #segments for irbz non kpath (cartesian coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        fout<<bzsetf<<cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(1,i),3)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2)<<" "
-          <<bzsetf<<cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3)<<endl;
+        fout << bzsetf << cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(1,i),3) << " "
+          << bzsetf << cirbz(irconback(2,i),1)-cirbz(irconback(1,i),1) << " "
+          << bzsetf << cirbz(irconback(2,i),2)-cirbz(irconback(1,i),2) << " "
+          << bzsetf << cirbz(irconback(2,i),3)-cirbz(irconback(1,i),3) << endl;
       }
-      fout<<Ncon<<" #segments for front bz (cartesian coordinates)"<<endl;
+      fout << Ncon << " #segments for front bz (cartesian coordinates)" << endl;
       for(i=1;i<Ncon+1;i++) {
-        fout<<bzsetf<<cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(1,i),3)<<" "
-          <<bzsetf<<cbz(con(2,i),1)-cbz(con(1,i),1)<<" "
-          <<bzsetf<<cbz(con(2,i),2)-cbz(con(1,i),2)<<" "
-          <<bzsetf<<cbz(con(2,i),3)-cbz(con(1,i),3)<<endl;
+        fout << bzsetf << cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(1,i),3) << " "
+          << bzsetf << cbz(con(2,i),1)-cbz(con(1,i),1) << " "
+          << bzsetf << cbz(con(2,i),2)-cbz(con(1,i),2) << " "
+          << bzsetf << cbz(con(2,i),3)-cbz(con(1,i),3) << endl;
       }
-      fout<<Nconback<<" #segments for back bz (cartesian coordinates)"<<endl;
+      fout << Nconback << " #segments for back bz (cartesian coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        fout<<bzsetf<<cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(1,i),3)<<" "
-          <<bzsetf<<cbz(conback(2,i),1)-cbz(conback(1,i),1)<<" "
-          <<bzsetf<<cbz(conback(2,i),2)-cbz(conback(1,i),2)<<" "
-          <<bzsetf<<cbz(conback(2,i),3)-cbz(conback(1,i),3)<<endl;
+        fout << bzsetf << cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(1,i),3) << " "
+          << bzsetf << cbz(conback(2,i),1)-cbz(conback(1,i),1) << " "
+          << bzsetf << cbz(conback(2,i),2)-cbz(conback(1,i),2) << " "
+          << bzsetf << cbz(conback(2,i),3)-cbz(conback(1,i),3) << endl;
       }
-      fout<<Nirbz<<" #kpoints in kpath (fractional coordinates)"<<endl;
+      fout << Nirbz << " #kpoints in kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirbz+1;i++) {
-        fout<<bzsetf<<irbz(i,1)<<" "
-          <<bzsetf<<irbz(i,2)<<" "
-          <<bzsetf<<irbz(i,3)<<"  "
-          <<irbzlab[i]<<endl;
+        fout << bzsetf << irbz(i,1) << " "
+          << bzsetf << irbz(i,2) << " "
+          << bzsetf << irbz(i,3) << "  "
+          << irbzlab[i] << endl;
       }
-      fout<<"Each line represents a line segment p1 to p2, "<<endl
-        <<"with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)."<<endl;
-      fout<<Nircon<<" #segments for kpath (fractional coordinates)"<<endl;
+      fout << "Each line represents a line segment p1 to p2, " << endl
+        << "with format p1(1) p1(2) p1(3) to p2(1) p2(2) p2(3)." << endl;
+      fout << Nircon << " #segments for kpath (fractional coordinates)" << endl;
       for(i=1;i<Nircon+1;i++) {
-        fout<<bzsetf<<irbz(ircon(1,i),1)<<" "
-          <<bzsetf<<irbz(ircon(1,i),2)<<" "
-          <<bzsetf<<irbz(ircon(1,i),3)<<"  to "
-          <<bzsetf<<irbz(ircon(2,i),1)<<" "
-          <<bzsetf<<irbz(ircon(2,i),2)<<" "
-          <<bzsetf<<irbz(ircon(2,i),3)<<endl;
+        fout << bzsetf << irbz(ircon(1,i),1) << " "
+          << bzsetf << irbz(ircon(1,i),2) << " "
+          << bzsetf << irbz(ircon(1,i),3) << "  to "
+          << bzsetf << irbz(ircon(2,i),1) << " "
+          << bzsetf << irbz(ircon(2,i),2) << " "
+          << bzsetf << irbz(ircon(2,i),3) << endl;
       }
-      fout<<Nirconback<<" #segments for irbz non kpath (fractional coordinates)"<<endl;
+      fout << Nirconback << " #segments for irbz non kpath (fractional coordinates)" << endl;
       for(i=1;i<Nirconback+1;i++) {
-        fout<<bzsetf<<irbz(irconback(1,i),1)<<" "
-          <<bzsetf<<irbz(irconback(1,i),2)<<" "
-          <<bzsetf<<irbz(irconback(1,i),3)<<"  to "
-          <<bzsetf<<irbz(irconback(2,i),1)<<" "
-          <<bzsetf<<irbz(irconback(2,i),2)<<" "
-          <<bzsetf<<irbz(irconback(2,i),3)<<endl;
+        fout << bzsetf << irbz(irconback(1,i),1) << " "
+          << bzsetf << irbz(irconback(1,i),2) << " "
+          << bzsetf << irbz(irconback(1,i),3) << "  to "
+          << bzsetf << irbz(irconback(2,i),1) << " "
+          << bzsetf << irbz(irconback(2,i),2) << " "
+          << bzsetf << irbz(irconback(2,i),3) << endl;
       }
-      fout<<Ncon<<" #segments for front bz"<<endl;
+      fout << Ncon << " #segments for front bz" << endl;
       for(i=1;i<Ncon+1;i++) {
-        fout<<bzsetf<<bz(con(1,i),1)<<" "
-          <<bzsetf<<bz(con(1,i),2)<<" "
-          <<bzsetf<<bz(con(1,i),3)<<"  to "
-          <<bzsetf<<bz(con(2,i),1)<<" "
-          <<bzsetf<<bz(con(2,i),2)<<" "
-          <<bzsetf<<bz(con(2,i),3)<<endl;
+        fout << bzsetf << bz(con(1,i),1) << " "
+          << bzsetf << bz(con(1,i),2) << " "
+          << bzsetf << bz(con(1,i),3) << "  to "
+          << bzsetf << bz(con(2,i),1) << " "
+          << bzsetf << bz(con(2,i),2) << " "
+          << bzsetf << bz(con(2,i),3) << endl;
       }
-      fout<<Nconback<<" #segments for back bz (fractional coordinates)"<<endl;
+      fout << Nconback << " #segments for back bz (fractional coordinates)" << endl;
       for(i=1;i<Nconback+1;i++) {
-        fout<<bzsetf<<bz(conback(1,i),1)<<" "
-          <<bzsetf<<bz(conback(1,i),2)<<" "
-          <<bzsetf<<bz(conback(1,i),3)<<"  to "
-          <<bzsetf<<bz(conback(2,i),1)<<" "
-          <<bzsetf<<bz(conback(2,i),2)<<" "
-          <<bzsetf<<bz(conback(2,i),3)<<endl;
+        fout << bzsetf << bz(conback(1,i),1) << " "
+          << bzsetf << bz(conback(1,i),2) << " "
+          << bzsetf << bz(conback(1,i),3) << "  to "
+          << bzsetf << bz(conback(2,i),1) << " "
+          << bzsetf << bz(conback(2,i),2) << " "
+          << bzsetf << bz(conback(2,i),3) << endl;
       }
       fout.close();
 
       fout.open("plotbz.sh");
-      cerr<<"Generating gnuplot script plotbz.sh"<<endl;
+      cerr << "Generating gnuplot script plotbz.sh" << endl;
 
-      fout<<"#!/bin/ksh"<<endl
-        <<"# A script to plot brillouin zone and kpath."<<endl
-        <<"# It needs aflow with --bzplotdata option"<<endl
-        <<"# input files: bzplot.dat"<<endl
-        <<"# output files: bzplot.eps bzplot.png"<<endl
-        <<"#"<<endl<<"# written: 2010 wahyu@alumni.duke.edu"<<endl<<endl
-        <<"datfile=bzplot.dat"<<endl
-        <<"recipfile=recip.dat #reciprocal vectors"<<endl
-        <<"kptsfile=kpts.dat #kpts"<<endl
-        <<"kpathfile=kpath.dat #kpath"<<endl
-        <<"nonkpathfile=nonkpath.dat #irbz non kpath"<<endl
-        <<"fbzfile=fbz.dat #front bz"<<endl
-        <<"bbzfile=bbz.dat #back bz"<<endl<<endl
-        <<"#-----reading datfile-----"<<endl
-        <<"#---reciprocal lattice vectors b1 b2 b3---"<<endl
-        <<"exec 0< $datfile"<<endl
-        <<"$IFS read glatt"<<endl
-        <<"$IFS read gpath"<<endl
-        <<"$IFS read xrotview zrotview srest"<<endl
-        <<"read srest"<<endl
-        <<"$IFS read Lb1 Lb2 Lb3 srest"<<endl
-        <<"$IFS read Tb1 Tb2 Tb3 srest"<<endl
-        <<"read srest"<<endl
-        <<"$IFS read b11 b12 b13"<<endl
-        <<"$IFS read b21 b22 b23"<<endl
-        <<"$IFS read b31 b32 b33"<<endl
-        <<"((hb11=b11/2.0)); ((hb12=b12/2.0)); ((hb13=b13/2.0)); "<<endl
-        <<"((hb21=b21/2.0)); ((hb22=b22/2.0)); ((hb23=b23/2.0)); "<<endl
-        <<"((hb31=b31/2.0)); ((hb32=b32/2.0)); ((hb33=b33/2.0)); "<<endl
-        <<"#--length of b1 b2 b3 arrows--"<<endl
-        <<"((db11=b11*Lb1)); ((db12=b12*Lb1)); ((db13=b13*Lb1)); "<<endl
-        <<"((db21=b21*Lb2)); ((db22=b22*Lb2)); ((db23=b23*Lb2)); "<<endl
-        <<"((db31=b31*Lb3)); ((db32=b32*Lb3)); ((db33=b33*Lb3)); "<<endl
-        <<"echo $hb11 $hb12 $hb13 $db11 $db12 $db13 > $recipfile"<<endl
-        <<"echo $hb21 $hb22 $hb23 $db21 $db22 $db23 >> $recipfile"<<endl
-        <<"echo $hb31 $hb32 $hb33 $db31 $db32 $db33 >> $recipfile"<<endl
-        <<"((tb11=hb11+b11*Tb1)); ((tb12=hb12+b12*Tb1)); ((tb13=hb13+b13*Tb1));"<<endl
-        <<"((tb21=hb21+b21*Tb2)); ((tb22=hb22+b22*Tb2)); ((tb23=hb23+b23*Tb2));"<<endl
-        <<"((tb31=hb31+b31*Tb3)); ((tb32=hb32+b32*Tb3)); ((tb33=hb33+b33*Tb3));"<<endl
-        <<""<<endl
-        <<"#---kpts---"<<endl
-        <<"$IFS read Nkpts srest"<<endl
-        <<"rm -f $kptsfile"<<endl
-        <<"for ((i=0;i<Nkpts;i++))"<<endl
-        <<"do"<<endl
-        <<"  read kptsx[$i] kptsy[$i] kptsz[$i] klab[$i]"<<endl
-        <<"  echo ${kptsx[$i]} ${kptsy[$i]} ${kptsz[$i]} ${klab[$i]} >> $kptsfile"<<endl
-        <<"done"<<endl
-        <<""<<endl
-        <<"#---kpath---"<<endl
-        <<"read srest"<<endl
-        <<"read srest"<<endl
-        <<"$IFS read N srest"<<endl
-        <<"rm -f $kpathfile"<<endl
-        <<"for ((i=0;i<N;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $kpathfile"<<endl
-        <<"done"<<endl
-        <<"#---irbz non kpath---"<<endl
-        <<"$IFS read Nnonkpath srest"<<endl
-        <<"rm -f $nonkpathfile"<<endl
-        <<"for ((i=0;i<Nnonkpath;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $nonkpathfile"<<endl
-        <<"done"<<endl
-        <<"#---front bz---"<<endl
-        <<"$IFS read N srest"<<endl
-        <<"rm -f $fbzfile"<<endl
-        <<"for ((i=0;i<N;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $fbzfile"<<endl
-        <<"done"<<endl
-        <<"#---back bz---"<<endl
-        <<"$IFS read N srest"<<endl
-        <<"rm -f $bbzfile"<<endl
-        <<"for ((i=0;i<N;i++))"<<endl
-        <<"do"<<endl
-        <<"  read srest"<<endl
-        <<"  echo $srest >> $bbzfile"<<endl
-        <<"done"<<endl
-        <<""<<endl;
+      fout << "#!/bin/ksh" << endl
+        << "# A script to plot brillouin zone and kpath." << endl
+        << "# It needs aflow with --bzplotdata option" << endl
+        << "# input files: bzplot.dat" << endl
+        << "# output files: bzplot.eps bzplot.png" << endl
+        << "#" << endl << "# written: 2010 wahyu@alumni.duke.edu" << endl << endl
+        << "datfile=bzplot.dat" << endl
+        << "recipfile=recip.dat #reciprocal vectors" << endl
+        << "kptsfile=kpts.dat #kpts" << endl
+        << "kpathfile=kpath.dat #kpath" << endl
+        << "nonkpathfile=nonkpath.dat #irbz non kpath" << endl
+        << "fbzfile=fbz.dat #front bz" << endl
+        << "bbzfile=bbz.dat #back bz" << endl << endl
+        << "#-----reading datfile-----" << endl
+        << "#---reciprocal lattice vectors b1 b2 b3---" << endl
+        << "exec 0< $datfile" << endl
+        << "$IFS read glatt" << endl
+        << "$IFS read gpath" << endl
+        << "$IFS read xrotview zrotview srest" << endl
+        << "read srest" << endl
+        << "$IFS read Lb1 Lb2 Lb3 srest" << endl
+        << "$IFS read Tb1 Tb2 Tb3 srest" << endl
+        << "read srest" << endl
+        << "$IFS read b11 b12 b13" << endl
+        << "$IFS read b21 b22 b23" << endl
+        << "$IFS read b31 b32 b33" << endl
+        << "((hb11=b11/2.0)); ((hb12=b12/2.0)); ((hb13=b13/2.0)); " << endl
+        << "((hb21=b21/2.0)); ((hb22=b22/2.0)); ((hb23=b23/2.0)); " << endl
+        << "((hb31=b31/2.0)); ((hb32=b32/2.0)); ((hb33=b33/2.0)); " << endl
+        << "#--length of b1 b2 b3 arrows--" << endl
+        << "((db11=b11*Lb1)); ((db12=b12*Lb1)); ((db13=b13*Lb1)); " << endl
+        << "((db21=b21*Lb2)); ((db22=b22*Lb2)); ((db23=b23*Lb2)); " << endl
+        << "((db31=b31*Lb3)); ((db32=b32*Lb3)); ((db33=b33*Lb3)); " << endl
+        << "echo $hb11 $hb12 $hb13 $db11 $db12 $db13 > $recipfile" << endl
+        << "echo $hb21 $hb22 $hb23 $db21 $db22 $db23 >> $recipfile" << endl
+        << "echo $hb31 $hb32 $hb33 $db31 $db32 $db33 >> $recipfile" << endl
+        << "((tb11=hb11+b11*Tb1)); ((tb12=hb12+b12*Tb1)); ((tb13=hb13+b13*Tb1));" << endl
+        << "((tb21=hb21+b21*Tb2)); ((tb22=hb22+b22*Tb2)); ((tb23=hb23+b23*Tb2));" << endl
+        << "((tb31=hb31+b31*Tb3)); ((tb32=hb32+b32*Tb3)); ((tb33=hb33+b33*Tb3));" << endl
+        << "" << endl
+        << "#---kpts---" << endl
+        << "$IFS read Nkpts srest" << endl
+        << "rm -f $kptsfile" << endl
+        << "for ((i=0;i<Nkpts;i++))" << endl
+        << "do" << endl
+        << "  read kptsx[$i] kptsy[$i] kptsz[$i] klab[$i]" << endl
+        << "  echo ${kptsx[$i]} ${kptsy[$i]} ${kptsz[$i]} ${klab[$i]} >> $kptsfile" << endl
+        << "done" << endl
+        << "" << endl
+        << "#---kpath---" << endl
+        << "read srest" << endl
+        << "read srest" << endl
+        << "$IFS read N srest" << endl
+        << "rm -f $kpathfile" << endl
+        << "for ((i=0;i<N;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $kpathfile" << endl
+        << "done" << endl
+        << "#---irbz non kpath---" << endl
+        << "$IFS read Nnonkpath srest" << endl
+        << "rm -f $nonkpathfile" << endl
+        << "for ((i=0;i<Nnonkpath;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $nonkpathfile" << endl
+        << "done" << endl
+        << "#---front bz---" << endl
+        << "$IFS read N srest" << endl
+        << "rm -f $fbzfile" << endl
+        << "for ((i=0;i<N;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $fbzfile" << endl
+        << "done" << endl
+        << "#---back bz---" << endl
+        << "$IFS read N srest" << endl
+        << "rm -f $bbzfile" << endl
+        << "for ((i=0;i<N;i++))" << endl
+        << "do" << endl
+        << "  read srest" << endl
+        << "  echo $srest >> $bbzfile" << endl
+        << "done" << endl
+        << "" << endl;
       /*
-         fout<<"#getting the structure name and icsd number"<<endl
-         <<"name=$(pwd)"<<endl
-         <<"echo $name | sed \"s/\//\n/g\" | grep '_ICSD_' > wahyutmp"<<endl
-         <<"exec 0< wahyutmp"<<endl
-         <<"$IFS read name"<<endl
-         <<"rm -f wahyutmp"<<endl
-         <<""<<endl;
+         fout << "#getting the structure name and icsd number" << endl
+         << "name=$(pwd)" << endl
+         << "echo $name | sed \"s/\//\n/g\" | grep '_ICSD_' > wahyutmp" << endl
+         << "exec 0< wahyutmp" << endl
+         << "$IFS read name" << endl
+         << "rm -f wahyutmp" << endl
+         << "" << endl;
          */
-      fout<<"echo \"set terminal postscript eps color enhanced \\\"" << DEFAULT_GNUPLOT_EPS_FONT << "\\\" 18 \"> plotbz.gnu"<<endl;
-      //fout<<"echo \"set output \\\"bz_$name.eps\\\" \">> plotbz.gnu"<<endl
-      fout<<"echo \"set output \\\"bzplot.eps\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"set key off \">> plotbz.gnu"<<endl
-        <<"echo \"unset border \">> plotbz.gnu"<<endl
-        <<"echo \"unset xtics \">> plotbz.gnu"<<endl
-        <<"echo \"unset ytics \">> plotbz.gnu"<<endl
-        <<"echo \"unset ztics \">> plotbz.gnu"<<endl
-        <<"echo \"set view equal xyz \">> plotbz.gnu"<<endl
-        <<"echo \"set view $xrotview,$zrotview \">> plotbz.gnu"<<endl
-        <<"echo \"set title \\\"$glatt  path: $gpath\\\" \">> plotbz.gnu"<<endl
-        <<"for ((i=0;i<Nkpts;i++))"<<endl
-        <<"do"<<endl
-        <<"  echo \"set label \\\"${klab[$i]}\\\" at ${kptsx[i]},${kptsy[i]},${kptsz[i]}\" >> plotbz.gnu"<<endl
-        <<"done"<<endl
-        <<"echo \"set label \\\"b{/Symbol _1}\\\" at $tb11,$tb12,$tb13 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"set label \\\"b{/Symbol _2}\\\" at $tb21,$tb22,$tb23 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"set label \\\"b{/Symbol _3}\\\" at $tb31,$tb32,$tb33 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu"<<endl
-        <<"echo \"splot '$recipfile' using 1:2:3:4:5:6 with vectors head filled lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"echo \"'$fbzfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"echo \"'$bbzfile' using 1:2:3:4:5:6 with vector nohead lt 0 lw 1.5 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"echo \"'$kpathfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"if((Nnonkpath>0))"<<endl
-        <<"then"<<endl
-        <<"  echo \"'$nonkpathfile' using 1:2:3:4:5:6 with vector nohead lt 2 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu"<<endl
-        <<"fi"<<endl
-        <<"echo \"'$kptsfile' using 1:2:3 with points pt 7 ps 0.8 lc rgb \\\"#FF0000\\\" \" >> plotbz.gnu"<<endl
-        <<""<<endl
-        <<XHOST.command("gnuplot")<< " plotbz.gnu"<<endl;
-      //fout<<XHOST.command("convert")<<" -density 200 bz_$name.eps bz_$name.png"<<endl;
-      fout<<XHOST.command("convert")<<" -density 200 bzplot.eps bzplot.png"<<endl;
-      fout<<"rm -f plotbz.gnu $recipfile $kptsfile $kpathfile $nonkpathfile $fbzfile $bbzfile"<<endl;
+      fout << "echo \"set terminal postscript eps color enhanced \\\"" << DEFAULT_GNUPLOT_EPS_FONT << "\\\" 18 \"> plotbz.gnu" << endl;
+      //fout << "echo \"set output \\\"bz_$name.eps\\\" \">> plotbz.gnu" << endl
+      fout << "echo \"set output \\\"bzplot.eps\\\" \">> plotbz.gnu" << endl
+        << "echo \"set key off \">> plotbz.gnu" << endl
+        << "echo \"unset border \">> plotbz.gnu" << endl
+        << "echo \"unset xtics \">> plotbz.gnu" << endl
+        << "echo \"unset ytics \">> plotbz.gnu" << endl
+        << "echo \"unset ztics \">> plotbz.gnu" << endl
+        << "echo \"set view equal xyz \">> plotbz.gnu" << endl
+        << "echo \"set view $xrotview,$zrotview \">> plotbz.gnu" << endl
+        << "echo \"set title \\\"$glatt  path: $gpath\\\" \">> plotbz.gnu" << endl
+        << "for ((i=0;i<Nkpts;i++))" << endl
+        << "do" << endl
+        << "  echo \"set label \\\"${klab[$i]}\\\" at ${kptsx[i]},${kptsy[i]},${kptsz[i]}\" >> plotbz.gnu" << endl
+        << "done" << endl
+        << "echo \"set label \\\"b{/Symbol _1}\\\" at $tb11,$tb12,$tb13 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+        << "echo \"set label \\\"b{/Symbol _2}\\\" at $tb21,$tb22,$tb23 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+        << "echo \"set label \\\"b{/Symbol _3}\\\" at $tb31,$tb32,$tb33 font \\\"" << DEFAULT_GNUPLOT_EPS_FONT << ",14\\\" \">> plotbz.gnu" << endl
+        << "echo \"splot '$recipfile' using 1:2:3:4:5:6 with vectors head filled lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "echo \"'$fbzfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "echo \"'$bbzfile' using 1:2:3:4:5:6 with vector nohead lt 0 lw 1.5 lc rgb \\\"#000000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "echo \"'$kpathfile' using 1:2:3:4:5:6 with vector nohead lt 1 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "if((Nnonkpath>0))" << endl
+        << "then" << endl
+        << "  echo \"'$nonkpathfile' using 1:2:3:4:5:6 with vector nohead lt 2 lw 1 lc rgb \\\"#FF0000\\\", \\\\\" >> plotbz.gnu" << endl
+        << "fi" << endl
+        << "echo \"'$kptsfile' using 1:2:3 with points pt 7 ps 0.8 lc rgb \\\"#FF0000\\\" \" >> plotbz.gnu" << endl
+        << "" << endl
+        << XHOST.command("gnuplot") << " plotbz.gnu" << endl;
+      //fout << XHOST.command("convert") << " -density 200 bz_$name.eps bz_$name.png" << endl;
+      fout << XHOST.command("convert") << " -density 200 bzplot.eps bzplot.png" << endl;
+      fout << "rm -f plotbz.gnu $recipfile $kptsfile $kpathfile $nonkpathfile $fbzfile $bbzfile" << endl;
       fout.close();
       stringstream command;
       command.clear();command.str(std::string());
@@ -6453,12 +6461,12 @@ namespace LATTICE {
 namespace LATTICE {
   string KPOINTS_Directions(xstructure str_in,double grid,bool &foundBZ) {
     xstructure str_sp,str_sc;
-    bool full_sym = false; // DX 8/29/17 - Speed increase
-    // DX 8/29/17 [OBSOLETE] LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
-    LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym); // DX 8/29/17 - Speed increase
+    bool full_sym = false; //DX20170829 - Speed increase
+    //DX20170829 [OBSOLETE] LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
+    LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym); //DX20170829 - Speed increase
     string lattice_type=str_sp.bravais_lattice_variation_type;
     //return LATTICE::KPOINTS_Directions(lattice_type,str_sp.lattice,grid,str_sp.iomode,foundBZ); 
-    return LATTICE::KPOINTS_Directions(lattice_type,str_sp.lattice,str_sp.transform_coordinates_original2new, grid,str_sp.iomode,foundBZ);  //DX 20181101
+    return LATTICE::KPOINTS_Directions(lattice_type,str_sp.lattice,str_sp.transform_coordinates_original2new, grid,str_sp.iomode,foundBZ);  //DX20181101
   }
 }
 
@@ -6480,7 +6488,7 @@ namespace LATTICE {
     oss.setf(std::ios::fixed);
     oss.precision(4);
     nkpoint++;
-    oss <<"  " << (Kx[1]>=0.0?" ":"") << Kx[1] 
+    oss << "  " << (Kx[1]>=0.0?" ":"") << Kx[1] 
       << " " << (Kx[2]>=0.0?" ":"") << Kx[2] 
       << " " << (Kx[3]>=0.0?" ":"") << Kx[3] 
       << "   " << double(1.0) << "   ! " << aurostd::PaddedPOST(Ks,20," ") << " // nkpoint=" << nkpoint << endl;
@@ -6515,7 +6523,7 @@ namespace LATTICE {
 // ***************************************************************************************************
 namespace LATTICE {
   string KPOINTS_Directions(string lattice_type,xmatrix<double> sp, double _grid,int iomode,bool &foundBZ) {
-    xmatrix<double> transformation_matrix = aurostd::eye<double>(); //CO190520
+    xmatrix<double> transformation_matrix = aurostd::eye<double>(); //CO20190520
     return KPOINTS_Directions(lattice_type,sp,transformation_matrix,_grid,iomode,foundBZ);
   }
 }
@@ -6539,10 +6547,10 @@ namespace LATTICE {
     //  if(grid>-1.0 && grid<0.0) grid=-1.0;
     if(grid>=0.0 && grid<1.0) grid=1.0;
 
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions iomode=" << iomode << endl;
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions isQE=" << isQE << endl;
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions isVASP=" << isVASP << endl;
-    if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions grid=" << grid << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions iomode=" << iomode << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions isQE=" << isQE << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions isVASP=" << isVASP << endl;
+    if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions grid=" << grid << endl;
 
     xvector<double> cdata(6),kdata(6);
     xmatrix<double> klattice(3,3),sc(3,3);
@@ -6558,39 +6566,38 @@ namespace LATTICE {
 
     foundBZ=FALSE;
     uint nkpoint=0;
-    /*
-       1. TRI order: kalpha,kbeta,kgamma  > 90 (kgamma<kalpha, kgamma<kbeta)
-       or kalpha,kbeta,kgamma  < 90 (kgamma>kalpha, kgamma>kbeta)
-       special case when kgamma=90
-       "TRI1a" kalpha>90 kbeta>90 kgamma>90
-       "TRI1b" kalpha<90 kbeta<90 kgamma<90
-       "TRI2a" kalpha>90 kbeta>90 kgamma=90
-       "TRI2b" kalpha<90 kbeta<90 kgamma=90
-       2. "MCL" unique (order b<=c)
-       3. MCLC (order alpha<90)
-       "MCLC1"  kgamma>90
-       "MCLC2"  kgamma=90
-       "MCLC3"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 < 1
-       "MCLC4"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 = 1
-       "MCLC5"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 > 1
-       4. "ORC" unique (order a<b<c)
-       5. "ORCC" unique (order a<b)
-       6. ORCF (order a<b<c)
-       "ORCF1" "ORCF_invb2+invc2<inva2"  for 1/a^2 > 1/b^2 + 1/c^2
-       "ORCF2" "ORCF_inva2<invb2+invc2"  for 1/a^2 < 1/b^2 + 1/c^2
-       "ORCF3"                           for 1/a^2 = 1/b^2 + 1/c^2
-       7. "ORCI" unique (order a<b<c)
-       8. "TET" unique (order a a c)
-       9. BCT (order a a c)
-       "BCT1" "BCT_c<a" for c<a
-       "BCT2" "BCT_c>a" for c>a
-       10. "RHL1" alpha<90
-       "RHL2" alpha>90
-       11. "HEX" unique (order 60 90 90)
-       12. "CUB" unique
-       13. "FCC" unique (order 60 60 60)
-       14. "BCC" unique
-       */
+
+    //   1. TRI order: kalpha,kbeta,kgamma  > 90 (kgamma<kalpha, kgamma<kbeta)
+    //   or kalpha,kbeta,kgamma  < 90 (kgamma>kalpha, kgamma>kbeta)
+    //   special case when kgamma=90
+    //   "TRI1a" kalpha>90 kbeta>90 kgamma>90
+    //   "TRI1b" kalpha<90 kbeta<90 kgamma<90
+    //   "TRI2a" kalpha>90 kbeta>90 kgamma=90
+    //   "TRI2b" kalpha<90 kbeta<90 kgamma=90
+    //   2. "MCL" unique (order b<=c)
+    //   3. MCLC (order alpha<90)
+    //   "MCLC1"  kgamma>90
+    //   "MCLC2"  kgamma=90
+    //   "MCLC3"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 < 1
+    //   "MCLC4"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 = 1
+    //   "MCLC5"  kgamma<90, b*cos(alpha)/c + (b*sin(alpha)/a)^2 > 1
+    //   4. "ORC" unique (order a<b<c)
+    //   5. "ORCC" unique (order a<b)
+    //   6. ORCF (order a<b<c)
+    //   "ORCF1" "ORCF_invb2+invc2<inva2"  for 1/a^2 > 1/b^2 + 1/c^2
+    //   "ORCF2" "ORCF_inva2<invb2+invc2"  for 1/a^2 < 1/b^2 + 1/c^2
+    //   "ORCF3"                           for 1/a^2 = 1/b^2 + 1/c^2
+    //   7. "ORCI" unique (order a<b<c)
+    //   8. "TET" unique (order a a c)
+    //   9. BCT (order a a c)
+    //   "BCT1" "BCT_c<a" for c<a
+    //   "BCT2" "BCT_c>a" for c>a
+    //   10. "RHL1" alpha<90
+    //   "RHL2" alpha>90
+    //   11. "HEX" unique (order 60 90 90)
+    //   12. "CUB" unique
+    //   13. "FCC" unique (order 60 60 60)
+    //   14. "BCC" unique
 
     xvector<double> b1(3),b2(3),b3(3);
     b1(1)=klattice(1,1); b1(2)=klattice(1,2); b1(3)=klattice(1,3);
@@ -6600,13 +6607,13 @@ namespace LATTICE {
     //**************************** CUBIC (CUB) ******************************
     if(lattice_type=="CUB") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,M,R,X;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] M="   0.500   0.500   0.000   ! M";
-      //DX 20181105 [OBSOLETE] R="   0.500   0.500   0.500   ! R";
-      //DX 20181105 [OBSOLETE] X="   0.000   0.500   0.000   ! X";
+      //DX20181105 [OBSOLETE] string G,M,R,X;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] M="   0.500   0.500   0.000   ! M";
+      //DX20181105 [OBSOLETE] R="   0.500   0.500   0.500   ! R";
+      //DX20181105 [OBSOLETE] X="   0.000   0.500   0.000   ! X";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,M,R,X;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       M.fpos(1)=0.500; M.fpos(2)=0.500; M.fpos(3)=0.000; M.label="M";
@@ -6620,40 +6627,40 @@ namespace LATTICE {
         R.TransformKpoint(aurostd::inverse(transformation_matrix));
         X.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (simple cubic) G-X-M-G-R-X M-R"  << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      oss << lattice_type << " (simple cubic) G-X-M-G-R-X M-R"   << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
     }
     //****************************** FCC ************************************
     if(lattice_type=="FCC") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,K,L,U,W,X;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma ";
-      //DX 20181105 [OBSOLETE] K="   0.375   0.375   0.750   ! K ";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L ";
-      //DX 20181105 [OBSOLETE] U="   0.625   0.250   0.625   ! U ";
-      //DX 20181105 [OBSOLETE] W="   0.500   0.250   0.750   ! W ";
-      //DX 20181105 [OBSOLETE] X="   0.500   0.000   0.500   ! X ";
+      //DX20181105 [OBSOLETE] string G,K,L,U,W,X;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma ";
+      //DX20181105 [OBSOLETE] K="   0.375   0.375   0.750   ! K ";
+      //DX20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L ";
+      //DX20181105 [OBSOLETE] U="   0.625   0.250   0.625   ! U ";
+      //DX20181105 [OBSOLETE] W="   0.500   0.250   0.750   ! W ";
+      //DX20181105 [OBSOLETE] X="   0.500   0.000   0.500   ! X ";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,K,L,U,W,X;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       K.fpos(1)=0.375; K.fpos(2)=0.375; K.fpos(3)=0.750; K.label="K";
@@ -6671,48 +6678,48 @@ namespace LATTICE {
         W.TransformKpoint(aurostd::inverse(transformation_matrix));
         X.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (face-centered cubic) G-X-W-K-G-L-U-W-L-K U-X" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),W.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),K.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),U.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),W.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),K.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),W.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),K.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),U.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),W.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),K.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
 
       //OLD: G-X-W-K-G-L-U-X  U-W-L-K
     }
     //************************ BCC ******************************************
     if(lattice_type=="BCC") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,H,N,P;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma ";
-      //DX 20181105 [OBSOLETE] H="   0.500  -0.500   0.500   ! H ";
-      //DX 20181105 [OBSOLETE] N="   0.000   0.000   0.500   ! N ";
-      //DX 20181105 [OBSOLETE] P="   0.250   0.250   0.250   ! P ";
+      //DX20181105 [OBSOLETE] string G,H,N,P;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma ";
+      //DX20181105 [OBSOLETE] H="   0.500  -0.500   0.500   ! H ";
+      //DX20181105 [OBSOLETE] N="   0.000   0.000   0.500   ! N ";
+      //DX20181105 [OBSOLETE] P="   0.250   0.250   0.250   ! P ";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,H,N,P;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       H.fpos(1)=0.500; H.fpos(2)=-0.500; H.fpos(3)=0.500; H.label="H";
@@ -6726,40 +6733,40 @@ namespace LATTICE {
         N.TransformKpoint(aurostd::inverse(transformation_matrix));
         P.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (body-centered cubic) G-H-N-G-P-H P-N"  << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
-      if(isVASP && grid>0) oss << " "  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      oss << lattice_type << " (body-centered cubic) G-H-N-G-P-H P-N"   << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << " "   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
     }  
     //************************* TETRAGONAL (TET) ****************************
     if(lattice_type=="TET") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,A,M,R,X,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] A="   0.500   0.500   0.500   ! A";
-      //DX 20181105 [OBSOLETE] M="   0.500   0.500   0.000   ! M";
-      //DX 20181105 [OBSOLETE] R="   0.000   0.500   0.500   ! R";
-      //DX 20181105 [OBSOLETE] X="   0.000   0.500   0.000   ! X";
-      //DX 20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
+      //DX20181105 [OBSOLETE] string G,A,M,R,X,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] A="   0.500   0.500   0.500   ! A";
+      //DX20181105 [OBSOLETE] M="   0.500   0.500   0.000   ! M";
+      //DX20181105 [OBSOLETE] R="   0.000   0.500   0.500   ! R";
+      //DX20181105 [OBSOLETE] X="   0.000   0.500   0.000   ! X";
+      //DX20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,A,M,R,X,Z;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       A.fpos(1)=0.500; A.fpos(2)=0.500; A.fpos(3)=0.500; A.label="A";
@@ -6777,46 +6784,46 @@ namespace LATTICE {
         X.TransformKpoint(aurostd::inverse(transformation_matrix));
         Z.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (tetragonal) G-X-M-G-Z-R-A-Z  X-R  M-A" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects            
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects            
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
     }
     // ************************* BCT  ***************************************
     if(lattice_type=="BCT1") {
       foundBZ=TRUE;
       float eta;
-      //DX 20181105 [OBSOLETE] string G,M,N,P,X;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] M="  -0.500   0.500   0.500   ! M";
-      //DX 20181105 [OBSOLETE] N="   0.000   0.500   0.000   ! N";
-      //DX 20181105 [OBSOLETE] P="   0.250   0.250   0.250   ! P";
-      //DX 20181105 [OBSOLETE] X="   0.000   0.000   0.500   ! X";
+      //DX20181105 [OBSOLETE] string G,M,N,P,X;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] M="  -0.500   0.500   0.500   ! M";
+      //DX20181105 [OBSOLETE] N="   0.000   0.500   0.000   ! N";
+      //DX20181105 [OBSOLETE] P="   0.250   0.250   0.250   ! P";
+      //DX20181105 [OBSOLETE] X="   0.000   0.000   0.500   ! X";
 
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
       _kpoint G,M,N,P,X;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       M.fpos(1)=-0.500; M.fpos(2)=0.500; M.fpos(3)=0.500; M.label="M";
@@ -6824,10 +6831,10 @@ namespace LATTICE {
       P.fpos(1)=0.250; P.fpos(2)=0.250; P.fpos(3)=0.250; P.label="P";
       X.fpos(1)=0.000; X.fpos(2)=0.000; X.fpos(3)=0.500; X.label="X";
       eta=0.25*(1+c*c/a/a);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      //DX 20181105 [OBSOLETE] stringstream Z,Z1;
-      //DX 20181105 [OBSOLETE] Z << eta << "  " << eta << "  " << -eta << "  ! Z";
-      //DX 20181105 [OBSOLETE] Z1 << -eta << "  " << (1-eta) << "  " << eta << "  ! Z_1";
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      //DX20181105 [OBSOLETE] stringstream Z,Z1;
+      //DX20181105 [OBSOLETE] Z << eta << "  " << eta << "  " << -eta << "  ! Z";
+      //DX20181105 [OBSOLETE] Z1 << -eta << "  " << (1-eta) << "  " << eta << "  ! Z_1";
       _kpoint Z,Z1;
       Z.fpos(1)=eta; Z.fpos(2)=eta; Z.fpos(3)=-eta; Z.label="Z";
       Z1.fpos(1)=-eta; Z1.fpos(2)=(1-eta); Z1.fpos(3)=eta; Z1.label="Z_1";
@@ -6842,45 +6849,45 @@ namespace LATTICE {
         Z.TransformKpoint(aurostd::inverse(transformation_matrix));
         Z1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (body-centered tetragonal c < a) G-X-M-G-Z-P-N-Z1-M X-P" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),Z1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),Z1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z1.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z1.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //OLD: G-X-M-G-Z-P-N-Z1-P-X M-Z1 Z-N
     }
     if(lattice_type=="BCT2") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,N,P,X,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] N="   0.000   0.500   0.000   ! N";
-      //DX 20181105 [OBSOLETE] P="   0.250   0.250   0.250   ! P";
-      //DX 20181105 [OBSOLETE] X="   0.000   0.000   0.500   ! X";
-      //DX 20181105 [OBSOLETE] Z="   0.500   0.500  -0.500   ! Z";
+      //DX20181105 [OBSOLETE] string G,N,P,X,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] N="   0.000   0.500   0.000   ! N";
+      //DX20181105 [OBSOLETE] P="   0.250   0.250   0.250   ! P";
+      //DX20181105 [OBSOLETE] X="   0.000   0.000   0.500   ! X";
+      //DX20181105 [OBSOLETE] Z="   0.500   0.500  -0.500   ! Z";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,N,P,X,Z;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       N.fpos(1)=0.000; N.fpos(2)=0.500; N.fpos(3)=0.000; N.label="N";
@@ -6890,14 +6897,14 @@ namespace LATTICE {
       float eta,zeta;
       eta=0.25*(1+a*a/c/c);
       zeta=0.5*a*a/c/c;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
-      //DX 20181105 [OBSOLETE] stringstream Sg1,Sg,Y1,Y;
-      //DX 20181105 [OBSOLETE] Sg << -eta << "  " << eta << "  " << eta << "  ! \\Sigma";
-      //DX 20181105 [OBSOLETE] Sg1 << eta << "  " << (1-eta) << "  " << -eta << "  ! \\Sigma_1";
-      //DX 20181105 [OBSOLETE] Y << -zeta << "  " << zeta << "   0.500   ! Y";
-      //DX 20181105 [OBSOLETE] Y1 << "   0.500   0.500  " << -zeta << "  ! Y_1";
+      //DX20181105 [OBSOLETE] stringstream Sg1,Sg,Y1,Y;
+      //DX20181105 [OBSOLETE] Sg << -eta << "  " << eta << "  " << eta << "  ! \\Sigma";
+      //DX20181105 [OBSOLETE] Sg1 << eta << "  " << (1-eta) << "  " << -eta << "  ! \\Sigma_1";
+      //DX20181105 [OBSOLETE] Y << -zeta << "  " << zeta << "   0.500   ! Y";
+      //DX20181105 [OBSOLETE] Y1 << "   0.500   0.500  " << -zeta << "  ! Y_1";
       _kpoint Sg,Sg1,Y,Y1;
       Sg.fpos(1)=-eta; Sg.fpos(2)=eta; Sg.fpos(3)=eta; Sg.label="\\Sigma";
       Sg1.fpos(1)=eta; Sg1.fpos(2)=(1-eta); Sg1.fpos(3)=-eta; Sg1.label="\\Sigma_1";
@@ -6916,54 +6923,54 @@ namespace LATTICE {
         Y.TransformKpoint(aurostd::inverse(transformation_matrix));
         Y1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (body-centered tetragonal a < c) G-X-Y-Sg-G-Z-Sg1-N-P-Y1-Z X-P" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),Sg.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),Sg.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Sg.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Sg.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),Sg1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),Sg1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Sg1.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Sg1.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),Y1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),Y1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //OLD: G-X-Y-Sg-G-Z-Y1-Sg1-N-P-Y X-P-Y1 Z-Sg1 Sg-N
     }
     //*********************** ORTHORHOMBIC (ORC) ****************************
     if(lattice_type=="ORC") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,R,S,T,U,X,Y,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] R="   0.500   0.500   0.500   ! R";
-      //DX 20181105 [OBSOLETE] S="   0.500   0.500   0.000   ! S";
-      //DX 20181105 [OBSOLETE] T="   0.000   0.500   0.500   ! T";
-      //DX 20181105 [OBSOLETE] U="   0.500   0.000   0.500   ! U";
-      //DX 20181105 [OBSOLETE] X="   0.500   0.000   0.000   ! X";
-      //DX 20181105 [OBSOLETE] Y="   0.000   0.500   0.000   ! Y";
-      //DX 20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
+      //DX20181105 [OBSOLETE] string G,R,S,T,U,X,Y,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] R="   0.500   0.500   0.500   ! R";
+      //DX20181105 [OBSOLETE] S="   0.500   0.500   0.000   ! S";
+      //DX20181105 [OBSOLETE] T="   0.000   0.500   0.500   ! T";
+      //DX20181105 [OBSOLETE] U="   0.500   0.000   0.500   ! U";
+      //DX20181105 [OBSOLETE] X="   0.500   0.000   0.000   ! X";
+      //DX20181105 [OBSOLETE] Y="   0.000   0.500   0.000   ! Y";
+      //DX20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,R,S,T,U,X,Y,Z;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       R.fpos(1)=0.500; R.fpos(2)=0.500; R.fpos(3)=0.500; R.label="R";
@@ -6985,53 +6992,53 @@ namespace LATTICE {
         Y.TransformKpoint(aurostd::inverse(transformation_matrix));
         Z.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (orthorhombic) G-X-S-Y-G-Z-U-R-T-Z Y-T U-X S-R" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),S.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),S.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),U.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),U.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),T.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),T.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects           
+      LATTICE::kpoint2stream(oss,isVASP,isQE,U.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects           
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       //OLD: G-X-S-Y-G-Z-U-R-T-Z X-U Y-T S-R
     }  
 
     //********************** ORCF *******************************************
     if(lattice_type=="ORCF1" || lattice_type=="ORCF3") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,Z,Y,L,T;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
-      //DX 20181105 [OBSOLETE] T="   1.000   0.500   0.500   ! T";
-      //DX 20181105 [OBSOLETE] Y="   0.500   0.000   0.500   ! Y";
-      //DX 20181105 [OBSOLETE] Z="   0.500   0.500   0.000   ! Z";
+      //DX20181105 [OBSOLETE] string G,Z,Y,L,T;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
+      //DX20181105 [OBSOLETE] T="   1.000   0.500   0.500   ! T";
+      //DX20181105 [OBSOLETE] Y="   0.500   0.000   0.500   ! Y";
+      //DX20181105 [OBSOLETE] Z="   0.500   0.500   0.000   ! Z";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,L,T,Y,Z;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       L.fpos(1)=0.500; L.fpos(2)=0.500; L.fpos(3)=0.500; L.label="L";
@@ -7039,17 +7046,17 @@ namespace LATTICE {
       Y.fpos(1)=0.500; Y.fpos(2)=0.000; Y.fpos(3)=0.500; Y.label="Y";
       Z.fpos(1)=0.500; Z.fpos(2)=0.500; Z.fpos(3)=0.000; Z.label="Z";
 
-      //DX 20181105 [OBSOLETE] stringstream A,A1,X,X1;
+      //DX20181105 [OBSOLETE] stringstream A,A1,X,X1;
       float zeta,eta;
       zeta = 0.25*(1+a*a/b/b-a*a/c/c);
       eta = 0.25*(1+a*a/b/b+a*a/c/c);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
-      //DX 20181105 [OBSOLETE] A << "   0.500  " << 0.5+zeta << "  " <<  zeta << "   ! A";
-      //DX 20181105 [OBSOLETE] A1 << "   0.500  " <<  0.5-zeta << "  " <<  1.0-zeta << "   ! A_1";
-      //DX 20181105 [OBSOLETE] X << "   0.000  " <<  eta << "  " <<  eta << "   ! X";
-      //DX 20181105 [OBSOLETE] X1 << "   1.000  " <<  1.0-eta << "  " <<  1.0-eta << "   ! X_1";
+      //DX20181105 [OBSOLETE] A << "   0.500  " << 0.5+zeta << "  " <<  zeta << "   ! A";
+      //DX20181105 [OBSOLETE] A1 << "   0.500  " <<  0.5-zeta << "  " <<  1.0-zeta << "   ! A_1";
+      //DX20181105 [OBSOLETE] X << "   0.000  " <<  eta << "  " <<  eta << "   ! X";
+      //DX20181105 [OBSOLETE] X1 << "   1.000  " <<  1.0-eta << "  " <<  1.0-eta << "   ! X_1";
       _kpoint A,A1,X,X1;
       A.fpos(1)=0.500; A.fpos(2)=(0.5+zeta); A.fpos(3)=zeta; A.label="A";
       A1.fpos(1)=0.500; A1.fpos(2)=(0.5-zeta); A1.fpos(3)=(1.0-zeta); A1.label="A_1";
@@ -7068,46 +7075,46 @@ namespace LATTICE {
         X.TransformKpoint(aurostd::inverse(transformation_matrix));
         X1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(lattice_type=="ORCF1") {
         if(isQE) oss << "K_POINTS  crystal ! ";
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
-        oss << lattice_type << " (face-centered orthorhombic 1/a^2 > 1/b^2+1/c^2) G-Y-T-Z-G-X-A1-Y T-X1 X-A-Z L-G" << endl; //ME190520
+        oss << lattice_type << " (face-centered orthorhombic 1/a^2 > 1/b^2+1/c^2) G-Y-T-Z-G-X-A1-Y T-X1 X-A-Z L-G" << endl; //ME20190520
       }
       else if(lattice_type=="ORCF3") {
         if(isQE) oss << "K_POINTS  crystal ! ";
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
-        oss << lattice_type << " (face-centered orthorhombic 1/a^2 = 1/b^2+1/c^2) G-Y-T-Z-G-X-A1-Y X-A-Z L-G" << endl; //ME190520
+        oss << lattice_type << " (face-centered orthorhombic 1/a^2 = 1/b^2+1/c^2) G-Y-T-Z-G-X-A1-Y X-A-Z L-G" << endl; //ME20190520
       }
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),T.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),A1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),A1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A1.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A1.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(lattice_type=="ORCF1") {
         if(isVASP && grid>0) oss << " " << endl;
-        LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),X1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),X1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       }
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE, X.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE, X.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //OLD:
       //ORCF1: G-Y-T-Z-G-X-A1-X1-A-X Y-A1 T-X1 Z-A
@@ -7115,35 +7122,35 @@ namespace LATTICE {
     }
     if(lattice_type=="ORCF2") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,Z,Y,X,L;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
-      //DX 20181105 [OBSOLETE] X="   0.000   0.500   0.500   ! X";
-      //DX 20181105 [OBSOLETE] Y="   0.500   0.000   0.500   ! Y";
-      //DX 20181105 [OBSOLETE] Z="   0.500   0.500   0.000   ! Z";
+      //DX20181105 [OBSOLETE] string G,Z,Y,X,L;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
+      //DX20181105 [OBSOLETE] X="   0.000   0.500   0.500   ! X";
+      //DX20181105 [OBSOLETE] Y="   0.500   0.000   0.500   ! Y";
+      //DX20181105 [OBSOLETE] Z="   0.500   0.500   0.000   ! Z";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,L,X,Y,Z;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       L.fpos(1)=0.500; L.fpos(2)=0.500; L.fpos(3)=0.500; L.label="L";
       X.fpos(1)=0.000; X.fpos(2)=0.500; X.fpos(3)=0.500; X.label="X";
       Y.fpos(1)=0.500; Y.fpos(2)=0.000; Y.fpos(3)=0.500; Y.label="Y";
       Z.fpos(1)=0.500; Z.fpos(2)=0.500; Z.fpos(3)=0.000; Z.label="Z";
-      //DX 20181105 [OBSOLETE] stringstream H1,D,C,H,D1,C1;
+      //DX20181105 [OBSOLETE] stringstream H1,D,C,H,D1,C1;
       float eta,phi,delta;
       eta = 0.25*(1+a*a/b/b-a*a/c/c);
       phi = 0.25*(1+c*c/b/b-c*c/a/a);
       delta = 0.25*(1+b*b/a/a-b*b/c/c);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
-      //DX 20181105 [OBSOLETE] C << "   0.500  " <<  0.5-eta  << "  " << 1.0-eta << "   ! C";
-      //DX 20181105 [OBSOLETE] C1 << "   0.500   " <<  0.5+eta << "  " <<  eta << "   ! C_1";
-      //DX 20181105 [OBSOLETE] D <<  0.5-delta << "   0.500  " << 1.0-delta << "   ! D";
-      //DX 20181105 [OBSOLETE] D1 <<  0.5+delta << "   0.500   " << delta << "   ! D_1";
-      //DX 20181105 [OBSOLETE] H <<  1.0-phi << "  " <<  0.5-phi << "   0.500   ! H";
-      //DX 20181105 [OBSOLETE] H1 <<  phi << "  " <<  phi+0.5 << "  " << "   0.5   ! H_1";
+      //DX20181105 [OBSOLETE] C << "   0.500  " <<  0.5-eta   << "  " << 1.0-eta << "   ! C";
+      //DX20181105 [OBSOLETE] C1 << "   0.500   " <<  0.5+eta << "  " <<  eta << "   ! C_1";
+      //DX20181105 [OBSOLETE] D <<  0.5-delta << "   0.500  " << 1.0-delta << "   ! D";
+      //DX20181105 [OBSOLETE] D1 <<  0.5+delta << "   0.500   " << delta << "   ! D_1";
+      //DX20181105 [OBSOLETE] H <<  1.0-phi << "  " <<  0.5-phi << "   0.500   ! H";
+      //DX20181105 [OBSOLETE] H1 <<  phi << "  " <<  phi+0.5 << "  " << "   0.5   ! H_1";
       _kpoint C,C1,D,D1,H,H1;
       C.fpos(1)=0.500; C.fpos(2)=(0.5-eta); C.fpos(3)=(1.0-eta); C.label="C";
       C1.fpos(1)=0.500; C1.fpos(2)=(0.5+eta); C1.fpos(3)=eta; C1.label="C_1";
@@ -7166,56 +7173,56 @@ namespace LATTICE {
         H.TransformKpoint(aurostd::inverse(transformation_matrix));
         H1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (face-centered orthorhombic 1/a^2 < 1/b^2+1/c^2) G-Y-C-D-X-G-Z-D1-H-C C1-Z X-H1 H-Y L-G" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),C.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),C.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,C.str(),D.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,C.str(),D.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,D.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,D.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),D1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),D1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,D1.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,D1.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),C.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),C.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,C1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,C1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),H1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),H1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //OLD: G-Y-C-D-X-G-Z-D1-C1-Z Y-H-C X-H1-D H1-C1 D1-H
     }
     //************************ ORCI *****************************************
     if(lattice_type=="ORCI") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,Z,S,R,T,W;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] R="   0.000   0.500   0.000   ! R";
-      //DX 20181105 [OBSOLETE] S="   0.500   0.000   0.000   ! S";
-      //DX 20181105 [OBSOLETE] T="   0.000   0.000   0.500   ! T";
-      //DX 20181105 [OBSOLETE] W="   0.250   0.250   0.250   ! W";
-      //DX 20181105 [OBSOLETE] Z="   0.500   0.500  -0.500   ! Z";
+      //DX20181105 [OBSOLETE] string G,Z,S,R,T,W;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] R="   0.000   0.500   0.000   ! R";
+      //DX20181105 [OBSOLETE] S="   0.500   0.000   0.000   ! S";
+      //DX20181105 [OBSOLETE] T="   0.000   0.000   0.500   ! T";
+      //DX20181105 [OBSOLETE] W="   0.250   0.250   0.250   ! W";
+      //DX20181105 [OBSOLETE] Z="   0.500   0.500  -0.500   ! Z";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,R,S,T,W,Z;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       R.fpos(1)=0.000; R.fpos(2)=0.500; R.fpos(3)=0.000; R.label="R";
@@ -7223,24 +7230,24 @@ namespace LATTICE {
       T.fpos(1)=0.000; T.fpos(2)=0.000; T.fpos(3)=0.500; T.label="T";
       W.fpos(1)=0.250; W.fpos(2)=0.250; W.fpos(3)=0.250; W.label="W";
       Z.fpos(1)=0.500; Z.fpos(2)=0.500; Z.fpos(3)=-0.500; Z.label="Z";
-      //DX 20181105 [OBSOLETE] stringstream X1,X,Y,Y1,L2,L,L1;
+      //DX20181105 [OBSOLETE] stringstream X1,X,Y,Y1,L2,L,L1;
       float zeta,eta,delta,mu;
       zeta = 0.25*(1+a*a/c/c);
       eta = 0.25*(1+b*b/c/c);
       delta = 0.25*(b*b-a*a)/c/c;
       mu = 0.25*(a*a+b*b)/c/c;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
 
-      //DX 20181105 [OBSOLETE] L <<  -mu << "  " <<  mu << "  " <<  0.5-delta << "   ! L";
-      //DX 20181105 [OBSOLETE] L1 <<  mu << "  " <<  -mu << "  " <<  0.5+delta << "   ! L_1";    
-      //DX 20181105 [OBSOLETE] L2 <<  0.5-delta << "  " <<  0.5+delta << "  " <<  -mu << "   ! L_2";
-      //DX 20181105 [OBSOLETE] X <<  -zeta << "  " <<  zeta << "  " <<  zeta << "   ! X";
-      //DX 20181105 [OBSOLETE] X1 <<  zeta << "  " <<  (1.0-zeta) << "  " <<  -zeta << "   ! X_1";
-      //DX 20181105 [OBSOLETE] Y <<  eta << "  " <<  -eta << "  " <<  eta << "   ! Y";
-      //DX 20181105 [OBSOLETE] Y1 <<  1.0-eta << "  " <<  eta << "  " <<  -eta << "   ! Y_1";
+      //DX20181105 [OBSOLETE] L <<  -mu << "  " <<  mu << "  " <<  0.5-delta << "   ! L";
+      //DX20181105 [OBSOLETE] L1 <<  mu << "  " <<  -mu << "  " <<  0.5+delta << "   ! L_1";    
+      //DX20181105 [OBSOLETE] L2 <<  0.5-delta << "  " <<  0.5+delta << "  " <<  -mu << "   ! L_2";
+      //DX20181105 [OBSOLETE] X <<  -zeta << "  " <<  zeta << "  " <<  zeta << "   ! X";
+      //DX20181105 [OBSOLETE] X1 <<  zeta << "  " <<  (1.0-zeta) << "  " <<  -zeta << "   ! X_1";
+      //DX20181105 [OBSOLETE] Y <<  eta << "  " <<  -eta << "  " <<  eta << "   ! Y";
+      //DX20181105 [OBSOLETE] Y1 <<  1.0-eta << "  " <<  eta << "  " <<  -eta << "   ! Y_1";
       _kpoint L,L1,L2,X,X1,Y,Y1;
       L.fpos(1)=-mu; L.fpos(2)=mu; L.fpos(3)=(0.5-delta); L.label="L";
       L1.fpos(1)=mu; L1.fpos(2)=-mu; L1.fpos(3)=(0.5+delta); L1.label="L_1";
@@ -7266,41 +7273,41 @@ namespace LATTICE {
         Y.TransformKpoint(aurostd::inverse(transformation_matrix));
         Y1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (body-centered orthorhombc a < b < c) G-X-L-T-W-R-X1-Z-G-Y-S-W L1-Y Y1-Z" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),T.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),W.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),W.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,W.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),X1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),X1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),S.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),S.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),W.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),W.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L1.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L1.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //OLD: G-X-L-T-L1-Y-G-Z-X1-L2-Y1-S-W-R-X T-W R-X1 Y1-Z Y-S
     }
@@ -7308,22 +7315,22 @@ namespace LATTICE {
     if(lattice_type=="ORCC") {
       foundBZ=TRUE;
       float zeta=(a*a+b*b)/(4.0*b*b);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
 
-      //DX 20181105 [OBSOLETE] string G,R,S,T,Y,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] R="   0.000   0.500   0.500   ! R";
-      //DX 20181105 [OBSOLETE] S="   0.000   0.500   0.000   ! S";
-      //DX 20181105 [OBSOLETE] T="  -0.500   0.500   0.500   ! T";
-      //DX 20181105 [OBSOLETE] Y="  -0.500   0.500   0.000   ! Y";
-      //DX 20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
-      //DX 20181105 [OBSOLETE] stringstream A,X,X1,A1;
-      //DX 20181105 [OBSOLETE] A << zeta << "  " << zeta << "  0.500  ! A";
-      //DX 20181105 [OBSOLETE] A1 << (-zeta) << "  " << (1.0-zeta) << "  0.500  ! A_1";
-      //DX 20181105 [OBSOLETE] X << zeta << "  " << zeta << "  0.000  ! X";
-      //DX 20181105 [OBSOLETE] X1 << (-zeta) << "  " << (1.0-zeta) << "  0.000  ! X_1";
+      //DX20181105 [OBSOLETE] string G,R,S,T,Y,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] R="   0.000   0.500   0.500   ! R";
+      //DX20181105 [OBSOLETE] S="   0.000   0.500   0.000   ! S";
+      //DX20181105 [OBSOLETE] T="  -0.500   0.500   0.500   ! T";
+      //DX20181105 [OBSOLETE] Y="  -0.500   0.500   0.000   ! Y";
+      //DX20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
+      //DX20181105 [OBSOLETE] stringstream A,X,X1,A1;
+      //DX20181105 [OBSOLETE] A << zeta << "  " << zeta << "  0.500  ! A";
+      //DX20181105 [OBSOLETE] A1 << (-zeta) << "  " << (1.0-zeta) << "  0.500  ! A_1";
+      //DX20181105 [OBSOLETE] X << zeta << "  " << zeta << "  0.000  ! X";
+      //DX20181105 [OBSOLETE] X1 << (-zeta) << "  " << (1.0-zeta) << "  0.000  ! X_1";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,R,S,T,Y,Z,A,A1,X,X1;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       R.fpos(1)=0.000; R.fpos(2)=0.500; R.fpos(3)=0.500; R.label="R";
@@ -7349,54 +7356,54 @@ namespace LATTICE {
         X.TransformKpoint(aurostd::inverse(transformation_matrix));
         X1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (C-centered orthorhombic a < b) G-X-S-R-A-Z-G-Y-X1-A1-T-Y Z-T" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),S.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),S.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),R.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,S.str(),R.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),X1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),X1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X1.str(),A1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X1.str(),A1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A1.str(),T.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A1.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,T.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),T.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),T.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //OLD: G-X-S-X1-Y-G-Z-A-R-A1-T-Z X-A X1-A1 Y-T R-S
     }
     // ***************** HEXAGONAL (HEX) ************************************
     if(lattice_type=="HEX") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,A,H,K,L,M;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] A="   0.000   0.000   0.500   ! A";
-      //DX 20181105 [OBSOLETE] H="   0.3333  0.3333  0.500   ! H";
-      //DX 20181105 [OBSOLETE] K="   0.3333  0.3333  0.000   ! K";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.000   0.500   ! L";
-      //DX 20181105 [OBSOLETE] M="   0.500   0.000   0.000   ! M";
+      //DX20181105 [OBSOLETE] string G,A,H,K,L,M;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] A="   0.000   0.000   0.500   ! A";
+      //DX20181105 [OBSOLETE] H="   0.3333  0.3333  0.500   ! H";
+      //DX20181105 [OBSOLETE] K="   0.3333  0.3333  0.000   ! K";
+      //DX20181105 [OBSOLETE] L="   0.500   0.000   0.500   ! L";
+      //DX20181105 [OBSOLETE] M="   0.500   0.000   0.000   ! M";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,A,H,K,L,M;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       A.fpos(1)=0.000; A.fpos(2)=0.000; A.fpos(3)=0.500; A.label="A";
@@ -7414,41 +7421,41 @@ namespace LATTICE {
         L.TransformKpoint(aurostd::inverse(transformation_matrix));
         M.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (hexagonal) G-M-K-G-A-L-H-A L-M K-H" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),K.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),K.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,K.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       // OLD: G-M-K-G-A-L-H-A  M-L  K-H
     }
     // ************************* RHOMBOHEDRAL (RHL) *************************
     if(lattice_type=="RHL1") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,L,L1,Z,F;
-      //DX 20181105 [OBSOLETE] stringstream B,P,P1,P2,B1,X,Q;
+      //DX20181105 [OBSOLETE] string G,L,L1,Z,F;
+      //DX20181105 [OBSOLETE] stringstream B,P,P1,P2,B1,X,Q;
       float alpharad,ap,h2,h,eta,nu;
       alpharad=alpha*PI/180.0;
       ap=2.0*a*sin(alpharad/2.0);
@@ -7456,23 +7463,23 @@ namespace LATTICE {
       h=sqrt(h2);
       eta= 5.0/6.0 - ap*ap/h/h/18.0;
       nu=0.5*(1.5-eta);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
-      //DX 20181105 [OBSOLETE] F="   0.500   0.500   0.000    ! F";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.000   0.000    ! L";
-      //DX 20181105 [OBSOLETE] L1="   0.000   0.000  -0.500    ! L_1";
-      //DX 20181105 [OBSOLETE] Z="   0.500   0.500   0.500    ! Z";
-      //DX 20181105 [OBSOLETE] B << eta << "  0.500  " << (1.0-eta) << "  ! B";
-      //DX 20181105 [OBSOLETE] B1 << "  0.500  " << (1.0-eta) << "  " << (eta-1.0) << "  ! B_1";
-      //DX 20181105 [OBSOLETE] P << eta << "  " << nu << "  " << nu << "  ! P";
-      //DX 20181105 [OBSOLETE] P1 << (1.0-nu) << "  " << (1.0-nu) << "  " << (1.0-eta) << "  ! P_1";
-      //DX 20181105 [OBSOLETE] P2 << nu << "  " << nu << "  " << (eta-1.0) << "  ! P_2";
-      //DX 20181105 [OBSOLETE] Q << (1.0-nu) << "  " << nu << "  0.000   ! Q";
-      //DX 20181105 [OBSOLETE] X << nu << "  0.000  " << -nu << "  ! X";
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
+      //DX20181105 [OBSOLETE] F="   0.500   0.500   0.000    ! F";
+      //DX20181105 [OBSOLETE] L="   0.500   0.000   0.000    ! L";
+      //DX20181105 [OBSOLETE] L1="   0.000   0.000  -0.500    ! L_1";
+      //DX20181105 [OBSOLETE] Z="   0.500   0.500   0.500    ! Z";
+      //DX20181105 [OBSOLETE] B << eta << "  0.500  " << (1.0-eta) << "  ! B";
+      //DX20181105 [OBSOLETE] B1 << "  0.500  " << (1.0-eta) << "  " << (eta-1.0) << "  ! B_1";
+      //DX20181105 [OBSOLETE] P << eta << "  " << nu << "  " << nu << "  ! P";
+      //DX20181105 [OBSOLETE] P1 << (1.0-nu) << "  " << (1.0-nu) << "  " << (1.0-eta) << "  ! P_1";
+      //DX20181105 [OBSOLETE] P2 << nu << "  " << nu << "  " << (eta-1.0) << "  ! P_2";
+      //DX20181105 [OBSOLETE] Q << (1.0-nu) << "  " << nu << "  0.000   ! Q";
+      //DX20181105 [OBSOLETE] X << nu << "  0.000  " << -nu << "  ! X";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,F,L,L1,Z,B,B1,P,P1,P2,Q,X;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       F.fpos(1)=0.500; F.fpos(2)=0.500; F.fpos(3)=0.000; F.label="F";
@@ -7502,40 +7509,40 @@ namespace LATTICE {
         Q.TransformKpoint(aurostd::inverse(transformation_matrix));
         X.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (rhombohedral alpha < 90) G-L-B1 B-Z-G-X Q-F-P1-Z L-P" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),B1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),B1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,B.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,B.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Q.str(),F.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Q.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),P1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),P1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       // old: G-Z-P-L-G-L1-P2-F-P1-Z-B F-Q L-B1 X-G
     }
     if(lattice_type=="RHL2") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,L,F,Z;
-      //DX 20181105 [OBSOLETE] stringstream Q,Q1,P1,P;
+      //DX20181105 [OBSOLETE] string G,L,F,Z;
+      //DX20181105 [OBSOLETE] stringstream Q,Q1,P1,P;
       float alpharad,ap,h2,h,ka,kalpha,kap,kh2,kh,eta,nu;
       alpharad=alpha*PI/180.0;
       ap=2.0*a*sin(alpharad/2.0);
@@ -7548,19 +7555,19 @@ namespace LATTICE {
       kh=sqrt(kh2);
       eta=0.5*ka*ka*h/kh;
       nu=(1.5-eta)*0.5;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
-      //DX 20181105 [OBSOLETE] F="   0.500  -0.500   0.000    ! F";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.000   0.000    ! L";
-      //DX 20181105 [OBSOLETE] Z="   0.500  -0.500   0.500    ! Z";
-      //DX 20181105 [OBSOLETE] Q << eta << "  " << eta << "  " << eta << "   ! Q";
-      //DX 20181105 [OBSOLETE] Q1 << (1-eta) << "  " << -eta << "  " << -eta << "   ! Q_1";
-      //DX 20181105 [OBSOLETE] P << (1.0-nu) << "  " << -nu << "  " << (1.0-nu) << "  ! P";
-      //DX 20181105 [OBSOLETE] P1 << nu << "  " << (nu-1.0) << "  " << (nu-1.0) << "  ! P_1";
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000    ! \\Gamma";
+      //DX20181105 [OBSOLETE] F="   0.500  -0.500   0.000    ! F";
+      //DX20181105 [OBSOLETE] L="   0.500   0.000   0.000    ! L";
+      //DX20181105 [OBSOLETE] Z="   0.500  -0.500   0.500    ! Z";
+      //DX20181105 [OBSOLETE] Q << eta << "  " << eta << "  " << eta << "   ! Q";
+      //DX20181105 [OBSOLETE] Q1 << (1-eta) << "  " << -eta << "  " << -eta << "   ! Q_1";
+      //DX20181105 [OBSOLETE] P << (1.0-nu) << "  " << -nu << "  " << (1.0-nu) << "  ! P";
+      //DX20181105 [OBSOLETE] P1 << nu << "  " << (nu-1.0) << "  " << (nu-1.0) << "  ! P_1";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,F,L,Z,Q,Q1,P,P1;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       F.fpos(1)=0.500; F.fpos(2)=-0.500; F.fpos(3)=0.000; F.label="F";
@@ -7582,66 +7589,66 @@ namespace LATTICE {
         P.TransformKpoint(aurostd::inverse(transformation_matrix));
         P1.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (rhombohedral alpha > 90) G-P-Z-Q-G-F-P1-Q1-L-Z" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),P.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),P.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),Q.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),Q.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Q.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Q.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),F.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),P1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),P1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,P1.str(),Q1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,P1.str(),Q1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Q1.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Q1.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //old: G-Q-Z-P-G-P1-Q1-L-Q P-Z-Q1 P-F-P1 F-G
     }
     //************************** MONOCLINIC (MCL) ***************************
     if(lattice_type=="MCL") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,A,C,D,D1,E,X,Y,Y1,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] A="   0.500   0.500   0.000   ! A";
-      //DX 20181105 [OBSOLETE] C="   0.000   0.500   0.500   ! C";
-      //DX 20181105 [OBSOLETE] D="   0.500   0.000   0.500   ! D";
-      //DX 20181105 [OBSOLETE] D1="   0.500   0.000  -0.500   ! D_1";
-      //DX 20181105 [OBSOLETE] E="   0.500   0.500   0.500   ! E";
-      //DX 20181105 [OBSOLETE] X="   0.000   0.500   0.000   ! X";
-      //DX 20181105 [OBSOLETE] Y="   0.000   0.000   0.500   ! Y";
-      //DX 20181105 [OBSOLETE] Y1="   0.000   0.000  -0.500   ! Y_1";
-      //DX 20181105 [OBSOLETE] Z="   0.500   0.000   0.000   ! Z";
-      //DX 20181105 [OBSOLETE] stringstream H2,H1,H,M2,M1,M;
+      //DX20181105 [OBSOLETE] string G,A,C,D,D1,E,X,Y,Y1,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] A="   0.500   0.500   0.000   ! A";
+      //DX20181105 [OBSOLETE] C="   0.000   0.500   0.500   ! C";
+      //DX20181105 [OBSOLETE] D="   0.500   0.000   0.500   ! D";
+      //DX20181105 [OBSOLETE] D1="   0.500   0.000  -0.500   ! D_1";
+      //DX20181105 [OBSOLETE] E="   0.500   0.500   0.500   ! E";
+      //DX20181105 [OBSOLETE] X="   0.000   0.500   0.000   ! X";
+      //DX20181105 [OBSOLETE] Y="   0.000   0.000   0.500   ! Y";
+      //DX20181105 [OBSOLETE] Y1="   0.000   0.000  -0.500   ! Y_1";
+      //DX20181105 [OBSOLETE] Z="   0.500   0.000   0.000   ! Z";
+      //DX20181105 [OBSOLETE] stringstream H2,H1,H,M2,M1,M;
       float alpharad,eta,nu;
       alpharad=alpha*PI/180.0;
       eta=0.5*(1-b*cos(alpharad)/c)/sin(alpharad)/sin(alpharad);
       nu=0.5-eta*c*cos(alpharad)/b;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
 
-      //DX 20181105 [OBSOLETE] H << "   0.000  " << eta << "  " << (1-nu) << "  ! H";
-      //DX 20181105 [OBSOLETE] H1 << "   0.000  " << (1-eta) << "  " << nu << "  ! H_1";
-      //DX 20181105 [OBSOLETE] H2 << "   0.000  " << eta << "  " << -nu << "  ! H_2";
-      //DX 20181105 [OBSOLETE] M << "   0.500  " << eta << "  " << (1-nu) << "  ! M";
-      //DX 20181105 [OBSOLETE] M1 << "   0.500  " << (1-eta) << "  " << nu << "  ! M_1";
-      //DX 20181105 [OBSOLETE] M2 << "   0.500  " << eta << "  " << -nu << "  ! M_2";
+      //DX20181105 [OBSOLETE] H << "   0.000  " << eta << "  " << (1-nu) << "  ! H";
+      //DX20181105 [OBSOLETE] H1 << "   0.000  " << (1-eta) << "  " << nu << "  ! H_1";
+      //DX20181105 [OBSOLETE] H2 << "   0.000  " << eta << "  " << -nu << "  ! H_2";
+      //DX20181105 [OBSOLETE] M << "   0.500  " << eta << "  " << (1-nu) << "  ! M";
+      //DX20181105 [OBSOLETE] M1 << "   0.500  " << (1-eta) << "  " << nu << "  ! M_1";
+      //DX20181105 [OBSOLETE] M2 << "   0.500  " << eta << "  " << -nu << "  ! M_2";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,A,C,D,D1,E,X,Y,Y1,Z,H,H1,H2,M,M1,M2;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       A.fpos(1)=0.500; A.fpos(2)=0.500; A.fpos(3)=0.000; A.label="A";
@@ -7679,43 +7686,43 @@ namespace LATTICE {
         M1.TransformKpoint(aurostd::inverse(transformation_matrix));
         M2.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (monoclinic) G-Y-H-C-E-M1-A-X-G-Z-D-M Z-A D-Y X-H1"  << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      oss << lattice_type << " (monoclinic) G-Y-H-C-E-M1-A-X-G-Z-D-M Z-A D-Y X-H1"   << endl;
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),C.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),C.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,C.str(),E.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,C.str(),E.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,E.str(),M1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,E.str(),M1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M1.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M1.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,A.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),D.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),D.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,D.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,D.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),A.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),A.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,D.str(),Y.str(),grid,nkpoint);	 //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,D.str(),Y.str(),grid,nkpoint);	 //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),H1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),H1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //old G-Y-H-C-E-M1-A-X-H1 M-D-Z Y-D
       //oldold G-Y-H-C-H1-X-H2 Y-D-Z-D1-M2-A-M1-E-M C-E X-A
@@ -7723,16 +7730,16 @@ namespace LATTICE {
     // MCLC ---------------------------------------------------------------------
     if(lattice_type=="MCLC1" || lattice_type=="MCLC2") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,N,N1,L,M,Z,Y,Y1;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
-      //DX 20181105 [OBSOLETE] M="   0.500   0.000   0.500   ! M";
-      //DX 20181105 [OBSOLETE] N="   0.500   0.000   0.000   ! N";
-      //DX 20181105 [OBSOLETE] N1="   0.000  -0.500   0.000   ! N_1";
-      //DX 20181105 [OBSOLETE] Y="   0.500   0.500   0.000   ! Y";
-      //DX 20181105 [OBSOLETE] Y1="  -0.500  -0.500   0.000   ! Y_1";
-      //DX 20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
-      //DX 20181105 [OBSOLETE] stringstream F,F1,F2,H,H1,I,I1,J,Q,X,X1,X2;
+      //DX20181105 [OBSOLETE] string G,N,N1,L,M,Z,Y,Y1;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
+      //DX20181105 [OBSOLETE] M="   0.500   0.000   0.500   ! M";
+      //DX20181105 [OBSOLETE] N="   0.500   0.000   0.000   ! N";
+      //DX20181105 [OBSOLETE] N1="   0.000  -0.500   0.000   ! N_1";
+      //DX20181105 [OBSOLETE] Y="   0.500   0.500   0.000   ! Y";
+      //DX20181105 [OBSOLETE] Y1="  -0.500  -0.500   0.000   ! Y_1";
+      //DX20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
+      //DX20181105 [OBSOLETE] stringstream F,F1,F2,H,H1,I,I1,J,Q,X,X1,X2;
       float alpharad,zeta,eta,psi,phi,mu,delta;
       alpharad=alpha*PI/180.0;
       zeta = 0.5/sin(alpharad)/sin(alpharad) - 0.25*b/c/tan(alpharad)/sin(alpharad);
@@ -7741,27 +7748,27 @@ namespace LATTICE {
       phi = psi + 0.25*a*a/b/c/tan(alpharad)/sin(alpharad);
       mu = psi + 0.25*(2-b/c/cos(alpharad))/tan(alpharad)/tan(alpharad);
       delta = 1.0 - 0.5*b/tan(alpharad)*(1/c/sin(alpharad)-2/b/tan(alpharad)) - mu;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
-      //DX 20181105 [OBSOLETE] F << (1.0-zeta) << "  " << (1.0-zeta) << "  " << (1.0-eta) << "   ! F";
-      //DX 20181105 [OBSOLETE] F1 << zeta << "  " << zeta << "  " << eta << "   ! F_1";
-      //DX 20181105 [OBSOLETE] F2 << (-zeta) << "  " << (-zeta) << "  " << (1.0-eta) << "   ! F_2";
-      //DX 20181105 [OBSOLETE] H << (1.0-delta) << "  " << (1.0-mu) << "  " << (1.0-eta) << "   ! H";
-      //DX 20181105 [OBSOLETE] H1 << (-delta) << "  " << (-mu) << "  " << (1.0-eta) << "   ! H_1";
-      //DX 20181105 [OBSOLETE] I << phi << "  " << (1.0-phi) << "   0.500   ! I";
-      //DX 20181105 [OBSOLETE] I1 << (1.0-phi) << "  " << (phi-1.0) << "   0.500   ! I_1";
-      //DX 20181105 [OBSOLETE] J << (1.0-mu) << "  " << (-delta) << "  " << (1.0-eta) << "   ! J";
-      //DX 20181105 [OBSOLETE] Q << mu << "  " << delta << "  " << eta << "   ! Q";
-      //DX 20181105 [OBSOLETE] X << (1.0-psi) << "  " << (psi-1.0) << "   0.000   ! X";
-      //DX 20181105 [OBSOLETE] X1 << (psi) << "  " << (1-psi) << "   0.000   ! X_1";
-      //DX 20181105 [OBSOLETE] X2 << (psi-1.0) << "  " << (-psi) << "   0.000   ! X_2";
+      //DX20181105 [OBSOLETE] F << (1.0-zeta) << "  " << (1.0-zeta) << "  " << (1.0-eta) << "   ! F";
+      //DX20181105 [OBSOLETE] F1 << zeta << "  " << zeta << "  " << eta << "   ! F_1";
+      //DX20181105 [OBSOLETE] F2 << (-zeta) << "  " << (-zeta) << "  " << (1.0-eta) << "   ! F_2";
+      //DX20181105 [OBSOLETE] H << (1.0-delta) << "  " << (1.0-mu) << "  " << (1.0-eta) << "   ! H";
+      //DX20181105 [OBSOLETE] H1 << (-delta) << "  " << (-mu) << "  " << (1.0-eta) << "   ! H_1";
+      //DX20181105 [OBSOLETE] I << phi << "  " << (1.0-phi) << "   0.500   ! I";
+      //DX20181105 [OBSOLETE] I1 << (1.0-phi) << "  " << (phi-1.0) << "   0.500   ! I_1";
+      //DX20181105 [OBSOLETE] J << (1.0-mu) << "  " << (-delta) << "  " << (1.0-eta) << "   ! J";
+      //DX20181105 [OBSOLETE] Q << mu << "  " << delta << "  " << eta << "   ! Q";
+      //DX20181105 [OBSOLETE] X << (1.0-psi) << "  " << (psi-1.0) << "   0.000   ! X";
+      //DX20181105 [OBSOLETE] X1 << (psi) << "  " << (1-psi) << "   0.000   ! X_1";
+      //DX20181105 [OBSOLETE] X2 << (psi-1.0) << "  " << (-psi) << "   0.000   ! X_2";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,L,M,N,N1,Y,Y1,Z,F,F1,F2,H,H1,I,I1,J,Q,X,X1,X2;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       L.fpos(1)=0.500; L.fpos(2)=0.500; L.fpos(3)=0.500; L.label="L";
@@ -7808,7 +7815,7 @@ namespace LATTICE {
         X1.TransformKpoint(aurostd::inverse(transformation_matrix));
         X2.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(lattice_type=="MCLC1") {
         if(isQE) oss << "K_POINTS  crystal ! ";
@@ -7820,39 +7827,39 @@ namespace LATTICE {
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
         oss << lattice_type << " (C-centered monoclinic kgamma = 90) G-Y-F-L-I I1-Z-G-M N-G Z-F1" << endl;
       }
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),I.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),I.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,I1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,I1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
       if(lattice_type=="MCLC1") {
-        LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
         if(isVASP && grid>0) oss << " " << endl;
-        LATTICE::kpoint2stream(oss,isVASP,isQE,X1.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,X1.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
         if(isVASP && grid>0) oss << " " << endl;
-        LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
         if(isVASP && grid>0) oss << " " << endl;
-        LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       }
       else if(lattice_type=="MCLC2") {
-        LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
         if(isVASP && grid>0) oss << " " << endl;
-        LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       }
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),F1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),F1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //old:
       //MCLC1: G-Y-F-L-I I1-Z-F1 Y-X1 X-G-N M-G
@@ -7863,15 +7870,15 @@ namespace LATTICE {
     }
     if(lattice_type=="MCLC3" || lattice_type=="MCLC4") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,N,N1,M,I,X,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] I="   0.500  -0.500   0.500   ! I";
-      //DX 20181105 [OBSOLETE] M="   0.500   0.000   0.500   ! M";
-      //DX 20181105 [OBSOLETE] N="   0.500   0.000   0.000   ! N";
-      //DX 20181105 [OBSOLETE] N1="   0.000  -0.500   0.000   ! N_1";
-      //DX 20181105 [OBSOLETE] X="   0.500  -0.500   0.000   ! X";
-      //DX 20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
-      //DX 20181105 [OBSOLETE] stringstream Y1,F,F2,H1,H2,H,F1,Y,Y3,Y2;
+      //DX20181105 [OBSOLETE] string G,N,N1,M,I,X,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] I="   0.500  -0.500   0.500   ! I";
+      //DX20181105 [OBSOLETE] M="   0.500   0.000   0.500   ! M";
+      //DX20181105 [OBSOLETE] N="   0.500   0.000   0.000   ! N";
+      //DX20181105 [OBSOLETE] N1="   0.000  -0.500   0.000   ! N_1";
+      //DX20181105 [OBSOLETE] X="   0.500  -0.500   0.000   ! X";
+      //DX20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
+      //DX20181105 [OBSOLETE] stringstream Y1,F,F2,H1,H2,H,F1,Y,Y3,Y2;
       float alpharad,zeta,eta,psi,phi,mu,delta;
       alpharad=alpha*PI/180.0;
       zeta = 0.25/sin(alpharad)/sin(alpharad) + 0.25*b*b/a/a - 0.25*b/c/sin(alpharad)/tan(alpharad);
@@ -7880,25 +7887,25 @@ namespace LATTICE {
       delta = (2*mu-0.5)*c/b*cos(alpharad);
       phi = 0.75 - 0.25*b*b/a/a - 0.25*b/tan(alpharad)*(1/c/sin(alpharad)-1/b/tan(alpharad));
       psi = 0.5 + (2*phi-1)*c/b*cos(alpharad);
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
-      //DX 20181105 [OBSOLETE] F <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! F";
-      //DX 20181105 [OBSOLETE] F1 <<  phi << "  " <<  (phi-1.0) << "  "  << psi << "   ! F_1";
-      //DX 20181105 [OBSOLETE] F2 <<  (1.0-phi) << "  " <<  (-phi) << "  " <<  (1.0-psi) << "   ! F_2";
-      //DX 20181105 [OBSOLETE] H <<  zeta << "  " <<  zeta << "  " <<  eta << "   ! H";
-      //DX 20181105 [OBSOLETE] H1 <<  (1.0-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_1";
-      //DX 20181105 [OBSOLETE] H2 <<  (-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_2";
-      //DX 20181105 [OBSOLETE] Y << mu << "  " <<  mu << "  " <<  delta << "   ! Y";
-      //DX 20181105 [OBSOLETE] Y1 <<  (1.0-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_1";
-      //DX 20181105 [OBSOLETE] Y2 <<  (-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_2";
-      //DX 20181105 [OBSOLETE] Y3 <<  mu << "  " <<  (mu-1.0) << "  " <<  delta << "   ! Y_3";
+      //DX20181105 [OBSOLETE] F <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! F";
+      //DX20181105 [OBSOLETE] F1 <<  phi << "  " <<  (phi-1.0) << "  "   << psi << "   ! F_1";
+      //DX20181105 [OBSOLETE] F2 <<  (1.0-phi) << "  " <<  (-phi) << "  " <<  (1.0-psi) << "   ! F_2";
+      //DX20181105 [OBSOLETE] H <<  zeta << "  " <<  zeta << "  " <<  eta << "   ! H";
+      //DX20181105 [OBSOLETE] H1 <<  (1.0-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_1";
+      //DX20181105 [OBSOLETE] H2 <<  (-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_2";
+      //DX20181105 [OBSOLETE] Y << mu << "  " <<  mu << "  " <<  delta << "   ! Y";
+      //DX20181105 [OBSOLETE] Y1 <<  (1.0-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_1";
+      //DX20181105 [OBSOLETE] Y2 <<  (-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_2";
+      //DX20181105 [OBSOLETE] Y3 <<  mu << "  " <<  (mu-1.0) << "  " <<  delta << "   ! Y_3";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,I,M,N,N1,X,Z,F,F1,F2,H,H1,H2,Y,Y1,Y2,Y3;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       I.fpos(1)=0.500; I.fpos(2)=-0.500; I.fpos(3)=0.500; I.label="I";
@@ -7939,49 +7946,49 @@ namespace LATTICE {
         Y2.TransformKpoint(aurostd::inverse(transformation_matrix));
         Y3.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(lattice_type=="MCLC3") {
         if(isQE) oss << "K_POINTS  crystal ! ";
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
-        oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2<1) G-Y-F-H-Z-I-X-G-Z M-G-N X-Y1-H1 I-F1" << endl; //ME190520
+        oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2<1) G-Y-F-H-Z-I-X-G-Z M-G-N X-Y1-H1 I-F1" << endl; //ME20190520
       }
       else if(lattice_type=="MCLC4") {
         if(isQE) oss << "K_POINTS  crystal ! ";
         // [FIX]  if(isVASP) oss << "KPOINTS: ";
-        oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2=1) G-Y-F-H-Z-I-X-G-Z M-G-N X-Y1-H1" << endl; //ME190520
+        oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2=1) G-Y-F-H-Z-I-X-G-Z M-G-N X-Y1-H1" << endl; //ME20190520
       }
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),H.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),H.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),I.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),I.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,I.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,I.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),H1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),H1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(lattice_type=="MCLC3") {
         if(isVASP && grid>0) oss << " " << endl;
-        LATTICE::kpoint2stream(oss,isVASP,isQE,I.str(),F1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+        LATTICE::kpoint2stream(oss,isVASP,isQE,I.str(),F1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       }
 
       //old:
@@ -7993,15 +8000,15 @@ namespace LATTICE {
     }
     if(lattice_type=="MCLC5") {
       foundBZ=TRUE;
-      //DX 20181105 [OBSOLETE] string G,N,N1,M,L,X,Z;
-      //DX 20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
-      //DX 20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
-      //DX 20181105 [OBSOLETE] M="   0.500   0.000   0.500   ! M";
-      //DX 20181105 [OBSOLETE] N="   0.500   0.000   0.000   ! N";
-      //DX 20181105 [OBSOLETE] N1="   0.000  -0.500   0.000   ! N_1";
-      //DX 20181105 [OBSOLETE] X="   0.500  -0.500   0.000   ! X";
-      //DX 20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
-      //DX 20181105 [OBSOLETE] stringstream Y1,S,S1,H1,H2,H,Q,I,F1,F,F2,I1,Y,Y3,Y2;
+      //DX20181105 [OBSOLETE] string G,N,N1,M,L,X,Z;
+      //DX20181105 [OBSOLETE] G="   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] L="   0.500   0.500   0.500   ! L";
+      //DX20181105 [OBSOLETE] M="   0.500   0.000   0.500   ! M";
+      //DX20181105 [OBSOLETE] N="   0.500   0.000   0.000   ! N";
+      //DX20181105 [OBSOLETE] N1="   0.000  -0.500   0.000   ! N_1";
+      //DX20181105 [OBSOLETE] X="   0.500  -0.500   0.000   ! X";
+      //DX20181105 [OBSOLETE] Z="   0.000   0.000   0.500   ! Z";
+      //DX20181105 [OBSOLETE] stringstream Y1,S,S1,H1,H2,H,Q,I,F1,F,F2,I1,Y,Y3,Y2;
       float alpharad,zeta,eta,psi,phi,mu,delta,nu,omega,rho;
       alpharad=alpha*PI/180.0;
       zeta = 0.25/sin(alpharad)/sin(alpharad) + 0.25*b*b/a/a - 0.25*b/c/sin(alpharad)/tan(alpharad);
@@ -8013,33 +8020,33 @@ namespace LATTICE {
       omega = c*cos(alpharad)/b*(2.0*nu-0.5) + c*sin(alpharad)*tan(alpharad)/b*(2.0*nu-0.5*b*b/a/a-0.5);
       rho = 0.75 + 0.25*a*a/b/b/sin(alpharad)*(b/c/tan(alpharad)-1/sin(alpharad));
       delta = (2.0*mu-nu)*c*cos(alpharad)/b + 0.5*omega - 0.25;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-      if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+      if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
 
-      //DX 20181105 [OBSOLETE] F <<  nu << "  " <<  nu << "  " <<  omega << "   ! F";
-      //DX 20181105 [OBSOLETE] F1 << (1.0-nu) << "  " << (1.0-nu) << "  " << (1.0-omega) << "   ! F_1";
-      //DX 20181105 [OBSOLETE] F2 <<  nu << "  " <<  (nu-1.0) << "  " <<  omega << "   ! F_2";
-      //DX 20181105 [OBSOLETE] H <<  zeta << "  " <<  zeta << "  " <<  eta << "   ! H";
-      //DX 20181105 [OBSOLETE] H1 <<  (1.0-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_1";
-      //DX 20181105 [OBSOLETE] H2 <<  (-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_2";
-      //DX 20181105 [OBSOLETE] I <<  rho  << "  " << (1.0-rho) << "   0.500   ! I";
-      //DX 20181105 [OBSOLETE] I1 << (1.0-rho) << "  " <<  (rho-1.0) << "   0.5   ! I_1";
-      //DX 20181105 [OBSOLETE] Q <<  phi << "  " <<  (phi-1.0) << "  "  << psi << "   ! Q";
-      //DX 20181105 [OBSOLETE] S <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! S";
-      //DX 20181105 [OBSOLETE] S1 <<  (1.0-phi) << "  " <<  (-phi) << "  " <<  (1.0-psi) << "   ! S_1";
-      //DX 20181105 [OBSOLETE] Y << mu << "  " <<  mu << "  " <<  delta << "   ! Y";
-      //DX 20181105 [OBSOLETE] Y1 <<  (1.0-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_1";
-      //DX 20181105 [OBSOLETE] Y2 <<  (-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_2";
-      //DX 20181105 [OBSOLETE] Y3 <<  mu << "  " <<  (mu-1.0) << "  " <<  delta << "   ! Y_3";
+      //DX20181105 [OBSOLETE] F <<  nu << "  " <<  nu << "  " <<  omega << "   ! F";
+      //DX20181105 [OBSOLETE] F1 << (1.0-nu) << "  " << (1.0-nu) << "  " << (1.0-omega) << "   ! F_1";
+      //DX20181105 [OBSOLETE] F2 <<  nu << "  " <<  (nu-1.0) << "  " <<  omega << "   ! F_2";
+      //DX20181105 [OBSOLETE] H <<  zeta << "  " <<  zeta << "  " <<  eta << "   ! H";
+      //DX20181105 [OBSOLETE] H1 <<  (1.0-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_1";
+      //DX20181105 [OBSOLETE] H2 <<  (-zeta) << "  " <<  (-zeta) << "  " <<  (1.0-eta) << "   ! H_2";
+      //DX20181105 [OBSOLETE] I <<  rho   << "  " << (1.0-rho) << "   0.500   ! I";
+      //DX20181105 [OBSOLETE] I1 << (1.0-rho) << "  " <<  (rho-1.0) << "   0.5   ! I_1";
+      //DX20181105 [OBSOLETE] Q <<  phi << "  " <<  (phi-1.0) << "  "   << psi << "   ! Q";
+      //DX20181105 [OBSOLETE] S <<  (1.0-phi) << "  " <<  (1.0-phi) << "  " <<  (1.0-psi) << "   ! S";
+      //DX20181105 [OBSOLETE] S1 <<  (1.0-phi) << "  " <<  (-phi) << "  " <<  (1.0-psi) << "   ! S_1";
+      //DX20181105 [OBSOLETE] Y << mu << "  " <<  mu << "  " <<  delta << "   ! Y";
+      //DX20181105 [OBSOLETE] Y1 <<  (1.0-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_1";
+      //DX20181105 [OBSOLETE] Y2 <<  (-mu) << "  " <<  (-mu) << "  " <<  (-delta) << "   ! Y_2";
+      //DX20181105 [OBSOLETE] Y3 <<  mu << "  " <<  (mu-1.0) << "  " <<  delta << "   ! Y_3";
 
-      //DX 20181105 - reformat kpoints to transform - START
+      //DX20181105 - reformat kpoints to transform - START
       _kpoint G,L,M,N,N1,X,Z,F,F1,F2,H,H1,H2,I,I1,Q,S,S1,Y,Y1,Y2,Y3;
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
       L.fpos(1)=0.500; L.fpos(2)=0.500; L.fpos(3)=0.500; L.label="L";
@@ -8090,43 +8097,43 @@ namespace LATTICE {
         Y2.TransformKpoint(aurostd::inverse(transformation_matrix));
         Y3.TransformKpoint(aurostd::inverse(transformation_matrix));
       }
-      //DX 20181105 - reformat kpoints to transform - END
+      //DX20181105 - reformat kpoints to transform - END
 
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
-      oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2>1) G-Y-F-L-I I1-Z-G-X-Y1-H1 H-F1 F2-X M-G-N H-Z" << endl; //ME190520
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      oss << lattice_type << " (kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2>1) G-Y-F-L-I I1-Z-G-X-Y1-H1 H-F1 F2-X M-G-N H-Z" << endl; //ME20190520
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y.str(),F.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),L.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,F.str(),L.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),I.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),I.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,I1.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,I1.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Z.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),Y1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),H1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,Y1.str(),H1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),F1.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),F1.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,F2.str(),X.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,F2.str(),X.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,M.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),N.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),N.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,H.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
 
       //old: G-Y-F-L-I I1-Z-H-F1 H1-Y1-X-G-N M-G
       //oldold: G-X-Y1-H1-F2-Y3-X Z-I1 L-I Y2-H2-Z-H-F1-L-F-Y-G
@@ -8134,15 +8141,15 @@ namespace LATTICE {
     //************** TRICLINIC ********************************************
     if( lattice_type=="TRI1A" || lattice_type=="TRI1a" || lattice_type=="TRI1B" || 
         lattice_type=="TRI1b" || lattice_type=="TRI2A" || lattice_type=="TRI2a" || 
-        lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//corey and david
-      //DX 20181105 [OBSOLETE] stringstream G,Y,A,D,H1,F2,B2,Z1,E,F,B,L,X,D1,H,O,K,M1,Y1,A1,F1,B1,Z,A2,D2,E1,M,R,N;
+        lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//CO+DX
+      //DX20181105 [OBSOLETE] stringstream G,Y,A,D,H1,F2,B2,Z1,E,F,B,L,X,D1,H,O,K,M1,Y1,A1,F1,B1,Z,A2,D2,E1,M,R,N;
       _kpoint G,L,M,M1,N,R,X,Y,Y1,Z,Z1,A,A1,A2,B,B1,B2,D,D1,D2,E,E1,F,F1,F2,H,H1,K,O;
       double zeta,phi,psi,rho,tau,nu,theta,lambda,omega,eta,mu,delta;
       double aa,bb,cc;
 
-      //DX 20181105 [OBSOLETE] G << "   0.000   0.000   0.000   ! \\Gamma";
+      //DX20181105 [OBSOLETE] G << "   0.000   0.000   0.000   ! \\Gamma";
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
-      if(lattice_type=="TRI1A" || lattice_type=="TRI1a" || lattice_type=="TRI2A" || lattice_type=="TRI2a") {		//corey and david
+      if(lattice_type=="TRI1A" || lattice_type=="TRI1a" || lattice_type=="TRI2A" || lattice_type=="TRI2a") {		//CO+DX
         foundBZ=TRUE;
         zeta=1.0+(b1(3)+b2(3))*(b1(3)+b2(3)+b3(3))/b1(1)/b1(1);
         zeta=zeta+ (b1(2)+b2(2))/b1(1)/b1(1)*(b1(2)-b2(3)*(b2(3)+b3(3))/b2(2));
@@ -8162,52 +8169,52 @@ namespace LATTICE {
         eta=0.5*(zeta-rho);
         mu=0.5+0.5*b2(3)*(b2(3)+b3(3))/b2(2)/b2(2)-eta*b1(2)/b2(2);
         delta=0.5+(eta*b1(3)+mu*b2(3))/b3(3);
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
         // 10 center of faces
-        //DX 20181105 [OBSOLETE] L << "   0.500   0.500   0.000   ! L";
-        //DX 20181105 [OBSOLETE] M << "   0.000   0.500   0.500   ! M";
-        //DX 20181105 [OBSOLETE] M1 << "   0.000  -0.500  -0.500   ! M_1";
-        //DX 20181105 [OBSOLETE] N << "   0.500   0.000   0.500   ! N";
-        //DX 20181105 [OBSOLETE] R << "   0.500   0.500   0.500   ! R";
-        //DX 20181105 [OBSOLETE] X << "   0.500   0.000   0.000   ! X";
-        //DX 20181105 [OBSOLETE] Y << "   0.000   0.500   0.000   ! Y";
-        //DX 20181105 [OBSOLETE] Y1 << "   0.000  -0.500   0.000   ! Y_1";
-        //DX 20181105 [OBSOLETE] Z << "   0.000   0.000   0.500   ! Z";
-        //DX 20181105 [OBSOLETE] Z1 << "   0.000   0.000  -0.500   ! Z_1";
-        //DX 20181105 [OBSOLETE] // 6 edges
-        //DX 20181105 [OBSOLETE] A << eta << "   " << mu << "   " << -delta << "   ! A";
-        //DX 20181105 [OBSOLETE] A1 << eta << "   " << mu-1.0 << "   " << -delta << "   ! A_1";
-        //DX 20181105 [OBSOLETE] A2 << eta << "   " << mu << "   " << 1.0-delta << "   ! A_2";
-        //DX 20181105 [OBSOLETE] B << -eta << "   " << -mu << "   " << delta-1.0 << "   ! B";
-        //DX 20181105 [OBSOLETE] B1 << -eta << "   " << -mu << "   " << delta << "   ! B_1";
-        //DX 20181105 [OBSOLETE] B2 << -eta << "   " << 1.0-mu << "   " << delta << "   ! B_2";
-        //DX 20181105 [OBSOLETE] // 12 corners
-        //DX 20181105 [OBSOLETE] D << zeta << "   " << phi << "   " << -psi << "   ! D";
-        //DX 20181105 [OBSOLETE] D1 << zeta << "   " << phi-1.0 << "   " << -psi << "   ! D_1";
-        //DX 20181105 [OBSOLETE] D2 << zeta << "   " << phi << "   " << 1.0-psi << "   ! D_2";
-        //DX 20181105 [OBSOLETE] E << theta << "   " << lambda << "   " << -omega << "   ! E";
-        //DX 20181105 [OBSOLETE] E1 << theta << "   " << lambda << "   " << 1.0-omega << "   ! E_1";
-        //DX 20181105 [OBSOLETE] F << rho << "   " << -tau << "   " << -nu << "   ! F";
-        //DX 20181105 [OBSOLETE] F1 << rho << "   " << -tau << "   " << 1.0-nu << "   ! F_1";
-        //DX 20181105 [OBSOLETE] F2 << rho << "   " << 1.0-tau << "   " << 1.0-nu << "   ! F_2";
-        //DX 20181105 [OBSOLETE] H << 1.0-theta << "   " << -lambda << "   " << omega << "   ! H";
-        //DX 20181105 [OBSOLETE] H1 << 1.0-theta << "   " << 1.0-lambda << "   " << omega << "   ! H_1";
-        //DX 20181105 [OBSOLETE] K << 1.0-zeta << "   " << 1.0-phi << "   " << psi << "   ! K";
-        //DX 20181105 [OBSOLETE] O << 1.0-rho << "   " << tau << "   " << nu << "   ! O";
+        //DX20181105 [OBSOLETE] L << "   0.500   0.500   0.000   ! L";
+        //DX20181105 [OBSOLETE] M << "   0.000   0.500   0.500   ! M";
+        //DX20181105 [OBSOLETE] M1 << "   0.000  -0.500  -0.500   ! M_1";
+        //DX20181105 [OBSOLETE] N << "   0.500   0.000   0.500   ! N";
+        //DX20181105 [OBSOLETE] R << "   0.500   0.500   0.500   ! R";
+        //DX20181105 [OBSOLETE] X << "   0.500   0.000   0.000   ! X";
+        //DX20181105 [OBSOLETE] Y << "   0.000   0.500   0.000   ! Y";
+        //DX20181105 [OBSOLETE] Y1 << "   0.000  -0.500   0.000   ! Y_1";
+        //DX20181105 [OBSOLETE] Z << "   0.000   0.000   0.500   ! Z";
+        //DX20181105 [OBSOLETE] Z1 << "   0.000   0.000  -0.500   ! Z_1";
+        //DX20181105 [OBSOLETE] // 6 edges
+        //DX20181105 [OBSOLETE] A << eta << "   " << mu << "   " << -delta << "   ! A";
+        //DX20181105 [OBSOLETE] A1 << eta << "   " << mu-1.0 << "   " << -delta << "   ! A_1";
+        //DX20181105 [OBSOLETE] A2 << eta << "   " << mu << "   " << 1.0-delta << "   ! A_2";
+        //DX20181105 [OBSOLETE] B << -eta << "   " << -mu << "   " << delta-1.0 << "   ! B";
+        //DX20181105 [OBSOLETE] B1 << -eta << "   " << -mu << "   " << delta << "   ! B_1";
+        //DX20181105 [OBSOLETE] B2 << -eta << "   " << 1.0-mu << "   " << delta << "   ! B_2";
+        //DX20181105 [OBSOLETE] // 12 corners
+        //DX20181105 [OBSOLETE] D << zeta << "   " << phi << "   " << -psi << "   ! D";
+        //DX20181105 [OBSOLETE] D1 << zeta << "   " << phi-1.0 << "   " << -psi << "   ! D_1";
+        //DX20181105 [OBSOLETE] D2 << zeta << "   " << phi << "   " << 1.0-psi << "   ! D_2";
+        //DX20181105 [OBSOLETE] E << theta << "   " << lambda << "   " << -omega << "   ! E";
+        //DX20181105 [OBSOLETE] E1 << theta << "   " << lambda << "   " << 1.0-omega << "   ! E_1";
+        //DX20181105 [OBSOLETE] F << rho << "   " << -tau << "   " << -nu << "   ! F";
+        //DX20181105 [OBSOLETE] F1 << rho << "   " << -tau << "   " << 1.0-nu << "   ! F_1";
+        //DX20181105 [OBSOLETE] F2 << rho << "   " << 1.0-tau << "   " << 1.0-nu << "   ! F_2";
+        //DX20181105 [OBSOLETE] H << 1.0-theta << "   " << -lambda << "   " << omega << "   ! H";
+        //DX20181105 [OBSOLETE] H1 << 1.0-theta << "   " << 1.0-lambda << "   " << omega << "   ! H_1";
+        //DX20181105 [OBSOLETE] K << 1.0-zeta << "   " << 1.0-phi << "   " << psi << "   ! K";
+        //DX20181105 [OBSOLETE] O << 1.0-rho << "   " << tau << "   " << nu << "   ! O";
 
-        //DX 20181105 - reformat kpoints to transform - START
+        //DX20181105 - reformat kpoints to transform - START
         L.fpos(1)=0.500; L.fpos(2)=0.500; L.fpos(3)=0.000; L.label="L";
         M.fpos(1)=0.000; M.fpos(2)=0.500; M.fpos(3)=0.500; M.label="M";
         M1.fpos(1)=0.000; M1.fpos(2)=-0.500; M1.fpos(3)=-0.500; M1.label="M_1";
@@ -8270,10 +8277,10 @@ namespace LATTICE {
           K.TransformKpoint(aurostd::inverse(transformation_matrix));
           O.TransformKpoint(aurostd::inverse(transformation_matrix));
         } 
-        //DX 20181105 - reformat kpoints to transform - END
+        //DX20181105 - reformat kpoints to transform - END
 
       }
-      if(lattice_type=="TRI1B" || lattice_type=="TRI1b" || lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//corey and david
+      if(lattice_type=="TRI1B" || lattice_type=="TRI1b" || lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//CO+DX
         foundBZ=TRUE;
         rho= 1.0 + b1(2)*(b1(2)+b2(2))/b1(1)/b1(1) - b1(3)*(b3(3)-b1(3))/b1(1)/b1(1);
         rho=rho - b2(3)*(b3(3)-b2(3))*b1(2)/b1(1)/b1(1)/b2(2);
@@ -8299,52 +8306,52 @@ namespace LATTICE {
         omega=0.5*(b1(3)-b2(3)) - b1(1)*b1(1)*(theta-0.5)/b1(3) + 0.5*b1(2)*b1(2)/b1(3) - 0.5*b2(2)*b2(2)/b2(3);
         omega= -0.5*b2(3)-b2(2)*(omega*aa*b2(3)+0.5*b2(2))/b2(3)+theta*b1(3)+(1.0-lambda)*b2(3);
         omega=omega/b3(3);
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
-        if(LDEBUG) cerr << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: zeta    = " << zeta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: phi     = " << phi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: psi     = " << psi << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: rho     = " << rho << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: tau     = " << tau << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: nu      = " << nu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: theta   = " << theta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: lambda  = " << lambda << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: omega   = " << omega << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: eta     = " << eta << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: mu      = " << mu << endl;
+        if(LDEBUG) cerr << XPID << "LATTICE::KPOINTS_Directions: delta   = " << delta << endl;
 
-        //DX 20181105 [OBSOLETE] // 10 center of faces
-        //DX 20181105 [OBSOLETE] L << "   0.500  -0.500   0.000   ! L";
-        //DX 20181105 [OBSOLETE] M << "   0.000   0.000   0.500   ! M";
-        //DX 20181105 [OBSOLETE] M1 << "   0.000   0.000  -0.500   ! M_1";
-        //DX 20181105 [OBSOLETE] N << "  -0.500  -0.500   0.500   ! N";
-        //DX 20181105 [OBSOLETE] R << "   0.000  -0.500   0.500   ! R";
-        //DX 20181105 [OBSOLETE] X << "   0.000  -0.500   0.000   ! X";
-        //DX 20181105 [OBSOLETE] Y << "   0.500   0.000   0.000   ! Y";
-        //DX 20181105 [OBSOLETE] Y1 << "  -0.500   0.000   0.000   ! Y_1";
-        //DX 20181105 [OBSOLETE] Z << "  -0.500   0.000   0.500   ! Z";
-        //DX 20181105 [OBSOLETE] Z1 << "   0.500   0.000  -0.500   ! Z_1";
-        //DX 20181105 [OBSOLETE] // 6 edges
-        //DX 20181105 [OBSOLETE] A << eta << "   " << mu << "   " << -delta << "   ! A";
-        //DX 20181105 [OBSOLETE] A1 << eta-1.0 << "   " << mu << "   " << -delta << "   ! A_1";
-        //DX 20181105 [OBSOLETE] A2 << eta-1.0 << "   " << mu << "   " << 1.0-delta << "   ! A_2";
-        //DX 20181105 [OBSOLETE] B << 1.0-eta << "   " << -mu << "   " << delta-1.0 << "   ! B";
-        //DX 20181105 [OBSOLETE] B1 << -eta << "   " << -mu << "   " << delta << "   ! B_1";
-        //DX 20181105 [OBSOLETE] B2 << 1.0-eta << "   " << -mu << "   " << delta << "   ! B_2";
-        //DX 20181105 [OBSOLETE] // 12 corners
-        //DX 20181105 [OBSOLETE] D << zeta << "   " << -phi << "   " << -psi << "   ! D";
-        //DX 20181105 [OBSOLETE] D1 << zeta-1.0 << "   " << -phi << "   " << -psi << "   ! D_1";
-        //DX 20181105 [OBSOLETE] D2 << zeta-1.0 << "   " << -phi << "   " << 1.0-psi << "   ! D_2";
-        //DX 20181105 [OBSOLETE] E << theta << "   " << -lambda << "   " << -omega << "   ! E";
-        //DX 20181105 [OBSOLETE] E1 << theta-1.0 << "   " << -lambda << "   " << 1.0-omega << "   ! E_1";
-        //DX 20181105 [OBSOLETE] F << rho << "   " << -tau << "   " << -nu << "   ! F";
-        //DX 20181105 [OBSOLETE] F1 << rho-1.0 << "   " << -tau << "   " << 1.0-nu << "   ! F_1";
-        //DX 20181105 [OBSOLETE] F2 << rho << "   " << -tau << "   " << 1.0-nu << "   ! F_2";
-        //DX 20181105 [OBSOLETE] H << -theta << "   " << lambda-1.0 << "   " << omega << "   ! H";
-        //DX 20181105 [OBSOLETE] H1 << 1.0-theta << "   " << lambda-1.0 << "   " << omega << "   ! H_1";
-        //DX 20181105 [OBSOLETE] K << 1.0-zeta << "   " << phi-1.0 << "   " << psi << "   ! K";
-        //DX 20181105 [OBSOLETE] O << -rho << "   " << tau-1.0 << "   " << nu << "   ! O";
+        //DX20181105 [OBSOLETE] // 10 center of faces
+        //DX20181105 [OBSOLETE] L << "   0.500  -0.500   0.000   ! L";
+        //DX20181105 [OBSOLETE] M << "   0.000   0.000   0.500   ! M";
+        //DX20181105 [OBSOLETE] M1 << "   0.000   0.000  -0.500   ! M_1";
+        //DX20181105 [OBSOLETE] N << "  -0.500  -0.500   0.500   ! N";
+        //DX20181105 [OBSOLETE] R << "   0.000  -0.500   0.500   ! R";
+        //DX20181105 [OBSOLETE] X << "   0.000  -0.500   0.000   ! X";
+        //DX20181105 [OBSOLETE] Y << "   0.500   0.000   0.000   ! Y";
+        //DX20181105 [OBSOLETE] Y1 << "  -0.500   0.000   0.000   ! Y_1";
+        //DX20181105 [OBSOLETE] Z << "  -0.500   0.000   0.500   ! Z";
+        //DX20181105 [OBSOLETE] Z1 << "   0.500   0.000  -0.500   ! Z_1";
+        //DX20181105 [OBSOLETE] // 6 edges
+        //DX20181105 [OBSOLETE] A << eta << "   " << mu << "   " << -delta << "   ! A";
+        //DX20181105 [OBSOLETE] A1 << eta-1.0 << "   " << mu << "   " << -delta << "   ! A_1";
+        //DX20181105 [OBSOLETE] A2 << eta-1.0 << "   " << mu << "   " << 1.0-delta << "   ! A_2";
+        //DX20181105 [OBSOLETE] B << 1.0-eta << "   " << -mu << "   " << delta-1.0 << "   ! B";
+        //DX20181105 [OBSOLETE] B1 << -eta << "   " << -mu << "   " << delta << "   ! B_1";
+        //DX20181105 [OBSOLETE] B2 << 1.0-eta << "   " << -mu << "   " << delta << "   ! B_2";
+        //DX20181105 [OBSOLETE] // 12 corners
+        //DX20181105 [OBSOLETE] D << zeta << "   " << -phi << "   " << -psi << "   ! D";
+        //DX20181105 [OBSOLETE] D1 << zeta-1.0 << "   " << -phi << "   " << -psi << "   ! D_1";
+        //DX20181105 [OBSOLETE] D2 << zeta-1.0 << "   " << -phi << "   " << 1.0-psi << "   ! D_2";
+        //DX20181105 [OBSOLETE] E << theta << "   " << -lambda << "   " << -omega << "   ! E";
+        //DX20181105 [OBSOLETE] E1 << theta-1.0 << "   " << -lambda << "   " << 1.0-omega << "   ! E_1";
+        //DX20181105 [OBSOLETE] F << rho << "   " << -tau << "   " << -nu << "   ! F";
+        //DX20181105 [OBSOLETE] F1 << rho-1.0 << "   " << -tau << "   " << 1.0-nu << "   ! F_1";
+        //DX20181105 [OBSOLETE] F2 << rho << "   " << -tau << "   " << 1.0-nu << "   ! F_2";
+        //DX20181105 [OBSOLETE] H << -theta << "   " << lambda-1.0 << "   " << omega << "   ! H";
+        //DX20181105 [OBSOLETE] H1 << 1.0-theta << "   " << lambda-1.0 << "   " << omega << "   ! H_1";
+        //DX20181105 [OBSOLETE] K << 1.0-zeta << "   " << phi-1.0 << "   " << psi << "   ! K";
+        //DX20181105 [OBSOLETE] O << -rho << "   " << tau-1.0 << "   " << nu << "   ! O";
 
-        //DX 20181105 - reformat kpoints to transform - END
+        //DX20181105 - reformat kpoints to transform - END
         L.fpos(1)=0.500; L.fpos(2)=-0.500; L.fpos(3)=0.000; L.label="L";
         M.fpos(1)=0.000; M.fpos(2)=0.000; M.fpos(3)=0.500; M.label="M";
         M1.fpos(1)=0.000; M1.fpos(2)=0.000; M1.fpos(3)=-0.500; M1.label="M_1";
@@ -8407,34 +8414,34 @@ namespace LATTICE {
           K.TransformKpoint(aurostd::inverse(transformation_matrix));
           O.TransformKpoint(aurostd::inverse(transformation_matrix));
         }
-        //DX 20181105 - reformat kpoints to transform - END
+        //DX20181105 - reformat kpoints to transform - END
       }
       if(isQE) oss << "K_POINTS  crystal ! ";
       // [FIX]  if(isVASP) oss << "KPOINTS: ";
       oss << lattice_type << " (triclinic) X-G-Y L-G-Z N-G-M R-G" << endl;
-      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "  << endl;
-      if(isVASP && grid>0) oss << "Line-mode"  << endl;
-      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      if(isVASP) oss << "reciprocal"  << endl;
-      if(isQE) oss << "NKPOINTS  ! number of kpoints"  << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      if(isVASP && grid>0) oss << round(grid) << "   ! " << round(grid) << " grids "   << endl;
+      if(isVASP && grid>0) oss << "Line-mode"   << endl;
+      if(isVASP && grid<0) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      if(isVASP) oss << "reciprocal"   << endl;
+      if(isQE) oss << "NKPOINTS  ! number of kpoints"   << endl;
+      LATTICE::kpoint2stream(oss,isVASP,isQE,X.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Y.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,L.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),Z.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,N.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,G.str(),M.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
       if(isVASP && grid>0) oss << " " << endl;
-      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),G.str(),grid,nkpoint); //DX 20181105 - high-sym pts are _kpoint objects
+      LATTICE::kpoint2stream(oss,isVASP,isQE,R.str(),G.str(),grid,nkpoint); //DX20181105 - high-sym pts are _kpoint objects
     }
     if(foundBZ==FALSE) {
       cerr << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
       cout << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
-      oss  << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
+      oss   << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
     }
     string output(oss.str());
     if(grid<0) aurostd::StringSubst(output,"NKPOINTS",aurostd::utype2string(nkpoint));
@@ -8449,6 +8456,6 @@ namespace LATTICE {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

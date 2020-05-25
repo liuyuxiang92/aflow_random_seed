@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -11,7 +11,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
-#include "aflow_symmetry_spacegroup.h" //DX 20180823
+#include "aflow_symmetry_spacegroup.h" //DX20180823
 
 // ***************************************************************************
 string _CleanElementName(const string& name) {
@@ -37,7 +37,7 @@ string _CleanElementName(const string& name) {
 namespace pflow {
   void PrintACE(const xstructure& str, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintACE: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintACE: BEGIN" << endl;
     // Print out data in ace format
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
@@ -85,7 +85,7 @@ namespace pflow {
 namespace pflow {
   void PrintAngles(xstructure str, const double& cutoff, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintAngles: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintAngles: BEGIN" << endl;
     uint MAX_NUM_ANGLE=21;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
@@ -119,10 +119,10 @@ namespace pflow {
         _atom a2=neigh_mat.at(ia1).at(ia2);
         xvector<double> a2pos=a2.cpos;
         for(int i=1;i<=3;i++) ijk(2,i)=a2.ijk(i);
-        for(uint ia3=0;(ia3<neigh_mat.at(a2.basis).size() && ia3<MAX_NUM_ANGLE);ia3++) //[CO200130 - number->basis]for(uint ia3=0;(ia3<neigh_mat.at(a2.number).size() && ia3<MAX_NUM_ANGLE);ia3++) 
+        for(uint ia3=0;(ia3<neigh_mat.at(a2.basis).size() && ia3<MAX_NUM_ANGLE);ia3++) //[CO20200130 - number->basis]for(uint ia3=0;(ia3<neigh_mat.at(a2.number).size() && ia3<MAX_NUM_ANGLE);ia3++) 
           {
           pflag(3)=1;
-          _atom a3=neigh_mat.at(a2.basis).at(ia3);       //[CO200130 - number->basis]_atom a3=neigh_mat.at(a2.number).at(ia3);      
+          _atom a3=neigh_mat.at(a2.basis).at(ia3);       //[CO20200130 - number->basis]_atom a3=neigh_mat.at(a2.number).at(ia3);      
           xvector<double> a3pos=a3.cpos;
           for(int i=1;i<=3;i++) ijk(3,i)=a3.ijk(i);
           xvector<double> a1toa2(3),a2toa3(3),a1toa3(3);
@@ -136,7 +136,7 @@ namespace pflow {
             if(aurostd::abs(getcos(a1toa2,a2toa3)-1)<tol) angle=180;
             if(aurostd::abs(getcos(a1toa2,a2toa3)+1)<tol) angle=0;
             if(pflag(1)) {
-              oss << setw(4) << a1.basis+1 //[CO200130 - number->basis]oss << setw(4) << a1.number+1
+              oss << setw(4) << a1.basis+1 //[CO20200130 - number->basis]oss << setw(4) << a1.number+1
                 << " " << setw(4) << a1.name.c_str()
                 << " " << setw(3) << ijk(1,1)
                 << " " << setw(3) << ijk(1,2)
@@ -145,7 +145,7 @@ namespace pflow {
               oss << endl;
             } // if plag(1)
             if(pflag(2)) {
-              oss << "     " << setw(4) << a2.basis+1  //[CO200130 - number->basis]oss << "     " << setw(4) << a2.number+1
+              oss << "     " << setw(4) << a2.basis+1  //[CO20200130 - number->basis]oss << "     " << setw(4) << a2.number+1
                 << " " << setw(4) << a2.name.c_str()
                 << " " << setw(3) << ijk(2,1)
                 << " " << setw(3) << ijk(2,2)
@@ -154,7 +154,7 @@ namespace pflow {
               oss << endl;
             } // if plag(2)
             if(pflag(3)) {
-              oss << "          " << setw(4) << a3.basis+1 //[CO200130 - number->basis]oss << "          " << setw(4) << a3.number+1
+              oss << "          " << setw(4) << a3.basis+1 //[CO20200130 - number->basis]oss << "          " << setw(4) << a3.number+1
                 << " " << setw(4) << a3.name.c_str()
                 << " " << setw(3) << ijk(3,1)
                 << " " << setw(3) << ijk(3,2)
@@ -178,7 +178,7 @@ namespace pflow {
 namespace pflow {
   void CalcPathLength(const pflow::projdata& pd, vector<double>& pathl,
       vector<double>& dpathl) {
-    pflow::matrix<double> rlat=RecipLat(pd.lat);
+    aurostd::matrix<double> rlat=RecipLat(pd.lat); //CO20200404 pflow::matrix()->aurostd::matrix()
     pathl[0]=0;
     dpathl[0]=0;
     for(int ik=1;ik<pd.nkpts;ik++) {
@@ -194,7 +194,7 @@ namespace pflow {
 namespace pflow {
   void PrintBands(const pflow::projdata& pd) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintBands: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintBands: BEGIN" << endl;
     ofstream outf_up("band.up.out");
     outf_up.precision(5);
     outf_up.setf(std::ios::fixed,std::ios::floatfield);
@@ -237,7 +237,7 @@ namespace pflow {
 // pflow::PrintCHGCAR
 // ***************************************************************************
 // Dane Morgan - Stefano Curtarolo
-// edited by Corey 1/8/14
+// edited by CO20140108
 namespace pflow {
   bool PrintCHGCAR(const xstructure& str,
       const stringstream& chgcar_header,
@@ -248,7 +248,7 @@ namespace pflow {
       const string& output_name,
       ostream& oss) {  
 
-    string soliloquy="pflow::PrintCHGCAR():  ";     // so you know who's talking
+    string soliloquy = XPID + "pflow::PrintCHGCAR():  ";     // so you know who's talking
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) oss << soliloquy << "BEGIN" << endl;
@@ -284,11 +284,11 @@ namespace pflow {
         numcolumns=npts-i;
       }
       for(uint j=0;j<numcolumns;j++) {    
-        // CO - START
+        //CO START
         //chg_tot CAN be negative too 
         //http://cms.mpi.univie.ac.at/vasp-forum/viewtopic.php?t=4194&p=4194
         CHGCARout_ss << " " << std::setw(18) << std::setprecision(11) << std::scientific << std::uppercase << chg_tot.at(i+j);
-        // CO - END
+        //CO END
       }
       CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
     }
@@ -387,10 +387,10 @@ namespace pflow {
 // This funtion prints out 3 lattice vectors in cartesian coordinates.
 // Dane Morgan - Stefano Curtarolo
 namespace pflow {
-  void PrintChgInt(vector<pflow::matrix<double> >& rad_chg_int,
-      pflow::matrix<double>& vor_chg_int, ostream& oss) {  
+  void PrintChgInt(vector<aurostd::matrix<double> >& rad_chg_int,
+      aurostd::matrix<double>& vor_chg_int, ostream& oss) {  //CO20200404 pflow::matrix()->aurostd::matrix()  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintChgInt: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintChgInt: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
 
@@ -427,14 +427,14 @@ namespace pflow {
 namespace pflow {
   void PrintCIF(ostream& oss,const xstructure& str,int _spacegroupnumber, int setting) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintCIF: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintCIF: BEGIN" << endl;
     // Print out data in cif format
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
     int spacegroupnumber=_spacegroupnumber;
     if(spacegroupnumber<1 || spacegroupnumber>230) spacegroupnumber=1;
     //title
-    // CO MODS START 170613 - fixes for BOB cif
+    //CO MODS START 20170613 - fixes for BH cif
     string compound="",pd_name="";
     string tmp;
     if(!str.title.empty()){
@@ -456,12 +456,12 @@ namespace pflow {
       else {compound="1";}
     }
     //oss << "data_" << str.title << endl;
-    oss << "# AFLOW.org Repositories" << endl;  // CO fix 170606
-    oss << "# " << str.title << endl;  // CO fix 170606
-    oss << "data_" << compound << endl;  // CO fix 170606
-    // CO try to get phase name, usually written as first part of title in AFLOW
+    oss << "# AFLOW.org Repositories" << endl;  //CO fix 20170606
+    oss << "# " << str.title << endl;  //CO fix 20170606
+    oss << "data_" << compound << endl;  //CO fix 20170606
+    //CO try to get phase name, usually written as first part of title in AFLOW
     if(!pd_name.empty()){oss << "_pd_phase_name " << pd_name << endl;}  //just safety
-    // CO MODS END 170613 - fixes for BOB cif
+    //CO MODS END 20170613 - fixes for BH cif
     xvector<double> data(6);
     data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
     oss << "_cell_length_a  " << setw(12) << data(1) <<endl;
@@ -471,22 +471,22 @@ namespace pflow {
     oss << "_cell_angle_beta  " << setw(9) << data(5) <<endl;
     oss << "_cell_angle_gamma  " << setw(9) << data(6) <<endl;
     if(str.wyccar_ITC.size()!=0){
-      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(spacegroupnumber,str.directory) << "'" << endl; //DX 20180526 - add directory
+      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(spacegroupnumber,str.directory) << "'" << endl; //DX20180526 - add directory
       oss << "_symmetry_Int_Tables_Number  " << spacegroupnumber << endl;
     }
     else {
       // Output space group - Use P1 for now
-      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(1,str.directory) << "'" << endl; //DX 20180526 - add directory
+      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(1,str.directory) << "'" << endl; //DX20180526 - add directory
       oss << "_symmetry_Int_Tables_Number  " << 1 << endl;
     }
     oss << "loop_" << endl;
     oss << "_symmetry_equiv_pos_site_id" << endl;
     //oss << "_symmetry_equiv_pos_as_xyz_" << endl;
-    oss << "_symmetry_equiv_pos_as_xyz" << endl;  // CO fix 170606
+    oss << "_symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
 
     // if the Wyckoff positions are stored/calculated
     if(str.wyccar_ITC.size()!=0){
-      //DX 20180801 - grab general Wyckoff equations
+      //DX20180801 - grab general Wyckoff equations
       string setting_string = aurostd::utype2string<uint>(setting);
       int general_wyckoff_multiplicity=0; // general Wyckoff position multiplicity
       vector<string> general_wyckoff_position; // general Wyckoff position equations
@@ -516,8 +516,8 @@ namespace pflow {
         aurostd::string2tokens(str.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");
         string wyckoff_multiplicity = tokens[0];
         string wyckoff_letter = tokens[1];
-        //DX 20191010 [OBOSLETE] oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
-        oss << str.wyckoff_sites_ITC[i].type << i+1 << " " << str.wyckoff_sites_ITC[i].site_occupation << " " //DX 20191010
+        //DX20191010 [OBOSLETE] oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
+        oss << str.wyckoff_sites_ITC[i].type << i+1 << " " << str.wyckoff_sites_ITC[i].site_occupation << " " //DX20191010
           << setw(12) << str.wyckoff_sites_ITC[i].coord(1) <<" "
           << setw(12) << str.wyckoff_sites_ITC[i].coord(2) <<" "
           << setw(12) << str.wyckoff_sites_ITC[i].coord(3) <<" "
@@ -560,8 +560,8 @@ namespace pflow {
 
       oss.precision(10);
       for(uint i=0;i<str.atoms.size();i++) {
-        //DX 20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
-        oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX 20191010
+        //DX20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
+        oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX20191010
           << setw(12) << str.atoms.at(i).fpos(1) <<" "
           << setw(12) << str.atoms.at(i).fpos(2) <<" "
           << setw(12) << str.atoms.at(i).fpos(3) <<" "
@@ -579,7 +579,7 @@ namespace pflow {
 namespace pflow {
   void PrintClat(const xvector<double>& data, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintClat: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
     if(data.rows!=6) {
       init::ErrorOption(cout,"","pflow::PrintClat",aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
       exit(0);
@@ -592,7 +592,7 @@ namespace pflow {
     oss << lattice(1,1) << " " << lattice(1,2) << " " << lattice(1,3) << endl;
     oss << lattice(2,1) << " " << lattice(2,2) << " " << lattice(2,3) << endl;
     oss << lattice(3,1) << " " << lattice(3,2) << " " << lattice(3,3) << endl;
-    if(LDEBUG) cerr << "pflow::PrintClat: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
   }
 } // namespace pflow
 
@@ -604,7 +604,7 @@ namespace pflow {
 namespace pflow {
   void PrintCmpStr(const xstructure& str1, const xstructure& str2, const double& rcut, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintCmpStr: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintCmpStr: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     oss.precision(4);
@@ -678,9 +678,9 @@ namespace pflow {
     oss << "  Vol %Err: " << 100*2*(v2-v1)/(v2+v1) << endl;
 
     // lat par and angles
-    // vector<double> ldat1=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr1.lattice));
+    // vector<double> ldat1=pflow::Getabc_angles(aurostd::xmatrix2matrix(sstr1.lattice));  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<double> ldat1=xvector2vector(Getabc_angles(sstr1.lattice,DEGREES));
-    // vector<double> ldat2=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr2.lattice));
+    // vector<double> ldat2=pflow::Getabc_angles(aurostd::xmatrix2matrix(sstr2.lattice));  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<double> ldat2=xvector2vector(Getabc_angles(sstr2.lattice,DEGREES));
 
     ldat1=pflow::Sort_abc_angles(ldat1);  
@@ -714,10 +714,10 @@ namespace pflow {
     xstructure str2_newvol=sstr2;
     str1_newvol=SetScale(str1_newvol,rescale1);
     str2_newvol=SetScale(str2_newvol,rescale2);
-    pflow::matrix<double> dist1;
-    pflow::matrix<double> dist2;
-    pflow::matrix<double> dist_diff;
-    pflow::matrix<double> dist_diff_n;
+    aurostd::matrix<double> dist1; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> dist2; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> dist_diff; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> dist_diff_n; //CO20200404 pflow::matrix()->aurostd::matrix()
     // If cutoff < 0 use default of 4*(avg rad of an atom).  Note
     // that in a rescaled str where each atom has vavg=1, rad=.6204.
     // In the true str, where each atom has vol vavg, rad=0.6204*vavg^(1/3).
@@ -742,7 +742,7 @@ namespace pflow {
           << cutoff << " (" << nn << ")" <<  endl;
         double adiff=0;
         double adiff_n=0;
-        // double perc_err=0;  // DANE not used
+        // double perc_err=0;  //DM not used
         for(int in=0;in<nn;in++) {
           adiff=adiff+abs(dist_diff[id][in]);
           adiff_n=adiff_n+abs(dist_diff_n[id][in]);
@@ -792,17 +792,17 @@ namespace pflow {
     int nbins=Nint(cutoff/bin_width);
     int smooth_width=5;
     int nsh_max=2;
-    pflow::matrix<double> rdf_all_1;
-    pflow::matrix<double> rdf_all_2;
+    aurostd::matrix<double> rdf_all_1; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_2; //CO20200404 pflow::matrix()->aurostd::matrix()
     GetRDF(sstr1,cutoff,nbins,rdf_all_1);
     GetRDF(sstr2,cutoff,nbins,rdf_all_2);
-    pflow::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width);
-    pflow::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width);
+    aurostd::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width); //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width); //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells
-    pflow::matrix<double> rdfsh_all_1;
-    pflow::matrix<double> rdfsh_loc_1; // Radial location of rdf shells.
-    pflow::matrix<double> rdfsh_all_2;
-    pflow::matrix<double> rdfsh_loc_2; // Radial location of rdf shells.
+    aurostd::matrix<double> rdfsh_all_1; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_1; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_all_2; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_2; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     GetRDFShells(sstr1,cutoff,nbins,smooth_width,
     rdf_all_1_sm,rdfsh_all_1,rdfsh_loc_1);
     GetRDFShells(sstr2,cutoff,nbins,smooth_width,
@@ -911,25 +911,25 @@ namespace pflow {
 // This funtion prints out structural data.
 // Stefano Curtarolo
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { // CO171027 //DX 20180806 - added space group setting
-    // DX 12/15/18 [OBSOLETE] double tolerance = AUROSTD_NAN;
-    double tolerance = SYM::defaultTolerance(str_sym); // DX 2/15/18 - start with default tolerance // DX 2/26/18 - str_sym not str_sp
-    if(already_calculated){tolerance=str_sp.sym_eps;} // CO 171025
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { //CO20171027 //DX20180806 - added space group setting
+    //DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
+    double tolerance = SYM::defaultTolerance(str_sym); //DX20180215 START with default tolerance //DX20180226 - str_sym not str_sp
+    if(already_calculated){tolerance=str_sp.sym_eps;} //CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); // CO171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); //CO20171027
   }
 }
 
-//DX 20180822 - add xoption - START
+//DX20180822 - add xoption - START
 namespace pflow {
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format,bool already_calculated) {
-    // DX 12/15/18 [OBSOLETE] double tolerance = AUROSTD_NAN;
-    double tolerance = SYM::defaultTolerance(str_sym); // DX 2/15/18 - start with default tolerance // DX 2/26/18 - str_sym not str_sp
-    if(already_calculated){tolerance=str_sp.sym_eps;} // CO 171025
+    //DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
+    double tolerance = SYM::defaultTolerance(str_sym); //DX20180215 START with default tolerance //DX20180226 - str_sym not str_sp
+    if(already_calculated){tolerance=str_sp.sym_eps;} //CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); // CO171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); //CO20171027
   }
 }
 
@@ -940,11 +940,11 @@ namespace pflow {
   }
 }
 
-//DX 20180822 - add xoption - END
+//DX20180822 - add xoption - END
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { // CO171027 //DX 20180822 -added xoption
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { //CO20171027 //DX20180822 -added xoption
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintData: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintData: BEGIN" << endl;
     // smode=="DATA" or "EDATA"
     // Print out structural data
     stringstream oss;
@@ -955,9 +955,9 @@ namespace pflow {
     bool symmetry_commensurate = false;
     bool force_perform = true;  // Force a result to be found at the end, even if incommensurate 
     double orig_tolerance = tolerance;
-    uint sym_eps_change_count = 0; // DX 2/26/18 - added sym eps change count
+    uint sym_eps_change_count = 0; //DX20180226 - added sym eps change count
 
-    xstructure str_aus(str);//,str_sp,str_sc; // CO171027
+    xstructure str_aus(str);//,str_sp,str_sc; //CO20171027
     while(symmetry_commensurate == false){
       if(smode!="EDATA" || no_scan){
         symmetry_commensurate=true;
@@ -980,26 +980,26 @@ namespace pflow {
         }
         oss << " Real space Volume: " << vol << endl;
         oss << " Real space c/a = " << data(3)/data(1) << endl;
-        str_aus=str;//,str_sp,str_sc; // CO171027
-        // DX 9/1/17 -Add tolerance - START
+        str_aus=str; //,str_sp,str_sc; //CO20171027
+        //DX20170901 -Add tolerance - START
         str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
-        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-        // DX 9/1/17 -Add tolerance - END
+        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
+        //DX20170901 -Add tolerance - END
         if(smode=="EDATA") {
           // str_aus.CalculateSymmetryPointGroup(FALSE);
           // str_aus.CalculateSymmetryFactorGroup(FALSE);
           // str_aus.CalculateSymmetryPointGroupCrystal(FALSE);
-          if(!already_calculated){  // CO 171025
+          if(!already_calculated){  //CO20171025
             str_aus.GetLatticeType(str_sp,str_sc);
             if(orig_tolerance == AUROSTD_NAN){
               orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
             }
             tolerance = str_sp.sym_eps;
-            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
           }
           oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
-          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//wahyu mod
+          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//WSETYAWAN mod
           oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_system << endl;
           oss << " Real space: Pearson Symbol                   = " << str_aus.pearson_symbol << endl;
           oss << "POINT GROUP CRYSTAL" << endl;
@@ -1012,20 +1012,20 @@ namespace pflow {
           oss << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
           oss << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
           oss << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
-          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO 171025 // CO171027 //DX 20180823 - added xoption
-          //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
+          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171025 //CO20171027 //DX20180823 - added xoption
+          //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
           if(sym_eps_change_count != str_aus.sym_eps_change_count){
             if(LDEBUG) {
-              cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+              cerr << XPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             sym_eps_change_count = str_aus.sym_eps_change_count;
             str_aus.ClearSymmetry();
             oss.str("");
             continue;
           }
-          //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
-          sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-          // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
+          //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
+          sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
+          //DX20170901 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
           if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan){
@@ -1033,7 +1033,7 @@ namespace pflow {
           }
           else {
             if(LDEBUG) {
-              cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+              cerr << XPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             str_aus.ClearSymmetry();
             oss.str("");
@@ -1041,7 +1041,7 @@ namespace pflow {
             if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan)){
               if(force_perform){
                 if(LDEBUG) {
-                  cerr << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
+                  cerr << XPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
                 }
                 no_scan=true; //Force it to continue 
                 tolerance = orig_tolerance;
@@ -1053,20 +1053,20 @@ namespace pflow {
             else {
               str_aus.ClearSymmetry();
               oss.str("");
-              sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+              sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
               continue;
             }
           }
-          // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
+          //DX20170901 - Add consistency check for input symmetry method and ITC method - END
           oss << "BRAVAIS LATTICE OF THE LATTICE (pgroup)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_lattice_type << endl;// " " << str.title << endl;
-          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl;//wahyu mod
+          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl; //WSETYAWAN mod
           oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_lattice_system << endl;
           oss << "SUPERLATTICE (equally decorated)" << endl;
           oss << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
           oss << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
-          // DX oss << " Real space: Superlattice System              = " << str_aus.bravais_lattice_system << endl;
-          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX - fixed mistake in line above
+          //DX oss << " Real space: Superlattice System              = " << str_aus.bravais_lattice_system << endl;
+          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; //DX - fixed mistake in line above
           oss << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
           }
           oss << "RECIPROCAL LATTICE" << endl;
@@ -1084,7 +1084,7 @@ namespace pflow {
           oss << " Reciprocal space Volume: " << kvol << endl;
           if(smode=="EDATA") {
             oss << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
-            oss << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl;//wahyu mod
+            oss << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl; //WSETYAWAN mod
             //oss << " Reciprocal conventional lattice         = " << str_aus.reciprocal_conventional_lattice_type << endl;
             oss << "SPRIM" << endl;
             oss << str_sp << endl;
@@ -1135,16 +1135,16 @@ namespace pflow {
           sscontent_json << "\"c_over_a\":" << data(3)/data(1) << eendl;
           vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-          str_aus=str;//,str_sp,str_sc; // CO171027
+          str_aus=str; //,str_sp,str_sc; //CO20171027
           str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
           if(smode=="EDATA") {
-            if(!already_calculated){  // CO 171025
+            if(!already_calculated){  //CO20171025
               str_aus.GetLatticeType(str_sp,str_sc);
               if(orig_tolerance == AUROSTD_NAN){
                 orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
               }
               tolerance = str_sp.sym_eps;
-              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
             }
 
             // Real space: bravais lattice primitive
@@ -1252,11 +1252,11 @@ namespace pflow {
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
             // SGDATA
-            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO171027 //DX 20180823 - added xoption
-            //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
+            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171027 //DX20180823 - added xoption
+            //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
             if(sym_eps_change_count != str_aus.sym_eps_change_count){
               if(LDEBUG) {
-                cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+                cerr << XPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
               }
               sym_eps_change_count = str_aus.sym_eps_change_count;
               str_aus.ClearSymmetry();
@@ -1264,27 +1264,27 @@ namespace pflow {
               vcontent_json.clear();
               continue;
             }
-            //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
-            sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+            //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
+            sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-            // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
+            //DX20170901 - Add consistency check for input symmetry method and ITC method - START
             int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
             bool derivative_structure=false;
             if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
               symmetry_commensurate=true;
-            } else { // CO171027
+            } else { //CO20171027
               if(LDEBUG) {
-                cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
+                cerr << XPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
               }
               str_aus.ClearSymmetry();
               sscontent_json.str("");
               vcontent_json.clear();
               //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan))
               if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan))
-              {   //CO200106 - patching for auto-indenting
+              {   //CO20200106 - patching for auto-indenting
                 if(force_perform){
                   if(LDEBUG) {
-                    cerr << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
+                    cerr << XPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
                   }
                   no_scan=true; //Force it to continue 
                   tolerance = orig_tolerance;
@@ -1298,11 +1298,11 @@ namespace pflow {
                 str_aus.ClearSymmetry();
                 sscontent_json.str("");
                 vcontent_json.clear();
-                sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+                sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
                 continue;
               }
             }
-            // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
+            //DX20170901 - Add consistency check for input symmetry method and ITC method - END
 
             // Real space: bravais lattice lattice type
             if(str_aus.bravais_lattice_lattice_type.size()){
@@ -1411,9 +1411,9 @@ namespace pflow {
         }
       }
       oss_final << oss.str();
-      str_sym=str_aus; // CO171027
-      //DX 20180822 - put attributes into vpflow - START
-      if(vpflow.flag("EDATA::CALCULATED")){ // DX 20180823 - if calculated remove
+      str_sym=str_aus; //CO20171027
+      //DX20180822 - put attributes into vpflow - START
+      if(vpflow.flag("EDATA::CALCULATED")){ //DX20180823 - if calculated remove
         vpflow.pop_attached("EDATA::LATTICE_PARAMETERS"); 
         vpflow.pop_attached("EDATA::COVERA"); 
         vpflow.pop_attached("EDATA::VOLUME"); 
@@ -1444,7 +1444,7 @@ namespace pflow {
         vpflow.pop_attached("EDATA::SPRIM"); 
         vpflow.pop_attached("EDATA::SCONV"); 
       }
-      //DX 20180823 - now populate xoption
+      //DX20180823 - now populate xoption
       vpflow.flag("EDATA::CALCULATED",TRUE);
       xvector<double> data(6);
       data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
@@ -1480,24 +1480,24 @@ namespace pflow {
       vpflow.push_attached("EDATA::SPRIM",ss_str_sp.str()); 
       stringstream ss_str_sc; ss_str_sc << str_sc << endl;
       vpflow.push_attached("EDATA::SCONV",ss_str_sc.str()); 
-      //DX 20180822 - put attributes into vpflow - END
+      //DX20180822 - put attributes into vpflow - END
     }
   } // namespace pflow
 
   namespace pflow {
     void PrintData(const xstructure& str,ostream& oss,string smode, const string& format) {
-      xstructure str_sym,str_sp,str_sc; // CO171027
+      xstructure str_sym,str_sp,str_sc; //CO20171027
       double tolerance = AUROSTD_NAN;
       bool no_scan = false;
       int sg_setting = 1;
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); //CO20171027
     }
   } // namespace pflow
 
   namespace pflow {
     void PrintData(const xstructure& str,ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format) {
-      xstructure str_sym,str_sp,str_sc; // CO171027
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
+      xstructure str_sym,str_sp,str_sc; //CO20171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); //CO20171027
     }
   } // namespace pflow
 
@@ -1515,7 +1515,7 @@ namespace pflow {
   namespace pflow {
     string PrintData1(const xstructure& str1, const double& rcut) {
       bool LDEBUG=(FALSE || XHOST.DEBUG);
-      if(LDEBUG) cerr << "pflow::PrintData1: BEGIN" << endl;
+      if(LDEBUG) cerr << XPID << "pflow::PrintData1: BEGIN" << endl;
       // LDEBUG=TRUE;
       stringstream oss;
       oss.setf(std::ios::left, std::ios::adjustfield);
@@ -1564,7 +1564,7 @@ namespace pflow {
       oss << "  Vol Str1: " << v1 << endl;
 
       // lat par and angles
-      //  vector<double> ldat1=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr1.lattice));
+      //  vector<double> ldat1=pflow::Getabc_angles(aurostd::xmatrix2matrix(sstr1.lattice)); //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> ldat1=xvector2vector(Getabc_angles(sstr1.lattice,DEGREES));
       ldat1=pflow::Sort_abc_angles(ldat1);  
       oss << "Unit cell: tot_vol a b c alpha beta gamma" << endl;
@@ -1578,10 +1578,10 @@ namespace pflow {
       xstructure str1_newvol=sstr1;
       // str1_newvol=SetScale(str1_newvol,rescale1); // Sets vol/atom=1
       str1_newvol.scale=rescale1;
-      pflow::matrix<double> dist1;
-      pflow::matrix<double> dist2;
-      pflow::matrix<double> dist_diff;
-      pflow::matrix<double> dist_diff_n;
+      aurostd::matrix<double> dist1; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dist2; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dist_diff; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dist_diff_n; //CO20200404 pflow::matrix()->aurostd::matrix()
       // If cutoff < 0 use default of 4*(avg rad of an atom).  Note
       // that in the rescaled str, where each atom has vavg=1, rad=.6204
       // In the true str, where each atom has vol = v1, rad=0.6204*v1^(1/3).
@@ -1601,9 +1601,9 @@ namespace pflow {
     oss << "  Working with the all the types up to num types (num pair types): " << ntyp1 << " (" << nprs1 << ")" << endl;
     oss << "  Including all pairs within cutoff: " << cutoff << endl;
 
-    // double tadiff=0;   // DANE not used
-    // double tadiff_n=0; // DANE not used
-    // int tnn=0;  // DANE not used
+    // double tadiff=0;   //DM not used
+    // double tadiff_n=0; //DM not used
+    // int tnn=0;  //DM not used
     for(int it1=0;it1<ntyp1;it1++) {
       for(int it2=it1;it2<ntyp1;it2++) {
         int id=it2-it1+ntyp1*it1-std::max(0,it1*(it1-1)/2);
@@ -1697,7 +1697,7 @@ namespace pflow {
 namespace pflow {
   void PrintData2(const xstructure& str, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintData2: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintData2: BEGIN" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(6);
     xvector<double> data(6);
@@ -1732,7 +1732,7 @@ namespace pflow {
 namespace pflow {
   void PrintDisplacements(xstructure str, const double cutoff, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintDisplacements: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintDisplacements: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1740,7 +1740,7 @@ namespace pflow {
     deque<deque<_atom> > neigh_mat;
     // [OBSOLETE]  pflow::GetStrNeighData(str,cutoff,neigh_mat);
     str.GetStrNeighData(cutoff,neigh_mat);
-    // double tol=1e-15;   // DANE not used
+    // double tol=1e-15;   //DM not used
     xmatrix<double> lattice(3);
     lattice=str.lattice;
     int coord_flag=str.coord_flag;
@@ -1757,7 +1757,7 @@ namespace pflow {
       _atom a = neigh_mat.at(ia).at(0);
 
       // Output reference atom info.
-      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
+      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO20200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
       xvector<double> pos(3);
       if(str.coord_flag==FALSE) { // direct
         pos=a.fpos;
@@ -1774,7 +1774,7 @@ namespace pflow {
         xvector<int> ijk(3);
         ijk=an.ijk;
         oss << "        ";
-        oss << setw(4) << an.basis+1 << " "; //[CO200130 - number->basis]oss << setw(4) << an.number+1 << " ";
+        oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
         oss << setw(4) << an.name.c_str() << "   ";
         oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
         xvector<double> disp(3);
@@ -1799,7 +1799,7 @@ namespace pflow {
 namespace pflow {
   void PrintDistances(xstructure str, const double cutoff, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintDistances: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintDistances: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1811,7 +1811,7 @@ namespace pflow {
     //  for(uint i=0;i<neigh_mat.size();i++)
     //   cerr << "DEBUG: neigh_mat.at(i).size()=" << neigh_mat.at(i).size() << endl;
 
-    // double tol=1e-15;  // DANE not used
+    // double tol=1e-15;  //DM not used
     uint xtra=0;//3;
 
     // Output header
@@ -1826,7 +1826,7 @@ namespace pflow {
       _atom a = neigh_mat.at(ia).at(0);
 
       // Output reference atom info.
-      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
+      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO20200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
       xvector<double> pos(3);
       if(str.coord_flag==FALSE) { // direct
         pos=a.fpos;
@@ -1844,7 +1844,7 @@ namespace pflow {
         xvector<double> fpos(3);fpos=neigh_mat.at(ia).at(in).fpos;
         xvector<double> cpos(3);cpos=neigh_mat.at(ia).at(in).cpos;
         oss << "      ";
-        oss << setw(4) << neigh_mat.at(ia).at(in).basis+1 << " ";  //[CO200130 - number->basis]oss << setw(4) << neigh_mat.at(ia).at(in).number+1 << " ";
+        oss << setw(4) << neigh_mat.at(ia).at(in).basis+1 << " ";  //[CO20200130 - number->basis]oss << setw(4) << neigh_mat.at(ia).at(in).number+1 << " ";
         oss << setw(4) << neigh_mat.at(ia).at(in).name.c_str() << "   ";
         oss << setw(3+xtra) <<  ijk(1) << " " << setw(3+xtra) <<  ijk(2) << " " << setw(3+xtra) <<  ijk(3) << "   ";
         //     oss << setw(3+xtra) << "F " << fpos(1) << " " << setw(3+xtra) << fpos(2) << " " << setw(3+xtra) << fpos(3) << "   ";
@@ -1866,10 +1866,10 @@ namespace pflow {
       double& ereal, double& erecip, double& eewald,
       double& eta, const double& SUMTOL, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintEwald: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintEwald: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
-    pflow::matrix<double> lat=pflow::GetScaledLat(in_str);
+    aurostd::matrix<double> lat=pflow::GetScaledLat(in_str); //CO20200404 pflow::matrix()->aurostd::matrix()
     int nat = pflow::GetNumAtoms(in_str);
     double vol=pflow::GetVol(lat);
     double d=std::pow((double) vol,(double) 1.0/3.0)*1E-10; // In meters
@@ -1921,7 +1921,7 @@ namespace pflow {
 namespace pflow {
   void PrintGulp(const xstructure& str, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintGulp: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintGulp: BEGIN" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
     xstructure sstr=str;
@@ -2069,15 +2069,15 @@ void PrintMSI(const xstructure& str, ostream& oss) {
   xmatrix<double> R1b(3,3);  
   xmatrix<double> R2(3,3);  
   xmatrix<double> Rtot(3,3);  
-  xvector<double> a(3);a=sstr.lattice(1);//double an=modulus(a); // DANE not used
-  xvector<double> b(3);b=sstr.lattice(2);//double bn=modulus(b); // DANE not used
+  xvector<double> a(3);a=sstr.lattice(1);//double an=modulus(a); //DM not used
+  xvector<double> b(3);b=sstr.lattice(2);//double bn=modulus(b); //DM not used
   xvector<double> c(3);c=sstr.lattice(3);double cn=modulus(c);
 
   double cxyn=sqrt(cn*cn-c(3)*c(3));
-  // double bxyn=sqrt(bn*bn-b(3)*b(3)); // DANE not used
-  // double cosa=cos(a,b); // DANE not used
-  // double cosb=cos(a,c); // DANE not used
-  // double cosg=cos(b,c); // DANE not used
+  // double bxyn=sqrt(bn*bn-b(3)*b(3)); //DM not used
+  // double cosa=cos(a,b); //DM not used
+  // double cosb=cos(a,c); //DM not used
+  // double cosg=cos(b,c); //DM not used
 
   // Build R1a.
   double cosp,sinp;
@@ -2360,7 +2360,7 @@ void PrintRBAnal(const int& nim, const string& path_flag, ostream& oss) {
 // This function prints out the displacement info for 2 POSCAR.
 // Dane Morgan - Stefano Curtarolo
 void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
-    pflow::matrix<double>& cm, const string& path_flag,
+    aurostd::matrix<double>& cm, const string& path_flag,  //CO20200404 pflow::matrix()->aurostd::matrix()
     ostream& oss) {
   oss << "*******  BEGIN:  Structure 2 - Structure 1  *******" << endl;
   oss << diffstr;
@@ -2383,9 +2383,9 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
 void PrintRDF(const xstructure& str, const double& rmax,
     const int& nbins,
     const int& smooth_width,
-    const pflow::matrix<double>& rdf_all,
-    pflow::matrix<double>& rdfsh_all,
-    pflow::matrix<double>& rdfsh_loc,
+    const aurostd::matrix<double>& rdf_all,  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double>& rdfsh_all,  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double>& rdfsh_loc,  //CO20200404 pflow::matrix()->aurostd::matrix()
     ostream& oss) {
   int natoms=str.atoms.size();
   //  vector<int> types=str.GetTypes();
@@ -2396,7 +2396,7 @@ void PrintRDF(const xstructure& str, const double& rmax,
   int w1=5;
   int _rdi=rdfsh_loc.size();
   int _rdj=nbins;
-  pflow::matrix<double> rdfsh_bin(_rdi,_rdj);pflow::VVset(rdfsh_bin,0.0);
+  aurostd::matrix<double> rdfsh_bin(_rdi,_rdj);pflow::VVset(rdfsh_bin,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
 
   // Put rdfsh_all into bins so you can write out in same
   // way as rdf_all
@@ -2479,10 +2479,10 @@ void PrintRDF(const xstructure& str, const double& rmax,
 void PrintRDFCmp(const xstructure& str_A, const xstructure& str_B,
     const double& rmax, const int nbins,
     const double& smooth_width,const int nsh,
-    const pflow::matrix<double>& rdfsh_all_A,
-    const pflow::matrix<double>& rdfsh_all_B,
+    const aurostd::matrix<double>& rdfsh_all_A,
+    const aurostd::matrix<double>& rdfsh_all_B,
     const vector<int>& best_match,
-    const pflow::matrix<double>& rms_mat, ostream& oss) {
+    const aurostd::matrix<double>& rms_mat, ostream& oss) {  //CO20200404 pflow::matrix()->aurostd::matrix()
   int nat=str_A.atoms.size();   if(str_B.atoms.size()) {;} // phony to keep str_B busy
   std::deque<int> num_each_type=str_A.num_each_type;
   int nt=num_each_type.size();
@@ -2672,7 +2672,7 @@ void PrintRSM(const xstructure& str, ostream& oss) {
   //%CONECTxxxxxyyyyy^M
 }
 
-// DX 8/30/17 - SGDATA
+//DX20170830 - SGDATA
 // ***************************************************************************
 // pflow::PrintSGData
 // ***************************************************************************
@@ -2681,39 +2681,39 @@ void PrintRSM(const xstructure& str, ostream& oss) {
 namespace pflow {
   bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone, const string& format,bool already_calculated) {
     double tolerance=SYM::defaultTolerance(str_sg);
-    if(already_calculated){tolerance=str_sg.sym_eps;} // CO 171025
+    if(already_calculated){tolerance=str_sg.sym_eps;} //CO20171025
     bool no_scan=false;
     int setting=1;
     return PrintSGData(str_sg,tolerance,oss,no_scan,setting,standalone,format,already_calculated);
   }
 }
 
-//DX 20180822 - add xoption - START
+//DX20180822 - add xoption - START
 namespace pflow {
   bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss, bool no_scan, const int& sg_setting, bool standalone, const string& format,bool already_calculated) { 
     aurostd::xoption vpflow;
     return PrintSGData(str_sg,tolerance,oss,vpflow,no_scan,sg_setting,standalone,format,already_calculated);
   }
 }
-//DX 20180822 - add xoption - END
+//DX20180822 - add xoption - END
 
 namespace pflow {
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { // DX 2/26/18 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintSGData: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::PrintSGData: BEGIN" << endl;
     stringstream oss;
     // smode=="DATA" or "EDATA"
     // Print out structural data
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    // DX TEST str_sg.SpaceGroup_ITC(tolerance);
-    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} // CO 171025
+    //DX TEST str_sg.SpaceGroup_ITC(tolerance);
+    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} //CO20171025
     // FORMAT = TXT
     if(format=="txt"){
       oss << "SPACE GROUP OF THE CRYSTAL" << endl;
       oss << " Space group number                           = " << str_sg.space_group_ITC << endl;
-      oss << " Space group label (Hermann Mauguin)          = " << GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory) << endl; //DX 20180526 - add directory
-      oss << " Space group label (Hall)                     = " << GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory) << endl; //DX 20180526 - add directory
-      oss << " Space group label (Schoenflies)              = " << GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory) << endl; //DX 20180526 - add directory
+      oss << " Space group label (Hermann Mauguin)          = " << GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory) << endl; //DX20180526 - add directory
+      oss << " Space group label (Hall)                     = " << GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory) << endl; //DX20180526 - add directory
+      oss << " Space group label (Schoenflies)              = " << GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory) << endl; //DX20180526 - add directory
       oss << " Laue class                                   = " << GetLaueLabel(str_sg.point_group_ITC) << endl;
       oss << " Crystal class                                = " << str_sg.point_group_ITC << endl;
       oss << "ITC REPRESENTATION OF CRYSTAL" << endl;
@@ -2735,7 +2735,7 @@ namespace pflow {
       for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
         wss << str_sg.wyccar_ITC[i] << endl;
       }
-      if(str_sg.wyccar_ITC.size()!=0){ //DX 20180526 - skip if fails
+      if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
         xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
         oss << xstr_wyccar << endl;
       }
@@ -2757,7 +2757,7 @@ namespace pflow {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // space group label (HM)
-      string sg_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory); //DX 20180526 - add directory
+      string sg_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory); //DX20180526 - add directory
       if(sg_HM.size()){
         sscontent_json << "\"space_group_Hermann_Mauguin\":\"" << sg_HM << "\"" << eendl;
       } else {
@@ -2766,7 +2766,7 @@ namespace pflow {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // space group label (Hall)
-      string sg_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory); //DX 20180526 - add directory
+      string sg_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory); //DX20180526 - add directory
       if(sg_Hall.size()){
         sscontent_json << "\"space_group_Hall\":\"" << sg_Hall << "\"" << eendl;
       } else {
@@ -2775,7 +2775,7 @@ namespace pflow {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // space group label (Schoenflies)
-      string sg_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory); //DX 20180526 - add directory
+      string sg_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory); //DX20180526 - add directory
       if(sg_Schoenflies.size()){
         sscontent_json << "\"space_group_Schoenflies\":\"" << sg_Schoenflies << "\"" << eendl;
       } else {
@@ -2913,8 +2913,8 @@ namespace pflow {
       }
     }
     oss_final << oss.str();
-    //DX 20180822 - put attributes into vpflow - START
-    if(vpflow.flag("SGDATA::CALCULATED")){ //DX 20180823 - if calculated, remove
+    //DX20180822 - put attributes into vpflow - START
+    if(vpflow.flag("SGDATA::CALCULATED")){ //DX20180823 - if calculated, remove
       vpflow.pop_attached("SGDATA::SPACE_GROUP_NUMBER"); 
       vpflow.pop_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN"); 
       vpflow.pop_attached("SGDATA::SPACE_GROUP_HALL"); 
@@ -2930,7 +2930,7 @@ namespace pflow {
       vpflow.pop_attached("SGDATA::WYCKOFF_POSITIONS"); 
       vpflow.pop_attached("SGDATA::WYCCAR"); 
     }
-    // DX 20180823 - now populate xoption
+    //DX20180823 - now populate xoption
     vpflow.flag("SGDATA::CALCULATED");
     vpflow.push_attached("SGDATA::SPACE_GROUP_NUMBER",aurostd::utype2string<uint>(str_sg.space_group_ITC)); 
     vpflow.push_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN",GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory)); 
@@ -2966,11 +2966,11 @@ namespace pflow {
     vpflow.push_attached("SGDATA::WYCKOFF_SITE_SYMMETRIES",SYM::ExtractWyckoffSiteSymmetriesString(str_sg.wyccar_ITC));
     vpflow.push_attached("SGDATA::WYCKOFF_POSITIONS",Wyckoff_positions.str()); 
     vpflow.push_attached("SGDATA::WYCCAR",wyccar.str()); 
-    //DX 20180822 - put attributes into vpflow - END
+    //DX20180822 - put attributes into vpflow - END
     return true;
   }
 }      
-// DX 8/30/17 - SGDATA
+//DX20170830 - SGDATA
 
 // **************************************************************************
 // PrintShell PrintShell
@@ -2982,16 +2982,16 @@ namespace pflow {
 // Given a point q and list of points, {p_i} returns the xmatrix
 // M_ij = Angle from pi-q-pj.
 // Dane Morgan - Stefano Curtarolo
-pflow::matrix<double> GetAngleMat(const xvector<double>& q, const vector<xvector<double> >& p) {
+aurostd::matrix<double> GetAngleMat(const xvector<double>& q, const vector<xvector<double> >& p) { //CO20200404 pflow::matrix()->aurostd::matrix()
   double TOL=1e-6;
   int np=p.size();
-  pflow::matrix<double> M(np,np);pflow::VVset(M,0.0);
+  aurostd::matrix<double> M(np,np);pflow::VVset(M,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
   for(int i=0;i<np;i++) {
     for(int j=0;j<np;j++) {
       xvector<double> a(3);a=p.at(i)-q;
       xvector<double> b(3);b=p.at(j)-q;
-      //  double na=aurostd::modulus(a); // DANE not used
-      //  double nb=aurostd::modulus(b); // DANE not used
+      //  double na=aurostd::modulus(a); //DM not used
+      //  double nb=aurostd::modulus(b); //DM not used
       double angle;
       double xcos=getcos(a,b);
       if(xcos>(1-TOL)) {
@@ -3087,7 +3087,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
   oss.setf(std::ios::left, std::ios::adjustfield);
   oss.setf(std::ios::fixed, std::ios::floatfield);
   xstructure sstr=str;
-  // double scale=str.scale; // DANE not used
+  // double scale=str.scale; //DM not used
   sstr=ReScale(sstr,1.0);
   xmatrix<double> lattice=sstr.lattice;
   //  oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -3106,7 +3106,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
     }
   }
   GetGoodShellPoints(points,str,ns,rmin,rmax,sname,neigh_mat);
-  // double tol=1e-15; // DANE not used
+  // double tol=1e-15; //DM not used
 
   // Get average fpos of neighbors of each point.
   vector<xvector<double> > avnfpos;
@@ -3178,7 +3178,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
         xvector<int> ijk(3);
         ijk=an.ijk;
         oss << "        ";
-        oss << setw(4) << an.basis+1 << " "; //[CO200130 - number->basis]oss << setw(4) << an.number+1 << " ";
+        oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
         oss << setw(4) << an.name.c_str() << "   ";
         oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
         oss << setprecision(4) << AtomDist(a,an);
@@ -3188,7 +3188,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
 
       // Print out angles with neighbors.
       xvector<double> q(3);q=F2C(lattice,avnfpos.at(ia));
-      pflow::matrix<double> ang_mat=GetAngleMat(q,p);
+      aurostd::matrix<double> ang_mat=GetAngleMat(q,p);  //CO20200404 pflow::matrix()->aurostd::matrix()
       int np=p.size();
       oss << "        ";
       oss << "Angles"<<endl;
@@ -3232,7 +3232,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
       xvector<int> ijk(3);
       ijk=an.ijk;
       oss << "        ";
-      oss << setw(4) << an.basis+1 << " "; //[CO200130 - number->basis]oss << setw(4) << an.number+1 << " ";
+      oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
       oss << setw(4) << an.name.c_str() << "   ";
       oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
       oss << setprecision(4) << AtomDist(a,an);
@@ -3261,7 +3261,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
 
   uint nnat=all_new_pts.size();
   uint nat=str.atoms.size();
-  // uint tnat=nat+nnat;  // DANE not used
+  // uint tnat=nat+nnat;  //DM not used
   // Number of types
   sstr.num_each_type.push_back(nnat);
   sstr.comp_each_type.push_back((double) nnat);
@@ -3277,7 +3277,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
     newatom.cleanname="XX";
     newatom.sd="";
     newatom.atomic_number=-1;
-    //[CO200130 - number->basis]newatom.number=nat+iat;                 // reference position for convasp
+    //[CO20200130 - number->basis]newatom.number=nat+iat;                 // reference position for convasp
     newatom.basis=nat+iat;                  // position in the basis	
     clear(newatom.ijk);                     // position in the unit cell
     sstr.atoms.push_back(newatom);
@@ -3287,7 +3287,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
 } // end routine
 
 // void PrintShell(const xstructure& str, const int& ns,const double& rmin,
-// const double& rmax,const string& sname, const int lin_dens) {    //[CO200106 - close bracket for indenting]}
+// const double& rmax,const string& sname, const int lin_dens) {    //[CO20200106 - close bracket for indenting]}
 
 // ***************************************************************************
 // PrintSumDOS
@@ -3338,7 +3338,7 @@ void PrintXYZ(const xstructure& a, const xvector<int>& n, ostream& oss) {
 // data in an XYZ format
 // Stefano Curtarolo
 void PrintXYZws(const xstructure& a, ostream& oss) {
-  // SC 10Jan2003
+  //SC20030110
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(10);
   xstructure sstr=a;
@@ -3462,7 +3462,7 @@ double CorrectionFactor(const double& th) {
 // PrintXRAY PrintXray
 // ***************************************************************************
 // Dane Morgan - Stefano Curtarolo
-// Updated by Corey Oses 190520
+// Updated by Corey Oses 20190520
 void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   oss.setf(std::ios::left, std::ios::adjustfield);
   oss.setf(std::ios::fixed, std::ios::floatfield);
@@ -3478,8 +3478,8 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   vector<double> twoB_vec(num_atoms,0.0);
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
-  pflow::matrix<double> data;
-  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
+  aurostd::matrix<double> data;  //CO20200404 pflow::matrix()->aurostd::matrix()
+  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO20190620 - intmax can be grabbed later
 
   //get intmax
   double intmax=1e-8;
@@ -3495,7 +3495,7 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
 
   // Print out all data.
   oss << "Wavelength(Ang) = " << lambda << endl;
-  oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO190329
+  oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO20190329
   for(uint iat=0;iat<(uint) num_atoms;iat++) {
     oss <<setw(4)<<iat+1<<" "<<setw(4)<<str.atoms.at(iat).cleanname << " ";
     if(str.atoms.at(iat).cleanname.length()>1) oss << " ";
@@ -3598,7 +3598,7 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************
 

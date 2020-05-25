@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -9,7 +9,7 @@
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
 
-#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO191112 - this file is not compiled like the rest
+#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO20191112 - this file is not compiled like the rest
 
 // ***************************************************************************
 // ***************************************************************************
@@ -22,13 +22,20 @@
 
 _XHOST::_XHOST() {  // constructor PUBLIC
   PID=0;
+  TID=0;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
+  sPID="";
+  sTID="";
+  showPID=FALSE;
+  showTID=FALSE;
   QUIET=FALSE;
   TEST=FALSE;
   DEBUG=FALSE;
   MPI=FALSE;
-  GENERATE_AFLOWIN_ONLY=FALSE;  //CT 180719
-  POSTPROCESS=FALSE;  //CT 181212
+  GENERATE_AFLOWIN_ONLY=FALSE;  //CT20180719
+  POSTPROCESS=FALSE;  //CT20181212
+  PSEUDOPOTENTIAL_GENERATOR=FALSE; //SC20200327
   hostname="";
   machine_type="";
   tmpfs="";
@@ -82,6 +89,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
   vGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_string.push_back(""); 
   vvGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvGlobal_string.push_back(vector<string>()); 
+  vvLIBS.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvLIBS.push_back(vector<string>()); 
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD.push_back(""); 
   // [OBSOLETE] vLibrary_ICSD_ALL.clear(); // for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD_ALL.push_back(""); 
   // [OBSOLETE] Library_ICSD_ALL="";
@@ -103,16 +111,20 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   XHOST_LIBRARY_LIB9=LIBRARY_NOTHING;
   XHOST_LIBRARY_ICSD=LIBRARY_NOTHING;
   XHOST_vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) XHOST_vLibrary_ICSD.push_back("");  // needs some initialization
+  // extensions
+  vcat.clear();vcat.push_back("cat");vcat.push_back("bzcat"); vcat.push_back("xzcat");vcat.push_back("gzcat");
+  vext.clear();vext.push_back("");   vext.push_back(".bz2");  vext.push_back(".xz");  vext.push_back(".gz");
+  vzip.clear();vzip.push_back("");   vzip.push_back("bzip2"); vzip.push_back("xz");   vzip.push_back("gzip");
   // AFLOWRC
   aflowrc_filename="";    // AFLOWRC
   aflowrc_content="";    // AFLOWRC
   vaflowrc.clear();   // AFLOWRC
   adefault.clear();    // AFLOWRC
   // AFLOWSYM
-  SKEW_TEST=FALSE; // DX 10/19/17
-  SKEW_TOL=AUROSTD_NAN; // DX 10/19/17
+  SKEW_TEST=FALSE; //DX20171019
+  SKEW_TOL=AUROSTD_NAN; //DX20171019
   // WEB
-  WEB_MODE=FALSE; //CO190402
+  //[CO20200404 - overload with --www]WEB_MODE=FALSE; //CO20190402
 };
 
 _XHOST::~_XHOST() { // destructor PUBLIC
@@ -121,13 +133,20 @@ _XHOST::~_XHOST() { // destructor PUBLIC
 
 void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   PID=b.PID;
+  TID=b.TID;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));ostrPID << b.ostrPID.str();
+  ostrTID.clear();ostrTID.str(string(""));ostrTID << b.ostrTID.str(); //CO20200502 - threadID
+  sPID=b.sPID;
+  sTID=b.sTID;
+  showPID=b.showPID;
+  showTID=b.showTID;
   QUIET=b.QUIET;
   TEST=b.TEST;
   DEBUG=b.DEBUG;
   MPI=b.MPI;
-  GENERATE_AFLOWIN_ONLY=b.GENERATE_AFLOWIN_ONLY;  //CT 180719
-  POSTPROCESS=b.POSTPROCESS;  //CT 181212
+  GENERATE_AFLOWIN_ONLY=b.GENERATE_AFLOWIN_ONLY;  //CT20180719
+  POSTPROCESS=b.POSTPROCESS;  //CT20181212
+  PSEUDOPOTENTIAL_GENERATOR=b.PSEUDOPOTENTIAL_GENERATOR; //SC20200327
   hostname=b.hostname;
   machine_type=b.machine_type;
   tmpfs=b.tmpfs;
@@ -180,6 +199,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vGlobal_uint.clear();for(uint i=0;i<b.vGlobal_uint.size();i++) vGlobal_uint.push_back(b.vGlobal_uint.at(i));
   vGlobal_string.clear();for(uint i=0;i<b.vGlobal_string.size();i++) vGlobal_string.push_back(b.vGlobal_string.at(i));
   vvGlobal_string.clear();for(uint i=0;i<b.vvGlobal_string.size();i++) vvGlobal_string.push_back(b.vvGlobal_string.at(i));
+  vvLIBS.clear();for(uint i=0;i<b.vvLIBS.size();i++) vvLIBS.push_back(b.vvLIBS.at(i));
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<b.vLibrary_ICSD.size();i++) vLibrary_ICSD.push_back(b.vLibrary_ICSD.at(i));
   // [OBSOLETE] vLibrary_ICSD_ALL.clear();for(uint i=0;i<b.vLibrary_ICSD_ALL.size();i++) vLibrary_ICSD_ALL.push_back(b.vLibrary_ICSD_ALL.at(i));
   // [OBSOLETE] Library_ICSD_ALL=b.Library_ICSD_ALL;
@@ -189,16 +209,20 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
   vschema=b.vschema;
+  // extensions
+  vcat.clear();for(uint i=0;i<b.vcat.size();i++) vcat.push_back(b.vcat.at(i));
+  vext.clear();for(uint i=0;i<b.vext.size();i++) vext.push_back(b.vext.at(i));
+  vzip.clear();for(uint i=0;i<b.vzip.size();i++) vzip.push_back(b.vzip.at(i));
   // AFLOWRC
   aflowrc_filename=b.aflowrc_filename;    // AFLOWRC
   aflowrc_content=b.aflowrc_content;    // AFLOWRC
   vaflowrc.clear();for(uint i=0;i<b.vaflowrc.size();i++) vaflowrc.push_back(b.vaflowrc.at(i));   // AFLOWRC
   adefault.clear(); adefault=b.adefault; // AFLOWRC
   // AFLOWSYM
-  SKEW_TEST=b.SKEW_TEST; // DX 10/19/17
-  SKEW_TOL=b.SKEW_TOL; // DX 10/19/17
+  SKEW_TEST=b.SKEW_TEST; //DX20171019
+  SKEW_TOL=b.SKEW_TOL; //DX20171019
   // WEB
-  WEB_MODE=b.WEB_MODE;  //CO190402
+  //[CO20200404 - overload with --www]WEB_MODE=b.WEB_MODE;  //CO20190402
 }
 
 const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
@@ -216,14 +240,16 @@ const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
 
 void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   vTemperatureCore.clear();
-  //  thread.clear();
-  //  iret.clear();
+  // thread.clear();
+  // iret.clear();
   // thread_busy.clear();
   vcmd.clear();
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
   vGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_string.push_back(""); 
   vvGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvGlobal_string.push_back(vector<string>()); 
+  vvLIBS.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvLIBS.push_back(vector<string>()); 
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD.push_back(""); 
   // [OBSOLETE] vLibrary_ICSD_ALL.clear();
   XHOST_vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) XHOST_vLibrary_ICSD.push_back("");  // needs some initialization
@@ -233,6 +259,10 @@ void _XHOST::free() { // free PRIVATE
   vflag_outreach.clear();
   vflag_control.clear();
   vschema.clear();
+  // extensions
+  vcat.clear();vcat.push_back("cat");vcat.push_back("bzcat"); vcat.push_back("xzcat");vcat.push_back("gzcat");
+  vext.clear();vext.push_back("");   vext.push_back(".bz2");  vext.push_back(".xz");  vext.push_back(".gz");
+  vzip.clear();vzip.push_back("");   vzip.push_back("bzip2"); vzip.push_back("xz");   vzip.push_back("gzip");
   // AFLOWRC
   aflowrc_filename.clear();    // AFLOWRC
   aflowrc_content.clear();    // AFLOWRC
@@ -250,58 +280,56 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
-  string soliloquy="_XHOST::command():";  //CO190629
+  string soliloquy = XPID + "_XHOST::command():";  //CO20190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
 #endif
-  // for(uint i=0;i<vcmd.size();i++) if(aurostd::substring2bool(vcmd.at(i),_command)) return vcmd.at(i); // found before..  [KESONG]
-  // for(uint i=0;i<vcmd.size();i++) if(vcmd.at(i)==command || aurostd::substring2bool(vcmd.at(i),command)) return vcmd.at(i); // found before..
-  //first check for EXACT match in vcmds  //CO 180705
-  if(command=="aflow_data"&&aurostd::FileExist("./aflow_data")){return "./aflow_data";} //CO 180705 - hack for developers, prefer ./aflow_data over aflow_data in PATH, as it is probably newer (development)
-  for(uint i=0;i<vcmd.size();i++){
-    if(vcmd.at(i)==command){
+  //first check for EXACT match in vcmds  //CO20180705
+  if(command=="aflow_data"&&aurostd::FileExist("./aflow_data")) {return "./aflow_data";} //CO20180705 - hack for developers, prefer ./aflow_data over aflow_data in PATH, as it is probably newer (development)
+  for(uint i=0;i<vcmd.size();i++) {
+    if(vcmd.at(i)==command) {
       return vcmd.at(i);
     }// found before.. only == otherwise cat gets confused with bzcat
   }
-  //next check if we can find the command in PATH or somewher else common //CO 180705
+  //next check if we can find the command in PATH or somewher else common //CO20180705
   if(aurostd::IsCommandAvailableModify(_command)) {
     pthread_mutex_lock(&mutex_XAFLOW_XHOST);
     // pthread_mutex_unlock(&mutex_XAFLOW_XHOST);
     vcmd.push_back(_command);
     pthread_mutex_unlock(&mutex_XAFLOW_XHOST);
     return _command; } // found and added
-  //CO 180705 - START
+  //CO20180705 START
   //requested command is "aflow_data", and we have ./aflow_data in our vcmd's
   //we need to strip vcmd's to basename and check
   vector<string> path_parts;
   string basename;
-  for(uint i=0;i<vcmd.size();i++){
+  for(uint i=0;i<vcmd.size();i++) {
     aurostd::string2tokens(vcmd[i],path_parts,"/",true);  //consecutive
-    if(path_parts.size()){
+    if(path_parts.size()) {
       basename=path_parts[path_parts.size()-1];
-      if(basename==command){
+      if(basename==command) {
         return vcmd[i];
       }
     }
   }
-  //CO 180705 - STOP
-  //[CO190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
+  //CO20180705 STOP
+  //[CO20190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
 bool _XHOST::is_command(const string& command) {
-  try{string path=_XHOST::command(command);return !path.empty();}    //CO190629 - using xerror now
-  catch(aurostd::xerror& excpt){return false;}  //CO190629 - using xerror now
-  //[CO190629 - using xerror now]return !_XHOST::command(command).empty(); //CO 180705
-  //[CO 180705 OBSOLETE]string _command=command;
-  //[CO 180705 OBSOLETE]#ifdef _MACOSX_
-  //[CO 180705 OBSOLETE]if(command=="beep") return TRUE;
-  //[CO 180705 OBSOLETE]#endif
-  //[CO 180705 OBSOLETE]for(uint i=0;i<vcmd.size();i++) if(aurostd::substring2bool(vcmd.at(i),_command)) return TRUE; // found before..
-  //[CO 180705 OBSOLETE]if(aurostd::IsCommandAvailableModify(_command)) return TRUE;
-  //[CO 180705 OBSOLETE]return FALSE; // not found
+  try{string path=_XHOST::command(command);return !path.empty();}    //CO20190629 - using xerror now
+  catch(aurostd::xerror& excpt) {return false;}  //CO20190629 - using xerror now
+  //[CO20190629 - using xerror now]return !_XHOST::command(command).empty(); //CO20180705
+  //[CO20180705 OBSOLETE]string _command=command;
+  //[CO20180705 OBSOLETE]#ifdef _MACOSX_
+  //[CO20180705 OBSOLETE]if(command=="beep") return TRUE;
+  //[CO20180705 OBSOLETE]#endif
+  //[CO20180705 OBSOLETE]for(uint i=0;i<vcmd.size();i++) if(aurostd::substring2bool(vcmd.at(i),_command)) return TRUE; // found before..
+  //[CO20180705 OBSOLETE]if(aurostd::IsCommandAvailableModify(_command)) return TRUE;
+  //[CO20180705 OBSOLETE]return FALSE; // not found
 }
 
 
@@ -330,13 +358,13 @@ _aflags::_aflags() {
   AFLOW_MODE_QSUB_MODE2                 = FALSE;
   AFLOW_MODE_QSUB_MODE3                 = FALSE;
   KBIN_RUN_AFLOWIN                      = FALSE;
-  KBIN_GEN_GENERAL                      = FALSE;  // CO 180405 - general --generate flag, we need to read aflow.in to determine whether vasp/sym/aims/etc.
+  KBIN_GEN_GENERAL                      = FALSE;  //CO20180405 - general --generate flag, we need to read aflow.in to determine whether vasp/sym/aims/etc.
   KBIN_GEN_VASP_FROM_AFLOWIN            = FALSE;
   KBIN_GEN_AIMS_FROM_AFLOWIN            = FALSE;
   KBIN_GEN_AFLOWIN_FROM_VASP            = FALSE;
-  // DX - START
+  //DX START
   KBIN_GEN_SYMMETRY_OF_AFLOWIN          = FALSE;
-  // DX - END
+  //DX END
   KBIN_DELETE_AFLOWIN                   = FALSE;
   AFLOW_FORCE_MPI                       = FALSE;
   AFLOW_FORCE_SERIAL                    = FALSE;
@@ -385,9 +413,9 @@ void _aflags::copy(const _aflags& b) {
   KBIN_GEN_VASP_FROM_AFLOWIN            = b.KBIN_GEN_VASP_FROM_AFLOWIN;
   KBIN_GEN_AIMS_FROM_AFLOWIN            = b.KBIN_GEN_AIMS_FROM_AFLOWIN;
   KBIN_GEN_AFLOWIN_FROM_VASP            = b.KBIN_GEN_AFLOWIN_FROM_VASP;
-  // DX - START
+  //DX START
   KBIN_GEN_SYMMETRY_OF_AFLOWIN          = b.KBIN_GEN_SYMMETRY_OF_AFLOWIN;
-  // DX - END
+  //DX END
   KBIN_DELETE_AFLOWIN                   = b.KBIN_DELETE_AFLOWIN;
   AFLOW_FORCE_MPI                       = b.AFLOW_FORCE_MPI;
   AFLOW_FORCE_SERIAL                    = b.AFLOW_FORCE_SERIAL;
@@ -461,12 +489,12 @@ _kflags::_kflags() {
   AFLOW_MODE_POSTSCRIPT.str(std::string());
   AFLOW_MODE_EMAIL                                 = FALSE;
   KBIN_BIN                                         = "";
-  KBIN_SERIAL_BIN                                  = ""; // ME190107
+  KBIN_SERIAL_BIN                                  = ""; //ME20190107
   KZIP_BIN                                         = "";
   KZIP_COMPRESS                                    = FALSE;
   KBIN_MPI                                         = FALSE;
   KBIN_MPI_NCPUS                                   = 0;
-  KBIN_MPI_NCPUS_STRING                            = ""; //ME181216
+  KBIN_MPI_NCPUS_STRING                            = ""; //ME20181216
   KBIN_MPI_NCPUS_BUFFER                            = 0;
   KBIN_MPI_START                                   = "";
   KBIN_MPI_STOP                                    = "";
@@ -485,20 +513,24 @@ _kflags::_kflags() {
   KBIN_QSUB_MODE_IMPLICIT                          = FALSE;
   KBIN_QSUB_FILE                                   = FALSE;
   KBIN_SYMMETRY_CALCULATION                        = FALSE;
-  // DX - START
+  //DX START
   KBIN_SYMMETRY_NO_SCAN                            = FALSE;
   KBIN_SYMMETRY_EPS                                = AUROSTD_NAN;
-  KBIN_SYMMETRY_CALCULATE_PGROUP                   = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_PGROUPK                  = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_FGROUP                   = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL              = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_IATOMS                   = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_AGROUP                   = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_SGROUP                   = TRUE; // DX 8/14/17 - Specify what to calculate/verify
-  // DX - END
+  KBIN_SYMMETRY_CALCULATE_PGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK                  = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_FGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL              = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL             = TRUE; //DX20200423 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON        = TRUE; //DX20200423 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_IATOMS                   = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_AGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_SGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
+  //DX END
   KBIN_SYMMETRY_PGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = FALSE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = FALSE;
+  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE                 = FALSE; //DX20200423
+  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE            = FALSE; //DX20200423
   KBIN_SYMMETRY_FGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_SGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_AGROUP_WRITE                       = FALSE;
@@ -510,7 +542,7 @@ _kflags::_kflags() {
   KBIN_NEIGHBOURS_DRADIUS                          = 0.0;
   KBIN_POCC                                        = FALSE;
   KBIN_POCC_CALCULATION                            = FALSE;
-  KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO191110
+  KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO20191110
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -529,9 +561,9 @@ _kflags::_kflags() {
   KBIN_FROZSL_DIELECTRIC_ZEFF                      = FALSE;
   KBIN_FROZSL_DIELECTRIC_STRING                    = "";
   KBIN_PHONONS_CALCULATION_APL                     = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA                     = FALSE; // CO 170601
-  KBIN_PHONONS_CALCULATION_AAPL                    = FALSE; // CO 170601
-  // ME 190208 - START
+  KBIN_PHONONS_CALCULATION_QHA                     = FALSE; //CO20170601
+  KBIN_PHONONS_CALCULATION_AAPL                    = FALSE; //CO20170601
+  //ME20190208 START
   // Flags must be initialized to false, or they may be initialized
   // to random numbers
   KBIN_PHONONS_CALCULATION_QHA_A                   = FALSE;
@@ -545,7 +577,7 @@ _kflags::_kflags() {
   KBIN_PHONONS_CALCULATION_QHA3P_A                 = FALSE;
   KBIN_PHONONS_CALCULATION_QHA3P_B                 = FALSE;
   KBIN_PHONONS_CALCULATION_QHA3P_C                 = FALSE;
-  // ME190208 - END
+  //ME20190208 END
   KBIN_PHONONS_CALCULATION_AGL                     = FALSE;
   KBIN_PHONONS_CALCULATION_AEL                     = FALSE;
   KBIN_PHONONS_CALCULATION_FROZSL                  = FALSE;
@@ -581,12 +613,12 @@ void _kflags::copy(const _kflags& b) {
   AFLOW_MODE_POSTSCRIPT.str(std::string()); AFLOW_MODE_POSTSCRIPT << b.AFLOW_MODE_POSTSCRIPT.str();
   AFLOW_MODE_EMAIL                                 = b.AFLOW_MODE_EMAIL;
   KBIN_BIN                                         = b.KBIN_BIN;
-  KBIN_SERIAL_BIN                                  = b.KBIN_SERIAL_BIN;  // ME 190107
+  KBIN_SERIAL_BIN                                  = b.KBIN_SERIAL_BIN;  //ME20190107
   KZIP_BIN                                         = b.KZIP_BIN;
   KZIP_COMPRESS                                    = b.KZIP_COMPRESS;
   KBIN_MPI                                         = b.KBIN_MPI;
   KBIN_MPI_NCPUS                                   = b.KBIN_MPI_NCPUS;
-  KBIN_MPI_NCPUS_STRING                            = b.KBIN_MPI_NCPUS_STRING;	//ME181216
+  KBIN_MPI_NCPUS_STRING                            = b.KBIN_MPI_NCPUS_STRING;	//ME20181216
   KBIN_MPI_NCPUS_BUFFER                            = b.KBIN_MPI_NCPUS_BUFFER;
   KBIN_MPI_START                                   = b.KBIN_MPI_START;
   KBIN_MPI_STOP                                    = b.KBIN_MPI_STOP;
@@ -605,20 +637,24 @@ void _kflags::copy(const _kflags& b) {
   KBIN_QSUB_MODE_IMPLICIT                          = b.KBIN_QSUB_MODE_IMPLICIT;
   KBIN_QSUB_FILE                                   = b.KBIN_QSUB_FILE;
   KBIN_SYMMETRY_CALCULATION                        = b.KBIN_SYMMETRY_CALCULATION;
-  // DX - START
+  //DX START
   KBIN_SYMMETRY_NO_SCAN                            = b.KBIN_SYMMETRY_NO_SCAN;
   KBIN_SYMMETRY_EPS                                = b.KBIN_SYMMETRY_EPS;
-  KBIN_SYMMETRY_CALCULATE_PGROUP                   = b.KBIN_SYMMETRY_CALCULATE_PGROUP; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_PGROUPK                  = b.KBIN_SYMMETRY_CALCULATE_PGROUPK; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_FGROUP                   = b.KBIN_SYMMETRY_CALCULATE_FGROUP; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL              = b.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_IATOMS                   = b.KBIN_SYMMETRY_CALCULATE_IATOMS; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_AGROUP                   = b.KBIN_SYMMETRY_CALCULATE_AGROUP; // DX 8/14/17 - Specify what to calculate/verify
-  KBIN_SYMMETRY_CALCULATE_SGROUP                   = b.KBIN_SYMMETRY_CALCULATE_SGROUP; // DX 8/14/17 - Specify what to calculate/verify
-  // DX - END
+  KBIN_SYMMETRY_CALCULATE_PGROUP                   = b.KBIN_SYMMETRY_CALCULATE_PGROUP; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK                  = b.KBIN_SYMMETRY_CALCULATE_PGROUPK; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_FGROUP                   = b.KBIN_SYMMETRY_CALCULATE_FGROUP; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL              = b.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL             = b.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; //DX20200423 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON        = b.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON; //DX20200423 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_IATOMS                   = b.KBIN_SYMMETRY_CALCULATE_IATOMS; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_AGROUP                   = b.KBIN_SYMMETRY_CALCULATE_AGROUP; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_SGROUP                   = b.KBIN_SYMMETRY_CALCULATE_SGROUP; //DX20170814 - Specify what to calculate/verify
+  //DX END
   KBIN_SYMMETRY_PGROUP_WRITE                       = b.KBIN_SYMMETRY_PGROUP_WRITE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = b.KBIN_SYMMETRY_PGROUP_XTAL_WRITE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = b.KBIN_SYMMETRY_PGROUPK_WRITE;
+  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE                 = b.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE; //DX20200423
+  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE            = b.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE; //DX20200423
   KBIN_SYMMETRY_FGROUP_WRITE                       = b.KBIN_SYMMETRY_FGROUP_WRITE;
   KBIN_SYMMETRY_SGROUP_WRITE                       = b.KBIN_SYMMETRY_SGROUP_WRITE;
   KBIN_SYMMETRY_AGROUP_WRITE                       = b.KBIN_SYMMETRY_AGROUP_WRITE;
@@ -629,8 +665,8 @@ void _kflags::copy(const _kflags& b) {
   KBIN_NEIGHBOURS_RADIUS                           = b.KBIN_NEIGHBOURS_RADIUS;
   KBIN_NEIGHBOURS_DRADIUS                          = b.KBIN_NEIGHBOURS_DRADIUS;
   KBIN_POCC                                        = b.KBIN_POCC;
-  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO191110
-  KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO191110
+  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO20191110
+  KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO20191110
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -648,11 +684,11 @@ void _kflags::copy(const _kflags& b) {
   KBIN_FROZSL_DIELECTRIC_MODE_EXPLICIT_START_STOP  = b.KBIN_FROZSL_DIELECTRIC_MODE_EXPLICIT_START_STOP;
   KBIN_FROZSL_DIELECTRIC_STRING                    = b.KBIN_FROZSL_DIELECTRIC_STRING;
   KBIN_PHONONS_CALCULATION_APL                     = b.KBIN_PHONONS_CALCULATION_APL;
-  KBIN_PHONONS_CALCULATION_QHA                     = b.KBIN_PHONONS_CALCULATION_QHA;  // CO 170601
-  KBIN_PHONONS_CALCULATION_AAPL                    = b.KBIN_PHONONS_CALCULATION_AAPL; // CO 170601
+  KBIN_PHONONS_CALCULATION_QHA                     = b.KBIN_PHONONS_CALCULATION_QHA;  //CO20170601
+  KBIN_PHONONS_CALCULATION_AAPL                    = b.KBIN_PHONONS_CALCULATION_AAPL; //CO20170601
   KBIN_PHONONS_CALCULATION_AGL                     = b.KBIN_PHONONS_CALCULATION_AGL;
   KBIN_PHONONS_CALCULATION_AEL                     = b.KBIN_PHONONS_CALCULATION_AEL;
-  // ME190208 - START
+  //ME20190208 START
   KBIN_PHONONS_CALCULATION_QHA_A                   = b.KBIN_PHONONS_CALCULATION_QHA_A;
   KBIN_PHONONS_CALCULATION_QHA_B                   = b.KBIN_PHONONS_CALCULATION_QHA_B;
   KBIN_PHONONS_CALCULATION_QHA_C                   = b.KBIN_PHONONS_CALCULATION_QHA_C;
@@ -664,11 +700,11 @@ void _kflags::copy(const _kflags& b) {
   KBIN_PHONONS_CALCULATION_QHA3P_A                 = b.KBIN_PHONONS_CALCULATION_QHA3P_A;
   KBIN_PHONONS_CALCULATION_QHA3P_B                 = b.KBIN_PHONONS_CALCULATION_QHA3P_B;
   KBIN_PHONONS_CALCULATION_QHA3P_C                 = b.KBIN_PHONONS_CALCULATION_QHA3P_C;
-  // ME190208 - END
+  //ME20190208 END
   KBIN_PHONONS_CALCULATION_FROZSL                  = b.KBIN_PHONONS_CALCULATION_FROZSL;
   KBIN_PHONONS_CALCULATION_FROZSL_output           = b.KBIN_PHONONS_CALCULATION_FROZSL_output;
   KBIN_PHONONS_CALCULATION_FROZSL_poscars          = b.KBIN_PHONONS_CALCULATION_FROZSL_poscars;
-  KBIN_MODULE_OPTIONS                              = b.KBIN_MODULE_OPTIONS;  // ME 181027
+  KBIN_MODULE_OPTIONS                              = b.KBIN_MODULE_OPTIONS;  //ME20181027
 }
 
 // copy
@@ -704,7 +740,7 @@ void _kflags::clear() {
 _vflags::_vflags() {
 
   // SYSTEM
-  AFLOW_SYSTEM.clear(); // ME 181121
+  AFLOW_SYSTEM.clear(); //ME20181121
 
   KBIN_VASP_RUN_NRELAX                                           = 0;
   //  RUN
@@ -756,12 +792,12 @@ _vflags::_vflags() {
   // EDIFFG
   KBIN_VASP_FORCE_OPTION_EDIFFG_EQUAL.clear();
   KBIN_VASP_FORCE_OPTION_EDIFFG_EQUAL.push(aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG));
-  // ISMEAR  //CO181128
-  KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.clear(); //CO181128
-  KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.push(aurostd::utype2string(1));  //default //CO181128
-  // SIGMA  //CO181128
-  KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.clear(); //CO181128
-  KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.push(aurostd::utype2string(0.1));  //default //CO181128
+  // ISMEAR  //CO20181128
+  KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.clear(); //CO20181128
+  KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.push(aurostd::utype2string(1));  //default //CO20181128
+  // SIGMA  //CO20181128
+  KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.clear(); //CO20181128
+  KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.push(aurostd::utype2string(0.1));  //default //CO20181128
   // RWIGS
   KBIN_VASP_FORCE_OPTION_RWIGS_STATIC                            = FALSE;
 
@@ -785,7 +821,7 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_WAVECAR.option                          = DEFAULT_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.clear();                         // CHGCAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.option                           = DEFAULT_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
-  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.clear();                    // ME191028
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.clear();                    //ME20191028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.clear();                     // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.option                       = DEFAULT_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
 
@@ -845,6 +881,8 @@ _vflags::_vflags() {
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME.push(DEFAULT_PHONONS_KSCHEME);  //"Gamma");           // KSCHEME
 
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.clear();         // PARITY
+  KBIN_VASP_KPOINTS_PHONONS_GRID.clear();                        //ME20200427
+  KBIN_VASP_KPOINTS_PHONONS_SHIFT.clear();                       //ME20200427
   // BANDS
   // KBIN_VASP_KPOINTS_BANDS_LATTICE
   KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();                       // LATTICE
@@ -864,8 +902,8 @@ _vflags::_vflags() {
   KBIN_VASP_POTCAR_MODE.clear();                                 // all false
   // KBIN_VASP_INCAR_FILE
   KBIN_VASP_INCAR_FILE.clear();                                  // all false
-  KBIN_VASP_INCAR_EXPLICIT.clear(); //ME181226
-  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); //ME181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_INCAR_EXPLICIT.clear(); //ME20181226
+  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_KEYWORD                     = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_SYSTEM_AUTO                 = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_FILE                        = FALSE;
@@ -874,8 +912,8 @@ _vflags::_vflags() {
 
   // KBIN_VASP_KPOINTS_FILE
   KBIN_VASP_KPOINTS_FILE.clear();                                // all false
-  KBIN_VASP_KPOINTS_EXPLICIT.clear(); //ME181226
-  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); //ME181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_KPOINTS_EXPLICIT.clear(); //ME20181226
+  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_KEYWORD                   = FALSE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_FILE                      = FALSE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_COMMAND                   = FALSE;
@@ -894,7 +932,7 @@ _vflags::_vflags() {
 
   // KBIN_VASP_POTCAR_FILE
   KBIN_VASP_POTCAR_FILE.clear();                                 // all false
-  KBIN_VASP_POTCAR_EXPLICIT.clear(); //ME181226
+  KBIN_VASP_POTCAR_EXPLICIT.clear(); //ME20181226
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_KEYWORD                    = FALSE;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_SYSTEM_AUTO                = FALSE;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_PREFIX                     = FALSE;
@@ -912,7 +950,7 @@ void _vflags::free() {
 }
 
 void _vflags::copy(const _vflags& b) {
-  AFLOW_SYSTEM                                                   = b.AFLOW_SYSTEM; //ME181226
+  AFLOW_SYSTEM                                                   = b.AFLOW_SYSTEM; //ME20181226
   KBIN_VASP_RUN_NRELAX                                           = b.KBIN_VASP_RUN_NRELAX;
   // RUN
   KBIN_VASP_RUN                                                  = b.KBIN_VASP_RUN;  
@@ -948,9 +986,9 @@ void _vflags::copy(const _vflags& b) {
   // EDIFFG
   KBIN_VASP_FORCE_OPTION_EDIFFG_EQUAL                            = b.KBIN_VASP_FORCE_OPTION_EDIFFG_EQUAL;
   // ISMEAR
-  KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL                            = b.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL; //CO181128
+  KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL                            = b.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL; //CO20181128
   // SIGMA
-  KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL                             = b.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL; //CO181128
+  KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL                             = b.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL; //CO20181128
   // RWIGS
   KBIN_VASP_FORCE_OPTION_RWIGS_STATIC                            = b.KBIN_VASP_FORCE_OPTION_RWIGS_STATIC;
 
@@ -965,7 +1003,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_SYM                                     = b.KBIN_VASP_FORCE_OPTION_SYM; // SYM
   KBIN_VASP_FORCE_OPTION_WAVECAR                                 = b.KBIN_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR                                  = b.KBIN_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
-  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE                             = b.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;  // ME1901028
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE                             = b.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;  //ME20191028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING                              = b.KBIN_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LDAU0                                   = b.KBIN_VASP_FORCE_OPTION_LDAU0;  // LDAU0
   KBIN_VASP_FORCE_OPTION_LDAU1                                   = b.KBIN_VASP_FORCE_OPTION_LDAU1;  // LDAU1
@@ -1016,6 +1054,8 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_KPOINTS_PHONONS_KPPRA                                = b.KBIN_VASP_KPOINTS_PHONONS_KPPRA;
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME                              = b.KBIN_VASP_KPOINTS_PHONONS_KSCHEME;
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY                  = b.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;
+  KBIN_VASP_KPOINTS_PHONONS_GRID                                 = b.KBIN_VASP_KPOINTS_PHONONS_GRID;  //ME20200427
+  KBIN_VASP_KPOINTS_PHONONS_SHIFT                                = b.KBIN_VASP_KPOINTS_PHONONS_SHIFT; //ME20200427
   // BANDS
   KBIN_VASP_KPOINTS_BANDS_LATTICE                                = b.KBIN_VASP_KPOINTS_BANDS_LATTICE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -1036,8 +1076,8 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_POTCAR_MODE                                          = b.KBIN_VASP_POTCAR_MODE;
   // KBIN_VASP_INCAR_FILE
   KBIN_VASP_INCAR_FILE                                           = b.KBIN_VASP_INCAR_FILE;
-  KBIN_VASP_INCAR_EXPLICIT.clear(); KBIN_VASP_INCAR_EXPLICIT << b.KBIN_VASP_INCAR_EXPLICIT.str(); //ME181226
-  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); KBIN_VASP_INCAR_EXPLICIT_START_STOP << b.KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(); //ME181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_INCAR_EXPLICIT.clear(); KBIN_VASP_INCAR_EXPLICIT << b.KBIN_VASP_INCAR_EXPLICIT.str(); //ME20181226
+  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); KBIN_VASP_INCAR_EXPLICIT_START_STOP << b.KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_KEYWORD                     = b.KBIN_VASP_INCAR_FILE_KEYWORD;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_SYSTEM_AUTO                 = b.KBIN_VASP_INCAR_FILE_SYSTEM_AUTO;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_FILE                        = b.KBIN_VASP_INCAR_FILE_FILE;
@@ -1046,8 +1086,8 @@ void _vflags::copy(const _vflags& b) {
 
   // KBIN_VASP_KPOINTS_FILE
   KBIN_VASP_KPOINTS_FILE                                         = b.KBIN_VASP_KPOINTS_FILE;
-  KBIN_VASP_KPOINTS_EXPLICIT.clear(); KBIN_VASP_KPOINTS_EXPLICIT << b.KBIN_VASP_KPOINTS_EXPLICIT.str(); //ME181226
-  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << b.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(); //ME181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_KPOINTS_EXPLICIT.clear(); KBIN_VASP_KPOINTS_EXPLICIT << b.KBIN_VASP_KPOINTS_EXPLICIT.str(); //ME20181226
+  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << b.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_KEYWORD                   = b.KBIN_VASP_KPOINTS_FILE_KEYWORD;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_FILE                      = b.KBIN_VASP_KPOINTS_FILE_FILE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_COMMAND                   = b.KBIN_VASP_KPOINTS_FILE_COMMAND;
@@ -1065,7 +1105,7 @@ void _vflags::copy(const _vflags& b) {
 
   // KBIN_VASP_POTCAR_FILE
   KBIN_VASP_POTCAR_FILE                                          = b.KBIN_VASP_POTCAR_FILE;
-  KBIN_VASP_POTCAR_EXPLICIT.clear(); KBIN_VASP_POTCAR_EXPLICIT << b.KBIN_VASP_POTCAR_EXPLICIT.str(); //ME181226
+  KBIN_VASP_POTCAR_EXPLICIT.clear(); KBIN_VASP_POTCAR_EXPLICIT << b.KBIN_VASP_POTCAR_EXPLICIT.str(); //ME20181226
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_KEYWORD                    = b.KBIN_VASP_POTCAR_FILE_KEYWORD;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_SYSTEM_AUTO                = b.KBIN_VASP_POTCAR_FILE_SYSTEM_AUTO;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_PREFIX                     = b.KBIN_VASP_POTCAR_FILE_PREFIX;
@@ -1146,11 +1186,12 @@ _xvasp::_xvasp() {
   // [OBSOLETE] POTCAR_changed              = FALSE;
   POTCAR_TYPE                 = "";
   POTCAR_TYPE_DATE_PRINT_flag = FALSE;
-  POTCAR_TYPE_PRINT_flag      = FALSE;  //CO181226
+  POTCAR_TYPE_PRINT_flag      = FALSE;  //CO20181226
   POTCAR_ENMAX                = 0.0;
   POTCAR_ENMIN                = 0.0;
   POTCAR_PAW                  = FALSE;
   POTCAR_POTENTIALS.str(std::string());
+  POTCAR_AUID.clear();        // md5sums
   NCPUS                       = 1;
   NRELAX                      = 0;
   NRELAXING                   = 0;
@@ -1167,19 +1208,20 @@ _xvasp::_xvasp() {
   // ABINIT INPUT
   // AIMS INPUT
   // AVASP
-  //aopts.clear();                                  // default  // CO 180420 - clears AFLOWIN_FLAG::VASP default (TRUE)
+  //aopts.clear();                                  // default  //CO20180420 - clears AFLOWIN_FLAG::VASP default (TRUE)
   AVASP_aflowin_only_if_missing=FALSE;  // DEFAULT VALUES
-  AVASP_arun = false;  // ME 181019
-  AVASP_arun_mode = "";  // ME 181019
-  AVASP_arun_runname = "";  // ME 181019
-  aplopts.clear();  // ME 181025
-  aaplopts.clear();  // ME 181025
+  AVASP_arun = false;         //ME20181019
+  AVASP_arun_mode = "";       //ME20181019
+  AVASP_arun_runname = "";    //ME20181019
+  aplopts.clear();            //ME20181025
+  aaplopts.clear();           //ME20181025
+  qhaopts.clear();            //AS20200302
   AVASP_dirbase="";
   AVASP_libbase="";
   AVASP_label="";
   AVASP_parameters="";
-  AVASP_pocc_parameters=""; //CO181226
-  AVASP_pocc_tol=""; //CO181226
+  AVASP_pocc_parameters=""; //CO20181226
+  AVASP_pocc_tol=""; //CO20181226
   AVASP_volume_in=0.0;
   AVASP_alpha_fix=FALSE;                          // DEFAULT VALUES
   AVASP_prototype_mode=LIBRARY_MODE_HTQC;         // DEFAULT VALUES
@@ -1205,14 +1247,14 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::AVASP_ELF",DEFAULT_VASP_FORCE_OPTION_ELF);                                   // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_LSCOUPLING",DEFAULT_VASP_FORCE_OPTION_LSCOUPLING);                     // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_AUTO_MAGMOM",DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM);                   // DEFAULT VALUES
-  aopts.flag("FLAG::AVASP_SYM",DEFAULT_VASP_FORCE_OPTION_SYM);                   // DEFAULT VALUES //ME181226
+  aopts.flag("FLAG::AVASP_SYM",DEFAULT_VASP_FORCE_OPTION_SYM);                   // DEFAULT VALUES //ME20181226
   aopts.flag("FLAG::AVASP_RELAX_FORCES",FALSE);          // DEFAULT VALUES
   aopts.flag("FLAG::AVASP_KPPRA",FALSE);                 // DEFAULT VALUES
   AVASP_value_KPPRA=DEFAULT_KPPRA;                       // DEFAULT VALUES
-  AVASP_KSCHEME=DEFAULT_KSCHEME;                         // DEFAULT VALUES //ME181226
-  AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC;         // DEFAULT VALUES //ME181226
-  AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;           // DEFAULT VALUES //ME181226
-  AVASP_KPOINTS=""; //ME181226
+  AVASP_KSCHEME=DEFAULT_KSCHEME;                         // DEFAULT VALUES //ME20181226
+  AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC;         // DEFAULT VALUES //ME20181226
+  AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;           // DEFAULT VALUES //ME20181226
+  AVASP_KPOINTS=""; //ME20181226
   AVASP_value_NSW=0;                                     // DEFAULT VALUES
   aopts.flag("FLAG::PRECISION_SET",FALSE);               // DEFAULT VALUES no PRECISION specified
   AVASP_flag_PRECISION_scheme="N";                       // DEFAULT VALUES Normal PRECISION
@@ -1236,12 +1278,12 @@ _xvasp::_xvasp() {
   aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_MINKOWSKI",TRUE);
   aopts.flag("FLAG::VOLUME_PRESERVED",FALSE);            // DEFAULT VALUES
   aopts.flag("FLAG::EXTRA_INCAR",FALSE);                 // DEFAULT VALUES
-  AVASP_EXTRA_INCAR.str("");                             // DEFAULT VALUES  // ME 190614  clear ss with .str("")
-  AVASP_INCAR_KEYWORD.clear();                           // DEFAULT VALUES  // ME 180601
-  AVASP_INCAR_EXPLICIT_START_STOP.str("");               // DEFAULT VALUES  // ME 180601  //CO190401 - clear ss with .str("")
-  AVASP_KPOINTS_KEYWORD.clear();                         // DEFAULT VALUES  // ME 180601
-  AVASP_KPOINTS_EXPLICIT_START_STOP.str("");             // DEFAULT VALUES  // ME 180601  //CO190401 - clear ss with .str("")
-  AVASP_POTCAR_KEYWORD.clear();                          // DEFAULT VALUES  // CO 170601
+  AVASP_EXTRA_INCAR.str("");                             // DEFAULT VALUES  //ME20190614  clear ss with .str("")
+  AVASP_INCAR_KEYWORD.clear();                           // DEFAULT VALUES  //ME20180601
+  AVASP_INCAR_EXPLICIT_START_STOP.str("");               // DEFAULT VALUES  //ME20180601  //CO20190401 - clear ss with .str("")
+  AVASP_KPOINTS_KEYWORD.clear();                         // DEFAULT VALUES  //ME20180601
+  AVASP_KPOINTS_EXPLICIT_START_STOP.str("");             // DEFAULT VALUES  //ME20180601  //CO20190401 - clear ss with .str("")
+  AVASP_POTCAR_KEYWORD.clear();                          // DEFAULT VALUES  //CO20170601
   AVASP_flag_MPI=FALSE;                                  // DEFAULT VALUES
   AVASP_flag_RUN_RELAX=TRUE;                             // DEFAULT VALUES
   AVASP_flag_RUN_RELAX_STATIC=FALSE;                     // DEFAULT VALUES
@@ -1256,13 +1298,13 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::KPOINTS_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVECAR_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVEDER_PRESERVED",FALSE);           // DEFAULT VALUES
-  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES  // CO 170601
-  aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",FALSE);        // DEFAULT VALUES  // CO 170601
-  aopts.flag("FLAG::AVASP_APL=OFF",FALSE);               // DEFAULT VALUES  // CO 170601
-  aopts.flag("FLAG::AVASP_QHA=OFF",FALSE);               // DEFAULT VALUES  // CO 170601
-  aopts.flag("FLAG::AVASP_AAPL=OFF",FALSE);              // DEFAULT VALUES  // CO 170601
-  aopts.flag("FLAG::AVASP_AGL=OFF",FALSE);               // DEFAULT VALUES  // CO 170601
-  aopts.flag("FLAG::AVASP_AEL=OFF",FALSE);               // DEFAULT VALUES  // CO 170601
+  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES   //CO20170601
+  aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",FALSE);        // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_APL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_QHA=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_AAPL=OFF",FALSE);              // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_AGL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_AEL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
 }
 
 // destructor
@@ -1305,11 +1347,12 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] POTCAR_changed                           = b.POTCAR_changed;
   POTCAR_TYPE                              = b.POTCAR_TYPE;
   POTCAR_TYPE_DATE_PRINT_flag              = b.POTCAR_TYPE_DATE_PRINT_flag;
-  POTCAR_TYPE_PRINT_flag                   = b.POTCAR_TYPE_PRINT_flag; //CO181226
+  POTCAR_TYPE_PRINT_flag                   = b.POTCAR_TYPE_PRINT_flag; //CO20181226
   POTCAR_ENMAX                             = b.POTCAR_ENMAX;
   POTCAR_ENMIN                             = b.POTCAR_ENMIN;
   POTCAR_PAW                               = b.POTCAR_PAW;
   POTCAR_POTENTIALS.str(std::string()); POTCAR_POTENTIALS << b.POTCAR_POTENTIALS.str();
+  POTCAR_AUID.clear();for(uint i=0;i<b.POTCAR_AUID.size();i++) POTCAR_AUID.push_back(b.POTCAR_AUID.at(i));
   NCPUS                                    = b.NCPUS;
   NRELAX                                   = b.NRELAX;
   NRELAXING                                = b.NRELAXING;
@@ -1330,17 +1373,18 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] AFLOWIN_FLAG_AIMS                      = b.AFLOWIN_FLAG_AIMS;
   // AVASP
   AVASP_aflowin_only_if_missing            = b.AVASP_aflowin_only_if_missing;
-  AVASP_arun                               = b.AVASP_arun;            // ME 181019
-  AVASP_arun_mode                          = b.AVASP_arun_mode;       // ME 181019
-  AVASP_arun_runname                       = b.AVASP_arun_runname;    // ME 181019
-  aplopts                                  = b.aplopts;               // ME 181025
-  aaplopts                                 = b.aaplopts;              // ME 181025
+  AVASP_arun                               = b.AVASP_arun;            //ME20181019
+  AVASP_arun_mode                          = b.AVASP_arun_mode;       //ME20181019
+  AVASP_arun_runname                       = b.AVASP_arun_runname;    //ME20181019
+  aplopts                                  = b.aplopts;               //ME20181025
+  aaplopts                                 = b.aaplopts;              //ME20181025
+  qhaopts                                  = b.qhaopts;               //AS20200302
   AVASP_dirbase                            = b.AVASP_dirbase;
   AVASP_libbase                            = b.AVASP_libbase;
   AVASP_label                              = b.AVASP_label;
   AVASP_parameters                         = b.AVASP_parameters;
-  AVASP_pocc_parameters                    = b.AVASP_pocc_parameters; //CO1821226
-  AVASP_pocc_tol                           = b.AVASP_pocc_tol; //CO1821226
+  AVASP_pocc_parameters                    = b.AVASP_pocc_parameters; //CO20181226
+  AVASP_pocc_tol                           = b.AVASP_pocc_tol; //CO20181226
   AVASP_volume_in                          = b.AVASP_volume_in;
   AVASP_potential                          = b.AVASP_potential;
   AVASP_alpha_fix                          = b.AVASP_alpha_fix;
@@ -1351,7 +1395,7 @@ void _xvasp::copy(const _xvasp& b) {
   AVASP_KSCHEME                            = b.AVASP_KSCHEME;
   AVASP_value_KPPRA_STATIC                 = b.AVASP_value_KPPRA_STATIC;
   AVASP_STATIC_KSCHEME                     = b.AVASP_STATIC_KSCHEME;
-  AVASP_KPOINTS                            = b.AVASP_KPOINTS;  // ME 180601
+  AVASP_KPOINTS                            = b.AVASP_KPOINTS;  //ME20180601
   AVASP_value_NSW                          = b.AVASP_value_NSW;
   // [OBSOLETE] AVASP_flag_PRECISION_flag                = b.AVASP_flag_PRECISION_flag;
   AVASP_flag_PRECISION_scheme              = b.AVASP_flag_PRECISION_scheme;
@@ -1374,11 +1418,11 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] AVASP_flag_PRESERVE_VOLUME               = b.AVASP_flag_PRESERVE_VOLUME;
   // [OBSOLETE] AVASP_flag_EXTRA_INCAR                   = b.AVASP_flag_EXTRA_INCAR;
   AVASP_EXTRA_INCAR.clear(); AVASP_EXTRA_INCAR << b.AVASP_EXTRA_INCAR.str();
-  AVASP_INCAR_KEYWORD                      = b.AVASP_INCAR_KEYWORD;  // ME 180601
-  AVASP_INCAR_EXPLICIT_START_STOP.str(""); AVASP_INCAR_EXPLICIT_START_STOP << b.AVASP_INCAR_EXPLICIT_START_STOP.str(); // ME 180601 //CO190401 - clear ss with .str("")
-  AVASP_KPOINTS_KEYWORD                    = b.AVASP_KPOINTS_KEYWORD; // ME 180601
-  AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); AVASP_KPOINTS_EXPLICIT_START_STOP << b.AVASP_KPOINTS_EXPLICIT_START_STOP.str(); // ME 180601 //CO190401 - clear ss with .str("")
-  AVASP_POTCAR_KEYWORD                    = b.AVASP_POTCAR_KEYWORD; // CO 170601
+  AVASP_INCAR_KEYWORD                      = b.AVASP_INCAR_KEYWORD;  //ME20180601
+  AVASP_INCAR_EXPLICIT_START_STOP.str(""); AVASP_INCAR_EXPLICIT_START_STOP << b.AVASP_INCAR_EXPLICIT_START_STOP.str(); //ME20180601 //CO20190401 - clear ss with .str("")
+  AVASP_KPOINTS_KEYWORD                    = b.AVASP_KPOINTS_KEYWORD; //ME20180601
+  AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); AVASP_KPOINTS_EXPLICIT_START_STOP << b.AVASP_KPOINTS_EXPLICIT_START_STOP.str(); //ME20180601 //CO20190401 - clear ss with .str("")
+  AVASP_POTCAR_KEYWORD                    = b.AVASP_POTCAR_KEYWORD; //CO20170601
   // [OBSOLETE] AVASP_flag_LSDAU                         = b.AVASP_flag_LSDAU;
   // [OBSOLETE] AVASP_Get_LDAU2_ParametersU_MODE         = b.AVASP_Get_LDAU2_ParametersU_MODE;
   AVASP_flag_MPI                           = b.AVASP_flag_MPI;
@@ -1481,17 +1525,17 @@ _aimsflags::~_aimsflags() {
 
 void _aimsflags::free() {
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear();
-  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].clear();} //DX 20191220 - uppercase to lowercase clear
+  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++) {KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].clear();} //DX20191220 - uppercase to lowercase clear
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear();
 }
 
-void _aimsflags::copy(const _aimsflags& b){
+void _aimsflags::copy(const _aimsflags& b) {
   KBIN_AIMS_FORCE_OPTION_NOTUNE=b.KBIN_AIMS_FORCE_OPTION_NOTUNE;
   KBIN_AIMS_RUN=b.KBIN_AIMS_RUN;
   KBIN_AIMS_GEOM_MODE=b.KBIN_AIMS_GEOM_MODE;
   KBIN_AIMS_GEOM_FILE=b.KBIN_AIMS_GEOM_FILE;
-  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING[i]);}
-  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i]);}
+  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++) {KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING[i]);}
+  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++) {KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i]);}
   KBIN_AIMS_GEOM_FILE_VOLUME=b.KBIN_AIMS_GEOM_FILE_VOLUME;
   KBIN_AIMS_FORCE_OPTION_VOLUME=b.KBIN_AIMS_FORCE_OPTION_VOLUME;
   KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL=b.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL;
@@ -1544,11 +1588,11 @@ _xaims::~_xaims() {
 }
 
 void _xaims::free() {
-  str.clear(); //DX 20191220 - uppercase to lowercase clear
+  str.clear(); //DX20191220 - uppercase to lowercase clear
   xqsub.clear();
 }
 
-void _xaims::copy(const _xaims& b){
+void _xaims::copy(const _xaims& b) {
   GEOM_index=b.GEOM_index;
   str=b.str;
   Directory=b.Directory;
@@ -1745,9 +1789,9 @@ _xflags::_xflags() {
   AFLOW_MODE_ALIEN=false;
   free();
 }
-_xflags::_xflags(_vflags& vflags){setVFlags(vflags);}
-_xflags::_xflags(_aimsflags& aimsflags){setAIMSFlags(aimsflags);}
-_xflags::_xflags(_alienflags& alienflags){setALIENFlags(alienflags);}
+_xflags::_xflags(_vflags& vflags) {setVFlags(vflags);}
+_xflags::_xflags(_aimsflags& aimsflags) {setAIMSFlags(aimsflags);}
+_xflags::_xflags(_alienflags& alienflags) {setALIENFlags(alienflags);}
 
 _xflags::~_xflags() {
   free();
@@ -1759,7 +1803,7 @@ void _xflags::free() {
   alienflags.clear();
 }
 
-void _xflags::copy(const _xflags& b){
+void _xflags::copy(const _xflags& b) {
   AFLOW_MODE_VASP=b.AFLOW_MODE_VASP;
   vflags=b.vflags;
   AFLOW_MODE_AIMS=b.AFLOW_MODE_AIMS;
@@ -1785,21 +1829,21 @@ void _xflags::clear() {
   copy(xflags_temp);
 }
 
-void _xflags::setVFlags(_vflags& in_vflags){
+void _xflags::setVFlags(_vflags& in_vflags) {
   vflags=in_vflags;
   AFLOW_MODE_VASP=true;
   AFLOW_MODE_AIMS=false;
   AFLOW_MODE_ALIEN=false;
 }
 
-void _xflags::setAIMSFlags(_aimsflags& in_aimsflags){
+void _xflags::setAIMSFlags(_aimsflags& in_aimsflags) {
   aimsflags=in_aimsflags;
   AFLOW_MODE_VASP=false;
   AFLOW_MODE_AIMS=true;
   AFLOW_MODE_ALIEN=false;
 }
 
-void _xflags::setALIENFlags(_alienflags& in_alienflags){
+void _xflags::setALIENFlags(_alienflags& in_alienflags) {
   alienflags=in_alienflags;
   AFLOW_MODE_VASP=false;
   AFLOW_MODE_AIMS=false;
@@ -1829,7 +1873,7 @@ void _xinput::free() {
   xalien.clear();
 }
 
-void _xinput::copy(const _xinput& b){
+void _xinput::copy(const _xinput& b) {
   AFLOW_MODE_VASP=b.AFLOW_MODE_VASP;
   xvasp=b.xvasp;
   AFLOW_MODE_AIMS=b.AFLOW_MODE_AIMS;
@@ -1877,43 +1921,43 @@ void _xinput::setXALIEN(_xalien& in_xalien) {
 }
 
 xstructure& _xinput::getXStr() {
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)){
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
     cerr << "_xinput::getXStr: no xstructure available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP){return xvasp.str;}
-  if(AFLOW_MODE_AIMS){return xaims.str;}
+  if(AFLOW_MODE_VASP) {return xvasp.str;}
+  if(AFLOW_MODE_AIMS) {return xaims.str;}
   return xvasp.str; //otherwise, return garbage
 }
 
 string& _xinput::getDirectory() {
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)){
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
     cerr << "_xinput::getDirectory: no Directory available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP){return xvasp.Directory;}
-  if(AFLOW_MODE_AIMS){return xaims.Directory;}
-  if(AFLOW_MODE_ALIEN){return xalien.Directory;}
+  if(AFLOW_MODE_VASP) {return xvasp.Directory;}
+  if(AFLOW_MODE_AIMS) {return xaims.Directory;}
+  if(AFLOW_MODE_ALIEN) {return xalien.Directory;}
   return xvasp.Directory; //otherwise, return garbage
 }
 
-void _xinput::setXStr(const xstructure& str,bool set_all){
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)){
+void _xinput::setXStr(const xstructure& str,bool set_all) {
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
     cerr << "_xinput::setStr: no xstructure available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP || set_all){xvasp.str=str;}
-  if(AFLOW_MODE_AIMS || set_all){xaims.str=str;}
+  if(AFLOW_MODE_VASP || set_all) {xvasp.str=str;}
+  if(AFLOW_MODE_AIMS || set_all) {xaims.str=str;}
 }
 
-void _xinput::setDirectory(string Directory,bool set_all){
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)){
+void _xinput::setDirectory(string Directory,bool set_all) {
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
     cerr << "_xinput::setDirectory: no Directory available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP  || set_all){xvasp.Directory=  Directory;}
-  if(AFLOW_MODE_AIMS  || set_all){xaims.Directory=  Directory;}
-  if(AFLOW_MODE_ALIEN || set_all){xalien.Directory= Directory;}
+  if(AFLOW_MODE_VASP  || set_all) {xvasp.Directory=  Directory;}
+  if(AFLOW_MODE_AIMS  || set_all) {xaims.Directory=  Directory;}
+  if(AFLOW_MODE_ALIEN || set_all) {xalien.Directory= Directory;}
 }
 
 // **************************************************************************
@@ -1986,42 +2030,53 @@ const _xqsub& _xqsub::operator=(const _xqsub& b) {  // operator=
 // **************************************************************************
 // **************************************************************************
 // **************************************************************************
-// XSTREAM - Corey Oses - 180420
+// XSTREAM - Corey Oses - 20180420
 // look into aflow.h for the definitions
 
 // constructors
-xStream::xStream() : p_FileMESSAGE(NULL),f_new_ofstream(false) {} //{free();}
-xStream::~xStream() {free();} //{freeAll();} //CO190318
-//void xStream::free() {} //CO190318 - not necessary
+xStream::xStream(ostream& oss) : p_FileMESSAGE(NULL),f_new_ofstream(false) {initialize(oss);} //{free();}
+xStream::xStream(ofstream& ofs,ostream& oss) : p_FileMESSAGE(NULL),f_new_ofstream(false) {initialize(ofs,oss);} //{free();}
+xStream::~xStream() {free();} //CO20190318
 void xStream::free() {
-  p_oss=NULL;
-  if(f_new_ofstream){delete p_FileMESSAGE;}  //first delete, then set to null
+  if(f_new_ofstream) {delete p_FileMESSAGE;}  //first delete, then set to null
   p_FileMESSAGE=NULL;
   f_new_ofstream=false;
+  p_oss=NULL;
 }
-//void xStream::freeAll(){free();free();}  //CO190318 - not necessary
-void xStream::copy(const xStream& b){
+void xStream::copy(const xStream& b) {
   //must handle this very carefully
   //first, since we are interested in copying the stream from b, we must delete the new pointer of self (if it's new)
   //if b is new, don't copy b's pointer, as it doesn't belong to self (and should not be deleted by self)
   //simply create a new one, and declare it as such
   //p_FileMESSAGE=b.p_FileMESSAGE;
   free();
-  p_oss=b.p_oss;
-  if(b.f_new_ofstream){p_FileMESSAGE=(new ofstream());}
-  else {p_FileMESSAGE=b.p_FileMESSAGE;}
+  if(b.f_new_ofstream) {p_FileMESSAGE=(new ofstream());}
+  else {setOFStream(*b.p_FileMESSAGE);}  //p_FileMESSAGE=b.p_FileMESSAGE;
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
+  setOSS(*b.p_oss); //p_oss=b.p_oss;
 }
-ostream* xStream::getOSS() const {return p_oss;} //CO191110
-ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO191110
-void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
+ostream* xStream::getOSS() const {return p_oss;} //CO20191110
+ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
+void xStream::setOFStream(ofstream& FileMESSAGE) {p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
+//ME20200427 START - Initializer functions
+void xStream::initialize(ostream& oss) {
+  free();
+  p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*p_FileMESSAGE,oss);
+  f_new_ofstream=true;  // override
+}
+void xStream::initialize(ofstream& ofs,ostream& oss) {
+  setOFStream(ofs);f_new_ofstream=false;
+  setOSS(oss);
+}
+//ME20200427 STOP - Initializer functions
 
 #endif  // _AFLOW_CLASSES_CPP
 
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

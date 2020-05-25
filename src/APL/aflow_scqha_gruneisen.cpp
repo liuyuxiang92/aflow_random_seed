@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2018             *
 // *                                                                         *
 // ***************************************************************************
@@ -27,7 +27,7 @@ namespace apl
 {
   // ***************************************************************************************
   //constructor 
-  SCQHA_QHA3P::SCQHA_QHA3P( IPhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
+  SCQHA_QHA3P::SCQHA_QHA3P( PhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
   {
     //clear all memories before using
     clear();
@@ -89,17 +89,17 @@ namespace apl
   }
   // ***************************************************************************************
   //Gruneisen parameter in uniform q-mesh
-  // bool SCQHA_QHA3P::calculation_gruneisen(apl::UniformMesh* umesh) OBSOLETE ME190428
-  bool SCQHA_QHA3P::calculation_gruneisen(apl::QMesh* umesh)  // ME190428
+  // bool SCQHA_QHA3P::calculation_gruneisen(apl::UniformMesh* umesh) OBSOLETE ME20190428
+  bool SCQHA_QHA3P::calculation_gruneisen(apl::QMesh* umesh)  //ME20190428
   {
     _kpoints.clear(); _weights.clear();
-    // ME190428 - START
+    //ME20190428 START
     //_kpoints=umesh->get_kpoints();  OBSOLETE
     // _weights=umesh->get_weights(); OBSOLETE
     _kpoints = umesh->getQPointsCPOS();
     // _weights are all 1.0
     _weights.assign(umesh->getnQPs(), 1.0);
-    // ME190428 - END
+    //ME20190428 END
 
     if(_kpoints.size()==0)
     {
@@ -199,7 +199,7 @@ namespace apl
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME20180801
     _gp_mesh_test.resize(ncpus, false);
     // Show info
     string msg=""; 
@@ -297,7 +297,7 @@ namespace apl
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME 180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME20180801
     _gp_path_test.resize(ncpus, false);
     // Show info 
     string msg="";
@@ -573,7 +573,7 @@ namespace apl
 
     string outfile =  "aflow.scqha.gpdis.out";
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.scqha.gpdis.out");
       string function = "SCQHA_QHA3P::write_gruneisen_parameter_path";
       string message = "Cannot write " + outfile;
@@ -612,7 +612,7 @@ namespace apl
 
     string outfile =  "aflow.qha3P.gp.mesh.out";
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.qha3P.gp.mesh.out");
       string function = "SCQHA_QHA3P::write_gruneisen_parameter_mesh";
       string message = "Cannot write " + outfile;
@@ -658,7 +658,7 @@ namespace apl
     os_avg<<"[AFLOW] "<<STAR40<<"\n";
     string avg_out =  "aflow.qha3P.avg_gp.out";
     if(!aurostd::stringstream2file(os_avg, avg_out, "WRITE")) {
-      // ME191031
+      //ME20191031
       //throw APLRuntimeError("Cannot write aflow.qha3P.avg_gp.out");
       string function = "SCQHA_QHA3P::Writeaverage_gp";
       string message = "Cannot write " + avg_out;
@@ -672,18 +672,18 @@ namespace apl
   double SCQHA_QHA3P::average_gruneisen_parameter(double temperature_in_kelvins)
   {
     if(temperature_in_kelvins<0.1) return 0.0;
-    // ME190726 - exit clean-up
+    //ME20190726 - exit clean-up
     //[OBSOLETE] if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
     //[OBSOLETE] if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
     if(_freqs_mesh.size()==0) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("_freqs_mesh.size()==0");
       string function = "SCQHA_QHA3P::average_gruneisen_parameter()";
       string message = "_freqs_mesh.size()==0";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if(_freqs_mesh.size()==0) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("_freqs_mesh.size()==0");
       string function = "SCQHA_QHA3P::average_gruneisen_parameter()";
       string message = "_freqs_mesh.size()==0";
@@ -731,7 +731,7 @@ namespace apl
     os_avg << "[APL_GRUNEISEN]STOP" <<"\n";
     string avg_out =  "aflow.scqha.avg_gp300K.out";
     if(!aurostd::stringstream2file(os_avg, avg_out, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.scqha.avg_gp300K.out");
       string function = "SCQHA_QHA3P::gruneisen_paramter_300K()";
       string message = "Cannot write " + avg_out;
@@ -743,7 +743,7 @@ namespace apl
   bool SCQHA_QHA3P::read_matrix(vector<xmatrix<xcomplex<double> > >&A, const string file)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("SCQHA_QHA3P::read_matrix(() Missing file: "+file);
       string function = "SCQHA_QHA3P::read_matrix()";
       string message = "Missing file: " + file;
@@ -764,10 +764,10 @@ namespace apl
   // ***************************************************************************************
   bool SCQHA_QHA3P::read_PDIS(vector<string> &hash_lines)
   {
-    string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  // ME190428
+    string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  //ME20190428
 
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
@@ -776,7 +776,7 @@ namespace apl
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
@@ -835,10 +835,10 @@ namespace apl
   {
     if(_iszero(f0))return 0;
     if(f0<0.0){
-      // ME190728 - exit clean-up
+      //ME20190728 - exit clean-up
       //_logger<< apl::error<<"Gruneisen calculation frequency negative "<<apl::endl;
       //exit(0);
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Grueneisen calculation frequency negative");
       string function = "SCQHA_QHA3P::calculate_gruneisen_with_freq_derivative()";
       string message = "Grueneisen calculation frequency negative";

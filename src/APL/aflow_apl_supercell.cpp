@@ -4,27 +4,193 @@
 
 #define _SYM_AFLOW_APL_EPS_ 0.05
 
-//CO - START
+//CO START
 #define ERROR_VERBOSE false
-//[CO190218 - OBSOLETE]#define GETFULLSYMBASIS false  //TRUE is NOT well tested with atomGoesTo() and atomComesFrom(), also slower //CO190218
-//[CO190218 - OBSOLETE]#define JAHNATEK_ORIGINAL false
 #define CENTER_PRIM false
 #define MAP_VERBOSE false
 #define COPY_XSTRUCTURE_FULL false
-//CO - END
+//CO END
 
 using namespace std;
+
+static const xcomplex<double> iONE(0.0, 1.0);  //ME20200116
+static const string _APL_SUPERCELL_MODULE_ = "SUPERCELL";  // for the logger
 
 namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  Supercell::Supercell(const xstructure& _xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO181226
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="apl::Supercell::Supercell():";
+  Supercell::Supercell(ostream& oss) : xStream(oss) {
+    free();
+  }
 
-    //CO190121 - need to sort by equivalent atoms
+  Supercell::Supercell(ofstream& mf, ostream& oss) : xStream(mf,oss) {
+    free();
+  }
+
+  //ME20200102 - Refactored
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {  //CO20181226
+    free();
+    _directory = directory;
+    initialize(_xstr);
+  }
+
+  //ME20200212 - read from a state file
+  Supercell::Supercell(const string& filename, ofstream& mf, const string& directory, ostream& oss) : xStream(mf,oss) {
+    free();
+    _directory = directory;
+    readFromStateFile(filename);
+  }
+
+  Supercell::Supercell(const Supercell& that) : xStream(*that.getOFStream(),*that.getOSS()) {
+    free();
+    copy(that);
+  }
+
+  Supercell& Supercell::operator=(const Supercell& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
+
+  void Supercell::copy(const Supercell& that) {
+    xStream::copy(that);
+    _directory = that._directory;
+    _inStructure = that._inStructure;
+    _inStructure_original = that._inStructure_original;  //CO
+    _inStructure_light = that._inStructure_light;        //CO
+    _pcStructure = that._pcStructure;                    //CO
+    _scStructure = that._scStructure;                    //CO
+    _scStructure_original = that._scStructure_original;  //CO
+    _scStructure_light = that._scStructure_light;        //CO
+    _pc2scMap.clear();
+    _pc2scMap = that._pc2scMap;
+    _sc2pcMap.clear();
+    _sc2pcMap = that._sc2pcMap;
+    //CO START
+    _skew = that._skew;
+    _derivative_structure = that._derivative_structure;
+    _sym_eps = that._sym_eps;
+    //CO END
+    _isShellRestricted = that._isShellRestricted;
+    _maxShellRadius.clear();
+    _maxShellRadius = that._maxShellRadius;
+    _isConstructed = that._isConstructed;  //CO
+    phase_vectors = that.phase_vectors;  //ME20200116
+  }
+
+  // Destructor
+  Supercell::~Supercell() {
+    xStream::free();
+    free();
+  }
+
+  void Supercell::free() {
+    _directory = "";
+    _inStructure.clear();
+    _inStructure_original.clear();
+    _inStructure_light.clear();
+    _pcStructure.clear();
+    _scStructure.clear();
+    _scStructure_original.clear();
+    _scStructure_light.clear();
+    _pc2scMap.clear();
+    _sc2pcMap.clear();
+    _skew = false;
+    _derivative_structure = false;
+    _sym_eps = 0.0;
+    _isShellRestricted = false;
+    _maxShellRadius.clear();
+    _isConstructed = false;
+    phase_vectors.clear();
+    _scStructure.clear();
+  }
+
+  void Supercell::clear() {
+    free();
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void Supercell::setDirectory(const string& directory) {
+    _directory = directory;
+  }
+
+  string Supercell::getDirectory() const {
+    return _directory;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void Supercell::readFromStateFile(const string& filename) {
+    string function = "apl::Supercell::readFromStateFile():";
+    string message = "";
+    if (!aurostd::EFileExist(filename)) {
+      message = "Could not find file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    // Read data
+    vector<string> vlines;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    stringstream poscar;
+
+    // Supercell dimensions
+    xvector<int> dims;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "SUPERCELL=")) {
+        vector<string> tokens;
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        vector<int> vdims;
+        aurostd::string2tokens(tokens[1], vdims);
+        if (vdims.size() == 3) {
+          dims = aurostd::vector2xvector(vdims);
+          break;
+        }
+      }
+    }
+    if (iline == nlines) {
+      message = "SUPERCELL tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Structure
+    xstructure xstr;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "INPUT_STRUCTURE=START")) {
+        while ((++iline < nlines) && !aurostd::substring2bool(vlines[iline], "INPUT_STRUCTURE=STOP")) {
+          poscar << vlines[iline] << std::endl;
+        }
+        if (iline < nlines) {
+          xstr = xstructure(poscar);
+          break;
+        }
+      }
+    }
+    if (iline == nlines) {
+      message = "INPUT_STRUCTURE tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Build
+    initialize(xstr, false);
+    build(dims, false);
+  }
+
+  //ME20200315 - Added VERBOSE to prevent excessive file output when
+  // reading from state file
+  void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="apl::Supercell::initialize():";
+    string tmp_dir = _directory;  // Do not delete directory
+    clear();
+    _directory = tmp_dir;
+
+    //CO20190121 - need to sort by equivalent atoms
     //Discovered with help from Xiaoyu Wang of Eva Zurek's group (UBuffalo)
     xstructure xstr(_xstr);
 
@@ -33,12 +199,12 @@ namespace apl {
       cerr << _inStructure << std::endl;
     }
 
-    xstr.sortAtomsEquivalent(); //CO190218
+    xstr.sortAtomsEquivalent(); //CO20190218
 
     // Copy
     _inStructure = xstr;
     _inStructure.ReScale(1.0);
-    _inStructure.ShifOriginToAtom(0);
+    _inStructure.ShiftOriginToAtom(0);
     _inStructure.BringInCell();  //clean up
 
     if(LDEBUG){
@@ -46,10 +212,14 @@ namespace apl {
       cerr << _inStructure << std::endl;
     }
 
-    //COREY, DO NOT MODIFY THE STRUCTURE BELOW HERE, THIS INCLUDES RESCALE(), BRINGINCELL(), SHIFORIGINATOM(), etc.
-    _logger << "Estimating the symmetry of structure and calculating the input structure. Please be patient." << apl::endl; //primitive cell." << apl::endl; //CO 180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
-    calculateWholeSymmetry(_inStructure);
-    if(LDEBUG){ //CO190218
+    //CO, DO NOT MODIFY THE STRUCTURE BELOW HERE, THIS INCLUDES RESCALE(), BRINGINCELL(), SHIFORIGINATOM(), etc.
+    if (VERBOSE) {
+      stringstream message;
+      message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    }
+    calculateWholeSymmetry(_inStructure, VERBOSE);
+    if(LDEBUG){ //CO20190218
       bool write_inequivalent_flag=_inStructure.write_inequivalent_flag;
       _inStructure.write_inequivalent_flag=true;
       cerr << soliloquy << " checking iatoms" << std::endl;
@@ -67,81 +237,14 @@ namespace apl {
     //#endif
     _skew = SYM::isLatticeSkewed(_inStructure.lattice, _inStructure.dist_nn_min, _inStructure.sym_eps);
     _sym_eps = _inStructure.sym_eps;
-    clear();
+
+    clearSupercell();
   }
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]Supercell::Supercell(const xstructure& xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO181226
-  //[CO190218 - OBSOLETE]  // Copy
-  //[CO190218 - OBSOLETE]  _inStructure = xstr;
-  //[CO190218 - OBSOLETE]  _inStructure.ReScale(1.0);
-  //[CO190218 - OBSOLETE]  _inStructure.ShifOriginToAtom(0);
-  //[CO190218 - OBSOLETE]  _inStructure.BringInCell();
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //
-  //[CO190218 - OBSOLETE]  _logger << "Reducing the input structure into a standard primitive form." << apl::endl;
-  //[CO190218 - OBSOLETE]  //_inStructure = GetPrimitive(xstr);
-  //[CO190218 - OBSOLETE]  _inStructure.Standard_Primitive_UnitCellForm();
-  //[CO190218 - OBSOLETE]  _inStructure.ReScale(1.0);
-  //[CO190218 - OBSOLETE]  _inStructure.ShifOriginToAtom(0);
-  //[CO190218 - OBSOLETE]  _inStructure.BringInCell();
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Calculate symmetry
-  //[CO190218 - OBSOLETE]  _logger << "Estimating the symmetry of primitive cell." << apl::endl;
-  //[CO190218 - OBSOLETE]  calculateWholeSymmetry(_inStructure);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //
-  //[CO190218 - OBSOLETE]  clear();
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
+
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  Supercell::Supercell(const Supercell& that) : _aflowFlags(that._aflowFlags), _logger(that._logger) {  //CO181226
-    *this = that;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  Supercell& Supercell::operator=(const Supercell& that) {
-    if (this != &that) {
-      _aflowFlags = that._aflowFlags; //CO181226
-      _logger = that._logger;
-
-      _inStructure = that._inStructure;
-      _inStructure_original = that._inStructure_original;  //CO
-      _inStructure_light = that._inStructure_light;        //CO
-      _pcStructure = that._pcStructure;                    //CO
-      _scStructure = that._scStructure;                    //CO
-      _scStructure_original = that._scStructure_original;  //CO
-      _scStructure_light = that._scStructure_light;        //CO
-      _pc2scMap.clear();
-      _pc2scMap = that._pc2scMap;
-      _sc2pcMap.clear();
-      _sc2pcMap = that._sc2pcMap;
-      //CO - START
-      _skew = that._skew;
-      _derivative_structure = that._derivative_structure;
-      _sym_eps = that._sym_eps;
-      //CO - END
-      _isShellRestricted = that._isShellRestricted;
-      _maxShellRadius.clear();
-      _maxShellRadius = that._maxShellRadius;
-      _isConstructed = that._isConstructed;  //CO
-    }
-
-    return *this;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  Supercell::~Supercell() {
-    clear();
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  void Supercell::clear() {
-    _aflowFlags.clear();  //CO181226
+  void Supercell::clearSupercell() {
     _scStructure.info = "not constructed";
     _isConstructed = FALSE;
     _isShellRestricted = FALSE;
@@ -152,112 +255,41 @@ namespace apl {
     //_sym_eps = AUROSTD_NAN; //CO, same for _sc and _pc (DO NOT RESET)
     _maxShellRadius.clear();
     _maxShellID = -1;
+    phase_vectors.clear();  //ME20200116
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //CO - START
-  void Supercell::LightCopy(const xstructure& a, xstructure& b) {
-#if COPY_XSTRUCTURE_FULL
-    b = a;
-    b.pgroup.clear();
-    b.pgroupk.clear();
-    b.pgroupk_xtal.clear();
-    b.fgroup.clear();
-    for (uint i = 0; i < b.agroup.size(); i++) {
-      b.agroup[i].clear();
-    }
-    b.agroup.clear();
-#else
-    b.clear(); //DX 20191220 - uppercase to lowercase clear
-    stringstream POSCAR;
-    POSCAR.str("");
-    if(0){cerr << a << std::endl;}
-    POSCAR << a;
-    POSCAR >> b;
-    //enable inequivalent flag to work
-    for (uint i = 0; i < b.atoms.size(); i++) {
-      b.atoms[i].equivalent = a.atoms[i].equivalent;
-      b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
-      b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
-    }
-    //[OBSOLETE] pseudo-potential stuff
-    //for(uint i=0;i<b.species.size();i++){
-    //  b.species[i]=a.species[i];
-    //  b.species_pp[i]=a.species_pp[i]; //VERY IMPORTANT
-    //}
-    //enable inequivalent flag to work
-    b.write_inequivalent_flag = a.write_inequivalent_flag;
-    b.info = a.info;
-    if(0){cerr << b << std::endl;}
-#endif
-  }
-  //CO - END
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  void Supercell::calculateWholeSymmetry(xstructure& xstr) {
-    //[CO181226 needs to write to correct directory]_aflags af;
-    //[CO181226 needs to write to correct directory]af.Directory = "./";
-    //[CO181226 needs to write to correct directory]af.QUIET = FALSE;
-
-    //CO 170804 - we want to append symmetry stuff to ofstream
+  //ME20200315 - Added VERBOSE to prevent excessive file output when reading
+  // from state file
+  void Supercell::calculateWholeSymmetry(xstructure& xstr, bool VERBOSE) {
+    //CO20170804 - we want to append symmetry stuff to ofstream
     _kflags kflags;
-    kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_SGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_IATOMS_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
+    //ME20200330 - Only write for verbose output
+    kflags.KBIN_SYMMETRY_PGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_FGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_SGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_IATOMS_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_AGROUP_WRITE=VERBOSE;
 
     //DX CAN REMOVE string options = "";
 
     xstr.LatticeReduction_avoid = TRUE;
     xstr.sgroup_radius = 8.0;
 
-    //CO 170804 - we want to append symmetry stuff to ofstream
+    //CO20170804 - we want to append symmetry stuff to ofstream
     //if (!pflow::CalculateFullSymmetry(af, xstr))
-    if (!pflow::PerformFullSymmetry(xstr,_logger.getOutputStream(),_aflowFlags,kflags,true,cout)) //CO181226
-    { //CO200106 - patching for auto-indenting
-      // ME191031 - use xerror
-      //throw APLRuntimeError("apl::Supercell::calculateWholeSymmetry(): Symmetry routine failed.");
-      string function = "apl::Supercell::calculateWholeSymmetry()";
+    if (!pflow::PerformFullSymmetry(xstr,*p_FileMESSAGE,_directory,kflags,VERBOSE,*p_oss)) //CO20181226
+    { //CO20200106 - patching for auto-indenting
+      string function = "apl::Supercell::calculateWholeSymmetry():";
       string message = "Symmetry routine failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]void Supercell::calculateWholeSymmetry(xstructure& xstr) {
-  //[CO190218 - OBSOLETE]  ofstream fileDevNull("/dev/null");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (!fileDevNull.is_open()) {
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::calculateWholeSymmetry(): Cannot open output stream /dev/null.");
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  _aflags af;
-  //[CO190218 - OBSOLETE]  af.Directory = "./";
-  //[CO190218 - OBSOLETE]  // af.hostname = "";
-  //[CO190218 - OBSOLETE]  af.QUIET = TRUE;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  xstr.LatticeReduction_avoid = TRUE;
-  //[CO190218 - OBSOLETE]  xstr.sgroup_radius = 8.0;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //if( xstr.pgroup_calculated == FALSE )
-  //[CO190218 - OBSOLETE]  SYM::CalculatePointGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO190218 - OBSOLETE]  //if( xstr.fgroup_calculated == FALSE )
-  //[CO190218 - OBSOLETE]  SYM::CalculateFactorGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO190218 - OBSOLETE]  //if( xstr.sgroup_calculated == FALSE )
-  //[CO190218 - OBSOLETE]  SYM::CalculateSpaceGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO190218 - OBSOLETE]  //if( xstr.iatoms_calculated == FALSE )
-  //[CO190218 - OBSOLETE]  SYM::CalculateInequivalentAtoms(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO190218 - OBSOLETE]  //if( xstr.agroup_calculated == FALSE )
-  //[CO190218 - OBSOLETE]  SYM::CalculateSitePointGroup(fileDevNull, xstr, af, FALSE, FALSE, cout);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  fileDevNull.clear();
-  //[CO190218 - OBSOLETE]  fileDevNull.close();
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -283,10 +315,91 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  //ME20191225
+  // Determine the supercell dimensions of the supercell for different methods
+  xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
+    string function = "apl::Supercell::determineSupercellDimensions():";
+    stringstream message;
+
+    xvector<int> dims(3);
+    string method = opts.getattachedscheme("SUPERCELL::METHOD");
+    if (method.empty()) {
+      message << "Supercell method empty.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
+    string value = opts.getattachedscheme("SUPERCELL::VALUE");
+    if (value.empty()) {
+      message << "Supercell value empty.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
+    if (method == "SUPERCELL") {
+      vector<int> tokens;
+      aurostd::string2tokens(value, tokens, " xX");
+      dims = aurostd::vector2xvector(tokens);
+    } else if (method == "MINATOMS") {
+      int minatoms = aurostd::string2utype<int>(value);
+      double radius = 0.0;
+      int natoms = (int) _inStructure.atoms.size();
+      for (radius = 0.01; natoms < minatoms; radius += 0.01) {
+        dims = LatticeDimensionSphere(_inStructure.lattice, radius);
+        natoms = dims[1] * dims[2] * dims[3] * (int) _inStructure.atoms.size();
+      }
+      if (opts.flag("SUPERCELL::VERBOSE")) {
+        message << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
+          << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
+          << " natoms=" << natoms;
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      }
+    } else if (method == "MINATOMS_RESTRICTED") {
+      int minatoms = aurostd::string2utype<int>(value);
+      int natoms = (int) _inStructure.atoms.size();
+      int Ni = 0;
+      for (Ni = 1; natoms < minatoms; Ni++) {
+        natoms = (int) std::pow(Ni, 3) * _inStructure.atoms.size();
+      }
+      if (Ni > 1) Ni--; //ME20200521
+      dims[1] = Ni; dims[2] = Ni; dims[3] = Ni;
+      if (opts.flag("SUPERCELL::VERBOSE")) {
+        message << "Ni=" << Ni
+          << " supercell=" << Ni << "x" << Ni << "x" << Ni
+          << " natoms=" << natoms;
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      }
+    } else if (method == "SHELLS") {
+      int shells = aurostd::string2utype<int>(value);
+      // There is currently no option nor any documentation about
+      // using full shells or not, so this feature will be turned off
+      // for now.
+      bool full_shell = false;
+      if (opts.flag("SUPERCELL::VERBOSE")) {
+        message << "Searching for suitable cell to handle " << shells << " shells...";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      }
+      dims = buildSuitableForShell(shells, full_shell, opts.flag("SUPERCELL::VERBOSE"));
+    } else {
+      message << "Unknown supercell method " + method + ".";
+      aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
+    return dims;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void Supercell::build(aurostd::xoption& opts, bool VERBOSE) {
+    opts.flag("SUPERCELL::VERBOSE", VERBOSE);
+    xvector<int> dims = determineSupercellDimensions(opts);
+    build(dims);
+  }
+
+  void Supercell::build(const xvector<int>& dims, bool VERBOSE) {
+    build(dims[1], dims[2], dims[3], VERBOSE);
+  }
+
+  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
   void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="apl::Supercell::build():"; //CO190218
+    string soliloquy="apl::Supercell::build():"; //CO20190218
+    stringstream message;
     //BEGIN JJPR
     scell(1) = nx;
     scell(2) = ny;
@@ -297,12 +410,14 @@ namespace apl {
 
     // Print info
     if (VERBOSE) {
-      _logger << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
-        << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms)." << apl::endl;
+      message << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
+        << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms).";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     if (VERBOSE && _derivative_structure) {
-      _logger << "Derivative structure detected, be patient as we calculate symmetry of the supercell." << apl::endl;
+      message << "Derivative structure detected, be patient as we calculate symmetry of the supercell.";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
     // Create lattice of the supercell
     xmatrix<double> scale(3, 3);
@@ -313,7 +428,7 @@ namespace apl {
 
     // Get supercell
     //_scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, _derivative_structure);  //now gets symmetries too! no need for full_basis (just a check)
-    _scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, get_full_sym, false, true);  //now gets symmetries too! no need for full_basis (just a check) //CO190409 - force_supercell_matrix==false as we might have a derivative structure, force_strict_pc2scMap==true because we want to map to true primitive cell, no equivalent atoms
+    _scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, get_full_sym, false, true);  //now gets symmetries too! no need for full_basis (just a check) //CO20190409 - force_supercell_matrix==false as we might have a derivative structure, force_strict_pc2scMap==true because we want to map to true primitive cell, no equivalent atoms
 
     //  cerr << _scStructure << std::endl;
     //  for(uint i=0;i<_scStructure.agroup.size();i++){
@@ -335,7 +450,7 @@ namespace apl {
     //for(uint i=0;i<_scStructure.agroup[0].size();i++){
     //  cerr << _scStructure.agroup[0][i] << std::endl;
     //}
-    //exit(0);  //COREY REMOVE
+    //exit(0);  //CO REMOVE
     //_scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, GETFULLSYMBASIS);  //now gets symmetries too! no need for full_basis (just a check)
     //_scStructure.ReScale(1.0); no longer needed, pc is already rescaled, also, try not to change structure much after calculating symmetry
 
@@ -356,169 +471,175 @@ namespace apl {
     _scStructure.info = "Supercell " + stringify(nx) + "x" + stringify(ny) + "x" + stringify(nz);
 
     // OK.
-    if (VERBOSE) _logger << "Supercell successfully created." << apl::endl;
+    if (VERBOSE) {
+      message << "Supercell successfully created.";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    }
     _isConstructed = TRUE;
 
     _scStructure_original = _scStructure;  //COPY EVERYTHING ONCE, will be very slow
     LightCopy(_scStructure, _scStructure_light);
     //_scStructure_atoms_original = _scStructure.atoms;
 
+    //ME20200116 - calculate phase vectors; significantly speeds up post-processing
+    calculatePhaseVectors();
+
     if(LDEBUG){
-      cerr << soliloquy << " this is the supercell to be analyzed" << std::endl; //CO190218
+      cerr << soliloquy << " this is the supercell to be analyzed" << std::endl; //CO20190218
       cerr << _scStructure << std::endl;
     }
   }
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
-  //[CO190218 - OBSOLETE]  // Copy the first cell
-  //[CO190218 - OBSOLETE]  _scStructure = _inStructure;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Clear some arrays we will rebuild...
-  //[CO190218 - OBSOLETE]  reset();
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Create lattice of the supercell
-  //[CO190218 - OBSOLETE]  xmatrix<double> scale(3, 3);
-  //[CO190218 - OBSOLETE]  scale.clear();
-  //[CO190218 - OBSOLETE]  scale(1, 1) = nx;
-  //[CO190218 - OBSOLETE]  scale(2, 2) = ny;
-  //[CO190218 - OBSOLETE]  scale(3, 3) = nz;
-  //[CO190218 - OBSOLETE]  _scStructure.lattice = scale * _inStructure.lattice;
-  //[CO190218 - OBSOLETE]  _scStructure.FixLattices();
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Print info
-  //[CO190218 - OBSOLETE]  if (VERBOSE) _logger << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
-  //[CO190218 - OBSOLETE]                       << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms). ";
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //
-  //[CO190218 - OBSOLETE]  _atom atom;
-  //[CO190218 - OBSOLETE]  xvector<double> cshift(3);
-  //[CO190218 - OBSOLETE]  for (uint ia = 0; ia < _inStructure.iatoms.size(); ia++) {
-  //[CO190218 - OBSOLETE]    for (uint iia = 0; iia < _inStructure.iatoms[ia].size(); iia++) {
-  //[CO190218 - OBSOLETE]      // Replicate this atom by given mesh...
-  //[CO190218 - OBSOLETE]      for (_AFLOW_APL_REGISTER_ int i = 0; i < nx; i++)
-  //[CO190218 - OBSOLETE]        for (_AFLOW_APL_REGISTER_ int j = 0; j < ny; j++)
-  //[CO190218 - OBSOLETE]          for (_AFLOW_APL_REGISTER_ int k = 0; k < nz; k++) {
-  //[CO190218 - OBSOLETE]            // Create position of new atoms...
-  //[CO190218 - OBSOLETE]            atom = _inStructure.atoms[_inStructure.iatoms[ia][iia]];
-  //[CO190218 - OBSOLETE]            cshift = (((double)i) * _inStructure.lattice(1) +
-  //[CO190218 - OBSOLETE]                      ((double)j) * _inStructure.lattice(2) +
-  //[CO190218 - OBSOLETE]                      ((double)k) * _inStructure.lattice(3));
-  //[CO190218 - OBSOLETE]            atom.cpos = atom.cpos + cshift;
-  //[CO190218 - OBSOLETE]            atom.fpos = C2F(_scStructure.lattice, atom.cpos);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]            // Increase the number of atoms of this type...
-  //[CO190218 - OBSOLETE]            _scStructure.num_each_type[atom.type]++;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]            // Mark this atom as equivalent or not....
-  //[CO190218 - OBSOLETE]            if (_scStructure.iatoms[ia].empty()) {
-  //[CO190218 - OBSOLETE]              atom.equivalent = _scStructure.atoms.size();
-  //[CO190218 - OBSOLETE]              atom.is_inequivalent = TRUE;
-  //[CO190218 - OBSOLETE]            } else {
-  //[CO190218 - OBSOLETE]              atom.equivalent = _scStructure.iatoms[ia][0];
-  //[CO190218 - OBSOLETE]              atom.is_inequivalent = FALSE;
-  //[CO190218 - OBSOLETE]            }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]            // Add it to the list of all atoms...
-  //[CO190218 - OBSOLETE]            _scStructure.atoms.push_back(atom);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]            // Add its ID number to the list of equivalent atoms of this type...
-  //[CO190218 - OBSOLETE]            _scStructure.iatoms[ia].push_back(_scStructure.atoms.size() - 1);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]            // Add its site point group...
-  //[CO190218 - OBSOLETE]            _scStructure.agroup.push_back(_inStructure.agroup[_inStructure.iatoms[ia][iia]]);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]            // Update our mapping arrays...
-  //[CO190218 - OBSOLETE]            _sc2pcMap.push_back(_inStructure.iatoms[ia][iia]);
-  //[CO190218 - OBSOLETE]            if (i == 0 && j == 0 && k == 0) _pc2scMap.push_back(_scStructure.atoms.size() - 1);
-  //[CO190218 - OBSOLETE]          }
-  //[CO190218 - OBSOLETE]    }
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Feed the factor group list (not efficient in this order, but we have all
-  //[CO190218 - OBSOLETE]  // similar operations in order just shifted...
-  //[CO190218 - OBSOLETE]  for (_AFLOW_APL_REGISTER_ uint l = 0; l < _inStructure.fgroup.size(); l++) {
-  //[CO190218 - OBSOLETE]    for (_AFLOW_APL_REGISTER_ int i = 0; i < nx; i++)
-  //[CO190218 - OBSOLETE]      for (_AFLOW_APL_REGISTER_ int j = 0; j < ny; j++)
-  //[CO190218 - OBSOLETE]        for (_AFLOW_APL_REGISTER_ int k = 0; k < nz; k++) {
-  //[CO190218 - OBSOLETE]          // Create position of new atoms...
-  //[CO190218 - OBSOLETE]          cshift = (((double)i) * _inStructure.lattice(1) +
-  //[CO190218 - OBSOLETE]                    ((double)j) * _inStructure.lattice(2) +
-  //[CO190218 - OBSOLETE]                    ((double)k) * _inStructure.lattice(3));
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]          // Get factor group from primitive celll
-  //[CO190218 - OBSOLETE]          _sym_op symOp = _inStructure.fgroup[l];
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]          // Add our shift(in cartesian) and transform to fractional coords
-  //[CO190218 - OBSOLETE]          symOp.ctau = symOp.ctau + cshift;
-  //[CO190218 - OBSOLETE]          symOp.ftau = C2F(_scStructure.lattice, symOp.ctau);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]          // If it is out of cell, skip it
-  //[CO190218 - OBSOLETE]          if (symOp.ftau(1) > 1.0 - _AFLOW_APL_EPS_ ||
-  //[CO190218 - OBSOLETE]              symOp.ftau(2) > 1.0 - _AFLOW_APL_EPS_ ||
-  //[CO190218 - OBSOLETE]              symOp.ftau(3) > 1.0 - _AFLOW_APL_EPS_ ||
-  //[CO190218 - OBSOLETE]              symOp.ftau(1) < 0.0 - _AFLOW_APL_EPS_ ||
-  //[CO190218 - OBSOLETE]              symOp.ftau(2) < 0.0 - _AFLOW_APL_EPS_ ||
-  //[CO190218 - OBSOLETE]              symOp.ftau(3) < 0.0 - _AFLOW_APL_EPS_) continue;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]          // We have to correct the Uf for each symop since we have changed the lattice...
-  //[CO190218 - OBSOLETE]          symOp.Uf = _scStructure.c2f * symOp.Uc * _scStructure.f2c;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]          // Store it
-  //[CO190218 - OBSOLETE]          _scStructure.fgroup.push_back(symOp);
-  //[CO190218 - OBSOLETE]        }
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  
-  //[CO190218 - OBSOLETE]    // Old version - Feed the factor group list
-  //[CO190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ uint l = 0; l < _inStructure.fgroup.size(); l++) {
-  //[CO190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ int i = 0; i < nx; i++)
-  //[CO190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ int j = 0; j < ny; j++)
-  //[CO190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ int k = 0; k < nz; k++) {
-  //[CO190218 - OBSOLETE]    // Create position of new atoms...
-  //[CO190218 - OBSOLETE]    cshift = ( ( (double)i ) * _inStructure.lattice(1) +
-  //[CO190218 - OBSOLETE]    ( (double)j ) * _inStructure.lattice(2) +
-  //[CO190218 - OBSOLETE]    ( (double)k ) * _inStructure.lattice(3) );
-  //[CO190218 - OBSOLETE]    _scStructure.fgroup.push_back(_inStructure.fgroup[l]);
-  //[CO190218 - OBSOLETE]    (_scStructure.fgroup.back()).ctau = (_scStructure.fgroup.back()).ctau + cshift;
-  //[CO190218 - OBSOLETE]    (_scStructure.fgroup.back()).ftau = C2F(_scStructure.lattice,(_scStructure.fgroup.back()).ctau);
-  //[CO190218 - OBSOLETE]    }
-  //[CO190218 - OBSOLETE]    }
-  //[CO190218 - OBSOLETE]    
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Setup symmetry flags
-  //[CO190218 - OBSOLETE]  _scStructure.pgroup_xtal_calculated = FALSE;
-  //[CO190218 - OBSOLETE]  _scStructure.pgroupk_calculated = FALSE;
-  //[CO190218 - OBSOLETE]  _scStructure.pgroupk_xtal_calculated = FALSE;
-  //[CO190218 - OBSOLETE]  _scStructure.pgroup_calculated = TRUE;
-  //[CO190218 - OBSOLETE]  _scStructure.fgroup_calculated = TRUE;
-  //[CO190218 - OBSOLETE]  _scStructure.sgroup_calculated = FALSE;
-  //[CO190218 - OBSOLETE]  _scStructure.agroup_calculated = TRUE;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Setup output flags
-  //[CO190218 - OBSOLETE]  _scStructure.write_inequivalent_flag = TRUE;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Set the information about this construction
-  //[CO190218 - OBSOLETE]  _scStructure.info = "Supercell " + stringify(nx) + "x" + stringify(ny) + "x" + stringify(nz);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // OK.
-  //[CO190218 - OBSOLETE]  if (VERBOSE) _logger << "Done." << apl::endl;
-  //[CO190218 - OBSOLETE]  _isConstructed = TRUE;
-  //[CO190218 - OBSOLETE]  //cout << _inStructure << std::endl;
-  //[CO190218 - OBSOLETE]  //cout << _scStructure << std::endl;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Bug correction for old version
-  //[CO190218 - OBSOLETE]  
-  //[CO190218 - OBSOLETE]      if( nx != ny || ny != nz || nx != nz ) {
-  //[CO190218 - OBSOLETE]      _logger << "Supercell is not symmetric, hence we need to recalculate the whole symmetry. (very slow)" << apl::endl;
-  //[CO190218 - OBSOLETE]      _scStructure.pgroup_calculated = FALSE;
-  //[CO190218 - OBSOLETE]      _scStructure.fgroup_calculated = FALSE;
-  //[CO190218 - OBSOLETE]      _scStructure.iatoms_calculated = FALSE;
-  //[CO190218 - OBSOLETE]      _scStructure.agroup_calculated = FALSE;
-  //[CO190218 - OBSOLETE]      calculateWholeSymmetry(_scStructure);
-  //[CO190218 - OBSOLETE]      }
-  //[CO190218 - OBSOLETE]    
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
+  //[CO20190218 - OBSOLETE]  // Copy the first cell
+  //[CO20190218 - OBSOLETE]  _scStructure = _inStructure;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Clear some arrays we will rebuild...
+  //[CO20190218 - OBSOLETE]  reset();
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Create lattice of the supercell
+  //[CO20190218 - OBSOLETE]  xmatrix<double> scale(3, 3);
+  //[CO20190218 - OBSOLETE]  scale.clear();
+  //[CO20190218 - OBSOLETE]  scale(1, 1) = nx;
+  //[CO20190218 - OBSOLETE]  scale(2, 2) = ny;
+  //[CO20190218 - OBSOLETE]  scale(3, 3) = nz;
+  //[CO20190218 - OBSOLETE]  _scStructure.lattice = scale * _inStructure.lattice;
+  //[CO20190218 - OBSOLETE]  _scStructure.FixLattices();
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Print info
+  //[CO20190218 - OBSOLETE]  if (VERBOSE) _logger << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
+  //[CO20190218 - OBSOLETE]                       << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms). ";
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  //
+  //[CO20190218 - OBSOLETE]  _atom atom;
+  //[CO20190218 - OBSOLETE]  xvector<double> cshift(3);
+  //[CO20190218 - OBSOLETE]  for (uint ia = 0; ia < _inStructure.iatoms.size(); ia++) {
+  //[CO20190218 - OBSOLETE]    for (uint iia = 0; iia < _inStructure.iatoms[ia].size(); iia++) {
+  //[CO20190218 - OBSOLETE]      // Replicate this atom by given mesh...
+  //[CO20190218 - OBSOLETE]      for (_AFLOW_APL_REGISTER_ int i = 0; i < nx; i++)
+  //[CO20190218 - OBSOLETE]        for (_AFLOW_APL_REGISTER_ int j = 0; j < ny; j++)
+  //[CO20190218 - OBSOLETE]          for (_AFLOW_APL_REGISTER_ int k = 0; k < nz; k++) {
+  //[CO20190218 - OBSOLETE]            // Create position of new atoms...
+  //[CO20190218 - OBSOLETE]            atom = _inStructure.atoms[_inStructure.iatoms[ia][iia]];
+  //[CO20190218 - OBSOLETE]            cshift = (((double)i) * _inStructure.lattice(1) +
+  //[CO20190218 - OBSOLETE]                      ((double)j) * _inStructure.lattice(2) +
+  //[CO20190218 - OBSOLETE]                      ((double)k) * _inStructure.lattice(3));
+  //[CO20190218 - OBSOLETE]            atom.cpos = atom.cpos + cshift;
+  //[CO20190218 - OBSOLETE]            atom.fpos = C2F(_scStructure.lattice, atom.cpos);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]            // Increase the number of atoms of this type...
+  //[CO20190218 - OBSOLETE]            _scStructure.num_each_type[atom.type]++;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]            // Mark this atom as equivalent or not....
+  //[CO20190218 - OBSOLETE]            if (_scStructure.iatoms[ia].empty()) {
+  //[CO20190218 - OBSOLETE]              atom.equivalent = _scStructure.atoms.size();
+  //[CO20190218 - OBSOLETE]              atom.is_inequivalent = TRUE;
+  //[CO20190218 - OBSOLETE]            } else {
+  //[CO20190218 - OBSOLETE]              atom.equivalent = _scStructure.iatoms[ia][0];
+  //[CO20190218 - OBSOLETE]              atom.is_inequivalent = FALSE;
+  //[CO20190218 - OBSOLETE]            }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]            // Add it to the list of all atoms...
+  //[CO20190218 - OBSOLETE]            _scStructure.atoms.push_back(atom);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]            // Add its ID number to the list of equivalent atoms of this type...
+  //[CO20190218 - OBSOLETE]            _scStructure.iatoms[ia].push_back(_scStructure.atoms.size() - 1);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]            // Add its site point group...
+  //[CO20190218 - OBSOLETE]            _scStructure.agroup.push_back(_inStructure.agroup[_inStructure.iatoms[ia][iia]]);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]            // Update our mapping arrays...
+  //[CO20190218 - OBSOLETE]            _sc2pcMap.push_back(_inStructure.iatoms[ia][iia]);
+  //[CO20190218 - OBSOLETE]            if (i == 0 && j == 0 && k == 0) _pc2scMap.push_back(_scStructure.atoms.size() - 1);
+  //[CO20190218 - OBSOLETE]          }
+  //[CO20190218 - OBSOLETE]    }
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Feed the factor group list (not efficient in this order, but we have all
+  //[CO20190218 - OBSOLETE]  // similar operations in order just shifted...
+  //[CO20190218 - OBSOLETE]  for (_AFLOW_APL_REGISTER_ uint l = 0; l < _inStructure.fgroup.size(); l++) {
+  //[CO20190218 - OBSOLETE]    for (_AFLOW_APL_REGISTER_ int i = 0; i < nx; i++)
+  //[CO20190218 - OBSOLETE]      for (_AFLOW_APL_REGISTER_ int j = 0; j < ny; j++)
+  //[CO20190218 - OBSOLETE]        for (_AFLOW_APL_REGISTER_ int k = 0; k < nz; k++) {
+  //[CO20190218 - OBSOLETE]          // Create position of new atoms...
+  //[CO20190218 - OBSOLETE]          cshift = (((double)i) * _inStructure.lattice(1) +
+  //[CO20190218 - OBSOLETE]                    ((double)j) * _inStructure.lattice(2) +
+  //[CO20190218 - OBSOLETE]                    ((double)k) * _inStructure.lattice(3));
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]          // Get factor group from primitive celll
+  //[CO20190218 - OBSOLETE]          _sym_op symOp = _inStructure.fgroup[l];
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]          // Add our shift(in cartesian) and transform to fractional coords
+  //[CO20190218 - OBSOLETE]          symOp.ctau = symOp.ctau + cshift;
+  //[CO20190218 - OBSOLETE]          symOp.ftau = C2F(_scStructure.lattice, symOp.ctau);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]          // If it is out of cell, skip it
+  //[CO20190218 - OBSOLETE]          if (symOp.ftau(1) > 1.0 - _AFLOW_APL_EPS_ ||
+  //[CO20190218 - OBSOLETE]              symOp.ftau(2) > 1.0 - _AFLOW_APL_EPS_ ||
+  //[CO20190218 - OBSOLETE]              symOp.ftau(3) > 1.0 - _AFLOW_APL_EPS_ ||
+  //[CO20190218 - OBSOLETE]              symOp.ftau(1) < 0.0 - _AFLOW_APL_EPS_ ||
+  //[CO20190218 - OBSOLETE]              symOp.ftau(2) < 0.0 - _AFLOW_APL_EPS_ ||
+  //[CO20190218 - OBSOLETE]              symOp.ftau(3) < 0.0 - _AFLOW_APL_EPS_) continue;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]          // We have to correct the Uf for each symop since we have changed the lattice...
+  //[CO20190218 - OBSOLETE]          symOp.Uf = _scStructure.c2f * symOp.Uc * _scStructure.f2c;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]          // Store it
+  //[CO20190218 - OBSOLETE]          _scStructure.fgroup.push_back(symOp);
+  //[CO20190218 - OBSOLETE]        }
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  
+  //[CO20190218 - OBSOLETE]    // Old version - Feed the factor group list
+  //[CO20190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ uint l = 0; l < _inStructure.fgroup.size(); l++) {
+  //[CO20190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ int i = 0; i < nx; i++)
+  //[CO20190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ int j = 0; j < ny; j++)
+  //[CO20190218 - OBSOLETE]    for(_AFLOW_APL_REGISTER_ int k = 0; k < nz; k++) {
+  //[CO20190218 - OBSOLETE]    // Create position of new atoms...
+  //[CO20190218 - OBSOLETE]    cshift = ( ( (double)i ) * _inStructure.lattice(1) +
+  //[CO20190218 - OBSOLETE]    ( (double)j ) * _inStructure.lattice(2) +
+  //[CO20190218 - OBSOLETE]    ( (double)k ) * _inStructure.lattice(3) );
+  //[CO20190218 - OBSOLETE]    _scStructure.fgroup.push_back(_inStructure.fgroup[l]);
+  //[CO20190218 - OBSOLETE]    (_scStructure.fgroup.back()).ctau = (_scStructure.fgroup.back()).ctau + cshift;
+  //[CO20190218 - OBSOLETE]    (_scStructure.fgroup.back()).ftau = C2F(_scStructure.lattice,(_scStructure.fgroup.back()).ctau);
+  //[CO20190218 - OBSOLETE]    }
+  //[CO20190218 - OBSOLETE]    }
+  //[CO20190218 - OBSOLETE]    
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Setup symmetry flags
+  //[CO20190218 - OBSOLETE]  _scStructure.pgroup_xtal_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]  _scStructure.pgroupk_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]  _scStructure.pgroupk_xtal_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]  _scStructure.pgroup_calculated = TRUE;
+  //[CO20190218 - OBSOLETE]  _scStructure.fgroup_calculated = TRUE;
+  //[CO20190218 - OBSOLETE]  _scStructure.sgroup_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]  _scStructure.agroup_calculated = TRUE;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Setup output flags
+  //[CO20190218 - OBSOLETE]  _scStructure.write_inequivalent_flag = TRUE;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Set the information about this construction
+  //[CO20190218 - OBSOLETE]  _scStructure.info = "Supercell " + stringify(nx) + "x" + stringify(ny) + "x" + stringify(nz);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // OK.
+  //[CO20190218 - OBSOLETE]  if (VERBOSE) _logger << "Done." << apl::endl;
+  //[CO20190218 - OBSOLETE]  _isConstructed = TRUE;
+  //[CO20190218 - OBSOLETE]  //cout << _inStructure << std::endl;
+  //[CO20190218 - OBSOLETE]  //cout << _scStructure << std::endl;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Bug correction for old version
+  //[CO20190218 - OBSOLETE]  
+  //[CO20190218 - OBSOLETE]      if( nx != ny || ny != nz || nx != nz ) {
+  //[CO20190218 - OBSOLETE]      _logger << "Supercell is not symmetric, hence we need to recalculate the whole symmetry. (very slow)" << apl::endl;
+  //[CO20190218 - OBSOLETE]      _scStructure.pgroup_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]      _scStructure.fgroup_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]      _scStructure.iatoms_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]      _scStructure.agroup_calculated = FALSE;
+  //[CO20190218 - OBSOLETE]      calculateWholeSymmetry(_scStructure);
+  //[CO20190218 - OBSOLETE]      }
+  //[CO20190218 - OBSOLETE]    
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]#endif
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -588,7 +709,7 @@ namespace apl {
               if (constructSymmetry) {
                 _scStructure.agroup.push_back(_inStructure.agroup[_inStructure.iatoms[ia][iia]]);
                 // We have to correct the Uf for each symop since we have changed the lattice...
-                // Stefano formula - great help!
+                //SC formula - great help!
                 vector<_sym_op>::iterator soi = _scStructure.agroup.back().begin();
                 for (; soi != _scStructure.agroup.back().end(); soi++)
                   soi->Uf = _scStructure.c2f * soi->Uc * _scStructure.f2c;
@@ -625,7 +746,7 @@ namespace apl {
                   symOp.ftau(3) < 0.0 - _AFLOW_APL_EPS_) continue;
 
               // We have to correct the Uf for each symop since we have changed the lattice...
-              // Stefano formula - great help!
+              //SC formula - great help!
               symOp.Uf = _scStructure.c2f * symOp.Uc * _scStructure.f2c;
 
               _scStructure.fgroup.push_back(symOp);
@@ -735,7 +856,187 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
+  //ME20200116 - rebase to primitive
+  // Does not capture rotated conventional cells yet, but does work for AFLOW's
+  // standard conventional unit cells.
+  bool Supercell::projectToPrimitive() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string function = "apl::Supercell::projectToPrimitive():";
+    vector<int> pc2sc, sc2pc;
+    xstructure pcell;
+    if (_pcStructure.iatoms_calculated) SYM::CalculateInequivalentAtoms(_pcStructure);
+    LightCopy(_pcStructure, pcell);  // No need for symmetry
+
+    // The original structure may be a rotated primitive cell. Transform the
+    // primitive cell so that they overlap or else the mapping will not work
+    if (_inStructure_original.atoms.size() == pcell.atoms.size()) {
+      xmatrix<double> U = trasp(_inStructure_original.scale*_inStructure_original.lattice) * inverse(trasp(pcell.scale*_pcStructure.lattice));
+      // For a rotation matrix, trasp(U) * U = I
+      if (aurostd::isidentity(trasp(U) * U)) {
+        pcell = Rotate(pcell, U);
+      }
+    }
+
+    bool mapped = getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc);
+    if (!mapped) {
+      // When calculating the primitive cell, the positions of the atoms
+      // may alternate between x and 1 - x. Test if this is the case here.
+      if (LDEBUG) std::cerr << function << " Not mapped succesfully. Try shifting atoms." << std::endl;
+      xvector<double> ones(3); ones.set(1.0);
+      for (uint at = 0; at < pcell.atoms.size(); at++) {
+        pcell.atoms[at].fpos = ones - pcell.atoms[at].fpos;
+        pcell.atoms[at].cpos = pcell.f2c * pcell.atoms[at].fpos;
+      }
+      pcell.BringInCell();
+      mapped = getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc);
+    }
+    if (mapped) {
+      // Sort the iatoms correctly or the non-analytical correction will not work
+      // This needs to be done from scratch because the sequence of the atoms may
+      // have shifted between the original and the primitive cell.
+      xvector<double> fpos(3);
+      const vector<vector<int> >& iatoms_pc = _pcStructure.iatoms;
+      const vector<vector<int> >& iatoms_oc = _inStructure_original.iatoms;
+      uint niatoms_pc = iatoms_pc.size();
+      uint niatoms_oc = iatoms_oc.size();
+      pcell.iatoms.clear();
+      pcell.iatoms.resize(niatoms_pc);
+      for (uint iatpc = 0; ((iatpc < niatoms_pc) && mapped); iatpc++) {
+        fpos = _inStructure_original.c2f * pcell.atoms[iatoms_pc[iatpc][0]].cpos;
+        uint iatoc = 0;
+        for (iatoc = 0; iatoc < niatoms_oc; iatoc++) {
+          uint i = 0;
+          for (i = 0; i < iatoms_oc[iatoc].size(); i++) {
+            if (SYM::FPOSMatch(fpos, _inStructure_original.atoms[iatoms_oc[iatoc][i]].fpos,
+                  _inStructure_original.lattice, _inStructure_original.f2c, _skew, _sym_eps)) {
+              pcell.iatoms[iatoc] = _pcStructure.iatoms[iatpc];
+              for (uint j = 0; j < iatoms_pc[iatpc].size(); j++) pcell.atoms[iatoms_pc[iatpc][j]].index_iatoms = iatoc;
+              break;
+            }
+          }
+          if (i < iatoms_oc[iatoc].size()) break;
+        }
+        if (iatoc == niatoms_oc) {
+          if (LDEBUG) std::cerr << function << " Did not map iatoms of primitive cell (failed for " << iatpc << ")." << std::endl;
+          mapped = false;
+        }
+      }
+    }
+
+    if (mapped) {
+      _inStructure = pcell;
+      _sc2pcMap = sc2pc;
+      _pc2scMap = pc2sc;
+      calculatePhaseVectors();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //ME20200116 - rebase to original
+  void Supercell::projectToOriginal() {
+    vector<int> pc2sc, sc2pc;
+    if (getMaps(_inStructure_original, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
+      _inStructure = _inStructure_original;
+      _pc2scMap = pc2sc;
+      _sc2pcMap = sc2pc;
+      calculatePhaseVectors();
+    } else {
+      // If the mapping fails for the original structure,
+      // something went seriously wrong
+      string function = "apl::Supercell::projectToOriginal():";
+      string message = "Mapping between original structure and supercell failed.";
+      message += " This is likely a bug in the code.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
+  }
+
+  //ME20200116
+  // Recalculates _sc2pcMap and _pc2scMap based on the projected cell (pcell)
+  // using the original cell (ocell).
+  // Returns true when mapping is successful.
+  bool Supercell::getMaps(const xstructure& pcell, const xstructure& ocell, const xstructure& scell,
+      vector<int>& pc2sc, vector<int>& sc2pc) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string function = "apl::Supercell::getMaps():";
+    uint natoms_pc = pcell.atoms.size();
+    uint natoms_oc = ocell.atoms.size();
+    uint natoms_sc = scell.atoms.size();
+
+    // Check that the cell sizes make sense
+    if ((natoms_pc > natoms_oc) || (natoms_oc > natoms_sc)) {
+      if (LDEBUG) {
+        std::cerr << function << " Cannot map a smaller cell to a larger cell." << std::endl;
+      }
+      return false;
+    }
+
+    pc2sc.clear(); pc2sc.resize(natoms_pc);
+    sc2pc.clear(); sc2pc.resize(natoms_sc);
+    xvector<double> fpos(3);
+
+    // sc2pcMap - convert scell positions into primitive coordinates
+    // and do straightforward fpos matching
+    for (uint i = 0; i < natoms_sc; i++) {
+      fpos = pcell.c2f * scell.atoms[i].cpos;
+      uint j = 0;
+      for (j = 0; j < natoms_pc; j++) {
+        if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, _skew, _sym_eps)) {
+          sc2pc[i] = j;
+          break;
+        }
+      }
+      if (j == natoms_pc) {
+        if (LDEBUG) {
+          std::cerr << function << " sc2pcMap failed for atom " << i << "." << std::endl;
+        }
+        return false;
+      }
+    }
+
+    // pc2scMap - more complex. Since the projected cell may not be fully
+    // inside original cell, the primitive atoms need to be mapped to the
+    // original cell first. Then, pc2scMap can be built using simple cpos
+    // matching. Since _pc2scMap may not represent the original structure
+    // anymore, it cannot be used to speed up the process.
+    for (uint i = 0; i < natoms_pc; i++) {
+      uint j = 0;
+      fpos = ocell.c2f * pcell.atoms[i].cpos;
+      for (j = 0; j < natoms_oc; j++) {
+        if (SYM::FPOSMatch(fpos, ocell.atoms[j].fpos, ocell.lattice, ocell.f2c, _skew, _sym_eps)) {
+          uint k = 0;
+          for (k = 0; k < natoms_sc; k++) {
+            if (aurostd::isequal(ocell.atoms[j].cpos, scell.atoms[k].cpos)) break;
+          }
+          // If scell was created from ocell, this should never happen
+          if (k == natoms_sc) {
+            if (LDEBUG) {
+              std::cerr << function << " pc2scMap failed for atom " << i << "."
+                << " Could not map original atom " << j << " to supercell." << std::endl;
+            }
+            return false;
+          }
+          pc2sc[i] = k;
+          break;
+        }
+      }
+      if (j == natoms_oc) {
+        if (LDEBUG) {
+          std::cerr << function << " pc2scMap failed for atom " << i << "." << std::endl;
+        }
+        return false;
+      }
+    }
+
+    // Mapping successful
+    return true;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  //ME20200102 - do not build the supercell here, just retrieve dimensions.
+  xvector<int> Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
     // What is the dimension of the supercell ? OK, user wants to have MAX_NN_SHELLS
     // shell occupied for each nonequvalent atom. Try to find it...
 
@@ -750,20 +1051,22 @@ namespace apl {
         if (useSplitShells)
           sh.back().splitBySymmetry();
       }
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //catch (APLLogicError& e)
       catch (aurostd::xerror& e)
-      { //CO200106 - patching for auto-indenting
-        //COREY, we may want to kill this if we create supercells of uniform expansion (not derivative_structures)
+      { //CO20200106 - patching for auto-indenting
+        //CO, we may want to kill this if we create supercells of uniform expansion (not derivative_structures)
         //come back to fix later, but for now, leave as is (NOT WELL TESTED)
         //also, see exit below (throw error), this indicates to me that we do not NEED to exit, but can proceed until next error
-        //corey, kill if errors with symmetry
+        //CO, kill if errors with symmetry
         //_logger << apl::error << e.what() << apl::endl;
         //_logger << apl::error << "The splitting of shells by the symmetry has failed [" << i << "]." << apl::endl;
         //throw APLRuntimeError("apl::Supercell::buildSuitableForShell(); Symmetry failed.");
         //_logger << apl::error << e.what() << apl::endl;
-        _logger << apl::error << e.error_message << apl::endl;
-        _logger << apl::warning << "The splitting of shells by symmetry has failed [" << i << "]. Continuing without this..." << apl::endl;
+        stringstream message;
+        message << e.error_message;
+        message << " The splitting of shells by symmetry has failed [" << i << "]. Continuing without this...";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         useSplitShells = false;
         for (uint j = 0; j < sh.size(); j++) {
           sh[j].removeSplitBySymmetry();
@@ -790,9 +1093,9 @@ namespace apl {
             break;
         }
         if (l == _scStructure.atoms.size()) {
-          // ME191031 - use xerror
+          //ME20191031 - use xerror
           //throw APLRuntimeError("apl::Supercell::buildSuitableForShell(); Mapping error.");
-          string function = "apl::Supercell::buildSuitableForShell()";
+          string function = "apl::Supercell::buildSuitableForShell():";
           string message = "Mapping error.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
@@ -813,21 +1116,19 @@ namespace apl {
       if (ia != _inStructure.iatoms.size()) {
         i++;
         j = k = i;
-        /*
-           if( i == j && j == k )
-           i++;
-           else if( j == k )
-           j++;
-           else
-           k++;
-           */
+        //   if( i == j && j == k )
+        //   i++;
+        //   else if( j == k )
+        //   j++;
+        //   else
+        //   k++;
       } else {
         break;
       }
     }
 
     // Build structure
-    build(i, j, k, VERBOSE);
+    //build(i, j, k, VERBOSE);  // OBSOLETE ME20200102
 
     // Print info about shells
     for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
@@ -836,7 +1137,12 @@ namespace apl {
     }
     sh.clear();
 
-    return i * j * k * _inStructure.atoms.size();
+    //ME20200102 BEGIN
+    //[OBSOLETE] return i * j * k * _inStructure.atoms.size();
+    xvector<int> dims(3);
+    dims[1] = i; dims[2] = j; dims[3] = k;
+    return dims;
+    //ME20200102 END
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -844,6 +1150,7 @@ namespace apl {
   void Supercell::setupShellRestrictions(int MAX_NN_SHELLS) {
     // Precompute shellhandles for each unique atom
     vector<ShellHandle> sh;
+    stringstream message;
     for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
       ShellHandle s;
       sh.push_back(s);
@@ -854,7 +1161,8 @@ namespace apl {
 
     // Set flag to shell restriction
     _isShellRestricted = true;
-    _logger << "Setting shell restrictions up to " << MAX_NN_SHELLS << "." << apl::endl;
+    message << "Setting shell restrictions up to " << MAX_NN_SHELLS << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Calculate the truncate radius for each atom
     _maxShellRadius.clear();
@@ -873,12 +1181,12 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   bool Supercell::isShellRestricted() const {
     return _isShellRestricted;
   }
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   int Supercell::getMaxShellID() const {
     return _maxShellID;
   }
@@ -964,11 +1272,16 @@ namespace apl {
   }
   // ///////////////////////////////////////////////////////////////////////////
 
-  xstructure Supercell::calculatePrimitiveStructure() const { //CO 180409
+  xstructure Supercell::calculatePrimitiveStructure() const { //CO20180409
     xstructure pcStructure=_inStructure;
+    //ME20200324 - Setting LatticeReduction_avoid to true can results in
+    // primitive cells with slightly different lattice parameters, especially
+    // for monoclinic cells. This error can propagate and break mappings from
+    // the conventional to the primitive cell.
+    pcStructure.LatticeReduction_avoid = false;
     pcStructure.Standard_Primitive_UnitCellForm();
     pcStructure.ReScale(1.0);
-    pcStructure.ShifOriginToAtom(0);
+    pcStructure.ShiftOriginToAtom(0);
     pcStructure.BringInCell();
     return pcStructure;
   }
@@ -979,6 +1292,11 @@ namespace apl {
 
   const xstructure& Supercell::getInputStructure() const {
     return _inStructure;
+  }
+
+  //ME20200117
+  const xstructure& Supercell::getOriginalStructure() const {
+    return _inStructure_original;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -1004,27 +1322,27 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfAtoms() const {
+  //ME20190715 - added const to use function with const Supercell &
+  uint Supercell::getNumberOfAtoms() const {
     return _scStructure.atoms.size();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfUniqueAtoms() const {
+  //ME20190715 - added const to use function with const Supercell &
+  uint Supercell::getNumberOfUniqueAtoms() const {
     return _scStructure.iatoms.size();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO190218
+  //ME20190715 - added const to use function with const Supercell &
+  uint Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO20190218
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
-      // ME191031 - use xerror
-      //throw APLRuntimeError("apl::Supercell::getNumberOfEquivalentAtomsOfType: Wrong index."); //CO190218
-      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
+      //ME20191031 - use xerror
+      //throw APLRuntimeError("apl::Supercell::getNumberOfEquivalentAtomsOfType: Wrong index."); //CO20190218
+      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType():";
       string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
@@ -1034,13 +1352,13 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   int Supercell::getUniqueAtomID(int i) const {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index.");
-      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
+      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType():";
       string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
@@ -1050,21 +1368,21 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   int Supercell::getUniqueAtomID(int i, int j) const {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index 1.");
-      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
+      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType():";
       string message = "Wrong index[1] " + aurostd::utype2string<int>(i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 
     if (j >= (int)_scStructure.iatoms[i].size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index 2.");
-      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
+      string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType():";
       string message = "Wrong index[2] " + aurostd::utype2string<int>(i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
@@ -1074,14 +1392,14 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   const _atom& Supercell::getUniqueAtom(int i) const {
     return _scStructure.atoms[getUniqueAtomID(i)];
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
   bool Supercell::compareFPositions(xvector<double>& v1, xvector<double>& v2) {
     //default assumption is that we are compare positions associated with symmetry rotations
     double eps = _sym_eps;
@@ -1090,66 +1408,69 @@ namespace apl {
   bool Supercell::compareFPositions(xvector<double>& v1, xvector<double>& v2, double eps) {
     // Get the difference vector for SUPERCELL positions
     // if symmetry related, use eps=_sym_eps (default), otherwise eps=_AFLOW_APL_EPS_
-    return SYM::FPOSMatch(v1, v2, _scStructure.lattice, _scStructure.f2c, _skew, eps); //DX 20190619 - lattice and f2c as input
+    return SYM::FPOSMatch(v1, v2, _scStructure.lattice, _scStructure.f2c, _skew, eps); //DX20190619 - lattice and f2c as input
   }
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]bool Supercell::compareFPositions(const xvector<double>& v1,
-  //[CO190218 - OBSOLETE]                                  const xvector<double>& v2, double eps) {
-  //[CO190218 - OBSOLETE]  // Get the difference vector
-  //[CO190218 - OBSOLETE]  xvector<double> r = v1 - v2;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Correct and check equality
-  //[CO190218 - OBSOLETE]  for (_AFLOW_APL_REGISTER_ int i = 1; i <= 3; i++) {
-  //[CO190218 - OBSOLETE]    // Correct it for rare cases, when structure is not well relaxed or
-  //[CO190218 - OBSOLETE]    // there is a lot of roundoff problems, like positions like
-  //[CO190218 - OBSOLETE]    // [0,0,0] and [0,0,0.9993567989], but they are the equal in principle
-  //[CO190218 - OBSOLETE]    if (aurostd::abs(v1(i) - 1.0) < eps)
-  //[CO190218 - OBSOLETE]      r(i) -= 1.0;
-  //[CO190218 - OBSOLETE]    if (aurostd::abs(v2(i) - 1.0) < eps)
-  //[CO190218 - OBSOLETE]      r(i) += 1.0;
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]    // If this component is still nonzero -> this two possitions are not
-  //[CO190218 - OBSOLETE]    // the same
-  //[CO190218 - OBSOLETE]    if (aurostd::abs(r(i)) > eps)
-  //[CO190218 - OBSOLETE]      return false;
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //
-  //[CO190218 - OBSOLETE]  return true;
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]bool Supercell::compareFPositions(const xvector<double>& v1,
+  //[CO20190218 - OBSOLETE]                                  const xvector<double>& v2, double eps) {
+  //[CO20190218 - OBSOLETE]  // Get the difference vector
+  //[CO20190218 - OBSOLETE]  xvector<double> r = v1 - v2;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Correct and check equality
+  //[CO20190218 - OBSOLETE]  for (_AFLOW_APL_REGISTER_ int i = 1; i <= 3; i++) {
+  //[CO20190218 - OBSOLETE]    // Correct it for rare cases, when structure is not well relaxed or
+  //[CO20190218 - OBSOLETE]    // there is a lot of roundoff problems, like positions like
+  //[CO20190218 - OBSOLETE]    // [0,0,0] and [0,0,0.9993567989], but they are the equal in principle
+  //[CO20190218 - OBSOLETE]    if (aurostd::abs(v1(i) - 1.0) < eps)
+  //[CO20190218 - OBSOLETE]      r(i) -= 1.0;
+  //[CO20190218 - OBSOLETE]    if (aurostd::abs(v2(i) - 1.0) < eps)
+  //[CO20190218 - OBSOLETE]      r(i) += 1.0;
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]    // If this component is still nonzero -> this two possitions are not
+  //[CO20190218 - OBSOLETE]    // the same
+  //[CO20190218 - OBSOLETE]    if (aurostd::abs(r(i)) > eps)
+  //[CO20190218 - OBSOLETE]      return false;
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  //
+  //[CO20190218 - OBSOLETE]  return true;
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]#endif
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]#if !GETFULLSYMBASIS
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
-    //corey
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]#if !GETFULLSYMBASIS
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO20190218
+    //CO
     //change so that if we can retrieve from fullsymbasis,  we do so
     //this functions looks at symop, and asks by applying it, which atom does atomID become?
     //in fgroup, look at basis_atoms_map, return atom at index atomID
 #ifndef __OPTIMIZE
     if (atomID >= (int)_scStructure.atoms.size()) {
-      // ME191031 - use xerror
-      //throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO190218
-      string function = "apl::Supercell::atomGoesTo()";
+      //ME20191031 - use xerror
+      //throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO20190218
+      string function = "apl::Supercell::atomGoesTo():";
       string message = "Wrong atomID index " + aurostd::utype2string<int>(atomID) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 
     if (centerID >= (int)_scStructure.atoms.size()) {
-      // ME191031 - use xerror
-      //throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO190218
-      string function = "apl::Supercell::atomGoesTo()";
+      //ME20191031 - use xerror
+      //throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO20190218
+      string function = "apl::Supercell::atomGoesTo():";
       string message = "Wrong centerID index " + aurostd::utype2string<int>(centerID) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 #endif
+
+    //ME20191219 - use basis_atoms_map
+    if (symOp.basis_map_calculated) return symOp.basis_atoms_map[atomID];
 
     // Get the center atom center...
     if (translate && symOp.is_agroup) center(centerID);
@@ -1159,9 +1480,9 @@ namespace apl {
     //DX                                   _scStructure, TRUE, FALSE, _derivative_structure);  //CO no roff
     _atom rotatedAtom;
     if (!SYM::ApplyAtomValidate(_scStructure.atoms[atomID], rotatedAtom, symOp, _scStructure, _skew, TRUE, FALSE, _sym_eps)) {
-      // ME191031 - use xerror
-      //throw APLLogicError("apl::Supercell::atomGoesTo(); Illegitimate mapping."); //CO190218
-      string function = "apl::Supercell::atomGoesTo()";
+      //ME20191031 - use xerror
+      //throw APLLogicError("apl::Supercell::atomGoesTo(); Illegitimate mapping."); //CO20190218
+      string function = "apl::Supercell::atomGoesTo():";
       string message = "Illegitimate mapping.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1169,7 +1490,7 @@ namespace apl {
     // Find its id...
     _AFLOW_APL_REGISTER_ int l = 0;
     for (; l < (int)_scStructure.atoms.size(); l++) {
-      if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[l].fpos)) {  //COREY NEW, default to symmetry tolerance
+      if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[l].fpos)) {  //CO NEW, default to symmetry tolerance
         break;
       }
     }
@@ -1187,9 +1508,9 @@ namespace apl {
         cout << aurostd::modulus(rotatedAtom.fpos - _scStructure.atoms[l].fpos) << std::endl;
       }
 #endif
-      // ME191031 - use xerror
-      //throw APLLogicError("apl::Supercell::atomGoesTo(); Mapping failed."); //CO190218
-      string function = "apl::Supercell::atomGoesTo()";
+      //ME20191031 - use xerror
+      //throw APLLogicError("apl::Supercell::atomGoesTo(); Mapping failed."); //CO20190218
+      string function = "apl::Supercell::atomGoesTo():";
       string message = "Mapping failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1207,113 +1528,125 @@ namespace apl {
 
     return l;
   }
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
-  //[CO190218 - OBSOLETE]//corey
-  //[CO190218 - OBSOLETE]//change so that if we can retrieve from fullsymbasis,  we do so
-  //[CO190218 - OBSOLETE]//this functions looks at symop, and asks by applying it, which atom does atomID become?
-  //[CO190218 - OBSOLETE]//in fgroup, look at basis_atoms_map, return atom at index atomID
-  //[CO190218 - OBSOLETE]#ifndef __OPTIMIZE
-  //[CO190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO190218
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO190218
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]//corey
-  //[CO190218 - OBSOLETE]#if MAP_VERBOSE
-  //[CO190218 - OBSOLETE]  bool will_translate = symOp.is_agroup && translate;
-  //[CO190218 - OBSOLETE]  cerr << "where: " << atomID << " " << centerID << " " << will_translate << " " << symOp.basis_atoms_map.at(atomID) << std::endl;
-  //[CO190218 - OBSOLETE]  cerr << "atomID : " << _scStructure.atoms[atomID] << std::endl;
-  //[CO190218 - OBSOLETE]  cerr << symOp << std::endl;
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]  return symOp.basis_atoms_map.at(atomID);
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
-  //[CO190218 - OBSOLETE]#ifndef __OPTIMIZE
-  //[CO190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO190218
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO190218
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Get the center atom center...
-  //[CO190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(centerID);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Transform atom...
-  //[CO190218 - OBSOLETE]  //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[atomID], symOp,
-  //[CO190218 - OBSOLETE]  //DX                                    _scStructure, TRUE);
-  //[CO190218 - OBSOLETE]  _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[atomID], symOp,
-  //[CO190218 - OBSOLETE]                                     _scStructure);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Find its id...
-  //[CO190218 - OBSOLETE]  _AFLOW_APL_REGISTER_ int l = 0;
-  //[CO190218 - OBSOLETE]  for (; l < (int)_scStructure.atoms.size(); l++) {
-  //[CO190218 - OBSOLETE]    if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[l].fpos, _SYM_AFLOW_APL_EPS_))
-  //[CO190218 - OBSOLETE]      break;
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (l == (int)_scStructure.atoms.size()) {
-  //[CO190218 - OBSOLETE]    /*
-  //[CO190218 - OBSOLETE]	_AFLOW_APL_REGISTER_ int l = 0;
-  //[CO190218 - OBSOLETE]	for(; l < (int)_scStructure.atoms.size(); l++) {
-  //[CO190218 - OBSOLETE]	printXVector(_scStructure.atoms[atomID].fpos,false); cout << " -> ";
-  //[CO190218 - OBSOLETE]	printXVector(rotatedAtom.fpos,false); cout << " | ";
-  //[CO190218 - OBSOLETE]	printXVector(_scStructure.atoms[l].fpos,false); cout << " | ";
-  //[CO190218 - OBSOLETE]	cout << aurostd::modulus( rotatedAtom.fpos - _scStructure.atoms[l].fpos ) << std::endl;
-  //[CO190218 - OBSOLETE]	}
-  //[CO190218 - OBSOLETE]      */
-  //[CO190218 - OBSOLETE]    throw APLLogicError("apl::Supercell::atomGoesTo(); Mapping failed."); //CO190218
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Move center back to zero atom...
-  //[CO190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(0);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  return l;
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO20190218
+  //[CO20190218 - OBSOLETE]//CO
+  //[CO20190218 - OBSOLETE]//change so that if we can retrieve from fullsymbasis,  we do so
+  //[CO20190218 - OBSOLETE]//this functions looks at symop, and asks by applying it, which atom does atomID become?
+  //[CO20190218 - OBSOLETE]//in fgroup, look at basis_atoms_map, return atom at index atomID
+  //[CO20190218 - OBSOLETE]#ifndef __OPTIMIZE
+  //[CO20190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]//CO
+  //[CO20190218 - OBSOLETE]#if MAP_VERBOSE
+  //[CO20190218 - OBSOLETE]  bool will_translate = symOp.is_agroup && translate;
+  //[CO20190218 - OBSOLETE]  cerr << "where: " << atomID << " " << centerID << " " << will_translate << " " << symOp.basis_atoms_map.at(atomID) << std::endl;
+  //[CO20190218 - OBSOLETE]  cerr << "atomID : " << _scStructure.atoms[atomID] << std::endl;
+  //[CO20190218 - OBSOLETE]  cerr << symOp << std::endl;
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]  return symOp.basis_atoms_map.at(atomID);
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO20190218
+  //[CO20190218 - OBSOLETE]#ifndef __OPTIMIZE
+  //[CO20190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Get the center atom center...
+  //[CO20190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(centerID);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Transform atom...
+  //[CO20190218 - OBSOLETE]  //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[atomID], symOp,
+  //[CO20190218 - OBSOLETE]  //DX                                    _scStructure, TRUE);
+  //[CO20190218 - OBSOLETE]  _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[atomID], symOp,
+  //[CO20190218 - OBSOLETE]                                     _scStructure);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Find its id...
+  //[CO20190218 - OBSOLETE]  _AFLOW_APL_REGISTER_ int l = 0;
+  //[CO20190218 - OBSOLETE]  for (; l < (int)_scStructure.atoms.size(); l++) {
+  //[CO20190218 - OBSOLETE]    if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[l].fpos, _SYM_AFLOW_APL_EPS_))
+  //[CO20190218 - OBSOLETE]      break;
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (l == (int)_scStructure.atoms.size()) {
+  //[CO20190218 - OBSOLETE]    /*
+  //[CO20190218 - OBSOLETE]	_AFLOW_APL_REGISTER_ int l = 0;
+  //[CO20190218 - OBSOLETE]	for(; l < (int)_scStructure.atoms.size(); l++) {
+  //[CO20190218 - OBSOLETE]	printXVector(_scStructure.atoms[atomID].fpos,false); cout << " -> ";
+  //[CO20190218 - OBSOLETE]	printXVector(rotatedAtom.fpos,false); cout << " | ";
+  //[CO20190218 - OBSOLETE]	printXVector(_scStructure.atoms[l].fpos,false); cout << " | ";
+  //[CO20190218 - OBSOLETE]	cout << aurostd::modulus( rotatedAtom.fpos - _scStructure.atoms[l].fpos ) << std::endl;
+  //[CO20190218 - OBSOLETE]	}
+  //[CO20190218 - OBSOLETE]      */
+  //[CO20190218 - OBSOLETE]    throw APLLogicError("apl::Supercell::atomGoesTo(); Mapping failed."); //CO20190218
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Move center back to zero atom...
+  //[CO20190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(0);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  return l;
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]#if !GETFULLSYMBASIS
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
-    //corey
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]#if !GETFULLSYMBASIS
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO20190218
+    //CO
     //this function does the opposite (to above)
     //in basis_atoms_map, return the index of the atom that is atomID
 #ifndef __OPTIMIZE
     if (atomID >= (int)_scStructure.atoms.size()) {
-      //throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO190218
-      string function = "apl::Supercell::atomComesFrom()";
+      //throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO20190218
+      string function = "apl::Supercell::atomComesFrom():";
       string message = "Wrong atomID index " + aurostd::utype2string<int>(atomID) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 
     if (centerID >= (int)_scStructure.atoms.size()) {
-      //throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO190218
-      string function = "apl::Supercell::atomComesFrom()";
+      //throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO20190218
+      string function = "apl::Supercell::atomComesFrom():";
       string message = "Wrong centerID index " + aurostd::utype2string<int>(centerID) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 #endif
+
+    //ME20191219 - use basis_atoms_map
+    if (symOp.basis_map_calculated) {
+      int natoms = (int) _scStructure.atoms.size();
+      for (int at = 0; at < natoms; at++) {
+        if (symOp.basis_atoms_map[at] == atomID) return at;
+      }
+      // If the code makes it past the for-loop, the mapping failed
+      string function = "apl::Supercell::atomComesFrom():";
+      string message = "Mapping failed.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
 
     // Get the center atom center...
     if (translate && symOp.is_agroup) center(centerID);
@@ -1324,13 +1657,13 @@ namespace apl {
     for (; l < (int)_scStructure.atoms.size(); l++) {
       //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE, FALSE, _derivative_structure);  //CO no roff
       if (!SYM::ApplyAtomValidate(_scStructure.atoms[l], rotatedAtom, symOp, _scStructure, _skew, TRUE, FALSE, _sym_eps)) {
-        // ME191031 - use xerror
-        //throw APLLogicError("apl::Supercell::atomComesFrom(); Illegitimate mapping."); //CO190218
-        string function = "apl::Supercell::atomComesFrom()";
+        //ME20191031 - use xerror
+        //throw APLLogicError("apl::Supercell::atomComesFrom(); Illegitimate mapping."); //CO20190218
+        string function = "apl::Supercell::atomComesFrom():";
         string message = "Illegitimate mapping.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
-      if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[atomID].fpos)) {  //COREY NEW, default to symmetry tolerance
+      if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[atomID].fpos)) {  //CO NEW, default to symmetry tolerance
         break;
       }
     }
@@ -1348,9 +1681,9 @@ namespace apl {
         cout << aurostd::modulus(rotatedAtom.fpos - _scStructure.atoms[atomID].fpos) << std::endl;
       }
 #endif
-      // ME191031 - use xerror
-      //throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO190218
-      string function = "apl::Supercell::atomComesFrom()";
+      //ME20191031 - use xerror
+      //throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO20190218
+      string function = "apl::Supercell::atomComesFrom():";
       string message = "Mapping failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1368,118 +1701,118 @@ namespace apl {
 
     return l;
   }
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
-  //[CO190218 - OBSOLETE]//corey
-  //[CO190218 - OBSOLETE]//this function does the opposite (to above)
-  //[CO190218 - OBSOLETE]//in basis_atoms_map, return the index of the atom that is atomID
-  //[CO190218 - OBSOLETE]#ifndef __OPTIMIZE
-  //[CO190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO190218
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO190218
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  int l = 0;
-  //[CO190218 - OBSOLETE]  //corey
-  //[CO190218 - OBSOLETE]  for (; l < (int)symOp.basis_atoms_map.size(); l++) {
-  //[CO190218 - OBSOLETE]    if (symOp.basis_atoms_map.at(l) == atomID) {
-  //[CO190218 - OBSOLETE]#if MAP_VERBOSE
-  //[CO190218 - OBSOLETE]      bool will_translate = symOp.is_agroup && translate;
-  //[CO190218 - OBSOLETE]      cerr << "wherefrom: " << atomID << " " << centerID << " " << will_translate << " " << l << std::endl;
-  //[CO190218 - OBSOLETE]      cerr << "atomID : " << _scStructure.atoms[atomID] << std::endl;
-  //[CO190218 - OBSOLETE]      cerr << symOp << std::endl;
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]      return l;
-  //[CO190218 - OBSOLETE]    }
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#if ERROR_VERBOSE
-  //[CO190218 - OBSOLETE]  int l = 0;
-  //[CO190218 - OBSOLETE]  for (; l < (int)symOp.basis_atoms_map.size(); l++) {
-  //[CO190218 - OBSOLETE]    cout << "CHECKING: atomID=" << atomID << ", symOp.basis_atoms_map.at(l)=" << symOp.basis_atoms_map.at(l) << std::endl;
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]  throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO190218
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
-  //[CO190218 - OBSOLETE]#ifndef __OPTIMIZE
-  //[CO190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO190218
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO190218
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Get the center atom center...
-  //[CO190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(centerID);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Find it
-  //[CO190218 - OBSOLETE]  int l = 0;
-  //[CO190218 - OBSOLETE]  for (; l < (int)_scStructure.atoms.size(); l++) {
-  //[CO190218 - OBSOLETE]    //DX_atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE);
-  //[CO190218 - OBSOLETE]    _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure);
-  //[CO190218 - OBSOLETE]    if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[atomID].fpos, _SYM_AFLOW_APL_EPS_))
-  //[CO190218 - OBSOLETE]      break;
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (l == (int)_scStructure.atoms.size()) {
-  //[CO190218 - OBSOLETE]    _AFLOW_APL_REGISTER_ int l = 0;
-  //[CO190218 - OBSOLETE]    for (; l < (int)_scStructure.atoms.size(); l++) {
-  //[CO190218 - OBSOLETE]      //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE);
-  //[CO190218 - OBSOLETE]      _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure);
-  //[CO190218 - OBSOLETE]      printXVector(rotatedAtom.fpos, false);
-  //[CO190218 - OBSOLETE]      cout << " | ";
-  //[CO190218 - OBSOLETE]      printXVector(_scStructure.atoms[atomID].fpos, false);
-  //[CO190218 - OBSOLETE]      cout << " | ";
-  //[CO190218 - OBSOLETE]      cout << aurostd::modulus(rotatedAtom.fpos - _scStructure.atoms[atomID].fpos) << std::endl;
-  //[CO190218 - OBSOLETE]    }
-  //[CO190218 - OBSOLETE]    throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO190218
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Move center back to zero atom...
-  //[CO190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(0);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  return l;
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO20190218
+  //[CO20190218 - OBSOLETE]//CO
+  //[CO20190218 - OBSOLETE]//this function does the opposite (to above)
+  //[CO20190218 - OBSOLETE]//in basis_atoms_map, return the index of the atom that is atomID
+  //[CO20190218 - OBSOLETE]#ifndef __OPTIMIZE
+  //[CO20190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  int l = 0;
+  //[CO20190218 - OBSOLETE]  //CO
+  //[CO20190218 - OBSOLETE]  for (; l < (int)symOp.basis_atoms_map.size(); l++) {
+  //[CO20190218 - OBSOLETE]    if (symOp.basis_atoms_map.at(l) == atomID) {
+  //[CO20190218 - OBSOLETE]#if MAP_VERBOSE
+  //[CO20190218 - OBSOLETE]      bool will_translate = symOp.is_agroup && translate;
+  //[CO20190218 - OBSOLETE]      cerr << "wherefrom: " << atomID << " " << centerID << " " << will_translate << " " << l << std::endl;
+  //[CO20190218 - OBSOLETE]      cerr << "atomID : " << _scStructure.atoms[atomID] << std::endl;
+  //[CO20190218 - OBSOLETE]      cerr << symOp << std::endl;
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]      return l;
+  //[CO20190218 - OBSOLETE]    }
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#if ERROR_VERBOSE
+  //[CO20190218 - OBSOLETE]  int l = 0;
+  //[CO20190218 - OBSOLETE]  for (; l < (int)symOp.basis_atoms_map.size(); l++) {
+  //[CO20190218 - OBSOLETE]    cout << "CHECKING: atomID=" << atomID << ", symOp.basis_atoms_map.at(l)=" << symOp.basis_atoms_map.at(l) << std::endl;
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]  throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO20190218
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO20190218
+  //[CO20190218 - OBSOLETE]#ifndef __OPTIMIZE
+  //[CO20190218 - OBSOLETE]  if (atomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (centerID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO20190218
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Get the center atom center...
+  //[CO20190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(centerID);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Find it
+  //[CO20190218 - OBSOLETE]  int l = 0;
+  //[CO20190218 - OBSOLETE]  for (; l < (int)_scStructure.atoms.size(); l++) {
+  //[CO20190218 - OBSOLETE]    //DX_atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE);
+  //[CO20190218 - OBSOLETE]    _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure);
+  //[CO20190218 - OBSOLETE]    if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[atomID].fpos, _SYM_AFLOW_APL_EPS_))
+  //[CO20190218 - OBSOLETE]      break;
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (l == (int)_scStructure.atoms.size()) {
+  //[CO20190218 - OBSOLETE]    _AFLOW_APL_REGISTER_ int l = 0;
+  //[CO20190218 - OBSOLETE]    for (; l < (int)_scStructure.atoms.size(); l++) {
+  //[CO20190218 - OBSOLETE]      //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE);
+  //[CO20190218 - OBSOLETE]      _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure);
+  //[CO20190218 - OBSOLETE]      printXVector(rotatedAtom.fpos, false);
+  //[CO20190218 - OBSOLETE]      cout << " | ";
+  //[CO20190218 - OBSOLETE]      printXVector(_scStructure.atoms[atomID].fpos, false);
+  //[CO20190218 - OBSOLETE]      cout << " | ";
+  //[CO20190218 - OBSOLETE]      cout << aurostd::modulus(rotatedAtom.fpos - _scStructure.atoms[atomID].fpos) << std::endl;
+  //[CO20190218 - OBSOLETE]    }
+  //[CO20190218 - OBSOLETE]    throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO20190218
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Move center back to zero atom...
+  //[CO20190218 - OBSOLETE]  if (translate && symOp.is_agroup) center(0);
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  return l;
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]#if !GETFULLSYMBASIS
-  //[CO190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]#if !GETFULLSYMBASIS
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
   const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID, int GROUP) {
     //go through all fgroups, look at basis_atoms_map at index whichatomID, find toAtomID
 #ifndef __OPTIMIZE
     if (whichAtomID >= (int)_scStructure.atoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom1ID index.");
-      string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
+      string function = "apl::Supercell::getSymOpWhichMatchAtoms():";
       string message = "Wrong atom1ID index " + aurostd::utype2string<int>(whichAtomID) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 
     if (toAtomID >= (int)_scStructure.atoms.size()) {
       //throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom2ID index.");
-      string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
+      string function = "apl::Supercell::getSymOpWhichMatchAtoms():";
       string message = "Wrong atom2ID index " + aurostd::utype2string<int>(toAtomID) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
@@ -1491,9 +1824,9 @@ namespace apl {
     else if (GROUP == _FGROUP_)
       symPool = &_scStructure.fgroup;
     else {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Unknown group type.");
-      string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
+      string function = "apl::Supercell::getSymOpWhichMatchAtoms():";
       string message = "Unknown group type.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1505,20 +1838,20 @@ namespace apl {
       //DX _atom newAtom = SYM::ApplyAtom(_scStructure.atoms[whichAtomID], (*symPool)[iSymOp],
       //DX                               _scStructure, TRUE, FALSE, _derivative_structure);  //CO no roff
       if (!SYM::ApplyAtomValidate(_scStructure.atoms[whichAtomID], newAtom, (*symPool)[iSymOp], _scStructure, _skew, TRUE, FALSE, _sym_eps)) {
-        // ME191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Illegitimate mapping.");
-        string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
+        string function = "apl::Supercell::getSymOpWhichMatchAtoms():";
         string message = "Illegitimate mapping.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
-      if (compareFPositions(newAtom.fpos, _scStructure.atoms[toAtomID].fpos)) {  //COREY NEW, default to symmetry tolerance
+      if (compareFPositions(newAtom.fpos, _scStructure.atoms[toAtomID].fpos)) {  //CO NEW, default to symmetry tolerance
         break;
       }
     }
 
     if (iSymOp == symPool->size()) {
 #if ERROR_VERBOSE
-      //corey some helpful output
+      //CO some helpful output
       cout << "_scStructure.fgroup.size()=" << _scStructure.fgroup.size() << std::endl;
       cout << "symPool->size()=" << symPool->size() << std::endl;
       cout << "ATOM " << whichAtomID << ": " << _scStructure.atoms[whichAtomID].fpos << std::endl;
@@ -1541,9 +1874,9 @@ namespace apl {
         cout << aurostd::modulus(newAtom.fpos - _scStructure.atoms[toAtomID].fpos) << std::endl;
       }
 #endif
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Mapping failed.");
-      string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
+      string function = "apl::Supercell::getSymOpWhichMatchAtoms():";
       string message = "Mapping failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1557,108 +1890,108 @@ namespace apl {
 
     return (*symPool)[iSymOp];
   }
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID, int GROUP) {
-  //[CO190218 - OBSOLETE]//go through all groups, look at basis_atoms_map at index whichatomID, find toAtomID
-  //[CO190218 - OBSOLETE]#ifndef __OPTIMIZE
-  //[CO190218 - OBSOLETE]  if (whichAtomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom1ID index.");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (toAtomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom2ID index.");
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  vector<_sym_op>* symPool = NULL;
-  //[CO190218 - OBSOLETE]  if (GROUP == _PGROUP_)
-  //[CO190218 - OBSOLETE]    symPool = &_scStructure.pgroup;
-  //[CO190218 - OBSOLETE]  else if (GROUP == _FGROUP_)
-  //[CO190218 - OBSOLETE]    symPool = &_scStructure.fgroup;
-  //[CO190218 - OBSOLETE]  else
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Unknown group type.");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  uint iSymOp = 0;
-  //[CO190218 - OBSOLETE]  for (; iSymOp < symPool->size(); iSymOp++) {
-  //[CO190218 - OBSOLETE]    if ((*symPool)[iSymOp].basis_atoms_map.at(whichAtomID) == toAtomID) {
-  //[CO190218 - OBSOLETE]      return (*symPool)[iSymOp];
-  //[CO190218 - OBSOLETE]    }
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]  throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Mapping failed.");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#if MAP_VERBOSE
-  //[CO190218 - OBSOLETE]  cerr << "getSymOp: " << whichAtomID << " " << toAtomID << " " << std::endl;
-  //[CO190218 - OBSOLETE]  cerr << "whichAtomID: " << _scStructure.atoms[whichAtomID] << std::endl;
-  //[CO190218 - OBSOLETE]  cerr << "toAtomID: " << _scStructure.atoms[toAtomID] << std::endl;
-  //[CO190218 - OBSOLETE]  cerr << (*symPool)[iSymOp] << std::endl;
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  return (*symPool)[iSymOp];
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID, int GROUP) {
-  //[CO190218 - OBSOLETE]#ifndef __OPTIMIZE
-  //[CO190218 - OBSOLETE]  if (whichAtomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom1ID index.");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (toAtomID >= (int)_scStructure.atoms.size())
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom2ID index.");
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  vector<_sym_op>* symPool = NULL;
-  //[CO190218 - OBSOLETE]  if (GROUP == _PGROUP_)
-  //[CO190218 - OBSOLETE]    symPool = &_scStructure.pgroup;
-  //[CO190218 - OBSOLETE]  else if (GROUP == _FGROUP_)
-  //[CO190218 - OBSOLETE]    symPool = &_scStructure.fgroup;
-  //[CO190218 - OBSOLETE]  else
-  //[CO190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Unknown group type.");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Apply all symmetry operations on atom1 and find which one produce atom2
-  //[CO190218 - OBSOLETE]  uint iSymOp = 0;
-  //[CO190218 - OBSOLETE]  for (; iSymOp < symPool->size(); iSymOp++) {
-  //[CO190218 - OBSOLETE]    //DX _atom newAtom = SYM::ApplyAtom(_scStructure.atoms[whichAtomID], (*symPool)[iSymOp],
-  //[CO190218 - OBSOLETE]    //DX                                _scStructure, TRUE);
-  //[CO190218 - OBSOLETE]    _atom newAtom = SYM::ApplyAtom(_scStructure.atoms[whichAtomID], (*symPool)[iSymOp],
-  //[CO190218 - OBSOLETE]                                   _scStructure);
-  //[CO190218 - OBSOLETE]    if (compareFPositions(newAtom.fpos, _scStructure.atoms[toAtomID].fpos, _SYM_AFLOW_APL_EPS_))
-  //[CO190218 - OBSOLETE]      break;
-  //[CO190218 - OBSOLETE]  }
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  if (iSymOp == symPool->size())
-  //[CO190218 - OBSOLETE]    throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Mapping failed.");
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  return (*symPool)[iSymOp];
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]/******************************************************************************/
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]#endif
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID, int GROUP) {
+  //[CO20190218 - OBSOLETE]//go through all groups, look at basis_atoms_map at index whichatomID, find toAtomID
+  //[CO20190218 - OBSOLETE]#ifndef __OPTIMIZE
+  //[CO20190218 - OBSOLETE]  if (whichAtomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom1ID index.");
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (toAtomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom2ID index.");
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  vector<_sym_op>* symPool = NULL;
+  //[CO20190218 - OBSOLETE]  if (GROUP == _PGROUP_)
+  //[CO20190218 - OBSOLETE]    symPool = &_scStructure.pgroup;
+  //[CO20190218 - OBSOLETE]  else if (GROUP == _FGROUP_)
+  //[CO20190218 - OBSOLETE]    symPool = &_scStructure.fgroup;
+  //[CO20190218 - OBSOLETE]  else
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Unknown group type.");
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  uint iSymOp = 0;
+  //[CO20190218 - OBSOLETE]  for (; iSymOp < symPool->size(); iSymOp++) {
+  //[CO20190218 - OBSOLETE]    if ((*symPool)[iSymOp].basis_atoms_map.at(whichAtomID) == toAtomID) {
+  //[CO20190218 - OBSOLETE]      return (*symPool)[iSymOp];
+  //[CO20190218 - OBSOLETE]    }
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]  throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Mapping failed.");
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#if MAP_VERBOSE
+  //[CO20190218 - OBSOLETE]  cerr << "getSymOp: " << whichAtomID << " " << toAtomID << " " << std::endl;
+  //[CO20190218 - OBSOLETE]  cerr << "whichAtomID: " << _scStructure.atoms[whichAtomID] << std::endl;
+  //[CO20190218 - OBSOLETE]  cerr << "toAtomID: " << _scStructure.atoms[toAtomID] << std::endl;
+  //[CO20190218 - OBSOLETE]  cerr << (*symPool)[iSymOp] << std::endl;
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  return (*symPool)[iSymOp];
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#else
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID, int GROUP) {
+  //[CO20190218 - OBSOLETE]#ifndef __OPTIMIZE
+  //[CO20190218 - OBSOLETE]  if (whichAtomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom1ID index.");
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (toAtomID >= (int)_scStructure.atoms.size())
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom2ID index.");
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  vector<_sym_op>* symPool = NULL;
+  //[CO20190218 - OBSOLETE]  if (GROUP == _PGROUP_)
+  //[CO20190218 - OBSOLETE]    symPool = &_scStructure.pgroup;
+  //[CO20190218 - OBSOLETE]  else if (GROUP == _FGROUP_)
+  //[CO20190218 - OBSOLETE]    symPool = &_scStructure.fgroup;
+  //[CO20190218 - OBSOLETE]  else
+  //[CO20190218 - OBSOLETE]    throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Unknown group type.");
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  // Apply all symmetry operations on atom1 and find which one produce atom2
+  //[CO20190218 - OBSOLETE]  uint iSymOp = 0;
+  //[CO20190218 - OBSOLETE]  for (; iSymOp < symPool->size(); iSymOp++) {
+  //[CO20190218 - OBSOLETE]    //DX _atom newAtom = SYM::ApplyAtom(_scStructure.atoms[whichAtomID], (*symPool)[iSymOp],
+  //[CO20190218 - OBSOLETE]    //DX                                _scStructure, TRUE);
+  //[CO20190218 - OBSOLETE]    _atom newAtom = SYM::ApplyAtom(_scStructure.atoms[whichAtomID], (*symPool)[iSymOp],
+  //[CO20190218 - OBSOLETE]                                   _scStructure);
+  //[CO20190218 - OBSOLETE]    if (compareFPositions(newAtom.fpos, _scStructure.atoms[toAtomID].fpos, _SYM_AFLOW_APL_EPS_))
+  //[CO20190218 - OBSOLETE]      break;
+  //[CO20190218 - OBSOLETE]  }
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  if (iSymOp == symPool->size())
+  //[CO20190218 - OBSOLETE]    throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Mapping failed.");
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]  return (*symPool)[iSymOp];
+  //[CO20190218 - OBSOLETE]}
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]#endif
+  //[CO20190218 - OBSOLETE]
+  //[CO20190218 - OBSOLETE]/******************************************************************************/
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   int Supercell::pc2scMap(int i) const {
     return _pc2scMap[i];
   }
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   int Supercell::sc2pcMap(int i) const {
     return _sc2pcMap[i];
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //CO - START
+  //CO START
   void Supercell::center(int i) {
     xvector<double> origin(3), frigin(3);
 #if CENTER_PRIM
-    //_inStructure.ShifOriginToAtom(_sc2pcMap[i]);
+    //_inStructure.ShiftOriginToAtom(_sc2pcMap[i]);
     //_inStructure.BringInCell();
     origin = _inStructure_original.atoms[_sc2pcMap[i]].cpos;
     frigin = _inStructure_original.atoms[_sc2pcMap[i]].fpos;
@@ -1669,7 +2002,7 @@ namespace apl {
       _inStructure.atoms[i] = BringInCell(_inStructure.atoms[i], _inStructure.lattice);
     }
 #endif
-    //_scStructure.ShifOriginToAtom(i);
+    //_scStructure.ShiftOriginToAtom(i);
     //_scStructure.BringInCell();
     origin = _scStructure_original.atoms[i].cpos;
     frigin = _scStructure_original.atoms[i].fpos;
@@ -1683,7 +2016,7 @@ namespace apl {
 
   void Supercell::center_original(void) {
     //just a (fast) undo for center(atom);
-    //refer to ShifOriginToAtom in case more properties need to be updated
+    //refer to ShiftOriginToAtom in case more properties need to be updated
 #if CENTER_PRIM
     _inStructure.origin = _inStructure_original.origin;
     for (uint i = 0; i < _inStructure.atoms.size(); i++) {
@@ -1700,44 +2033,68 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   const vector<_sym_op>& Supercell::getFGROUP(void) const {
     return _scStructure.fgroup;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20191219
+  void Supercell::getFullBasisAGROUP() {
+    string message = "Calculating the full basis for the site point groups of the supercell.";
+    message += " This may take a few minutes for high-symmetry structures.";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
+      string function = "apl::Supercell::getFullBasisAGROUP():";
+      message = "Could not calculate the bases of the site point groups.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
+  }
+
+  //ME20191219
+  bool Supercell::fullBasisCalculatedAGROUP() {
+    uint natoms = _scStructure.atoms.size();
+    for (uint at = 0; at < natoms; at++) {
+      const vector<_sym_op>& agroup = getAGROUP(at);
+      for (uint symop = 0; symop < agroup.size(); symop++) {
+        if (!agroup[symop].basis_map_calculated) return false;
+      }
+    }
+    return true;
+  }
+
+  //ME20190715 - added const to use function with const Supercell &
   const vector<vector<_sym_op> >& Supercell::getAGROUP(void) const {
     return _scStructure.agroup;
   }
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   const vector<_sym_op>& Supercell::getAGROUP(int i) const {
     return _scStructure.agroup[i];
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   double Supercell::getEPS(void) const {
     return _sym_eps;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   bool Supercell::isDerivativeStructure(void) const {
     return _derivative_structure;
   }
-  //CO - END
+  //CO END
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   string Supercell::getUniqueAtomSymbol(int i) const {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getUniqueAtomSymbol(): Wrong index.");
       string function = "apl::Supercell::getUniqueAtomSymbol():";
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
@@ -1749,57 +2106,57 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   double Supercell::getUniqueAtomMass(int i) const {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getUniqueAtomMass(): Wrong index.");
-      string function = "apl::Supercell::getUniqueAtomMass()";
+      string function = "apl::Supercell::getUniqueAtomMass():";
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 #endif
     //return( GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].cleanname) * KILOGRAM2AMU ); //JAHNATEK ORIGINAL
-    //COREY - START
-    //double mass = GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].cleanname); ME 190111 - too slow since version 3.216
-    double mass = GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].atomic_number);  // ME 190111
+    //CO START
+    //double mass = GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].cleanname); ME20190111 - too slow since version 3.216
+    double mass = GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].atomic_number);  //ME20190111
     if (mass == NNN) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getUniqueAtomMass(): Unknown atom types.");
-      string function = "apl::Supercell::getUniqueAtomMass()";
+      string function = "apl::Supercell::getUniqueAtomMass():";
       string message = "Unknown atom types.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     return mass * KILOGRAM2AMU;
-    //COREY - END
+    //CO END
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   double Supercell::getAtomMass(int i) const {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.atoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getAtomMass(): Wrong index.");
-      string function = "apl::Supercell::getAtomMass()";
+      string function = "apl::Supercell::getAtomMass():";
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 #endif
-    //return (GetAtomMass(_scStructure.atoms[i].cleanname) * KILOGRAM2AMU); ME 190111 - too slow since version 3.216
-    return (GetAtomMass(_scStructure.atoms[i].atomic_number) * KILOGRAM2AMU);  // ME 190111
+    //return (GetAtomMass(_scStructure.atoms[i].cleanname) * KILOGRAM2AMU); ME20190111 - too slow since version 3.216
+    return (GetAtomMass(_scStructure.atoms[i].atomic_number) * KILOGRAM2AMU);  //ME20190111
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME190715 - added const to use function with const Supercell &
+  //ME20190715 - added const to use function with const Supercell &
   int Supercell::getAtomNumber(int i) const {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.atoms.size()) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::getAtomNumber(): Wrong index.");
-      string function = "apl::Supercell::getAtomNumber()";
+      string function = "apl::Supercell::getAtomNumber():";
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
@@ -1808,7 +2165,54 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  // ME 180827 -- overloaded to calculate derivatives
+
+  //ME20200116 - Calculate the real space vectors for the phases once.
+  // Calculating them once for all atoms is very quick and significantly speeds
+  // up dynamical matrix calculations.
+  void Supercell::calculatePhaseVectors() {
+    uint natoms_in = _inStructure.atoms.size();
+    uint natoms_sc = _scStructure.atoms.size();
+    phase_vectors.clear();
+    phase_vectors.resize(natoms_in, vector<vector<xvector<double> > >(natoms_sc));
+    xvector<double> rf(3), rc(3), delta(3), pf(3), pc(3);
+    double rshell = 0.0;
+    int at1pc = -1, at2pc = -1, at1sc = -1, at2sc = -1, centerIDsc = -1;
+
+    for (uint centerID = 0; centerID < natoms_in; centerID++) {
+      centerIDsc = pc2scMap(centerID);
+      at2pc = sc2pcMap(centerIDsc);
+      at2sc = pc2scMap(at2pc);
+      for (uint atomID = 0; atomID < natoms_sc; atomID++) {
+        at1pc = sc2pcMap(atomID);
+        at1sc = pc2scMap(at1pc);
+        // Get the nearest image of atomID and determine the shell radius
+        rf = getFPositionItsNearestImage(atomID, centerIDsc);
+        rc = F2C(_scStructure.lattice, rf);
+        rshell = aurostd::modulus(rc);
+        delta = _scStructure.atoms[at1sc].cpos - _scStructure.atoms[at2sc].cpos;
+        // Get the phase vectors for all atoms that sit on the shell
+        if (!_isShellRestricted || (rshell <= _maxShellRadius[centerIDsc] + _AFLOW_APL_EPS_)) {
+          for (int ii = -1; ii <= 1; ii++) {
+            for (int jj = -1; jj <= 1; jj++) {
+              for (int kk = -1; kk <= 1; kk++) {
+                pf[1] = rf[1] + ii;
+                pf[2] = rf[2] + jj;
+                pf[3] = rf[3] + kk;
+                pc = F2C(_scStructure.lattice, pf);
+                if (aurostd::isequal(aurostd::modulus(pc), rshell, _AFLOW_APL_EPS_)) {
+                  pc -= delta;
+                  phase_vectors[centerID][atomID].push_back(pc);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  //ME20180827 -- overloaded to calculate derivatives
   bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
       xcomplex<double>& phase) {
     xvector<xcomplex<double> > placeholder;
@@ -1816,25 +2220,15 @@ namespace apl {
     return calcShellPhaseFactor(atomID, centerID, qpoint, phase, i, placeholder, false);
   }
 
+  //ME20200116 - rewritten to accommodate new phase vectors
   bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-      xcomplex<double>& phase, int& ifound,
+      xcomplex<double>& phase, int& multiplicity,
       xvector<xcomplex<double> >& derivative, bool calc_derivative) {
-    // Get the nearest image of this atom, it determine also the shell radius
-    xvector<double> rf = getFPositionItsNearestImage(atomID, centerID);
-    xvector<double> rc = F2C(_scStructure.lattice, rf);
-    double rshell = aurostd::modulus(rc);
-    // ME 180829 -- correction for the real space vector pc. With delta, the
-    // phases in AAPL are easier to calculate.
-    int at1pc = sc2pcMap(atomID);
-    int at2pc = sc2pcMap(centerID);
-    int at1sc = pc2scMap(at1pc);
-    int at2sc = pc2scMap(at2pc);
-    xvector<double> delta = getSupercellStructure().atoms[at1sc].cpos - getSupercellStructure().atoms[at2sc].cpos;
-
-    // Initialize
-    bool isCountable = false;
-    xcomplex<double> iONE(0.0, 1.0);
-    phase = 0.0;
+    centerID = sc2pcMap(centerID);
+    const vector<xvector<double> >& vec = phase_vectors[centerID][atomID];
+    multiplicity = (int) vec.size();
+    phase.re = 0.0;
+    phase.im = 0.0;
     if (calc_derivative) {
       for (int i = 1; i < 4; i++) {
         derivative[i].re = 0.0;
@@ -1842,42 +2236,16 @@ namespace apl {
       }
     }
 
-    // Count in all atoms which sit on this shell
-    if (!_isShellRestricted || (rshell <= _maxShellRadius[centerID] + _AFLOW_APL_EPS_)) {
-      isCountable = true;
-      ifound = 0;
-      xvector<double> pf(3), pc(3);
-
-      for (_AFLOW_APL_REGISTER_ int ii = -1; ii <= 1; ii++)
-        for (_AFLOW_APL_REGISTER_ int jj = -1; jj <= 1; jj++)
-          for (_AFLOW_APL_REGISTER_ int kk = -1; kk <= 1; kk++) {
-            pf(1) = rf(1) + ii;
-            pf(2) = rf(2) + jj;
-            pf(3) = rf(3) + kk;
-            pc = F2C(_scStructure.lattice, pf);
-
-
-            if (aurostd::abs(aurostd::modulus(pc) - rshell) < _AFLOW_APL_EPS_) {
-              //cout << centerID+1 << " " << atomID+1 << " " << aurostd::modulus(pc) << " "; printXVector(pc);
-              pc -= delta;
-              phase = phase + exp(iONE * scalar_product(qpoint, pc));
-              if (calc_derivative) {
-                for (uint i = 1; i < 4; i++) {
-                  derivative[i] += exp(iONE * (scalar_product(qpoint, pc))) * iONE * (pc(i));
-                }
-              }
-              ifound++;
-            }
-          }
-      phase *= (1.0 / ifound);
+    xcomplex<double> p;
+    for (int i = 0; i < multiplicity; i++) {
+      p = exp(iONE * scalar_product(qpoint, vec[i]))/((double) multiplicity);
+      phase += p;
       if (calc_derivative) {
-        for (int i = 1; i < 4; i++) {
-          derivative[i] /= (double) ifound;
-        }
+        for (int j = 1; j < 4; j++) derivative[j] += vec[i][j] * p * iONE;
       }
     }
-    //
-    return isCountable;
+
+    return (multiplicity > 0);
   }
 
 }  // namespace apl

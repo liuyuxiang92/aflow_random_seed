@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -44,7 +44,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   char string_line_TMELTING[1024],alloy_TMELTING[1024],*string_TMELTING_ptr;
   in_file_pointer_TMELTING=fopen(TMELTING_FILE,"r");
   if(in_file_pointer_TMELTING==NULL) {
-    cerr <<  "ERROR: file not found [M] " << MELTING_FILE << endl;
+    cerr << "ERROR: file not found [M] " << MELTING_FILE << endl;
     exit(0);
   }
   fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
@@ -53,7 +53,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   for(uint nalloy=0;nalloy<alloys.size();nalloy++)
     //  cerr << "DEBUG [0]  " << "Nalloy=" << nalloy << endl;
     // for(nalloy=1;nalloy<=1;nalloy++)
-  { //CO200106 - patching for auto-indenting
+  { //CO20200106 - patching for auto-indenting
 #ifdef TMELTING
     fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
     if(!strstr(string_line_TMELTING,alloys.at(nalloy))) {
@@ -100,7 +100,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     // 		      vector<string> &vList_Pmin,                       // OUT  [0,nspecies[ returns the prototype for reference
     // 		      vector<uint> &vList_Imin,                         // OUT  [0,nspecies[ returns the line index of vList.at(ispecies), in which we have the min enthalpy for reference
     // 		      vector<vector<vector<double> > > &vList_concs,    // OUT  [0,naries[*[0,vList.size()[*[0.nspecies[ the concentrations AxAyCz... where x+y+z=1 and it contains also ZEROS so that 0 0.25 0.75 is allowed
-    // 		      vector<vector<double> > &vList_Ef) {              // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list  //[CO200106 - close bracket for indenting]}
+    // 		      vector<vector<double> > &vList_Ef) {              // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list  //[CO20200106 - close bracket for indenting]}
     //vector<string> vspecies;                         // IN   [0,nspecies[ the species Ag,Cd,...   nspecies=number of these items    nspecies=naries
     //vector<string> vspecies_pp;                      // IN   [0,nspecies[ the pseudopotentials Ag_pv, Cd_sv
     //vector<vector<string> > vList;                   // OUT  [0,naries[*[0,vList.size()[ returns the lines of the library containing A,B,C,AB,AC,BC,ABC....
@@ -344,19 +344,19 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
             cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.orig")) {xstr=xstructure(aurl+"/POSCAR.orig",IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax1")) {xstr=xstructure(aurl+"/POSCAR.relax1",IOVASP_AUTO);}
-          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // MID
           if(!aurostd::FileExist(aurl+"/CONTCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.relax2")) {
             cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax2")) {xstr=xstructure(aurl+"/POSCAR.relax2",IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax1")) {xstr=xstructure(aurl+"/CONTCAR.relax1",IOVASP_AUTO);}
-          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // POST
           if(!aurostd::FileExist(aurl+"/CONTCAR.relax") && !aurostd::FileExist(aurl+"/CONTCAR.relax2")) {
             cerr << "ERROR aurl=\"" << aurl << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax")) {xstr=xstructure(aurl+"/CONTCAR.relax",IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax2")) {xstr=xstructure(aurl+"/CONTCAR.relax2",IOVASP_AUTO);}
-          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           //	plug.vstr.clear(); for(uint ii=0;ii<struct_proprts.vstr.size();ii++) plug.vstr.push_back(struct_proprts.vstr.at(ii));
           //	plug.nrelaxations=struct_proprts.nrelaxations;
           //	exit(0);
@@ -370,7 +370,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.orig"));xstr=xstructure(aus,IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1")) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
-          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // MID
           if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
             cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
@@ -378,7 +378,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
-          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // POST
           if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
             cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
@@ -386,7 +386,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax"));xstr=xstructure(aus,IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
-          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
 
         }
 
@@ -1071,8 +1071,8 @@ bool APENNSY_Parameters::LibLoadAlloysALLOY(string alloy_name,_aflags &aflags) {
       //  cerr << "[" << names << "] [" << KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))) << "]" << endl;
       // if(aurostd::substring2bool(KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))),names))
       if(names==KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i)))) // only one
-      { //CO200106 - patching for auto-indenting
-        // if(names==paramsX_tmp.alloys.at(i)) { // only one  //[CO200106 - close bracket for indenting]}
+      { //CO20200106 - patching for auto-indenting
+        // if(names==paramsX_tmp.alloys.at(i)) { // only one  //[CO20200106 - close bracket for indenting]}
         cerr << paramsX_tmp.alloys.at(i) << endl;
         alloys.push_back(paramsX_tmp.alloys.at(i));
         alloysRAW.push_back(paramsX_tmp.alloysRAW.at(i));
@@ -1101,7 +1101,7 @@ bool APENNSY_Parameters::LibLoadAlloysALLOY(string alloy_name,_aflags &aflags) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

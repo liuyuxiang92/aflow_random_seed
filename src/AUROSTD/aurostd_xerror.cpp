@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************
 // Class to handle AFLOW exceptions.
@@ -20,6 +20,8 @@
 namespace aurostd {
   // List of error types and errors ////////////////////////////////////////////
 #define _AFLOW_NUM_ERR_TYPES_ 7  // Number of error types
+
+  string xerror_PID;  //SC20200508
 
   static const std::string error_types[_AFLOW_NUM_ERR_TYPES_] = 
   {"", "Input Error", "File Error", "Value Error",
@@ -85,10 +87,12 @@ namespace aurostd {
   //buildMessageString/////////////////////////////////////////////////////////
   std::string xerror::buildMessageString() {
     std::stringstream msgstr;
+    msgstr << xerror_PID; //SC20200508
     msgstr << "ERROR " << error_code << " in ";
     msgstr << whereFunction() << ": ";  // function name
-    msgstr << error_string() << endl; //<< " - ";  // error type  //CO181226
+    msgstr << error_string() << endl; //<< " - ";  // error type  //CO20181226
     if (error_code == 2) {
+      //   msgstr << xerror_PID;  //SC20200508
       msgstr << "There was an error, but the supplied error code is invalid. Please contact the developers. ";
       msgstr << "Supplied error message: ";
     }
@@ -96,11 +100,11 @@ namespace aurostd {
     return msgstr.str();
   }
 
-  std::string xerror::whereFunction() { //CO191201
+  std::string xerror::whereFunction() { //CO20191201
     return function_name;
   }
 
-  std::string xerror::whereFileName() { //CO191201
+  std::string xerror::whereFileName() { //CO20191201
     return file_name;
   }
 
@@ -126,9 +130,10 @@ namespace aurostd {
   }
 } // namespace aurostd
 #endif
+
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************

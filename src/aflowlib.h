@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo 
@@ -13,7 +13,7 @@
 
 #include "aflow.h"
 #include "SQLITE/aflow_sqlite.h"
-//[OBSOLETE] [KESONG] #include "aflow_contrib_kesong.h" //CO 180515
+//[OBSOLETE] [KY] #include "aflow_contrib_kesong.h" //CO20180515
 
 using std::vector;
 using std::string;
@@ -51,7 +51,7 @@ namespace aflowlib {
       string auid;                                              // AFLOW UNIQUE IDENTIFIER
       deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
-      string title;                                             // ME 190125 - title of the calculation
+      string title;                                             //ME20190125 - title of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
       string aflowlib_date,aflowlib_version;                    // version/creation
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
@@ -74,7 +74,7 @@ namespace aflowlib {
       string composition;vector<double> vcomposition;
       string compound;
       double density;
-      double density_orig; //DX 20190124 - add original crystal info
+      double density_orig; //DX20190124 - add original crystal info
       string dft_type;vector<string> vdft_type;
       double eentropy_cell,eentropy_atom;
       double Egap,Egap_fit;
@@ -97,12 +97,12 @@ namespace aflowlib {
       string files_WEB;vector<string> vfiles_WEB;
       string forces;vector<xvector<double> > vforces;
       string geometry;vector<double> vgeometry; // a,b,c and unit_cell_angles (b,c) (a,c) (a,b)
-      string geometry_orig;vector<double> vgeometry_orig; // a,b,c and unit_cell_angles (b,c) (a,c) (a,b) //DX 20190124 - add original crystal info
+      string geometry_orig;vector<double> vgeometry_orig; // a,b,c and unit_cell_angles (b,c) (a,c) (a,b) //DX20190124 - add original crystal info
       string lattice_system_orig,lattice_variation_orig,lattice_system_relax,lattice_variation_relax;
       string ldau_TLUJ;
-      vector<vector<double> > vLDAU;  // ME190124
+      vector<vector<double> > vLDAU;  //ME20190124
       uint natoms;
-      uint natoms_orig; //DX 20190124 - add original crystal info
+      uint natoms_orig; //DX20190124 - add original crystal info
       string nbondxx;vector<double> vnbondxx;
       uint nspecies;
       string Pearson_symbol_orig,Pearson_symbol_relax;
@@ -115,12 +115,14 @@ namespace aflowlib {
       string prototype;
       double PV_cell,PV_atom;
       double scintillation_attenuation_length;
-      string sg,sg2;vector<string> vsg,vsg2; // CO 180101
+      string sg,sg2;vector<string> vsg,vsg2; //CO20180101
       string spacegroup_orig,spacegroup_relax;
       string species;vector<string> vspecies;
       string species_pp;vector<string> vspecies_pp;
       string species_pp_version;vector<string> vspecies_pp_version;
       string species_pp_ZVAL;vector<double> vspecies_pp_ZVAL;
+      string species_pp_AUID;vector<string> vspecies_pp_AUID;
+      string METAGGA; // empty if none, potential type is in xPOTCAR/xOUTCAR
       double spin_cell,spin_atom;
       string spinD;vector<double> vspinD;
       string spinD_magmom_orig;vector<double> vspinD_magmom_orig;
@@ -129,8 +131,8 @@ namespace aflowlib {
       string stoichiometry;vector<double> vstoichiometry;
       double valence_cell_std,valence_cell_iupac;
       double volume_cell,volume_atom;
-      double volume_cell_orig,volume_atom_orig; //DX 20190124 - add original crystal info
-      //DX 20190124 - added original symmetry info - START
+      double volume_cell_orig,volume_atom_orig; //DX20190124 - add original crystal info
+      //DX20190124 - added original symmetry info - START
       // SYMMETRY
       string crystal_family_orig;
       string crystal_system_orig;
@@ -155,8 +157,8 @@ namespace aflowlib {
       string Wyckoff_letters_orig;
       string Wyckoff_multiplicities_orig;
       string Wyckoff_site_symmetries_orig;
-      //DX 20190124 - added original symmetry info - END
-      //DX 20180823 - added more symmetry info - START
+      //DX20190124 - added original symmetry info - END
+      //DX20180823 - added more symmetry info - START
       // SYMMETRY
       string crystal_family;
       string crystal_system;
@@ -181,15 +183,15 @@ namespace aflowlib {
       string Wyckoff_letters;
       string Wyckoff_multiplicities;
       string Wyckoff_site_symmetries;
-      //DX 20180823 - added more symmetry info - END
-      //DX 20190208 - added anrl info - START
+      //DX20180823 - added more symmetry info - END
+      //DX20190208 - added anrl info - START
       string anrl_label_orig;
       string anrl_parameter_list_orig;
       string anrl_parameter_values_orig;
       string anrl_label_relax;
       string anrl_parameter_list_relax;
       string anrl_parameter_values_relax;
-      //DX 20190208 - added anrl info - END
+      //DX20190208 - added anrl info - END
       // AGL/AEL
       double agl_thermal_conductivity_300K;//  (W/m*K)
       double agl_debye;//  (K)
@@ -201,10 +203,10 @@ namespace aflowlib {
       double agl_bulk_modulus_static_300K;//  (GPa)
       double agl_bulk_modulus_isothermal_300K;//  (GPa)
       string agl_poisson_ratio_source;//
-      double agl_vibrational_free_energy_300K_cell;// (meV/cell) //CT181212
-      double agl_vibrational_free_energy_300K_atom;// (meV/atom) //CT181212
-      double agl_vibrational_entropy_300K_cell;// (meV/cell*K) //CT181212
-      double agl_vibrational_entropy_300K_atom;// (meV/atom*K) //CT181212
+      double agl_vibrational_free_energy_300K_cell;// (meV/cell) //CT20181212
+      double agl_vibrational_free_energy_300K_atom;// (meV/atom) //CT20181212
+      double agl_vibrational_entropy_300K_cell;// (meV/cell*K) //CT20181212
+      double agl_vibrational_entropy_300K_atom;// (meV/atom*K) //CT20181212
       double ael_poisson_ratio ;//
       double ael_bulk_modulus_voigt;//  (GPa)
       double ael_bulk_modulus_reuss;//  (GPa)
@@ -212,18 +214,17 @@ namespace aflowlib {
       double ael_shear_modulus_reuss;//  (GPa)
       double ael_bulk_modulus_vrh;//  (GPa)
       double ael_shear_modulus_vrh;//  (GPa)
-      double ael_elastic_anisotropy;// //CO181128
-      double ael_youngs_modulus_vrh;//  (GPa) //CT181212
-      double ael_speed_sound_transverse;// (m/s) //CT181212
-      double ael_speed_sound_longitudinal;// (m/s) //CT181212
-      double ael_speed_sound_average;// (m/s) //CT181212
-      double ael_pughs_modulus_ratio;// //CT181212
-      double ael_debye_temperature;// (K) //CT181212
-      double ael_applied_pressure;// (GPa) //CT181212
-      double ael_average_external_pressure; // (GPa) //CT181212
-      xmatrix<double> ael_stiffness_tensor;  // ME191105
-      xmatrix<double> ael_compliance_tensor;  // ME191105
-
+      double ael_elastic_anisotropy;// //CO20181128
+      double ael_youngs_modulus_vrh;//  (GPa) //CT20181212
+      double ael_speed_sound_transverse;// (m/s) //CT20181212
+      double ael_speed_sound_longitudinal;// (m/s) //CT20181212
+      double ael_speed_sound_average;// (m/s) //CT20181212
+      double ael_pughs_modulus_ratio;// //CT20181212
+      double ael_debye_temperature;// (K) //CT20181212
+      double ael_applied_pressure;// (GPa) //CT20181212
+      double ael_average_external_pressure; // (GPa) //CT20181212
+      xmatrix<double> ael_stiffness_tensor;  //ME20191105
+      xmatrix<double> ael_compliance_tensor;  //ME20191105
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -254,10 +255,10 @@ namespace aflowlib {
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
       bool directory2auid(string directory);                                                // from directory and AURL gives AUID and VAUID
-      void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         // CO 171202 - apennsy fixes
-      void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   // CO 171202 - apennsy fixes
-      bool ignoreBadDatabase() const;                                                       // CO 171202 - apennsy fixes
-      bool ignoreBadDatabase(string& reason) const;                                         // CO 171202 - apennsy fixes
+      void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
+      void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
+      bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
+      bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
     private:                                                     //
@@ -278,13 +279,13 @@ namespace aflowlib {
     private:
       struct sockaddr_in client;
       int sock;
-      int PORT;// = 80; // CO 180401
+      int PORT;// = 80; //CO20180401
       string Summons;
       string API_Path;
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; // CO 181226
+      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
@@ -292,16 +293,17 @@ namespace aflowlib {
 
 // ***************************************************************************
 namespace aflowlib {
-  uint auid2present(string="");
+  bool json2aflowlib(const string& json,string key,string& value); //ME I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
+  uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
-  string AFLUXCall(aurostd::xoption& vpflow); //DX 20190206 - add AFLUX functionality for command line 
-  string AFLUXCall(vector<string>& matchbook); //DX 20190206 - add AFLUX functionality
-  string AFLUXCall(string& summons); //DX 20190206 - add AFLUX functionality 
-  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX 20190206 - get properties from AFLUX response
-  uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss);
+  string AFLUXCall(aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
+  string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
+  string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
-  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  // TEST SC 20190813
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
 }
 
 // ***************************************************************************
@@ -372,8 +374,10 @@ namespace aflowlib {
   bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,string MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   bool LIB2RAW(string options,bool overwrite,bool LOCAL=false);
-  bool XPLUG(vector<string> argv);
-  bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); // CO 171025
+  bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
+  bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
+  bool XPLUG(const vector<string>& argv);  //CO20200501
+  bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
   bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
   // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
   bool LIB2RAW_Loop_Bands(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
@@ -382,7 +386,8 @@ namespace aflowlib {
   bool LIB2RAW_Loop_AGL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
   bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
   bool LIB2RAW_Loop_LOCK(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT181212
+  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
+  bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT20181212
 }
 
 namespace aflowlib {
@@ -425,6 +430,7 @@ class _outreach {
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
+    bool _isonline;       // YES
     string host;           // who invited
     string abstract;       // if available and in LaTeX
     string pdf;
@@ -490,7 +496,7 @@ bool AlloyAlphabeticLIBRARY(const string& system);
 // ***************************************************************************
 
 // ***************************************************************************
-// ME191001
+//ME20191001
 // AflowDB class
 
 namespace aflowlib {
@@ -585,13 +591,25 @@ namespace aflowlib {
       string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
       string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
   };
-
 }  // namespace aflowlib
+
+// ----------------------------------------------------------------------------
+// aflowlib_libraries_scrubber.cpp
+
+// will be moved near LI2RAW
+namespace aflowlib {
+  uint MOSFET(int mode,bool VERBOSE);
+  uint MAIL2SCAN(string library,bool VERBOSE);
+  uint LIB2SCRUB(string library,bool VERBOSE);
+  bool LIB2AUID(string entry,bool TEST,bool _VERBOSE);
+}  // namespace aflowlib
+
+
 
 #endif //  _AFLOWLIB_H_
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

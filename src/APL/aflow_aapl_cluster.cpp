@@ -1,9 +1,9 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
 // DOI: 10.1038/s41524-017-0046-7) and Jesus Carrete (ShengBTE, 
 // DOI: 10.1016/j.cpc.2014.02.015).
@@ -23,86 +23,60 @@ using aurostd::xerror;
 
 #define _DEBUG_AAPL_CLUSTERS_ false
 static const string _AAPL_CLUSTER_ERR_PREFIX_ = "apl::ClusterSet::";
+static const string _AAPL_CLUSTER_MODULE_ = "CLUSTER";
 
 /************************** CONSTRUCTORS/DESTRUCTOR *************************/
 
 namespace apl {
 
-  //Constructors////////////////////////////////////////////////////////////////
-  ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
-      double& cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
-    free();  // Clear old vectors
-    _logger << "CLUSTER: Building coordination shells." << apl::endl;
+  //Constructors//////////////////////////////////////////////////////////////
+  // Default constructor
+  ClusterSet::ClusterSet(ostream& oss) : xStream(oss) {
+    free();
+    directory = "./";
+  }
 
-    scell = supercell.getSupercellStructure();
-    pcell = supercell.getPrimitiveStructure();
-    sc_dim = supercell.scell;
-    pc2scMap = supercell._pc2scMap;
-    sc2pcMap = supercell._sc2pcMap;
-    symmetry_map = getSymmetryMap();
+  ClusterSet::ClusterSet(ofstream& mf, ostream& oss) : xStream(mf,oss) {
+    free();
+    directory = "./";
+  }
 
-    if (cut_shell > 0) {
-      double max_rad = getMaxRad(scell, cut_shell);
-      if (max_rad > cut_rad) {
-        // globally changes CUT_RAD
-        _logger << "Cutoff has been modified to " << max_rad << " Angstroms." << apl::endl;
-        cut_rad = max_rad;
-      }
-    }
-    cutoff = cut_rad;
-    buildShells();
+  ClusterSet::ClusterSet(const Supercell& supercell, int _order, int cut_shell,
+      double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream(mf,oss) {
+    free();
+    directory = dir;
+    initialize(supercell, _order, cut_shell, cut_rad);
   }
 
   //From file
-  ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
-      const int& cut_shell, double& cut_rad,
-      int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
+  ClusterSet::ClusterSet(const string& filename, const Supercell& supercell, int _order,
+      int cut_shell, double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();  // Clear old vectors
-    _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
-
-    order = _order;
-    scell = supercell.getSupercellStructure();
-    pcell = supercell.getPrimitiveStructure();
-    sc_dim = supercell.scell;
-    pc2scMap = supercell._pc2scMap;
-    sc2pcMap = supercell._sc2pcMap;
-    if (cut_shell > 0) {
-      double max_rad = getMaxRad(scell, cut_shell);
-      if (max_rad > cut_rad) {
-        // globally changes CUT_RAD
-        cut_rad = max_rad;
-      }
-    }
-    cutoff = cut_rad;
+    directory = dir;
+    initialize(supercell, _order, cut_shell, cut_rad);
     readClusterSetFromFile(filename);
-    // Necessary for AAPL calculations; since these calculations are
-    // quick, they are not stored in the output file
-    distortion_vectors = getCartesianDistortionVectors();
-    permutations = getPermutations(order);
-    nifcs = aurostd::powint(3, order);
   }
 
-  // Default constructor
-  ClusterSet::ClusterSet(Logger& l, _aflags& a) : _logger(l), aflags(a) {
+  //Copy Constructors/////////////////////////////////////////////////////////
+  ClusterSet::ClusterSet(const ClusterSet& that) : xStream(*that.getOFStream(),*that.getOSS()) {
     free();
-  }
-
-  //Copy Constructors///////////////////////////////////////////////////////////
-  ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
     copy(that);
   }
 
   const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
   void ClusterSet::copy(const ClusterSet& that) {
-    _logger = that._logger;
-    aflags = that.aflags;
+    xStream::copy(that);
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;
     cutoff = that.cutoff;
+    directory = that.directory;
     distortion_vectors = that.distortion_vectors;
     higher_order_ineq_distortions = that.higher_order_ineq_distortions;
     ineq_clusters = that.ineq_clusters;
@@ -119,78 +93,141 @@ namespace apl {
     symmetry_map = that.symmetry_map;
   }
 
-  //Destructor//////////////////////////////////////////////////////////////////
+  //Destructor////////////////////////////////////////////////////////////////
   ClusterSet::~ClusterSet() {
+    xStream::free();
     free();
   }
 
-  //free////////////////////////////////////////////////////////////////////////
+  //free//////////////////////////////////////////////////////////////////////
   // Clears all vectors and resets all values.
   void ClusterSet::free() {
+    clusters.clear();
     coordination_shells.clear();
     cutoff = 0.0;
+    directory = "";
     distortion_vectors.clear();
     higher_order_ineq_distortions.clear();
     ineq_clusters.clear();
     ineq_distortions.clear();
+    linear_combinations.clear();
     nifcs = 0;
     order = 0;
     pc2scMap.clear();
+    pcell.clear();
     permutations.clear();
+    scell.clear();
     sc_dim.clear();
     sc2pcMap.clear();
     symmetry_map.clear();
   }
 
 
-  //clear////////////////////////////////////////////////////////////////////////
+  //clear/////////////////////////////////////////////////////////////////////
   // Creates an empty ClusterSet object.
-  void ClusterSet::clear(Logger& l, _aflags& a) {
-    ClusterSet that(l, a);
-    copy(that);
+  void ClusterSet::clear() {
+    free();
+  }
+
+  //initialize////////////////////////////////////////////////////////////////
+  // Initialize basic parameters.
+  void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad) {
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize():";
+    stringstream message;
+    if (_order > 1) {
+      order = _order;
+    } else {
+      message << "Cluster order must be larger than 1 (is " << _order << ").";
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
+    }
+    nifcs = aurostd::powint(3, order);
+    scell = supercell.getSupercellStructure();
+    pcell = supercell.getInputStructure();
+    sc_dim = supercell.scell;
+    pc2scMap = supercell._pc2scMap;
+    sc2pcMap = supercell._sc2pcMap;
+    symmetry_map = getSymmetryMap();
+    if (cut_shell > 0) {
+      double max_rad = getMaxRad(scell, cut_shell);
+      if (max_rad > cut_rad) {
+        message << "Cutoff has been modified to " << max_rad << " Angstroms.";
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+        cut_rad = max_rad;
+      }
+    }
+    cutoff = cut_rad;
+    permutations = getPermutations(order);
+
+    // Clear cluster data
+    clusters.clear();
+    coordination_shells.clear();
+    higher_order_ineq_distortions.clear();
+    ineq_clusters.clear();
+    ineq_distortions.clear();
+    linear_combinations.clear();
   }
 
 }  // namespace apl
+
+/******************************* INTERFACE **********************************/
+
+namespace apl {
+
+  //getCluster////////////////////////////////////////////////////////////////
+  // Returns a cluster from the list of clusters
+  const _cluster& ClusterSet::getCluster(const int& i) const {
+    return clusters[i];
+  }
+
+  //Directory/////////////////////////////////////////////////////////////////
+  const string& ClusterSet::getDirectory() const {
+    return directory;
+  }
+
+  void ClusterSet::setDirectory(const string& dir) {
+    directory = dir;
+  }
+
+}
 
 /************************** INITIAL CALCULATIONS ****************************/
 
 namespace apl {
 
-  //getSymmetryMap//////////////////////////////////////////////////////////////
+  //getSymmetryMap////////////////////////////////////////////////////////////
   // Creates a symmetry map for a list of atoms in the supercell using scaled
   // symmetry operations. Note that the supercell and the primtive cell must
   // have the same symmetry.
   vector<vector<int> > ClusterSet::getSymmetryMap() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap():";
+    string message = "";
     // Check if the symmetry of the supercell and the primitive cell are the
-    // same by comparing the lattice point groups. To calculate the point
-    // groups, some dummy objects are needed. These objects will be removed
-    // as soon as CalculatePointGroup is redesigned to work without output
-    // streams and flags.
-    ofstream FileDevNull("/dev/null");
-    ostream dummy_os(NULL);
-    _aflags aflags;
-    aflags.QUIET = true;
-    if (!scell.pgroup_calculated) {
-      if (!SYM::CalculatePointGroup(FileDevNull, scell, aflags,
-            false, false, dummy_os, scell.sym_eps)) {
-        string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
-        string message = "Could not calculate the point group of the supercell.";
+    // same by comparing the crystal point groups.
+    if (!scell.pgroup_xtal_calculated) {
+      scell.CalculateSymmetryPointGroupCrystal(false);
+      if (!scell.pgroup_xtal_calculated) {
+        message = "Could not calculate the point group of the supercell.";
         throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
     if (!pcell.pgroup_xtal_calculated) {
-      if (!SYM::CalculatePointGroupCrystal(FileDevNull, pcell, aflags,
-            false, false, dummy_os, pcell.sym_eps)) {
-        string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
-        string message = "Could not calculate the point group of the primitive cell.";
+      pcell.CalculateSymmetryPointGroupCrystal(false);
+      if (!pcell.pgroup_xtal_calculated) {
+        message = "Could not calculate the point group of the primitive cell.";
         throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
-    FileDevNull.clear();
-    FileDevNull.close();
 
     if (SYM::PointGroupsIdentical(scell.pgroup_xtal, pcell.pgroup_xtal, scell.sym_eps, false)) {
+      // Make sure that the factor group is calculated
+      if (!pcell.fgroup_calculated) {
+        pcell.CalculateSymmetryFactorGroup(false);
+        if (!pcell.fgroup_calculated) {
+          message = "Could not calculate the factor group of the primitive cell.";
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        }
+      }
       bool mapped = false;
       // Minimum distance for pcell is the same for scell and cheaper to compute
       pcell.dist_nn_min = SYM::minimumDistance(pcell.atoms, pcell.lattice);
@@ -210,19 +247,17 @@ namespace apl {
         for (uint atsc = 0; atsc < natoms; atsc++) {
           mapped = false;
           fpos_scaled = (pcell.fgroup[fg].Uf * scell.atoms[atsc].fpos) + ftau_scaled;
-          for (uint at_map = 0; at_map < natoms; at_map++) {
+          for (uint at_map = 0; at_map < natoms && !mapped; at_map++) {
             if (SYM::FPOSMatch(fpos_scaled, scell.atoms[at_map].fpos,
-                  scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
+                  scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX20190619 - lattice and f2c as input
               sym_map[fg][atsc] = at_map;
               mapped = true;
             }
           }
           if (!mapped) {
-            string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
-            string message = "At least one atom of the supercell could not be mapped.";
+            message = "At least one atom of the supercell could not be mapped.";
             if (LDEBUG) {
-              std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc;
-              std::cerr << "using symmetry fgroup number " << fg << std::endl;
+              std::cerr << function << " Failed to map atom " << atsc << " using fgroup number " << fg << "." << std::endl;
             }
             throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
           }
@@ -230,8 +265,7 @@ namespace apl {
       }
       return sym_map;
     } else {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
-      string message = "The point group of supercell is different than the point of the supercell.";
+      message = "The point group of supercell is different than the point group of the input structure.";
       message += " This feature is not implemented yet.";
       if (LDEBUG) {
         std::cerr << "ClusterSet::getSymmetryMap: Point group mismatch. Primitive cell: ";
@@ -241,10 +275,10 @@ namespace apl {
     }
   }
 
-  ///getMaxRad//////////////////////////////////////////////////////////////////
+  ///getMaxRad////////////////////////////////////////////////////////////////
   // Returns the largest coordination shell for all inequivalent atoms using
   // cut_shell coordination shells.
-  double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
+  double ClusterSet::getMaxRad(const xstructure& cell, int cut_shell){
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_) || _DEBUG_AAPL_CLUSTERS_;
     if (cut_shell > 0) {
       int countshell = 0;
@@ -257,12 +291,12 @@ namespace apl {
         countshell = 0;
         int at1 = cell.iatoms[i][0];
         for (uint at2 = 0; at2 < natoms; at2++) {
-          //DX 20190613 [OBSOLETE - changed function name] distances[at2] = SYM::minimumCartesianDistance(cell.atoms[at1].cpos,
-          //DX 20190613 [OBSOLETE - changed function name]                                                cell.atoms[at2].cpos,
-          //DX 20190613 [OBSOLETE - changed function name]                                                cell.lattice);
+          //DX20190613 [OBSOLETE - changed function name] distances[at2] = SYM::minimumCartesianDistance(cell.atoms[at1].cpos,
+          //DX20190613 [OBSOLETE - changed function name]                                                cell.atoms[at2].cpos,
+          //DX20190613 [OBSOLETE - changed function name]                                                cell.lattice);
           distances[at2] = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(cell.atoms[at1].cpos,
                 cell.atoms[at2].cpos,
-                cell.lattice)); //DX 20190613
+                cell.lattice)); //DX20190613
         }
         distances = aurostd::sort(distances);
         for (uint j = 1; j < natoms; j++) {
@@ -287,10 +321,12 @@ namespace apl {
     }
   }
 
-  //buildShells/////////////////////////////////////////////////////////////////
+  //buildShells///////////////////////////////////////////////////////////////
   // Creates coordination shells around the atoms of the primitive cell.
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
+    string message = "Building coordination shells.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     int at1sc = 0;
     vector<int> shell;
     coordination_shells.clear();
@@ -301,13 +337,13 @@ namespace apl {
       at1sc = pc2scMap[at1];
       shell.push_back(at1sc);
       for (uint at2 = 0; at2 < natoms_scell; at2++) {
-        //DX 20190613 [OBSOLETE - changed function name] xvector<double> vec; xvector<int> ijk;
-        //DX 20190613 [OBSOLETE - changed function name] double cart_dist = SYM::minimumCartesianDistance(scell.atoms[at1sc].cpos,
-        //DX 20190613 [OBSOLETE - changed function name]                                                  scell.atoms[at2].cpos,
-        //DX 20190613 [OBSOLETE - changed function name]                                                  scell.lattice, vec, ijk);
+        //DX20190613 [OBSOLETE - changed function name] xvector<double> vec; xvector<int> ijk;
+        //DX20190613 [OBSOLETE - changed function name] double cart_dist = SYM::minimumCartesianDistance(scell.atoms[at1sc].cpos,
+        //DX20190613 [OBSOLETE - changed function name]                                                  scell.atoms[at2].cpos,
+        //DX20190613 [OBSOLETE - changed function name]                                                  scell.lattice, vec, ijk);
         double cart_dist = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(scell.atoms[at1sc].cpos,
               scell.atoms[at2].cpos,
-              scell.lattice)); //DX 20190613
+              scell.lattice)); //DX20190613
         if (cart_dist < cutoff) {
           shell.push_back(at2);
         }
@@ -332,28 +368,14 @@ namespace apl {
 
 namespace apl {
 
-  //getCluster//////////////////////////////////////////////////////////////////
-  // Returns a cluster from the list of clusters
-  const _cluster& ClusterSet::getCluster(const int& i) const {
-    return clusters[i];
-  }
-
-  //build///////////////////////////////////////////////////////////////////////
+  //build/////////////////////////////////////////////////////////////////////
   // Builds the inequivalent clusters.
-  void ClusterSet::build(int _order) {
+  void ClusterSet::build() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
-    if (_order > 1) {
-      order = _order;
-    } else {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "build";
-      stringstream message;
-      message << "Cluster order must be larger than 1 (is " << _order << ").";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
-    }
-    _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
-    nifcs = aurostd::powint(3, order);
-
-    permutations = getPermutations(order);
+    stringstream message;
+    message << "Building clusters of order " << order << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+    buildShells();
     clusters = buildClusters();
     getInequivalentClusters(clusters, ineq_clusters);
 
@@ -372,9 +394,9 @@ namespace apl {
     }
   }
 
-  //getPermutations/////////////////////////////////////////////////////////////
+  //getPermutations///////////////////////////////////////////////////////////
   // Initialize permutations.
-  vector<vector<int> > ClusterSet::getPermutations(const int& order) {
+  vector<vector<int> > ClusterSet::getPermutations(int order) {
     vector<int> permut_base(order);
     vector<vector<int> > permuts;
     for (int i = 0; i < order; i++) {
@@ -387,7 +409,7 @@ namespace apl {
     return permuts;
   }
 
-  //buildClusters///////////////////////////////////////////////////////////////
+  //buildClusters/////////////////////////////////////////////////////////////
   // Builds a list of clusters around the central atoms. No symmetry reduction
   // is performed here.
   vector<_cluster> ClusterSet::buildClusters() {
@@ -405,12 +427,12 @@ namespace apl {
           int at = coordination_shells[s][clst[o-1] + 1];
           for (int d = 1; d < o; d++) {
             int atc = atoms_in_cluster[d];
-            //DX 20190613 [OBSOLETE - changed function name] double mdist = SYM::minimumCartesianDistance(scell.atoms[at].cpos,
-            //DX 20190613 [OBSOLETE - changed function name]                                              scell.atoms[atc].cpos,
-            //DX 20190613 [OBSOLETE - changed function name]                                              scell.lattice);
+            //DX20190613 [OBSOLETE - changed function name] double mdist = SYM::minimumCartesianDistance(scell.atoms[at].cpos,
+            //DX20190613 [OBSOLETE - changed function name]                                              scell.atoms[atc].cpos,
+            //DX20190613 [OBSOLETE - changed function name]                                              scell.lattice);
             double mdist = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(scell.atoms[at].cpos,
                   scell.atoms[atc].cpos,
-                  scell.lattice)); //DX 20190613
+                  scell.lattice)); //DX20190613
             if (mdist > cutoff) {
               append = false;
               d = o;
@@ -437,17 +459,19 @@ namespace apl {
   }
 
   // BEGIN getInequivalentClusters functions
-  //getInequivalentClusters/////////////////////////////////////////////////////
+  //getInequivalentClusters///////////////////////////////////////////////////
   // Builds a list of inequivalent clusters and their transformations. This is
   // done in two steps: First, equivalenceCluster determines if the cluster in
-  // question can be transformed into an inequivalent cluster. However, for the
-  // force constants, it is important to know how the inequivalent cluster
+  // question can be transformed into an inequivalent cluster. However, for
+  // the force constants, it is important to know how the inequivalent cluster
   // transforms into the equivalent cluster, which is determined by getSymOp.
-  // While it is possible to determine this in one step, the two-step procedure
-  // is significantly faster, especially with many coordination shells.
+  // While it is possible to determine this in one step, the two-step
+  // procedure is significantly faster, especially with many coordination
+  // shells.
   void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
       vector<vector<int> > & ineq_clst) {
-    _logger << "CLUSTER: Determining inequivalent clusters." << apl::endl;
+    string message = "Determining inequivalent clusters.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     int equivalent_clst = -1;
     vector<int> unique_atoms;
     vector<vector<int> > compositions;
@@ -478,7 +502,7 @@ namespace apl {
     }
   }
 
-  //getNumUniqueAtoms///////////////////////////////////////////////////////////
+  //getNumUniqueAtoms/////////////////////////////////////////////////////////
   // Gets the number of unique atoms in a cluster. This greatly speeds up the
   // determination of inequivalent clusters because clusters with different
   // numbers of unique atoms cannot be equivalent and thus do not need to be
@@ -500,11 +524,11 @@ namespace apl {
     return unique;
   }
 
-  //getComposition//////////////////////////////////////////////////////////////
+  //getComposition////////////////////////////////////////////////////////////
   // Determines the composition of a cluster. This greatly speeds up the
   // determination of inequivalent clusters because clusters with different
-  // compoistion cannot be equivalent and thus do not need to be compared with
-  // each other.
+  // compoistion cannot be equivalent and thus do not need to be compared
+  // with each other.
   vector<int> ClusterSet::getComposition(const vector<int>& atoms) {
     vector<int> composition(scell.species.size());
     int type = -1;
@@ -515,7 +539,7 @@ namespace apl {
     return composition;
   }
 
-  //sameCompositions////////////////////////////////////////////////////////////
+  //sameCompositions//////////////////////////////////////////////////////////
   // Compares the compositions of two clusters. If they are not the same, the
   // symmetry check can be skipped.
   bool ClusterSet::sameComposition(const vector<int>& comp1,
@@ -528,10 +552,10 @@ namespace apl {
     return true;
   }
 
-  //equivalenceCluster//////////////////////////////////////////////////////////
-  // Determines whether a cluster is equivalent to another inequivalent cluster.
-  // The output is the index of the inequivalent cluster the cluster it is
-  // equivalent to (-1 if none).
+  //equivalenceCluster////////////////////////////////////////////////////////
+  // Determines whether a cluster is equivalent to another inequivalent
+  // cluster. The output is the index of the inequivalent cluster the cluster
+  // it is equivalent to (-1 if none).
   int ClusterSet::equivalenceCluster(const vector<int>& atoms,
       const vector<int>& unique_atoms,
       const vector<vector<int> >& compositions,
@@ -579,7 +603,7 @@ namespace apl {
     return -1;
   }
 
-  //translateToPcell//////////////////////////////////////////////////////////////
+  //translateToPcell//////////////////////////////////////////////////////////
   // Translates the cluster so that the atom with index "at" is inside the
   // primitive cell.
   vector<int> ClusterSet::translateToPcell(const vector<int>& atoms, int at) {
@@ -598,7 +622,7 @@ namespace apl {
           // No need to compare when atoms are of different type
           if (scell.atoms[j].type == scell.atoms[atoms[i]].type) {
             if (SYM::FPOSMatch(fpos_transl, scell.atoms[j].fpos, scell.lattice,
-                  scell.f2c, update, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
+                  scell.f2c, update, scell.sym_eps)) { //DX20190619 - lattice and f2c as input
               atoms_translated[i] = j;
               j = scell.atoms.size();
             }
@@ -609,10 +633,10 @@ namespace apl {
     return atoms_translated;
   }
 
-  //comparePermutations/////////////////////////////////////////////////////////
-  // Compares if clusters are equivalent by permutation and returns the index of
-  // the permutation (-1 if none). The algorithm requires the permutations to be
-  // in lexicographical order, which is done by xcombos.
+  //comparePermutations///////////////////////////////////////////////////////
+  // Compares if clusters are equivalent by permutation and returns the index
+  // of the permutation (-1 if none). The algorithm requires the permutations
+  // to be in lexicographical order, which is done by xcombos.
   int ClusterSet::comparePermutations(const vector<int>& cluster_ineq,
       const vector<int>& cluster_compare) {
     int index = 0, iper = 0;
@@ -637,20 +661,16 @@ namespace apl {
     }
   }
 
-  //atomsMatch//////////////////////////////////////////////////////////////////
-  // Auxilliary function for comparePermutations to make the code more legible.
-  // Returns true if the indices after permutation are the same.
+  //atomsMatch////////////////////////////////////////////////////////////////
+  // Auxilliary function for comparePermutations to make the code more
+  // legible. Returns true if the indices after permutation are the same.
   bool ClusterSet::atomsMatch(const vector<int>& permutation, const vector<int>& cluster_perm,
       const vector<int>& cluster_orig, const int& depth) {
-    if (cluster_perm[permutation[depth]] == cluster_orig[depth]) {
-      return true;
-    } else {
-      return false;
-    }
+    return (cluster_perm[permutation[depth]] == cluster_orig[depth]);
   }
 
-  //getSymOp////////////////////////////////////////////////////////////////////
-  // Determines the factor group and the permutation index that transforms the
+  //getSymOp//////////////////////////////////////////////////////////////////
+  // Determines the factor group and the permutation index that transforms
   // the inequivalent cluster into the equivalent cluster.
   void ClusterSet::getSymOp(_cluster& cluster, const vector<int>& atoms_orig) {
     vector<int> cluster_transformed(order), cluster_transl(order);
@@ -679,10 +699,11 @@ namespace apl {
 
 namespace apl {
 
-  //buildDistortions////////////////////////////////////////////////////////////
+  //buildDistortions//////////////////////////////////////////////////////////
   // Builds the inequivalent distortions for the AAPL calculations.
   void ClusterSet::buildDistortions() {
-    _logger << "CLUSTER: Getting inequivalent distortions." << apl::endl;
+    string message = "Getting inequivalent distortions.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     distortion_vectors = getCartesianDistortionVectors();
     linear_combinations = getLinearCombinations();
     ineq_distortions = initializeIneqDists();
@@ -696,7 +717,7 @@ namespace apl {
     }
   }
 
-  //getCartesianDistortionVectors///////////////////////////////////////////////
+  //getCartesianDistortionVectors/////////////////////////////////////////////
   // Builds vectors along the plus and minus direction of the Cartesian axes.
   vector<xvector<double> > ClusterSet::getCartesianDistortionVectors() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
@@ -728,9 +749,9 @@ namespace apl {
     return dist_vecs;
   }
 
-  //initializeIneqDists/////////////////////////////////////////////////////////
-  // Initializes the inequivalent distortion objects and groups all inequivalent
-  // clusters that require the same distortions.
+  //initializeIneqDists///////////////////////////////////////////////////////
+  // Initializes the inequivalent distortion objects and groups all
+  // inequivalent clusters that require the same distortions.
   vector<_ineq_distortions> ClusterSet::initializeIneqDists() {
     vector<_ineq_distortions> ineq_dists;
     for (uint ineq = 0; ineq < ineq_clusters.size(); ineq++) {
@@ -751,7 +772,7 @@ namespace apl {
     return ineq_dists;
   }
 
-  //sameDistortions/////////////////////////////////////////////////////////////
+  //sameDistortions///////////////////////////////////////////////////////////
   // Checks if the atoms that would be distorted for the inequivalent cluster
   // are already distorted by another cluster. Returns -1 if none are found.
   int ClusterSet::sameDistortions(const _cluster& clst,
@@ -776,7 +797,7 @@ namespace apl {
     return same;
   }
 
-  //getTestDistortions//////////////////////////////////////////////////////////
+  //getTestDistortions////////////////////////////////////////////////////////
   // Gets the test distortions from the linear dependences of the interatomic
   // force constants. Only the distortions that belong to linearly independent
   // force constants are kept.
@@ -830,9 +851,9 @@ namespace apl {
   }
 
   // BEGIN Inequivalent distortions functions
-  //getInequivalentDistortions//////////////////////////////////////////////////
-  // Determines a set of inequivalent distortions and the distortions that are
-  // equivalent by symmetry.
+  //getInequivalentDistortions////////////////////////////////////////////////
+  // Determines a set of inequivalent distortions and the distortions that
+  // are equivalent by symmetry.
   void ClusterSet::getInequivalentDistortions(const vector<vector<int> >& dists,
       _ineq_distortions& ineq_dists) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
@@ -878,9 +899,9 @@ namespace apl {
     }
   }
 
-  //appendDistortion////////////////////////////////////////////////////////////
-  // Append the distortion either to its equivalent distortion or creates a new
-  // inequivalent distortion.
+  //appendDistortion//////////////////////////////////////////////////////////
+  // Append the distortion either to its equivalent distortion or creates a
+  // new inequivalent distortion.
   void ClusterSet::appendDistortion(_ineq_distortions& ineq_dists, vector<int> dist,
       const int& eq, const int& fg) {
     vector<int> transformation_map;
@@ -903,12 +924,12 @@ namespace apl {
     }
   }
 
-  //allZeroDistortions///////////////////////////////////////////////////////////
-  // Returns whether the set of distortions cancel each other out (i.e. the total
-  // distortions are all zero vectors) since the force constant is then zero and
-  // does not need to be considered. This algorithm assumes that atoms are in
-  // lexicographical order, which is true when the clusters were created using
-  // xcombos.
+  //allZeroDistortions////////////////////////////////////////////////////////
+  // Returns whether the set of distortions cancel each other out (i.e. the
+  // total distortions are all zero vectors) since the force constant is then
+  // zero and does not need to be considered. This algorithm assumes that
+  // atoms are in lexicographical order, which is true when the clusters were
+  // created using xcombos.
   bool ClusterSet::allZeroDistortions(const vector<int>& atoms, const vector<int>& dist) {
     int atom = 0, at_count = 0;
     uint natoms = atoms.size();
@@ -935,7 +956,7 @@ namespace apl {
     return true;
   }
 
-  //allAtomsMatch///////////////////////////////////////////////////////////////
+  //allAtomsMatch/////////////////////////////////////////////////////////////
   // Tests whether all atoms transform into themselves under factor group fg.
   bool ClusterSet::allAtomsMatch(const int& fg, const vector<int>& atoms) {
     vector<int> atoms_transformed(order -1);
@@ -951,7 +972,7 @@ namespace apl {
     return true;
   }
 
-  //equivalenceDistortions//////////////////////////////////////////////////////
+  //equivalenceDistortions////////////////////////////////////////////////////
   // Determines whether a distortion is equivalent to another inequivalent
   // distortion and returns the index of that distortion (-1 if not equivalent
   // to any).
@@ -1003,7 +1024,7 @@ namespace apl {
     return eq;
   }
 
-  //getTransformationMap////////////////////////////////////////////////////////
+  //getTransformationMap//////////////////////////////////////////////////////
   // Obtains the transformation map for the equivalent distortion.
   vector<int> ClusterSet::getTransformationMap(const int& fg, const int& atom) {
     uint natoms = scell.atoms.size();
@@ -1024,7 +1045,7 @@ namespace apl {
         xvector<double> fpos = scell.c2f * (scell.atoms[atom_trans].cpos - transl);
         for (uint at_map = 0; at_map < natoms; at_map++) {
           if (SYM::FPOSMatch(fpos, scell.atoms[at_map].fpos,
-                scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
+                scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX20190619 - lattice and f2c as input
             transformation_map[at] = at_map;
             at_map = natoms;
           }
@@ -1035,7 +1056,7 @@ namespace apl {
   }
   // END Inequivalent distortions functions
 
-  //getHigherOrderDistortions///////////////////////////////////////////////////
+  //getHigherOrderDistortions/////////////////////////////////////////////////
   vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
     vector<_ineq_distortions> ineq_dists;
     if (order != 4) return ineq_dists;  // Not implemented for higher order and not necessary for lower
@@ -1078,7 +1099,7 @@ namespace apl {
 
 namespace apl {
 
-  //getLinearCombinations///////////////////////////////////////////////////////
+  //getLinearCombinations/////////////////////////////////////////////////////
   // Obtains the linear combinations of the IFCs. See aflow.apl.h for a
   // description of the _linearCombinations struct.
   vector<_linearCombinations> ClusterSet::getLinearCombinations() {
@@ -1146,7 +1167,7 @@ namespace apl {
     return lincombs;
   }
 
-  //getSymOps///////////////////////////////////////////////////////////////////
+  //getSymOps/////////////////////////////////////////////////////////////////
   // Gets all the symmetry operations permutation that transform a cluster of
   // atoms into itself or a permutation of itself. This algorithm cannot use
   // ClusterSet::comparePermutations because it needs to find all permutations
@@ -1190,7 +1211,7 @@ namespace apl {
     return sym;
   }
 
-  //buildCoefficientMatrix//////////////////////////////////////////////////////
+  //buildCoefficientMatrix////////////////////////////////////////////////////
   // Builds the coefficient matrix that will be used to obtain the RREF.
   vector<vector<double> > ClusterSet::buildCoefficientMatrix(const vector<vector<int> >& symops) {
     vector<vector<double> > coeff_mat;
@@ -1240,7 +1261,7 @@ namespace apl {
     return coeff_mat;
   }
 
-  //getRREF/////////////////////////////////////////////////////////////////////
+  //getRREF///////////////////////////////////////////////////////////////////
   // Obtains the reduced row echelon form (RREF) of the coefficient matrix
   // using Gaussian elimination.
   vector<vector<double> > ClusterSet::getRREF(vector<vector<double> > mat) {
@@ -1292,10 +1313,11 @@ namespace apl {
 namespace apl {
 
   // BEGIN Write files
-  //writeClusterSetToFile///////////////////////////////////////////////////////
+  //writeClusterSetToFile/////////////////////////////////////////////////////
   // Writes the ClusterSet object to an XML file.
   void ClusterSet::writeClusterSetToFile(const string& filename) {
-    _logger << "Writing ClusterSet to file " << filename << apl::endl;
+    string message = "Writing ClusterSet to file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     std::stringstream output;
     // Header
     output << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
@@ -1310,26 +1332,27 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "writeClusterSetToFile";
-      string message = "Could not write ClusterSet to file.";
+      message = "Could not write ClusterSet to file.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }
 
-  //writeParameters/////////////////////////////////////////////////////////////
-  // Writes the calculation parameters and minimal structure information of the
-  // XML file.
+  //writeParameters///////////////////////////////////////////////////////////
+  // Writes the calculation parameters and minimal structure information of
+  // the XML file.
   string ClusterSet::writeParameters() {
     std::stringstream parameters;
     string tab = " ";
 
     // Info about calculation run
     parameters << tab << "<generator>" << std::endl;
+    parameters << tab << tab << "<i name=\"aflow_version\" type=\"string\">" << AFLOW_VERSION << "</i>" << std::endl;
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
-    parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
+    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
+    parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
 
@@ -1373,7 +1396,7 @@ namespace apl {
     return parameters.str();
   }
 
-  //writeClusters///////////////////////////////////////////////////////////////
+  //writeClusters/////////////////////////////////////////////////////////////
   // Writes the _cluster objects inside a set of clusters.
   string ClusterSet::writeClusters(const vector<_cluster>& clusters) {
     string tab = " ";
@@ -1396,7 +1419,7 @@ namespace apl {
     return clst.str();
   }
 
-  //writeInequivalentClusters///////////////////////////////////////////////////
+  //writeInequivalentClusters/////////////////////////////////////////////////
   // Writes the inequivalent clusters and the linear combinations.
   string ClusterSet::writeInequivalentClusters() {
     string tab = " ";
@@ -1414,7 +1437,7 @@ namespace apl {
     return clusters.str();
   }
 
-  //writeLinearCombinations/////////////////////////////////////////////////////
+  //writeLinearCombinations///////////////////////////////////////////////////
   // Writes the _linearCombinations object.
   string ClusterSet::writeLinearCombinations(const _linearCombinations& lcombs) {
     string tab = " ";
@@ -1468,7 +1491,7 @@ namespace apl {
     return lc.str();
   }
 
-  //writeInequivalentDistortions////////////////////////////////////////////////
+  //writeInequivalentDistortions//////////////////////////////////////////////
   // Writes the inequivalent distortions.
   string ClusterSet::writeInequivalentDistortions() {
     string tab = " ";
@@ -1483,7 +1506,7 @@ namespace apl {
     return distortions.str();
   }
 
-  //writeIneqDist///////////////////////////////////////////////////////////////
+  //writeIneqDist/////////////////////////////////////////////////////////////
   // Writes a single _ineq_distortions object.
   string ClusterSet::writeIneqDist(const _ineq_distortions& ineq_dist) {
     string tab = " ";
@@ -1562,11 +1585,11 @@ namespace apl {
 
   // BEGIN Read files
 
-  //readClusterSetFromFile//////////////////////////////////////////////////////
+  //readClusterSetFromFile////////////////////////////////////////////////////
   // Reads a ClusterSet from an XML file.
   void ClusterSet::readClusterSetFromFile(const string& filename) {
     // Open file and handle exceptions
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusterSetFromFile";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusterSetFromFile():";
     stringstream message;
 
     if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
@@ -1600,17 +1623,23 @@ namespace apl {
       message << "The settings in the hibernate file and the aflow.in file are incompatible.";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
+
+    // Necessary for AAPL calculations; since these calculations are
+    // quick, they are not stored in the output file
+    distortion_vectors = getCartesianDistortionVectors();
+    permutations = getPermutations(order);
+    nifcs = aurostd::powint(3, order);
   }
 
-  //checkCompatibility//////////////////////////////////////////////////////////
-  // Checks if the hibernate XML file is compatible with the aflow.in file. If
-  // the checksum in the XML file is the same as the checksum of the aflow.in
-  // file, then the parameters are the same. If not, the function checks if the
-  // parameters relevant for the ClusterSet (supercell, order, cutoff) are the
-  // same. This prevents the ClusterSet from being recalculated when only
-  // post-processing parameters are changed.
+  //checkCompatibility////////////////////////////////////////////////////////
+  // Checks if the hibernate XML file is compatible with the aflow.in file.
+  // If the checksum in the XML file is the same as the checksum of the
+  // aflow.in file, then the parameters are the same. If not, the function
+  // checks if the parameters relevant for the ClusterSet (supercell, order,
+  // cutoff) are the same. This prevents the ClusterSet from being
+  // recalculated when only post-processing parameters are changed.
   bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlines) {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility():";
     string line = "";
     std::stringstream message;
     bool compatible = true;
@@ -1632,7 +1661,7 @@ namespace apl {
 
     t = line.find_first_of(">") + 1;
     tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
+    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
       tokens.clear();
@@ -1823,18 +1852,17 @@ namespace apl {
       } else {
         message << "The ClusterSet needs to be determined again.";
       }
-      _logger << apl::warning << "apl::ClusterSet::readClusterSetFromFile(); ";
-      _logger << message.str() << apl::endl;
+      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     return compatible;
   }
 
 
-  //readInequivalentClusters////////////////////////////////////////////////////
+  //readInequivalentClusters//////////////////////////////////////////////////
   // Reads the inequivalent clusters.
   void ClusterSet::readInequivalentClusters(uint& line_count,
       const vector<string>& vlines) {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters():";
     string line = "", message = "";
     vector<string> tokens;
     int t = 0;
@@ -1880,11 +1908,11 @@ namespace apl {
     }
   }
 
-  //readClusters////////////////////////////////////////////////////////////////
+  //readClusters//////////////////////////////////////////////////////////////
   // Reads a set of _cluster objects for the inequivalent clusters.
   vector<_cluster> ClusterSet::readClusters(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readClusters";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusters():";
     string message = "", line = "";
     vector<_cluster> clusters;
     vector<string> tokens;
@@ -1931,11 +1959,11 @@ namespace apl {
     return clusters;
   }
 
-  //readLinearCombinations//////////////////////////////////////////////////////
+  //readLinearCombinations////////////////////////////////////////////////////
   // Reads a single _linearCombinations object.
   _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readLinearCombinations";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readLinearCombinations():";
     string message = "", line = "";
     _linearCombinations lcombs;
     vector<string> tokens;
@@ -2028,11 +2056,11 @@ namespace apl {
     return lcombs;
   }
 
-  //readInequivalentDistortions/////////////////////////////////////////////////
+  //readInequivalentDistortions///////////////////////////////////////////////
   // Reads the inequivalent distortions.
   void ClusterSet::readInequivalentDistortions(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readInequivalentDistortions";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentDistortions():";
     string line = "", message = "";
     uint vsize = vlines.size();
 
@@ -2050,7 +2078,7 @@ namespace apl {
   }
 
   _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string>& vlines) {
-    string function = "readIneqDist";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readIneqDist():";
     string line = "", message = "";
     uint vsize = vlines.size();
     vector<string> tokens;
@@ -2175,7 +2203,7 @@ namespace apl {
 
   void ClusterSet::readHigherOrderDistortions(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readHigherOrderDistortions";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readHigherOrderDistortions():";
     string line = "", message = "";
     uint vsize = vlines.size();
 
@@ -2198,7 +2226,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow Marco Esters - Duke University 2018                *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow MARCO ESTERS - Duke University 2018-2020           *
 // *                                                                         *
 // ***************************************************************************

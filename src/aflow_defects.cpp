@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - Nov 2007
@@ -99,8 +99,8 @@ acage::acage(const acage& b) {
 // ***************************************************************************
 // implementations
 bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
-			     const xvector<double>& v1,const xvector<double>& v2,
-			     const xvector<double>& v3,const xvector<double>& v4) {
+    const xvector<double>& v1,const xvector<double>& v2,
+    const xvector<double>& v3,const xvector<double>& v4) {
   double eps=_EPS_;
   xmatrix<double> A(5,5);
   A[1][1]=1.0;A[1][2]=1.0;A[1][3]=1.0;A[1][4]=0;A[1][5]=1.0;
@@ -129,7 +129,7 @@ bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
 }
 
 bool GetCircumCircleeFromThreePoints(xvector<double>& orig,double& radius,
-				     const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
+    const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
   double eps=_EPS_;
   xmatrix<double> A(4,4);
   A[1][1]=0;                                   A[1][2]=0;     A[1][3]=    0; A[1][4]=    0;
@@ -169,7 +169,7 @@ bool FPositionInsideCell(const xvector<double>& r) {
 bool EmptySphere(const deque<_atom>& grid_atoms,const xvector<double>& origin_cpos,const double& radius) {
   double eps=_EPS_;
   bool empty=TRUE;
-  //  for(uint iat=0;iat<grid_atoms.size()&&empty==TRUE;iat++) {
+  //  for(uint iat=0;iat<grid_atoms.size()&&empty==TRUE;iat++)
   for(uint iat=0;iat<grid_atoms.size();iat++) {
     //    if(abs(grid_atoms.at(iat).cpos[1]-1.728644884961154)<0.01)
     //     //   0.000000000099805   2.261436255651232
@@ -213,9 +213,9 @@ uint CoordinationPoint(const xstructure& str,deque<_atom>& ratoms,const xvector<
 
 
 bool AddCageToCages(const xstructure& str,const xvector<double>& origin_cpos,const xvector<double>& origin_fpos,const double& radius,
-		    const int& cage_points_type,const double& roughness,
-		    vector<acage>& cages,vector<acage>& cagesX,
-		    const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2,int ithread) {
+    const int& cage_points_type,const double& roughness,
+    vector<acage>& cages,vector<acage>& cagesX,
+    const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2,int ithread) {
   acage cage;
   double eps=_EPS_;
   bool found=FALSE;
@@ -251,7 +251,7 @@ bool AddCageToCages(const xstructure& str,const xvector<double>& origin_cpos,con
     if(oss2write) oss2 << "  " << (int) cagesX.at(ig).cages_position;
     if(oss1write) {oss1 << "  [";for(uint iat=0;iat<cagesX.at(ig).atoms.size();iat++) oss1 << str.species.at(cagesX.at(ig).atoms.at(iat).type) << "(" << cagesX.at(ig).atoms.at(iat).basis << ")" << (iat<cagesX.at(ig).atoms.size()-1?",":""); oss1 << "]"; }
     if(oss2write) {oss2 << "  [";for(uint iat=0;iat<cagesX.at(ig).atoms.size();iat++) oss2 << str.species.at(cagesX.at(ig).atoms.at(iat).type) << "(" << cagesX.at(ig).atoms.at(iat).basis << ")" << (iat<cagesX.at(ig).atoms.size()-1?",":""); oss2 << "]"; }
-      
+
     // if(oss1write) oss1 << " " << iat1 << "(" << modulus(origin_cpos-v1) << ") ";
     // if(oss1write) oss1 << " " << iat2 << "(" << modulus(origin_cpos-v2) << ") ";
     // if(oss1write) oss1 << " " << iat3 << "(" << modulus(origin_cpos-v3) << ") ";
@@ -267,7 +267,7 @@ bool AddCageToCages(const xstructure& str,const xvector<double>& origin_cpos,con
 }
 
 uint GetCages4(const xstructure& str,const double& roughness,vector<acage>& cages,vector<acage>& cages4,
-	      const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2) {
+    const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2) {
   xvector<double> v1(3),v2(3),v3(3),v4(3);
   xvector<double> origin_cpos(3),origin_fpos(3);
   double radius;
@@ -275,26 +275,26 @@ uint GetCages4(const xstructure& str,const double& roughness,vector<acage>& cage
   cages4.clear();
   bool found;
   uint gridsize=str.grid_atoms.size();
-  //  for(uint iat1=0;iat1<gridsize;iat1++) {
+  //  for(uint iat1=0;iat1<gridsize;iat1++)
   for(uint iat1=0;iat1<str.atoms.size();iat1++) {
     v1=str.grid_atoms.at(iat1).cpos;
     for(uint iat2=iat1+1;iat2<gridsize;iat2++) {
       v2=str.grid_atoms.at(iat2).cpos;
       for(uint iat3=iat2+1;iat3<gridsize;iat3++) {
-	v3=str.grid_atoms.at(iat3).cpos;
-	for(uint iat4=iat3+1;iat4<gridsize;iat4++) {
-	  v4=str.grid_atoms.at(iat4).cpos;
-	  found=GetSphereFromFourPoints(origin_cpos,radius,v1,v2,v3,v4);
-	  if(found) {
-	    origin_fpos=C2F(str.lattice,origin_cpos);
-	    //  origin_fpos=str.c2f*origin_cpos;
-	    // roundoff(origin_fpos,eps);
-	    if(FPositionInsideCell(origin_fpos))
-	      //	      cerr << origin_fpos << "  " << origin_cpos << endl;
-	      if(EmptySphere(str,origin_cpos,radius))
-		AddCageToCages(str,origin_cpos,origin_fpos,radius,4,roughness,cages,cages4,oss1write,oss1,oss2write,oss2,-1);
-	  }
-	}
+        v3=str.grid_atoms.at(iat3).cpos;
+        for(uint iat4=iat3+1;iat4<gridsize;iat4++) {
+          v4=str.grid_atoms.at(iat4).cpos;
+          found=GetSphereFromFourPoints(origin_cpos,radius,v1,v2,v3,v4);
+          if(found) {
+            origin_fpos=C2F(str.lattice,origin_cpos);
+            //  origin_fpos=str.c2f*origin_cpos;
+            // roundoff(origin_fpos,eps);
+            if(FPositionInsideCell(origin_fpos))
+              //	      cerr << origin_fpos << "  " << origin_cpos << endl;
+              if(EmptySphere(str,origin_cpos,radius))
+                AddCageToCages(str,origin_cpos,origin_fpos,radius,4,roughness,cages,cages4,oss1write,oss1,oss2write,oss2,-1);
+          }
+        }
       }
     }
   }
@@ -332,32 +332,32 @@ void *_threaded_GetCages4(void *ptr) {
   // pthread_mutex_lock( &mutex_DEFECTS );
   // cerr << "DEBUG: _threaded_GetCages4 " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;
   // pthread_mutex_unlock( &mutex_DEFECTS );
-  // for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).grid_atoms.size();iat1+=(pparams->THREADS_MAX)) {
+  // for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).grid_atoms.size();iat1+=(pparams->THREADS_MAX))
   for(uint iat1=0;iat1<(*pparams->pstr).atoms.size();iat1++) {
     v1=(*pparams->pstr).grid_atoms[iat1].cpos;
-    // for(uint iat2=iat1+1;iat2<(*pparams->pstr).grid_atoms.size();iat2++) {
+    // for(uint iat2=iat1+1;iat2<(*pparams->pstr).grid_atoms.size();iat2++)
     for(uint iat2=iat1+1+(pparams->ITHREAD);iat2<(*pparams->pstr).grid_atoms.size();iat2+=(pparams->THREADS_MAX)) {
       v2=(*pparams->pstr).grid_atoms[iat2].cpos;
       for(uint iat3=iat2+1;iat3<(*pparams->pstr).grid_atoms.size();iat3++) {
-	v3=(*pparams->pstr).grid_atoms[iat3].cpos;
-	for(uint iat4=iat3+1;iat4<(*pparams->pstr).grid_atoms.size();iat4++) {
-	  v4=(*pparams->pstr).grid_atoms[iat4].cpos;
-	  found=GetSphereFromFourPoints(origin_cpos,radius,v1,v2,v3,v4);
-	  if(found) {
-	    origin_fpos=C2F((*pparams->pstr).lattice,origin_cpos);
-	    roundoff(origin_fpos,eps);
-	    if(FPositionInsideCell(origin_fpos))
-	      if(EmptySphere((*pparams->pstr),origin_cpos,radius)) {
-		pthread_mutex_lock( &mutex_DEFECTS );
-		AddCageToCages((*pparams->pstr),origin_cpos,origin_fpos,radius,4,(*pparams->proughness),
-			       (*pparams->pcages),(*pparams->pcages4),
-			       (*pparams->poss1write),(*pparams->poss1),
-			       (*pparams->poss2write),(*pparams->poss2),
-			       (pparams->ITHREAD));	    
-		pthread_mutex_unlock( &mutex_DEFECTS );
-	      }
-	  }
-	}
+        v3=(*pparams->pstr).grid_atoms[iat3].cpos;
+        for(uint iat4=iat3+1;iat4<(*pparams->pstr).grid_atoms.size();iat4++) {
+          v4=(*pparams->pstr).grid_atoms[iat4].cpos;
+          found=GetSphereFromFourPoints(origin_cpos,radius,v1,v2,v3,v4);
+          if(found) {
+            origin_fpos=C2F((*pparams->pstr).lattice,origin_cpos);
+            roundoff(origin_fpos,eps);
+            if(FPositionInsideCell(origin_fpos))
+              if(EmptySphere((*pparams->pstr),origin_cpos,radius)) {
+                pthread_mutex_lock( &mutex_DEFECTS );
+                AddCageToCages((*pparams->pstr),origin_cpos,origin_fpos,radius,4,(*pparams->proughness),
+                    (*pparams->pcages),(*pparams->pcages4),
+                    (*pparams->poss1write),(*pparams->poss1),
+                    (*pparams->poss2write),(*pparams->poss2),
+                    (pparams->ITHREAD));	    
+                pthread_mutex_unlock( &mutex_DEFECTS );
+              }
+          }
+        }
       }
     }
   }
@@ -369,29 +369,29 @@ void *_threaded_GetCages4(void *ptr) {
 }
 
 uint GetCages3(const xstructure& str,const double& roughness,vector<acage>& cages,vector<acage>& cages3,
-	      const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2) {
+    const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2) {
   xvector<double> v1(3),v2(3),v3(3),origin_cpos(3),origin_fpos(3);
   //  acage cage;
   double eps=_EPS_;
   double radius;
   cages3.clear();
   bool found;
-  // for(uint iat1=0;iat1<str.grid_atoms.size();iat1++) {
+  // for(uint iat1=0;iat1<str.grid_atoms.size();iat1++)
   for(uint iat1=0;iat1<str.atoms.size();iat1++) {
     v1=str.grid_atoms[iat1].cpos;
     for(uint iat2=iat1+1;iat2<str.grid_atoms.size();iat2++) {
       v2=str.grid_atoms[iat2].cpos;
       for(uint iat3=iat2+1;iat3<str.grid_atoms.size();iat3++) {
-	v3=str.grid_atoms[iat3].cpos;
-	found=GetCircumCircleeFromThreePoints(origin_cpos,radius,v1,v2,v3);
-	if(found) {
-	  // cerr << iat1 << " " << iat2 << " " << iat3 << endl;
-	  origin_fpos=C2F(str.lattice,origin_cpos);
-	  roundoff(origin_fpos,eps);
-	  if(FPositionInsideCell(origin_fpos))
-	    if(EmptySphere(str,origin_cpos,radius))
-	      AddCageToCages(str,origin_cpos,origin_fpos,radius,3,roughness,cages,cages3,oss1write,oss1,oss2write,oss2,-1);
-	}
+        v3=str.grid_atoms[iat3].cpos;
+        found=GetCircumCircleeFromThreePoints(origin_cpos,radius,v1,v2,v3);
+        if(found) {
+          // cerr << iat1 << " " << iat2 << " " << iat3 << endl;
+          origin_fpos=C2F(str.lattice,origin_cpos);
+          roundoff(origin_fpos,eps);
+          if(FPositionInsideCell(origin_fpos))
+            if(EmptySphere(str,origin_cpos,radius))
+              AddCageToCages(str,origin_cpos,origin_fpos,radius,3,roughness,cages,cages3,oss1write,oss1,oss2write,oss2,-1);
+        }
       }
     }
   }
@@ -412,30 +412,30 @@ void *_threaded_GetCages3(void *ptr) {
   // pthread_mutex_lock( &mutex_DEFECTS );
   // cerr << "DEBUG: _threaded_GetCages3 " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;
   // pthread_mutex_unlock( &mutex_DEFECTS );
-  // for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).grid_atoms.size();iat1+=(pparams->THREADS_MAX)) {
+  // for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).grid_atoms.size();iat1+=(pparams->THREADS_MAX))
   for(uint iat1=0;iat1<(*pparams->pstr).atoms.size();iat1++) {
     v1=(*pparams->pstr).grid_atoms[iat1].cpos;
-    // for(uint iat2=iat1+1;iat2<(*pparams->pstr).grid_atoms.size();iat2++) {
+    // for(uint iat2=iat1+1;iat2<(*pparams->pstr).grid_atoms.size();iat2++)
     for(uint iat2=iat1+1+(pparams->ITHREAD);iat2<(*pparams->pstr).grid_atoms.size();iat2+=(pparams->THREADS_MAX)) {
       v2=(*pparams->pstr).grid_atoms[iat2].cpos;
       for(uint iat3=iat2+1;iat3<(*pparams->pstr).grid_atoms.size();iat3++) {
-	v3=(*pparams->pstr).grid_atoms[iat3].cpos;
-	found=GetCircumCircleeFromThreePoints(origin_cpos,radius,v1,v2,v3);
-	if(found) {
-	  // cerr << iat1 << " " << iat2 << " " << iat3 << endl;
-	  origin_fpos=C2F((*pparams->pstr).lattice,origin_cpos);
-	  roundoff(origin_fpos,eps);
-	  if(FPositionInsideCell(origin_fpos))
-	    if(EmptySphere((*pparams->pstr),origin_cpos,radius)) {
-	      pthread_mutex_lock( &mutex_DEFECTS );
-	      AddCageToCages((*pparams->pstr),origin_cpos,origin_fpos,radius,3,
-			     (*pparams->proughness),(*pparams->pcages),(*pparams->pcages3),
-			     (*pparams->poss1write),(*pparams->poss1),
-			     (*pparams->poss2write),(*pparams->poss2),
-			     (pparams->ITHREAD));
-	      pthread_mutex_unlock( &mutex_DEFECTS );
-	    }
-	}
+        v3=(*pparams->pstr).grid_atoms[iat3].cpos;
+        found=GetCircumCircleeFromThreePoints(origin_cpos,radius,v1,v2,v3);
+        if(found) {
+          // cerr << iat1 << " " << iat2 << " " << iat3 << endl;
+          origin_fpos=C2F((*pparams->pstr).lattice,origin_cpos);
+          roundoff(origin_fpos,eps);
+          if(FPositionInsideCell(origin_fpos))
+            if(EmptySphere((*pparams->pstr),origin_cpos,radius)) {
+              pthread_mutex_lock( &mutex_DEFECTS );
+              AddCageToCages((*pparams->pstr),origin_cpos,origin_fpos,radius,3,
+                  (*pparams->proughness),(*pparams->pcages),(*pparams->pcages3),
+                  (*pparams->poss1write),(*pparams->poss1),
+                  (*pparams->poss2write),(*pparams->poss2),
+                  (pparams->ITHREAD));
+              pthread_mutex_unlock( &mutex_DEFECTS );
+            }
+        }
       }
     }
   }
@@ -447,25 +447,25 @@ void *_threaded_GetCages3(void *ptr) {
 }
 
 uint GetCages2(const xstructure& str,const double& roughness,vector<acage>& cages,vector<acage>& cages2,
-	      const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2) {
+    const bool& oss1write,ostream& oss1, const bool& oss2write,ostream& oss2) {
   xvector<double> v1(3),v2(3),origin_cpos(3),origin_fpos(3);
   //  acage cage;
   double eps=_EPS_;
   double radius;
   cages2.clear();
   bool found;
-  //  for(uint iat1=0;iat1<str.grid_atoms.size();iat1++) {
+  //  for(uint iat1=0;iat1<str.grid_atoms.size();iat1++)
   for(uint iat1=0;iat1<str.atoms.size();iat1++) {
     v1=str.grid_atoms[iat1].cpos;
     for(uint iat2=iat1+1;iat2<str.grid_atoms.size();iat2++) {
       v2=str.grid_atoms[iat2].cpos;
       found=GetCircleFromTwoPoints(origin_cpos,radius,v1,v2);
       if(found) {
-	origin_fpos=C2F(str.lattice,origin_cpos);
-	roundoff(origin_fpos,eps);
-	if(FPositionInsideCell(origin_fpos))
-	  if(EmptySphere(str,origin_cpos,radius))
-	    AddCageToCages(str,origin_cpos,origin_fpos,radius,2,roughness,cages,cages2,oss1write,oss1,oss2write,oss2,-1);
+        origin_fpos=C2F(str.lattice,origin_cpos);
+        roundoff(origin_fpos,eps);
+        if(FPositionInsideCell(origin_fpos))
+          if(EmptySphere(str,origin_cpos,radius))
+            AddCageToCages(str,origin_cpos,origin_fpos,radius,2,roughness,cages,cages2,oss1write,oss1,oss2write,oss2,-1);
       }
     }
   }
@@ -486,29 +486,29 @@ void *_threaded_GetCages2(void *ptr) {
   // pthread_mutex_lock( &mutex_DEFECTS );
   // cerr << "DEBUG: _threaded_GetCages2 " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;
   // pthread_mutex_unlock( &mutex_DEFECTS );
-  // for(uint iat1=0;iat1<(*pparams->pstr).grid_atoms.size();iat1++) {
+  // for(uint iat1=0;iat1<(*pparams->pstr).grid_atoms.size();iat1++)
   for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).grid_atoms.size();iat1+=(pparams->THREADS_MAX)) {
     v1=(*pparams->pstr).grid_atoms[iat1].cpos;
     for(uint iat2=iat1+1;iat2<(*pparams->pstr).grid_atoms.size();iat2++) {
       v2=(*pparams->pstr).grid_atoms[iat2].cpos;
       found=GetCircleFromTwoPoints(origin_cpos,radius,v1,v2);
       if(found) {
-	origin_fpos=C2F((*pparams->pstr).lattice,origin_cpos);
-	roundoff(origin_fpos,eps);
-	if(FPositionInsideCell(origin_fpos))
-	  if(EmptySphere((*pparams->pstr),origin_cpos,radius)) {
-	    pthread_mutex_lock( &mutex_DEFECTS );
-	    AddCageToCages((*pparams->pstr),origin_cpos,origin_fpos,radius,2,(*pparams->proughness),
-			   (*pparams->pcages),(*pparams->pcages2),
-			   (*pparams->poss1write),(*pparams->poss1),
-			   (*pparams->poss2write),(*pparams->poss2),
-			   (pparams->ITHREAD));
-	    pthread_mutex_unlock( &mutex_DEFECTS );
-	  }
+        origin_fpos=C2F((*pparams->pstr).lattice,origin_cpos);
+        roundoff(origin_fpos,eps);
+        if(FPositionInsideCell(origin_fpos))
+          if(EmptySphere((*pparams->pstr),origin_cpos,radius)) {
+            pthread_mutex_lock( &mutex_DEFECTS );
+            AddCageToCages((*pparams->pstr),origin_cpos,origin_fpos,radius,2,(*pparams->proughness),
+                (*pparams->pcages),(*pparams->pcages2),
+                (*pparams->poss1write),(*pparams->poss1),
+                (*pparams->poss2write),(*pparams->poss2),
+                (pparams->ITHREAD));
+            pthread_mutex_unlock( &mutex_DEFECTS );
+          }
       }
     }
   }
-  
+
   // CODE END
   (pparams->itbusy)=FALSE;
   AFLOW_PTHREADS::RUNNING--;
@@ -517,19 +517,19 @@ void *_threaded_GetCages2(void *ptr) {
 }
 
 bool GetCages(const xstructure& _str,_aflags& aflags,
-	      vector<acage>& cagesirreducible,vector<acage>& cagesreducible,
-	      vector<acage>& cages4,vector<acage>& cages3,vector<acage>& cages2,
-	      const double& _roughness,const bool& osswrite,ostream& oss) {
+    vector<acage>& cagesirreducible,vector<acage>& cagesreducible,
+    vector<acage>& cages4,vector<acage>& cages3,vector<acage>& cages2,
+    const double& _roughness,const bool& osswrite,ostream& oss) {
   // oss << "CAGES BEGIN" << endl;
   bool Krun=TRUE;
   string species=string_species;
-  
+
   xstructure str(_str);
   // str=BringInCell(_str);
   str=ReScale(BringInCell(_str),1.0);str.neg_scale=FALSE;
   // str.SetCoordinates(_COORDS_CARTESIAN_);
-  
-  // if(1) str.ShifOriginToAtom(0);
+
+  // if(1) str.ShiftOriginToAtom(0);
   xmatrix<double> lattice(3,3);                         // lattice
   lattice=(str.lattice);                                // lattice
   xvector<double> a1(3),a2(3),a3(3);                    // a1,a2,a3 are the rows of the lattice matrix
@@ -538,7 +538,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   xvector<double> spherecenter_cpos(3),spherecenter_fpos(3);
   double radius;
   xvector<double> rrr(3),origin_cpos(3),origin_fpos(3);
-  
+
   double eps=_EPS_;
   double roughness=_roughness;
   double cagesirreducible_rmax,cagesirreducible_rmin;
@@ -585,18 +585,18 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   if(AFLOW_PTHREADS::FLAG) FFF << "THREADS - AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
   oss << banner << endl; // ---------------------------------
   FFF << banner << endl; // ---------------------------------
-  str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);                                   // CO 171024 - new sym framework
-  _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO 171024 - new sym framework
-  pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO 171024 - new sym framework
-  pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO 171024 - new sym framework
-  // str.LatticeReduction_avoid=TRUE;                                                       // CO 171024 - new sym framework
-  /*SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup.size()=" << str.pgroup.size() << endl;                   // CO 171024 - new sym framework
-  /*str.BringInCell();*/                                                                                                                                  // CO 171024 - new sym framework
-  /*SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.agroup.size()=" << str.agroup.size() << endl;               // CO 171024 - new sym framework
-  /*SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.fgroup.size()=" << str.fgroup.size() << endl;                  // CO 171024 - new sym framework
-  /*SYM::CalculatePointGroupCrystal(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup_xtal.size()=" << str.pgroup_xtal.size() << endl;  // CO 171024 - new sym framework
-  /*str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);*/                                                                                             // CO 171024 - new sym framework
-  /*SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);*/ oss << "str.sgroup.size()=" << str.sgroup.size() << endl;                      // CO 171024 - new sym framework
+  str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);                                   //CO20171024 - new sym framework
+  _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                //CO20171024 - new sym framework
+  pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  //CO20171024 - new sym framework
+  pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   //CO20171024 - new sym framework
+  // str.LatticeReduction_avoid=TRUE;                                                       //CO20171024 - new sym framework
+  /*SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup.size()=" << str.pgroup.size() << endl;                   //CO20171024 - new sym framework
+  /*str.BringInCell();*/                                                                                                                                  //CO20171024 - new sym framework
+  /*SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.agroup.size()=" << str.agroup.size() << endl;               //CO20171024 - new sym framework
+  /*SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.fgroup.size()=" << str.fgroup.size() << endl;                  //CO20171024 - new sym framework
+  /*SYM::CalculatePointGroupCrystal(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup_xtal.size()=" << str.pgroup_xtal.size() << endl;  //CO20171024 - new sym framework
+  /*str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);*/                                                                                             //CO20171024 - new sym framework
+  /*SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);*/ oss << "str.sgroup.size()=" << str.sgroup.size() << endl;                      //CO20171024 - new sym framework
   oss << banner << endl; // ---------------------------------
   FFF << banner << endl; // ---------------------------------
   oss << "REFERENCE STRUCTURE BELOW" << endl; // STRUCTURE TO USE
@@ -657,11 +657,11 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
       cages4.clear();
       cerr << "START THREADS " << endl;
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
-	AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetCages4,(void*)&params[ithread]);
-	//  aurostd::Sleep(10);
+        AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetCages4,(void*)&params[ithread]);
+        //  aurostd::Sleep(10);
       }
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
-	pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
+        pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
       sort(cages4.begin(),cages4.end(),_isort_acage_radius());
     }
     cage4_rmax=cages4.at(0).radius;
@@ -694,11 +694,11 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
       cages3.clear();
       //    cerr << "START THREADS3 " << endl;
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
-	AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetCages3,(void*)&params[ithread]);
-	//  aurostd::Sleep(10);
+        AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetCages3,(void*)&params[ithread]);
+        //  aurostd::Sleep(10);
       }
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
-	pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
+        pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
       sort(cages3.begin(),cages3.end(),_isort_acage_radius());
     }
     if(cages3.size()>0) {
@@ -721,7 +721,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
       FFF << "NONE TO BE ADDED" << endl;
     }
   }
-  
+
   // SCANNING CAGES 2 POINTS
   if(go2) {
     oss << "SCANNING STABLE CAGES (2 points)" << endl;
@@ -736,11 +736,11 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
       cages2.clear();
       //     cerr << "START THREADS2 " << endl;
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
-	AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetCages2,(void*)&params[ithread]);
-	//  aurostd::Sleep(10);
+        AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetCages2,(void*)&params[ithread]);
+        //  aurostd::Sleep(10);
       }
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
-	pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
+        pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
       sort(cages2.begin(),cages2.end(),_isort_acage_radius());
     }
     if(cages2.size()>0) {
@@ -784,26 +784,26 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     cage_found=FALSE;
     for(uint ii=0;ii<cagesirreducible.size()&&!cage_found;ii++)
       if(abs(cagesreducible[i].radius-cagesirreducible[ii].radius)<eps) { // must have the same radius, at least
-	iatom.cpos=cagesirreducible[ii].origin_cpos;
-	iatom.fpos=C2F(str.lattice,iatom.cpos);
-	// 	for(uint fg=0;fg<str.fgroup.size()&&!cage_found;fg++) {  // FGROUP
-	// 	  tatom=SYM::ApplyAtom(iatom,str.fgroup[fg],str,TRUE);  // FGROUP
-	// 	  cage_found=(modulus(ratom.fpos-tatom.fpos)<eps);    // FGROUP
-	for(uint sg=0;sg<str.sgroup.size()&&!cage_found;sg++) {  // SGROUP
-	  tatom=SYM::ApplyAtom(iatom,str.sgroup[sg],str);  // SGROUP
-	  cage_found=(modulus(ratom.cpos-tatom.cpos)<eps); // SGROUP
-	  if(cage_found) cagesreducible[i].cages_irrtype=cagesirreducible[ii].cages_irrtype;
-	  // DEBUG
-	  if(1) if(modulus(ratom.cpos-tatom.cpos)>eps && modulus(ratom.fpos-tatom.fpos)<eps) {
-	    cerr.setf(std::ios::fixed,std::ios::floatfield);
-	    cerr.precision(14);  // STEFANO to cut/paste from matlab in format long
-	    cerr << ratom.fpos[1] << " " << ratom.fpos[2] << " " << ratom.fpos[3] << " " << endl;
-	    cerr << tatom.fpos[1] << " " << tatom.fpos[2] << " " << tatom.fpos[3] << " " << endl;
-	    cerr << ratom.cpos[1] << " " << ratom.cpos[2] << " " << ratom.cpos[3] << " " << endl;
-	    cerr << tatom.cpos[1] << " " << tatom.cpos[2] << " " << tatom.cpos[3] << " " << endl;
-	    exit(0);
-	  }
-	}
+        iatom.cpos=cagesirreducible[ii].origin_cpos;
+        iatom.fpos=C2F(str.lattice,iatom.cpos);
+        // 	for(uint fg=0;fg<str.fgroup.size()&&!cage_found;fg++)  // FGROUP
+        // 	  tatom=SYM::ApplyAtom(iatom,str.fgroup[fg],str,TRUE);  // FGROUP
+        // 	  cage_found=(modulus(ratom.fpos-tatom.fpos)<eps);    // FGROUP
+        for(uint sg=0;sg<str.sgroup.size()&&!cage_found;sg++) {  // SGROUP
+          tatom=SYM::ApplyAtom(iatom,str.sgroup[sg],str);  // SGROUP
+          cage_found=(modulus(ratom.cpos-tatom.cpos)<eps); // SGROUP
+          if(cage_found) cagesreducible[i].cages_irrtype=cagesirreducible[ii].cages_irrtype;
+          // DEBUG
+          if(1) if(modulus(ratom.cpos-tatom.cpos)>eps && modulus(ratom.fpos-tatom.fpos)<eps) {
+            cerr.setf(std::ios::fixed,std::ios::floatfield);
+            cerr.precision(14);  //SC to cut/paste from matlab in format long
+            cerr << ratom.fpos[1] << " " << ratom.fpos[2] << " " << ratom.fpos[3] << " " << endl;
+            cerr << tatom.fpos[1] << " " << tatom.fpos[2] << " " << tatom.fpos[3] << " " << endl;
+            cerr << ratom.cpos[1] << " " << ratom.cpos[2] << " " << ratom.cpos[3] << " " << endl;
+            cerr << tatom.cpos[1] << " " << tatom.cpos[2] << " " << tatom.cpos[3] << " " << endl;
+            exit(0);
+          }
+        }
       }
     if(cage_found==FALSE) {                                     // new irreducible operation, generate and save it
       cagesirreducible.push_back(cagesreducible[i]);
@@ -872,23 +872,23 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
       FFF << endl;
       //   oss << " ("; for(int i=1;i<=3;i++) {if(cagesirreducible.at(ig).origin_cpos[i]>=0.0) oss << " "; oss << " " << cagesirreducible.at(ig).origin_cpos[i];};oss << ")c" << endl;
       //    FFF << " ("; for(int i=1;i<=3;i++) {if(cagesirreducible.at(ig).origin_cpos[i]>=0.0) FFF << " "; FFF << " " << cagesirreducible.at(ig).origin_cpos[i];};FFF << ")c" << endl;
-    
+
       for(uint jg=0;jg<cagesreducible.size();jg++)
-	if(abs(cagesreducible[jg].cages_irrtype-cagesirreducible.at(ig).cages_irrtype)<eps) {
-	  oss.precision(_oss_short_precision_aflow_defects_);
-	  oss << "      equiv "; for(int i=1;i<=3;i++) {if(cagesreducible[jg].origin_fpos[i]>=0.0) oss << " "; oss << " " << cagesreducible[jg].origin_fpos[i];}
-	  oss.precision(_oss_precision_aflow_defects_);
-	  oss << "   type=" << (int) cagesreducible[jg].cages_irrtype << " ";
-	  oss << endl;
-	  FFF.precision(_oss_short_precision_aflow_defects_);
-	  FFF << "      equiv "; for(int i=1;i<=3;i++) {if(cagesreducible[jg].origin_fpos[i]>=0.0) FFF << " "; FFF << " " << cagesreducible[jg].origin_fpos[i];}
-	  FFF.precision(_oss_precision_aflow_defects_);
-	  FFF << "   type=" << (int) cagesreducible[jg].cages_irrtype << " ";
-	  FFF << endl;
- 	}
+        if(abs(cagesreducible[jg].cages_irrtype-cagesirreducible.at(ig).cages_irrtype)<eps) {
+          oss.precision(_oss_short_precision_aflow_defects_);
+          oss << "      equiv "; for(int i=1;i<=3;i++) {if(cagesreducible[jg].origin_fpos[i]>=0.0) oss << " "; oss << " " << cagesreducible[jg].origin_fpos[i];}
+          oss.precision(_oss_precision_aflow_defects_);
+          oss << "   type=" << (int) cagesreducible[jg].cages_irrtype << " ";
+          oss << endl;
+          FFF.precision(_oss_short_precision_aflow_defects_);
+          FFF << "      equiv "; for(int i=1;i<=3;i++) {if(cagesreducible[jg].origin_fpos[i]>=0.0) FFF << " "; FFF << " " << cagesreducible[jg].origin_fpos[i];}
+          FFF.precision(_oss_precision_aflow_defects_);
+          FFF << "   type=" << (int) cagesreducible[jg].cages_irrtype << " ";
+          FFF << endl;
+        }
     }
   }
-  
+
   // for(int i=0;i<grid_origin_cpos.size();i++) delete grid_origin_cpos[i]; grid_origin_cpos.clear();
   // for(int i=0;i<grid_origin_fpos.size();i++) delete grid_origin_fpos[i]; grid_origin_fpos.clear();
 
@@ -906,7 +906,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   if(cagesreducible_rmin) {;} // phony
   if(cagesirreducible_rmax) {;} // phony
   if(cagesirreducible_rmin) {;} // phony
-  
+
   oss << banner << endl; // ---------------------------------
   FFF << banner << endl; // ---------------------------------
   oss << "IRREDUCIBLE=" << cagesirreducible.size() << "   REDUCIBLE=" << cagesreducible.size() << endl;
@@ -933,7 +933,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     aus << " C=" << (int) cagesirreducible.at(ig).coordination_position << " P=" << (int) cagesirreducible.at(ig).cages_position;
     {aus << " [";for(uint iat=0;iat<cagesirreducible.at(ig).atoms.size();iat++) aus << str.species.at(cagesirreducible.at(ig).atoms.at(iat).type) << "(" << cagesirreducible.at(ig).atoms.at(iat).basis << ")" << (iat<cagesirreducible.at(ig).atoms.size()-1?",":""); aus << "]"; }
     straus.title+=aus.str();
-    
+
     _atom atom;
     atom=str.atoms.at(0);
     atom.fpos=cagesirreducible.at(ig).origin_fpos;
@@ -947,7 +947,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     vstr.push_back(straus);
     vtitle.push_back("cages_T"+aurostd::utype2string(cagesirreducible.at(ig).cages_irrtype));
   }
-  
+
   aflowin << AFLOWIN_SEPARATION_LINE << endl;
   aflowin << "[AFLOW] CAGES IN AFLOW.IN FORMAT" << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl;
@@ -956,7 +956,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     aflowin << vstr.at(ivstr);
     aflowin << "[VASP_POSCAR_MODE_EXPLICIT]STOP." << vtitle.at(ivstr) << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl;
- }  
+  }  
   aflowin << AFLOWIN_SEPARATION_LINE << endl;
 
   //  cout << aflowin.str();
@@ -1006,6 +1006,6 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

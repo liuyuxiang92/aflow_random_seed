@@ -94,13 +94,13 @@ void Rational(ostream &os,double x) {
 }
 
 void read_VASPIN(ostringstream* l,
-		 int number,
-		 const char* _labels,
-		 const char* _strukturbericht,
-		 const char* _superstr,
-		 const char* _superlatt,
-		 const char* _proto,
-		 bool VERB) {
+    int number,
+    const char* _labels,
+    const char* _strukturbericht,
+    const char* _superstr,
+    const char* _superlatt,
+    const char* _proto,
+    bool VERB) {
   ifstream File,FileResult;
   ofstream FileOut;
   ostringstream aus0,aus1;
@@ -267,31 +267,31 @@ void read_VASPIN(ostringstream* l,
     l[j] << "&\t\t";j++;  // atomic positions
     for(int i=1;i<=AAmax;i++) {
       if(i<=AA) {
-	FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Apos(i,1)=atof(buffer);if(VERB) cerr << "Apos("<<i<<",1)=" << Apos(i,1) << endl;
-	FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Apos(i,2)=atof(buffer);if(VERB) cerr << "Apos("<<i<<",2)=" << Apos(i,2) << endl;
-	FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Apos(i,3)=atof(buffer);if(VERB) cerr << "Apos("<<i<<",3)=" << Apos(i,3) << endl;
-	//l[j]<<"& [A]$(";Rational(l[j],Apos(i,1));l[j]<<",";Rational(l[j],Apos(i,2));l[j]<<",";Rational(l[j],Apos(i,3));l[j]<<")$";j++;
- 	l[j]<<"& $(";Rational(l[j],Apos(i,1));l[j]<<",";Rational(l[j],Apos(i,2));l[j]<<",";Rational(l[j],Apos(i,3));l[j]<<")$";j++;
+        FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Apos(i,1)=atof(buffer);if(VERB) cerr << "Apos("<<i<<",1)=" << Apos(i,1) << endl;
+        FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Apos(i,2)=atof(buffer);if(VERB) cerr << "Apos("<<i<<",2)=" << Apos(i,2) << endl;
+        FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Apos(i,3)=atof(buffer);if(VERB) cerr << "Apos("<<i<<",3)=" << Apos(i,3) << endl;
+        //l[j]<<"& [A]$(";Rational(l[j],Apos(i,1));l[j]<<",";Rational(l[j],Apos(i,2));l[j]<<",";Rational(l[j],Apos(i,3));l[j]<<")$";j++;
+        l[j]<<"& $(";Rational(l[j],Apos(i,1));l[j]<<",";Rational(l[j],Apos(i,2));l[j]<<",";Rational(l[j],Apos(i,3));l[j]<<")$";j++;
       } else {
-	//l[j] << "& [A]    $-$     ";j++;
- 	l[j] << "&     $-$     ";j++;
+        //l[j] << "& [A]    $-$     ";j++;
+        l[j] << "&     $-$     ";j++;
       }
     }
     for(int i=1;i<=BBmax;i++) {
       if(i<=BB) {
-	FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Bpos(i,1)=atof(buffer);if(VERB) cerr << "Bpos("<<i<<",1)=" << Bpos(i,1) << endl;
-	FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Bpos(i,2)=atof(buffer);if(VERB) cerr << "Bpos("<<i<<",2)=" << Bpos(i,2) << endl;
-	FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Bpos(i,3)=atof(buffer);if(VERB) cerr << "Bpos("<<i<<",3)=" << Bpos(i,3) << endl;
-       	//l[j]<<"& [B]$(";Rational(l[j],Bpos(i,1));l[j]<<",";Rational(l[j],Bpos(i,2));l[j]<<",";Rational(l[j],Bpos(i,3));l[j]<<")$";j++;
-       	l[j]<<"& $(";Rational(l[j],Bpos(i,1));l[j]<<",";Rational(l[j],Bpos(i,2));l[j]<<",";Rational(l[j],Bpos(i,3));l[j]<<")$";j++;
+        FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Bpos(i,1)=atof(buffer);if(VERB) cerr << "Bpos("<<i<<",1)=" << Bpos(i,1) << endl;
+        FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Bpos(i,2)=atof(buffer);if(VERB) cerr << "Bpos("<<i<<",2)=" << Bpos(i,2) << endl;
+        FileResult.getline(buffer,BUFFER_MAXLEN,'\n');Bpos(i,3)=atof(buffer);if(VERB) cerr << "Bpos("<<i<<",3)=" << Bpos(i,3) << endl;
+        //l[j]<<"& [B]$(";Rational(l[j],Bpos(i,1));l[j]<<",";Rational(l[j],Bpos(i,2));l[j]<<",";Rational(l[j],Bpos(i,3));l[j]<<")$";j++;
+        l[j]<<"& $(";Rational(l[j],Bpos(i,1));l[j]<<",";Rational(l[j],Bpos(i,2));l[j]<<",";Rational(l[j],Bpos(i,3));l[j]<<")$";j++;
       } else {
-	//l[j] << "& [B]    $-$     ";j++;
-	l[j] << "&     $-$     ";j++;
+        //l[j] << "& [B]    $-$     ";j++;
+        l[j] << "&     $-$     ";j++;
       }
     }
     l[j] << "&\t\t";j++;  // fractional
   }
-  
+
   //system(aus0.str().c_str());
   //if(VERB) cerr << aus0.str() << "\t";
   //  system(aus0.str().c_str());
@@ -308,7 +308,7 @@ void MakeVaspIn(bool VERB) {
   bool _FCC=0,_BCC=0,_HCP=0,_EXT=0;
 
   _FCC=1,_BCC=1,_HCP=1,_EXT=1;
-  
+
   cerr << "% VASP IN PROCEDURE " << endl;
   //cout << "\\documentclass" << APENNSY_LATEX_DOC_TYPE << endl;
   //cout << "\\usepackage{epsfig}" << endl;
@@ -354,12 +354,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -387,12 +387,12 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -423,12 +423,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -456,12 +456,12 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -492,12 +492,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -535,12 +535,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -568,12 +568,12 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -604,12 +604,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -637,12 +637,12 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -673,12 +673,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -716,12 +716,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -749,12 +749,12 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -784,12 +784,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -817,12 +817,12 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -852,12 +852,12 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    cout << lines[i].str();
-	    if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	    cout << endl;}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            cout << lines[i].str();
+            if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+            cout << endl;}}}
       cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -895,13 +895,13 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -929,13 +929,13 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -967,13 +967,13 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -1004,13 +1004,13 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -1041,13 +1041,13 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -1075,13 +1075,13 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -1113,13 +1113,13 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0 && (int) aus.find("ositions")<0 && (int) aus.find("raction")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0 && (int) aus.find("ositions")<0 && (int) aus.find("raction")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -1147,13 +1147,13 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0 && (int) aus.find("ositions")<0 && (int) aus.find("raction")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0 && (int) aus.find("ositions")<0 && (int) aus.find("raction")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -1186,13 +1186,13 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       //     cout << "\\hline \\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
       cout << "\\hline \\hline \\hline \\hline " << endl;
     }
@@ -1220,13 +1220,13 @@ void MakeVaspIn(bool VERB) {
       // cout << "{\\footnotesize" << endl;
       // cout << "\\begin{tabular}{||c||c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
     }
   }
@@ -1254,43 +1254,41 @@ void MakeVaspIn(bool VERB) {
       cout << "{\\footnotesize" << endl;
       cout << "\\begin{tabular}{||c||c|c|c|c|c||}\\hline\\hline   " << endl;
       for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	  if(i!=i5 || (int) aus.find("A")>0) {
-	    if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	      cout << lines[i].str();
-	      if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	      cout << endl;}}}}
-      /*
-	cout << "\\hline \\hline \\hline \\hline " << endl;
-	}
-	{ // EXT6b TABLE
-	cerr << "EXT6b TABLE" << endl; // EXT5b TABLE
-	ostringstream lines[MAXLINESOSTREAM];
-	j=1;
-	lines[j++] << "Strukturbericht";lines[j++] << "Prototype      ";
-	lines[j++] << "Label          ";lines[j++] << "Formula        ";
-	lines[j++] << "Parent lattice ";lines[j++] << "C$_b$          ";
-	lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
-	lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
-	lines[j++] << "Superlattice   ";
-	lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
-	lines[j++]<<"Atomic positions";
-	for(i=1;i<=AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-	for(i=1;i<=BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
-	lines[j++] << "(fractional)   ";
-	for(i=1;i<j;i++) lines[i] << "\t \\\\ ";
-	for(i=1;i<j;i++) {
-	string aus=lines[i].str();
-	if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
-	if(i!=i5 || (int) aus.find("A")>0) {
-	if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
-	cout << lines[i].str();
-	if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
-	cout << endl;}}}}
-      */
+        string aus=lines[i].str();
+        if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+          if(i!=i5 || (int) aus.find("A")>0) {
+            if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+              cout << lines[i].str();
+              if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+              cout << endl;}}}}
+      //   cout << "\\hline \\hline \\hline \\hline " << endl;
+      //   }
+      //   { // EXT6b TABLE
+      //   cerr << "EXT6b TABLE" << endl; // EXT5b TABLE
+      //   ostringstream lines[MAXLINESOSTREAM];
+      //   j=1;
+      //   lines[j++] << "Strukturbericht";lines[j++] << "Prototype      ";
+      //   lines[j++] << "Label          ";lines[j++] << "Formula        ";
+      //   lines[j++] << "Parent lattice ";lines[j++] << "C$_b$          ";
+      //   lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
+      //   lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
+      //   lines[j++] << "Superlattice   ";
+      //   lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+      //   lines[j++]<<"Atomic positions";
+      //   for(i=1;i<=AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
+      //   for(i=1;i<=BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+      //   lines[j++] << "(fractional)   ";
+      //   for(i=1;i<j;i++) lines[i] << "\t \\\\ ";
+      //   for(i=1;i<j;i++) {
+      //   string aus=lines[i].str();
+      //   if(i<=i1 || (i>i1 && (((int) aus.find(")"))>0)) || ((((int) aus.find("posi"))>0)) ) {
+      //   if(i!=i5 || (int) aus.find("A")>0) {
+      //   if((i<i6 || i>i7) && (int) aus.find("aren")<0) {
+      //   cout << lines[i].str();
+      //   if(i<=i2 || i==i1 || i==i3 || i==i4 ) cout << "\\hline";
+      //   cout << endl;}}}}
       cout << "\\hline\\hline" << endl << "\\end{tabular}}" << endl << "\\end{center}}" << endl;
-    }
+  }
   }
 
   cerr << " *********************************************************************** END " << endl;

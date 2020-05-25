@@ -33,7 +33,7 @@ $(document).ready(function() {
   for (var i = 0; i < lineLabels.length; ++i) {
     var label = lineLabels[i];
     label = label.replace("G", "G");
-    label = label.replace("Sigm", "&Sigma;");	//CO190301
+    label = label.replace("Sigm", "&Sigma;");	//CO20190301
     label = label.replace("_1", "<tspan class='subScript' dy='3'>1</tspan>");
     lineLabels[i] = label;
   }
@@ -95,7 +95,7 @@ $(document).ready(function() {
       rows = dosData.length - 1,
       cols = dosData[0].length;
 
-    //PC -- 2018/08/09 -- Calculates x range for DOS plot
+    //PC20180809 - Calculates x range for DOS plot
     var minDosX = 1000;
     var maxDosX = -1000;
     for (var i = 0; i < dosData[0].length; i++) {
@@ -159,7 +159,7 @@ $(document).ready(function() {
         return d3.max(array);
       })
     );
-    // PC --  2018/08/09
+    //PC20180809
   // dosX = [-10, 10];
     //dosX = [min-1, max+1];
      dosX = [-finalMaxDosX, finalMaxDosX];
@@ -214,7 +214,7 @@ $(document).ready(function() {
     var dosArray = new Array(),
       rows = dosData.length - 1,
       cols = dosData[0].length;
-    //PC -- 2018/08/09 -- Calculates x range for DOS plot
+    //PC20180809 - Calculates x range for DOS plot
     var maxDosX = -1000;
     for (var i = 0; i < dosData[0].length; i++) {
       if ((dosData[0][i] > -5) && (dosData[0][i] < 5)) {
@@ -304,7 +304,7 @@ $(document).ready(function() {
         return d3.max(array);
       })
     );
-    // PC -- 2018/08/09 
+    //PC20180809 
     //dosX = [0, max + 2];
      dosX = [0, maxDosX];
 

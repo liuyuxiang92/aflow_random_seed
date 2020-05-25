@@ -1,33 +1,29 @@
 ********************************************************************************
 *                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2020              *
 *                High-Throughput ab-initio Materials Discovery                 *
 *                                                                              *
 ********************************************************************************
 LATEST VERSION OF THE FILE:        materials.duke.edu/AFLOW/README_AFLOW_CCE.TXT
 ********************************************************************************
 
-Written by Rico Friedrich and Corey Oses, 2019
+Written by Rico Friedrich, Corey Oses, and Marco Esters, 2018-2020
 
 USER INSTRUCTIONS:
 
 (i) GENERAL INFORMATION:
-Implementation to obtain corrected DFT formation enthalpies is based on the coordination corrected 
+Implementation to obtain corrected DFT formation enthalpies based on the coordination corrected 
 enthalpies (CCE) methodology described in:
 Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);
-https://doi.org/10.1038/s41524-019-0192-1.
+https://doi.org/10.1038/s41524-019-0192-1
 Please cite this article when using this method and/or this implementation.
 The corrections depend on the number of cation-anion bonds and on the cation oxidation state.
-The current implementation requires a structure file in VASP5 POSCAR format as input and will 
-return the CCE corrections for the DFT formation energies for PBE, LDA and SCAN if the oxidation 
-numbers for each cation can be determined.
-The oxidation numbers can be determined in two ways:
-- as specified by the user as an input option or
-- if both an aflow.in and a Bader charges file in the AFLOW format are present and no oxidation 
-numbers are given as input, this implementation will try to determine the oxidation numbers based 
-on this data.
+The current implementation requires a structure file as input and will return the CCE corrections for
+the DFT formation energies for PBE, LDA and SCAN if the oxidation numbers can be determined.
+The oxidation numbers can be provided by the user or can be automatically determined from the
+structure using Allen electronegativities.
 In addition, the user can provide precalculated DFT formation energies for PBE, LDA and SCAN and the 
-implementation will directly calculate and return the CCE formation enthalpies at both 0 and 298.15K.
+implementation will directly calculate and return the CCE formation enthalpies at both 298.15 and 0 K.
 If DFT formation energies are provided as additional input, the functionals corresponding to those 
 energies are required. They need to be given in the same sequence as the precalculated DFT formation 
 energies they correspond to.
@@ -36,20 +32,27 @@ be PBE (default).
 Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
---cce                       Prints these user instructions.
---cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format.
---oxidation_numbers=        Provide as a comma separated list the oxidation numbers. It is 
-                            assumed that: (i) one is provided for each atom of the structure and 
-                            (ii) they are in the same sequence as the corresponding atoms in the 
-                            provided POSCAR file.
---dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies, 
-                            they are assumed to be: (i) negative for compounds lower in energy 
-                            than the elements, (ii) in eV/cell. Currently, corrections are available 
-                            for PBE, LDA and SCAN (no DFT+U yet).
---functionals=              Provide a comma separated list with the functionals in the same sequence 
-                            as the DFT formation energies they correspond to. These can be:
-                            (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation 
-                            energy is provided).
+--cce                         Prints user instructions.
+--cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure 
+                              format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... 
+                              For VASP, a VASP5 POSCAR is required.
+--dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies, 
+                              they are assumed to be: (i) negative for compounds lower in energy 
+                              than the elements, (ii) in eV/cell. Currently, corrections are available 
+                              for PBE, LDA and SCAN.
+--functionals=                Provide a comma separated list of functionals for which corrections 
+                              should be returned. If used together with --dft_formation energies, 
+                              the functionals must be in the same sequence as the DFT formation 
+                              energies they correspond to. Available functionals are:
+                              (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation 
+                              energy is provided).
+--oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is 
+                              assumed that: (i) one is provided for each atom of the structure and 
+                              (ii) they are in the same sequence as the corresponding atoms in the 
+                              provided structure file.
+--poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE. 
+                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                              QE, aims, ... For VASP, a VASP5 POSCAR is required.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)
@@ -67,22 +70,22 @@ Direct(2) [A1B1]
 Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO 
 in the current directory as POSCAR, the following commands can be executed:
 
-aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,-2
-This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA and SCAN for MgO.
+aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN
+This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO.
 
-aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA --oxidation_numbers=2,-2
+aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA
 This gives you only the CCE corrections and CCE formation enthalpies for LDA.
 
-aflow --cce=POSCAR --dft_formation_energies=-5.434 --oxidation_numbers=2,-2
+aflow --cce=POSCAR --dft_formation_energies=-5.434
 This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that 
 PBE is assumed as functional.
 
-aflow --cce=POSCAR --oxidation_numbers=2,-2
-This gives you only the CCE corrections for PBE, LDA and SCAN.
-
 aflow --cce=POSCAR
-This gives you the CCE corrections for PBE, LDA and SCAN if an aflow.in and a Bader charges file 
-in AFLOW format are present and the oxidation numbers can be determined from them.
+This gives you the CCE corrections for PBE, LDA, and SCAN and a rough guess of the formation 
+enthalpy based on experimental formation enthalpies per bond.
+
+aflow --cce=POSCAR --oxidation_numbers=2,-2
+Oxidation numbers for each atom can also be provided as input.
 
 (v) AVAILABLE CORRECTIONS:
 
@@ -159,3 +162,24 @@ for per- and superoxides
 O2 -2 from Li2O2
 O2 -1 from KO2  
 
+NITRIDES
+Al +3 from AlN     
+B  +3 from BN
+Ca +2 from Ca3N2
+Li +1 from Li3N    
+Zn +2 from Zn3N2   
+Be +2 from Be3N2   
+Cr +3 from CrN     
+Ga +3 from GaN
+Hf +3 from HfN     
+In +3 from InN
+La +3 from LaN
+Mg +2 from Mg3N2   
+Nb +3 from NbN     
+Sc +3 from ScN     
+Si +4 from Si3N4   
+Ta +3 from TaN     
+Ti +3 from TiN     
+V  +3 from VN       
+Y  +3 from YN       
+Zr +3 from ZrN

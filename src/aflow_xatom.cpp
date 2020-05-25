@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
@@ -8,9 +8,9 @@
 #define _AFLOW_XATOM_CPP
 #include "aflow.h"
 #include "aflow_pflow.h"
-#include "aflow_symmetry_spacegroup.h" //DX 20180723
+#include "aflow_symmetry_spacegroup.h" //DX20180723
 #include "AUROSTD/aurostd_xscalar.h"
-#include "aflow_compare_structure.h" // CO 180409
+#include "aflow_compare_structure.h" //CO20180409
 
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 #define PLATON_MIN_VOLUME_PER_ATOM   6.0   // for symmetry calculation
@@ -23,7 +23,7 @@
 
 #define _EPS_ 0.02
 
-//#define _pocc_precision_ 5  // CO 170630 - we should really be fixing default vs. fixed
+//#define _pocc_precision_ 5  //CO20170630 - we should really be fixing default vs. fixed
 // tested right
 // ./aflow --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
 // aflow.3.1.184 --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
@@ -54,12 +54,12 @@ _atom::_atom() {
   cpos.clear();
   corigin.clear();
   coord.clear();
-  fpos_equation.clear(); //DX 20180607 - symbolic math for atom positions
-  cpos_equation.clear(); //DX 20180607 - symbolic math for atom positions
+  fpos_equation.clear(); //DX20180607 - symbolic math for atom positions
+  cpos_equation.clear(); //DX20180607 - symbolic math for atom positions
   spin=0.0;
-  spin_is_given=FALSE; // DX 9/21/17 - magnetic sym
-  noncoll_spin.clear(); // DX 12/5/17 - magnetic sym (non-collinear)
-  noncoll_spin_is_given=FALSE; // DX 12/5/17 - magnetic sym (non-collinear)
+  spin_is_given=FALSE; //DX20170921 - magnetic sym
+  noncoll_spin.clear(); //DX20171205 - magnetic sym (non-collinear)
+  noncoll_spin_is_given=FALSE; //DX20171205 - magnetic sym (non-collinear)
   mass=0.0;
   type=0;
   name="";
@@ -67,7 +67,7 @@ _atom::_atom() {
   cleanname="";
   info=0;  // (RHT)
   atomic_number=0;
-  //[CO200130 - number->basis]number=0;
+  //[CO20200130 - number->basis]number=0;
   sd="";
   ijk.clear();
   isincell=FALSE;
@@ -84,7 +84,7 @@ _atom::_atom() {
   partial_occupation_flag=FALSE;
   shell=0;
   verbose=FALSE;
-  print_RHT=false;  //CO190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
+  print_RHT=false;  //CO20190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
   print_cartesian=FALSE;
 }
 
@@ -100,12 +100,12 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
   cpos=b.cpos;
   corigin=b.corigin;
   coord=b.coord;
-  fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
-  cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
+  fpos_equation=b.fpos_equation; //DX20180607 - symbolic math for atom positions
+  cpos_equation=b.cpos_equation; //DX20180607 - symbolic math for atom positions
   spin=b.spin;
-  spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
-  noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-  noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+  spin_is_given=b.spin_is_given; //DX20170921 - magnetic sym
+  noncoll_spin=b.noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+  noncoll_spin_is_given=b.noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
   mass=b.mass;
   type=b.type;
   name=b.name;
@@ -113,7 +113,7 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
   cleanname=b.cleanname;
   info=b.info;  // (RHT)
   atomic_number=b.atomic_number;
-  //[CO200130 - number->basis]number=b.number;
+  //[CO20200130 - number->basis]number=b.number;
   sd=b.sd;
   ijk=b.ijk;
   isincell=b.isincell;
@@ -159,15 +159,15 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "ATOM COUT" << endl;
       oss << "type=" << atom.type << endl;
       oss << "spin=" << atom.spin << endl;
-      oss << "spin_is_given=" << atom.spin_is_given << endl; // DX 9/21/17 - magnetic sym
-      oss << "noncoll_spin=" << atom.noncoll_spin << endl;                   // DX 12/5/17 - magnetic sym (non-collinear)
-      oss << "noncoll_spin_is_given=" << atom.noncoll_spin_is_given << endl; // DX 12/5/17 - magnetic sym (non-collinear)
+      oss << "spin_is_given=" << atom.spin_is_given << endl; //DX20170921 - magnetic sym
+      oss << "noncoll_spin=" << atom.noncoll_spin << endl;                   //DX20171205 - magnetic sym (non-collinear)
+      oss << "noncoll_spin_is_given=" << atom.noncoll_spin_is_given << endl; //DX20171205 - magnetic sym (non-collinear)
       oss << "mass=" << atom.mass << endl;
       oss << "name=" << atom.name << endl;
       oss << "info=" << atom.info << endl;
       oss << "cleanname=" << atom.cleanname << endl;
       oss << "atomic_number=" << atom.atomic_number << endl;
-      oss << "basis=" << atom.basis << endl;  //[CO200130 - number->basis]oss << "number=" << atom.number << endl;
+      oss << "basis=" << atom.basis << endl;  //[CO20200130 - number->basis]oss << "number=" << atom.number << endl;
       oss << "name_is_given=" << atom.name_is_given << endl;
       oss << "sd=" <<  atom.sd << endl;
       oss << "print_cartesian" << atom.print_cartesian << endl;
@@ -175,8 +175,8 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "corigin" << atom.corigin(1) << " " << atom.corigin(2) << " " << atom.corigin(3) << endl;
       oss << "coord" << atom.coord(1) << " " << atom.coord(2) << " " << atom.coord(3) << endl;
 
-      oss << "fpos_equation" << aurostd::joinWDelimiter(atom.fpos_equation," ") << endl; //DX 20180607 - symbolic math for atom positions //DX 20191218 - join with delimiter in case empty
-      oss << "cpos_equation" << aurostd::joinWDelimiter(atom.cpos_equation," ") << endl; //DX 20180607 - symbolic math for atom positions //DX 20191218 - join with delimiter in case empty
+      oss << "fpos_equation" << aurostd::joinWDelimiter(atom.fpos_equation," ") << endl; //DX20180607 - symbolic math for atom positions //DX20191218 - join with delimiter in case empty
+      oss << "cpos_equation" << aurostd::joinWDelimiter(atom.cpos_equation," ") << endl; //DX20180607 - symbolic math for atom positions //DX20191218 - join with delimiter in case empty
       oss << "isincell=" << atom.isincell << endl;
       oss << "reference=" << atom.reference << endl;
       oss << "ireference=" << atom.ireference << endl;
@@ -200,7 +200,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
     }
     oss << " T=" << atom.type;
     oss << " B=" << atom.basis;
-    //[CO200130 - number->basis]oss << " N=" << atom.number;
+    //[CO20200130 - number->basis]oss << " N=" << atom.number;
     //  oss << setw(1);
     oss << " ijk=[" << atom.ijk(1) << "," << atom.ijk(2) << "," << atom.ijk(3) << "]";
     if(atom.verbose) oss << " " << endl;
@@ -208,18 +208,18 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
   return oss;
 }
 
-//DX 20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double tol) {
-//DX 20190214 [OBSOLETE]  bool out = false;
-//DX 20190214 [OBSOLETE]  // DX and CO - START
-//DX 20190214 [OBSOLETE]  if(abs(a.fpos(1)-b.fpos(1)) < tol && 
-//DX 20190214 [OBSOLETE]     abs(a.fpos(2)-b.fpos(2)) < tol && 
-//DX 20190214 [OBSOLETE]     abs(a.fpos(3)-b.fpos(3)) < tol &&
-//DX 20190214 [OBSOLETE]     // DX and CO - END
-//DX 20190214 [OBSOLETE]     a.name == b.name) {
-//DX 20190214 [OBSOLETE]    out = true;
-//DX 20190214 [OBSOLETE]  }
-//DX 20190214 [OBSOLETE]  return out;
-//DX 20190214 [OBSOLETE]}
+//DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double tol) {
+//DX20190214 [OBSOLETE]  bool out = false;
+//DX20190214 [OBSOLETE]  //DX+CO START
+//DX20190214 [OBSOLETE]  if(abs(a.fpos(1)-b.fpos(1)) < tol && 
+//DX20190214 [OBSOLETE]     abs(a.fpos(2)-b.fpos(2)) < tol && 
+//DX20190214 [OBSOLETE]     abs(a.fpos(3)-b.fpos(3)) < tol &&
+//DX20190214 [OBSOLETE]     //DX+CO END
+//DX20190214 [OBSOLETE]     a.name == b.name) {
+//DX20190214 [OBSOLETE]    out = true;
+//DX20190214 [OBSOLETE]  }
+//DX20190214 [OBSOLETE]  return out;
+//DX20190214 [OBSOLETE]}
 
 
 void _atom::CleanName(void) {
@@ -240,14 +240,14 @@ void _atom::CleanName(void) {
 
 void _atom::CleanSpin(void) {
   spin=0.0;
-  spin_is_given=FALSE; // DX 9/21/17 - magnetic sym
-  noncoll_spin.clear();            // DX 12/5/17 - magnetic sym (non-collinear)
-  noncoll_spin_is_given=FALSE; // DX 12/5/17 - magnetic sym (non-collinear)
-  if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} // DX 9/21/17 - magnetic sym
-  if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} // DX 9/21/17 - magnetic sym
+  spin_is_given=FALSE; //DX20170921 - magnetic sym
+  noncoll_spin.clear();            //DX20171205 - magnetic sym (non-collinear)
+  noncoll_spin_is_given=FALSE; //DX20171205 - magnetic sym (non-collinear)
+  if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} //DX20170921 - magnetic sym
+  if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} //DX20170921 - magnetic sym
 }
 
-void _atom::ClearSymmetry(void) { //CO190219
+void _atom::ClearSymmetry(void) { //CO20190219
   (*this).equivalent=-1;
   (*this).is_inequivalent=TRUE;
   (*this).num_equivalents=0;
@@ -266,12 +266,12 @@ std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);   // store starting fro
 std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
 std::vector<double> vatom_radius(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE // DX and CO - 9/4/17 
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE //DX+CO20170904 
 std::vector<double> vatom_electronegativity(NUM_ELEMENTS);        // store starting from ONE
 std::vector<string> vatom_crystal(NUM_ELEMENTS);        // store starting from ONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);         // store starting from ONE
 std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);         // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);    // ME181020 Pearson mass deviation coefficient
+std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);    //ME20181020 Pearson mass deviation coefficient
 
 void atoms_initialize(void) {
   for(int i=0;i<NUM_ELEMENTS;i++) {       // clear
@@ -286,7 +286,7 @@ void atoms_initialize(void) {
     vatom_miedema_gamma_s.at(i)=NNN;                  // Miedema Rule Table 1a Physica 100B (1980) 1-28   \gamma_s^0 in (mJ/m^2)
     vatom_miedema_BVm.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   BV_m (kJ/mole)
     vatom_radius.at(i)=NNN;             // Saxena (nm)
-    vatom_radius_covalent.at(i)=NNN;    // Codero (Angstroms) // DX and CO - 9/4/17
+    vatom_radius_covalent.at(i)=NNN;    // Codero (Angstroms) //DX+CO20170904
     vatom_electronegativity.at(i)=NNN;  // Saxena
     vatom_crystal.at(i)="nnn";          // Ashcroft-Mermin
   }
@@ -315,9 +315,9 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Be"; vatom_name[i]="Beryllium";    vatom_mass[i]*=9.0122;    vatom_volume[i]= 7.83290; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=4.20;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.9;  vatom_miedema_gamma_s[i]=1900;   vatom_miedema_BVm[i]=4.9;   vatom_radius[i]=0.114;  vatom_radius_covalent[i]=0.96;   vatom_electronegativity[i]=1.57;  vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.50; vatom_pearson_coefficient[i]=0.0;  // Be
   // p-electron systems
   i++; vatom_symbol[i]="B";  vatom_name[i]="Boron";        vatom_mass[i]*=10.81;     vatom_volume[i]= 5.88420; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3;  vatom_miedema_phi_star[i]=4.75;  vatom_miedema_nws[i]=1.55;  vatom_miedema_Vm[i]=2.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.097;  vatom_radius_covalent[i]=0.84;   vatom_electronegativity[i]=2.04;  vatom_crystal[i]="tet";  vatom_pettifor_scale[i]=2.00; vatom_pearson_coefficient[i]=0.00135391428;  // B
-  i++; vatom_symbol[i]="C";  vatom_name[i]="Carbon";       vatom_mass[i]*=12.011;    vatom_volume[i]= 5.59490; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4;  vatom_miedema_phi_star[i]=6.20;  vatom_miedema_nws[i]=1.90;  vatom_miedema_Vm[i]=1.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.077;  vatom_radius_covalent[i]=0.76;   vatom_electronegativity[i]=2.55;  vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=2.50; vatom_xray_scatt[i]=6.019; vatom_pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - 9/4/17 vatom_radius_covalent uses sp3 hybridization (most common)
-  i++; vatom_symbol[i]="N";  vatom_name[i]="Nitrogen";     vatom_mass[i]*=14.0067;   vatom_volume[i]= 7.59940; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5;  vatom_miedema_phi_star[i]=7.00;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.2;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.071;  vatom_radius_covalent[i]=0.71;   vatom_electronegativity[i]=3.04;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=3.00; vatom_pearson_coefficient[i]=0.00001857771; // N JUNKAI CHANGED VALENCE
-  i++; vatom_symbol[i]="O";  vatom_name[i]="Oxygen";       vatom_mass[i]*=15.9994;   vatom_volume[i]= 7.78230; vatom_valence_std[i]=6; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=6.97;  vatom_miedema_nws[i]=1.70;  vatom_miedema_Vm[i]=2.656;vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.060;  vatom_radius_covalent[i]=0.66;   vatom_electronegativity[i]=3.44;  vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=3.50; vatom_xray_scatt[i]=8.052; vatom_pearson_coefficient[i]=0.00003358805;  // O Table 27 of JUNKAI
+  i++; vatom_symbol[i]="C";  vatom_name[i]="Carbon";       vatom_mass[i]*=12.011;    vatom_volume[i]= 5.59490; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4;  vatom_miedema_phi_star[i]=6.20;  vatom_miedema_nws[i]=1.90;  vatom_miedema_Vm[i]=1.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.077;  vatom_radius_covalent[i]=0.76;   vatom_electronegativity[i]=2.55;  vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=2.50; vatom_xray_scatt[i]=6.019; vatom_pearson_coefficient[i]=0.00007387218;   // C  //DX+CO20170904 vatom_radius_covalent uses sp3 hybridization (most common)
+  i++; vatom_symbol[i]="N";  vatom_name[i]="Nitrogen";     vatom_mass[i]*=14.0067;   vatom_volume[i]= 7.59940; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5;  vatom_miedema_phi_star[i]=7.00;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.2;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.071;  vatom_radius_covalent[i]=0.71;   vatom_electronegativity[i]=3.04;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=3.00; vatom_pearson_coefficient[i]=0.00001857771; // N JX CHANGED VALENCE
+  i++; vatom_symbol[i]="O";  vatom_name[i]="Oxygen";       vatom_mass[i]*=15.9994;   vatom_volume[i]= 7.78230; vatom_valence_std[i]=6; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=6.97;  vatom_miedema_nws[i]=1.70;  vatom_miedema_Vm[i]=2.656;vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.060;  vatom_radius_covalent[i]=0.66;   vatom_electronegativity[i]=3.44;  vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=3.50; vatom_xray_scatt[i]=8.052; vatom_pearson_coefficient[i]=0.00003358805;  // O Table 27 of JX
   i++; vatom_symbol[i]="F";  vatom_name[i]="Fluorine";     vatom_mass[i]*=18.9984;   vatom_volume[i]= 9.99090; vatom_valence_std[i]=7; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=0.57;   vatom_electronegativity[i]=3.98;  vatom_crystal[i]="mcl";  vatom_pettifor_scale[i]=4.00; vatom_pearson_coefficient[i]=0.0;  // F
   i++; vatom_symbol[i]="Ne";vatom_name[i]="Neon";        vatom_mass[i]*=20.179;   vatom_volume[i]=19.9052; vatom_valence_std[i]=0; vatom_valence_iupac[i]=0; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=0.58;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00082783369; // Ne volume calculated with fcc-pawpbe
 
@@ -329,9 +329,9 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Al";vatom_name[i]="Aluminium";   vatom_mass[i]*=26.9815;  vatom_volume[i]=16.4000; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=4.20; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.6; vatom_miedema_gamma_s[i]=1200;  vatom_miedema_BVm[i]=7.2;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.21;   vatom_electronegativity[i]=1.61; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.66; vatom_pearson_coefficient[i]=0.0;  // Al
   i++; vatom_symbol[i]="Si";vatom_name[i]="Silicon";     vatom_mass[i]*=28.0855;  vatom_volume[i]=14.3536; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.70; vatom_miedema_nws[i]=1.50; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=1290;  vatom_miedema_BVm[i]=11.9; vatom_radius[i]=0.117; vatom_radius_covalent[i]=1.11;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=1.92; vatom_xray_scatt[i]=14.43; vatom_pearson_coefficient[i]=0.00020046752; // Si ???
   i++; vatom_symbol[i]="P"; vatom_name[i]="Phosphorus";  vatom_mass[i]*=30.9738;  vatom_volume[i]=14.1995; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.5;  vatom_miedema_nws[i]=1.65; vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.109; vatom_radius_covalent[i]=1.07;   vatom_electronegativity[i]=2.19; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=2.18; vatom_xray_scatt[i]=15.3133; vatom_pearson_coefficient[i]=0.0; // P   MIEDEMA = PAUL VAN DER PUT book
-  i++; vatom_symbol[i]="S"; vatom_name[i]="Sulphur";     vatom_mass[i]*=32.06;    vatom_volume[i]=15.7301; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.6;  vatom_miedema_nws[i]=1.46; vatom_miedema_Vm[i]=4.376;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.106; vatom_radius_covalent[i]=1.05;   vatom_electronegativity[i]=2.58; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.44; vatom_pearson_coefficient[i]=0.00016807795;  // S Table 27 of JUNKAI
-  i++; vatom_symbol[i]="Cl";vatom_name[i]="Chlorine";    vatom_mass[i]*=35.453;   vatom_volume[i]=21.2947; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.32;  vatom_miedema_nws[i]=0.34;  vatom_miedema_Vm[i]=6.71; vatom_miedema_gamma_s[i]= 1013;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.107; vatom_radius_covalent[i]=1.02;   vatom_electronegativity[i]=3.16; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.70; vatom_pearson_coefficient[i]=0.00058238731;  // Cl interpolation phi_star, nws, Vm, gamma  JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ar";vatom_name[i]="Argon";       vatom_mass[i]*=39.948;   vatom_volume[i]=22.000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.192; vatom_radius_covalent[i]=1.06;   vatom_electronegativity[i]=NNN;  vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00003509919;  // Ar guessed volume, must double check from results  JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="S"; vatom_name[i]="Sulphur";     vatom_mass[i]*=32.06;    vatom_volume[i]=15.7301; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.6;  vatom_miedema_nws[i]=1.46; vatom_miedema_Vm[i]=4.376;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.106; vatom_radius_covalent[i]=1.05;   vatom_electronegativity[i]=2.58; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.44; vatom_pearson_coefficient[i]=0.00016807795;  // S Table 27 of JX
+  i++; vatom_symbol[i]="Cl";vatom_name[i]="Chlorine";    vatom_mass[i]*=35.453;   vatom_volume[i]=21.2947; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.32;  vatom_miedema_nws[i]=0.34;  vatom_miedema_Vm[i]=6.71; vatom_miedema_gamma_s[i]= 1013;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.107; vatom_radius_covalent[i]=1.02;   vatom_electronegativity[i]=3.16; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.70; vatom_pearson_coefficient[i]=0.00058238731;  // Cl interpolation phi_star, nws, Vm, gamma  JX CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ar";vatom_name[i]="Argon";       vatom_mass[i]*=39.948;   vatom_volume[i]=22.000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.192; vatom_radius_covalent[i]=1.06;   vatom_electronegativity[i]=NNN;  vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00003509919;  // Ar guessed volume, must double check from results  JX CHANGED VALENCE    
 
   // ROW4
   // s-electron systems
@@ -342,18 +342,18 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Ti";vatom_name[i]="Titanium";    vatom_mass[i]*=47.9;     vatom_volume[i]=17.1035; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.65; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=4.8; vatom_miedema_gamma_s[i]=2050;  vatom_miedema_BVm[i]=11.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.60;   vatom_electronegativity[i]=1.54; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.79; vatom_xray_scatt[i]=22.24; vatom_pearson_coefficient[i]=0.000286456;  // Ti
   i++; vatom_symbol[i]="V"; vatom_name[i]="Vanadium";    vatom_mass[i]*=50.9415;  vatom_volume[i]=13.2086; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.25; vatom_miedema_nws[i]=1.64; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2600;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.132; vatom_radius_covalent[i]=1.53;   vatom_electronegativity[i]=1.63; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.84; vatom_pearson_coefficient[i]=9.54831E-07;  // V
   i++; vatom_symbol[i]="Cr";vatom_name[i]="Chromium";    vatom_mass[i]*=51.996;   vatom_volume[i]=11.4136; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.74; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2400;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.66; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.89; vatom_xray_scatt[i]=23.84; vatom_pearson_coefficient[i]=0.00013287;  // Cr
-  i++; vatom_symbol[i]="Mn";vatom_name[i]="Manganese";   vatom_mass[i]*=54.93805; vatom_volume[i]=10.6487; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.61; vatom_miedema_Vm[i]=3.8; vatom_miedema_gamma_s[i]=1600;  vatom_miedema_BVm[i]=4.4;  vatom_radius[i]=0.112; vatom_radius_covalent[i]=1.61;   vatom_electronegativity[i]=1.55; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=0.94; vatom_xray_scatt[i]=24.46; vatom_pearson_coefficient[i]=1.67276E-32;  // vatom_xray_scatt[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent)   
-  i++; vatom_symbol[i]="Fe";vatom_name[i]="Iron";        vatom_mass[i]*=55.847;   vatom_volume[i]=10.2315; vatom_valence_std[i]=8; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.93; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.124; vatom_radius_covalent[i]=1.52;   vatom_electronegativity[i]=1.83; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.99; vatom_xray_scatt[i]=24.85; vatom_pearson_coefficient[i]=9.17912E-05;  // vatom_xray_scatt[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent) 
-  i++; vatom_symbol[i]="Co";vatom_name[i]="Cobalt";      vatom_mass[i]*=58.9332;  vatom_volume[i]=10.3205; vatom_valence_std[i]=9; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.10; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=13.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.26;   vatom_electronegativity[i]=1.88; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.04; vatom_xray_scatt[i]=24.59; vatom_pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses low spin configuration (most frequent)   
+  i++; vatom_symbol[i]="Mn";vatom_name[i]="Manganese";   vatom_mass[i]*=54.93805; vatom_volume[i]=10.6487; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.61; vatom_miedema_Vm[i]=3.8; vatom_miedema_gamma_s[i]=1600;  vatom_miedema_BVm[i]=4.4;  vatom_radius[i]=0.112; vatom_radius_covalent[i]=1.61;   vatom_electronegativity[i]=1.55; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=0.94; vatom_xray_scatt[i]=24.46; vatom_pearson_coefficient[i]=1.67276E-32;  // vatom_xray_scatt[i]=24.3589; Mn JX CHANGED VALENCE //DX+CO20170904 vatom_radius_covalent[i] uses high spin configuration (most frequent)   
+  i++; vatom_symbol[i]="Fe";vatom_name[i]="Iron";        vatom_mass[i]*=55.847;   vatom_volume[i]=10.2315; vatom_valence_std[i]=8; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.93; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.124; vatom_radius_covalent[i]=1.52;   vatom_electronegativity[i]=1.83; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.99; vatom_xray_scatt[i]=24.85; vatom_pearson_coefficient[i]=9.17912E-05;  // vatom_xray_scatt[i]=24.6830; Fe JX CHANGED VALENCE //DX+CO20170904 vatom_radius_covalent[i] uses high spin configuration (most frequent) 
+  i++; vatom_symbol[i]="Co";vatom_name[i]="Cobalt";      vatom_mass[i]*=58.9332;  vatom_volume[i]=10.3205; vatom_valence_std[i]=9; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.10; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=13.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.26;   vatom_electronegativity[i]=1.88; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.04; vatom_xray_scatt[i]=24.59; vatom_pearson_coefficient[i]=0.0;  // Co JX CHANGED VALENCE //DX+CO20170904 vatom_radius_covalent[i] uses low spin configuration (most frequent)   
   i++; vatom_symbol[i]="Ni";vatom_name[i]="Nickel";      vatom_mass[i]*=58.69;    vatom_volume[i]=10.8664; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2450;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.24;   vatom_electronegativity[i]=1.91; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.09; vatom_xray_scatt[i]=25.02; vatom_pearson_coefficient[i]=0.000430773;  // Ni
-  i++; vatom_symbol[i]="Cu";vatom_name[i]="Copper";      vatom_mass[i]*=63.546;   vatom_volume[i]=12.0159; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=1850;  vatom_miedema_BVm[i]=9.3;  vatom_radius[i]=0.128; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.20; vatom_xray_scatt[i]=27.03; vatom_pearson_coefficient[i]=0.00021086;  // Cu JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Cu";vatom_name[i]="Copper";      vatom_mass[i]*=63.546;   vatom_volume[i]=12.0159; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=1850;  vatom_miedema_BVm[i]=9.3;  vatom_radius[i]=0.128; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.20; vatom_xray_scatt[i]=27.03; vatom_pearson_coefficient[i]=0.00021086;  // Cu JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Zn";vatom_name[i]="Zinc";        vatom_mass[i]*=65.38;    vatom_volume[i]=15.0827; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.32; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=1020;  vatom_miedema_BVm[i]=5.5;  vatom_radius[i]=0.133; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.65; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.44; vatom_xray_scatt[i]=28.44; vatom_pearson_coefficient[i]=0.000595597;  // Zn
   // p-electron systems
   i++; vatom_symbol[i]="Ga";vatom_name[i]="Gallium";     vatom_mass[i]*=69.737;   vatom_volume[i]=18.9039; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.31; vatom_miedema_Vm[i]=5.2; vatom_miedema_gamma_s[i]= 830;  vatom_miedema_BVm[i]=6.7;  vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.81; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=1.68; vatom_pearson_coefficient[i]=0.000197588;  // Ga
   i++; vatom_symbol[i]="Ge";vatom_name[i]="Germanium";   vatom_mass[i]*=72.59;    vatom_volume[i]=19.2948; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.37; vatom_miedema_Vm[i]=4.6; vatom_miedema_gamma_s[i]=1030;  vatom_miedema_BVm[i]=10.5; vatom_radius[i]=0.122; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.01; vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=1.92; vatom_pearson_coefficient[i]=0.00058782;  // Ge
   i++; vatom_symbol[i]="As";vatom_name[i]="Arsenic";     vatom_mass[i]*=74.9216;  vatom_volume[i]=19.0677; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.80; vatom_miedema_nws[i]=1.44; vatom_miedema_Vm[i]=5.2; vatom_miedema_gamma_s[i]=1000;  vatom_miedema_BVm[i]=5.1;  vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.19;   vatom_electronegativity[i]=2.18; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.16; vatom_pearson_coefficient[i]=0.0;  // As
-  i++; vatom_symbol[i]="Se";vatom_name[i]="Selenium";    vatom_mass[i]*=78.96;    vatom_volume[i]=20.3733; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.17; vatom_miedema_nws[i]=1.40; vatom_miedema_Vm[i]=5.172;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.116; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.55; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.40; vatom_pearson_coefficient[i]=0.00046279;  // Se Table 27 of JUNKAI
-  i++; vatom_symbol[i]="Br";vatom_name[i]="Bromine";     vatom_mass[i]*=79.904;   vatom_volume[i]=26.3292; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.35; vatom_miedema_Vm[i]=7.31; vatom_miedema_gamma_s[i]= 943;  vatom_miedema_BVm[i]=3.4;  vatom_radius[i]=0.119; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.96; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.64; vatom_pearson_coefficient[i]=0.000156277;  // Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Se";vatom_name[i]="Selenium";    vatom_mass[i]*=78.96;    vatom_volume[i]=20.3733; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.17; vatom_miedema_nws[i]=1.40; vatom_miedema_Vm[i]=5.172;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.116; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.55; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.40; vatom_pearson_coefficient[i]=0.00046279;  // Se Table 27 of JX
+  i++; vatom_symbol[i]="Br";vatom_name[i]="Bromine";     vatom_mass[i]*=79.904;   vatom_volume[i]=26.3292; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.35; vatom_miedema_Vm[i]=7.31; vatom_miedema_gamma_s[i]= 943;  vatom_miedema_BVm[i]=3.4;  vatom_radius[i]=0.119; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.96; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.64; vatom_pearson_coefficient[i]=0.000156277;  // Br interpolation phi_star, nws, Vm, gamma, BVm JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Kr";vatom_name[i]="Krypton";     vatom_mass[i]*=83.8;     vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.197; vatom_radius_covalent[i]=1.16;   vatom_electronegativity[i]=3; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000248482;  // Kr
 
   // ROW5
@@ -365,19 +365,19 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Zr";vatom_name[i]="Zirconium";   vatom_mass[i]*=91.22;    vatom_volume[i]=23.2561; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.40; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]=1950;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.158; vatom_radius_covalent[i]=1.75;   vatom_electronegativity[i]=1.33; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.76; vatom_pearson_coefficient[i]=0.000342629;  // Zr
   i++; vatom_symbol[i]="Nb";vatom_name[i]="Niobium";     vatom_mass[i]*=92.9064;  vatom_volume[i]=18.3132; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.00; vatom_miedema_nws[i]=1.62; vatom_miedema_Vm[i]=4.9; vatom_miedema_gamma_s[i]=2700;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.64;   vatom_electronegativity[i]=1.60; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.82; vatom_pearson_coefficient[i]=0.0;  // Nb
   i++; vatom_symbol[i]="Mo";vatom_name[i]="Molybdenum";  vatom_mass[i]*=95.94;    vatom_volume[i]=15.6175; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=2950;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.136; vatom_radius_covalent[i]=1.54;   vatom_electronegativity[i]=2.16; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.88; vatom_pearson_coefficient[i]=0.000598128;  // Mo
-  i++; vatom_symbol[i]="Tc";vatom_name[i]="Technetium";  vatom_mass[i]*=98.9062;  vatom_volume[i]=14.4670; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.30; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.47;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=0.0;  //Tc JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ru";vatom_name[i]="Ruthenium";   vatom_mass[i]*=101.07;   vatom_volume[i]=13.8390; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.46;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.00; vatom_pearson_coefficient[i]=0.000406665;  //Ru JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Tc";vatom_name[i]="Technetium";  vatom_mass[i]*=98.9062;  vatom_volume[i]=14.4670; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.30; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.47;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=0.0;  //Tc JX CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ru";vatom_name[i]="Ruthenium";   vatom_mass[i]*=101.07;   vatom_volume[i]=13.8390; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.46;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.00; vatom_pearson_coefficient[i]=0.000406665;  //Ru JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Rh";vatom_name[i]="Rhodium";     vatom_mass[i]*=102.9055; vatom_volume[i]=14.1731; vatom_valence_std[i]=9; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.76; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2750;  vatom_miedema_BVm[i]=23.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.42;   vatom_electronegativity[i]=2.28; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.06; vatom_pearson_coefficient[i]=1.90706E-32;  // Rh
   i++; vatom_symbol[i]="Pd";vatom_name[i]="Palladium";   vatom_mass[i]*=106.4;    vatom_volume[i]=15.4596; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.45; vatom_miedema_nws[i]=1.67; vatom_miedema_Vm[i]=4.3; vatom_miedema_gamma_s[i]=2100;  vatom_miedema_BVm[i]=16.0; vatom_radius[i]=0.137; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.12; vatom_pearson_coefficient[i]=0.000309478;  // Pd
-  i++; vatom_symbol[i]="Ag";vatom_name[i]="Silver";      vatom_mass[i]*=107.8682; vatom_volume[i]=18.0678; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1250;  vatom_miedema_BVm[i]=10.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.45;   vatom_electronegativity[i]=1.93; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.18; vatom_xray_scatt[i]=47.18; vatom_pearson_coefficient[i]=8.57985E-05;  // Ag JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ag";vatom_name[i]="Silver";      vatom_mass[i]*=107.8682; vatom_volume[i]=18.0678; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1250;  vatom_miedema_BVm[i]=10.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.45;   vatom_electronegativity[i]=1.93; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.18; vatom_xray_scatt[i]=47.18; vatom_pearson_coefficient[i]=8.57985E-05;  // Ag JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Cd";vatom_name[i]="Cadmium";     vatom_mass[i]*=112.41;   vatom_volume[i]=22.0408; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.05; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=5.5; vatom_miedema_gamma_s[i]= 780;  vatom_miedema_BVm[i]=6.10; vatom_radius[i]=0.150; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=1.69; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.36; vatom_pearson_coefficient[i]=0.000271603;  // Cd
   // p-electron systems
   i++; vatom_symbol[i]="In";vatom_name[i]="Indium";      vatom_mass[i]*=114.82;   vatom_volume[i]=27.5233; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.90; vatom_miedema_nws[i]=1.17; vatom_miedema_Vm[i]=6.3; vatom_miedema_gamma_s[i]= 690;  vatom_miedema_BVm[i]=6.4;  vatom_radius[i]=0.157; vatom_radius_covalent[i]=1.42;   vatom_electronegativity[i]=1.78; vatom_crystal[i]="fct";  vatom_pettifor_scale[i]=1.60; vatom_pearson_coefficient[i]=1.24494E-05;  // In
   i++; vatom_symbol[i]="Sn";vatom_name[i]="Tin";         vatom_mass[i]*=118.69;   vatom_volume[i]=27.5555; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.15; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=6.4; vatom_miedema_gamma_s[i]= 710;  vatom_miedema_BVm[i]=8.8;  vatom_radius[i]=0.158; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.96; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=1.84; vatom_pearson_coefficient[i]=0.000334085;  // Sn
   i++; vatom_symbol[i]="Sb";vatom_name[i]="Antimony";    vatom_mass[i]*=121.75;   vatom_volume[i]=27.1823; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.40; vatom_miedema_nws[i]=1.26; vatom_miedema_Vm[i]=6.6; vatom_miedema_gamma_s[i]= 680;  vatom_miedema_BVm[i]=7.0;  vatom_radius[i]=0.161; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.05; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.08; vatom_pearson_coefficient[i]=6.60751E-05;  // Sb
-  i++; vatom_symbol[i]="Te";vatom_name[i]="Tellurium";   vatom_mass[i]*=127.6;    vatom_volume[i]=28.1993; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.72; vatom_miedema_nws[i]=1.31;vatom_miedema_Vm[i]=6.439;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.38;   vatom_electronegativity[i]=2.10; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.32; vatom_pearson_coefficient[i]=0.000283934;  // Te Table 27 of JUNKAI
+  i++; vatom_symbol[i]="Te";vatom_name[i]="Tellurium";   vatom_mass[i]*=127.6;    vatom_volume[i]=28.1993; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.72; vatom_miedema_nws[i]=1.31;vatom_miedema_Vm[i]=6.439;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.38;   vatom_electronegativity[i]=2.10; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.32; vatom_pearson_coefficient[i]=0.000283934;  // Te Table 27 of JX
   i++; vatom_symbol[i]="I"; vatom_name[i]="Iodine";     vatom_mass[i]*=126.9045; vatom_volume[i]=34.9784;  vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.33; vatom_miedema_nws[i]=0.17;  vatom_miedema_Vm[i]=8.72;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;vatom_radius[i]=0.136; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.66; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.56; vatom_pearson_coefficient[i]=0.0;  // I interpolation phi_star, nws, Vm,
-  i++; vatom_symbol[i]="Xe";vatom_name[i]="Xenon";       vatom_mass[i]*=131.3;    vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.218; vatom_radius_covalent[i]=1.40;   vatom_electronegativity[i]=2.60; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000267781;  //Xe JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Xe";vatom_name[i]="Xenon";       vatom_mass[i]*=131.3;    vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.218; vatom_radius_covalent[i]=1.40;   vatom_electronegativity[i]=2.60; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000267781;  //Xe JX CHANGED VALENCE    
 
   // ROW6
   // s-electron systems
@@ -388,16 +388,16 @@ void atoms_initialize(void) {
   // lantanidies
   i++; vatom_symbol[i]="Ce";vatom_name[i]="Cerium";      vatom_mass[i]*=140.12;   vatom_volume[i]=26.4729; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.18;  vatom_miedema_nws[i]=1.19;  vatom_miedema_Vm[i]=7.76; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.04;   vatom_electronegativity[i]=1.12; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.7460; vatom_pearson_coefficient[i]=2.24956E-05;  // Ce pettifor linear interpolation // miedema from Alonso-March.
   i++; vatom_symbol[i]="Pr";vatom_name[i]="Praseodymium";vatom_mass[i]*=140.9077; vatom_volume[i]=36.4987; vatom_valence_std[i]=5; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.56; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.183; vatom_radius_covalent[i]=2.03;   vatom_electronegativity[i]=1.13; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7440; vatom_pearson_coefficient[i]=0.0;  // Pr pettifor linear interpolation
-  i++; vatom_symbol[i]="Nd";vatom_name[i]="Neodymium";   vatom_mass[i]*=144.24;   vatom_volume[i]=29.6719; vatom_valence_std[i]=6; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.51; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.01;   vatom_electronegativity[i]=1.14; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7420; vatom_pearson_coefficient[i]=0.000231599;  // Nd pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Nd";vatom_name[i]="Neodymium";   vatom_mass[i]*=144.24;   vatom_volume[i]=29.6719; vatom_valence_std[i]=6; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.51; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.01;   vatom_electronegativity[i]=1.14; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7420; vatom_pearson_coefficient[i]=0.000231599;  // Nd pettifor linear interpolation JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Pm";vatom_name[i]="Promethium";  vatom_mass[i]*=146.92;   vatom_volume[i]=34.6133; vatom_valence_std[i]=7; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.43; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.99;   vatom_electronegativity[i]=1.13; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7400; vatom_pearson_coefficient[i]=0.0;  // Pm pettifor linear interpolation
   i++; vatom_symbol[i]="Sm";vatom_name[i]="Samarium";    vatom_mass[i]*=150.4;    vatom_volume[i]=33.9484; vatom_valence_std[i]=8; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.37; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.181; vatom_radius_covalent[i]=1.98;   vatom_electronegativity[i]=1.17; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=0.7380; vatom_pearson_coefficient[i]=0.000334686;  // Sm pettifor linear interpolation
   i++; vatom_symbol[i]="Eu";vatom_name[i]="Europium";    vatom_mass[i]*=151.96;   vatom_volume[i]=43.1719; vatom_valence_std[i]=9; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.36; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.204; vatom_radius_covalent[i]=1.98;   vatom_electronegativity[i]=1.20; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.7360; vatom_pearson_coefficient[i]=4.32857E-05;  // Eu pettifor linear interpolation
   i++; vatom_symbol[i]="Gd";vatom_name[i]="Gadolinium";  vatom_mass[i]*=157.25;   vatom_volume[i]=32.5777; vatom_valence_std[i]=10; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.34; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.180; vatom_radius_covalent[i]=1.96;   vatom_electronegativity[i]=1.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7340; vatom_pearson_coefficient[i]=0.000127674;  // Gd pettifor linear interpolation
   i++; vatom_symbol[i]="Tb";vatom_name[i]="Terbium";     vatom_mass[i]*=158.9254; vatom_volume[i]=32.0200; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.20; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.94;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7320; vatom_pearson_coefficient[i]=0.0;  // Tb pettifor linear interpolation
-  i++; vatom_symbol[i]="Dy";vatom_name[i]="Dysprosium";  vatom_mass[i]*=162.5;    vatom_volume[i]=31.5096; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.12; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.22; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7300; vatom_pearson_coefficient[i]=5.20771E-05;  // Dy pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Dy";vatom_name[i]="Dysprosium";  vatom_mass[i]*=162.5;    vatom_volume[i]=31.5096; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.12; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.22; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7300; vatom_pearson_coefficient[i]=5.20771E-05;  // Dy pettifor linear interpolation JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Ho";vatom_name[i]="Holmium";     vatom_mass[i]*=164.9304; vatom_volume[i]=31.0155; vatom_valence_std[i]=13; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.06; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.176; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.23; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7280; vatom_pearson_coefficient[i]=2.96961E-32;  // Ho pettifor linear interpolation
   i++; vatom_symbol[i]="Er";vatom_name[i]="Erbium";      vatom_mass[i]*=167.26;   vatom_volume[i]=30.5431; vatom_valence_std[i]=14; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.98; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.175; vatom_radius_covalent[i]=1.89;   vatom_electronegativity[i]=1.24; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7260; vatom_pearson_coefficient[i]=7.24618E-05;  // Er pettifor linear interpolation
-  i++; vatom_symbol[i]="Tm";vatom_name[i]="Thulium";     vatom_mass[i]*=168.9342; vatom_volume[i]=30.0016; vatom_valence_std[i]=15; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.90; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.174; vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=1.25; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7240; vatom_pearson_coefficient[i]=0.0;  // Tm pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Tm";vatom_name[i]="Thulium";     vatom_mass[i]*=168.9342; vatom_volume[i]=30.0016; vatom_valence_std[i]=15; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.90; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.174; vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=1.25; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7240; vatom_pearson_coefficient[i]=0.0;  // Tm pettifor linear interpolation JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Yb";vatom_name[i]="Ytterbium";   vatom_mass[i]*=173.04;   vatom_volume[i]=39.4395; vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.86; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.193; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.7220; vatom_pearson_coefficient[i]=8.54557E-05;  // Yb pettifor linear interpolation
   i++; vatom_symbol[i]="Lu";vatom_name[i]="Lutetium";    vatom_mass[i]*=174.967;  vatom_volume[i]=29.3515; vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.24;  vatom_miedema_Vm[i]=6.81; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.173; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=1.27; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7200; vatom_pearson_coefficient[i]=8.27273E-07;  // Lu
   // d-electron systems: transition metalsnnn";
@@ -405,8 +405,8 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Ta";vatom_name[i]="Tantalum";    vatom_mass[i]*=180.9479; vatom_volume[i]=18.1100; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.05; vatom_miedema_nws[i]=1.63; vatom_miedema_Vm[i]=4.9; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=22.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.70;   vatom_electronegativity[i]=1.50; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.83; vatom_pearson_coefficient[i]=3.66845E-09;  // Ta
   i++; vatom_symbol[i]="W"; vatom_name[i]="Tungsten";    vatom_mass[i]*=183.85;   vatom_volume[i]=15.9387; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.80; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.5; vatom_miedema_gamma_s[i]=3300;  vatom_miedema_BVm[i]=31.0; vatom_radius[i]=0.137; vatom_radius_covalent[i]=1.62;   vatom_electronegativity[i]=2.36; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.885; vatom_pearson_coefficient[i]=6.96679E-05;  // W
   i++; vatom_symbol[i]="Re";vatom_name[i]="Rhenium";     vatom_mass[i]*=186.2;    vatom_volume[i]=14.8941; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.86; vatom_miedema_Vm[i]=4.3; vatom_miedema_gamma_s[i]=3650;  vatom_miedema_BVm[i]=33.0; vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.51;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=2.70849E-05;  // Re
-  i++; vatom_symbol[i]="Os";vatom_name[i]="Osmium";      vatom_mass[i]*=190.2;    vatom_volume[i]=14.2403; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.85; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3500;  vatom_miedema_BVm[i]=35.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.995; vatom_pearson_coefficient[i]=7.45234E-05;  // Os JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ir";vatom_name[i]="Iridium";     vatom_mass[i]*=192.22;   vatom_volume[i]=14.5561; vatom_valence_std[i]=9; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.55; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3100;  vatom_miedema_BVm[i]=25.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.41;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.05; vatom_pearson_coefficient[i]=2.53787E-05;  // Ir JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Os";vatom_name[i]="Osmium";      vatom_mass[i]*=190.2;    vatom_volume[i]=14.2403; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.85; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3500;  vatom_miedema_BVm[i]=35.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.995; vatom_pearson_coefficient[i]=7.45234E-05;  // Os JX CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ir";vatom_name[i]="Iridium";     vatom_mass[i]*=192.22;   vatom_volume[i]=14.5561; vatom_valence_std[i]=9; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.55; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3100;  vatom_miedema_BVm[i]=25.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.41;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.05; vatom_pearson_coefficient[i]=2.53787E-05;  // Ir JX CHANGED VALENCE    
   i++; vatom_symbol[i]="Pt";vatom_name[i]="Platinum";    vatom_mass[i]*=195.09;   vatom_volume[i]=15.7298; vatom_valence_std[i]=10; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.65; vatom_miedema_nws[i]=1.78; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.36;   vatom_electronegativity[i]=2.28; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.105; vatom_pearson_coefficient[i]=3.39206E-05;  // Pt
   i++; vatom_symbol[i]="Au";vatom_name[i]="Gold";        vatom_mass[i]*=196.9665; vatom_volume[i]=18.1904; vatom_valence_std[i]=11; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.15; vatom_miedema_nws[i]=1.57; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1550;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.36;   vatom_electronegativity[i]=2.54; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.16; vatom_xray_scatt[i]=74.99; vatom_pearson_coefficient[i]=2.08217E-32;  // Au
   i++; vatom_symbol[i]="Hg";vatom_name[i]="Mercury";     vatom_mass[i]*=200.59;   vatom_volume[i]=29.7156; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.20; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=4.0;  vatom_radius[i]=0.150; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=2.00; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=1.32; vatom_pearson_coefficient[i]=6.52519E-05;  // Hg
@@ -441,19 +441,17 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="No"; vatom_name[i]="Nobelium";   vatom_mass[i]*=259.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // No
   i++; vatom_symbol[i]="Lr"; vatom_name[i]="Lawrencium"; vatom_mass[i]*=262.11;   vatom_volume[i]=NNN;     vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Lr
 
-  /*
-     int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
-     for(uint j=1;j<93;j++) {
-     int test=vatom_valence_std[j];
-     if(j<=9 && test>=5) {test=test-8;} // first row
-     if(j<=17 && test>=5) {test=test-8;} // second row
-  //   if(test!=valence_wahyu[j]) 
-  cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
-  if(test!=valence_wahyu[j]) cerr << "   ****   ";
-  cerr << endl;
-  }
-  exit(0);
-  */
+  //   int valence_WSETYAWAN[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
+  //   for(uint j=1;j<93;j++) {
+  //   int test=vatom_valence_std[j];
+  //   if(j<=9 && test>=5) {test=test-8;} // first row
+  //   if(j<=17 && test>=5) {test=test-8;} // second row
+  ////   if(test!=valence_WSETYAWAN[j]) 
+  //cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_WSETYAWAN[j];
+  //if(test!=valence_WSETYAWAN[j]) cerr << "   ****   ";
+  //cerr << endl;
+  //}
+  //exit(0);
 
 
   //   for(int i=1;i<90;i++) {
@@ -560,9 +558,9 @@ std::string GetAtomSymbol(const uint& atnum) {
 // **************************************************************************
 // Function GetAtomMass
 // **************************************************************************
-double GetAtomMass(const string& _symbol,bool clean) { //CO181128
-  string symbol=_symbol; //CO181128
-  if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO181128
+double GetAtomMass(const string& _symbol,bool clean) { //CO20181128
+  string symbol=_symbol; //CO20181128
+  if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO20181128
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
     if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
       return vatom_mass.at(iat);
@@ -620,9 +618,9 @@ double GetAtomPhotoelectricCrossSection(const uint& atnum) { //sigma_pe photoele
 // **************************************************************************
 // Function GetAtomVolume
 // **************************************************************************
-double GetAtomVolume(const string& _symbol,bool clean) { //CO181128
-  string symbol=_symbol; //CO181128
-  if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO181128
+double GetAtomVolume(const string& _symbol,bool clean) { //CO20181128
+  string symbol=_symbol; //CO20181128
+  if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO20181128
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
     if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
       return vatom_volume.at(iat);
@@ -689,7 +687,7 @@ double GetAtomRadius(const uint& atnum) {
   return vatom_radius.at(atnum);
 }
 
-// DX and CO - 9/4/17 - START 
+//DX+CO20170904 START 
 // **************************************************************************
 // Function GetAtomRadiusCovalent
 // **************************************************************************
@@ -706,7 +704,7 @@ double GetAtomRadiusCovalent(const uint& atnum) {
   }
   return vatom_radius_covalent.at(atnum);
 }
-// DX and CO - 9/4/17 - END 
+//DX+CO20170904 END 
 
 // **************************************************************************
 // Function GetAtomElectronegativity
@@ -866,7 +864,7 @@ double GetAtomXrayScatt(const uint& atnum) {
   return vatom_xray_scatt.at(atnum);
 }
 
-//DX 20181220 - get group of atoms - START 
+//DX20181220 - get group of atoms - START 
 // **************************************************************************
 // Function GetGroupOfAtoms
 // **************************************************************************
@@ -928,7 +926,7 @@ vector<string> GetGroupOfAtoms(string& group_name){
   print(element_list);
   return element_list;
 }
-//DX 20181220 - get group of atoms - END 
+//DX20181220 - get group of atoms - END 
 
 // **************************************************************************
 // Function GetPearsonCoefficient
@@ -954,11 +952,11 @@ double GetPearsonCoefficient(const int& iat) {
 // **************************************************************************
 double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
   if(species.size()!=composition.size()) {
-    //[CO190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
-    //[CO190629 - no exit()]exit(0);
-    stringstream message; //CO190629
-    message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
+    //[CO20190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
+    //[CO20190629 - no exit()]exit(0);
+    stringstream message; //CO20190629
+    message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO20190629
   }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
@@ -1081,7 +1079,7 @@ uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vect
     for(uint j=0;j<letters.length();j++)
       if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
 
-  cerr << alloy << endl; exit(0); //CO190629 - need to clean this exit(), but this function looks unused...
+  cerr << alloy << endl; exit(0); //CO20190629 - need to clean this exit(), but this function looks unused...
 
   speciesX.clear();
   for(uint i=0;i<alloy.length();i++) {
@@ -1228,21 +1226,22 @@ _sym_op::~_sym_op() {free();}
 void _sym_op::free() {
   Uc.clear();Uf.clear();           // clear stuff
   generator.clear();               // clear stuff
-  generator_coefficients.clear();  // clear stuff       // DX 12/6/17 - generator coefficients
-  SU2_matrix.clear();              // clear stuff	// DX 1/15/18 - 2x2 complex SU(2) matrix
-  su2_coefficients.clear();        // clear stuff       // DX 1/15/18 - su(2) coefficients on Pauli matrices
+  generator_coefficients.clear();  // clear stuff       //DX20171206 - generator coefficients
+  SU2_matrix.clear();              // clear stuff	      //DX20180115 - 2x2 complex SU(2) matrix
+  su2_coefficients.clear();        // clear stuff       //DX20180115 - su(2) coefficients on Pauli matrices
   angle=0.0;                       // clear stuff
   axis.clear();                    // clear stuff
-  quaternion_vector.clear();       // clear stuff	//GEENA
-  quaternion_matrix.clear();       // clear stuff	//GEENA
+  quaternion_vector.clear();       // clear stuff	//GG
+  quaternion_matrix.clear();       // clear stuff	//GG
   str_type="";                     // clear stuff
   str_Hermann_Mauguin="";          // clear stuff
   str_Schoenflies="";              // clear stuff
   flag_inversion=FALSE;            // clear stuff
   is_pgroup=FALSE;                 // clear stuff
   is_pgroup_xtal=FALSE;            // clear stuff
+  is_pgroupk_Patterson=FALSE;       // clear stuff      //DX20200129
   is_pgroupk=FALSE;                // clear stuff
-  is_pgroupk_xtal=FALSE;           // clear stuff       // DX 12/5/17
+  is_pgroupk_xtal=FALSE;           // clear stuff       //DX20171205
   ctau.clear();ftau.clear();       // clear stuff
   basis_atoms_map.clear();         // clear stuff
   basis_types_map.clear();         // clear stuff
@@ -1250,7 +1249,7 @@ void _sym_op::free() {
   is_fgroup=FALSE;                 // clear stuff
   ctrasl.clear();ftrasl.clear();   // clear stuff
   is_sgroup=FALSE;                 // clear stuff
-  site=0;                          // clear stuff       // DX 8/3/17
+  site=0;                          // clear stuff       //DX20170803
   is_agroup=FALSE;                 // clear stuff
 }
 
@@ -1258,21 +1257,22 @@ void _sym_op::copy(const _sym_op& b){
   Uc=b.Uc;
   Uf=b.Uf;
   generator=b.generator;
-  generator_coefficients=b.generator_coefficients; // DX 12/6/17 - generator coefficients
-  SU2_matrix=b.SU2_matrix;                         // DX 1/15/18 - 2x2 complex SU(2) matrix 
-  su2_coefficients=b.su2_coefficients;             // DX 1/15/18 - su(2) coefficients on Pauli matrices
+  generator_coefficients=b.generator_coefficients; //DX20171206 - generator coefficients
+  SU2_matrix=b.SU2_matrix;                         //DX20180115 - 2x2 complex SU(2) matrix 
+  su2_coefficients=b.su2_coefficients;             //DX20180115 - su(2) coefficients on Pauli matrices
   angle=b.angle;
   axis=b.axis;
-  quaternion_vector=b.quaternion_vector;	//GEENA
-  quaternion_matrix=b.quaternion_matrix;	//GEENA
+  quaternion_vector=b.quaternion_vector;	//GG
+  quaternion_matrix=b.quaternion_matrix;	//GG
   str_type=b.str_type;
   str_Hermann_Mauguin=b.str_Hermann_Mauguin;
   str_Schoenflies=b.str_Schoenflies;
   flag_inversion=b.flag_inversion;
   is_pgroup=b.is_pgroup;
   is_pgroup_xtal=b.is_pgroup_xtal;
+  is_pgroupk_Patterson=b.is_pgroupk_Patterson; //DX20200129
   is_pgroupk=b.is_pgroupk;
-  is_pgroupk_xtal=b.is_pgroupk_xtal;  // DX 12/5/17
+  is_pgroupk_xtal=b.is_pgroupk_xtal;  //DX20171205
   ctau=b.ctau;
   ftau=b.ftau;
   basis_atoms_map.clear();for(uint i=0;i<b.basis_atoms_map.size();i++){basis_atoms_map.push_back(b.basis_atoms_map.at(i));}
@@ -1282,7 +1282,7 @@ void _sym_op::copy(const _sym_op& b){
   ctrasl=b.ctrasl;
   ftrasl=b.ftrasl;
   is_sgroup=b.is_sgroup;
-  site=b.site;                        // DX 8/3/17
+  site=b.site;                        //DX20170803
   is_agroup=b.is_agroup;
 }
 
@@ -1297,24 +1297,25 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   // oss.precision(10);
   if(symop.is_pgroup==TRUE) oss << " pgroup" << endl;
   if(symop.is_pgroup_xtal==TRUE) oss << " pgroup_xtal" << endl;
+  if(symop.is_pgroupk_Patterson==TRUE) oss << " pgroupk_Patterson" << endl; //DX20200129
   if(symop.is_fgroup==TRUE) oss << " fgroup" << endl;
   if(symop.is_sgroup==TRUE) oss << " sgroup" << endl;
   if(symop.is_agroup==TRUE) oss << " agroup" << endl;
   if(symop.is_pgroupk==TRUE) oss << " pgroupk" << endl;
-  if(symop.is_pgroupk_xtal==TRUE) oss << " pgroupk_xtal" << endl;  // DX 12/5/17
-  if(symop.is_agroup==TRUE) oss << " site:" << symop.site << endl; // DX 8/3/17
+  if(symop.is_pgroupk_xtal==TRUE) oss << " pgroupk_xtal" << endl;  //DX20171205
+  if(symop.is_agroup==TRUE) oss << " site:" << symop.site << endl; //DX20170803
   oss << " type: "<< symop.str_type << endl;
   oss << " Hermann_Mauguin: "<< symop.str_Hermann_Mauguin << endl;
   oss << " Schoenflies: "<< symop.str_Schoenflies << endl;
-  // DX and CO - START
-  oss << "" << roundoff(symop.Uc,1e-8) << " Uc "<< endl; // COREY roundoff for printing
+  //DX+CO START
+  oss << "" << roundoff(symop.Uc,1e-8) << " Uc "<< endl; //CO roundoff for printing
   //oss << "" << symop.Uc << " Uc "<< endl;
-  // DX and CO -END
+  //DX+CO END
   Uexp=exp(symop.generator);
   // if(! a.symop_inversion[k] ) oss << "" << max(aurostd::abs(Uexp-Uc))
   // << " error " << endl; else oss << "" <<  max(aurostd::abs(Uexp+Uc)) << " error " << endl;
-  //oss << "" << xint(symop.Uf) << " Uf "<< endl; // CO, WILL ZERO OUT 0.999999999999999999
-  // CO - START
+  //oss << "" << xint(symop.Uf) << " Uf "<< endl; //CO, WILL ZERO OUT 0.999999999999999999
+  //CO START
   xmatrix<int> Uf_int(symop.Uf.lrows,symop.Uf.lcols,symop.Uf.urows,symop.Uf.ucols);
   for (int i=symop.Uf.lrows;i<=symop.Uf.urows;i++){
     for (int j=symop.Uf.lcols;j<=symop.Uf.ucols;j++){
@@ -1322,12 +1323,12 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
     }
   }
   oss << "" << Uf_int << " Uf "<< endl;
-  // CO - END
+  //CO END
   oss << "" << symop.generator << " A=generator U=+-exp(A) [not Uc and -1 if inversion]" << endl;
-  // DX 12/6/17
+  //DX20171206
   oss << "" << symop.generator_coefficients << "  so(3) expansion coefficients on Lx, Ly, and Lz basis" << endl;
-  // DX 12/6/17
-  // DX 1/15/18 - adding SU(2) and su(2); specific xcomplex printing - START
+  //DX20171206
+  //DX20180115 - adding SU(2) and su(2); specific xcomplex printing - START
   char buf11_re[80],buf11_im[80],buf12_re[80],buf12_im[80],buf21_re[80],buf21_im[80],buf22_re[80],buf22_im[80];
   string iobuf="%11.4le";
   sprintf(buf11_re,iobuf.c_str(),symop.SU2_matrix(1,1).re);sprintf(buf11_im,iobuf.c_str(),symop.SU2_matrix(1,1).im);
@@ -1338,7 +1339,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf12_re << "," << buf12_im << ")" << endl; 
   oss << " (" << buf21_re << "," << buf21_im << ") "; 
   oss << " (" << buf22_re << "," << buf22_im << ")" << "  SU(2) complex matrix [(real,imaginary)]" << endl; 
-  // DX - formatting issues with complesx: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
+  //DX - formatting issues with xcomplex: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
   char buf1_re[80],buf1_im[80],buf2_re[80],buf2_im[80],buf3_re[80],buf3_im[80];
   sprintf(buf1_re,iobuf.c_str(),symop.su2_coefficients(1).re);sprintf(buf1_im,iobuf.c_str(),symop.su2_coefficients(1).im);
   sprintf(buf2_re,iobuf.c_str(),symop.su2_coefficients(2).re);sprintf(buf2_im,iobuf.c_str(),symop.su2_coefficients(2).im);
@@ -1346,16 +1347,16 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf1_re << "," << buf1_im << ") ";
   oss << " (" << buf2_re << "," << buf2_im << ") ";
   oss << " (" << buf3_re << "," << buf3_im << ")" << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
-  // DX - formatting issues with complex: oss << " " << symop.su2_coefficients << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
-  // DX 1/15/18 - adding SU(2) and su(2); specific xcomplex printing - END
+  //DX - formatting issues with complex: oss << " " << symop.su2_coefficients << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
+  //DX20180115 - adding SU(2) and su(2); specific xcomplex printing - END
   oss << " "<< symop.angle << "  angle " << endl;
   oss << "" << symop.axis <<  "  axis " << endl;
-  //GEENA START HERE
+  //GG START HERE
   // Quaternion Output
   // Roundoff used to print zeros instead of values e-17
   oss << "" << roundoff(symop.quaternion_vector, 1e-8) << " quaternion_vector " << endl;
   oss << "" << roundoff(symop.quaternion_matrix, 1e-8) << " quaternion_matrix " << endl;
-  //GEENA STOP HERE
+  //GG STOP HERE
   oss << " "<< symop.flag_inversion << "   inversion " << endl;
   //   oss << " "<< symop.str_type << endl;
   //   oss << " "<< symop.str_Hermann_Mauguin << endl;
@@ -1365,10 +1366,10 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   if(symop.is_sgroup) oss << "" << symop.ctrasl << "    ctrasl " << endl;
   if(symop.is_sgroup) oss << "" << symop.ftrasl << "    ftrasl " << endl;
 
-  // DX and CO - START
+  //DX+CO START
   //if(symop.is_fgroup==TRUE||symop.is_agroup==TRUE) {
   if(symop.basis_map_calculated) {
-    // DX and CO - END
+    //DX+CO END
     oss << " - ";
     for(uint n=0;n<symop.basis_atoms_map.size();n++)
       oss << symop.basis_atoms_map[n] << " ";
@@ -1383,18 +1384,18 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   return oss;
 }
 
-void _sym_op::setUc(const xmatrix<double>& _Uc,const xmatrix<double>& lattice){ //CO190520
+void _sym_op::setUc(const xmatrix<double>& _Uc,const xmatrix<double>& lattice){ //CO20190520
   Uc=_Uc;
   xmatrix<double> f2c=trasp(lattice);xmatrix<double> c2f=inverse(trasp(lattice));
   Uf=c2f*Uc*f2c;
 }
-void _sym_op::setUf(const xmatrix<double>& _Uf,const xmatrix<double>& lattice){ //CO190520
+void _sym_op::setUf(const xmatrix<double>& _Uf,const xmatrix<double>& lattice){ //CO20190520
   Uf=_Uf;
   xmatrix<double> f2c=trasp(lattice);xmatrix<double> c2f=inverse(trasp(lattice));
   Uc=f2c*Uf*c2f;
 }
 
-//DX 201801107 - add _kpoint class - START
+//DX201801107 - add _kpoint class - START
 // ***************************************************************************
 // ***************************************************************************
 // _kpoint
@@ -1448,7 +1449,7 @@ void _kpoint::TransformKpoint(const xmatrix<double>& P){
   klattice=aurostd::inverse(P)*klattice; //i.e., klattice'=Q*klattice
   is_transformed=true;
 }
-//DX 201801107 - add _kpoint class - END
+//DX201801107 - add _kpoint class - END
 
 // ***************************************************************************
 // ***************************************************************************
@@ -1461,11 +1462,11 @@ wyckoffsite_ITC::wyckoffsite_ITC() {
   coord.clear();
   type="";
   wyckoffSymbol="";
-  letter=""; //DX 20180128 - add Wyckoff letter
-  site_symmetry=""; //DX 20180128 - add Wyckoff site symmetry
-  multiplicity=0; //DX 20180128 - add Wyckoff multiplicity
-  site_occupation=1.0; //DX 20191010 - add site occupation (default: 1.0)
-  equations.clear(); //DX 20180128 - add Wyckoff multiplicity
+  letter=""; //DX20180128 - add Wyckoff letter
+  site_symmetry=""; //DX20180128 - add Wyckoff site symmetry
+  multiplicity=0; //DX20180128 - add Wyckoff multiplicity
+  site_occupation=1.0; //DX20191010 - add site occupation (default: 1.0)
+  equations.clear(); //DX20180128 - add Wyckoff multiplicity
 }
 
 // destructor
@@ -1484,16 +1485,16 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
     coord=b.coord;
     type=b.type;
     wyckoffSymbol=b.wyckoffSymbol;
-    letter=b.letter; //DX 20180128 - add Wyckoff letter
-    site_symmetry=b.site_symmetry; //DX 20180128 - add Wyckoff site symmetry
-    multiplicity=b.multiplicity; //DX 20180128 - add Wyckoff multiplicity
-    site_occupation=b.site_occupation; //DX 20191010 - add site occupation
-    equations=b.equations; //DX 20180128 - add Wyckoff multiplicity
+    letter=b.letter; //DX20180128 - add Wyckoff letter
+    site_symmetry=b.site_symmetry; //DX20180128 - add Wyckoff site symmetry
+    multiplicity=b.multiplicity; //DX20180128 - add Wyckoff multiplicity
+    site_occupation=b.site_occupation; //DX20191010 - add site occupation
+    equations=b.equations; //DX20180128 - add Wyckoff multiplicity
   }
   return *this;
 }
 
-//DX 20190130 - add comparison operator so we can sort by Wyckoff letter, then species - START
+//DX20190130 - add comparison operator so we can sort by Wyckoff letter, then species - START
 // operator<
 bool wyckoffsite_ITC::operator<(const wyckoffsite_ITC& b) const {       // operator<
   if(letter<b.letter){
@@ -1509,7 +1510,7 @@ bool wyckoffsite_ITC::operator<(const wyckoffsite_ITC& b) const {       // opera
   }
   return false;
 }
-//DX 20190130 - add comparison operator so we can sort by Wyckoff letter, then species - END
+//DX20190130 - add comparison operator so we can sort by Wyckoff letter, then species - END
 
 // copy 
 wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
@@ -1517,24 +1518,24 @@ wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   coord=b.coord;
   type=b.type;
   wyckoffSymbol=b.wyckoffSymbol;
-  letter=b.letter; //DX 20180128 - add Wyckoff letter
-  site_symmetry=b.site_symmetry; //DX 20180128 - add Wyckoff site symmetry
-  multiplicity=b.multiplicity; //DX 20180128 - add Wyckoff multiplicity
-  site_occupation=b.site_occupation; //DX 20191010 - add site occupation
-  equations=b.equations; //DX 20180128 - add Wyckoff multiplicity
+  letter=b.letter; //DX20180128 - add Wyckoff letter
+  site_symmetry=b.site_symmetry; //DX20180128 - add Wyckoff site symmetry
+  multiplicity=b.multiplicity; //DX20180128 - add Wyckoff multiplicity
+  site_occupation=b.site_occupation; //DX20191010 - add site occupation
+  equations=b.equations; //DX20180128 - add Wyckoff multiplicity
 }
 
 // operator <<
 ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
-  // DX 12/12/17 [OBSOLETE] oss << "wyckoffsite_ITC operator<< " << endl;
+  //DX20171212 [OBSOLETE] oss << "wyckoffsite_ITC operator<< " << endl;
   oss << " coord: "<< site.coord << endl;
   oss << " type: "<< site.type << endl;
   oss << " letter: "<< site.letter << endl;
   oss << " site_symmetry: "<< site.site_symmetry << endl;
   oss << " multiplicity: "<< site.multiplicity << endl;
   oss << " wyckoffSymbol: "<< site.wyckoffSymbol << endl;
-  oss << " site_occupation: " << site.site_occupation << endl; //DX 20191010 - add site occupation
-  oss << " equations: " << endl; //DX 20191010 - add site occupation
+  oss << " site_occupation: " << site.site_occupation << endl; //DX20191010 - add site occupation
+  oss << " equations: " << endl; //DX20191010 - add site occupation
   for(uint i=0;i<site.equations.size();i++){
     oss << "  " << aurostd::joinWDelimiter(site.equations[i],",") << endl;
   }
@@ -1542,7 +1543,7 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
 }
 
 // ***************************************************************************
-// AtomEnvironment Class - DX 20191122
+// AtomEnvironment Class - DX20191122
 // ***************************************************************************
 // ---------------------------------------------------------------------------
 // AtomEnvironment (constructor)
@@ -1652,7 +1653,7 @@ ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 }
 
 // ***************************************************************************
-// AtomEnvironment::getAtomEnvironment() - DX 20191122 
+// AtomEnvironment::getAtomEnvironment() - DX20191122 
 // ***************************************************************************
 // determines the atomic environment around a central atom 
 // current functionality:
@@ -1686,7 +1687,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
   if(mode==ATOM_ENVIRONMENT_MODE_1){
     for(uint i=0;i<xstr.species.size();i++){
       // check if types are restricted, otherwise get closest neighbors by type
-      if(aurostd::withinList(neighbor_elements, xstr.species[i]) || neighbor_elements.empty()){
+      if(aurostd::WithinList(neighbor_elements, xstr.species[i]) || neighbor_elements.empty()){
         uint frequency = 0;
         double min_dist = AUROSTD_MAX_DOUBLE;
         vector<xvector<double> > coordinates;
@@ -1714,7 +1715,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
 }
 
 // ***************************************************************************
-// getAtomEnvironments() - DX 20191122
+// getAtomEnvironments() - DX20191122
 // ***************************************************************************
 vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
 
@@ -1731,13 +1732,13 @@ vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
 }
 
 // ***************************************************************************
-// getLFAAtomEnvironments() - DX 20191122
+// getLFAAtomEnvironments() - DX20191122
 // ***************************************************************************
 vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode){
 
   // Calculate the LFA atomic environments
   // i.e., only environments comprised of the least frequent atom (LFA) type
-  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalMatch)
+  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalFinder)
 
   vector<AtomEnvironment> environments_LFA;
 
@@ -1752,7 +1753,7 @@ vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const str
 }
 
 // ***************************************************************************
-// Reset dims for RadiusSphereLattice() - DX 20191122
+// Reset dims for RadiusSphereLattice() - DX20191122
 // ***************************************************************************
 void resetLatticeDimensions(const xmatrix<double>& lattice, 
     double radius, 
@@ -1769,7 +1770,7 @@ void resetLatticeDimensions(const xmatrix<double>& lattice,
   // stores dimension indices (a_index,b_index,c_index)
   // new dims explore order : zeroth cell to max dims = speed increase 
   // (can break early if match is found)
-  // DX create function date: 20190705
+  //DX create function date: 20190705
 
   // ---------------------------------------------------------------------------
   // get new dimensions based on radius
@@ -1797,7 +1798,7 @@ void resetLatticeDimensions(const xmatrix<double>& lattice,
 }
 
 // ***************************************************************************
-// minimumCoordinationShellLatticeOnly() - DX 20191122 
+// minimumCoordinationShellLatticeOnly() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
     double& min_dist, 
@@ -1816,7 +1817,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 }
 
 // ***************************************************************************
-// minimumCoordinationShellLatticeOnly() - DX 20191122 
+// minimumCoordinationShellLatticeOnly() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
     double& min_dist, 
@@ -1841,7 +1842,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 }
 
 // ***************************************************************************
-// minimumCoordinationShellLatticeOnly() - DX 20191122
+// minimumCoordinationShellLatticeOnly() - DX20191122
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, 
     xvector<int>& dims,
@@ -1873,12 +1874,12 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
   // ---------------------------------------------------------------------------
   // loop through lattice vectors (stored before-hand in l1,l2,l3)
   for(uint m=0;m<l1.size();m++){
-    xvector<double> a_component = l1[m];                  // DX : coord1-coord2+a*lattice(1)
+    xvector<double> a_component = l1[m];                  //DX : coord1-coord2+a*lattice(1)
     for(uint n=0;n<l2.size();n++){
-      xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+      xvector<double> ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
       for(uint p=0;p<l3.size();p++){
         if(!(m==0 && n==0 && p==0)){
-          tmp = ab_component + l3[p];                     // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+          tmp = ab_component + l3[p];                     //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
           double tmp_mod = aurostd::modulus(tmp);
           // ---------------------------------------------------------------------------
           // if found a new minimum distance and update coordination/frequency and coordinate 
@@ -1886,7 +1887,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
             // ---------------------------------------------------------------------------
             // if new distance is close to the original it is the same coordination shell (add to coordination)
             // otherwise, reset coordination shell
-            // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
             if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
             else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
             min_dist=tmp_mod;
@@ -1899,7 +1900,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
               frequency=0; //reset
             }
           }
-          // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+          //DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
           else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
         }
       }
@@ -1908,7 +1909,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 }
 
 // ***************************************************************************
-// minimumCoordinationShell() - DX 20191122 
+// minimumCoordinationShell() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShell(const xstructure& xstr, 
     uint center_index, 
@@ -1922,7 +1923,7 @@ void minimumCoordinationShell(const xstructure& xstr,
 }
 
 // ***************************************************************************
-// minimumCoordinationShell() - DX 20191122
+// minimumCoordinationShell() - DX20191122
 // ***************************************************************************
 void minimumCoordinationShell(const xstructure& xstr, 
     uint center_index, 
@@ -1949,19 +1950,19 @@ void minimumCoordinationShell(const xstructure& xstr,
   for(uint ii=0; ii<xstr.atoms.size(); ii++){
     // ---------------------------------------------------------------------------
     // if atom ii is not environment center, find minimum distance between center atom ii's images 
-    if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type=="" 
+    if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX20191105 - added type=="" 
       xvector<double> incell_dist = xstr.atoms[center_index].cpos-xstr.atoms[ii].cpos;
       double incell_mod = aurostd::modulus(incell_dist);
       if(!(dims[1]==1 && dims[2]==1 && dims[3]==1) && incell_mod!=1e9){
         resetLatticeDimensions(xstr.lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
       }
-      //DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+      //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
       for(uint m=0;m<l1.size();m++){
-        xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+        xvector<double> a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
         for(uint n=0;n<l2.size();n++){
-          xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+          xvector<double> ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
           for(uint p=0;p<l3.size();p++){
-            tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+            tmp_coord = ab_component + l3[p];                 //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
             double tmp_mod = aurostd::modulus(tmp_coord);
             if(tmp_mod<min_dist){
               //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
@@ -1978,7 +1979,7 @@ void minimumCoordinationShell(const xstructure& xstr,
     // ---------------------------------------------------------------------------
     // if atom is environment center check its images, but only need to search as 
     // far as min_dist or lattice_radius (whichever is smaller)
-    else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type==""
+    else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX20191105 - added type==""
       double lattice_radius=RadiusSphereLattice(xstr.lattice);
       double search_radius=min(lattice_radius,min_dist);
 
@@ -1999,9 +2000,9 @@ void minimumCoordinationShell(const xstructure& xstr,
 // STRUCTURE
 // look into aflow.h for the definitions
 
-void xstructure::free() { //DX 20191220 - moved all initializations from constuctor into free()
+void xstructure::free() { //DX20191220 - moved all initializations from constuctor into free()
   iomode=IOAFLOW_AUTO;        // what else could we do right now...
-  title=""; //DX 20191210
+  title=""; //DX20191210
   directory="";
   prototype="";
   info="";
@@ -2010,10 +2011,10 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   // num_types=0;
   scale=1.0;
   neg_scale=FALSE;
-  scale_second=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // CO 180409
-  neg_scale_second=FALSE; // CO 180409
-  scale_third.isentry=false;  // CO 170803 - site tol
-  scale_third.content_double=DEFAULT_POCC_STOICH_TOL;//DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;  // CO 170803 - site tol
+  scale_second=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; //CO20180409
+  neg_scale_second=FALSE; //CO20180409
+  scale_third.isentry=false;  //CO20170803 - site tol
+  scale_third.content_double=DEFAULT_POCC_STOICH_TOL;//DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;  //CO20170803 - site tol
   coord_type[0]=coord_type[1]=0;
   coord_flag=_COORDS_FRACTIONAL_; // _COORDS_FRACTIONAL_ (0) fractional, _COORDS_CARTESIAN_ (1) cartesian.
   isd=FALSE; // !=0 => Selective dynamics, =0 => no selective dynamics.
@@ -2023,9 +2024,9 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   klattice=ReciprocalLattice(lattice,scale);
   f2c=trasp(lattice);
   c2f=inverse(trasp(lattice));
-  symbolic_math_representation_only=FALSE;                   //DX 20180618
-  constrained_symmetry_calculation=FALSE;                    //DX 20180618
-  symbolic_math_lattice.clear();                             //DX 20180618
+  symbolic_math_representation_only=FALSE;                   //DX20180618
+  constrained_symmetry_calculation=FALSE;                    //DX20180618
+  symbolic_math_lattice.clear();                             //DX20180618
   num_parameters=0;                                          // number of parameters ANRL 20180618
   num_lattice_parameters=0;                                  // number of lattice parameters ANRL 20180618
   prototype_parameter_list.clear();                          // prototype parameter list ANRL 20180618
@@ -2034,12 +2035,12 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   // TOLERANCES ------------------------
   equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; // standard but you can change
   // NUM_EACH_TYPE ---------------------
-  //ClearSpecies(); // CO 180420
-  num_each_type.clear();    // CO 180420 - ClearSpecies()
-  comp_each_type.clear();   // CO 180420 - ClearSpecies()
-  stoich_each_type.clear(); // CO 171025 // CO 180420 - ClearSpecies()
+  //ClearSpecies(); //CO20180420
+  num_each_type.clear();    //CO20180420 - ClearSpecies()
+  comp_each_type.clear();   //CO20180420 - ClearSpecies()
+  stoich_each_type.clear(); //CO20171025 //CO20180420 - ClearSpecies()
   // SPECIES ---------------------------
-  species.clear();species_pp.clear();species_pp_type.clear();species_pp_version.clear();species_pp_ZVAL.clear();species_pp_vLDAU.clear();species_volume.clear();species_mass.clear(); // CO 180420 - ClearSpecies()
+  species.clear();species_pp.clear();species_pp_type.clear();species_pp_version.clear();species_pp_ZVAL.clear();species_pp_vLDAU.clear();species_volume.clear();species_mass.clear(); //CO20180420 - ClearSpecies()
   is_vasp4_poscar_format=TRUE;
   is_vasp5_poscar_format=FALSE;
   // ATOMS -----------------------------
@@ -2058,19 +2059,19 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   Standard_Lattice_conventional=FALSE;
   Standard_Lattice_has_failed=FALSE;
   bravais_lattice_type="";
-  bravais_lattice_variation_type="";//wahyu mod
+  bravais_lattice_variation_type="";//WSETYAWAN mod
   bravais_lattice_system="";
   bravais_lattice_lattice_type="";
-  bravais_lattice_lattice_variation_type="";//wahyu mod
+  bravais_lattice_lattice_variation_type="";//WSETYAWAN mod
   bravais_lattice_lattice_system="";
   pearson_symbol="";
   reciprocal_lattice_type="";
-  reciprocal_lattice_variation_type="";//wahyu mod
-  volume_changed_original2new=FALSE; //DX 20181024
-  transform_coordinates_original2new.clear(); //DX 20181024
-  transform_coordinates_new2original.clear(); //DX 20181024
-  rotate_lattice_original2new.clear(); //DX 20181024
-  rotate_lattice_new2original.clear(); //DX 20181024
+  reciprocal_lattice_variation_type="";//WSETYAWAN mod
+  volume_changed_original2new=FALSE; //DX20181024
+  transform_coordinates_original2new.clear(); //DX20181024
+  transform_coordinates_new2original.clear(); //DX20181024
+  rotate_lattice_original2new.clear(); //DX20181024
+  rotate_lattice_new2original.clear(); //DX20181024
   //reciprocal_conventional_lattice_type="";
   bravais_superlattice_type="";
   bravais_superlattice_variation_type="";
@@ -2087,8 +2088,8 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   order_parameter_sum=0;
   // PARTIAL OCCUPATION -------------------
   partial_occupation_flag=FALSE;
-  partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;     // DEFAULT // CO 180409
-  partial_occupation_stoich_tol=DEFAULT_POCC_STOICH_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;   // DEFAULT // CO 180409
+  partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;     // DEFAULT //CO20180409
+  partial_occupation_stoich_tol=DEFAULT_POCC_STOICH_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE;   // DEFAULT //CO20180409
   partial_occupation_HNF=0;
   partial_occupation_sublattice.clear();
   // FORCES/POSITIONS ------------------
@@ -2113,13 +2114,13 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   kpoints_kmax=0;kpoints_kppra=0;
   kpoints_mode=0;
   kpoints_kscheme="";
-  // DX and CO - START
-  dist_nn_min=AUROSTD_NAN;    // CO
+  //DX+CO START
+  dist_nn_min=AUROSTD_NAN;    //CO
   // SYMMETRY TOLERANCE ----------------------------
-  sym_eps=AUROSTD_NAN; // DX
-  sym_eps_calculated=false; // DX, this means that it was calculated and set by the symmetry routines
-  sym_eps_change_count=0; // DX 2/22/18 - added tolerance count specific to structure
-  // DX and CO - END
+  sym_eps=AUROSTD_NAN; //DX
+  sym_eps_calculated=false; //DX, this means that it was calculated and set by the symmetry routines
+  sym_eps_change_count=0; //DX20180222 - added tolerance count specific to structure
+  //DX+CO END
   // PGROUP ----------------------------
   pgroup.clear();            // just initialize
   pgroup_calculated=FALSE;
@@ -2129,12 +2130,15 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   crystal_family="";crystal_system="";point_group_crystal_class="";
   point_group_Shoenflies="";point_group_Hermann_Mauguin="";point_group_orbifold="";
   point_group_type="";point_group_order="";point_group_structure="";
+  // PGROUPK_PATTERSON ---------------------------- //DX20200129
+  pgroupk_Patterson.clear();        // just initialize
+  pgroupk_Patterson_calculated=FALSE;
   // PGROUPK ----------------------------
   pgroupk.clear();            // just initialize
   pgroupk_calculated=FALSE;
   // PGROUPK_XTAL ----------------------------
-  pgroupk_xtal.clear();            // just initialize // DX 12/5/17 - Added pgroupk_xtal
-  pgroupk_xtal_calculated=FALSE;                      // DX 12/5/17 - Added pgroupk_xtal
+  pgroupk_xtal.clear();            // just initialize //DX20171205 - Added pgroupk_xtal
+  pgroupk_xtal_calculated=FALSE;                      //DX20171205 - Added pgroupk_xtal
   // FGROUP ----------------------------
   fgroup.clear();            // just initialize
   fgroup_calculated=FALSE;
@@ -2163,30 +2167,30 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   is_spacegroup_findsym=FALSE;
   is_spacegroup_aflow=FALSE;
   // SPACE GROUP ITC (RHT)
-  crystal_system_ITC="";  // RHT
-  point_group_ITC=""; // RHT
-  // DX and CO - START
-  bravais_label_ITC='X';  // RHT
-  lattice_label_ITC='X'; // RHT
-  space_group_ITC=0; // RHT
-  // DX and CO - END
-  wyckoff_library_entry_ITC=""; // RHT
-  wyccar_ITC.clear(); // RHT
-  standard_lattice_ITC.clear(); // RHT
-  standard_basis_ITC.clear(); // RHT
-  wyckoff_sites_ITC.clear();   // RHT
-  wyckoff_symbols_ITC.clear(); // RHT
-  setting_ITC = 0; // DX 8/30/17 - SGDATA
-  origin_ITC.clear(); // DX 8/30/17 - SGDATA
-  general_position_ITC.clear(); // DX 8/30/17 - SGDATA
+  crystal_system_ITC="";  //RHT
+  point_group_ITC=""; //RHT
+  //DX+CO START
+  bravais_label_ITC='X';  //RHT
+  lattice_label_ITC='X'; //RHT
+  space_group_ITC=0; //RHT
+  //DX+CO END
+  wyckoff_library_entry_ITC=""; //RHT
+  wyccar_ITC.clear(); //RHT
+  standard_lattice_ITC.clear(); //RHT
+  standard_basis_ITC.clear(); //RHT
+  wyckoff_sites_ITC.clear();   //RHT
+  wyckoff_symbols_ITC.clear(); //RHT
+  setting_ITC = 0; //DX20170830 - SGDATA
+  origin_ITC.clear(); //DX20170830 - SGDATA
+  general_position_ITC.clear(); //DX20170830 - SGDATA
   // GRID ATOMS ------------------------
   grid_atoms_calculated=FALSE;
   grid_atoms_dimsL.clear();
   grid_atoms_dimsH.clear();
   grid_atoms.clear();        // just initialize
   grid_atoms_number=0;
-  grid_atoms_sc2pcMap.clear(); // CO 171025
-  grid_atoms_pc2scMap.clear(); // CO 171025
+  grid_atoms_sc2pcMap.clear(); //CO20171025
+  grid_atoms_pc2scMap.clear(); //CO20171025
   // LIJK OBEJCTS ----------------------
   lijk_calculated=FALSE;
   lijk_table.clear();
@@ -2220,45 +2224,45 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
 
 // Constructors
 xstructure::xstructure(string structure_title) {
-  free(); //DX 20191220 - moved contents below into free()
+  free(); //DX20191220 - moved contents below into free()
   title=structure_title;
 }
 
 // ifstream/istream
 xstructure::xstructure(istream& _input,int _iomode) {
-  free(); //DX 20191220 - added free to initialize
+  free(); //DX20191220 - added free to initialize
   (*this).iomode=_iomode;
   _input >> (*this);
 }
 
 xstructure::xstructure(ifstream& _input,int _iomode) {
-  free(); //DX 20191220 - added free to initialize
+  free(); //DX20191220 - added free to initialize
   (*this).iomode=_iomode;
   _input >> (*this);
 }
 
 xstructure::xstructure(stringstream& __input,int _iomode) {
-  free(); //DX 20191220 - added free to initialize
+  free(); //DX20191220 - added free to initialize
   (*this).iomode=_iomode;
   stringstream _input(__input.str());
   _input >> (*this);
 }
 
 xstructure::xstructure(const string& _input,int _iomode) {
-  free(); //DX 20191220 - added free to initialize
+  free(); //DX20191220 - added free to initialize
   stringstream strstream;
-  aurostd::efile2stringstream(_input,strstream); // CO 171025
+  aurostd::efile2stringstream(_input,strstream); //CO20171025
   (*this).iomode=_iomode;
-  (*this).directory = _input; //DX 20180526 - location of xstructure
+  (*this).directory = _input; //DX20180526 - location of xstructure
   strstream >> (*this);
 }
 
 xstructure::xstructure(const string& url,const string& file,int _iomode) {
-  free(); //DX 20191220 - added free to initialize
+  free(); //DX20191220 - added free to initialize
   stringstream strstream;
   aurostd::url2stringstream(url+"/"+file,strstream);
   (*this).iomode=_iomode;
-  (*this).directory = url+"/"+file; //DX 20180526 - location of xstructure
+  (*this).directory = url+"/"+file; //DX20180526 - location of xstructure
   strstream >> (*this);
 }
 
@@ -2273,9 +2277,9 @@ void xstructure::copy(const xstructure& bstr) {
   //  num_atoms=bstr.num_atoms;
   scale=bstr.scale;
   neg_scale=bstr.neg_scale;
-  scale_second=bstr.scale_second; // CO 180409
-  neg_scale_second=bstr.neg_scale_second; // CO 180409
-  scale_third=bstr.scale_third; // CO 170803 - site tol // CO 180409
+  scale_second=bstr.scale_second; //CO20180409
+  neg_scale_second=bstr.neg_scale_second; //CO20180409
+  scale_third=bstr.scale_third; //CO20170803 - site tol //CO20180409
   strcpy(coord_type,bstr.coord_type);
   coord_flag=bstr.coord_flag;
   isd=bstr.isd;
@@ -2286,9 +2290,9 @@ void xstructure::copy(const xstructure& bstr) {
   origin=bstr.origin;
   f2c=bstr.f2c;
   c2f=bstr.c2f;
-  symbolic_math_representation_only=bstr.symbolic_math_representation_only;                  //DX 20180618
-  constrained_symmetry_calculation=bstr.constrained_symmetry_calculation;                    //DX 20180618
-  symbolic_math_lattice=bstr.symbolic_math_lattice; //DX 20180618
+  symbolic_math_representation_only=bstr.symbolic_math_representation_only;                  //DX20180618
+  constrained_symmetry_calculation=bstr.constrained_symmetry_calculation;                    //DX20180618
+  symbolic_math_lattice=bstr.symbolic_math_lattice; //DX20180618
   num_parameters=bstr.num_parameters;                                      // number of parameters ANRL 20180618
   num_lattice_parameters=bstr.num_lattice_parameters;                      // number of lattice parameters ANRL 20180618
   prototype_parameter_list=bstr.prototype_parameter_list;                  // prototype parameter list ANRL 20180618
@@ -2302,9 +2306,9 @@ void xstructure::copy(const xstructure& bstr) {
   comp_each_type.clear();
   for(uint i=0;i<bstr.comp_each_type.size();i++)
     comp_each_type.push_back(bstr.comp_each_type.at(i));
-  stoich_each_type.clear(); // CO 171025
-  for(uint i=0;i<bstr.stoich_each_type.size();i++) // CO 171025
-    stoich_each_type.push_back(bstr.stoich_each_type.at(i)); // CO 171025
+  stoich_each_type.clear(); //CO20171025
+  for(uint i=0;i<bstr.stoich_each_type.size();i++) //CO20171025
+    stoich_each_type.push_back(bstr.stoich_each_type.at(i)); //CO20171025
   // SPECIES ---------------------------
   species.clear();
   for(uint i=0;i<bstr.species.size();i++)
@@ -2358,11 +2362,11 @@ void xstructure::copy(const xstructure& bstr) {
   bravais_superlattice_variation_type=bstr.bravais_superlattice_variation_type;
   bravais_superlattice_system=bstr.bravais_superlattice_system;
   pearson_symbol_superlattice=bstr.pearson_symbol_superlattice;
-  volume_changed_original2new=bstr.volume_changed_original2new; //DX 20181024
-  transform_coordinates_original2new=bstr.transform_coordinates_original2new; //DX 20181024
-  transform_coordinates_new2original=bstr.transform_coordinates_new2original; //DX 20181024
-  rotate_lattice_original2new=bstr.rotate_lattice_original2new; //DX 20181024
-  rotate_lattice_new2original=bstr.rotate_lattice_new2original; //DX 20181024
+  volume_changed_original2new=bstr.volume_changed_original2new; //DX20181024
+  transform_coordinates_original2new=bstr.transform_coordinates_original2new; //DX20181024
+  transform_coordinates_new2original=bstr.transform_coordinates_new2original; //DX20181024
+  rotate_lattice_original2new=bstr.rotate_lattice_original2new; //DX20181024
+  rotate_lattice_new2original=bstr.rotate_lattice_new2original; //DX20181024
   // ATOMS -----------------------------
   atoms.clear();
   for(uint i=0;i<bstr.atoms.size();i++)
@@ -2380,8 +2384,8 @@ void xstructure::copy(const xstructure& bstr) {
   order_parameter_sum=bstr.order_parameter_sum;
   // PARTIAL OCCUPATION -------------------
   partial_occupation_flag=bstr.partial_occupation_flag;
-  partial_occupation_site_tol=bstr.partial_occupation_site_tol;     // CO 180409
-  partial_occupation_stoich_tol=bstr.partial_occupation_stoich_tol; // CO 180409
+  partial_occupation_site_tol=bstr.partial_occupation_site_tol;     //CO20180409
+  partial_occupation_stoich_tol=bstr.partial_occupation_stoich_tol; //CO20180409
   partial_occupation_HNF=bstr.partial_occupation_HNF;
   partial_occupation_sublattice.clear();
   for(uint i=0;i<bstr.partial_occupation_sublattice.size();i++)
@@ -2413,13 +2417,13 @@ void xstructure::copy(const xstructure& bstr) {
   kpoints_kmax=bstr.kpoints_kmax;kpoints_kppra=bstr.kpoints_kppra;
   kpoints_mode=bstr.kpoints_mode;
   kpoints_kscheme=bstr.kpoints_kscheme;
-  // DX and CO - START
-  dist_nn_min=bstr.dist_nn_min;    // CO
+  //DX+CO START
+  dist_nn_min=bstr.dist_nn_min;    //CO
   // SYMMETRY TOLERANCE ----------------------------
-  sym_eps=bstr.sym_eps; // DX
-  sym_eps_calculated=bstr.sym_eps_calculated; // DX
-  sym_eps_change_count=bstr.sym_eps_change_count; // DX 2/22/18 - added tolerance count specific to structure
-  // DX and CO - END
+  sym_eps=bstr.sym_eps; //DX
+  sym_eps_calculated=bstr.sym_eps_calculated; //DX
+  sym_eps_change_count=bstr.sym_eps_change_count; //DX20180222 - added tolerance count specific to structure
+  //DX+CO END
   // PGROUP ----------------------------
   pgroup.clear();
   for(uint i=0;i<bstr.pgroup.size();i++)
@@ -2439,16 +2443,21 @@ void xstructure::copy(const xstructure& bstr) {
   point_group_type=bstr.point_group_type;
   point_group_order=bstr.point_group_order;
   point_group_structure=bstr.point_group_structure;
+  // PGROUPK_PATTERSON ---------------------------- //DX20200129
+  pgroupk_Patterson.clear();
+  for(uint i=0;i<bstr.pgroupk_Patterson.size();i++)
+    pgroupk_Patterson.push_back(bstr.pgroupk_Patterson.at(i));
+  pgroupk_Patterson_calculated=bstr.pgroupk_Patterson_calculated;
   // PGROUPK ----------------------------
   pgroupk.clear();
   for(uint i=0;i<bstr.pgroupk.size();i++)
     pgroupk.push_back(bstr.pgroupk.at(i));
   pgroupk_calculated=bstr.pgroupk_calculated;
   // PGROUPK_XTAL ----------------------------
-  pgroupk_xtal.clear();                                    // DX 12/5/17 - Added pgroupk_xtal
-  for(uint i=0;i<bstr.pgroupk_xtal.size();i++)             // DX 12/5/17 - Added pgroupk_xtal
-    pgroupk_xtal.push_back(bstr.pgroupk_xtal.at(i));       // DX 12/5/17 - Added pgroupk_xtal
-  pgroupk_xtal_calculated=bstr.pgroupk_xtal_calculated;    // DX 12/5/17 - Added pgroupk_xtal
+  pgroupk_xtal.clear();                                    //DX20171205 - Added pgroupk_xtal
+  for(uint i=0;i<bstr.pgroupk_xtal.size();i++)             //DX20171205 - Added pgroupk_xtal
+    pgroupk_xtal.push_back(bstr.pgroupk_xtal.at(i));       //DX20171205 - Added pgroupk_xtal
+  pgroupk_xtal_calculated=bstr.pgroupk_xtal_calculated;    //DX20171205 - Added pgroupk_xtal
   // FGROUP ----------------------------
   fgroup.clear();
   for(uint i=0;i<bstr.fgroup.size();i++)
@@ -2488,20 +2497,20 @@ void xstructure::copy(const xstructure& bstr) {
   is_spacegroup_findsym=bstr.is_spacegroup_findsym;
   is_spacegroup_aflow=bstr.is_spacegroup_aflow;
   // SPACE GROUP ITC -----------
-  crystal_system_ITC=bstr.crystal_system_ITC;  // RHT
-  point_group_ITC=bstr.point_group_ITC; // RHT
-  bravais_label_ITC=bstr.bravais_label_ITC; // RHT
-  lattice_label_ITC=bstr.lattice_label_ITC; // RHT
-  space_group_ITC=bstr.space_group_ITC; // RHT
-  wyckoff_library_entry_ITC=bstr.wyckoff_library_entry_ITC; // RHT
-  wyccar_ITC.clear(); for(uint i=0;i<bstr.wyccar_ITC.size();i++) wyccar_ITC.push_back(bstr.wyccar_ITC.at(i)); // RHT
-  standard_lattice_ITC=bstr.standard_lattice_ITC; // RHT
-  standard_basis_ITC.clear(); for(uint i=0;i<bstr.standard_basis_ITC.size();i++) standard_basis_ITC.push_back(bstr.standard_basis_ITC.at(i)); // RHT
-  wyckoff_sites_ITC.clear(); for(uint i=0;i<bstr.wyckoff_sites_ITC.size();i++) wyckoff_sites_ITC.push_back(bstr.wyckoff_sites_ITC.at(i)); // RHT
-  wyckoff_symbols_ITC.clear(); for(uint i=0;i<bstr.wyckoff_symbols_ITC.size();i++) wyckoff_symbols_ITC.push_back(bstr.wyckoff_symbols_ITC.at(i)); // RHT
-  setting_ITC=bstr.setting_ITC; // DX 8/30/17 - SGDATA
-  origin_ITC=bstr.origin_ITC; // DX 8/30/17 - SGDATA
-  general_position_ITC=bstr.general_position_ITC; // DX 8/30/17 - SGDATA
+  crystal_system_ITC=bstr.crystal_system_ITC;  //RHT
+  point_group_ITC=bstr.point_group_ITC; //RHT
+  bravais_label_ITC=bstr.bravais_label_ITC; //RHT
+  lattice_label_ITC=bstr.lattice_label_ITC; //RHT
+  space_group_ITC=bstr.space_group_ITC; //RHT
+  wyckoff_library_entry_ITC=bstr.wyckoff_library_entry_ITC; //RHT
+  wyccar_ITC.clear(); for(uint i=0;i<bstr.wyccar_ITC.size();i++) wyccar_ITC.push_back(bstr.wyccar_ITC.at(i)); //RHT
+  standard_lattice_ITC=bstr.standard_lattice_ITC; //RHT
+  standard_basis_ITC.clear(); for(uint i=0;i<bstr.standard_basis_ITC.size();i++) standard_basis_ITC.push_back(bstr.standard_basis_ITC.at(i)); //RHT
+  wyckoff_sites_ITC.clear(); for(uint i=0;i<bstr.wyckoff_sites_ITC.size();i++) wyckoff_sites_ITC.push_back(bstr.wyckoff_sites_ITC.at(i)); //RHT
+  wyckoff_symbols_ITC.clear(); for(uint i=0;i<bstr.wyckoff_symbols_ITC.size();i++) wyckoff_symbols_ITC.push_back(bstr.wyckoff_symbols_ITC.at(i)); //RHT
+  setting_ITC=bstr.setting_ITC; //DX20170830 - SGDATA
+  origin_ITC=bstr.origin_ITC; //DX20170830 - SGDATA
+  general_position_ITC=bstr.general_position_ITC; //DX20170830 - SGDATA
   // GRID ATOMS ------------------------
   grid_atoms_calculated=bstr.grid_atoms_calculated;
   grid_atoms_dimsL=bstr.grid_atoms_dimsL;
@@ -2510,8 +2519,8 @@ void xstructure::copy(const xstructure& bstr) {
   for(uint i=0;i<bstr.grid_atoms.size();i++)
     grid_atoms.push_back(bstr.grid_atoms.at(i));
   grid_atoms_number=bstr.grid_atoms_number;
-  grid_atoms_sc2pcMap.clear(); for(uint i=0;i<bstr.grid_atoms_sc2pcMap.size();i++){grid_atoms_sc2pcMap.push_back(bstr.grid_atoms_sc2pcMap[i]);} // CO 171025
-  grid_atoms_pc2scMap.clear(); for(uint i=0;i<bstr.grid_atoms_pc2scMap.size();i++){grid_atoms_pc2scMap.push_back(bstr.grid_atoms_pc2scMap[i]);} // CO 171025
+  grid_atoms_sc2pcMap.clear(); for(uint i=0;i<bstr.grid_atoms_sc2pcMap.size();i++){grid_atoms_sc2pcMap.push_back(bstr.grid_atoms_sc2pcMap[i]);} //CO20171025
+  grid_atoms_pc2scMap.clear(); for(uint i=0;i<bstr.grid_atoms_pc2scMap.size();i++){grid_atoms_pc2scMap.push_back(bstr.grid_atoms_pc2scMap[i]);} //CO20171025
   // LIJK OBEJCTS ----------------------
   lijk_calculated=bstr.lijk_calculated;
   lijk_table.clear();
@@ -2556,6 +2565,24 @@ void xstructure::copy(const xstructure& bstr) {
   // ----------------------------------
 }
 
+//ME20200220 - from CO's function in apl::Supercell
+void LightCopy(const xstructure& a, xstructure& b) {
+  b.clear();
+  stringstream POSCAR;
+  POSCAR.str("");
+  POSCAR << a;
+  POSCAR >> b;
+  //enable inequivalent flag to work
+  for (uint i = 0; i < b.atoms.size(); i++) {
+    b.atoms[i].equivalent = a.atoms[i].equivalent;
+    b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
+    b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
+  }
+  //enable inequivalent flag to work
+  b.write_inequivalent_flag = a.write_inequivalent_flag;
+  b.info = a.info;
+}
+
 // copy
 xstructure::xstructure(const xstructure& b) {
   //  free();
@@ -2565,7 +2592,7 @@ xstructure::xstructure(const xstructure& b) {
 
 // destructor
 xstructure::~xstructure() {
-  free(); //DX 20191220 - added free and moved contents below into free
+  free(); //DX20191220 - added free and moved contents below into free
 }
 
 // copies xtructures: b=a
@@ -2577,20 +2604,20 @@ const xstructure& xstructure::operator=(const xstructure& b) {  // operator=
   return *this;
 }
 
-void xstructure::clear() { //DX 20191220 - uppercase to lowercase clear
+void xstructure::clear() { //DX20191220 - uppercase to lowercase clear
   xstructure _tmp;
   (*this)=_tmp;
 }
 
-void xstructure::clean() { //DX 20191220 - uppercase to lowercase clean
+void xstructure::clean() { //DX20191220 - uppercase to lowercase clean
   stringstream ss_xstr;
   ss_xstr << (*this);
-  (*this).clear(); //DX 20191220 - uppercase to lowercase clear
+  (*this).clear(); //DX20191220 - uppercase to lowercase clear
   ss_xstr >> (*this);
   ss_xstr.str("");
 }
 
-void xstructure::ClearSpecies() { // CO 180420 - helps with pocc, match with AddAtom()
+void xstructure::ClearSpecies() { //CO20180420 - helps with pocc, match with AddAtom()
   num_each_type.clear();
   comp_each_type.clear();
   stoich_each_type.clear();
@@ -2607,7 +2634,7 @@ void xstructure::ClearSpecies() { // CO 180420 - helps with pocc, match with Add
 // print an xstructure in a variety of forms
 ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="XSTRUCTURE::operator<<():";
+  string soliloquy = XPID + "XSTRUCTURE::operator<<():";
   stringstream message;
   int a_iomode=a.iomode;
   //  DEBUG=TRUE;
@@ -2618,39 +2645,39 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // VASP OUTPUT
   if(a_iomode==IOVASP_AUTO || a_iomode==IOVASP_POSCAR || a_iomode==IOVASP_ABCCAR || a_iomode==IOVASP_WYCKCAR) { // VASP POSCAR
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO 180515
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
-    //DX 20180618 - Check for symbolic representaion only - START
+    //DX20180618 - Check for symbolic representaion only - START
     if(a.symbolic_math_representation_only){
       xstructure aa(a);
       oss << aa.PrintSymbolicMathRepresentation();
       return oss;
     }
-    //DX 20180618 - Check for symbolic representation only - END
+    //DX20180618 - Check for symbolic representation only - END
     if(a_iomode==IOAFLOW_AUTO)   oss << a.title <<endl; // << " (AUTO) " << endl;
     if(a_iomode==IOVASP_AUTO)    oss << a.title <<endl; // << " (AUTO) " << endl;
     if(a_iomode==IOVASP_POSCAR)  oss << a.title <<endl; // << " (POSCAR) " << endl;
     if(a_iomode==IOVASP_ABCCAR)  oss << a.title <<endl; // << " (ABCCAR) " << endl;
     if(a_iomode==IOVASP_WYCKCAR) oss << a.title <<endl; // << " (WYCKCAR) " << endl;
     if(a.neg_scale==FALSE) {
-      oss.precision(6);  // DANE
-      oss << a.scale; // << endl; // CO 170630
+      oss.precision(6);  //DM
+      oss << a.scale; // << endl; //CO20170630
     } else {
       // oss << a.scale << endl;
       double s=a.scale;
       double vol=s*s*s*GetVol(a.lattice);
-      oss.precision(6);  // DANE
-      oss << -1*vol;  // << endl; // CO 170630
+      oss.precision(6);  //DM
+      oss << -1*vol;  // << endl; //CO20170630
     }
-    oss.precision(_precision_);  // STEFANO to cut/paste from matlab in format long
-    // CO 170630, add pocc tol to make truly pocc readable by aflow
+    oss.precision(_precision_);  //SC to cut/paste from matlab in format long
+    //CO20170630, add pocc tol to make truly pocc readable by aflow
     if(a.partial_occupation_flag==TRUE) {
       oss.unsetf(ios_base::floatfield);
       oss << " "; //<< std::defaultfloat;
       if(a.neg_scale_second){oss << (-1)*a.partial_occupation_HNF;}
       else {
         oss << a.partial_occupation_site_tol;
-        if(1||a.scale_third.isentry){  // CO 170803 - stoich tol //always print
+        if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
           oss << " "; 
           oss << a.partial_occupation_stoich_tol;
         }
@@ -2673,7 +2700,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // ----------------------------------------------------------------------
     if(a_iomode==IOVASP_ABCCAR || a_iomode==IOVASP_WYCKCAR) {
       oss << " ";
-      oss.precision(10);  // STEFANO to cut/paste from matlab in format long
+      oss.precision(10);  //SC to cut/paste from matlab in format long
       if(abs(a.a)<10.0) oss << " ";
       if(!std::signbit(a.a)) oss << " ";
       oss << a.a << "";
@@ -2683,7 +2710,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(abs(a.c)<10.0) oss << " ";
       if(!std::signbit(a.c)) oss << " ";
       oss << a.c << "";
-      oss.precision(4);  // STEFANO to cut/paste from matlab in format long
+      oss.precision(4);  //SC to cut/paste from matlab in format long
       if(abs(a.alpha)<10.0) oss << " ";
       if(!std::signbit(a.alpha)) oss << " ";
       oss << a.alpha << "";
@@ -2695,23 +2722,23 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << a.gamma << "";
       if(a_iomode==IOVASP_WYCKCAR) oss << "  " << a.spacegroupnumber << "";
       oss << endl;
-      oss.precision(_precision_);  // STEFANO to cut/paste from matlab in format long
+      oss.precision(_precision_);  //SC to cut/paste from matlab in format long
     }
     // ----------------------------------------------------------------------
     if(a.is_vasp4_poscar_format==TRUE) {
     } // nothing to do
 
     if(a.is_vasp5_poscar_format==TRUE) {
-      for(uint i=0;i<a.species_pp.size();i++) { // ME 190308 - species is empty when structure is based on vasp4 POSCAR
-        //oss << a.species.at(i)<< " ";  OBSOLETE ME 190304 - species can contain PP information, which VASP doesn't recognize
-        oss << KBIN::VASP_PseudoPotential_CleanName(a.species_pp.at(i)) << " ";  // ME 190308
+      for(uint i=0;i<a.species_pp.size();i++) { //ME20190308 - species is empty when structure is based on vasp4 POSCAR
+        //oss << a.species.at(i)<< " ";  OBSOLETE ME20190304 - species can contain PP information, which VASP doesn't recognize
+        oss << KBIN::VASP_PseudoPotential_CleanName(a.species_pp.at(i)) << " ";  //ME20190308
       }
       oss << endl;
     }
     // ----------------------------------------------------------------------
-    // CO 170630 - fixing for POCC
-    //[CO 180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO 180705 - repetita iuvant
-    //[CO 180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO 180705 - this makes it necessary that atoms are properly typed
+    //CO20170630 - fixing for POCC
+    //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO20180705 - repetita iuvant
+    //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO20180705 - this makes it necessary that atoms are properly typed
     if(a.partial_occupation_flag==TRUE) {
       //need to figure out the '+'
       uint iatom=0;
@@ -2762,12 +2789,12 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         //}
       }
 
-      //[OBSOLETE - CO 180705]for(uint i=0;i<a.num_each_type.size();i++){
-      //[OBSOLETE - CO 180705]  oss << a.num_each_type.at(i) << "*";
-      //[OBSOLETE - CO 180705]  //oss << std::defaultfloat;
-      //[OBSOLETE - CO 180705]  oss.unsetf(ios_base::floatfield);
-      //[OBSOLETE - CO 180705]  oss << a.atoms[i].partial_occupation_value << std::fixed << " ";
-      //[OBSOLETE - CO 180705]}
+      //[OBSOLETE - CO20180705]for(uint i=0;i<a.num_each_type.size();i++){
+      //[OBSOLETE - CO20180705]  oss << a.num_each_type.at(i) << "*";
+      //[OBSOLETE - CO20180705]  //oss << std::defaultfloat;
+      //[OBSOLETE - CO20180705]  oss.unsetf(ios_base::floatfield);
+      //[OBSOLETE - CO20180705]  oss << a.atoms[i].partial_occupation_value << std::fixed << " ";
+      //[OBSOLETE - CO20180705]}
     } else {for(uint i=0;i<a.num_each_type.size();i++){oss << a.num_each_type.at(i) << " ";}}
     oss << endl;
     if(a.isd) oss << "Selective Dynamics" << endl; // DONE YOYO BUG
@@ -2779,17 +2806,17 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a.order_parameter_structure==TRUE)  oss << "OrderParameter(" << a.order_parameter_atoms.size() << ") ";
     if(1) { // write [A1B2C3D4]
       //      oss << "[";for(uint i=0;i<a.num_each_type.size();i++) {oss << char('A'+i) << a.num_each_type.at(i);}oss << "] ";
-      // CO - 170630, the original num_each_type doesn't work here, so we fix
+      //CO20170630, the original num_each_type doesn't work here, so we fix
       if(a.partial_occupation_flag==TRUE) {
         oss << "Partial ";
-        //oss.precision(_pocc_precision_);  // CO 170630
+        //oss.precision(_pocc_precision_);  //CO20170630
         //oss << std::defaultfloat;
-        int comp_prec=(int)ceil(log10(1.0/a.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO181226
-        oss.precision(comp_prec); //CO181226
+        int comp_prec=(int)ceil(log10(1.0/a.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
+        oss.precision(comp_prec); //CO20181226
         oss.unsetf(ios_base::floatfield);
         oss << "[";for(uint i=0;i<a.comp_each_type.size();i++) {oss << char('A'+i) << a.comp_each_type.at(i);}oss << "] ";
         oss << std::fixed;
-        oss.precision(_precision_);       // CO 170630 //CO181226
+        oss.precision(_precision_);       //CO20170630 //CO20181226
       } else {
         oss << "["; for(uint i=0,k=0;i<a.num_each_type.size();k+=a.num_each_type.at(i),i++) { oss << char(a.atoms.at(k).type+65) << a.num_each_type.at(i);} oss << "] ";
       }
@@ -2797,21 +2824,21 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // done
     oss << endl;
 
-    double _coord;  //CO190322 - remove annoying -0.0000000
+    double _coord;  //CO20190322 - remove annoying -0.0000000
     for(uint iat=0;iat<a.atoms.size();iat++) {
       oss << " ";
       for(uint j=1;j<=3;j++) {
         //	oss << " ";
-        if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO190322 - remove annoying -0.0000000
-        if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO190322 - remove annoying -0.0000000
+        if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO20190322 - remove annoying -0.0000000
+        if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO20190322 - remove annoying -0.0000000
 
-        _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO190322 - remove annoying -0.0000000
-        if(abs(_coord)<10.0) oss << " "; //CO190322 - remove annoying -0.0000000
-        if(!std::signbit(_coord)) oss << " ";  //CO190322 - remove annoying -0.0000000
-        oss << _coord << " "; //CO190322 - remove annoying -0.0000000
+        _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO20190322 - remove annoying -0.0000000
+        if(abs(_coord)<10.0) oss << " "; //CO20190322 - remove annoying -0.0000000
+        if(!std::signbit(_coord)) oss << " ";  //CO20190322 - remove annoying -0.0000000
+        oss << _coord << " "; //CO20190322 - remove annoying -0.0000000
 
-        //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
-        //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
+        //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
+        //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
       }
       //  cout << aurostd::modulus(a.atoms.at(iat).cpos) << " ";
       if(a.isd==TRUE)
@@ -2821,14 +2848,14 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         for(uint j=a.atoms.at(iat).name.length();j<5;j++) oss << " ";
       }
       if(a.partial_occupation_flag==TRUE) {
-        //oss.precision(_pocc_precision_);  // CO 170630
+        //oss.precision(_pocc_precision_);  //CO20170630
         //if(a.atoms.at(iat).partial_occupation_flag==FALSE) oss << "-      ";
         //	if(a.atoms.at(iat).partial_occupation_flag==TRUE) oss << a.atoms.at(iat).partial_occupation_value << "  ";// << " (" << iat << "/" << a.partial_occupation_flags.size() << ")";
         //oss << std::defaultfloat;
         oss.unsetf(ios_base::floatfield);
         oss << "pocc=" << a.atoms.at(iat).partial_occupation_value << "  ";
         oss << std::fixed;
-        //oss.precision(_precision_); // CO 170630
+        //oss.precision(_precision_); //CO20170630
       }
       if(a.order_parameter_structure==TRUE) {
         if(a.atoms.at(iat).order_parameter_atom==FALSE) oss << "- ";
@@ -2869,7 +2896,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       if(a.write_DEBUG_flag) {
         oss << " s"<<a.atoms.at(iat).spin;
-        //[CO200130 - number->basis]oss << " n"<<a.atoms.at(iat).number;
+        //[CO20200130 - number->basis]oss << " n"<<a.atoms.at(iat).number;
         oss << " b"<<a.atoms.at(iat).basis;
         oss << " N("<<a.atoms.at(iat).cleanname;
         oss << " "<<a.atoms.at(iat).atomic_number<<" "<<" ["<<a.atoms.at(iat).type<<"] ";
@@ -2919,19 +2946,19 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << "kpoints_mode     = " << a.kpoints_mode << endl;
       oss << "kpoints_kscheme  = " << a.kpoints_kscheme << endl;
     }
-    if(0 && a.partial_occupation_flag==TRUE) { // KESONG
+    if(0 && a.partial_occupation_flag==TRUE) { //KY
       oss << "*******************************" << endl;
       for(int hnf=1;hnf<10;hnf++) {
         oss << hnf << " ";
         oss << endl;
       }
     }
-    //DX 20180618 - Check for symmetry constrained calculation - START
+    //DX20180618 - Check for symmetry constrained calculation - START
     if(a.constrained_symmetry_calculation){
       xstructure aa(a);
       oss << aa.PrintSymbolicMathRepresentation();
     }
-    //DX 20180618 - Check for symmetry constrained calculation - END
+    //DX20180618 - Check for symmetry constrained calculation - END
     return oss;
   } // END OF VASP
   // ----------------------------------------------------------------------
@@ -2945,12 +2972,12 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     oss << aurostd::PaddedPOST(" ibrav=0,",depthQE," ") << " ! // free " << endl;
     oss << aurostd::PaddedPOST(" nat="+aurostd::utype2string(a.atoms.size())+",",depthQE) << " ! // a.atoms.size() " << endl;
     oss << aurostd::PaddedPOST(" ntyp="+aurostd::utype2string(a.num_each_type.size()),depthQE) << " ! // a.num_each_type.size() " << endl;
-    //oss << aurostd::PaddedPOST(" ntyp="+aurostd::utype2string(a.num_each_type.size())+",",depthQE) << " ! // a.num_each_type.size() " << endl;  // CO 171010
-    //oss << aurostd::PaddedPOST(" ecutwfc=_AFLOW_ECUTWFC_,",depthQE," ") << " ! // fix these " << endl;  // CO 171010
-    //oss << aurostd::PaddedPOST(" ecutrho=_AFLOW_ECUTRHO_",depthQE," ") << " ! // fix these " << endl;   // CO 171010
+    //oss << aurostd::PaddedPOST(" ntyp="+aurostd::utype2string(a.num_each_type.size())+",",depthQE) << " ! // a.num_each_type.size() " << endl;  //CO20171010
+    //oss << aurostd::PaddedPOST(" ecutwfc=_AFLOW_ECUTWFC_,",depthQE," ") << " ! // fix these " << endl;  //CO20171010
+    //oss << aurostd::PaddedPOST(" ecutrho=_AFLOW_ECUTRHO_",depthQE," ") << " ! // fix these " << endl;   //CO20171010
     oss << " /" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO 180515
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     if(a.coord_flag==_COORDS_FRACTIONAL_) oss << "ATOMIC_POSITIONS (crystal)" << endl;
     if(a.coord_flag==_COORDS_CARTESIAN_)  oss << "ATOMIC_POSITIONS (angstrom)" << endl;
@@ -2959,9 +2986,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(a.atoms.at(iat).name_is_given==TRUE) {
         oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
-        //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
-        message << "QE needs atoms species names";  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
+        //[CO20190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
+        message << "QE needs atoms species names";  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
       }
       for(uint j=1;j<=3;j++) {
         //  oss << " ";
@@ -2985,7 +3012,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << endl;
     }
     // ----------------------------------------------------------------------
-    oss.precision(_precision_);  // STEFANO to cut/paste from matlab in format long
+    oss.precision(_precision_);  //SC to cut/paste from matlab in format long
     oss << "CELL_PARAMETERS (angstrom)" << endl ;
     {
       for(uint i=1;i<=3;i++) {
@@ -2993,7 +3020,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
           oss << " ";
           if(abs(a.lattice(i,j))<10.0) oss << " ";
           if(!std::signbit(a.lattice(i,j))) oss << " ";
-          oss << a.lattice(i,j)*a.scale << ""; // DX 2/15/18 - added scaling factor
+          oss << a.lattice(i,j)*a.scale << ""; //DX20180215 - added scaling factor
         }
         oss << endl;
       }
@@ -3012,25 +3039,37 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   //  ABINIT OUTPUT
   if(a_iomode==IOABINIT_AUTO || a_iomode==IOABINIT_GEOM) { // VASP POSCAR
     oss << "# AFLOW::ABINIT BEGIN " << endl;
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO 180515
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     if(a_iomode==IOABINIT_AUTO) oss << "# " << a.title <<endl;//<< " (AUTO)" << endl;
     if(a_iomode==IOABINIT_GEOM) oss << "# " << a.title <<endl;//<< " (GEOM)" << endl;
     oss << "acell   " << double(1) << "   " << double(1) << "   " << double(1) << "  ANGSTR" << endl; // scaling of the primitive vectors, in Bohr.
-    for(uint j=1;j<=3;j++) { //CO190908 - manual is misleading, it's row-based// each COLUMN of this array is one primitive translation
+    for(uint j=1;j<=3;j++) { //CO20190908 - manual is misleading, it's row-based// each COLUMN of this array is one primitive translation
       if(j==1) oss << "rprim";
       if(j==2) oss << "     ";
       if(j==3) oss << "     ";
       for(uint i=1;i<=3;i++) {
         oss << " ";
-        if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO190908 - manual is misleading, it's row-based
-        if(!std::signbit(a.lattice(j,i))) oss << " "; //CO190908 - manual is misleading, it's row-based
-        oss << a.lattice(j,i) << "";  //CO190908 - manual is misleading, it's row-based
+        if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO20190908 - manual is misleading, it's row-based
+        if(!std::signbit(a.lattice(j,i))) oss << " "; //CO20190908 - manual is misleading, it's row-based
+        oss << a.lattice(j,i) << "";  //CO20190908 - manual is misleading, it's row-based
       }
       oss << endl;
     }
     oss << "natom " << a.atoms.size() << endl;
+    //DX20200313 - add atom type info via znucl - START
+    oss << "znucl ";
+    for(uint i=0;i<a.species.size();i++){
+      for(uint e=0;e<velement.size();e++){ //external variable (see aflow_xelement.h)
+        if(velement[e].symbol == KBIN::VASP_PseudoPotential_CleanName(a.species[i])){
+          oss << e << " "; // index corresponds to Z value 
+          break;
+        }
+      }
+    }
+    oss << endl;
+    //DX20200313 - add atom type info via znucl - END
     oss << "typat ";
     //   for(uint i=0;i<a.num_each_type.size();i++) oss << a.num_each_type.at(i) << " ";  oss << endl;
     for(uint i=0;i<a.atoms.size();i++)
@@ -3073,22 +3112,83 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   } 
 
   // ----------------------------------------------------------------------
+  //  ELK OUTPUT //DX20200315
+  if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
+    oss << "# AFLOW::ELK BEGIN " << endl;
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    oss.precision(_precision_);
+    oss.setf(std::ios::fixed,std::ios::floatfield);
+    oss << "# " << a.title <<endl;
+    oss << endl;
+    //scaling factors
+    oss << "scale" << endl << " " << a.scale << endl << endl;
+    oss << "scale1" << endl << " 1.0" << endl << endl; // returns unscaled (for now)
+    oss << "scale2" << endl << " 1.0" << endl << endl; // returns unscaled (for now) 
+    oss << "scale3" << endl << " 1.0" << endl << endl; // returns unscaled (for now)
+
+    //lattice, note: convert to atomic units (Bohr)
+    oss << "avec" << endl;
+    oss << " " << a.lattice(1)*angstrom2bohr << endl;
+    oss << " " << a.lattice(2)*angstrom2bohr << endl;
+    oss << " " << a.lattice(3)*angstrom2bohr << endl;
+    oss << endl;
+
+    // atom info
+    oss << "atoms" << endl;
+    oss << " " << setw(49) << std::left << a.species.size();
+    oss << ": nspecies" << endl;
+    xvector<double> magnetic_field; // not currently supported; zero vector for now
+    for(uint i=0;i<a.num_each_type.size();i++){
+      oss << setw(50) << std::left << "\'" + a.species[i] + ".in\'";
+      oss << ": spfname" << endl;
+      oss << " " << setw(49) << std::left << a.num_each_type[i];
+      oss << ": natoms; atpos, bfcmt below" << endl;
+      for(uint iat=0;iat<a.atoms.size();iat++){
+        if(a.atoms[iat].name == a.species[i]){
+          // atom coordinates
+          for(uint j=1;j<=3;j++) {
+            if(a.coord_flag==_COORDS_CARTESIAN_) {
+              if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
+              if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
+              oss << a.atoms.at(iat).fpos(j) << " ";
+            }
+            if(a.coord_flag==_COORDS_FRACTIONAL_) {
+              if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
+              if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
+              oss << a.atoms.at(iat).fpos(j) << " ";
+            }
+          }
+          // magnetic field
+          for(uint j=1;j<=3;j++) {
+            if(abs(magnetic_field(j))<10.0) oss << " ";
+            if(!std::signbit(magnetic_field(j))) oss << " ";
+            oss << magnetic_field(j) << " ";
+          }
+          oss << endl;
+        }
+      }
+    }
+    oss << "# AFLOW::ELK END " << endl;
+    return oss;
+  }
+
+  // ----------------------------------------------------------------------
   //  AIMS OUTPUT
   if(a_iomode==IOAIMS_AUTO || a_iomode==IOAIMS_GEOM) { // VASP POSCAR
     xstructure aa(a);
-    aa.ReScale(1.0); //very important because there is NO scale factor in AIMS // CO 180420
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO 180515
+    aa.ReScale(1.0); //very important because there is NO scale factor in AIMS //CO20180420
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss << "# " << aa.title <<endl;//<< " (AUTO)" << endl;
     oss << "# AFLOW::AIMS BEGIN " << endl;  //come after title
-    //DX 20180618 - Check for symbolic representaion only - START
+    //DX20180618 - Check for symbolic representaion only - START
     if(aa.symbolic_math_representation_only){
       oss << aa.PrintSymbolicMathRepresentation();
       oss << "# AFLOW::AIMS END " << endl;
       return oss;
     }
-    //DX 20180618 - Check for symbolic representation only - END
+    //DX20180618 - Check for symbolic representation only - END
     for(uint i=1;i<=3;i++) { // each COLUMN of this array is one primitive translation
       oss << "lattice_vector ";
       for(uint j=1;j<=3;j++) {
@@ -3136,11 +3236,11 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       oss << endl;
     }
-    //DX 20180618 - Check for symmetry constrained calculation - START
+    //DX20180618 - Check for symmetry constrained calculation - START
     if(aa.constrained_symmetry_calculation){
       oss << aa.PrintSymbolicMathRepresentation();
     }
-    //DX 20180618 - Check for symmetry constrained calculation - END
+    //DX20180618 - Check for symmetry constrained calculation - END
     oss << "# AFLOW::AIMS END " << endl;
     return oss;
   } 
@@ -3193,12 +3293,12 @@ string xstructure::PrintSymbolicMathRepresentation(void){
     if(1) { 
       if(aa.partial_occupation_flag==TRUE) {
         oss << "Partial ";
-        //oss.precision(_pocc_precision_);  // CO 170630
+        //oss.precision(_pocc_precision_);  //CO20170630
         //oss << std::defaultfloat;
         oss.unsetf(ios_base::floatfield);
         oss << "[";for(uint i=0;i<aa.comp_each_type.size();i++) {oss << char('A'+i) << aa.comp_each_type.at(i);}oss << "] ";
         oss << std::fixed;
-        //oss.precision(_precision_);       // CO 170630
+        //oss.precision(_precision_);       //CO20170630
       } else {
         oss << "["; for(uint i=0,k=0;i<aa.num_each_type.size();k+=aa.num_each_type.at(i),i++) { oss << char(aa.atoms.at(k).type+65) << aa.num_each_type.at(i);} oss << "] ";
       }
@@ -3328,7 +3428,7 @@ string xstructure::PrintUNCLE(void) {   // Print in uncle format
 // // **************************************************************************
 // string xstructure::PrintADO(string strin) {   // Print in ado format
 //   stringstream oss;
-//   uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO 180515
+//   uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
 //   oss.setf(std::ios::fixed,std::ios::floatfield);
 //   oss.precision(_precision_);
 //   // oss << "# Structure name number of atoms in the cell:" << endl;
@@ -3368,8 +3468,8 @@ string DeStupidizer(string &strin) {
   return strin;
 }
 
-bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO 180705
-  //CO190218
+bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO20180705
+  //CO20190218
   //sorting on DOUBLES is dangerous, we need to avoid flipping equivalent atoms
   //so we need to set a cutoff
   if(a1.type!=a2.type){return a1.type<a2.type;}
@@ -3391,8 +3491,8 @@ bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO 180705
 }
 
 //ideal for AFLOW (alphabetized) + POCC (grouped by occupations)
-bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO 180705
-  //CO190218
+bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO20180705
+  //CO20190218
   //sorting on DOUBLES is dangerous, we need to avoid flipping equivalent atoms
   //so we need to set a cutoff
   if(a1.name!=a2.name){return a1.name<a2.name;}
@@ -3415,14 +3515,14 @@ bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO 180705
 }
 
 bool sortAtomsDist(const _atom& a1,const _atom& a2) {
-  //CO190218
+  //CO20190218
   //sorting on DOUBLES is dangerous, we need to avoid flipping equivalent atoms
   //so we need to set a cutoff
   if(a1.type!=a2.type){return a1.type<a2.type;}
   double dist1=aurostd::modulus(a1.cpos);
   double dist2=aurostd::modulus(a2.cpos);
-  if(!aurostd::isequal(dist1,dist2,_ZERO_TOL_)){return dist1<dist2;} //CO 180705 - maybe we need to consider adding tol here
-  return sortAtomsTypes(a1,a2); //CO 180705, pocc values!
+  if(!aurostd::isequal(dist1,dist2,_ZERO_TOL_)){return dist1<dist2;} //CO20180705 - maybe we need to consider adding tol here
+  return sortAtomsTypes(a1,a2); //CO20180705, pocc values!
 }
 
 //void sortAtomsDist() {std::stable_sort(atoms.begin(),atoms.end(),sortAtomsDist);}
@@ -3430,8 +3530,8 @@ bool sortAtomsDist(const _atom& a1,const _atom& a2) {
 bool sortAtomsEquiv(const _atom& a1,const _atom& a2){
   if(a1.type!=a2.type){return a1.type<a2.type;} //this is generally implied by equivalent, but not so for POCC, so keep
   if(a1.equivalent!=a2.equivalent){return a1.equivalent<a2.equivalent;}
-  return sortAtomsTypes(a1,a2); //CO 180705, pocc values!
-} //CO 190101
+  return sortAtomsTypes(a1,a2); //CO20180705, pocc values!
+} //CO20190101
 
 // **************************************************************************
 // Xstructure operator>>  INPUT_XSTRUCTURE_INPUT
@@ -3441,7 +3541,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 #define oss cout
   // this is also a constructor so everything should look well defined
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="XSTRUCTURE>>:";
+  string soliloquy = XPID + "XSTRUCTURE>>:";
   stringstream message;
 
   if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
@@ -3452,34 +3552,36 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
   if(LDEBUG) if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
   if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
-  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  // CO 171008
-  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  // CO 171008
-  if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX 20180723
+  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
+  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
+  if(LDEBUG) if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
+  if(LDEBUG) if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
+  if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
 
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
   uint iline=0;
   vector<string> vinput,tokens;
   aurostd::stream2vectorstring(cinput,vinput);
-  //CO 180702 - detect NO input
+  //CO20180702 - detect NO input
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
-    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
-  }  // CO 180702
+    //[CO20190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
+  }  //CO20180702
 
   if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
   // now clean for comments, tabs, double spaces ... etc
-  // CO 180409 - fixing for issues with # at the beginning of the line
-  string::size_type loc;  // CO 180409
+  //CO20180409 - fixing for issues with # at the beginning of the line
+  string::size_type loc;  //CO20180409
   for(uint i=1;i<vinput.size();i++) { // not 1st line
-    //aurostd::string2tokens(vinput[i],tokens,"//");  // stefano   // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //aurostd::string2tokens(vinput[i],tokens,"#");  // stefano    // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //aurostd::string2tokens(vinput[i],tokens,"!");  // for QE     // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    if(i>0){  // CO 180409
+    //aurostd::string2tokens(vinput[i],tokens,"//");  //SC          //CO20180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);            //CO20180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"#");  //SC           //CO20180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);            //CO20180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"!");  // for QE      //CO20180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);            //CO20180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    if(i>0){  //CO20180409
       loc=vinput[i].find("//");vinput[i]=vinput[i].substr(0,loc);
       loc=vinput[i].find('#');vinput[i]=vinput[i].substr(0,loc);
       loc=vinput[i].find("!");vinput[i]=vinput[i].substr(0,loc);
@@ -3487,9 +3589,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     DeStupidizer(vinput[i]);
   }
   if(vinput.size()==0) {
-    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
-  }  // CO 180420
+    //[CO20190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
+  }  //CO20180420
 
   //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
   string sstring,stmp;
@@ -3497,9 +3599,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
   vector<double> poccaus; // partial occupation local host
   a.partial_occupation_sublattice.clear(); // partial occupation local host
 
-  //CO190219 - need to clear atoms
-  //a.atoms.clear();  //CO190219 - need to use RemoveAtom() (safe)
-  //CO190219 - really remove atoms
+  //CO20190219 - need to clear atoms
+  //a.atoms.clear();  //CO20190219 - need to use RemoveAtom() (safe)
+  //CO20190219 - really remove atoms
   for(uint i=a.atoms.size()-1;i<a.atoms.size();i--){
     if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
     a.RemoveAtom(i);
@@ -3512,34 +3614,36 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " PAULING PROTO DETECTOR" << endl;
     aurostd::string2tokens(vinput.at(0),tokens);
-    if(tokens.size() && (tokens.at(0)=="PAULING" || tokens.at(0)=="pauling" || tokens.at(0)=="Pauling")) {  // CO 180420 - ask for size() to print core file
+    if(tokens.size() && (tokens.at(0)=="PAULING" || tokens.at(0)=="pauling" || tokens.at(0)=="Pauling")) {  //CO20180420 - ask for size() to print core file
       if(LDEBUG) cerr << soliloquy << " PAULING PROTO DETECTOR = TRUE" << endl;
       IOMODE_found=TRUE;
       PAULING_WyckoffDetector(vinput);
       tokens.clear();
     }
   }
+
+  // ----------------------------------------------------------------------
   // QUANTUM ESPRESSO FINDER
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR" << endl;
     uint QE=0;
     bool QE_ERROR=FALSE;
     if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"&system",true)+aurostd::substring2bool(vinput[i],"&SYSTEM",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"&system",true)+aurostd::substring2bool(vinput[i],"&SYSTEM",true); //DX20180123 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(&system)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ibrav=",true)+aurostd::substring2bool(vinput[i],"IBRAV=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ibrav=",true)+aurostd::substring2bool(vinput[i],"IBRAV=",true); //DX20180123 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ibrav)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"nat=",true)+aurostd::substring2bool(vinput[i],"NAT=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"nat=",true)+aurostd::substring2bool(vinput[i],"NAT=",true); //DX20180123 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(nat)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ntyp=",true)+aurostd::substring2bool(vinput[i],"NTYP=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ntyp=",true)+aurostd::substring2bool(vinput[i],"NTYP=",true); //DX20180123 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ntyp)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"atomic_positions",true)+aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"atomic_positions",true)+aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS",true); //DX20180123 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ATOMIC_POSITIONS)=" << QE << endl;
 
     for(uint i=0;i<vinput.size()&&QE==5;i++) {
       if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && 
           !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
-          !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
+          !aurostd::substring2bool(vinput[i],"bohr","BOHR") && //DX added
           !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
         cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
@@ -3548,8 +3652,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(QE==5 && QE_ERROR) {
-      //[CO190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
+      //[CO20190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO20190629
     }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
@@ -3558,7 +3662,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
   }
 
-  //for CIF input //DX 20180723 - add cif reader - START
+  // ----------------------------------------------------------------------
+  //for CIF input //DX20180723 - add cif reader - START
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " CIF DETECTOR" << endl;
     uint CIF=0;
@@ -3578,8 +3683,66 @@ istream& operator>>(istream& cinput, xstructure& a) {
       IOMODE_found=TRUE;
     }
   }
-  //DX 20180723 - add cif reader - END
+  //DX20180723 - add cif reader - END
 
+  // ----------------------------------------------------------------------
+  // ABINIT input - START (DX20200310)
+  // based on documentation found at https://docs.abinit.org/variables/basic/
+  // NOTE: originally had acell and rprim as keywords, but they are not mandatory
+  if(!IOMODE_found) {
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR" << endl;
+    uint ABINIT=0;
+    // find number of atoms (natom)
+    for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"natom",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (natom)=" << ABINIT << endl;
+    // find types of atoms (typat)
+    for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"typat",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (typat)=" << ABINIT << endl;
+    // find atom positions (xred, xcart, xangst)
+    for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"xred",true) || 
+          aurostd::substring2bool(vinput[i],"xcart",true) || 
+          aurostd::substring2bool(vinput[i],"xangst",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (xred,xcart,xangst)=" << ABINIT << endl;
+
+    if(ABINIT==3){
+      a.iomode = IOABINIT_GEOM;
+      if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR = TRUE" << endl;
+      IOMODE_found = TRUE;
+    }
+  }
+  // ABINIT input - END (DX20200310)
+
+  // ----------------------------------------------------------------------
+  // ELK input - START (DX20200310)
+  if(!IOMODE_found) {
+    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR" << endl;
+    uint ELK=0;
+    // find atoms keyword (atoms)
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(vinput[i],"atoms",true)){ ELK+=1; break;}
+    }
+    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR (atoms)=" << ELK << endl;
+    // find lattice keyword (avec)
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(vinput[i],"avec",true)){ ELK+=1; break;}
+    }
+    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR (avec)=" << ELK << endl;
+
+    if(ELK==2){
+      a.iomode = IOELK_GEOM;
+      if(LDEBUG) cerr << soliloquy << " ELK DETECTOR = TRUE" << endl;
+      IOMODE_found = TRUE;
+    }
+  }
+  // ELK input - END (DX20200310)
+
+  // ----------------------------------------------------------------------
   //for AIMS input - unfortunately, it's very generic so leave for last
   if(!IOMODE_found) {
     vector<string> tokens_line;
@@ -3624,39 +3787,39 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(lat_found || atom_found){
           if(lat_found && tokens_line.size()<4){  //could be more, but not less
-            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
-            //[CO190629 - no exit()]cerr << "lattice_vector ";
-            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
-            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
-            //[CO190629 - no exit()]exit(1);
-            message << " AIMS input error, ";  //CO196029
-            message << "lattice_vector "; //CO190629
-            message << "at line[" << i+1 << "] is ill-defined" << endl; //CO190629
-            message << "line: " << vinput[i] << endl; //CO190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+            //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO20190629 - no exit()]cerr << "lattice_vector ";
+            //[CO20190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
+            //[CO20190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO20190629 - no exit()]exit(1);
+            message << " AIMS input error, ";  //CO20190629
+            message << "lattice_vector "; //CO20190629
+            message << "at line[" << i+1 << "] is ill-defined" << endl; //CO20190629
+            message << "line: " << vinput[i] << endl; //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
-            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
-            //[CO190629 - no exit()]cerr << "atom position ";
-            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO 180627
-            //[CO190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO 180627
-            //[CO190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO 180627
-            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
-            //[CO190629 - no exit()]exit(1);
-            message << " AIMS input error, "; //CO190629
-            message << "atom position "; //CO190629
-            message << "at line[" << i+1 << "] "; //CO190629
-            if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO190629
-            else {message << "is ill-defined" << endl;} //CO190629
-            message << "line: " << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+            //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO20190629 - no exit()]cerr << "atom position ";
+            //[CO20190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO20180627
+            //[CO20190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO20180627
+            //[CO20190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO20180627
+            //[CO20190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO20190629 - no exit()]exit(1);
+            message << " AIMS input error, "; //CO20190629
+            message << "atom position "; //CO20190629
+            message << "at line[" << i+1 << "] "; //CO20190629
+            if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO20190629
+            else {message << "is ill-defined" << endl;} //CO20190629
+            message << "line: " << vinput[i] << endl;  //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
         }
       }
       if(!atom_found_anywhere){
-        //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
-        //[CO190629 - no exit()]exit(1);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
+        //[CO20190629 - no exit()]exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -3672,22 +3835,21 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
-              //[CO190629 - no exit()]exit(1);
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
+              //[CO20190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
+              //[CO20190629 - no exit()]exit(1);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
-          //[CO190629 - no exit()]exit(1);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
+          //[CO20190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
+          //[CO20190629 - no exit()]exit(1);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
         }
       }
     }
     else {if(LDEBUG) {cerr << soliloquy << " AIMS GEOM DETECTOR = FALSE" << endl;}}
   }
-
   // DESPERATE FINDING => VASP
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " VASP DETECTOR" << endl;
@@ -3708,14 +3870,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
   if(LDEBUG) if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
   if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
-  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  // CO 171008
-  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  // CO 171008
+  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
+  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
   // ----------------------------------------------------------------------
   // VASP INPUT
   if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) { // VASP POSCAR
     // for variable number of items
-    //bool scale_second_flag=FALSE;//,scale_third_flag=FALSE; // CO 180409
-    //double scale_second_value=0.0;//,scale_third_value=0.0;; // CO 180409
+    //bool scale_second_flag=FALSE;//,scale_third_flag=FALSE; //CO20180409
+    //double scale_second_value=0.0;//,scale_third_value=0.0;; //CO20180409
     //
     a.is_vasp4_poscar_format=FALSE;
     a.is_vasp5_poscar_format=FALSE;
@@ -3724,53 +3886,53 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- TITLE
     // input.getline(stmp,MAX_TITLE_SIZE);title=stmp;
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-    }  // CO 180420 - check for missing lines
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    }  //CO20180420 - check for missing lines
     a.title=vinput.at(iline++);
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-    }  // CO 180420 - check for missing lines
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing second line in poscar" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing second line in poscar" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
     a.scale=0.0;
     if(tokens.size()>0) {a.scale=aurostd::string2utype<double>(tokens.at(0));}
-    if(tokens.size()>1) {/*a.neg_scale_second=TRUE;*/a.scale_second=aurostd::string2utype<double>(tokens.at(1));a.neg_scale_second=std::signbit(a.scale_second);} // CO 180409
-    if(tokens.size()>2) {a.scale_third.isentry=TRUE;a.scale_third.content_double=aurostd::string2utype<double>(tokens.at(2));}  // CO 170803 - site tol
+    if(tokens.size()>1) {/*a.neg_scale_second=TRUE;*/a.scale_second=aurostd::string2utype<double>(tokens.at(1));a.neg_scale_second=std::signbit(a.scale_second);} //CO20180409
+    if(tokens.size()>2) {a.scale_third.isentry=TRUE;a.scale_third.content_double=aurostd::string2utype<double>(tokens.at(2));}  //CO20170803 - site tol
     //  oss << a.scale << endl;
-    // if(a.neg_scale_second) oss << a.scale_second << endl; // CO 180409
+    // if(a.neg_scale_second) oss << a.scale_second << endl; //CO20180409
     // if(scale_third_flag) oss << scale_third_value << endl;
     // oss << sstring << endl;
     // -------------- UNIT CELL
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-    }  // CO 180420 - check for missing lines
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
     a.iomode=IOVASP_POSCAR;
@@ -3787,23 +3949,23 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.lattice(1,3)=aurostd::string2utype<double>(tokens[2]);
       stringstream input_tmp;
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-      }  // CO 180420 - check for missing lines
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      }  //CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-      }  // CO 180420 - check for missing lines
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      }  //CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
       xvector<double> data(6);
@@ -3825,13 +3987,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // ---------------------------------------------------------------
     if(a.iomode==IOVASP_WYCKCAR) {
       //     cerr << soliloquy << " Chosen IOVASP_WYCKCAR" << endl;
-      // DX 9/5/17 - GET SYM_EPS
+      //DX20170905 - GET SYM_EPS
       vector<string> title_tokens;
       aurostd::string2tokens(a.title,title_tokens);
       if(aurostd::substring2bool(title_tokens,"sym_eps")){
         a.sym_eps=aurostd::string2utype<double>(title_tokens[title_tokens.size()-1]);     
       } 
-      // DX 9/5/17 - GET SYM_EPS
+      //DX20170905 - GET SYM_EPS
       a.a=aurostd::string2utype<double>(tokens[0]);
       a.b=aurostd::string2utype<double>(tokens[1]);
       a.c=aurostd::string2utype<double>(tokens[2]);
@@ -3842,7 +4004,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.spacegroupnumberoption=0;// 1; no option
       if(tokens.size()>=8) a.spacegroupnumberoption=aurostd::string2utype<int>(tokens[7]);
       a.spacegrouplabel=GetSpaceGroupLabel(a.spacegroupnumber);
-      a.spacegroup=GetSpaceGroupName(a.spacegroupnumber, a.directory); //DX 20180526 - add directory
+      a.spacegroup=GetSpaceGroupName(a.spacegroupnumber, a.directory); //DX20180526 - add directory
       a.lattice=GetClat(a.a,a.b,a.c,a.alpha,a.beta,a.gamma);
     }
     // If scale < 0 then it should be treated as the volume.
@@ -3859,7 +4021,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     clear(a.origin);
     // ---------------------------------------------------------------
     // -------------- CHECK VASP4 VASP5 and CHECK DIRECT/CARTESIANS STUFF
-    //CO190629 - shift to line with Direct/Cartesian to find POCC specification
+    //CO20190629 - shift to line with Direct/Cartesian to find POCC specification
     //don't worry about setting Selective Dynamics yet (but be aware of it)
     if(a.iomode==IOVASP_POSCAR) stmp=vinput[6]; //true for VASP4, change if VASP5 later
     if(a.iomode==IOVASP_ABCCAR) stmp=vinput[4];
@@ -3867,13 +4029,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      //[CO190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO190629
-      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      //[CO20190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO20190629
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
     }
 
     // VASP 4
@@ -3896,73 +4058,73 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
 
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
-      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
     }
 
-    //[CO190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
-    //[CO190629 - OBSOLETE]  // VASP 4
-    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
-    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=FALSE;
-    //[CO190629 - OBSOLETE]} else {
-    //[CO190629 - OBSOLETE]  // VASP 5
-    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
-    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
-    //[CO190629 - OBSOLETE]}
+    //[CO20190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
+    //[CO20190629 - OBSOLETE]  // VASP 4
+    //[CO20190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
+    //[CO20190629 - OBSOLETE]  a.is_vasp5_poscar_format=FALSE;
+    //[CO20190629 - OBSOLETE]} else {
+    //[CO20190629 - OBSOLETE]  // VASP 5
+    //[CO20190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
+    //[CO20190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
+    //[CO20190629 - OBSOLETE]}
 
     a.partial_occupation_flag=FALSE;
 
     for(uint j=1;j<tokens.size();j++) if(tokens[j][0]=='P' || tokens[j][0]=='p') a.partial_occupation_flag=TRUE;
-    //if(a.scale_second==0.0) { // CO 180409
-    a.partial_occupation_HNF=0; // nothing defined // CO 180409
-    a.partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  // CO 170803 - site tol
-    a.partial_occupation_stoich_tol=DEFAULT_POCC_STOICH_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined // CO 180409
+    //if(a.scale_second==0.0) { //CO20180409
+    a.partial_occupation_HNF=0; // nothing defined //CO20180409
+    a.partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  //CO20170803 - site tol
+    a.partial_occupation_stoich_tol=DEFAULT_POCC_STOICH_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined //CO20180409
     //}
-    if(a.partial_occupation_flag) //&& a.neg_scale_second) // CO 180409
-    { //CO200106 - patching for auto-indenting
+    if(a.partial_occupation_flag) //&& a.neg_scale_second) //CO20180409
+    { //CO20200106 - patching for auto-indenting
       if(LDEBUG) {cerr << soliloquy << " a.neg_scale_second=" << a.neg_scale_second << ", a.scale_second=" << a.scale_second << endl;}
-      if(a.neg_scale_second){a.partial_occupation_HNF=(int) (-a.scale_second);} // CO 180409
+      if(a.neg_scale_second){a.partial_occupation_HNF=(int) (-a.scale_second);} //CO20180409
       else {
-        a.partial_occupation_site_tol=a.partial_occupation_stoich_tol=a.scale_second; // CO 180409
-        if(a.scale_third.isentry){a.partial_occupation_stoich_tol=a.scale_third.content_double;} // CO 170803 - site tol
+        a.partial_occupation_site_tol=a.partial_occupation_stoich_tol=a.scale_second; //CO20180409
+        if(a.scale_third.isentry){a.partial_occupation_stoich_tol=a.scale_third.content_double;} //CO20170803 - site tol
       }
       if(LDEBUG) {
         cerr << soliloquy << " a.partial_occupation_HNF=" << a.partial_occupation_HNF << endl;
         cerr << soliloquy << " a.partial_occupation_site_tol=" << a.partial_occupation_site_tol << endl;
         cerr << soliloquy << " a.partial_occupation_stoich_tol=" << a.partial_occupation_stoich_tol << endl;
       }
-      //if(a.scale_second==0.0) {// CO 180409
+      //if(a.scale_second==0.0) {//CO20180409
       //  a.partial_occupation_stoich_tol=DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined
-      //  a.partial_occupation_site_tol=DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  // CO 170803 - site tol
+      //  a.partial_occupation_site_tol=DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  //CO20170803 - site tol
       //}
-      //     if(abs(a.partial_occupation_stoich_tol)>1e-12) cerr << "a.partial_occupation_stoich_tol=" << a.partial_occupation_stoich_tol << endl; // CO 180409
+      //     if(abs(a.partial_occupation_stoich_tol)>1e-12) cerr << "a.partial_occupation_stoich_tol=" << a.partial_occupation_stoich_tol << endl; //CO20180409
       //   if(abs(a.partial_occupation_HNF)>0.0) cerr << "a.partial_occupation_HNF=" << a.partial_occupation_HNF << endl;
     }
-    //if(a.partial_occupation_flag && a.scale_third.isentry){a.partial_occupation_site_tol=a.scale_third.content_double;} // CO 170803 - site tol
+    //if(a.partial_occupation_flag && a.scale_third.isentry){a.partial_occupation_site_tol=a.scale_third.content_double;} //CO20170803 - site tol
 
     //last line was last lattice vector/geometry line
     if(a.is_vasp5_poscar_format) {
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-      }  // CO 180420 - check for missing lines
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      }  //CO20180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
     // ---------------------------------------------------------------
     // -------------- ATOMS
     // Number of atoms of each type and total number of atoms.
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-    }  // CO 180420 - check for missing lines
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
     // tabs/spaces after it then the getline just grabs those spaces.  This
@@ -3972,13 +4134,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     tmpns=aurostd::RemoveWhiteSpaces(stmp);
     if(string(tmpns).size()==0) {
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-      }  // CO 180420 - check for missing lines
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      }  //CO20180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
     a.num_each_type.clear();num_atoms=0;
@@ -4015,12 +4177,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           for(uint j=0;j<tokens_j.size();j++) {
             aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
             if(tokens_k.size()==0) {
-              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
-              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-              //[CO190629 - no exit()]exit(0);
-              message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO190629
-              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+              //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
+              //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO20190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO20190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
             }
             nnumber=aurostd::string2utype<int>(tokens_k.at(0));
             if(tokens_k.size()==1) dpocc=1.0;
@@ -4032,12 +4194,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
               if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
             }
             if(tokens_k.size()>=3) {
-              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
-              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-              //[CO190629 - no exit()]exit(0);
-              message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO190629
-              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+              //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
+              //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO20190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO20190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
             }
           } // loop on +
           a.num_each_type.push_back(number);
@@ -4053,25 +4215,25 @@ istream& operator>>(istream& cinput, xstructure& a) {
     string stmp;
     if(LDEBUG) cerr << soliloquy << " DEBUG [1]" << endl;
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-    }  // CO 180420 - check for missing lines
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
     std::vector<string> stmp_tokens;
     aurostd::string2tokens(stmp,stmp_tokens);
     // Note that if there are spaces at the beginning of the line we have to remove them.
     if(stmp_tokens.size()==0) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     } else {
       if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
@@ -4079,13 +4241,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(sstmp[0]=='S' || sstmp[0]=='s') {
         a.isd=TRUE;
         if(vinput.size()-1<iline){
-          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "missing line[" << iline << "]" << endl; //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
-        }  // CO 180420 - check for missing lines
+          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "missing line[" << iline << "]" << endl; //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+        }  //CO20180420 - check for missing lines
         stmp=vinput.at(iline++);
         sstmp=aurostd::RemoveSpaces(stmp);
       }
@@ -4100,20 +4262,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.coord_type[0]=sstmp[0];
           a.coord_flag=_COORDS_CARTESIAN_;
           if(a.iomode==IOVASP_WYCKCAR) {
-            //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
-            //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-            //[CO190629 - no exit()]exit(0);
-            message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO190629
-            for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+            //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
+            //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+            //[CO20190629 - no exit()]exit(0);
+            message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO20190629
+            for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
         } else {
-          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Did not find coordinate type D/d or C/c." << endl;  //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Did not find coordinate type D/d or C/c." << endl;  //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }
       }
       a.coord_type[1]='\0';
@@ -4159,19 +4321,19 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //	bool plug_atom=TRUE;
         iat++; // it startf from -1 so the first is ZERO
         //  cerr << iat << " type=" << itype << endl;
-        //  for(int iat=1;iat<=(num_atoms);iat++) { //[CO200106 - close bracket for indenting]}
+        //  for(int iat=1;iat<=(num_atoms);iat++) { //[CO20200106 - close bracket for indenting]}
         // cerr << iat << " " << (num_atoms) << endl;
         _atom atom;                                        // create new atom
         string stmp;
         stmp=vinput.at(iline++);
         if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
         if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
-          //[CO190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Insufficient number of atom lines." << endl;  //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Insufficient number of atom lines." << endl;  //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }  
         if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
@@ -4180,12 +4342,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         aurostd::string2tokens(stmp,stmp_tokens);
         if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
         if(stmp_tokens.size()<3) {
-          //[CO190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO 180409
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20180409
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }  
 
         int id=0;
@@ -4203,13 +4365,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.cpos=v;
           atom.fpos=C2F(a.lattice,atom.cpos);
         }
-        //[CO200130 - number->basis]atom.number=iat;    // reference position for convasp
+        //[CO20200130 - number->basis]atom.number=iat;    // reference position for convasp
         atom.basis=iat;     // position in the basis
         atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
         atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
         atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
         atom.spin=0.0;
-        atom.noncoll_spin.clear(); // DX 12/5/17 - non-collinear spin
+        atom.noncoll_spin.clear(); //DX20171205 - non-collinear spin
         atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
         atom.order_parameter_value=0;
         atom.order_parameter_atom=FALSE;
@@ -4250,19 +4412,19 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(a.order_parameter_structure==TRUE) {
           if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
             if(a.order_parameter_structure==TRUE) {
-              //[CO190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
-              //[CO190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
-              //[CO190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
-              //[CO190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
-              //[CO190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
-              //[CO190629 - no exit()]cerr << " good luck" << endl;
-              //[CO190629 - no exit()]exit(0);
-              message << "With the order parameter you must specify " << endl;  //CO190629
-              message << "  x y z Name OrderParameter "                     << endl;  //CO190629
-              message << " where x,y,z are the coordinates " << endl; //CO190629
-              message << " Name is the symbol of the atom  " << endl; //CO190629
-              message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+              //[CO20190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
+              //[CO20190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
+              //[CO20190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
+              //[CO20190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
+              //[CO20190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
+              //[CO20190629 - no exit()]cerr << " good luck" << endl;
+              //[CO20190629 - no exit()]exit(0);
+              message << "With the order parameter you must specify " << endl;  //CO20190629
+              message << "  x y z Name OrderParameter "                     << endl;  //CO20190629
+              message << " where x,y,z are the coordinates " << endl; //CO20190629
+              message << " Name is the symbol of the atom  " << endl; //CO20190629
+              message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
             }
           }
           if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
@@ -4290,9 +4452,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(LDEBUG) cerr << soliloquy << " DEBUG [8]" << endl;
         // now plug atom into the atomlist
-        //      cerr <<  atom.name << endl;
-        //      cerr <<  atom.cleanname << endl;
-        //      cerr <<  atom.name_is_given << endl;
+        //      cerr << atom.name << endl;
+        //      cerr << atom.cleanname << endl;
+        //      cerr << atom.name_is_given << endl;
         a.atoms.push_back(atom);
       } // iat loop
     }
@@ -4307,18 +4469,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
-    int ibrav_value = 0; // DX 1/23/18 - added ibrav
-    int nat_value = 0;   // DX 1/23/18 - added nat
-    bool bohr_lat = false;   // DX 2/15/18 - added bohr for lattice
-    bool bohr_pos = false;   // DX 2/15/18 - added bohr for positions
-    bool alat = false;   // DX 2/15/18 - added alat
-    uint iline,jline;
+    int ibrav_value = 0; //DX20180123 - added ibrav
+    int nat_value = 0;   //DX20180123 - added nat
+    bool bohr_lat = false;   //DX20180215 - added bohr for lattice
+    bool bohr_pos = false;   //DX20180215 - added bohr for positions
+    bool alat = false;   //DX20180215 - added alat
+    uint iline = 0, jline = 0;
     iline=vinput.size();
-    // DX 1/23/18 - added nat - START
+    //DX20180123 - added nat - START
     for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NAT=",true)){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); //DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"NAT=",true)){
             vector<string> tokens; 
@@ -4328,29 +4490,29 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }                                       
     }
-    // DX 1/23/18 - added nat - END
+    //DX20180123 - added nat - END
     for(uint i=0;i<vinput.size();i++){
-      // DX 1/23/18 [OBSOLETE]  if(aurostd::substring2bool(vinput[i],"CELL_PARAMETERS") && 
-      // DX 1/23/18 [OBSOLETE]    aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {iline=i+1;jline=i;}
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELL_PARAMETERS")){ // DX 1/24/17 - added aurostd::toupper
+      //DX20180123 [OBSOLETE]  if(aurostd::substring2bool(vinput[i],"CELL_PARAMETERS") && 
+      //DX20180123 [OBSOLETE]    aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {iline=i+1;jline=i;}
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELL_PARAMETERS")){ //DX20170124 - added aurostd::toupper
         if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")){
           iline=i+1;jline=i;
         }
-        else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ALAT")){ // DX 2/15/18 - added alat bool
-          iline=i+1;jline=i;                                                     // DX 2/15/18 - added alat bool
-          alat = true;                                                           // DX 2/15/18 - added alat bool
+        else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ALAT")){ //DX20180215 - added alat bool
+          iline=i+1;jline=i;                                                     //DX20180215 - added alat bool
+          alat = true;                                                           //DX20180215 - added alat bool
         }
-        // DX 1/23/18 - added bohr - START
+        //DX20180123 - added bohr - START
         else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")){
           iline=i+1;jline=i;
           bohr_lat = true;
         }
-        // DX 1/23/18 - added bohr - END
+        //DX20180123 - added bohr - END
       }
-      // DX 1/23/18 - added ibrav - START
+      //DX20180123 - added ibrav - START
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"IBRAV=",true)){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); //DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"IBRAV=",true)){
             vector<string> tokens; 
@@ -4359,7 +4521,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           }
         }
       }
-      // DX 1/23/18 - added ibrav - END
+      //DX20180123 - added ibrav - END
     }
     xvector<double> parameters(6); 
     uint celldm_count = 0;
@@ -4369,9 +4531,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); //DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
-          if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"CELLDM",true)){ // DX 1/24/17 - added aurostd::toupper
+          if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"CELLDM",true)){ //DX20170124 - added aurostd::toupper
             celldm_count++;
             vector<string> tokens; 
             aurostd::string2tokens(aurostd::RemoveWhiteSpaces(comma_tokens.at(j)),tokens,"=");
@@ -4390,9 +4552,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       for(uint i=0;i<vinput.size();i++){
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); //DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"A=",true)){ // DX 1/24/17 - added aurostd::toupper
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"A=",true)){ //DX20170124 - added aurostd::toupper
               vector<string> tokens; 
               aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"A=");
               if(tokens.size()==1){
@@ -4403,9 +4565,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); //DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"B=",true)){ // DX 1/24/17 - added aurostd::toupper
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"B=",true)){ //DX20170124 - added aurostd::toupper
               vector<string> tokens; 
               aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"B=");
               if(tokens.size()==1){
@@ -4416,9 +4578,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); //DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"C=",true)){ // DX 1/24/17 - added aurostd::toupper
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"C=",true)){ //DX20170124 - added aurostd::toupper
               vector<string> tokens; 
               aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"C=");
               if(tokens.size()==1){
@@ -4429,9 +4591,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); //DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAB=",true)){ // DX 1/24/17 - added aurostd::toupper
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAB=",true)){ //DX20170124 - added aurostd::toupper
               vector<string> tokens; 
               aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSAB=");
               if(tokens.size()==1){
@@ -4442,9 +4604,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); //DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAC=",true)){ // DX 1/24/17 - added aurostd::toupper
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAC=",true)){ //DX20170124 - added aurostd::toupper
               vector<string> tokens; 
               aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSAC=");
               if(tokens.size()==1){
@@ -4455,9 +4617,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); //DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSBC=",true)){ // DX 1/24/17 - added aurostd::toupper
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSBC=",true)){ //DX20170124 - added aurostd::toupper
               vector<string> tokens; 
               aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSBC=");
               if(tokens.size()==1){
@@ -4468,11 +4630,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
       }
     }
-    // DX 1/23/18 - added ibrav/parameters - START
+    //DX20180123 - added ibrav/parameters - START
     if(ibrav_value!=0){
       a.lattice = pflow::QE_ibrav2lattice(ibrav_value, parameters, isabc);
     }
-    // DX 1/23/18 - added ibrav/parameters - END
+    //DX20180123 - added ibrav/parameters - END
     else {
       if(iline<vinput.size()-3) { // IN a1 / a2 / a3 rows version
         if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO FOUND 3 extra lines after, trying a1/a2/a3 on raws" << endl;
@@ -4483,17 +4645,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
         input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
         input_tmp.clear();input_tmp.str(vinput.at(iline++));
         input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
-        if(bohr_lat){                     // DX 1/23/18 - added bohr 
-          a.lattice = a.lattice*bohr2angstrom; // DX 1/23/18 - added bohr
-        }                             // DX 1/23/18 - added bohr
-        if(alat){                     // DX 2/15/18 - added alat 
+        if(bohr_lat){                          //DX20180123 - added bohr 
+          a.lattice = a.lattice*bohr2angstrom; //DX20180123 - added bohr
+        }                                      //DX20180123 - added bohr
+        if(alat){                              //DX20180215 - added alat 
           if(isabc){
-            a.lattice = a.lattice*parameters[1]; // DX 1/23/18 - added alat
+            a.lattice = a.lattice*parameters[1]; //DX20180123 - added alat
           }
           else {
-            a.lattice = a.lattice*parameters[1]*bohr2angstrom; // DX 1/23/18 - added alat
+            a.lattice = a.lattice*parameters[1]*bohr2angstrom; //DX20180123 - added alat
           }
-        }                             // DX 2/15/18 - added alat
+        }                             //DX20180215 - added alat
         xvector<double> data(6);
         data=Getabc_angles(a.lattice,DEGREES);
         a.a=data[1];a.b=data[2];a.c=data[3];
@@ -4515,25 +4677,25 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // cerr << "vinput.size()=" << vinput.size() << endl;
     // NOW ADD ATOMS
     for(uint i=0;i<vinput.size();i++) {
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL"))
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) // DX 1/24/18 - added aurostd::toupper
-      { //CO200106 - patching for auto-indenting
+      //DX20180124 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL"))
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) //DX20180124 - added aurostd::toupper
+      { //CO20200106 - patching for auto-indenting
         iline=i+1;a.coord_flag=_COORDS_FRACTIONAL_;
-        jline=iline+nat_value; // DX 1/23/18 - added nat
+        jline=iline+nat_value; //DX20180123 - added nat
       }
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM"))
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) // DX 1/24/18 - added aurostd::toupper
-      { //CO200106 - patching for auto-indenting
+      //DX20180124 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM"))
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) //DX20180124 - added aurostd::toupper
+      { //CO20200106 - patching for auto-indenting
         iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
-        jline=iline+nat_value; // DX 1/23/18 - added nat
+        jline=iline+nat_value; //DX20180123 - added nat
       }
-      // DX 1/24/18 -- added Bohr case - START
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")) { // DX 1/24/18 - added aurostd::toupper
+      //DX20180124 -- added Bohr case - START
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")) { //DX20180124 - added aurostd::toupper
         iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
-        jline=iline+nat_value; // DX 1/23/18 - added nat
+        jline=iline+nat_value; //DX20180123 - added nat
         bohr_pos = true;
       }
-      // DX 1/24/18 -- added Bohr case - END
+      //DX20180124 -- added Bohr case - END
     }
 
     for(uint i=iline;i<vinput.size()&&i<jline;i++) {
@@ -4545,12 +4707,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
       aurostd::string2tokens(stmp,stmp_tokens);
       if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
       if(stmp_tokens.size()<4) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO 180409
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; //CO20180409
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }  
       int id=0;
       string name;
@@ -4564,11 +4726,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
         atom.cpos=F2C(a.lattice,atom.fpos);
       }
       if(a.coord_flag==_COORDS_CARTESIAN_) {
-        if(bohr_pos){ // DX 1/24/18 - added bohr case
-          atom.cpos=bohr2angstrom*v; // DX 1/24/18 - added bohr case
+        if(bohr_pos){ //DX20180124 - added bohr case
+          atom.cpos=bohr2angstrom*v; //DX20180124 - added bohr case
           atom.fpos=C2F(a.lattice,atom.cpos);
         }
-        else { // DX 1/24/18 - added bohr case
+        else { //DX20180124 - added bohr case
           atom.cpos=v;
           atom.fpos=C2F(a.lattice,atom.cpos);
         }
@@ -4578,13 +4740,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atom.CleanSpin();
       atom.name_is_given=TRUE;
 
-      //[CO200130 - number->basis]atom.number=a.atoms.size();    // reference position for convasp
+      //[CO20200130 - number->basis]atom.number=a.atoms.size();    // reference position for convasp
       atom.basis=a.atoms.size();     // position in the basis
       atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
       atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
       atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
       atom.spin=0.0;
-      atom.noncoll_spin.clear(); // DX 12/5/17 - non-collinear spin
+      atom.noncoll_spin.clear(); //DX20171205 - non-collinear spin
       // FIXED BELOW atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
       atom.order_parameter_value=0;
       atom.order_parameter_atom=FALSE;
@@ -4614,12 +4776,669 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } // QE INPUT
 
   // ----------------------------------------------------------------------
+  // ABINIT INPUT (DX20200310)
+  if(a.iomode==IOABINIT_AUTO || a.iomode==IOABINIT_GEOM) { // ABINIT
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER begin" << endl; }
+
+    a.scale=1.0; // standard
+    a.neg_scale=FALSE; // standard
+
+    // ----------------------------------------------------------------------
+    // get lattice scaling: acell (optional keyword)
+    xvector<double> acell; acell(1)=1.0; acell(2)=1.0; acell(3)=1.0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ACELL",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER acell line=" << vinput[i] << endl; }
+        string acell_line = aurostd::toupper(vinput[i]);
+        aurostd::StringSubst(acell_line,"ACELL","");
+
+        // get units first (then remove from temp string for easy parsing)
+        string lattice_vec_unit = "Bohr"; // default is Bohr
+        if(aurostd::substring2bool(acell_line,"ANGST",true)){ 
+          lattice_vec_unit = "Angstrom"; 
+          aurostd::StringSubst(acell_line,"ANGSTROM","");
+          aurostd::StringSubst(acell_line,"ANGSTR","");
+          aurostd::StringSubst(acell_line,"ANGST","");
+        }
+        if(aurostd::substring2bool(acell_line,"BOHR",true)){
+          lattice_vec_unit = "Bohr";
+          aurostd::StringSubst(acell_line,"BOHR","");
+        }
+
+        // clean-up
+        acell_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(acell_line);
+
+        // check if explicitly given or uses multiplication
+        // explicit : e.g., "acell 1.0 1.0 1.0"
+        // multiplication : e.g., "acell 3*1.0"
+        bool multiplication_variant = false;
+        if(aurostd::substring2bool(acell_line,"*",true)){ multiplication_variant=true; }
+
+        if(multiplication_variant){
+          vector<string> tokens;
+          aurostd::string2tokens(acell_line,tokens,"*");
+          double factor = aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(tokens[1]));
+          acell= factor*acell;
+        }
+        else{
+          vector<string> tokens;
+          uint number_tokens = aurostd::string2tokens(acell_line,tokens," ");
+          if(number_tokens==3){
+            acell(1) = aurostd::string2utype<double>(tokens[0]);
+            acell(2) = aurostd::string2utype<double>(tokens[1]);
+            acell(3) = aurostd::string2utype<double>(tokens[2]);
+          }
+          else{
+            message << "Unable to parse the acell line; unexpected format. acell_line = " << acell_line << " tokens: " << aurostd::joinWDelimiter(tokens,",");
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          }
+        }
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER extracted acell = " << acell << endl; }
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // get lattice (rprim) : given column-major (optional)
+    // default: identity (i.e., cube)
+    // supported formats:
+    //   1) single line 9 fields
+    //   2) three lines 3 fields per line
+    bool is_lattice_line = false;
+    uint lattice_line_count = 0;
+    a.lattice = aurostd::identity((double) 0,3); //abinit default //DX20200521 - new identity format
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"RPRIM",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER rprim line found = " << vinput[i] << endl; }
+        is_lattice_line = true;
+      }
+      if(is_lattice_line){
+        string rprim_line = aurostd::toupper(vinput[i]);
+        aurostd::StringSubst(rprim_line,"RPRIM","");
+        vector<string> tokens;
+        uint number_tokens = aurostd::string2tokens(rprim_line,tokens," ");
+        if(number_tokens==9){
+          //column-major
+          a.lattice(1,1) = aurostd::frac2dbl(tokens[0])*acell(1);
+          a.lattice(2,1) = aurostd::frac2dbl(tokens[1])*acell(1);
+          a.lattice(3,1) = aurostd::frac2dbl(tokens[2])*acell(1);
+          a.lattice(1,2) = aurostd::frac2dbl(tokens[3])*acell(2);
+          a.lattice(2,2) = aurostd::frac2dbl(tokens[4])*acell(2);
+          a.lattice(3,2) = aurostd::frac2dbl(tokens[5])*acell(2);
+          a.lattice(1,3) = aurostd::frac2dbl(tokens[6])*acell(3);
+          a.lattice(2,3) = aurostd::frac2dbl(tokens[7])*acell(3);
+          a.lattice(3,3) = aurostd::frac2dbl(tokens[8])*acell(3);
+          is_lattice_line = false;
+          break;
+        }
+        else if(number_tokens==3){
+          lattice_line_count += 1;
+          //column-major
+          a.lattice(1,lattice_line_count) = aurostd::frac2dbl(tokens[0])*acell(lattice_line_count);
+          a.lattice(2,lattice_line_count) = aurostd::frac2dbl(tokens[1])*acell(lattice_line_count);
+          a.lattice(3,lattice_line_count) = aurostd::frac2dbl(tokens[2])*acell(lattice_line_count);
+          if(lattice_line_count == 3){ is_lattice_line=false; break; }
+        }
+        else if(number_tokens==0){ continue; }
+        else{
+          message << "Unable to parse the rprim line; unexpected format.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
+
+    // ----------------------------------------------------------------------
+    // get number of atoms
+    // NOTE: sometimes multiple keywords can be in the same line
+    // natom : number of atoms in unit cell
+    // natrd : number of atoms to read in file (useful for symmetry reduced files, e.g., iatom representations)
+    uint number_of_atoms = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATOM",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER natom line = " << vinput[i] << endl; }
+        string natom_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(natom_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="NATOM"){ number_of_atoms = aurostd::string2utype<uint>(tokens[t+1]); break; }
+        }
+        if(number_of_atoms == 0){ 
+          message << "Unable to parse the natom line; unexpected format. vinput[i] = \"" << natom_line << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atoms; natom = " << number_of_atoms << endl; }
+
+    // natrd (optional)
+    bool found_natrd = false;
+    uint number_of_atoms_to_read = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATRD",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER natrd line = " << vinput[i] << endl; }
+        found_natrd = true;
+        string natrd_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(natrd_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="NATRD"){ number_of_atoms_to_read = aurostd::string2utype<uint>(tokens[t+1]); break; }
+        }
+        if(number_of_atoms_to_read == 0){ 
+          message << "Unable to parse the natrd line; unexpected format. natrd_line = \"" << natrd_line << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atoms to read; natrd = " << number_of_atoms_to_read << endl; }
+      }
+    }
+    if(!found_natrd){ number_of_atoms_to_read = number_of_atoms; } // if natrd not specified set to natom
+
+    if(number_of_atoms != number_of_atoms_to_read){
+      message << "The natoms != natrd, i.e., unit cell requires atoms (iatoms) to be expanded by symmetry. Functionality not yet supported.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+    }
+
+    // ----------------------------------------------------------------------
+    // get number of types (optional)
+    bool found_ntypat = false;
+    uint number_of_atom_types = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NTYPAT",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER ntypat line = " << vinput[i] << endl; }
+        found_ntypat = true;
+        string ntypat_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(ntypat_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="NTYPAT"){ number_of_atom_types = aurostd::string2utype<uint>(tokens[t+1]); break; }
+        }
+        if(number_of_atoms_to_read == 0){ 
+          message << "Unable to parse the ntypat line; unexpected format. ntypat_line = \"" << ntypat_line << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atom types; ntypat = " << number_of_atom_types << endl; }
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // get atom type index
+    // in same order as xred, xcart, or xangst
+    vector<uint> atom_types; //follows order of atoms
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"TYPAT",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER typat line = " << vinput[i] << endl; }
+        string typat_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(typat_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        bool found_typat = false;
+        bool is_field_attribute = false;
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="TYPAT"){ found_typat = true; is_field_attribute = true; continue; }
+          if(is_field_attribute){
+            if(aurostd::substring2bool(tokens[t],"*")){
+              vector<string> sub_tokens; aurostd::string2tokens(tokens[t],sub_tokens,"*");
+              uint multiplier = aurostd::string2utype<uint>(sub_tokens[0]);
+              uint type_index = aurostd::string2utype<uint>(sub_tokens[1]);
+              for(uint m=0;m<multiplier;m++){ atom_types.push_back(type_index); }
+            }
+            else if(tokens[t][0]>='0' && tokens[t][0]<='9'){ //is digit
+              atom_types.push_back(aurostd::string2utype<uint>(tokens[t]));
+            }
+            else{
+              // signals a new keyword in the same line
+              is_field_attribute = false;
+              break;
+            }
+          }
+        }
+        if(!found_typat){ continue; } //found ntypat not typat, try another line
+      }
+    }
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER atom type sequence (matches order of atom positions); typat = " << aurostd::joinWDelimiter(atom_types,",") << endl; }
+
+    // check the number of unique types matches ntypat
+    vector<uint> unique_types = atom_types;
+    std::stable_sort(unique_types.begin(),unique_types.end());
+    unique_types.erase(std::unique(unique_types.begin(),unique_types.end()),unique_types.end());
+    if(found_ntypat && (unique_types.size() != number_of_atom_types)){
+      message << "Number of atom types does not match ntypat variable. typat=" << aurostd::joinWDelimiter(unique_types,",") << " | ntypat=" << number_of_atom_types;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    }
+    if(atom_types.size() != number_of_atoms_to_read){ 
+      message << "Number of atom types does not match the number of atoms to read. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | natom=" << number_of_atoms;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    }
+
+    // ----------------------------------------------------------------------
+    // get atom type; element (znucl)
+    vector<uint> nuclear_charge;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ZNUCL",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER znucl line = " << vinput[i] << endl; }
+        string znucl_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(znucl_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        bool is_field_attribute = false;
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="ZNUCL"){ is_field_attribute = true; continue; }
+          if(is_field_attribute){
+            if(tokens[t][0]>='0' && tokens[t][0]<='9'){ //is digit
+              nuclear_charge.push_back(aurostd::string2utype<uint>(tokens[t]));
+            }
+            else{
+              // signals a new keyword in the same line
+              is_field_attribute = false;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER nuclear charge of each atom type (order corresponds to typat index); znucl = " << aurostd::joinWDelimiter(nuclear_charge,",") << endl; }
+
+    // ----------------------------------------------------------------------
+    // normally a mandatory keyword, but the AFLOW-ABINIT writer has not been printing this keyword
+    // for backwards compatability, we will throw a warning (for now)
+    if(nuclear_charge.size()==0){ 
+      message << "The atom elements/types (znucl) are not specified. Using fictious atoms.";
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_WARNING_);
+    }
+
+    // ----------------------------------------------------------------------
+    // get atom positions
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER reading atom positions" << endl; }
+    deque<_atom> atoms_temp;
+    bool is_atom_line = false;
+    bool is_Bohr_units = false;
+    uint atom_line_count = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XRED",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xred (fractional) line = " << vinput[i] << endl; }
+        a.coord_flag = _COORDS_FRACTIONAL_;
+        is_atom_line = true;
+      }
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XCART",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xcart (Cartesian, unit=Bohr) line = " << vinput[i] << endl; }
+        a.coord_flag = _COORDS_CARTESIAN_;
+        is_Bohr_units = true;
+        is_atom_line = true;
+      }
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XANGST",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xangst (Cartesian, unit=Angstrom) line = " << vinput[i] << endl; }
+        a.coord_flag = _COORDS_CARTESIAN_;
+        is_atom_line = true;
+      }
+      if(is_atom_line){
+        string atom_line = aurostd::toupper(vinput[i]);
+        aurostd::StringSubst(atom_line,"XRED",""); //for easier parsing
+        aurostd::StringSubst(atom_line,"XCART",""); //for easier parsing 
+        aurostd::StringSubst(atom_line,"XANGST",""); //for easier parsing
+        vector<string> tokens;
+        uint number_tokens = aurostd::string2tokens(atom_line,tokens," ");
+        if(number_tokens==3){
+          atom_line_count += 1;
+          xvector<double> coordinate;
+          coordinate(1) = aurostd::frac2dbl(tokens[0]);
+          coordinate(2) = aurostd::frac2dbl(tokens[1]);
+          coordinate(3) = aurostd::frac2dbl(tokens[2]);
+
+          _atom atom;
+          if(a.coord_flag == _COORDS_FRACTIONAL_){ 
+            atom.fpos = coordinate; 
+            atom.cpos = F2C(a.lattice,atom.fpos); 
+          }
+          else if(a.coord_flag == _COORDS_CARTESIAN_){ 
+            atom.cpos = coordinate; 
+            if(is_Bohr_units){ atom.cpos *= bohr2angstrom; } // AFLOW expects Angstroms
+            atom.fpos = C2F(a.lattice,atom.cpos); 
+          }
+          atoms_temp.push_back(atom);
+        }
+        else if(number_tokens==(3*number_of_atoms_to_read)){
+          for(uint t=0;t<tokens.size();t+=3){
+            atom_line_count += 1;
+            xvector<double> coordinate;
+            coordinate(1) = aurostd::frac2dbl(tokens[t]);
+            coordinate(2) = aurostd::frac2dbl(tokens[t+1]);
+            coordinate(3) = aurostd::frac2dbl(tokens[t+2]);
+
+            _atom atom;
+            if(a.coord_flag == _COORDS_FRACTIONAL_){ 
+              atom.fpos = coordinate; 
+              atom.cpos = F2C(a.lattice,atom.fpos); 
+            }
+            else if(a.coord_flag == _COORDS_CARTESIAN_){ 
+              atom.cpos = coordinate; 
+              if(is_Bohr_units){ atom.cpos *= bohr2angstrom; } // AFLOW expects Angstroms
+              atom.fpos = C2F(a.lattice,atom.cpos); 
+            }
+            atoms_temp.push_back(atom);
+          }
+        }
+        else if(number_tokens==0){ continue; }
+        else{
+          message << "Unable to parse the atom line; unexpected format. vinput[i] = " << atom_line;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+        if(atom_line_count == number_of_atoms_to_read){ break;}
+      }
+    }
+
+    if(LDEBUG){ 
+      for(uint iat=0;iat<atoms_temp.size();iat++){
+        cerr << soliloquy << " ABINIT READER atom position [" << iat << "] = " << atoms_temp[iat] << endl;
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // ensure correct number of atoms
+    if(atoms_temp.size() != number_of_atoms_to_read){ 
+      message << "The number of atoms is not commensurate: number of atom positions found = " << atoms_temp.size() << " vs natom/natrd = " << number_of_atoms_to_read;
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_RUNTIME_ERROR_);
+    }
+
+    // ----------------------------------------------------------------------
+    // add atoms to xstructure 
+    // add name/type info as well
+    for(uint i=0;i<atoms_temp.size();i++){
+      if(LDEBUG) {cerr << soliloquy << " ABINIT READER finding element/type for atom [" << a << "]" << endl; }
+      xelement::xelement element;
+      // use nuclear charge associated atom index
+      if(nuclear_charge.size()){ element = xelement::xelement(nuclear_charge[atom_types[i]-1]); } //i-1 since index doesn't start at zero
+      // use arbitrary element names (in order of increasing Z)
+      else{ element = xelement::xelement(atom_types[i]); }
+      if(LDEBUG) {cerr << soliloquy << " ABINIT READER element/type for atom [" << a << "] = " << element.symbol << endl; }
+      atoms_temp[i].name=element.symbol;
+      atoms_temp[i].CleanName();
+      atoms_temp[i].CleanSpin();
+      atoms_temp[i].name_is_given=TRUE;
+
+      //[CO20200130 - number->basis]atoms_temp[i].number=atoms_temp.size();    // reference position for convasp
+      atoms_temp[i].basis=atoms_temp.size();     // position in the basis
+      atoms_temp[i].ijk(1)=0;atoms_temp[i].ijk(2)=0;atoms_temp[i].ijk(3)=0; // inside the zero cell...
+      atoms_temp[i].corigin(1)=0.0;atoms_temp[i].corigin(2)=0.0;atoms_temp[i].corigin(3)=0.0; // inside the zero cell
+      atoms_temp[i].coord(1)=0.0;atoms_temp[i].coord(2)=0.0;atoms_temp[i].coord(3)=0.0; // inside the zero cell
+      atoms_temp[i].spin=0.0;
+      atoms_temp[i].noncoll_spin.clear(); //DX20171205 - non-collinear spin
+      // FIXED BELOW atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
+      atoms_temp[i].order_parameter_value=0;
+      atoms_temp[i].order_parameter_atom=FALSE;
+      atoms_temp[i].partial_occupation_value=1.0;
+      atoms_temp[i].partial_occupation_flag=FALSE;
+      // DONE
+      a.AddAtom(atoms_temp[i]);
+      // NO PARTIAL OCCUPATION
+      a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+
+    }
+    if(LDEBUG) {cerr << soliloquy << " ABINIT READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
+    a.SpeciesPutAlphabetic();
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
+    a.MakeBasis();
+    a.MakeTypes(); //DX20190508 - otherwise types are not created
+    uint iat=0;
+    // add system name to title
+    a.title += " "; // add space between existing title
+    for(uint itype=0;itype<a.num_each_type.size();itype++) 
+      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+        a.atoms.at(iat++).type=itype;
+      }
+    a.partial_occupation_flag=FALSE;
+    a.is_vasp4_poscar_format=FALSE;
+    a.is_vasp5_poscar_format=FALSE;
+
+    if(LDEBUG) {cerr << soliloquy << " ABINIT READER - Finished" << endl; }
+
+  }
+
+  // ----------------------------------------------------------------------
+  // ELK INPUT - START (DX20200310)
+  // based on information from http://elk.sourceforge.net/elk.pdf
+  if(a.iomode==IOELK_AUTO || a.iomode==IOELK_GEOM) { // ELK
+    if(LDEBUG){ cerr << soliloquy << " ELK READER begin" << endl; }
+
+    a.scale=1.0; // standard
+    a.neg_scale=FALSE; // standard
+    a.coord_flag = _COORDS_FRACTIONAL_; // always for ELK
+
+    // ----------------------------------------------------------------------
+    // get isotropic lattice scaling; two types
+    //   1) scale : isotropic scaling
+    //   2) scale1/2/3 : anisotropic scaling
+    double isotropic_scaling = 1.0;
+    xvector<double> anisotropic_scaling;
+    anisotropic_scaling(1) = 1.0; anisotropic_scaling(2) = 1.0; anisotropic_scaling(3) = 1.0;
+
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"SCALE",true)){
+
+        string scaling_title_line = aurostd::toupper(vinput[i]);
+        // ----------------------------------------------------------------------
+        // anisotropic
+        if(aurostd::substring2bool(scaling_title_line,"SCALE1",true) ||
+            aurostd::substring2bool(scaling_title_line,"SCALE2",true) ||
+            aurostd::substring2bool(scaling_title_line,"SCALE3",true)){
+          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
+          uint vector_index = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::StringSubst(scaling_title_line,"SCALE","")));
+          string scaling_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vinput[i+1]); // scaling value is in the next line
+          anisotropic_scaling(vector_index) = aurostd::string2utype<double>(scaling_line);
+
+          if(anisotropic_scaling(vector_index)<_ZERO_TOL_){
+            message << "Anisotropic scaling factor is zero or negative for " << vector_index << " component;; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          }
+          if(LDEBUG){ cerr << soliloquy << " ELK READER anisotropic scaling for vector " << vector_index << " = " << anisotropic_scaling(vector_index) << endl; }
+        }
+        // ----------------------------------------------------------------------
+        // isotropic
+        else{
+          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
+          string scaling_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vinput[i+1]); // scaling is the next line
+          isotropic_scaling = aurostd::string2utype<double>(scaling_line);
+          if(isotropic_scaling<_ZERO_TOL_){
+            message << "Isotropic scaling factor is zero or negative; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          }
+          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling = " << isotropic_scaling << endl; }
+        }
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // get lattice (avec) : row-major
+    bool is_lattice_line = false;
+    uint lattice_line_count = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"AVEC",true)){
+        if(LDEBUG){ cerr << soliloquy << " ELK READER avec line found = " << vinput[i] << endl; }
+        is_lattice_line = true;
+      }
+      if(is_lattice_line){
+        string avec_line = aurostd::toupper(vinput[i]);
+        aurostd::StringSubst(avec_line,"AVEC","");
+        vector<string> tokens;
+        uint number_tokens = aurostd::string2tokens(avec_line,tokens," ");
+        if(number_tokens==9){
+          //row-major
+          a.lattice(1,1) = aurostd::frac2dbl(tokens[0])*isotropic_scaling*anisotropic_scaling(1);
+          a.lattice(1,2) = aurostd::frac2dbl(tokens[1])*isotropic_scaling*anisotropic_scaling(1);
+          a.lattice(1,3) = aurostd::frac2dbl(tokens[2])*isotropic_scaling*anisotropic_scaling(1);
+          a.lattice(2,1) = aurostd::frac2dbl(tokens[3])*isotropic_scaling*anisotropic_scaling(2);
+          a.lattice(2,2) = aurostd::frac2dbl(tokens[4])*isotropic_scaling*anisotropic_scaling(2);
+          a.lattice(2,3) = aurostd::frac2dbl(tokens[5])*isotropic_scaling*anisotropic_scaling(2);
+          a.lattice(3,1) = aurostd::frac2dbl(tokens[6])*isotropic_scaling*anisotropic_scaling(3);
+          a.lattice(3,2) = aurostd::frac2dbl(tokens[7])*isotropic_scaling*anisotropic_scaling(3);
+          a.lattice(3,3) = aurostd::frac2dbl(tokens[8])*isotropic_scaling*anisotropic_scaling(3);
+          is_lattice_line = false;
+          break;
+        }
+        else if(number_tokens==3){
+          lattice_line_count += 1;
+          //row-major
+          a.lattice(lattice_line_count,1) = aurostd::frac2dbl(tokens[0])*isotropic_scaling*anisotropic_scaling(lattice_line_count);
+          a.lattice(lattice_line_count,2) = aurostd::frac2dbl(tokens[1])*isotropic_scaling*anisotropic_scaling(lattice_line_count);
+          a.lattice(lattice_line_count,3) = aurostd::frac2dbl(tokens[2])*isotropic_scaling*anisotropic_scaling(lattice_line_count);
+          if(lattice_line_count == 3){ is_lattice_line=false; break; }
+        }
+        else if(number_tokens==0){ continue; }
+        else{
+          message << "Unable to parse the avec line; unexpected format.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
+    a.lattice = a.lattice*bohr2angstrom; // convert to Angstroms
+    if(LDEBUG){ cerr << soliloquy << " ELK READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
+
+    // ----------------------------------------------------------------------
+    // get number of atom types (atoms)
+    double number_of_atom_types = 0;
+
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMS",true) &&
+          !aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATOMS",true)){
+        vector<string> tokens;
+        aurostd::string2tokens(vinput[i+1],tokens," "); // scaling value is in the next line
+        number_of_atom_types = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]));
+
+        if(number_of_atom_types == 0){
+          message << "Unable to parse the atoms line; unexpected format. atoms_line = \"" << tokens[0] << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+        if(LDEBUG){ cerr << soliloquy << " ELK READER number of atom types atoms = " << number_of_atom_types << endl; }
+        break;
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // get atoms (elements, positions, etc.)
+    uint number_of_element_dot_in_files = 0;
+    vector<uint> num_each_type;
+
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),".IN",true)){
+        number_of_element_dot_in_files++;
+        if(LDEBUG){ cerr << soliloquy << " ELK READER \"ELEMENT.in\" file line found = " << vinput[i] << endl; }
+
+        vector<string> tokens;
+        // ----------------------------------------------------------------------
+        // get element
+        aurostd::string2tokens(vinput[i],tokens,".");
+        string element_symbol = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[0],'\''); //clean
+        element_symbol = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(element_symbol); //clean
+        tokens.clear();
+        if(LDEBUG){ cerr << soliloquy << " ELK READER element extracted = " << element_symbol << endl; }
+
+        // ----------------------------------------------------------------------
+        // get number of that element (+1 line down)
+        aurostd::string2tokens(vinput[i+1],tokens," "); // note: +1 line down
+        uint num_of_this_type = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0])); //clean
+        num_each_type.push_back(num_of_this_type);
+        if(LDEBUG){ cerr << soliloquy << " ELK READER number of " << element_symbol << " atoms = " << num_of_this_type << endl; }
+        tokens.clear();
+
+        // ----------------------------------------------------------------------
+        // get subsequent atom positions
+        for(uint iat=1;iat<=num_of_this_type;iat++){
+          uint line_index = i+1+iat; // keep track of line index
+          _atom atom;
+
+          string atom_line = vinput[line_index];
+          uint number_of_tokens = aurostd::string2tokens(atom_line,tokens," ");
+
+          // first three fields are atom positions (fractional)
+          if(number_of_tokens >= 3){
+            atom.fpos(1) = aurostd::string2utype<double>(tokens[0]);
+            atom.fpos(2) = aurostd::string2utype<double>(tokens[1]);
+            atom.fpos(3) = aurostd::string2utype<double>(tokens[2]);
+
+            if(number_of_tokens == 6){
+              // subsequent are external magnetic field in Cartesian coords
+              // not stored beyond here (for now)
+              xvector<double> magnetic_field;
+              magnetic_field(1) = aurostd::string2utype<double>(tokens[3]);
+              magnetic_field(2) = aurostd::string2utype<double>(tokens[4]);
+              magnetic_field(3) = aurostd::string2utype<double>(tokens[5]);
+              if(LDEBUG){ cerr << soliloquy << " ELK READER magnetic field found : " << magnetic_field << " [CURRENTLY NOT USED]" << endl; }
+            }
+          }
+          // F2C
+          atom.cpos = F2C(a.lattice,atom.fpos);
+
+          atom.name=element_symbol;
+          atom.CleanName();
+          atom.CleanSpin();
+          atom.name_is_given=TRUE;
+
+          //[CO20200130 - number->basis]atom.number=a.atoms.size();    // reference position for convasp
+          atom.basis=a.atoms.size();     // position in the basis
+          atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
+          atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
+          atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
+          atom.spin=0.0;
+          atom.noncoll_spin.clear();
+          atom.order_parameter_value=0;
+          atom.order_parameter_atom=FALSE;
+          atom.partial_occupation_value=1.0;
+          atom.partial_occupation_flag=FALSE;
+
+          if(LDEBUG){ cerr << soliloquy << " ELK READER atom added = " << atom << endl; }
+          // DONE
+          a.AddAtom(atom);
+          // NO PARTIAL OCCUPATION
+          a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+        }
+        i += num_of_this_type+1; // no need to read over the same lines
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // check number of element types is consistent
+    if(number_of_atom_types == 0 || number_of_atom_types != number_of_element_dot_in_files){
+      message << "The number of atom types do not match the number of \"ELEMENT.in\" files: atom = " << number_of_atom_types << " vs # .in files = " << number_of_element_dot_in_files;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+    }
+    // ----------------------------------------------------------------------
+    // check number of total atoms is consistent
+    uint sum_each_type = aurostd::sum(num_each_type);
+    if(sum_each_type != a.atoms.size()){
+      message << "The total number of atoms does not match the sum of each atom type: a.atoms.size() = " << a.atoms.size() << " vs sum(num_each_type) = " << sum_each_type;;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " ELK READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
+    a.SpeciesPutAlphabetic();
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
+    a.MakeBasis();
+    a.MakeTypes();
+    uint iat=0;
+    // add system name to title
+    a.title += " "; // add space between existing title
+    for(uint itype=0;itype<a.num_each_type.size();itype++)
+      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+        a.atoms.at(iat++).type=itype;
+      }
+    // NO PARTIAL OCCUPATION
+    a.partial_occupation_flag=FALSE;
+    a.is_vasp4_poscar_format=FALSE;
+    a.is_vasp5_poscar_format=FALSE;
+
+    if(LDEBUG) {cerr << soliloquy << " ELK READER - Finished" << endl; }
+  }
+
+  // ----------------------------------------------------------------------
   // CIF INPUT
   if(a.iomode==IOCIF) { // CIF
     if(LDEBUG) cerr << soliloquy << " CIF" << endl;
     a.scale=1.0; 
     a.neg_scale=FALSE; 
-    a.lattice=aurostd::eye<double>(); //CO190520
+    a.lattice=aurostd::eye<double>(); //CO20190520
 
     a.spacegroupnumber=0;
     a.spacegroupnumberoption=0;
@@ -4639,7 +5458,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
-      //DX 20190708 - added another space group variant - START
+      //DX20190708 - added another space group variant - START
       else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SYMMETRY_SPACE_GROUP_NAME_H-M")){ // converted to upper to be case insensitive
         vector<string> tokens; 
         aurostd::string2tokens(vinput.at(i),tokens);
@@ -4650,35 +5469,36 @@ istream& operator>>(istream& cinput, xstructure& a) {
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\"'); //clean
           try{ 
             a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); 
-          } //DX 20191029 - added try/catch sequence
+          } //DX20191029 - added try/catch sequence
           catch(aurostd::xerror& re){ 
             if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_); } 
-          } //DX 20191029 - added try/catch sequence
+          } //DX20191029 - added try/catch sequence
         }
       }
-      //DX 20190708 - added another space group variant - END
+      //DX20190708 - added another space group variant - END
     }
     // get space group setting
     string spacegroup_Hall="";
     for(uint i=0;i<vinput.size();i++) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SYMMETRY_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive //DX20200521 - missing "_SYMMETRY_" prefix
         vector<string> tokens; 
-        //DX 20190708 - fix Hall reader - START
-        if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_H-M"){
+        aurostd::string2tokens(vinput.at(i),tokens); //DX20200521 - this line was missing
+        //DX20190708 - fix Hall reader - START
+        if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_HALL"){ //DX20200521 - changed H-M to HALL
           tokens.erase(tokens.begin());
           spacegroup_Hall = aurostd::joinWDelimiter(tokens," "); //need a space here for Hall designation
           spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\''); //clean
           spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\"'); //clean
         }
-        //DX 20190708 - fix Hall reader - END
+        //DX20190708 - fix Hall reader - END
       }
     }
-    //DX 20191029 - check if space group number is found - START
+    //DX20191029 - check if space group number is found - START
     if(a.spacegroupnumber==0){
       message << "Either space group number was not given or it was given in a non-standard setting.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_VALUE_ERROR_);
     }
-    //DX 20191029 - check if space group number is found - END
+    //DX20191029 - check if space group number is found - END
     bool found_setting = false;
     // loop over possible settings in aflow
     for(uint setting_number=1;setting_number<=2;setting_number++){
@@ -4728,30 +5548,30 @@ istream& operator>>(istream& cinput, xstructure& a) {
       vector<string> spacegroup_symop_xyz;  
       int multiplicity_count=0;
       bool found_symops=FALSE;
-      bool found_symop_id=FALSE; //DX 20190708
+      bool found_symop_id=FALSE; //DX20190708
       for(uint i=0;i<vinput.size();i++) {
         if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
           found_symops=TRUE;
         }
-        else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX 20190708
+        else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX20190708
           found_symop_id=TRUE;
         }
         else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
           multiplicity_count+=1;
           vector<string> tokens; 
           aurostd::string2tokens(vinput[i],tokens," ");
-          // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
-          if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX 20190708 - enclose in if-statement
+          //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
+          if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
           string symop = aurostd::joinWDelimiter(tokens,"");
           symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
           symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
           symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
-          symop = SYM::reorderWyckoffPosition(symop); //DX 20190708 - standardize order of equation (variable first, then number)
+          symop = SYM::reorderWyckoffPosition(symop); //DX20190708 - standardize order of equation (variable first, then number)
           spacegroup_symop_xyz.push_back(symop);
           //if(tokens.size()==2){
           //  spacegroup_symop_xyz.push_back(tokens[1]);
           //}
-          // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
+          //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
         }
       }
       // compare cif and aflow's general position
@@ -4782,29 +5602,29 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         else {
           a.spacegroupnumberoption = setting_number;
-          a.spacegroupoption = setting_string; //DX 20191029
+          a.spacegroupoption = setting_string; //DX20191029
           found_setting = true;
           break; //found setting
         }
       }
       else {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
-        //[CO190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO190629
-          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
+        //[CO20190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
+          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }
     }
     if(!found_setting){
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -4837,25 +5657,25 @@ istream& operator>>(istream& cinput, xstructure& a) {
     bool found_atom_site_labels=FALSE;
     bool already_storing_atoms=FALSE;
     for(uint i=0;i<vinput.size();i++) {
-      //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso loop - START
+      //DX20181210 - CIF can have multiple loops, reset after each loop and neglect aniso loop - START
       if(aurostd::substring2bool(vinput[i],"loop")){
         found_atom_site_labels = FALSE;
       }
       if(aurostd::substring2bool(vinput[i],"_atom_site") && !aurostd::substring2bool(vinput[i],"aniso")){
-        if(already_storing_atoms){ break; } //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
+        if(already_storing_atoms){ break; } //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         found_atom_site_labels=TRUE;
         atom_site_fields.push_back(vinput[i]);
       }
       else if(found_atom_site_labels && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0 && 
-          vinput[i][0]=='_' && !aurostd::substring2bool(vinput[i],"aniso")){ //DX 20190718 - to account for non-standard fields, e.g., _sm_ (Springer Materials) fields; not standard, but abundant
-        if(already_storing_atoms){ break; } //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
+          vinput[i][0]=='_' && !aurostd::substring2bool(vinput[i],"aniso")){ //DX20190718 - to account for non-standard fields, e.g., _sm_ (Springer Materials) fields; not standard, but abundant
+        if(already_storing_atoms){ break; } //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         atom_site_fields.push_back(vinput[i]);
       }
-      //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso_U loop - END
+      //DX20181210 - CIF can have multiple loops, reset after each loop and neglect aniso_U loop - END
       else if(found_atom_site_labels == TRUE && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0){
         vector<string> tokens;
         aurostd::string2tokens(vinput[i],tokens," ");
-        //DX 20190718 - check tokens first; Springer Materials has extra spaces - START
+        //DX20190718 - check tokens first; Springer Materials has extra spaces - START
         for(uint t=0;t<tokens.size();t++){
           if(aurostd::RemoveWhiteSpaces(tokens[t])[0]=='\'' && aurostd::RemoveWhiteSpaces(tokens[t])[tokens[t].size()-1]!='\''){
             if(t+1<tokens.size()){
@@ -4866,50 +5686,51 @@ istream& operator>>(istream& cinput, xstructure& a) {
             }
           }
         }
-        //DX 20190718 - check tokens first; Springer Materials has extra spaces - END
+        //DX20190718 - check tokens first; Springer Materials has extra spaces - END
         if(tokens.size()==atom_site_fields.size()){
           _atom atom_tmp;
-          wyckoffsite_ITC wyckoff_tmp; //DX 20191029
+          wyckoffsite_ITC wyckoff_tmp; //DX20191029
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ atom_tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); atom_tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ atom_tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); atom_tmp.name_is_given=TRUE; } //DX20190718 - remove surrounding '' (common in Springer Materials cifs)
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ atom_tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ atom_tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ atom_tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_occupancy")){ 
               atom_tmp.partial_occupation_value = aurostd::string2utype<double>(tokens[t]); 
-              wyckoff_tmp.site_occupation = atom_tmp.partial_occupation_value; //DX 20191029 
+              wyckoff_tmp.site_occupation = atom_tmp.partial_occupation_value; //DX20191029 
               if(aurostd::abs(atom_tmp.partial_occupation_value-1.0)<1e-6){ atom_tmp.partial_occupation_flag = FALSE; }
               else { atom_tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
             }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_symmetry_multiplicity")){ wyckoff_tmp.multiplicity=aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label")){ wyckoff_tmp.letter=tokens[t]; }
           }
-          wyckoff_tmp.type = atom_tmp.name; //DX 20191029
-          wyckoff_tmp.coord = atom_tmp.fpos; //DX 20191029
+          wyckoff_tmp.type = atom_tmp.name; //DX20191029
+          wyckoff_tmp.coord = atom_tmp.fpos; //DX20191029
           if(wyckoff_tmp.multiplicity!=0 && wyckoff_tmp.letter!=""){
             SYM::getWyckoffInformation(a.spacegroupnumber, a.spacegroupoption, wyckoff_tmp.letter, wyckoff_tmp.multiplicity, wyckoff_tmp.site_symmetry, wyckoff_tmp.equations);
           }
           a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
           atom_tmp.cpos=a.f2c*atom_tmp.fpos;
           a.AddAtom(atom_tmp);
-          already_storing_atoms=TRUE; //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
+          already_storing_atoms=TRUE; //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
-          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }
       }
     }
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
     a.isd=FALSE; // set Selective Dynamics to false
-    //DX 20191010 - moved loop that used to be here after re-alphabetizing
+    //DX20191010 - moved loop that used to be here after re-alphabetizing
     a.MakeBasis();
-    a.MakeTypes(); //DX 20190508 - otherwise types are not created
-    a.SpeciesPutAlphabetic(); //DX 20190508 - put alphabetic, needed for many AFLOW functions to work properly
-    //DX 20191010 - moved this loop - START
+    a.MakeTypes(); //DX20190508 - otherwise types are not created
+    a.SpeciesPutAlphabetic(); //DX20190508 - put alphabetic, needed for many AFLOW functions to work properly
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames); //DX20200312
+    //DX20191010 - moved this loop - START
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){
         poccaus.push_back(a.atoms[i].partial_occupation_value);
@@ -4920,15 +5741,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
         a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
       }
     }
-    //DX 20191010 - moved this loop - END
-    a.is_vasp4_poscar_format=FALSE; //DX 20190308 - needed or SPECIES section breaks
-    a.is_vasp5_poscar_format=FALSE; //DX 20190308 - needed or SPECIES section breaks
+    //DX20191010 - moved this loop - END
+    a.is_vasp4_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
+    a.is_vasp5_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
   } // CIF INPUT
 
   // ----------------------------------------------------------------------
   // AINS INPUT
   if(a.iomode==IOAIMS_AUTO || a.iomode==IOAIMS_GEOM) { // AIMS GEOM
-    // CO 171008
+    //CO20171008
     //remember, we already did all the debugging above
     //if we get here, we can assume geometry.in is solid!
     //if more debugging needed, test above where we detect iomode
@@ -4936,7 +5757,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
-    a.lattice=aurostd::eye<double>();//CO190520
+    a.lattice=aurostd::eye<double>();//CO20190520
 
     uint lat_count=0;
     //get lattice first, if available (c2f,f2c)
@@ -5016,7 +5837,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
           atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
           atom.spin=0.0;
-          atom.noncoll_spin.clear(); // DX 12/5/17 - non-collinear spin
+          atom.noncoll_spin.clear(); //DX20171205 - non-collinear spin
           // FIXED BELOW atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
           atom.order_parameter_value=0;
           atom.order_parameter_atom=FALSE;
@@ -5096,12 +5917,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } else {
     // have partial
     if(poccaus.size()!=a.atoms.size()) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -5120,7 +5941,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
   }
-  a.GetStoich();  //170724 CO
+  a.GetStoich();  //CO20170724
   // ---------------------------------------------------------------
   // -------------- CREATE PARTIAL OCCUPATION STUFF
   // cerr << a.atoms.size() << endl;
@@ -5176,14 +5997,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.num_each_type.size()!=tokens.size()) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
-      //[CO190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
-      //[CO190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "You need to specify the same number of species and atoms types" << endl;  //CO190629
-      message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO190629
-      message << "      tokens.size()=" << tokens.size() << endl; //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
+      //[CO20190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
+      //[CO20190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "You need to specify the same number of species and atoms types" << endl;  //CO20190629
+      message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO20190629
+      message << "      tokens.size()=" << tokens.size() << endl; //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -5271,27 +6092,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.qm_forces_write=FALSE;
   a.qm_positions_write=FALSE;
   // CALCULATED STUFF
-  // DX and CO - START
-  a.dist_nn_min=AUROSTD_NAN;    // CO
-  a.sym_eps=AUROSTD_NAN; // DX
-  a.sym_eps_calculated=FALSE; // DX
-  a.sym_eps_change_count=0; // DX 2/22/18 - added tolerance count specific to structure
-  // DX and CO - END
+  //DX+CO START
+  a.dist_nn_min=AUROSTD_NAN;    //CO
+  a.sym_eps=AUROSTD_NAN; //DX
+  a.sym_eps_calculated=FALSE; //DX
+  a.sym_eps_change_count=0; //DX20180222 - added tolerance count specific to structure
+  //DX+CO END
   a.iatoms_calculated=FALSE;
   a.pgroup_calculated=FALSE;
   a.pgroup_xtal_calculated=FALSE;
+  a.pgroupk_Patterson_calculated=FALSE; //DX20200129
   a.pgroupk_calculated=FALSE;
-  a.pgroupk_xtal_calculated=FALSE; // DX 12/5/17 - Added pgroupk_xtal
+  a.pgroupk_xtal_calculated=FALSE; //DX20171205 - Added pgroupk_xtal
   a.fgroup_calculated=FALSE;
   a.sgroup_calculated=FALSE;
   a.grid_atoms_calculated=FALSE;
   a.lijk_calculated=FALSE;
   a.neighbours_calculated=FALSE;
-  //DX 20180712 - START
+  //DX20180712 START
   // ANRL SYMBOLIC MATH
   a.symbolic_math_representation_only=FALSE;
   a.constrained_symmetry_calculation=FALSE;
-  //DX 20180712 - END
+  //DX20180712 END
   // OUTPUT STUFF
   a.error_flag=FALSE;
   a.error_string="";
@@ -5305,31 +6127,40 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.write_klattice_flag=TRUE;
   a.write_DEBUG_flag=TRUE;
 #endif
+  //RF20200310 BEGIN
+  for(int i=0;i<(int)a.atoms.size();i++) {
+    if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).cleanname=(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name));
+  }
+  //RF20200310 END
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
-    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
-    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO190629 - no exit()]exit(0);
-    message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO190629
-    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
+    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO20190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
-    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
-    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO190629 - no exit()]exit(0);
-    message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO190629
-    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
+    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO20190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
-    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
-    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO190629 - no exit()]exit(0);
-    message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO190629
-    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
+    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO20190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
+  if(det(a.lattice)<0.0){ //CO20200201
+    message << "Found negative determinant for lattice (det()=" << det(a.lattice) << "). Flip your basis."; //CO20200201
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200201
+  } //CO20200201
 
   // ---------------------------------------------------------------
   if(LDEBUG) cerr << soliloquy << " DONE [99]" << endl;
@@ -5337,7 +6168,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   return cinput;
 }
 
-// DX 1/24/18 - added ibrav to lattice - START
+//DX20180124 - added ibrav to lattice - START
 // **************************************************************************
 // pflow::QE_ibrav2lattice
 // **************************************************************************
@@ -5354,9 +6185,9 @@ namespace pflow {
       c = parameters(3);               // parameters(3) = c
     }
     else {
-      a = parameters(1)*bohr2angstrom;               // parameters(1) = a   // DX 2/15/18 - added bohr2angstrom (celldm is in Bohr)
-      b = parameters(2)*parameters(1)*bohr2angstrom; // parameters(2) = b/a // DX 2/15/18 - added bohr2angstrom (celldm is in Bohr)
-      c = parameters(3)*parameters(1)*bohr2angstrom; // parameters(3) = c/a // DX 2/15/18 - added bohr2angstrom (celldm is in Bohr)
+      a = parameters(1)*bohr2angstrom;               // parameters(1) = a   //DX20180215 - added bohr2angstrom (celldm is in Bohr)
+      b = parameters(2)*parameters(1)*bohr2angstrom; // parameters(2) = b/a //DX20180215 - added bohr2angstrom (celldm is in Bohr)
+      c = parameters(3)*parameters(1)*bohr2angstrom; // parameters(3) = c/a //DX20180215 - added bohr2angstrom (celldm is in Bohr)
     }
     gamma = acos(parameters(4));       // parameters(4) = cos(gamma) NOTE: Different than AFLOW's order convention of a,b,c,alpha,beta,gamma
     beta = acos(parameters(5));        // parameters(5) = cos(beta)  NOTE: Different than AFLOW's order convention of a,b,c,alpha,beta,gamma
@@ -5469,13 +6300,13 @@ namespace pflow {
     return lattice;
   }
 }
-// DX 1/24/18 - added ibrav to lattice - START
+//DX20180124 - added ibrav to lattice - START
 
 // **************************************************************************
 // xstructure::GetStoich
 // **************************************************************************
 // Get stoichiometries
-bool xstructure::GetStoich(void) { // CO 171025
+bool xstructure::GetStoich(void) { //CO20171025
   double total_comp=0.0;
   for(uint i=0;i<comp_each_type.size();i++){
     total_comp+=comp_each_type[i];
@@ -5493,7 +6324,7 @@ bool xstructure::GetStoich(void) { // CO 171025
 // cluster together atoms by equivalent atoms
 bool xstructure::sortAtomsEquivalent(void) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
-  string soliloquy="xstructure::sortAtomsEquivalent():";
+  string soliloquy = XPID + "xstructure::sortAtomsEquivalent():";
   if(partial_occupation_flag==false){
     if(!(*this).iatoms_calculated){pflow::PerformFullSymmetry(*this);}
     if(!(*this).iatoms_calculated){return false;}
@@ -5652,17 +6483,17 @@ void xstructure::SetCoordinates(const int& mode)  {
 // **************************************************************************
 // This fixes basis and number
 void xstructure::MakeBasis(void) {
-  // need to update NUMBER and BASIS, number seems restricted to convasp and largely OBSOLETE (CO190226)
+  // need to update NUMBER and BASIS, number seems restricted to convasp and largely OBSOLETE (CO20190226)
   for(uint iatom=0;iatom<atoms.size();iatom++) {
     atoms.at(iatom).basis=iatom;
-    //[CO200130 - number->basis]atoms.at(iatom).number=iatom;
+    //[CO20200130 - number->basis]atoms.at(iatom).number=iatom;
   }
 }
 
 // **************************************************************************
 // xstructure::MakeTypes
 // **************************************************************************
-// CO 180420
+//CO20180420
 void xstructure::MakeTypes(void) {
   // need to update TYPES based on num_each_type
   // type is usually used as an index for species
@@ -5700,16 +6531,16 @@ void xstructure::AddAtom(const _atom& atom) {
           for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
             aijk[1]=i;aijk[2]=j;aijk[3]=k;
             //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
-            // DX and CO -START    
-            // DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
-            if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ // DX 12/1/17 - Added (*this).sym_eps>1e-10 // DX 2/15/18 - added (*this).sym_eps<AUROSTD_NAN (needed) 
-              if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; // DX
+            //DX+CO START    
+            //DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
+            if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+              if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
             }
             else { 
-              //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; // DX
-              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; // DX 12/1/17
+              //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
             }
-            // DX and CO - END
+            //DX+CO END
           }
   if(FOUND_POSITION==TRUE) return; // found no need to add it further
 
@@ -5733,17 +6564,17 @@ void xstructure::AddAtom(const _atom& atom) {
     species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
     species_mass.push_back(GetAtomMass(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
   } else {
-    // cerr <<  num_each_type.size() << " " <<  btom.type << endl;
-    // cerr <<  comp_each_type.size() << " " <<  btom.type << endl;
+    // cerr << num_each_type.size() << " " <<  btom.type << endl;
+    // cerr << comp_each_type.size() << " " <<  btom.type << endl;
     if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
     num_each_type.at(species_position)++;
     comp_each_type.at(species_position)+=atom.partial_occupation_value;
   }
   if(btom.name_is_given) {
     btom.CleanName();
-    // DX 9/21/17 - Need to keep spin info  btom.CleanSpin();
+    //DX20170921 - Need to keep spin info  btom.CleanSpin();
   }
-  GetStoich();  //170724 - CO
+  GetStoich();  //CO20170724
 
   // OLD STYLE
   //  atoms.push_back(btom);  MakeBasis(); return;
@@ -5766,7 +6597,7 @@ void xstructure::AddAtom(const _atom& atom) {
       if(iat<atoms.size()-1) {
         //	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
         if((atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) || 
-            (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO 180705 - for pocc sorting, larger pocc ahead of smaller pocc
+            (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
           //	if(LDEBUG)
           //	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
           atoms.insert(it+1,btom);  // it is iterator, fine for insert.
@@ -5787,7 +6618,7 @@ void xstructure::AddAtom(const _atom& atom) {
 // xstructure::RemoveAtom
 // **************************************************************************
 // This removes an atom to the structure.
-// 170721 - CO added some safety checks to make sure we weren't deleting an entry
+//CO20170721 - added some safety checks to make sure we weren't deleting an entry
 // of a vector/deque that didn't exist (see if size() > itype)
 // this is really important because if we build an xstructure on the fly and only occupy
 // some of these attributes, the code will seg fault badly, and the error will not
@@ -5809,13 +6640,13 @@ void xstructure::RemoveAtom(const uint& iatom) {
       if(species_pp_vLDAU.size()>itype)   species_pp_vLDAU.erase(species_pp_vLDAU.begin()+itype);  // erase species_pp_vLDAU
       if(species_volume.size()>itype)     species_volume.erase(species_volume.begin()+itype);  // erase species_volume
       if(species_mass.size()>itype)       species_mass.erase(species_mass.begin()+itype);  // erase species_mass
-      // CO 170721 - might be better if we wrote function like MakeBasis() for types and did 
+      //CO20170721 - might be better if we wrote function like MakeBasis() for types and did 
       //at the end, but it is not unsafe (seg fault) in the way it is written
       for(uint i=0;i<atoms.size();i++)
         if(i!=iatom && atoms.at(i).type>(int)itype)
           atoms.at(i).type--;
     }
-    //170721 CO - this is obsolete with MakeBasis() below!
+    //CO20170721 - this is obsolete with MakeBasis() below!
     // do atoms
     //for(uint i=0;i<atoms.size();i++) {
     //  if(i!=iatom && atoms.at(i).number>atoms.at(iatom).number)
@@ -5829,19 +6660,19 @@ void xstructure::RemoveAtom(const uint& iatom) {
     //      if(iatom==partial_occupation_flags.at(i))
     //	partial_occupation_flags.erase(partial_occupation_flags.begin()+i);
     // do order_parameter_atoms
-    // 170721 CO - this is okay as it won't seg fault (doesn't delete anything bigger than .size() )
+    //CO20170721 - this is okay as it won't seg fault (doesn't delete anything bigger than .size() )
     for(uint i=0;i<order_parameter_atoms.size();i++)
       if(iatom==order_parameter_atoms.at(i))
         order_parameter_atoms.erase(order_parameter_atoms.begin()+i);
   }
-  GetStoich();  //170724 CO
+  GetStoich();  //CO20170724
   // done
   MakeBasis(); // need to update NUMBER and BASIS
 }
 
-void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO181226
+void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO20181226
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  std::sort(v_atoms_to_remove.begin(),v_atoms_to_remove.end());v_atoms_to_remove.erase( std::unique( v_atoms_to_remove.begin(), v_atoms_to_remove.end() ), v_atoms_to_remove.end() ); //remove duplicates //CO181226
+  std::sort(v_atoms_to_remove.begin(),v_atoms_to_remove.end());v_atoms_to_remove.erase( std::unique( v_atoms_to_remove.begin(), v_atoms_to_remove.end() ), v_atoms_to_remove.end() ); //remove duplicates //CO20181226
   std::sort(v_atoms_to_remove.rbegin(),v_atoms_to_remove.rend()); //NOTE the r, reverse sort, that way when we remove, it doesn't affect other indices
   for(uint atom=0;atom<v_atoms_to_remove.size();atom++){
     if(LDEBUG) {cerr << "Removing Atom " <<  v_atoms_to_remove[atom] << endl;}
@@ -5849,11 +6680,11 @@ void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO181226
   }
 }
 
-void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO190520
+void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO20190520
   //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="xstructure::ReplaceAtoms():";
+  string soliloquy = XPID + "xstructure::ReplaceAtoms():";
   for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
     if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
     RemoveAtom(i);
@@ -5895,12 +6726,12 @@ void xstructure::RemoveFractionalCopies(double tol) {
     } else {
       flag_remove=false;
       for(iat2=iat1+1;iat2<atoms.size()&&flag_remove==FALSE;iat2++){
-        xvector<double> fdiff = atoms.at(iat1).fpos-atoms.at(iat2).fpos; //DX 5/3/18 - account for PBC
-        fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
-        //DX 20190613 [OBSOLETE] SYM::PBC(fdiff); //DX 5/3/18 - account for PBC
-        if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) //DX 5/3/18 - account for PBC and perform in Cartesian space
-          //DX 5/3/18 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE)
-        { //CO200106 - patching for auto-indenting
+        xvector<double> fdiff = atoms.at(iat1).fpos-atoms.at(iat2).fpos; //DX20180503 - account for PBC
+        fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX20190613
+        //DX20190613 [OBSOLETE] SYM::PBC(fdiff); //DX20180503 - account for PBC
+        if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) //DX20180503 - account for PBC and perform in Cartesian space
+          //DX20180503 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE)
+        { //CO20200106 - patching for auto-indenting
           flag_remove=TRUE;
           irm=iat2;
         }
@@ -5956,13 +6787,13 @@ void xstructure::AddCorners(void) {
 }
 
 // **************************************************************************
-// xstructure::ShifOriginToAtom
+// xstructure::ShiftOriginToAtom
 // **************************************************************************
 // // Shift the origin to atom(iat)
-void xstructure::ShifOriginToAtom(const int& iat) {
-  // DX and CO - START
+void xstructure::ShiftOriginToAtom(const int& iat) {
+  //DX+CO START
   if(iat<0 || iat>=(int)atoms.size()) {
-    cerr << "ERROR void xstructure::ShifOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
+    cerr << "ERROR void xstructure::ShiftOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
     exit(0);
   }
   xvector<double> frigin(3);
@@ -5972,14 +6803,14 @@ void xstructure::ShifOriginToAtom(const int& iat) {
     atoms[i].fpos=atoms[i].fpos-frigin;
     atoms[i].cpos=atoms[i].cpos-origin;
   }
-  // CO TOO SLOW
+  //CO TOO SLOW
   //origin=atoms.at(iat).cpos;
   //frigin=atoms.at(iat).fpos;
   //for(uint i=0;i<atoms.size();i++) {
   //  atoms.at(i).fpos=atoms.at(i).fpos-frigin;
   //  atoms.at(i).cpos=atoms.at(i).cpos-origin;
   //}
-  // DX and CO - END
+  //DX+CO END
 }
 
 // **************************************************************************
@@ -6078,16 +6909,16 @@ string GetElementName(string stringin) {
 // GetSpaceGroupName
 // ***************************************************************************
 string GetSpaceGroupName(int spacegroupnumber, string directory) {
-  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupName()"; //DX 20190708 - for xerror
-  stringstream message; //DX 20190708 - for xerror
-  string spacegroup=""; //DX 20190708 - for xerror
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
-    message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
-    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupName()"; //DX20190708 - for xerror
+  stringstream message; //DX20190708 - for xerror
+  string spacegroup=""; //DX20190708 - for xerror
+  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
+    message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
+    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
-  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
+  //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  P1 #1
     spacegroup="P1";}
   else if(spacegroupnumber==2) { // ------------------- 2  P-1 #2
@@ -6556,8 +7387,8 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
 // GetSpaceGroupNumber
 // ***************************************************************************
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
-  // DX 20190708
-  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupNumber()";
+  //DX20190708
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupNumber()";
   stringstream message;
   int spacegroupnumber=0;
   if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
@@ -6567,7 +7398,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
   // OK
-  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
+  //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupsymbol=="P1") {  // ------------------- 1  P1 #1                                                                                 
     spacegroupnumber=1;}
   else if(spacegroupsymbol=="P-1") {  // ------------------- 2  P-1 #2
@@ -7041,16 +7872,16 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
 // GetSpaceGroupSchoenflies
 // ***************************************************************************
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
-  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX 20190708 - for xerror
-  stringstream message; //DX 20190708 - for xerror
-  string spacegroup=""; //DX 20190708 - for xerror
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
-    message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
-    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX20190708 - for xerror
+  stringstream message; //DX20190708 - for xerror
+  string spacegroup=""; //DX20190708 - for xerror
+  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
+    message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
+    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
-  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
+  //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  C_{1}^{1} #1
     spacegroup="C_{1}^{1}";}
   else if(spacegroupnumber==2) { // ------------------- 2  C_{i}^{1} #2
@@ -7519,19 +8350,19 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
 // GetSpaceGroupHall
 // ***************************************************************************
 string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
-  // DX - Hall distinguishes space group setting.  This table assumes the first 
+  //DX - Hall distinguishes space group setting.  This table assumes the first 
   //      setting that appears in the ITC.
   //      For more settings, they need to be hard-coded here.
-  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX 20190708 - for xerror
-  stringstream message; //DX 20190708 - for xerror
-  string spacegroup=""; //DX 20190708 - for xerror
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
-    message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
-    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX20190708 - for xerror
+  stringstream message; //DX20190708 - for xerror
+  string spacegroup=""; //DX20190708 - for xerror
+  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
+    message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
+    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
-  if(setting==0){ //signals default //DX 20180807
+  if(setting==0){ //signals default //DX20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
         spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
@@ -7543,11 +8374,11 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
     }
   }
   if(setting < 1 || setting > 2) {
-    message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX 20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
-  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
+  //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  P 1 #1
     spacegroup="P 1";}
   else if(spacegroupnumber==2) { // ------------------- 2  -P 1 #2
@@ -8079,7 +8910,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
 // ***************************************************************************
 string GetLaueLabel(string& point_group) {
   string laue = "";
-  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
+  //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
   // -1 
   if (point_group=="1" || point_group=="-1"){
     laue = "-1";
@@ -8149,8 +8980,8 @@ xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale) {
     exit(1);
   }
   xmatrix<double> metric_tensor(lattice.rows,lattice.cols);
-  for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO190520
-    for(int j=lattice.lcols;j<=lattice.ucols;j++){ //CO190520
+  for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO20190520
+    for(int j=lattice.lcols;j<=lattice.ucols;j++){ //CO20190520
       metric_tensor(i,j)=aurostd::scalar_product(lattice(i),lattice(j));
     }
   }
@@ -8397,7 +9228,7 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
   if (nions < 100) {
     out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
   } else {
-    out= out * std::pow((double) nions,(double) 0.06);  // ME191028 - prior scaling factor not sufficient for supercells
+    out= out * std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
   }
   //  cerr << "GetNBANDS=" << out << endl;
   // exit(0);
@@ -8850,7 +9681,7 @@ double RadiusSphereLattice(const xmatrix<double>& lattice,double scale) {
 xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radius,double scale) {
   // Adapted from AVDV routine
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="LatticeDimensionSphere():"; //CO190520
+  string soliloquy = XPID + "LatticeDimensionSphere():"; //CO20190520
   xmatrix<double> lattice; lattice=scale*_lattice;
   int i,j,k;
   xmatrix<double> invlattice(3,3),normals(3,3),frac_normals(3,3);
@@ -8898,11 +9729,11 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   }
   //get the normals in the coordinates system of the lattice vectors
   invlattice=aurostd::inverse(lattice);
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " normals="<< endl;cerr << normals << endl; //CO190520
-    cerr << soliloquy << " lattice="<< endl;cerr << lattice << endl; //CO190520
-    cerr << soliloquy << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO190520
-  } //CO190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " normals="<< endl;cerr << normals << endl; //CO20190520
+    cerr << soliloquy << " lattice="<< endl;cerr << lattice << endl; //CO20190520
+    cerr << soliloquy << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO20190520
+  } //CO20190520
 
   for(i=1;i<=3;i++) {
     for(j=1;j<=3;j++) {
@@ -8925,7 +9756,7 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
 }
 
 xvector<int> LatticeDimensionSphere(const xstructure& str, double radius) {
-  return LatticeDimensionSphere(str.lattice,radius,str.scale);//str.scale*str.lattice,radius);  // CO 171024
+  return LatticeDimensionSphere(str.lattice,radius,str.scale); //str.scale*str.lattice,radius);  //CO20171024
 }
 
 // **************************************************************************
@@ -9065,7 +9896,7 @@ void xstructure::IdenticalAtoms(void) {
   // fix numbers
   num_each_type.clear();num_each_type.push_back(atoms.size());
   comp_each_type.clear();comp_each_type.push_back((double) atoms.size());
-  GetStoich();  //170724 CO
+  GetStoich();  //CO20170724
   // fix species
   for(uint i=1;i<species.size();i++) {
     species.at(i)="";species_pp.at(i)="";species_volume.at(i)=0.0;species_mass.at(i)=0.0;
@@ -9123,8 +9954,8 @@ void xstructure::GetLatticeType(void) {
 void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
   //  bool VERBOSE=TRUE;
   bool VERBOSE=FALSE;
-  // DX double eps=0.002,epsang=0.02;
-  // double eps=0.02,epsang=0.02;  // JUNKAI
+  //DX double eps=0.002,epsang=0.02;
+  // double eps=0.02,epsang=0.02;  //JX
   // DIRECT
   xstructure str_in;//,str_sp,str_sc;
   // start
@@ -9136,19 +9967,19 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
   // str_in.CalculateSymmetryPointGroup(TRUE);
   // str_in.CalculateSymmetryFactorGroup(TRUE);
   // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
-  // DX - START
+  //DX START
   bool same_eps = false;
   uint count = 0;
   while(same_eps == false && count++ < 100){
-    // DX - END
+    //DX END
     if(0) {
       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
       // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
     }
     if(1) {
-      //    cerr << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
+      //    cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
       LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
-      //  cerr << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
+      //  cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
     }
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [4]" << endl;
     if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
@@ -9161,11 +9992,11 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
     this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
     this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
-    this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX 20181024
-    this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX 20181024
-    this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX 20181024
-    this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX 20181024
-    this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX 20181024
+    this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
+    this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
+    this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
+    this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
+    this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
     this->pearson_symbol=str_sp.pearson_symbol;
     this->crystal_family=str_sp.crystal_family;
     this->crystal_system=str_sp.crystal_system;
@@ -9180,44 +10011,44 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     xstructure str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc;
     str_reciprocal_in.lattice=this->klattice;str_reciprocal_in.FixLattices();
     str_reciprocal_in.title="NO_RECURSION";
-    // DX and CO - START
-    this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; // DX
-    this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; // DX
-    this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
-    // DX and CO - END
+    //DX+CO START
+    this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; //DX
+    this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+    this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+    //DX+CO END
     _atom atom;str_reciprocal_in.AddAtom(atom);
-    //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //STEFANO OLD VERSION
+    //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [5]" << endl;
-    // DX int ss=0; //JUNKAI
-    // DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JUNKAI
-    // DX 8/14/17 - START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-    // DX 8/14/17 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-    // DX 8/14/17 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
-    // DX 8/29/17 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKlattice(FALSE);
-    // DX 4/26/18 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
-    // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
-    // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
-    // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
-    // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
-    // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
-    // DX 8/14/17 - END
-    LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); // DX // DX 2/26/18 - do not need to do full sym for recip
-    // DX - START
+    //DX int ss=0; //JX
+    //DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JX
+    //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+    //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+    //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
+    //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
+    //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
+    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
+    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
+    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
+    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+    //DX20170814 END
+    LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); //DX //DX20180226 - do not need to do full sym for recip
+    //DX START
     if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
       same_eps = true;
     }
     else {
       str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
-      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
+      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
     }
-    // DX - END
+    //DX END
     this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
     this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
     // SUPERLATTICE
     xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
     str_superlattice_in=*this;
-    str_superlattice_in.ClearSymmetry();  // DX 8/14/17 - It wasn't cleared, so nothing was being calculated
+    str_superlattice_in.ClearSymmetry();  //DX20170814 - It wasn't cleared, so nothing was being calculated
     str_superlattice_in.title="NO_RECURSION";
     //str_superlattice_in.GetPrimitive(0.01);
     if(VERBOSE) cerr << str_superlattice_in << endl;
@@ -9233,24 +10064,24 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     str_superlattice_in.MinkowskiBasisReduction();
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [11]" << endl;
     if(VERBOSE) cerr << str_superlattice_in << endl;
-    //  LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc); //STEFANO OLD VERSION
-    // DX ss=0; //JUNKAI
-    // DX and CO - START
-    str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; // DX
-    str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; // DX
-    str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
-    // DX and CO - END
-    // DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JUNKAI
-    LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); // DX // DX 2/26/18 - do not need to do full sym for superlattice
-    // DX - START
+    //  LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc); //SC OLD VERSION
+    //DX ss=0; //JX
+    //DX+CO START
+    str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; //DX
+    str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+    str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+    //DX+CO END
+    //DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JX
+    LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
+    //DX START
     if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
       same_eps = true;
     }
     else {
       str_sp.sym_eps = str_superlattice_sp.sym_eps;
-      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; // DX 2/22/18 - added sym_eps change count
+      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
     }
-    // DX - END
+    //DX END
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
     this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
     this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
@@ -9260,19 +10091,19 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
       cerr << "ERROR in Bravais_Lattice_StructureDefault(): Unable to find reliable sym_eps." << endl;
       break;
     }
-  } // DX while loop
+  } //DX while loop
 }
 
 string GetLatticeType(xmatrix<double> lattice) {
-  // DX double eps=0.00010,epsang=0.01;
+  //DX double eps=0.00010,epsang=0.01;
   xstructure str_in,str_sp,str_sc;
   str_in.lattice=lattice;str_in.FixLattices();
   str_in.title="NO_RECURSION";
   _atom atom;str_in.AddAtom(atom);
-  // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); // STEFANO OLD VERSION
-  // DX int ss=0; //JUNKAI
-  // DX LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JUNKAI
-  LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // DX
+  // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
+  //DX int ss=0; //JX
+  //DX LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JX
+  LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); //DX
   return str_sp.bravais_lattice_type;
   //  return str_sp.bravais_lattice_variation_type;
 }
@@ -9452,8 +10283,8 @@ void xstructure::SpeciesSwap(const uint& specieA,const uint& specieB) {
   string saus;double daus;
   if(specieAA<species.size() && specieBB<species.size()) {saus=species.at(specieAA);species.at(specieAA)=species.at(specieBB);species.at(specieBB)=saus;}
   if(specieAA<species_pp.size() && specieBB<species_pp.size()) {saus=species_pp.at(specieAA);species_pp.at(specieAA)=species_pp.at(specieBB);species_pp.at(specieBB)=saus;}
-  if(specieAA<comp_each_type.size() && specieBB<comp_each_type.size()) {daus=comp_each_type.at(specieAA);comp_each_type.at(specieAA)=comp_each_type.at(specieBB);comp_each_type.at(specieBB)=daus;} //CO 180705
-  if(specieAA<stoich_each_type.size() && specieBB<stoich_each_type.size()) {daus=stoich_each_type.at(specieAA);stoich_each_type.at(specieAA)=stoich_each_type.at(specieBB);stoich_each_type.at(specieBB)=daus;} //CO 180705
+  if(specieAA<comp_each_type.size() && specieBB<comp_each_type.size()) {daus=comp_each_type.at(specieAA);comp_each_type.at(specieAA)=comp_each_type.at(specieBB);comp_each_type.at(specieBB)=daus;} //CO20180705
+  if(specieAA<stoich_each_type.size() && specieBB<stoich_each_type.size()) {daus=stoich_each_type.at(specieAA);stoich_each_type.at(specieAA)=stoich_each_type.at(specieBB);stoich_each_type.at(specieBB)=daus;} //CO20180705
   if(specieAA<species_volume.size() && specieBB<species_volume.size()) {daus=species_volume.at(specieAA);species_volume.at(specieAA)=species_volume.at(specieBB);species_volume.at(specieBB)=daus;}
   if(specieAA<species_mass.size() && specieBB<species_mass.size()) {daus=species_mass.at(specieAA);species_mass.at(specieAA)=species_mass.at(specieBB);species_mass.at(specieBB)=daus;}
 }
@@ -9533,17 +10364,17 @@ string xstructure::SpeciesString(void) {
 // ***************************************************************************
 // Set the species  Stefano Curtarolo Nov 2014
 uint xstructure::SetSpecies(const deque<string>& vspecies) {
-  string soliloquy="xstructure::SetSpecies():"; //CO190317
-  stringstream message; //CO190317
+  string soliloquy = XPID + "xstructure::SetSpecies():"; //CO20190317
+  stringstream message; //CO20190317
   if(vspecies.size()!=species.size() ) {
-    message << "vspecies.size()!=species.size()"; //CO190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
-    //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
+    message << "vspecies.size()!=species.size()"; //CO20190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
+    //[CO20190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
   }
   if(vspecies.size()!=num_each_type.size() ) {
-    message << "vspecies.size()!=num_each_type.size()"; //CO190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
-    //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
+    message << "vspecies.size()!=num_each_type.size()"; //CO20190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
+    //[CO20190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
   }
   int iatom=0;
   for(uint itype=0;itype<num_each_type.size();itype++) {
@@ -9553,7 +10384,7 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
     for(int j=0;j<num_each_type.at(itype);j++) {
       atoms.at(iatom).name=itype_species;    // CONVASP_MODE
       atoms.at(iatom).CleanName();
-      // DX 9/21/17 - Need to keep spin info atoms.at(iatom).CleanSpin();
+      //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
       atoms.at(iatom).name_is_given=TRUE;
       iatom++;
     }
@@ -9628,14 +10459,14 @@ bool GetNiggliCell(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xma
   return GetNiggliCell_20180213(in_lat,niggli_lat,P,Q);
 }
 
-// DX 2/13/18 - Niggli algorithm, fixed tolerances and added goto loop in step 6 - START
+//DX20180213 - Niggli algorithm, fixed tolerances and added goto loop in step 6 - START
 bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q) {
   // return FALSE if failed
   // rerurn TRUE if ok
 
-  //  double RENORM=1E+6;  // DANE not used
+  //  double RENORM=1E+6;  //DM not used
   int MAXITER=100000;
-  double TOL=_ZERO_TOL_; // DX 2/12/18 - from 1e-15 to 1e-10
+  double TOL=_ZERO_TOL_; //DX20180212 - from 1e-15 to 1e-10
 
   // Initialize matrices for tranformations (3x3).
   xmatrix<double> m1(3,3);
@@ -9660,7 +10491,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Initialize a, b, c, ksi, eta, zeta
   xvector<double> indat(6);
-  indat=Getabc_angles(in_lat,RADIANTS);
+  indat=Getabc_angles(in_lat,RADIANS);
   double a=indat(1)*indat(1);
   double b=indat(2)*indat(2);
   double c=indat(3)*indat(3);
@@ -9710,9 +10541,9 @@ LoopHead:
 
 
   // Step 1
-  // DX 2/9/18 [OBSOLETE] if(((a-b)>TOL) || ((abs(a-b)<TOL) && (abs(ksi)>abs(eta)) ) )
-  if(((a-b)>TOL) || ((abs(a-b)<TOL) && ((abs(ksi)-abs(eta))>TOL) ) ) // DX 2/9/18 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  //DX20180209 [OBSOLETE] if(((a-b)>TOL) || ((abs(a-b)<TOL) && (abs(ksi)>abs(eta)) ) )
+  if(((a-b)>TOL) || ((abs(a-b)<TOL) && ((abs(ksi)-abs(eta))>TOL) ) ) //DX20180209 - more robust; precision
+  { //CO20200106 - patching for auto-indenting
     temp=a;a=b;b=temp;
     temp=-ksi;ksi=-eta;eta=temp;
     P=P*m1;
@@ -9721,9 +10552,9 @@ LoopHead:
   }
 
   // Step 2
-  // DX 2/9/18 [OBSOLETE] if(((b-c)>TOL) || ((abs(b-c)<TOL) && (abs(eta)>abs(zeta)) ) )
-  if(((b-c)>TOL) || ((abs(b-c)<TOL) && ((abs(eta)-abs(zeta))>TOL) ) ) // DX 2/9/18 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  //DX20180209 [OBSOLETE] if(((b-c)>TOL) || ((abs(b-c)<TOL) && (abs(eta)>abs(zeta)) ) )
+  if(((b-c)>TOL) || ((abs(b-c)<TOL) && ((abs(eta)-abs(zeta))>TOL) ) ) //DX20180209 - more robust; precision
+  { //CO20200106 - patching for auto-indenting
     temp=b;b=c;c=temp;
     temp=-eta;eta=-zeta;zeta=temp;
     P=P*m2;
@@ -9733,9 +10564,9 @@ LoopHead:
   }
 
   // Step 3
-  // DX 2/9/18 [OBSOLETE] if((ksi*eta*zeta)>0.0)
-  if((ksi*eta*zeta)>TOL) // DX 2/9/18 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  //DX20180209 [OBSOLETE] if((ksi*eta*zeta)>0.0)
+  if((ksi*eta*zeta)>TOL) //DX20180209 - more robust; precision
+  { //CO20200106 - patching for auto-indenting
     m3(1,1)=SignNoZero(ksi);
     m3(2,2)=SignNoZero(eta);
     m3(3,3)=SignNoZero(zeta);
@@ -9748,10 +10579,10 @@ LoopHead:
   }
 
   // Step 4
-  // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
-  if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL))  // DX 2/12/18 - if any are zero, then, ksi*eta*zeta is zero
-    //if(ksi*eta*zeta<=TOL) // DX 2/9/18 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  //EG's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
+  if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL))  //DX20180212 - if any are zero, then, ksi*eta*zeta is zero
+    //if(ksi*eta*zeta<=TOL) //DX20180209 - more robust; precision
+  { //CO20200106 - patching for auto-indenting
     m4(1,1)=-(SignNoZero(ksi));
     m4(2,2)=-(SignNoZero(eta));
     m4(3,3)=-(SignNoZero(zeta));
@@ -9768,12 +10599,12 @@ LoopHead:
 
   // Step 5
   if(((abs(ksi)-b)>TOL) ||
-      ((abs(ksi-b)<TOL) && (2.0*eta-zeta)<-TOL) || // DX 2/9/18 - more robust; precision
-      ((abs(ksi+b)<TOL) && (zeta<-TOL)) ) // DX 2/9/18 - more robust; precision
-    // DX 2/9/18 [OBSOLETE] if(((abs(ksi)-b)>=TOL) ||
-    // DX 2/9/18 [OBSOLETE] ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
-    // DX 2/9/18 [OBSOLETE] ((abs(ksi+b)<TOL) && (zeta<0)) )
-  { //CO200106 - patching for auto-indenting
+      ((abs(ksi-b)<TOL) && (2.0*eta-zeta)<-TOL) || //DX20180209 - more robust; precision
+      ((abs(ksi+b)<TOL) && (zeta<-TOL)) ) //DX20180209 - more robust; precision
+    //DX20180209 [OBSOLETE] if(((abs(ksi)-b)>=TOL) ||
+    //DX20180209 [OBSOLETE] ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
+    //DX20180209 [OBSOLETE] ((abs(ksi+b)<TOL) && (zeta<0)) )
+  { //CO20200106 - patching for auto-indenting
     m5(2,3)=-(SignNoZero(ksi));
     P=P*m5;
     temp1=b+c-ksi*SignNoZero(ksi);
@@ -9789,11 +10620,11 @@ LoopHead:
 
   // Step 6
   if(((abs(eta)-a)>TOL) || 
-      ((abs(eta-a)<TOL) && (2.0*ksi-zeta)<-TOL) || // DX 2/9/18 - more robust; precision
-      ((abs(eta+a)<TOL) && (zeta<-TOL))) // DX 2/9/18 - more robust; precision
-    // DX 2/9/18 [OBSOLETE] ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
-    // DX 2/9/18 [OBSOLETE] ((abs(eta+a)<TOL) && (zeta<0)))
-  { //CO200106 - patching for auto-indenting
+      ((abs(eta-a)<TOL) && (2.0*ksi-zeta)<-TOL) || //DX20180209 - more robust; precision
+      ((abs(eta+a)<TOL) && (zeta<-TOL))) //DX20180209 - more robust; precision
+    //DX20180209 [OBSOLETE] ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
+    //DX20180209 [OBSOLETE] ((abs(eta+a)<TOL) && (zeta<0)))
+  { //CO20200106 - patching for auto-indenting
     m6(1,3)=-SignNoZero(eta);
     P=P*m6;
     temp1=a+c-eta*SignNoZero(eta);
@@ -9804,16 +10635,16 @@ LoopHead:
     eta=temp3;
     // tpx
     // _sdebug_GetNiggliCell(6,cnt,a,b,c,ksi,eta,zeta,cout);
-    goto LoopHead; // DX 2/12/18 - this was missing
+    goto LoopHead; //DX20180212 - this was missing
   }
 
   // Step 7
   if(((abs(zeta)-a)>TOL) || 
-      ((abs(zeta-a)<TOL) && (2.0*ksi-eta)<-TOL) || // DX 2/9/18 - more robust; precision
-      ((abs(zeta+a)<TOL) && (eta<-TOL))) // DX 2/9/18 - more robust; precision
-    // DX 2/9/18 [OBSOLETE] ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
-    // DX 2/9/18 [OBSOLETE] ((abs(zeta+a)<TOL) && (eta<0)))
-  { //CO200106 - patching for auto-indenting
+      ((abs(zeta-a)<TOL) && (2.0*ksi-eta)<-TOL) || //DX20180209 - more robust; precision
+      ((abs(zeta+a)<TOL) && (eta<-TOL))) //DX20180209 - more robust; precision
+    //DX20180209 [OBSOLETE] ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
+    //DX20180209 [OBSOLETE] ((abs(zeta+a)<TOL) && (eta<0)))
+  { //CO20200106 - patching for auto-indenting
     m7(1,2)=-SignNoZero(zeta);
     P=P*m7;
     temp1=a+b-zeta*SignNoZero(zeta);
@@ -9828,11 +10659,11 @@ LoopHead:
   }
 
   // Step 8
-  // DX 2/9/18 [OBSOLETE] if((ksi+eta+zeta+a+b<0) ||
-  // DX 2/9/18 [OBOSLETE]   ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0)))
-  if((ksi+eta+zeta+a+b<-TOL) || // DX 2/9/18 - more robust; precision
-      (abs(ksi+eta+zeta+a+b)<TOL && (2.0*(a+eta)+zeta>TOL))) // DX 2/9/18 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  //DX20180209 [OBSOLETE] if((ksi+eta+zeta+a+b<0) ||
+  //DX20180209 [OBOSLETE]   ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0)))
+  if((ksi+eta+zeta+a+b<-TOL) || //DX20180209 - more robust; precision
+      (abs(ksi+eta+zeta+a+b)<TOL && (2.0*(a+eta)+zeta>TOL))) //DX20180209 - more robust; precision
+  { //CO20200106 - patching for auto-indenting
     P=P*m8;
     temp1=a+b+c+ksi+eta+zeta;
     temp2=2.0*b+ksi+zeta;
@@ -9873,7 +10704,7 @@ LoopHead:
   // Make sure that a,b,c,alpha,beta,gamma are the same from
   // direct calculation and from using P to get niggli_lat.
   xvector<double> poutdat(6);
-  poutdat=Getabc_angles(niggli_lat,RADIANTS);
+  poutdat=Getabc_angles(niggli_lat,RADIANS);
   int flag=0;
   for(int i=1;i<=6;i++) {
     if(abs(poutdat(i)-outdat(i))>2*TOL) {flag=1;}
@@ -9896,14 +10727,14 @@ LoopHead:
   }
   return TRUE; // perfect
 }
-// DX 2/13/18 - Niggli algorithm, fixed tolerances and added goto loop in step 6 - END
+//DX20180213 - Niggli algorithm, fixed tolerances and added goto loop in step 6 - END
 
-// DX 2/13/18 - Original Niggli routine below
+//DX20180213 - Original Niggli routine below
 bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q) {
   // return FALSE if failed
   // rerurn TRUE if ok
 
-  //  double RENORM=1E+6;  // DANE not used
+  //  double RENORM=1E+6;  //DM not used
   int MAXITER=100000;
   double TOL=1e-14;
 
@@ -9930,7 +10761,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Initialize a, b, c, ksi, eta, zeta
   xvector<double> indat(6);
-  indat=Getabc_angles(in_lat,RADIANTS);
+  indat=Getabc_angles(in_lat,RADIANS);
   double a=indat(1)*indat(1);
   double b=indat(2)*indat(2);
   double c=indat(3)*indat(3);
@@ -10011,9 +10842,9 @@ LoopHead:
   }
 
   // Step 4
-  // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
+  //EW's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
   if(ksi*eta*zeta<=0)
-  { //CO200106 - patching for auto-indenting
+  { //CO20200106 - patching for auto-indenting
     m4(1,1)=-(SignNoZero(ksi));
     m4(2,2)=-(SignNoZero(eta));
     m4(3,3)=-(SignNoZero(zeta));
@@ -10119,7 +10950,7 @@ LoopHead:
   // Make sure that a,b,c,alpha,beta,gamma are the same from
   // direct calculation and from using P to get niggli_lat.
   xvector<double> poutdat(6);
-  poutdat=Getabc_angles(niggli_lat,RADIANTS);
+  poutdat=Getabc_angles(niggli_lat,RADIANS);
   int flag=0;
   for(int i=1;i<=6;i++) {
     if(abs(poutdat(i)-outdat(i))>2*TOL) {flag=1;}
@@ -10325,14 +11156,14 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 // Fold atoms into cell
 // ******************************************************************************
 // Folds atoms into the cell
-//DX 20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew) { //CO190520 - removed pointers for bools and doubles, added const where possible
-//DX 20190214 [OBSOLETE]   double tol = _SYM_TOL_;
-//DX 20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
-//DX 20190214 [OBSOLETE]}
+//DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew) { //CO20190520 - removed pointers for bools and doubles, added const where possible
+//DX20190214 [OBSOLETE]   double tol = _SYM_TOL_;
+//DX20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
+//DX20190214 [OBSOLETE]}
 
-deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 = added check_min_dists bool
+deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="foldAtomsInCell():";
+  string soliloquy = XPID + "foldAtomsInCell():";
 
   double volume_original=abs(aurostd::det(a.lattice));
   double volume_new=abs(aurostd::det(lattice_new));
@@ -10343,7 +11174,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
   xstructure atomic_grid; //stays empty if not needed
   if(!fold_in_only){
     double radius=RadiusSphereLattice(lattice_new);
-    xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO190520
+    xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO20190520
     if(LDEBUG){
       cerr << soliloquy << " a.lattice=" << endl;cerr << a.lattice << endl;
       cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
@@ -10353,23 +11184,23 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
       cerr << soliloquy << " radius(lattice_new)=" << radius << endl;
       cerr << soliloquy << " dims=" << dims << endl;
     }
-    //[CO190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
+    //[CO20190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //vector<int> sc2pcMap, pc2scMap; //dummy
     if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
-    atomic_grid=a;atomic_grid.clean(); //DX 20191220 - uppercase to lowercase clean
+    atomic_grid=a;atomic_grid.clean(); //DX20191220 - uppercase to lowercase clean
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
-    ptr_atoms=&atomic_grid.grid_atoms;  //CO190808 - GenerateGridAtoms() populates grid_atoms, not atoms
+    ptr_atoms=&atomic_grid.grid_atoms;  //CO20190808 - GenerateGridAtoms() populates grid_atoms, not atoms
   }
   const deque<_atom> atoms=*ptr_atoms;
 
-  return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol,check_min_dists); //DX 20190619 = added check_min_dists bool
+  return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol,check_min_dists); //DX20190619 = added check_min_dists bool
 }
 
-deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX 20190619 - added check_min_dists bool
+deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX20190619 - added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="foldAtomsInCell():";
+  string soliloquy = XPID + "foldAtomsInCell():";
 
   deque<_atom> atoms_in_cell;
 
@@ -10383,28 +11214,28 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
 
   _atom tmp;
   for (uint j = 0; j < atoms.size(); j++) {
-    //[CO190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
-    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
-    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
-    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
-    //[CO190520 - this case is not needed]  atoms_in_cell.push_back(atoms[j]);
-    //[CO190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
-    //[CO190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
-    //[CO190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-    //[CO190520 - this case is not needed]} else {  //[CO200106 - close bracket for indenting]}
+    //[CO20190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
+    //[CO20190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
+    //[CO20190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
+    //[CO20190520 - this case is not needed]  //[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
+    //[CO20190520 - this case is not needed]  atoms_in_cell.push_back(atoms[j]);
+    //[CO20190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
+    //[CO20190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
+    //[CO20190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+    //[CO20190520 - this case is not needed]} else {  //[CO20200106 - close bracket for indenting]}
     //bool duplicate_atom = false;
     tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
     tmp.cpos = f2c_new * tmp.fpos;
     //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
     //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
     //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-    //[OBSOLETE]  { //CO200106 - patching for auto-indenting
+    //[OBSOLETE]  { //CO20200106 - patching for auto-indenting
     //[OBSOLETE]    duplicate_atom = true;
     //[OBSOLETE]    break;
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //[OBSOLETE]if(duplicate_atom == false) {
-    if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX 20190619 - lattice_new and f2c_new as input
+    if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX20190619 - lattice_new and f2c_new as input
       //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
       //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
       atoms_in_cell.push_back(atoms[j]);
@@ -10412,10 +11243,10 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
       atoms_in_cell.back().cpos = tmp.cpos;
       atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
     }
-    //[CO190520 - this case is not needed]}
+    //[CO20190520 - this case is not needed]}
   }
 
-  if(check_min_dists){ //DX 20190613
+  if(check_min_dists){ //DX20190613
     double min_dist_orig=SYM::minimumDistance(atoms);  //lattice_orig //this does NOT work if we use GenerateGridAtoms (no longer periodic with lattice), so simply compare distances between atoms. NOTE: this is no longer the TRUE minimumDistance(), which requires knowledge of the lattice vectors
     double min_dist_new=SYM::minimumDistance(atoms_in_cell);  //lattice_new
     if(LDEBUG){
@@ -10436,7 +11267,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
 // ***************************************************************************
 // get reduced lattice in reciprocal space, converts to real and folds atoms into this lattice
 // this should be the fastest lattice for VASP
-// CO 180409 - refer to standard primitive instead, this function is simply a test, probably not optimal to standard primitive
+//CO20180409 - refer to standard primitive instead, this function is simply a test, probably not optimal to standard primitive
 xstructure GetPrimitiveVASP(const xstructure& a) {
   double tol=a.sym_eps;
   if(tol==AUROSTD_NAN){tol=SYM::defaultTolerance(a);}
@@ -10456,14 +11287,14 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
   //get skew - STOP
   b.lattice=lattice_new; //b.f2c=trasp(b.lattice); b.c2f=inverse(b.f2c);  //set new lattice, f2c, c2f
   //b.atoms=foldAtomsInCell(b.atoms,b.c2f,b.f2c,skew,tol);                //fold atoms into new lattice
-  //[CO190520 - ReplaceAtoms()]b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
-  deque<_atom> atoms=foldAtomsInCell(a,b.lattice,skew,tol);  //CO190520 - ReplaceAtoms()
-  b.ReplaceAtoms(atoms);  //CO190520 - ReplaceAtoms()
+  //[CO20190520 - ReplaceAtoms()]b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
+  deque<_atom> atoms=foldAtomsInCell(a,b.lattice,skew,tol);  //CO20190520 - ReplaceAtoms()
+  b.ReplaceAtoms(atoms);  //CO20190520 - ReplaceAtoms()
   if((0||LDEBUG)&&!isequal(a.lattice,b.lattice,1e-3)){
     cerr << "-----------------------------------------------------------------------" << endl;
     cerr << "ORIG STRUCTURE " << endl;
     cerr << a;
-    b.ReScale(1.0); b.ShifOriginToAtom(0); b.BringInCell(); //fast clean for comparison
+    b.ReScale(1.0); b.ShiftOriginToAtom(0); b.BringInCell(); //fast clean for comparison
     cerr << "NEW STRUCTURE " << endl;
     cerr << b;
     cerr << "STRUCTURES IDENTICAL = " << (compare::aflowCompareStructure(a,b,true) ? "TRUE" : "FALSE") << endl;
@@ -10478,20 +11309,20 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // these routines take atoms or structures and brings them
 // to the unit cell (incell). There is some overloading for
 // structures. SC Aug2007
-// EDITED BY COREY AND DAVID to include a tolerance that converts from Cartesian
+// EDITED BY CO+DX to include a tolerance that converts from Cartesian
 // space to direct space via covariant and contravariant transformations.
 #define _EPS_roundoff_ 0.001
 #define _incellcutoff_ (1.0-_EPS_roundoff_)
-// DX and CO, IF EPSILON IS PROVIDED, THEN WE ASSUME YOU WANT US TO MOVE THE ATOMS, OTHERWISE IT'S A HARD CUT OFF
+//DX+CO, IF EPSILON IS PROVIDED, THEN WE ASSUME YOU WANT US TO MOVE THE ATOMS, OTHERWISE IT'S A HARD CUT OFF
 
-// BringInCell() - ROBUST (DX/ME/CO: 20190905)
+// BringInCell() - ROBUST (DX+ME+CO20190905)
 // this function brings components/xvectors/_atoms into a unit cell
 // the upper bound and lower bound of the cell can be adjusted
 // (e.g., standard unit cell : 0.0 to 1.0 ; unit cell centered on origin: -0.5 to 0.5)
 // the tolerance can be tuned and "shifts" the bounds, favoring the lower bound
 // (e.g., for bounds 0.0 to 1.0, we favor the origin, bringing values 
 // inside the cell if they are between "lower_bound-tolerance" and "upper_bound-tolerance")
-// the AFLOW developers suggest a hard cutoff, e.g., _ZERO_TOL_ (DX/ME/CO)
+// the AFLOW developers suggest a hard cutoff, e.g., _ZERO_TOL_ (DX+ME+CO)
 
 // **************************************************************************
 // BringInCellInPlace() (change value/object in place)
@@ -10500,13 +11331,13 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // double (change in place)
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
   if (component == INFINITY || component != component || component == -INFINITY) {
-    string function_name = "BringInCellInPlace()";
+    string function_name = XPID + "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
-  if (std::signbit(tolerance)) { //DX 20191115 
-    string function_name = "BringInCellInPlace()";
+  if (std::signbit(tolerance)) { //DX20191115 
+    string function_name = XPID + "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
@@ -10525,7 +11356,7 @@ void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bo
 
 // -------------------------------------------------------------------
 // _atom (change in place, updates both fpos and pos) 
-void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound); // update fpos first
 
   // update cpos
@@ -10535,7 +11366,7 @@ void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tole
 
 // -------------------------------------------------------------------
 // xstructure (change in place) 
-void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   for(uint i=0;i<xstr.atoms.size();i++){
     BringInCellInPlace(xstr.atoms[i], xstr.lattice, tolerance, upper_bound, lower_bound);
   }
@@ -10549,13 +11380,13 @@ void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, 
 double BringInCell(double component_in, double tolerance, double upper_bound, double lower_bound) {
   double component_out = component_in;
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
-    string function_name = "BringInCell()";
+    string function_name = XPID + "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
-  if (std::signbit(tolerance)) { //DX 20191115 
-    string function_name = "BringInCell()";
+  if (std::signbit(tolerance)) { //DX20191115 
+    string function_name = XPID + "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
@@ -10567,7 +11398,7 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
 
 // -------------------------------------------------------------------
 // xvector (return new xvector)
-xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   xvector<double> fpos_out = fpos_in;
   for (int i = fpos_out.lrows; i <= fpos_out.urows; i++) {
     BringInCellInPlace(fpos_out[i], tolerance, upper_bound, lower_bound);
@@ -10577,7 +11408,7 @@ xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance, do
 
 // -------------------------------------------------------------------
 // _atom (return new _atom, update fpos only) 
-_atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   _atom atom_out = atom_in;
   BringInCellInPlace(atom_out.fpos, tolerance, upper_bound, lower_bound);
 
@@ -10591,7 +11422,7 @@ _atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound
 
 // -------------------------------------------------------------------
 // xstructure (return xstructure) 
-xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   xstructure xstr_out = xstr_in;
   for(uint i=0;i<xstr_out.atoms.size();i++){
     BringInCellInPlace(xstr_out.atoms[i], xstr_out.lattice, tolerance, upper_bound, lower_bound);
@@ -10604,7 +11435,7 @@ xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper
 
 // -------------------------------------------------------------------
 // _atom (change in place, update fpos only) 
-void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
   BringInCellInPlace(atom.fpos, tolerance, upper_bound, lower_bound);
 
@@ -10616,7 +11447,7 @@ void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, d
 
 // -------------------------------------------------------------------
 // _atom (return new _atom, update fpos and cpos) 
-_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX20190904
   _atom atom_out = BringInCellFPOS(atom_in, tolerance, upper_bound, lower_bound);
 
   // update cpos
@@ -10631,202 +11462,202 @@ _atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double t
 
 // -------------------------------------------------------------------
 // xstructure (xstructure method) 
-void xstructure::BringInCell(double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+void xstructure::BringInCell(double tolerance, double upper_bound, double lower_bound) { //DX20190904
   for(uint i=0;i<atoms.size();i++){
     BringInCellInPlace(atoms[i], lattice, tolerance, upper_bound, lower_bound); //DX "::" to access outside of xstructure class
   }
 }
 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon) {
-//DX 20190905 [OBSOLETE]   // DX and CO - START
-//DX 20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon) {
-//DX 20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon); //SYM::mod_one_xvec(v_in);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon) {
-//DX 20190905 [OBSOLETE]   double incelleps=1.0-epsilon;
-//DX 20190905 [OBSOLETE]   xvector<double> v_out(v_in.urows,v_in.lrows);
-//DX 20190905 [OBSOLETE]   for(int i=v_out.lrows;i<=v_out.urows;i++) {
-//DX 20190905 [OBSOLETE]     v_out(i)=v_in(i);
-//DX 20190905 [OBSOLETE]     while(v_out(i)> incelleps) v_out(i)-=1.0;
-//DX 20190905 [OBSOLETE]     while(v_out(i)< 0.0)       v_out(i)+=1.0;
-//DX 20190905 [OBSOLETE]     if(abs(v_out(i))<epsilon)  v_out(i)=0.0;
-//DX 20190905 [OBSOLETE]     if(v_out(i)> incelleps)    v_out(i)=0.0;
-//DX 20190905 [OBSOLETE]   }
-//DX 20190905 [OBSOLETE]   //v_out=roundoff(v_out,_EPS_sym_);
-//DX 20190905 [OBSOLETE]   // DX and CO - END
-//DX 20190905 [OBSOLETE]   return v_out;
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in) {
-//DX 20190905 [OBSOLETE]   // DX and CO - START
-//DX 20190905 [OBSOLETE]   return SYM::mod_one_xvec(v_in); //hard cutoff, _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE]   //_EPS_sym_ is the universal tolerance here
-//DX 20190905 [OBSOLETE]   //return BringInCell(v_in,_EPS_sym_);
-//DX 20190905 [OBSOLETE]   // DX and CO - END
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] // DX anc CO - START
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
-//DX 20190905 [OBSOLETE]  
-//DX 20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
-//DX 20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);//BringInCell(atom_in,lattice);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] // DX and CO - END
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
-//DX 20190905 [OBSOLETE]   double _incelleps=1.0;
-//DX 20190905 [OBSOLETE]   if(epsilon>0.0) _incelleps=1.0-epsilon;else _incelleps=1.0;
-//DX 20190905 [OBSOLETE]   _atom atom;
-//DX 20190905 [OBSOLETE]   atom=atom_in;
-//DX 20190905 [OBSOLETE]   atom.ijk=atom_in.ijk;
-//DX 20190905 [OBSOLETE]   for(int i=1;i<=3;i++) {
-//DX 20190905 [OBSOLETE]     while(atom.fpos(i)> _incelleps) {
-//DX 20190905 [OBSOLETE]       atom.fpos(i)-=1.0;
-//DX 20190905 [OBSOLETE]       atom.ijk(i)++;
-//DX 20190905 [OBSOLETE]     }
-//DX 20190905 [OBSOLETE]     while(atom.fpos(i)<0.0) {
-//DX 20190905 [OBSOLETE]       atom.fpos(i)+=1.0;
-//DX 20190905 [OBSOLETE]       atom.ijk(i)--;
-//DX 20190905 [OBSOLETE]     }
-//DX 20190905 [OBSOLETE]     if(epsilon>0.0) { // roundoff only if epsilon>0.0
-//DX 20190905 [OBSOLETE]       if(abs(atom.fpos(i))<epsilon) atom.fpos(i)=0.0;
-//DX 20190905 [OBSOLETE]       if(atom.fpos(i)>_incelleps) atom.fpos(i)=0.0;
-//DX 20190905 [OBSOLETE]     }
-//DX 20190905 [OBSOLETE]   }
-//DX 20190905 [OBSOLETE]   atom.cpos=F2C(lattice,atom.fpos);
-//DX 20190905 [OBSOLETE]   atom.isincell=TRUE;
-//DX 20190905 [OBSOLETE]   return atom;
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] // DX and CO - START
-//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
-//DX 20190905 [OBSOLETE]   return BringInCell_20161115(atom_in,lattice);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice) {
-//DX 20190905 [OBSOLETE]   //_atom atom;
-//DX 20190905 [OBSOLETE]   //atom=atom_in;
-//DX 20190905 [OBSOLETE]   //atom.ijk=atom_in.ijk; //just to be sure //it's part of the assignment operator now
-//DX 20190905 [OBSOLETE]   _atom atom=SYM::mod_one_atom(atom_in);
-//DX 20190905 [OBSOLETE]   atom.cpos=F2C(lattice,atom.fpos);
-//DX 20190905 [OBSOLETE]   atom.isincell=TRUE;
-//DX 20190905 [OBSOLETE]   return atom;
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] // DX and CO - END
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice) {
-//DX 20190905 [OBSOLETE]   return BringInCell(atom_in,lattice,_EPS_roundoff_);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //_atom _BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
-//DX 20190905 [OBSOLETE] //  return BringInCell(atom_in,lattice);
-//DX 20190905 [OBSOLETE] //}
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] // DX and CO - START
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon) {
-//DX 20190905 [OBSOLETE]   return BringInCell_20160101(a,epsilon);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon) {
-//DX 20190905 [OBSOLETE]   xstructure b(a); // copies everything
-//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)a.atoms.size();i++){
-//DX 20190905 [OBSOLETE]     b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
-//DX 20190905 [OBSOLETE]   }
-//DX 20190905 [OBSOLETE]   return b;
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon) {
-//DX 20190905 [OBSOLETE]   xstructure b(a); // copies everything
-//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)a.atoms.size();i++) {
-//DX 20190905 [OBSOLETE]     b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
-//DX 20190905 [OBSOLETE]   }
-//DX 20190905 [OBSOLETE]   return b;
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a) {
-//DX 20190905 [OBSOLETE]   // DX and CO - START
-//DX 20190905 [OBSOLETE]   return BringInCell_20161115(a);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //SUPER SLOW, AVOID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//DX 20190905 [OBSOLETE] //USE THE ONE THAT ONLY COPIES ATOMS, COREY
-//DX 20190905 [OBSOLETE] //a.sym_eps is STRONGLY PREFERRED
-//DX 20190905 [OBSOLETE] //however, it requires knowledge (and calculating of the full symmetry, i.e. slow factor group)
-//DX 20190905 [OBSOLETE] //therefore, if you call the default without having a.sym_eps calculated, the assumption
-//DX 20190905 [OBSOLETE] //is that a constant tolerance is good enough (speed)
-//DX 20190905 [OBSOLETE] //if you want to do this correctly, calculate the full symmetry of the structure first (CalculateFullSymmetry() in
-//DX 20190905 [OBSOLETE] //aflow_aconvasp_main.cpp)
-//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a) {
-//DX 20190905 [OBSOLETE]   xstructure b=a;
-//DX 20190905 [OBSOLETE]   //  double _eps_;
-//DX 20190905 [OBSOLETE]   //  if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
-//DX 20190905 [OBSOLETE]   //    _eps_=a.sym_eps;
-//DX 20190905 [OBSOLETE]   //  }
-//DX 20190905 [OBSOLETE]   //  else {
-//DX 20190905 [OBSOLETE]   //    _eps_=_EPS_sym_;
-//DX 20190905 [OBSOLETE]   //    // Calculate point group/space group to find correct tolerance for system
-//DX 20190905 [OBSOLETE]   //    //SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       
-//DX 20190905 [OBSOLETE]   //    //_eps_=a.sym_eps;
-//DX 20190905 [OBSOLETE]   //  }
-//DX 20190905 [OBSOLETE]   //  return BringInCell(a,_eps_);
-//DX 20190905 [OBSOLETE]   for(uint i=0; i<b.atoms.size(); i++){
-//DX 20190905 [OBSOLETE]     b.atoms[i].fpos = SYM::mod_one_xvec(b.atoms[i].fpos);
-//DX 20190905 [OBSOLETE]   } 
-//DX 20190905 [OBSOLETE]   return b;
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a) {
-//DX 20190905 [OBSOLETE]   return BringInCell(a,_EPS_roundoff_);
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] // DX and CO - END
-//DX 20190905 [OBSOLETE] 
-//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-//DX 20190905 [OBSOLETE] void xstructure::BringInCell(double epsilon) {
-//DX 20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
-//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)atoms.size();i++){
-//DX 20190905 [OBSOLETE]     atoms[i]=BringInCell(atoms[i],lattice,epsilon);
-//DX 20190905 [OBSOLETE]   }
-//DX 20190905 [OBSOLETE] }
-//DX 20190905 [OBSOLETE] void xstructure::BringInCell(void) {
-//DX 20190905 [OBSOLETE]   // DX and CO - START
-//DX 20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
-//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)atoms.size();i++){
-//DX 20190905 [OBSOLETE]     atoms[i]=BringInCell(atoms[i],lattice);
-//DX 20190905 [OBSOLETE]   }
-//DX 20190905 [OBSOLETE]   //TOO SLOW
-//DX 20190905 [OBSOLETE]   //xstructure BringInCell(const xstructure& a);
-//DX 20190905 [OBSOLETE]   //*this=BringInCell(*this);
-//DX 20190905 [OBSOLETE]   //BringInCell(_EPS_sym_);  // CO
-//DX 20190905 [OBSOLETE]   // DX and CO - END
-//DX 20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon) {
+//DX20190905 [OBSOLETE]   //DX+CO START
+//DX20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon) {
+//DX20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon); //SYM::mod_one_xvec(v_in);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon) {
+//DX20190905 [OBSOLETE]   double incelleps=1.0-epsilon;
+//DX20190905 [OBSOLETE]   xvector<double> v_out(v_in.urows,v_in.lrows);
+//DX20190905 [OBSOLETE]   for(int i=v_out.lrows;i<=v_out.urows;i++) {
+//DX20190905 [OBSOLETE]     v_out(i)=v_in(i);
+//DX20190905 [OBSOLETE]     while(v_out(i)> incelleps) v_out(i)-=1.0;
+//DX20190905 [OBSOLETE]     while(v_out(i)< 0.0)       v_out(i)+=1.0;
+//DX20190905 [OBSOLETE]     if(abs(v_out(i))<epsilon)  v_out(i)=0.0;
+//DX20190905 [OBSOLETE]     if(v_out(i)> incelleps)    v_out(i)=0.0;
+//DX20190905 [OBSOLETE]   }
+//DX20190905 [OBSOLETE]   //v_out=roundoff(v_out,_EPS_sym_);
+//DX20190905 [OBSOLETE]   //DX+CO END
+//DX20190905 [OBSOLETE]   return v_out;
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in) {
+//DX20190905 [OBSOLETE]   //DX+CO START
+//DX20190905 [OBSOLETE]   return SYM::mod_one_xvec(v_in); //hard cutoff, _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE]   //_EPS_sym_ is the universal tolerance here
+//DX20190905 [OBSOLETE]   //return BringInCell(v_in,_EPS_sym_);
+//DX20190905 [OBSOLETE]   //DX+CO END
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //DX+CO START
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
+//DX20190905 [OBSOLETE]  
+//DX20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
+//DX20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);//BringInCell(atom_in,lattice);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] //DX+CO END
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
+//DX20190905 [OBSOLETE]   double _incelleps=1.0;
+//DX20190905 [OBSOLETE]   if(epsilon>0.0) _incelleps=1.0-epsilon;else _incelleps=1.0;
+//DX20190905 [OBSOLETE]   _atom atom;
+//DX20190905 [OBSOLETE]   atom=atom_in;
+//DX20190905 [OBSOLETE]   atom.ijk=atom_in.ijk;
+//DX20190905 [OBSOLETE]   for(int i=1;i<=3;i++) {
+//DX20190905 [OBSOLETE]     while(atom.fpos(i)> _incelleps) {
+//DX20190905 [OBSOLETE]       atom.fpos(i)-=1.0;
+//DX20190905 [OBSOLETE]       atom.ijk(i)++;
+//DX20190905 [OBSOLETE]     }
+//DX20190905 [OBSOLETE]     while(atom.fpos(i)<0.0) {
+//DX20190905 [OBSOLETE]       atom.fpos(i)+=1.0;
+//DX20190905 [OBSOLETE]       atom.ijk(i)--;
+//DX20190905 [OBSOLETE]     }
+//DX20190905 [OBSOLETE]     if(epsilon>0.0) { // roundoff only if epsilon>0.0
+//DX20190905 [OBSOLETE]       if(abs(atom.fpos(i))<epsilon) atom.fpos(i)=0.0;
+//DX20190905 [OBSOLETE]       if(atom.fpos(i)>_incelleps) atom.fpos(i)=0.0;
+//DX20190905 [OBSOLETE]     }
+//DX20190905 [OBSOLETE]   }
+//DX20190905 [OBSOLETE]   atom.cpos=F2C(lattice,atom.fpos);
+//DX20190905 [OBSOLETE]   atom.isincell=TRUE;
+//DX20190905 [OBSOLETE]   return atom;
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //DX+CO START
+//DX20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX20190905 [OBSOLETE]   return BringInCell_20161115(atom_in,lattice);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX20190905 [OBSOLETE]   //_atom atom;
+//DX20190905 [OBSOLETE]   //atom=atom_in;
+//DX20190905 [OBSOLETE]   //atom.ijk=atom_in.ijk; //just to be sure //it's part of the assignment operator now
+//DX20190905 [OBSOLETE]   _atom atom=SYM::mod_one_atom(atom_in);
+//DX20190905 [OBSOLETE]   atom.cpos=F2C(lattice,atom.fpos);
+//DX20190905 [OBSOLETE]   atom.isincell=TRUE;
+//DX20190905 [OBSOLETE]   return atom;
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] //DX+CO END
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX20190905 [OBSOLETE]   return BringInCell(atom_in,lattice,_EPS_roundoff_);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //_atom _BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX20190905 [OBSOLETE] //  return BringInCell(atom_in,lattice);
+//DX20190905 [OBSOLETE] //}
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //DX+CO START
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon) {
+//DX20190905 [OBSOLETE]   return BringInCell_20160101(a,epsilon);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon) {
+//DX20190905 [OBSOLETE]   xstructure b(a); // copies everything
+//DX20190905 [OBSOLETE]   for(int i=0;i<(int)a.atoms.size();i++){
+//DX20190905 [OBSOLETE]     b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
+//DX20190905 [OBSOLETE]   }
+//DX20190905 [OBSOLETE]   return b;
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon) {
+//DX20190905 [OBSOLETE]   xstructure b(a); // copies everything
+//DX20190905 [OBSOLETE]   for(int i=0;i<(int)a.atoms.size();i++) {
+//DX20190905 [OBSOLETE]     b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
+//DX20190905 [OBSOLETE]   }
+//DX20190905 [OBSOLETE]   return b;
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a) {
+//DX20190905 [OBSOLETE]   //DX+CO START
+//DX20190905 [OBSOLETE]   return BringInCell_20161115(a);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //SUPER SLOW, AVOID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//DX20190905 [OBSOLETE] //USE THE ONE THAT ONLY COPIES ATOMS, CO
+//DX20190905 [OBSOLETE] //a.sym_eps is STRONGLY PREFERRED
+//DX20190905 [OBSOLETE] //however, it requires knowledge (and calculating of the full symmetry, i.e. slow factor group)
+//DX20190905 [OBSOLETE] //therefore, if you call the default without having a.sym_eps calculated, the assumption
+//DX20190905 [OBSOLETE] //is that a constant tolerance is good enough (speed)
+//DX20190905 [OBSOLETE] //if you want to do this correctly, calculate the full symmetry of the structure first (CalculateFullSymmetry() in
+//DX20190905 [OBSOLETE] //aflow_aconvasp_main.cpp)
+//DX20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a) {
+//DX20190905 [OBSOLETE]   xstructure b=a;
+//DX20190905 [OBSOLETE]   //  double _eps_;
+//DX20190905 [OBSOLETE]   //  if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
+//DX20190905 [OBSOLETE]   //    _eps_=a.sym_eps;
+//DX20190905 [OBSOLETE]   //  }
+//DX20190905 [OBSOLETE]   //  else {
+//DX20190905 [OBSOLETE]   //    _eps_=_EPS_sym_;
+//DX20190905 [OBSOLETE]   //    // Calculate point group/space group to find correct tolerance for system
+//DX20190905 [OBSOLETE]   //    //SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       
+//DX20190905 [OBSOLETE]   //    //_eps_=a.sym_eps;
+//DX20190905 [OBSOLETE]   //  }
+//DX20190905 [OBSOLETE]   //  return BringInCell(a,_eps_);
+//DX20190905 [OBSOLETE]   for(uint i=0; i<b.atoms.size(); i++){
+//DX20190905 [OBSOLETE]     b.atoms[i].fpos = SYM::mod_one_xvec(b.atoms[i].fpos);
+//DX20190905 [OBSOLETE]   } 
+//DX20190905 [OBSOLETE]   return b;
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a) {
+//DX20190905 [OBSOLETE]   return BringInCell(a,_EPS_roundoff_);
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] //DX+CO END
+//DX20190905 [OBSOLETE] 
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX20190905 [OBSOLETE] void xstructure::BringInCell(double epsilon) {
+//DX20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
+//DX20190905 [OBSOLETE]   for(int i=0;i<(int)atoms.size();i++){
+//DX20190905 [OBSOLETE]     atoms[i]=BringInCell(atoms[i],lattice,epsilon);
+//DX20190905 [OBSOLETE]   }
+//DX20190905 [OBSOLETE] }
+//DX20190905 [OBSOLETE] void xstructure::BringInCell(void) {
+//DX20190905 [OBSOLETE]   //DX+CO START
+//DX20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
+//DX20190905 [OBSOLETE]   for(int i=0;i<(int)atoms.size();i++){
+//DX20190905 [OBSOLETE]     atoms[i]=BringInCell(atoms[i],lattice);
+//DX20190905 [OBSOLETE]   }
+//DX20190905 [OBSOLETE]   //TOO SLOW
+//DX20190905 [OBSOLETE]   //xstructure BringInCell(const xstructure& a);
+//DX20190905 [OBSOLETE]   //*this=BringInCell(*this);
+//DX20190905 [OBSOLETE]   //BringInCell(_EPS_sym_);  //CO
+//DX20190905 [OBSOLETE]   //DX+CO END
+//DX20190905 [OBSOLETE] }
 
 // ***************************************************************************
 // Function BringInCompact
@@ -10881,7 +11712,7 @@ xstructure _old_BringInCompact(const xstructure& a) {
             bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
             // if((bond<min_bond)                  // if it is OK then DO IT !
             if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) )
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               // if it is OK then DO IT !
               min_bond=bond;                                      // update
               adtrgpos=adtstpos;
@@ -10935,7 +11766,7 @@ void xstructure::BringInCompact(void) {
             bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
             // if((bond<min_bond)                  // if it is OK then DO IT !
             if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) )
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               // if it is OK then DO IT !
               min_bond=bond;                                      // update
               adtrgpos=adtstpos;
@@ -11133,8 +11964,8 @@ bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double
     for(uint jat=0;jat<a.atoms.size();jat++) {
       if(types[iat]==types[jat]) {
         diff=ftpos-a.atoms.at(jat).fpos;
-        diff = SYM::minimizeDistanceFractionalMethod(diff); //DX 20190613
-        //DX 20190613 [OBSOLETE] SYM::PBC(diff); //DX 20190317 - need to use PBC for comparing difference vectors
+        diff = SYM::minimizeDistanceFractionalMethod(diff); //DX20190613
+        //DX20190613 [OBSOLETE] SYM::PBC(diff); //DX20190317 - need to use PBC for comparing difference vectors
         // If the translated atom maps onto another and its type is the same as the atom mapped onto then increment.
         if(aurostd::modulus(diff)< tolerance ) CntGoodTrans++;
       }
@@ -11270,7 +12101,7 @@ void *_threaded_GetTvectors(void *ptr) {
           if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
             if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
               if(det(plattice)<det((*pparams->polattice))) {                    // better than before
-                if(LDEBUG) cout<<"DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+                if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
                 if(isdifferent(plattice,(*pparams->polattice),0.0001)) {
                   plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
                   plattice=NiggliUnitCellForm(plattice);           // Niggli Second
@@ -11296,26 +12127,26 @@ void *_threaded_GetTvectors(void *ptr) {
 
 xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // APRIL 2009 JUNE 2012 added tolerance
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetPrimitiveMULTITHREAD():"; //CO200201
-  if(LDEBUG) cerr << soliloquy << " BEGIN " << endl; //CO200201
-  if(LDEBUG){cerr << soliloquy << " _a=" << endl;cerr << _a << endl;} //CO200201
+  string soliloquy="GetPrimitiveMULTITHREAD():"; //CO20200201
+  if(LDEBUG) cerr << soliloquy << " BEGIN " << endl; //CO20200201
+  if(LDEBUG){cerr << soliloquy << " _a=" << endl;cerr << _a << endl;} //CO20200201
   cout.setf(std::ios::fixed,std::ios::floatfield);
   cout.precision(10);
   xstructure a(_a);
   xstructure sstr=a;
-  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO200201
-  if(LDEBUG){cerr << soliloquy << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO200201
+  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
+  if(LDEBUG){cerr << soliloquy << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO20200201
   sstr.SetVolume(sstr.atoms.size());
-  if(LDEBUG){cerr << soliloquy << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO200201
+  if(LDEBUG){cerr << soliloquy << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO20200201
   sstr=ReScale(sstr,1.0);
-  if(LDEBUG){cerr << soliloquy << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO200201
+  if(LDEBUG){cerr << soliloquy << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
   sstr=BringInCell(sstr);
-  if(LDEBUG){cerr << soliloquy << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO200201
+  if(LDEBUG){cerr << soliloquy << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
   //  sstr.CalculateSymmetry();
   if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
   double sstr_volume=sstr.Volume();
 
-  if(LDEBUG) cerr << soliloquy << " [1] " << endl; //CO200201
+  if(LDEBUG) cerr << soliloquy << " [1] " << endl; //CO20200201
 
   _aflags aflags;
   // identify the minimum set of atoms
@@ -11323,7 +12154,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   // bool OSSWRITE=TRUE; // to FileMESSAGE, does not matter as it is /dev/null
   // ofstream FileMESSAGE("/dev/stderr");
   // SYM::CalculatePointGroup(FileMESSAGE,sstr,aflags,PGROUPWRITE,OSSWRITE,cout);
-  // SYM::CalculatePointGroupKlattice(FileMESSAGE,sstr,aflags,PGROUPKWRITE,OSSWRITE,cout);
+  // SYM::CalculatePointGroupKLattice(FileMESSAGE,sstr,aflags,PGROUPKWRITE,OSSWRITE,cout);
   // SYM::CalculateFactorGroup(FileMESSAGE,sstr,aflags,FGROUPWRITE,OSSWRITE,cout);
   // SYM::CalculateInequivalentAtoms(FileMESSAGE,sstr,aflags,IATOMSWRITE,OSSWRITE,cout);
 
@@ -11331,7 +12162,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   xvector<double> fdisp(3),cdisp(3);
   std::vector<xvector<double> > candidate_lattice_vector;
 
-  if(LDEBUG) cerr << soliloquy << " [2] " << endl; //CO200201
+  if(LDEBUG) cerr << soliloquy << " [2] " << endl; //CO20200201
 
   int specie_min=sstr.num_each_type.at(0),ispecie_min=0,specie_min_threshold=_PRIM_MULTITHREAD_MIN_ATOMS_THRESHOLD_; // seems a good threshold
   for(uint ispecie=0;ispecie<sstr.num_each_type.size();ispecie++)
@@ -11348,7 +12179,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   candidate_lattice_vector.push_back(sstr.lattice(3));  // lattice is made of good vectors
   // no threads
 
-  if(LDEBUG) cerr << soliloquy << " [3] " << endl; //CO200201
+  if(LDEBUG) cerr << soliloquy << " [3] " << endl; //CO20200201
 
   if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
     //   cerr << "NO PTHREADS" << endl;
@@ -11407,7 +12238,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
             if(aurostd::isinteger(sstr_volume/det(plattice),0.0001)) {    // integer ratio of volumes
               //  cerr << sstr_volume/det(plattice) << " " << aurostd::isinteger(sstr_volume/det(plattice),0.001) << endl;
               if(det(plattice)<det(olattice)) {                    // better than before
-                if(LDEBUG) cout<<"DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+                if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
                 if(isdifferent(plattice,olattice,0.001)) {
                   plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
                   plattice=NiggliUnitCellForm(plattice);           // Niggli Second
@@ -11449,14 +12280,14 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
     // collect
     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
       pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
-    if(LDEBUG) cerr << soliloquy << " END THREADS " << endl; //CO200201
+    if(LDEBUG) cerr << soliloquy << " END THREADS " << endl; //CO20200201
   }
 
   plattice=olattice;
 
   // done
-  
-  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO200201
+
+  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
   xstructure b=sstr;
   b.lattice=plattice;//b.lattice=roundoff(b.lattice,_EPS_FPOS_EQUAL_);
   b.FixLattices();
@@ -11507,8 +12338,8 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
     exit(0);
   }
   // everything ok
-  if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO200201
-  b.ClearSymmetry();  //CO181226 - new structure, symmetry not calculated
+  if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO20200201
+  b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
   return b;
 
 }
@@ -11566,7 +12397,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
         if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
           if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
             if(det(plattice)<det(olattice)) {                    // better than before
-              if(LDEBUG) cout<<"DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+              if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
               if(isdifferent(plattice,olattice,0.0001)) {
                 plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
                 plattice=NiggliUnitCellForm(plattice);           // Niggli Second
@@ -11621,7 +12452,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
     exit(0);
   }
   // everything ok
-  b.ClearSymmetry();  //CO181226 - new structure, symmetry not calculated
+  b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
   return b;
 }
 
@@ -11735,7 +12566,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
           }
         }
   }
-  b.GetStoich();  //170724 - CO
+  b.GetStoich();  //CO20170724
   // rescale back to original scale.
   b.SetVolume(Volume(a)*b.atoms.size()/a.atoms.size());
   b=ReScale(b,a.scale);
@@ -11911,7 +12742,7 @@ xstructure GetPrimitive2(const xstructure& a) {
           }
         }
   }
-  b.GetStoich();  //170724 CO
+  b.GetStoich();  //CO20170724
   // some check
   double fraction=((double) GetVol(sstr.lattice)/GetVol(b.lattice));
   if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
@@ -12052,7 +12883,7 @@ xstructure GetPrimitive3(const xstructure& a) {
           }
         }
   }
-  b.GetStoich();  //170724 CO
+  b.GetStoich();  //CO20170724
   // rescale back to original scale.
   b.SetVolume(Volume(a)*b.atoms.size()/a.atoms.size());
   b=ReScale(b,a.scale);
@@ -12201,40 +13032,53 @@ xstructure SetScale(const xstructure& a,const double &in_scale) {
   return b;
 }
 
+//AS20200514 START
+// ***************************************************************************
+// Function UpdateCartesianCoordinates
+// ***************************************************************************
+void xstructure::UpdateCartesianCoordinates()
+{
+  for (uint at=0; at<atoms.size(); at++) atoms[at].cpos = scale*f2c*atoms[at].fpos;
+}
+//AS20200514 END
+
 // ***************************************************************************
 // Function SetVolume
 // ***************************************************************************
 void xstructure::SetVolume(const double &in_volume) {
-  //[CO200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_scale must be non zero" << endl;exit(0);}
-  if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO200201
-  if(det(lattice)<0.0){
-    stringstream message;
-    message << "Found negative determinant for lattice (det()=" << det(lattice) << "). Flip your basis.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_);
-  }
+  //[CO20200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_scale must be non zero" << endl;exit(0);}
+  if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
+  if(det(lattice)<0.0){ //CO20200201
+    stringstream message; //CO20200201
+    message << "Found negative determinant for lattice (det()=" << det(lattice) << "). Flip your basis."; //CO20200201
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_); //CO20200201
+  } //CO20200201
   scale=std::pow((double) in_volume/det(lattice),(double) 1.0/3.0);
   FixLattices();  // touched scale, then fix the lattices
 }
 
 xstructure SetVolume(const xstructure& a,const double &in_volume) {
-  //[CO200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_volume must be non zero" << endl;exit(0);}
-  if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO200201
-  xstructure b;b=a;
-  if(det(b.lattice)<0.0){ //CO200201
-    stringstream message;
-    message << "Found negative determinant for lattice (det()=" << det(b.lattice) << "). Flip your basis.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_);
-  }
-  b.scale=std::pow((double) in_volume/det(b.lattice),(double) 1.0/3.0);
-  b.FixLattices(); // touched scale, need to fix the lattices
+  xstructure b(a);
+  b.SetVolume(in_volume);
   return b;
+  //[CO20200201 OBSOLETE]//[CO20200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_volume must be non zero" << endl;exit(0);}
+  //[CO20200201 OBSOLETE]if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
+  //[CO20200201 OBSOLETE]xstructure b;b=a;
+  //[CO20200201 OBSOLETE]if(det(b.lattice)<0.0){ //CO20200201
+  //[CO20200201 OBSOLETE]  stringstream message; //CO20200201
+  //[CO20200201 OBSOLETE]  message << "Found negative determinant for lattice (det()=" << det(b.lattice) << "). Flip your basis."; //CO20200201
+  //[CO20200201 OBSOLETE]  throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_); //CO20200201
+  //[CO20200201 OBSOLETE]} //CO20200201
+  //[CO20200201 OBSOLETE]b.scale=std::pow((double) in_volume/det(b.lattice),(double) 1.0/3.0);
+  //[CO20200201 OBSOLETE]b.FixLattices(); // touched scale, need to fix the lattices
+  //[CO20200201 OBSOLETE]return b;
 }
 
 // ***************************************************************************
 // Function SetAutoVolume
 // ***************************************************************************
-void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
-  string soliloquy="xstructure::setAutoVolume():";
+void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
+  string soliloquy = XPID + "xstructure::setAutoVolume():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream message;
 
@@ -12315,6 +13159,7 @@ void xstructure::InflateVolume(const double &coefficient) {
   // scale=std::pow((double) coefficient,(double) 1/3)*scale;
   lattice=std::pow((double) coefficient,(double) 1/3)*lattice;
   FixLattices();  // touched scale/lattice, then fix the lattices
+  UpdateCartesianCoordinates(); //AS20200514
 }
 
 xstructure InflateVolume(const xstructure& a,const double &coefficient) {
@@ -12323,6 +13168,7 @@ xstructure InflateVolume(const xstructure& a,const double &coefficient) {
   //  b.scale=std::pow((double) coefficient,(double) 1/3)*b.scale;
   b.lattice=std::pow((double) coefficient,(double) 1/3)*b.lattice;
   b.FixLattices(); // touched scale/lattice, need to fix the lattices
+  b.UpdateCartesianCoordinates(); //AS20200514
   return b;
 }
 
@@ -12330,25 +13176,25 @@ xstructure InflateVolume(const xstructure& a,const double &coefficient) {
 // ***************************************************************************
 // Function GetVolume
 // ***************************************************************************
-double xstructure::GetVolume(void) const {  //CO200201
+double xstructure::GetVolume(void) const {  //CO20200201
   return scale*scale*scale*det(lattice);
 }
 
 double GetVolume(const xstructure& a) {
-  return a.scale*a.scale*a.scale*det(a.lattice);
+  return a.GetVolume(); //[CO20200520 - OBSOLETE]a.scale*a.scale*a.scale*det(a.lattice);
 }
 
 // ***************************************************************************
 // Function Volume
 // ***************************************************************************
-double xstructure::Volume(void) const { //CO200201
-  return GetVolume(); //CO200201
-  //[CO200201]return scale*scale*scale*det(lattice);
+double xstructure::Volume(void) const { //CO20200201
+  return GetVolume(); //CO20200201
+  //[CO20200201]return scale*scale*scale*det(lattice);
 }
 
 double Volume(const xstructure& a) {
-  return a.GetVolume(); //CO200201
-  //[CO200201]return a.scale*a.scale*a.scale*det(a.lattice);
+  return a.GetVolume(); //CO20200201
+  //[CO20200201]return a.scale*a.scale*a.scale*det(a.lattice);
 }
 
 _atom BringCloseToOrigin(_atom& atom, xmatrix<double>& f2c){
@@ -12381,20 +13227,20 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
   return FALSE;
 }
 
-// DX - START
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW] bool inCell(xvector<double>& pos_vec){
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   //DX 20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   //DX 20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
-////DX 20180726 [OBSOLETE]    pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0-_ZERO_TOL_) {      // found something inside
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0+_ZERO_TOL_) {      // found something inside //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]     return TRUE;
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   }
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   return FALSE;
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW] }
-//DX 20191125 [OBSOLETE - GENERALIZED BELOW] }
-// DX - END
+//DX START
+//DX20191125 [OBSOLETE - GENERALIZED BELOW] bool inCell(xvector<double>& pos_vec){
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]   //DX20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]   //DX20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
+////DX20180726 [OBSOLETE]    pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0-_ZERO_TOL_) {      // found something inside
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]   if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0+_ZERO_TOL_ && //DX20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0+_ZERO_TOL_ && //DX20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0+_ZERO_TOL_) {      // found something inside //DX20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]     return TRUE;
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]   }
+//DX20191125 [OBSOLETE - GENERALIZED BELOW]   return FALSE;
+//DX20191125 [OBSOLETE - GENERALIZED BELOW] }
+//DX20191125 [OBSOLETE - GENERALIZED BELOW] }
+//DX END
 
 // ***************************************************************************
 // atomInCell() 
@@ -12433,12 +13279,12 @@ bool inCell(const xvector<double>& pos_vec, double tolerance){
 }
 
 
-//DX 20180726 - check if already in cell - START
+//DX20180726 - check if already in cell - START
 bool alreadyInCell(_atom& atom, deque<_atom> atoms){
   for(uint i=0;i<atoms.size();i++){ 
     xvector<double> fdiff = atom.fpos-atoms[i].fpos;
-    fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
-    //DX 20190613 [OBSOLETE] SYM::PBC(fdiff);
+    fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX20190613
+    //DX20190613 [OBSOLETE] SYM::PBC(fdiff);
     if(aurostd::abs(fdiff(1))<_ZERO_TOL_ && 
         aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
         aurostd::abs(fdiff(3))<_ZERO_TOL_){
@@ -12447,7 +13293,7 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
   }
   return FALSE;
 }
-//DX 20180726 - check if already in cell - END
+//DX20180726 - check if already in cell - END
 
 // ***************************************************************************
 // Function GetSuperCell
@@ -12460,23 +13306,23 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
 // and generate a bunch of atoms around the old cell and check
 // if they are inside the new cell... There is a checksum with ERROR
 // if the numbers do not match. Stefano Curtarolo (aug07).
-// COREY (2017) adding maps to/from supercell/primitive structure, get_symmetry and get_full_basis flags
+//CO (2017) adding maps to/from supercell/primitive structure, get_symmetry and get_full_basis flags
 // get_symmetry will propagate symmetry of primitive cell
 // WARNING: if the structure is a derivative structure (i.e., non-uniform expansion, see derivative_structure) then
 // NOT all symmetry operations will work, as the symmetry is reduced
 // YOU need to check which of these don't work, unless you also calculate get_full_basis,
 // which checks the validity of the symmetry operation by finding the full basis map
 
-// COREY - START
+//CO START
 xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell)
-{ //CO200106 - patching for auto-indenting
+{ //CO20200106 - patching for auto-indenting
   //#define _eps_scell_ 1.0e-5
   //#define _eps_scell_ 0.0
   // check for error
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetSuperCell():";
+  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
   if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);} //exit(0)
@@ -12486,12 +13332,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   xstructure b(a); //actual supercell, need to copy!
   //pflow::CalculateFullSymmetry(a);
   _atom atom,atom2;
-  _sym_op pSymOp,fSymOp,aSymOp;  //corey
+  _sym_op pSymOp,fSymOp,aSymOp;  //CO
   int i,j,k; //,dim;
-  uint iat;//,at_indx; //corey
+  uint iat;//,at_indx; //CO
   xvector<int> dims(3);
-  xvector<double> cshift(3);  //corey
-  vector<xvector<double> > cshifts; //corey
+  xvector<double> cshift(3);  //CO
+  vector<xvector<double> > cshifts; //CO
   //double zeroTol=1e-10;
   double radius;
   b.lattice=supercell*a.lattice;
@@ -12500,15 +13346,15 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   for(i=0;i<(int) b.num_each_type.size();i++) b.num_each_type[i]=0;
   for(i=0;i<(int) b.comp_each_type.size();i++) b.comp_each_type[i]=0;
   b.atoms.clear();
-  sc2pcMap.clear(); pc2scMap.clear(); // CO 170722 - clear this everytime
+  sc2pcMap.clear(); pc2scMap.clear(); //CO20170722 - clear this everytime
 
-  bool skew = false; // DX 20190319 - declared outside loop
+  bool skew = false; //DX20190319 - declared outside loop
 
-  if(get_symmetry){ //DX 20190319 - added if statement; don't calc unless necessary
+  if(get_symmetry){ //DX20190319 - added if statement; don't calc unless necessary
     if(b.dist_nn_min==AUROSTD_NAN){b.dist_nn_min=SYM::minimumDistance(a);} //calculate dist_nn_min
     if(b.sym_eps==AUROSTD_NAN){b.sym_eps=SYM::defaultTolerance(b);}
-    skew = SYM::isLatticeSkewed(b.lattice,b.dist_nn_min,b.sym_eps); // DX 20190319 - declared above
-  } //DX //DX 20190319 - added if statement; don't calc unless necessary
+    skew = SYM::isLatticeSkewed(b.lattice,b.dist_nn_min,b.sym_eps); //DX20190319 - declared above
+  } //DX //DX20190319 - added if statement; don't calc unless necessary
 
   double nx=supercell(1,1),ny=supercell(2,2),nz=supercell(3,3);
   //can only propagate if nx==ny==nz and diagonal
@@ -12520,31 +13366,31 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   bool derivative_structure=!(aurostd::isdiagonal(supercell) && 
       aurostd::isequal(nx,ny) && 
       aurostd::isequal(ny,nz));
-  // COREY
+  //CO
   //VERY IMPORTANT, as we need to reduce the symmetry of the derivative structure
   //getting the basis serves as a validation for the symmetry operator
   //get_full_basis = get_full_basis || derivative_structure;
 
-  //corey START
+  //CO START
   // symmetry stuff
   b.ClearSymmetry();  //clear first
-  //corey END
+  //CO END
 
-  // DX 20190319 - added option to expand strictly by uniform supercell matrix - START
-  // CO190409 - note, force_supercell_matrix is PURELY for speed up purposes, the other approach should yield the same results (just slower)
-  if(force_supercell_matrix && aurostd::isdiagonal(supercell)){dims[1]=nx;dims[2]=ny;dims[3]=nz;} //[CO190520 - fixing for dims] && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
+  //DX20190319 - added option to expand strictly by uniform supercell matrix - START
+  //CO20190409 - note, force_supercell_matrix is PURELY for speed up purposes, the other approach should yield the same results (just slower)
+  if(force_supercell_matrix && aurostd::isdiagonal(supercell)){dims[1]=nx;dims[2]=ny;dims[3]=nz;} //[CO20190520 - fixing for dims] && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
   else{
     radius=RadiusSphereLattice(b.lattice);
-    dims=LatticeDimensionSphere(a.lattice,radius);//[CO190520 - EXCESSIVE]dim=max(dims)+1;
+    dims=LatticeDimensionSphere(a.lattice,radius);//[CO20190520 - EXCESSIVE]dim=max(dims)+1;
   } 
 
   if(LDEBUG){cerr << soliloquy << " dims=" << dims << endl;}
-  // DX 20190319 - added option to expand strictly by uniform supercell matrix - END
+  //DX20190319 - added option to expand strictly by uniform supercell matrix - END
   // if(LDEBUG) cerr << "DEBUG  dims=" << dims << " " << " radius=" << radius << endl;  // DEBUG
 
   bool match=false;
 
-  //CO190409 - this pc2scMap issue is more complicated...
+  //CO20190409 - this pc2scMap issue is more complicated...
   //this is how we resolve: force_strict_pc2scMap
   //if force_strict_pc2scMap==false (default), then the pc2scMap returns the first of the equivalent atoms
   //this is good because of how the algorithm enumerates equivalent atoms: 
@@ -12553,20 +13399,20 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //therefore, use force_strict_pc2scMap=true
   //for force_strict_pc2scMap==true, the supercell matrix should be diagonal, otherwise you are not guaranteed to get the i==0 && j==0 && k==0 atom
   //if force_strict_pc2scMap==true and it does not find the i==0 && j==0 && k==0, it throws an error
-  //CO190114 - pc2scMap only makes sense for true supercell expansions
+  //CO20190114 - pc2scMap only makes sense for true supercell expansions
   //there are cases where we use GetSuperCell to convert between representations (see aflow_lattice.cpp)
   //in this case, a mapping is not really possible/useful, so clear out pc2scMap
   bool ignore_pcmap=false;
   bool pcmap=false;
 
-  //CO181226 - do a check if iatoms really calculated for this cell
+  //CO20181226 - do a check if iatoms really calculated for this cell
   uint atoms_size_check=0;
   for(uint i=0;i<a.iatoms.size();i++){atoms_size_check+=a.iatoms[i].size();}
   if(atoms_size_check!=a.atoms.size()){a.ClearSymmetry();}  //it's possible that the cell was transformed somewhere in aflow, and the symmetry was not cleared
 
-  //corey START
+  //CO START
   if(a.iatoms_calculated){
-    //corey START
+    //CO START
     //create bins
     for(uint ii=0;ii<a.iatoms.size();ii++){
       b.iatoms.push_back(vector<int>(0));
@@ -12574,9 +13420,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     for(uint ia=0;ia<a.iatoms.size();ia++){
       for(uint iia=0;iia<a.iatoms[ia].size();iia++){
         pcmap=false;
-        //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {  //[CO200106 - close bracket for indenting]}
-        //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {  //[CO200106 - close bracket for indenting]}
-        //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {  //[CO200106 - close bracket for indenting]}
+        //[CO20190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {  //[CO20200106 - close bracket for indenting]}
+        //[CO20190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {  //[CO20200106 - close bracket for indenting]}
+        //[CO20190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {  //[CO20200106 - close bracket for indenting]}
         for(i=-dims[1];i<=dims[1];i++) {
           for(j=-dims[2];j<=dims[2];j++) {
             for(k=-dims[3];k<=dims[3];k++) {
@@ -12588,9 +13434,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //  atom.fpos=roundoff(atom.fpos);
               //cerr << "atom " << a.iatoms[ia][iia] << " fpos_rot   " << atom.fpos << endl;
               //cerr << "atom_fpos: " << atom.fpos << endl;
-              //DX 20180726 - if(inCell(atom.fpos)) //hard cut off
-              if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX 20180726
-              { //CO200106 - patching for auto-indenting
+              //DX20180726 - if(inCell(atom.fpos)) //hard cut off
+              if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX20180726
+              { //CO20200106 - patching for auto-indenting
                 //if(atom.fpos(1)>=-_eps_scell_ && atom.fpos(1)<1.0-_eps_scell_ &&
                 //  atom.fpos(2)>=-_eps_scell_ && atom.fpos(2)<1.0-_eps_scell_ &&
                 //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_)      // found something inside
@@ -12611,7 +13457,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                 //ijk
                 atom.ijk(1)=i;atom.ijk(2)=j;atom.ijk(3)=k;
 
-                //DX 20180726 - bring close to origin 
+                //DX20180726 - bring close to origin 
                 atom = BringCloseToOrigin(atom, b.f2c);  //updates fpos/cpos/ijk
 
                 b.atoms.push_back(atom);  //do NOT use AddAtom(), AddAtom() rearranges per species and we need to know the mapping
@@ -12634,16 +13480,16 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                     if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
                   } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
                 }
-                //[CO190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
-                //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-                //[CO190116 - OBSOLETE]  pcmap=true;
-                //[CO190116 - OBSOLETE]}
-                //[CO190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
-                //[CO190116 - OBSOLETE]//so just pick the first one
-                //[CO190116 - OBSOLETE]if(!pcmap){
-                //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-                //[CO190116 - OBSOLETE]  pcmap=true;
-                //[CO190116 - OBSOLETE]}
+                //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
+                //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+                //[CO20190116 - OBSOLETE]  pcmap=true;
+                //[CO20190116 - OBSOLETE]}
+                //[CO20190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
+                //[CO20190116 - OBSOLETE]//so just pick the first one
+                //[CO20190116 - OBSOLETE]if(!pcmap){
+                //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+                //[CO20190116 - OBSOLETE]  pcmap=true;
+                //[CO20190116 - OBSOLETE]}
                 //matching cpos does not work!
                 //matching by index (i,j,k) does not work because of inCell()
                 //if(!i&&!j&&!k) pc2scMap.push_back(b.atoms.size()-1);
@@ -12676,13 +13522,13 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     }
 
     b.iatoms_calculated=TRUE;
-    //corey END
+    //CO END
   } else {
     for(uint ia=0;ia<a.atoms.size();ia++) {
       pcmap=false;
-      //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){ //[CO200106 - close bracket for indenting]}
-      //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){ //[CO200106 - close bracket for indenting]}
-      //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){ //[CO200106 - close bracket for indenting]}
+      //[CO20190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){ //[CO20200106 - close bracket for indenting]}
+      //[CO20190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){ //[CO20200106 - close bracket for indenting]}
+      //[CO20190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){ //[CO20200106 - close bracket for indenting]}
       for(i=-dims[1];i<=dims[1];i++){
         for(j=-dims[2];j<=dims[2];j++){
           for(k=-dims[3];k<=dims[3];k++){
@@ -12692,18 +13538,18 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             atom.cpos=atom.cpos+cshift;
             atom.fpos=b.c2f*atom.cpos; //C2F(b.lattice,atom.cpos);               // put in fractional of new basis
             //  atom.fpos=roundoff(atom.fpos);
-            //DX 20180726 - if(inCell(atom.fpos)) //hard cut off
-            if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX 20180726
+            //DX20180726 - if(inCell(atom.fpos)) //hard cut off
+            if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX20180726
               //if(atom.fpos(1)>=-_eps_scell_ && atom.fpos(1)<1.0-_eps_scell_ &&
               //  atom.fpos(2)>=-_eps_scell_ && atom.fpos(2)<1.0-_eps_scell_ &&
               //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_)      // found something inside
               // atom=BringInCell(atom,b.lattice);
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               b.num_each_type[atom.type]++;                  // CONVASP_MODE
               b.comp_each_type[atom.type]+=atom.partial_occupation_value;                  // CONVASP_MODE
               //ijk
               atom.ijk(1)=i;atom.ijk(2)=j;atom.ijk(3)=k;
-              //DX 20180726 - bring close to origin 
+              //DX20180726 - bring close to origin 
               atom = BringCloseToOrigin(atom, b.f2c);  //updates fpos/cpos/ijk
               b.atoms.push_back(atom);  //do NOT use AddAtom(), AddAtom() rearranges per species and we need to know the mapping
               //save cshifts for fgroups later...
@@ -12724,16 +13570,16 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                   if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
                 } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
               }
-              //[CO190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
-              //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-              //[CO190116 - OBSOLETE]  pcmap=true;
-              //[CO190116 - OBSOLETE]}
-              //[CO190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
-              //[CO190116 - OBSOLETE]//so just pick the first one
-              //[CO190116 - OBSOLETE]if(!pcmap){
-              //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-              //[CO190116 - OBSOLETE]  pcmap=true;
-              //[CO190116 - OBSOLETE]}
+              //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
+              //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+              //[CO20190116 - OBSOLETE]  pcmap=true;
+              //[CO20190116 - OBSOLETE]}
+              //[CO20190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
+              //[CO20190116 - OBSOLETE]//so just pick the first one
+              //[CO20190116 - OBSOLETE]if(!pcmap){
+              //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+              //[CO20190116 - OBSOLETE]  pcmap=true;
+              //[CO20190116 - OBSOLETE]}
               //matching cpos does not work!
               //matching by index (i,j,k) does not work because of inCell()
               //if(!i&&!j&&!k) pc2scMap.push_back(b.atoms.size()-1);
@@ -12754,9 +13600,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       }
     }
   }
-  //corey END
+  //CO END
 
-  b.GetStoich();  //170724 CO
+  b.GetStoich();  //CO20170724
   b.MakeBasis(); // need to update NUMBER and BASIS
 
   if(LDEBUG) {
@@ -12769,20 +13615,20 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   double density_a=a.scale*a.scale*a.scale*abs(det(a.lattice))/a.atoms.size();
   double density_b=b.scale*b.scale*b.scale*abs(det(b.lattice))/b.atoms.size();
   if(abs(b.atoms.size()-a.atoms.size()*fraction)>0.1 || abs(density_a-density_b)>0.001) {
-    //[CO190520 - OBSOLETE]cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
-    //[CO190520 - OBSOLETE]cerr << "         supercell has the wrong number of atoms" << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.scale            = " << b.scale << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.scale            = " << a.scale << endl;
-    //[CO190520 - OBSOLETE]cerr << "         fraction           = " << fraction << endl;
-    //[CO190520 - OBSOLETE]cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.density          = " << density_b << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.density          = " << density_a << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.lattice          = " << endl;
-    //[CO190520 - OBSOLETE]cerr << b.lattice << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.lattice          = " << endl;
-    //[CO190520 - OBSOLETE]cerr << a.lattice << endl;
+    //[CO20190520 - OBSOLETE]cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         supercell has the wrong number of atoms" << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.scale            = " << b.scale << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.scale            = " << a.scale << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         fraction           = " << fraction << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.density          = " << density_b << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.density          = " << density_a << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.lattice          = " << endl;
+    //[CO20190520 - OBSOLETE]cerr << b.lattice << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.lattice          = " << endl;
+    //[CO20190520 - OBSOLETE]cerr << a.lattice << endl;
 
     message << "Supercell has the wrong number of atoms" << endl;
     message << "b.atoms.size()     = " << b.atoms.size() << endl;
@@ -12802,21 +13648,21 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     //exit(0);
   }
 
-  bool pretend_uniform=false;//true;  // COREY TEST, REMOVE ME
+  bool pretend_uniform=false;//true;  //CO TEST, REMOVE ME
   get_full_basis = !pretend_uniform && get_full_basis;
 
-  //corey START
+  //CO START
   //for now, we focus on pgroup, fgroup, iatoms, and site symmetry (agroup), add as you need
   if(get_symmetry){
     ofstream FileMESSAGE;
     _aflags aflags;
     _kflags kflags;
-    bool _write_=false;    // COREY no verbose, annoys jose
-    bool osswrite=false;   // COREY no verbose, annoys jose
+    bool _write_=false;    //CO no verbose, annoys JJPR
+    bool osswrite=false;   //CO no verbose, annoys JJPR
     bool same_pgroups=true;
     bool calculated_pgroups=false;
     bool CALCULATE_FULL_SYMMETRY_ROBUSTLY = false;  //for testing APL
-    bool KRUN=true;  //FORCE FULL CALC//false; //CO181226
+    bool KRUN=true;  //FORCE FULL CALC//false; //CO20181226
     //ostream& oss=cout;  //defined in macro at top of file
     if(derivative_structure){
       KRUN = KRUN && SYM::CalculatePointGroup(FileMESSAGE,b,aflags,_write_,osswrite,oss);
@@ -12827,7 +13673,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           cerr << "Symmetry propagation PASSED with derivative structure at point group" << endl;
         }
       }
-      same_pgroups=(KRUN && SYM::PointGroupsIdentical(a.pgroup,b.pgroup,b.sym_eps,false));  // DX 12/7/17 - added is_same_lattice
+      same_pgroups=(KRUN && SYM::PointGroupsIdentical(a.pgroup,b.pgroup,b.sym_eps,false));  //DX20171207 - added is_same_lattice
       calculated_pgroups=KRUN;
     }
     if((KRUN && !pretend_uniform && !same_pgroups) || CALCULATE_FULL_SYMMETRY_ROBUSTLY){
@@ -12885,7 +13731,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           pSymOp.basis_atoms_map.clear();
           pSymOp.basis_types_map.clear();
           pSymOp.basis_map_calculated=FALSE;
-          // CO and DX, getFullSymBasis does not make sense for just rotations
+          //CO+DX, getFullSymBasis does not make sense for just rotations
           //if(get_full_basis){
           //  KRUN = KRUN && SYM::getFullSymBasis(b.atoms,b.lattice,b.c2f,b.f2c,pSymOp,FALSE,skew,b.sym_eps,pSymOp.basis_atoms_map,pSymOp.basis_types_map);
           //  if(LDEBUG) {
@@ -12898,7 +13744,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           //  pSymOp.basis_map_calculated=KRUN;
           //}
           //if(KRUN){b.pgroup.push_back(pSymOp);}
-          if(KRUN){SYM::AddSymmetryToStructure(b,pSymOp.Uc,pSymOp.Uf,pSymOp.ctau,pSymOp.ftau,pSymOp.ctrasl,pSymOp.ftrasl,pSymOp.basis_atoms_map,pSymOp.basis_types_map,pSymOp.basis_map_calculated,_PGROUP_,FALSE);}  // CO 170706 - make sure quaternion is updated
+          if(KRUN){SYM::AddSymmetryToStructure(b,pSymOp.Uc,pSymOp.Uf,pSymOp.ctau,pSymOp.ftau,pSymOp.ctrasl,pSymOp.ftrasl,pSymOp.basis_atoms_map,pSymOp.basis_types_map,pSymOp.basis_map_calculated,_PGROUP_,FALSE);}  //CO20170706 - make sure quaternion is updated
         }
         //if(KRUN && b.pgroup.size()){
         //b.pgroup_calculated=true;
@@ -12915,7 +13761,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             fSymOp=a.fgroup[fg];
             fSymOp.ctau=fSymOp.ctau+cshifts[cs];
             fSymOp.ftau=b.c2f*fSymOp.ctau;
-            if(inCell(fSymOp.ftau)){ // DX CHANGE HERE; NO MORE TOL_ABC_RES
+            if(inCell(fSymOp.ftau)){ //DX CHANGE HERE; NO MORE TOL_ABC_RES
               // We have to correct the Uf for each symop since we have changed the lattice...
               fSymOp.Uf=b.c2f * fSymOp.Uc * b.f2c;
               fSymOp.basis_atoms_map.clear();
@@ -12946,7 +13792,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                 fSymOp.basis_map_calculated=KRUN;
               }
               //if(KRUN){b.fgroup.push_back(fSymOp);}
-              if(KRUN){SYM::AddSymmetryToStructure(b,fSymOp.Uc,fSymOp.Uf,fSymOp.ctau,fSymOp.ftau,fSymOp.ctrasl,fSymOp.ftrasl,fSymOp.basis_atoms_map,fSymOp.basis_types_map,fSymOp.basis_map_calculated,_FGROUP_,FALSE);}  // CO 170706 - make sure quaternion is updated
+              if(KRUN){SYM::AddSymmetryToStructure(b,fSymOp.Uc,fSymOp.Uf,fSymOp.ctau,fSymOp.ftau,fSymOp.ctrasl,fSymOp.ftrasl,fSymOp.basis_atoms_map,fSymOp.basis_types_map,fSymOp.basis_map_calculated,_FGROUP_,FALSE);}  //CO20170706 - make sure quaternion is updated
             }
           }
         }
@@ -12966,7 +13812,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           pSymOp.basis_atoms_map.clear();
           pSymOp.basis_types_map.clear();
           pSymOp.basis_map_calculated=FALSE;
-          // CO and DX, getFullSymBasis does not make sense for just rotations
+          //CO+DX, getFullSymBasis does not make sense for just rotations
           //if(get_full_basis){
           //  KRUN = KRUN && SYM::getFullSymBasis(b.atoms,b.lattice,b.c2f,b.f2c,pSymOp,FALSE,skew,b.sym_eps,pSymOp.basis_atoms_map,pSymOp.basis_types_map);
           //  if(LDEBUG) {
@@ -12979,7 +13825,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           //  pSymOp.basis_map_calculated=KRUN;
           //}
           //if(KRUN){b.pgroup_xtal.push_back(pSymOp);}
-          if(KRUN){SYM::AddSymmetryToStructure(b,pSymOp.Uc,pSymOp.Uf,pSymOp.ctau,pSymOp.ftau,pSymOp.ctrasl,pSymOp.ftrasl,pSymOp.basis_atoms_map,pSymOp.basis_types_map,pSymOp.basis_map_calculated,_PGROUP_XTAL_,FALSE);}  // CO 170706 - make sure quaternion is updated
+          if(KRUN){SYM::AddSymmetryToStructure(b,pSymOp.Uc,pSymOp.Uf,pSymOp.ctau,pSymOp.ftau,pSymOp.ctrasl,pSymOp.ftrasl,pSymOp.basis_atoms_map,pSymOp.basis_types_map,pSymOp.basis_map_calculated,_PGROUP_XTAL_,FALSE);}  //CO20170706 - make sure quaternion is updated
         }
         //if(KRUN && b.pgroup_xtal.size()){
         //b.pgroup_xtal_calculated=true;
@@ -13025,7 +13871,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //now bring in cell
               b_atoms[ii]=BringInCell(b_atoms[ii],b.lattice);
             }
-            //bb.ShifOriginToAtom(iat);
+            //bb.ShiftOriginToAtom(iat);
             //bb.BringInCell();
 
             //IATOMS ONLY
@@ -13058,7 +13904,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //}
               aSymOp.basis_map_calculated=KRUN;
               //if(KRUN){b.agroup[iat].push_back(aSymOp);}
-              if(KRUN){SYM::AddSymmetryToStructure(b,iat,aSymOp.Uc,aSymOp.Uf,aSymOp.ctau,aSymOp.ftau,aSymOp.ctrasl,aSymOp.ftrasl,aSymOp.basis_atoms_map,aSymOp.basis_types_map,aSymOp.basis_map_calculated,_AGROUP_,FALSE);}  // CO 170706 - make sure quaternion is updated
+              if(KRUN){SYM::AddSymmetryToStructure(b,iat,aSymOp.Uc,aSymOp.Uf,aSymOp.ctau,aSymOp.ftau,aSymOp.ctrasl,aSymOp.ftrasl,aSymOp.basis_atoms_map,aSymOp.basis_types_map,aSymOp.basis_map_calculated,_AGROUP_,FALSE);}  //CO20170706 - make sure quaternion is updated
             }
           }
 
@@ -13094,103 +13940,103 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //////////////////////////////////////////////////////////////////////////
     }
     if(!KRUN){
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-      b.ClearSymmetry(); //CO181226
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      b.ClearSymmetry(); //CO20181226
       pflow::PerformFullSymmetry(b,FileMESSAGE,aflags,kflags,osswrite,oss);
       //FOOLPROOF!!!!!!!!!
       //no need for krun here with force_perform: if it fails with full scan, it will calculate at default tolerance and keep going!
     }
   }
 
-  //cerr << "prim: " << a.pgroup.size() << ", sup: " << b.pgroup.size() << endl;    // COREY REMOVE
+  //cerr << "prim: " << a.pgroup.size() << ", sup: " << b.pgroup.size() << endl;    //CO REMOVE
 
-  //corey END
+  //CO END
 
   b.ReScale(aa.scale);  //the nuclear option, the only way not to mess around with scale EVERYWHERE
   return b;
 }
-// COREY - END
+//CO END
 
 xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell)
-{ //CO200106 - patching for auto-indenting
+{ //CO20200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   if(supercell.rows==9) {
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
     _supercell(2,1)=supercell(4);_supercell(2,2)=supercell(5);_supercell(2,3)=supercell(6);
     _supercell(3,1)=supercell(7);_supercell(3,2)=supercell(8);_supercell(3,3)=supercell(9);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
   if(supercell.rows==3) {
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  //[CO190520 -OBSOLETE]exit(0);
-  string soliloquy="GetSuperCell():";
+  //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO20190520 -OBSOLETE]exit(0);
+  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell)
-{ //CO200106 - patching for auto-indenting
+{ //CO20200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   if(supercell.rows==9) {
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
     _supercell(2,1)=supercell(4);_supercell(2,2)=supercell(5);_supercell(2,3)=supercell(6);
     _supercell(3,1)=supercell(7);_supercell(3,2)=supercell(8);_supercell(3,3)=supercell(9);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
   if(supercell.rows==3) {
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  //[CO190520 -OBSOLETE]exit(0);
-  string soliloquy="GetSuperCell():";
+  //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO20190520 -OBSOLETE]exit(0);
+  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33)
-{ //CO200106 - patching for auto-indenting
+{ //CO20200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   _supercell.clear();
   _supercell(1,1)=(double) sc11;_supercell(1,2)=(double) sc12;_supercell(1,3)=(double) sc13;
   _supercell(2,1)=(double) sc21;_supercell(2,2)=(double) sc22;_supercell(2,3)=(double) sc23;
   _supercell(3,1)=(double) sc31;_supercell(3,2)=(double) sc32;_supercell(3,3)=(double) sc33;
-  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3)
-{ //CO200106 - patching for auto-indenting
+{ //CO20200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   _supercell.clear();
   _supercell(1,1)=(double) sc1;
   _supercell(2,2)=(double) sc2;
   _supercell(3,3)=(double) sc3;
-  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
-//corey START
+//CO START
 xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell) {
   vector<int> sc2pcMap;
   vector<int> pc2scMap;
   bool get_symmetry=false;
   bool get_full_basis=false;
-  bool force_supercell_matrix=false; //DX 20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(aa,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(aa,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell) {
@@ -13198,9 +14044,9 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell) {
   vector<int> pc2scMap;
   bool get_symmetry=false;
   bool get_full_basis=false;
-  bool force_supercell_matrix=false; //DX 20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
+  bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell) {
@@ -13208,9 +14054,9 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell) {
   vector<int> pc2scMap;
   bool get_symmetry=false;
   bool get_full_basis=false;
-  bool force_supercell_matrix=false; //DX 20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap);  //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap);  //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33) {
@@ -13218,9 +14064,9 @@ xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,con
   vector<int> pc2scMap;
   bool get_symmetry=false;
   bool get_full_basis=false;
-  bool force_supercell_matrix=false; //DX 20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,sc11,sc12,sc13,sc21,sc22,sc23,sc31,sc32,sc33,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,sc11,sc12,sc13,sc21,sc22,sc23,sc31,sc32,sc33,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3) {
@@ -13228,11 +14074,11 @@ xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const
   vector<int> pc2scMap;
   bool get_symmetry=false;
   bool get_full_basis=false;
-  bool force_supercell_matrix=false; //DX 20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,sc1,sc2,sc3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
+  bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,sc1,sc2,sc3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
 }
-//corey END
+//CO END
 
 
 // ***************************************************************************
@@ -13248,12 +14094,15 @@ void xstructure::ClearSymmetry(void) {
   crystal_family="";crystal_system="";point_group_crystal_class="";
   point_group_Shoenflies="";point_group_Hermann_Mauguin="";point_group_orbifold="";
   point_group_type="";point_group_order="";point_group_structure="";
+  // PGROUPK_PATTERSON ---------------------------- //DX20200129
+  pgroupk_Patterson.clear();        // just initialize
+  pgroupk_Patterson_calculated=FALSE;
   // PGROUPK ----------------------------
   pgroupk.clear();            // just initialize
   pgroupk_calculated=FALSE;
   // PGROUPK_XTAL ----------------------------
-  pgroupk_xtal.clear();            // just initialize // DX 12/5/17 - Added pgroupk_xtal
-  pgroupk_xtal_calculated=FALSE;                      // DX 12/5/17 - Added pgroupk_xtal
+  pgroupk_xtal.clear();            // just initialize //DX20171205 - Added pgroupk_xtal
+  pgroupk_xtal_calculated=FALSE;                      //DX20171205 - Added pgroupk_xtal
   // FGROUP ----------------------------
   fgroup.clear();            // just initialize
   fgroup_calculated=FALSE;
@@ -13272,10 +14121,10 @@ void xstructure::ClearSymmetry(void) {
   for(uint i=0;i<iatoms.size();i++)
     iatoms.at(i).clear();
   iatoms.clear();
-  for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO190219
+  for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO20190219
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+//DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetry
@@ -13292,7 +14141,7 @@ bool xstructure::CalculateSymmetry(bool ossverbose,double radius) {
   return pflow::PerformFullSymmetry(*this,FileDevNull,aflags,kflags,ossverbose,oss);
 
   //SYM::CalculatePointGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
-  //SYM::CalculatePointGroupKlattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+  //SYM::CalculatePointGroupKLattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateSitePointGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateFactorGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateInequivalentAtoms(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
@@ -13315,7 +14164,7 @@ bool CalculateSymmetry(xstructure& str,bool ossverbose,ostream& oss,bool fffverb
 
   return pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,ossverbose,oss);
   //SYM::CalculatePointGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
-  //SYM::CalculatePointGroupKlattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+  //SYM::CalculatePointGroupKLattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculateFactorGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculateInequivalentAtoms(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
@@ -13362,7 +14211,7 @@ bool CalculateSymmetry(xstructure& str) {
   return CalculateSymmetry(str,FALSE,cout,FALSE,_calculate_symmetry_default_sgroup_radius_*MaxStructureLattice(str));
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+//DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroup
@@ -13409,7 +14258,7 @@ void CalculateSymmetryPointGroup(xstructure& str) {
   CalculateSymmetryPointGroup(str,FALSE,cout,FALSE);
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+//DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupCrystal
@@ -13464,7 +14313,7 @@ void CalculateSymmetryPointGroupCrystal(xstructure& str) {
   CalculateSymmetryPointGroupCrystal(str,FALSE,cout,FALSE);
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+//DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryFactorGroup
@@ -13513,51 +14362,133 @@ void CalculateSymmetryFactorGroup(xstructure& str) {
   CalculateSymmetryFactorGroup(str,FALSE,cout,FALSE);
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+//DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
+//ME20200114 - made capitalization more consistent with other functions
 // ***************************************************************************
-// Function CalculateSymmetryPointGroupKlattice
+// Function CalculateSymmetryPointGroupKLattice
 // ***************************************************************************
-void xstructure::CalculateSymmetryPointGroupKlattice(bool ossverbose) {
+void xstructure::CalculateSymmetryPointGroupKLattice(bool ossverbose) {
   ofstream FileDevNull("/dev/null");
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
   // LatticeReduction_avoid=TRUE;  // not necssary for klattice
-  SYM::CalculatePointGroupKlattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+  SYM::CalculatePointGroupKLattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
 }
 
-void xstructure::CalculateSymmetryPointGroupKlattice(void) {
+void xstructure::CalculateSymmetryPointGroupKLattice(void) {
   // LatticeReduction_avoid=TRUE;  // not necssary for klattice
-  CalculateSymmetryPointGroupKlattice(FALSE);
+  CalculateSymmetryPointGroupKLattice(FALSE);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
   ofstream FileDevNull("/dev/null");
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
   // str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
-  SYM::CalculatePointGroupKlattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+  SYM::CalculatePointGroupKLattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss) {
   // str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
-  CalculateSymmetryPointGroupKlattice(str,ossverbose,oss,FALSE);
+  CalculateSymmetryPointGroupKLattice(str,ossverbose,oss,FALSE);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose) {
   //  str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
-  CalculateSymmetryPointGroupKlattice(str,ossverbose,cout,FALSE);
+  CalculateSymmetryPointGroupKLattice(str,ossverbose,cout,FALSE);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str) {
   //  str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
-  CalculateSymmetryPointGroupKlattice(str,FALSE,cout,FALSE);
+  CalculateSymmetryPointGroupKLattice(str,FALSE,cout,FALSE);
+}
+
+//ME20200114 - added missing function
+// ***************************************************************************
+// Function CalculateSymmetryPointGroupKCrystal
+// ***************************************************************************
+void xstructure::CalculateSymmetryPointGroupKCrystal(bool ossverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKCrystal(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+}
+
+void xstructure::CalculateSymmetryPointGroupKCrystal(void) {
+  CalculateSymmetryPointGroupKCrystal(FALSE);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKCrystal(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKCrystal(str,ossverbose,oss,FALSE);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKCrystal(str,ossverbose,cout,FALSE);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKCrystal(str,FALSE,cout,FALSE);
+}
+
+//ME20200129
+// ***************************************************************************
+// Function CalculateSymmetryPointGroupKPatterson
+// ***************************************************************************
+
+void xstructure::CalculateSymmetryPointGroupKPatterson(bool ossverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKPatterson(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+}
+
+void xstructure::CalculateSymmetryPointGroupKPatterson(void) {
+  CalculateSymmetryPointGroupKPatterson(FALSE);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKPatterson(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKPatterson(str,ossverbose,oss,FALSE);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKPatterson(str,ossverbose,cout,FALSE);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKPatterson(str,FALSE,cout,FALSE);
 }
 
 // ***************************************************************************
@@ -13567,20 +14498,20 @@ void xstructure::buildGenericTitle(bool vasp_input,bool force_fix){
   if(vasp_input){pflow::fixEmptyAtomNames(*this,force_fix);}
   title.clear();
   title=getGenericTitleXStructure(*this,false); //no latex
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]uint iat=0;
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]//if any names missing from atoms, lets use generic names
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]bool atom_names=true;
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]for(uint i=0;i<atoms.size()&&atom_names;i++){if(atoms[i].name.empty()){atom_names=false;}} // CO 180316 - use pp names
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]for(uint itype=0;itype<num_each_type.size();itype++){
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]  for(uint j=0;j<(uint) num_each_type.at(itype);j++) {
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]    if(j==0){
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]      if(atom_names){title+=atoms.at(iat).name;} // CO 180316 - use pp names
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]      else {title+=char('A'+itype);}
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]      title+=aurostd::utype2string(num_each_type.at(itype));
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]    }
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]    iat++;
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]  }
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]}
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]uint iat=0;
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]//if any names missing from atoms, lets use generic names
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]bool atom_names=true;
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]for(uint i=0;i<atoms.size()&&atom_names;i++){if(atoms[i].name.empty()){atom_names=false;}} //CO20180316 - use pp names
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]for(uint itype=0;itype<num_each_type.size();itype++){
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]  for(uint j=0;j<(uint) num_each_type.at(itype);j++) {
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]    if(j==0){
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]      if(atom_names){title+=atoms.at(iat).name;} //CO20180316 - use pp names
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]      else {title+=char('A'+itype);}
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]      title+=aurostd::utype2string(num_each_type.at(itype));
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]    }
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]    iat++;
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]  }
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]}
 }
 
 // ***************************************************************************
@@ -13598,13 +14529,13 @@ void xstructure::xstructure2qe(void) {
 // Function xstructure2vasp
 // ***************************************************************************
 void xstructure::xstructure2vasp(void) {
-  // DX 4/25/18 [OBSOLETE] scale=1.0;
-  ReScale(1.0); // DX 4/25/18 - needs to be generic and rescale to 1.0; see other xstructure converters
+  //DX20180425 [OBSOLETE] scale=1.0;
+  ReScale(1.0); //DX20180425 - needs to be generic and rescale to 1.0; see other xstructure converters
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOVASP_AUTO;
   //  cerr << "title=\"" << title << "\"" << endl;
-  if(title.empty()) {buildGenericTitle();}  // CO 171008 - pushed all of this to a function
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   //  uint iat=0;
   //  for(uint itype=0;itype<num_each_type.size();itype++) 
   //    for(uint j=0;j<(uint) num_each_type.at(itype);j++) {
@@ -13622,7 +14553,7 @@ void xstructure::xstructure2aims(void) {
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOAIMS_GEOM;
-  if(title.empty()) {buildGenericTitle();}  // CO 171008
+  if(title.empty()) {buildGenericTitle();}  //CO20171008
   return;
 }
 
@@ -13640,7 +14571,7 @@ void xstructure::xstructure2abinit(void) {
 // ***************************************************************************
 // Function xstructure2cif
 // ***************************************************************************
-void xstructure::xstructure2cif(void) { //DX190131
+void xstructure::xstructure2cif(void) { //DX20190131
   ReScale(1.0);
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
@@ -13653,11 +14584,22 @@ void xstructure::xstructure2cif(void) { //DX190131
 // ***************************************************************************
 // Function xstructure2abccar
 // ***************************************************************************
-void xstructure::xstructure2abccar(void) { //DX190131
+void xstructure::xstructure2abccar(void) { //DX20190131
   ReScale(1.0);
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOVASP_ABCCAR;
+  return;
+}
+
+// ***************************************************************************
+// Function xstructure2elk
+// ***************************************************************************
+void xstructure::xstructure2elk(void) { //DX20200313
+  ReScale(1.0);
+  neg_scale=FALSE;
+  coord_flag=_COORDS_FRACTIONAL_; 
+  iomode=IOELK_GEOM;
   return;
 }
 
@@ -13765,7 +14707,7 @@ void xstructure::FakeNames(void) {
         if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
         //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
         atoms.at(iatom).CleanName();
-        // DX 9/21/17 - Need to keep spin info atoms.at(iatom).CleanSpin();
+        //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
         atoms.at(iatom).name_is_given=TRUE;
       }
       iatom++;
@@ -13778,8 +14720,8 @@ void xstructure::FakeNames(void) {
 string xstructure::platon2sg(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3) {
   xstructure str=*this;
   stringstream aus;
-  // string directory="/tmp/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
-  string directory=XHOST.tmpfs+"/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
+  // string directory="/tmp/_aflow_platon_"+XHOST.ostrPID.str()+"_"+XHOST.ostrTID.str();  // dont change what works //CO20200502 - threadID
+  string directory=XHOST.tmpfs+"/_aflow_platon_"+XHOST.ostrPID.str()+"_"+XHOST.ostrTID.str();  // dont change what works  //CO20200502 - threadID
   string file=directory+"/aflow_platon_";
   string file_spf=file+".spf";
   string file_out=file+".out";
@@ -13913,34 +14855,36 @@ string xstructure::findsym2print(double tolerance) {
 // a matrix.  Then we must add q to all the final cartesian
 // positions.
 xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
-  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
-  string soliloquy="Rotate():"; //CO190520
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO190520
-    cerr << soliloquy << " a.origin=" << a.origin << endl; //CO190520
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+  string soliloquy = XPID + "Rotate():"; //CO20190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO20190520
+    cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
+    cerr << soliloquy << " rm=" << endl;cerr << rm << endl; //ME20200204
   }
+  if (aurostd::isidentity(rm)) return a;  //ME20200204 - no need to go through all the motions for identity matrix
   // Get R_0(p) for all cartesian positions.
   xstructure b(a);
   xmatrix<double> nlattice(3,3);
   nlattice=trasp(a.lattice);
   b.lattice=trasp(rm*nlattice);
-  b.FixLattices();  //CO190409 - so we don't need to keep redefining f2c/c2f
-  const xmatrix<double>& f2c=b.f2c; //CO190520
-  const xmatrix<double>& c2f=b.c2f; //CO190520
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos=f2c*b.atoms.at(ia).fpos;}  //CO190409 - so we don't need to keep redefining f2c/c2f
-  //[CO190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
+  b.FixLattices();  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  const xmatrix<double>& f2c=b.f2c; //CO20190520
+  const xmatrix<double>& c2f=b.c2f; //CO20190520
+  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos=f2c*b.atoms.at(ia).fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
+  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
   //Get R_0(q)
   xvector<double> r_orig(3);
   r_orig=rm*b.origin;
   // Assign new cartesian positions
   for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos+=(-r_orig+b.origin);}
-  //[CO190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO190409 - OBSOLETE]  b.atoms.at(ia).cpos=b.atoms.at(ia).cpos-r_orig+b.origin;
+  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
+  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=b.atoms.at(ia).cpos-r_orig+b.origin;
   // Get all the direct coords.
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).fpos=c2f*b.atoms.at(ia).cpos;}  //CO190409 - so we don't need to keep redefining f2c/c2f
-  //[CO190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
+  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).fpos=c2f*b.atoms.at(ia).cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
+  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
   return b;
 }
 
@@ -14099,7 +15043,7 @@ bool DifferentAtom(const xstructure& str,const _atom& atom1,const _atom& atom2) 
 // **************************************************************************
 // GetDistMatrix
 // **************************************************************************
-// CO 171024
+//CO20171024
 xmatrix<double> GetDistMatrix(const xstructure& aa){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   xstructure a(aa); a.ReScale(1.0);
@@ -14179,7 +15123,7 @@ xmatrix<double> GetDistMatrix(const xstructure& aa){
 // **************************************************************************
 // GetNBONDXX
 // **************************************************************************
-// CO 171024
+//CO20171024
 vector<double> GetNBONDXX(const xstructure& a){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   xmatrix<double> distsij=GetDistMatrix(a);
@@ -14216,19 +15160,19 @@ int xstructure::GenerateGridAtoms(int d) {
   return GenerateGridAtoms(*this,-d,d,-d,d,-d,d);
 }
 
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218
   return GenerateGridAtoms_20191218(str,i1,i2,j1,j2,k1,k2);
 }
 
-int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218 - added date [ORIG]
-  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
-  string soliloquy="GenerateGridAtoms():"; //CO190520
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO190520
-    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO190520
-    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO190520
-    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO190520
-  } //CO190520
+int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+  string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
+    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
+    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
+  } //CO20190520
   // same scale as before
   str.grid_atoms.clear();
   str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
@@ -14236,40 +15180,40 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
   str.BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
   //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
+  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
 
   for(uint iat=0;iat<str.atoms.size();iat++){
-    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
-    str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); //CO20171025 
+    str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
   }
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
         if(i!=0 || j!=0 || k!=0) {
           for(uint iat=0;iat<str.atoms.size();iat++) {
-            atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
+            atom=str.atoms[iat]; //DX20190709 - at to [] = speed increase
             atom.isincell=FALSE; // these are OUT OF CELL
-            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
-            atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
-            atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
-            atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+            atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+            atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+            atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
             str.grid_atoms.push_back(atom);
-            str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-            if(LDEBUG) { //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX 20191218
-              cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; // DX 20191218
-            } //CO190520
+            str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+            if(LDEBUG) { //CO20190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; //DX20191218
+            } //CO20190520
           }
         }
       }
     }
   }
-  if(0){  //CO190808 - quick check of mindist
+  if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<str.grid_atoms.size()-1;i++){
       for(uint j=i+1;j<str.grid_atoms.size();j++){
@@ -14291,15 +15235,15 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
   return str.grid_atoms.size();
 }
 
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218 - [NEW]
-  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
-  string soliloquy="GenerateGridAtoms():"; //CO190520
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO190520
-    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO190520
-    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO190520
-    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO190520
-  } //CO190520
+int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+  string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
+    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
+    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
+  } //CO20190520
   // same scale as before
   str.grid_atoms.clear();
   str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
@@ -14307,97 +15251,108 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   str.BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
   //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
-  //DX 20190709 - calculate and store once = speed - START
+  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
+  //DX20190709 - calculate and store once = speed - START
   vector<xvector<double> > l1, l2, l3;
   vector<int> a_index, b_index, c_index;
   for(int i=i1;i<=i2;i++){l1.push_back(i*a1);a_index.push_back(i);}
   for(int j=j1;j<=j2;j++){l2.push_back(j*a2);b_index.push_back(j);}
   for(int k=k1;k<=k2;k++){l3.push_back(k*a3);c_index.push_back(k);}
-  //DX 20191218 - calculate and store once = speed - END
+  //DX20191218 - calculate and store once = speed - END
 
-  // resize vectors - DX 20191122
+  // resize vectors - DX20191122
   uint num_grid_atoms = str.atoms.size()*l1.size()*l2.size()*l3.size();
   str.grid_atoms.resize(num_grid_atoms);
-  str.grid_atoms_pc2scMap.resize(str.atoms.size()); //DX 20191218 - should be the size of the the primitive cell, not grid
+  str.grid_atoms_pc2scMap.resize(str.atoms.size()); //DX20191218 - should be the size of the the primitive cell, not grid
   str.grid_atoms_sc2pcMap.resize(num_grid_atoms);
 
-  uint grid_atom_count = 0; // keep track of index - DX 20191122
+  uint grid_atom_count = 0; // keep track of index - DX20191122
 
   for(uint iat=0;iat<str.atoms.size();iat++){
-    //str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
-    //str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
-    //str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-    str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap[grid_atom_count] = iat; //DX 20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
-    str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
-    grid_atom_count++; //DX 20191122
+    //str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    //str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); //CO20171025 
+    //str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+    str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    str.grid_atoms_pc2scMap[grid_atom_count] = iat; //DX20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
+    str.grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
+    grid_atom_count++; //DX20191122
   }
   //for(int i=i1;i<=i2;i++) {
   //for(int j=j1;j<=j2;j++) {
   //for(int k=k1;k<=k2;k++) {
   //if(i!=0 || j!=0 || k!=0) {
   //for(uint iat=0;iat<str.atoms.size();iat++) {
-  //atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
+  //atom=str.atoms[iat]; //DX20190709 - at to [] = speed increase
   //atom.isincell=FALSE; // these are OUT OF CELL
-  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
-  //atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
-  //atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
-  //atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+  //atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+  //atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+  //atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
   //str.grid_atoms.push_back(atom);
-  //str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-  //if(LDEBUG) { //CO190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-  //} //CO190520
+  //str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+  //if(LDEBUG) { //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+  //} //CO20190520
   //}
   //}
   //}
   //}
   //}
-  xvector<double> a_component(3), ab_component(3), abc_component(3); //DX+ME 20191107 - define outside loop (speed increase)
-  uint natoms = str.atoms.size(); //DX 20191107 - initialize natoms outside loop (speed increase)
+  xvector<double> a_component(3), ab_component(3), abc_component(3); //DX+ME20191107 - define outside loop (speed increase)
+  uint natoms = str.atoms.size(); //DX20191107 - initialize natoms outside loop (speed increase)
   for(uint i=0;i<l1.size();i++) {
-    a_component = l1[i];                           // DX : i*lattice(1)
+    a_component = l1[i];                           //DX : i*lattice(1)
     for(uint j=0;j<l2.size();j++) {
-      ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
+      ab_component = a_component + l2[j];          //DX : i*lattice(1) + j*lattice(2)
       for(uint k=0;k<l3.size();k++) {
-        //DX 20191218 [WRONG INDICES] if(i!=0 || j!=0 || k!=0)
-        if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) //DX 20191218
-        { //CO200106 - patching for auto-indenting
-          abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
-          for(uint iat=0;iat<natoms;iat++) {       //DX 20191107 - replace str.atoms.size() with natoms
-            atom=str.atoms[iat];                   //DX 20190709 - at to [] = speed increase
+        //DX20191218 [WRONG INDICES] if(i!=0 || j!=0 || k!=0)
+        if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) //DX20191218
+        { //CO20200106 - patching for auto-indenting
+          abc_component = ab_component + l3[k];    //DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
+          for(uint iat=0;iat<natoms;iat++) {       //DX20191107 - replace str.atoms.size() with natoms
+            atom=str.atoms[iat];                   //DX20190709 - at to [] = speed increase
             atom.isincell=FALSE;                   // these are OUT OF CELL
-            //DX 20191127 [OBOSLETE] atom.cpos=abc_component+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
-            atom.cpos+=abc_component;              //DX 20190709 - at to [] = speed increase // CO 20191127 
-            //DX 20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
-            //DX 20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
-            //DX 20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
-            atom.fpos[1]+=a_index[i];              //DX 20190709 - at to [] = speed increase //CO 20191127
-            atom.fpos[2]+=b_index[j];              //DX 20190709 - at to [] = speed increase //CO 20191127
-            atom.fpos[3]+=c_index[k];              //DX 20190709 - at to [] = speed increase //CO 20191127
-            //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
-            //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+            //DX20191127 [OBOSLETE] atom.cpos=abc_component+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+            atom.cpos+=abc_component;              //DX20190709 - at to [] = speed increase //CO20191127 
+            //DX20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+            atom.fpos[1]+=a_index[i];              //DX20190709 - at to [] = speed increase //CO20191127
+            atom.fpos[2]+=b_index[j];              //DX20190709 - at to [] = speed increase //CO20191127
+            atom.fpos[3]+=c_index[k];              //DX20190709 - at to [] = speed increase //CO20191127
+            //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
+            //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
             str.grid_atoms[grid_atom_count] = atom;
-            str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
-            if(LDEBUG) { //CO190520
-              //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-              //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX 20191218
-              cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; // DX 20191218
-            } //CO190520
-            grid_atom_count++; //DX 20191122
+            str.grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
+            //DX20200320 [OBSOLETE-moved outside of loop for speed] if(LDEBUG) { //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed] } //CO20190520
+            grid_atom_count++; //DX20191122
           }
         }
       }
     }
   }
-  if(0){  //CO190808 - quick check of mindist
+  //DX20200320 - moved outside of loop so that LDEBUG boolean is not checked every time (speed increase when grid atoms is large)
+  if(LDEBUG) { //CO20190520
+    for(uint i=0;i<str.grid_atoms.size();i++){
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << str.grid_atoms[i].cpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << str.grid_atoms[i].fpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "]=" << str.grid_atoms[i] << endl; //DX20191218
+      cerr << soliloquy << " grid_atoms_sc2pcMap[" << i << "]=" << str.grid_atoms_sc2pcMap[i] << endl; //DX20191218
+    } //CO20190520
+  }
+  if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<str.grid_atoms.size()-1;i++){
       for(uint j=i+1;j<str.grid_atoms.size();j++){
@@ -14603,6 +15558,12 @@ xstructure input2VASPxstr(istream& input) {
   return a;
 }
 
+xstructure input2ELKxstr(istream& input) { //DX20200313
+  xstructure a(input,IOAFLOW_AUTO);
+  a.xstructure2elk();
+  return a;
+}
+
 // **************************************************************************
 // r_lattice
 // ***************************************************************************
@@ -14634,7 +15595,7 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk) {
 // Output position in cell 0 is given with same coordinate type (Cart or Direct) as input position.
 // Note that there is always an ambiguity of being in a given cell with position 0, or one cell over with position 1.  This
 // is broken by forcing all cell positions to be at 0 if they are within TOL of 1.  This gives consistent cell image locations.
-// CO 170717 - Compare this with PBC() function, this function brings in to 0th cell, PBC brings in to cell between -0.5 and 0.5
+//CO20170717 - Compare this with PBC() function, this function brings in to 0th cell, PBC brings in to cell between -0.5 and 0.5
 // PBC() is good for minimizing overall fpos
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
     xvector<int>& ijk,const xmatrix<double>& lattice,
@@ -14776,8 +15737,8 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
   deque<_atom> all_atom_vec;
   // latt maybe a rotated version of POSCAR, so need to incell-ized the fpos and cpos
   // sstr.BringInCell(); // with roundoff
-  sstr.BringInCell(); //DX+RF 20200121 - negative input is no longer accepted // no roundoff
-  //DX+RF 20200121 - negative input is no longer accepted : sstr.BringInCell(-1.0); // no roundoff
+  sstr.BringInCell(); //DX+RF20200121 - negative input is no longer accepted // no roundoff
+  //DX+RF20200121 - negative input is no longer accepted : sstr.BringInCell(-1.0); // no roundoff
   for(ijk(1)=-imax;ijk(1)<=imax;ijk(1)++) {
     for(ijk(2)=-jmax;ijk(2)<=jmax;ijk(2)++) {
       for(ijk(3)=-kmax;ijk(3)<=kmax;ijk(3)++) {
@@ -14787,7 +15748,7 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
           _atom a;
           a=sstr.atoms.at(iat);
           a.name=sstr.atoms.at(iat).name;
-          a.basis=iat; //[CO200130 - number->basis]a.number=iat;
+          a.basis=iat; //[CO20200130 - number->basis]a.number=iat;
           a.ijk=ijk;
           for(int ic=1;ic<=3;ic++)
             ctpos(ic)=sstr.atoms.at(iat).cpos(ic)+ijk(1)*lat(1,ic)+ijk(2)*lat(2,ic)+ijk(3)*lat(3,ic);
@@ -14857,7 +15818,7 @@ void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
     _atom a=sstr.atoms.at(iat);
     a.name=sstr.atoms.at(iat).name;
-    a.basis=iat; //[CO200130 - number->basis]a.number=iat;
+    a.basis=iat; //[CO20200130 - number->basis]a.number=iat;
     a.ijk=sstr.atoms.at(iat).ijk;
     a.cpos=sstr.atoms.at(iat).cpos;
     a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
@@ -14928,7 +15889,7 @@ void xstructure::qm_load(string Directory,string suffix,int iomode) {
   if(iomode==IOVASP_POSCAR) {
     xOUTCAR outcar;
     //if(aurostd::FileEmpty(Directory+"/OUTCAR"))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}
-    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}  // PINKU AND JOSE FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}  //PN+JJPR FIXED BUG
 
     outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix,data_natoms,TRUE);
 
@@ -14954,9 +15915,9 @@ void xstructure::qm_load(string Directory,string suffix,int iomode) {
     // NEW WITH xVASPRUNXML
     xVASPRUNXML vasprunxml;
     //if(aurostd::FileEmpty(Directory+"/vasprun.xml"))   {cerr << "ERROR xtructure::qm_load: Empty vasprun.xml" << endl;exit(0);}
-    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty vasprun.xml" << endl;exit(0);} //PINKU AND JOSE FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty vasprun.xml" << endl;exit(0);} //PN+JJPR FIXED BUG
     //vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml");
-    vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml"+suffix); //PINKU AND JOSE FIXED BUG
+    vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml"+suffix); //PN+JJPR FIXED BUG
     qm_forces.clear(); for(uint i=0;i<vasprunxml.vforces.size();i++)  qm_forces.push_back(vasprunxml.vforces.at(i)); 
 
 
@@ -15053,7 +16014,7 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
   exit(0);
 }
 
-// DX 8/31/17 - xstructure2json - START
+//DX20170831 - xstructure2json - START
 // **************************************************************************
 // xstructure2json
 // **************************************************************************
@@ -15075,7 +16036,7 @@ string xstructure2json(xstructure& xstr) {
 
   // SCALE/VOL 
   if(xstr.scale){
-    sscontent_json << "\"scale\":" << xstr.scale << "" << eendl; // DX 3/6/18 - number not string (removed quotations)
+    sscontent_json << "\"scale\":" << xstr.scale << "" << eendl; //DX20180306 - number not string (removed quotations)
   } else {
     if(PRINT_NULL){ sscontent_json << "\"scale\":null" << eendl;}
   }
@@ -15083,7 +16044,7 @@ string xstructure2json(xstructure& xstr) {
 
   // LATTICE
   if(xstr.lattice.rows){
-    sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_AFLOW_XSTR_PRINT_PRECISION_,roff) << "]" << eendl; //CO 180515
+    sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_AFLOW_XSTR_PRINT_PRECISION_,roff) << "]" << eendl; //CO20180515
   } else {
     if(PRINT_NULL){ sscontent_json << "\"lattice\":null" << eendl;}
   }
@@ -15091,9 +16052,9 @@ string xstructure2json(xstructure& xstr) {
 
   // SPECIES 
   if(xstr.species.size()){
-    deque<string> cleaned_species; //DX 20190612 - cleaned species names
-    for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX 20190612 - cleaned species names
-    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapDeqEntries(cleaned_species,"\""),",") << "]" << eendl; //DX 20190612 - cleaned species names
+    deque<string> cleaned_species; //DX20190612 - cleaned species names
+    for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX20190612 - cleaned species names
+    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(cleaned_species,"\""),",") << "]" << eendl; //DX20190612 - cleaned species names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"species\":null" << eendl;}
   }
@@ -15109,7 +16070,7 @@ string xstructure2json(xstructure& xstr) {
 
   // COORDINATES TYPE
   if(xstr.coord_flag==_COORDS_FRACTIONAL_){
-    sscontent_json << "\"coordinates_type\":\"direct\"" << eendl; // CO 171025
+    sscontent_json << "\"coordinates_type\":\"direct\"" << eendl; //CO20171025
   } else if(xstr.coord_flag==_COORDS_CARTESIAN_){
     sscontent_json << "\"coordinates_type\":\"Cartesian\"" << eendl;
   }
@@ -15131,9 +16092,9 @@ string xstructure2json(xstructure& xstr) {
   sss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}" << eendl;
   return sss.str();
 }
-// DX 8/31/17 - xstructure2json - END
+//DX20170831 - xstructure2json - END
 
-// DX 8/31/17 - atom2json - START
+//DX20170831 - atom2json - START
 // **************************************************************************
 // atom2json
 // **************************************************************************
@@ -15147,7 +16108,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
   // NAME 
   if(atom.name.size()){
-    sscontent_json << "\"name\":\"" << KBIN::VASP_PseudoPotential_CleanName(atom.name) << "\"" << eendl; //DX 20190612 - added function to clean names
+    sscontent_json << "\"name\":\"" << KBIN::VASP_PseudoPotential_CleanName(atom.name) << "\"" << eendl; //DX20190612 - added function to clean names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"name\":null" << eendl;}
   }
@@ -15155,9 +16116,9 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
   // POSITION
   if(coord_flag==_COORDS_FRACTIONAL_){
-    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.fpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO 180515
+    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.fpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO20180515
   } else if(coord_flag==_COORDS_CARTESIAN_){
-    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO 180515
+    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO20180515
   } else {
     if(PRINT_NULL){ sscontent_json << "\"position\":null" << eendl;}
   }
@@ -15176,12 +16137,12 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   sss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
   return sss.str();
 } 
-// DX 8/31/17 - atom2json
+//DX20170831 - atom2json
 
 #endif  // _AFLOW_XATOM_CPP
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************
