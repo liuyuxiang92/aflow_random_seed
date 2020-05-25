@@ -10,9 +10,6 @@
 // 2015: corey.oses@duke.edu
 
 #include "aflow.h"
-#include "aflow_bader.h"
-#include <iostream>
-#include <string>
 
 // ***************************************************************************//
 // bader_functions::BaderCalc

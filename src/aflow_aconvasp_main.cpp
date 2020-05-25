@@ -21,7 +21,6 @@
 // [OBSOLETE] [KY] #include "aflow_contrib_kesong.h"
 #include "aflow_pocc.h"  //CO20181226
 #include "aflow_pocc_old.h"
-#include "aflow_bader.h"
 #include "aflow_chull.h"
 #include "aflow_compare_structure.h" //DX20181023
 // [OBSOLETE] #include "aflow_contrib_cormac.h"

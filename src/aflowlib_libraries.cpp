@@ -11,7 +11,6 @@
 #include "aflow.h"
 #include "aflowlib.h"
 #include "aflow_pflow.h"
-#include "aflow_bader.h"
 #include "aflow_matlab_funcs.cpp" //CO20200508
 #include "aflow_gnuplot_funcs.cpp" //CO20200508
 

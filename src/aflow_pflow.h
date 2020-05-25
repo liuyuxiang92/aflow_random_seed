@@ -346,7 +346,6 @@ namespace pflow {
   void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // main function
   void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // main function
-  /**/
   // END - added by Corey Oses - May 2017
   xstructure LTCELL(string options,istream& input);
   // [OBSOLETE]  xstructure LTCELLFV(string options,istream& input);
