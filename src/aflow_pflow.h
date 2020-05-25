@@ -545,6 +545,9 @@ namespace pflow { //CO20190601
   void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
   void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
   void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+
+  bool findClosedPackingPlane(istream& input);  //CO20191110
+  bool findClosedPackingPlane(const xstructure& xstr);  //CO20191110
 } // namespace pflow
 
 namespace pflow {

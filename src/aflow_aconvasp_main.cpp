@@ -603,6 +603,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
 
+  vpflow.flag("FIND_CLOSED_PACKING_PLANE",aurostd::args2flag(argv,cmds,"--find_closed_packing_plane")); //CO20191110
+
   vpflow.flag("FRAC",aurostd::args2flag(argv,cmds,"--frac|-frac|--fractional|-fract|--fract|--direct|-direct|-f|-d"));
   vpflow.flag("FROZSL_VASPSETUP_AFLOW",aurostd::args2flag(argv,cmds,"--frozsl_vaspsetup_aflow|--frozsl_vaspsetup|--frozsl_vasp|--frozsl_setup|--phvaspsetup"));
   vpflow.flag("FROZSL_VASPSETUP_POSCAR",aurostd::args2flag(argv,cmds,"--frozsl_vaspsetup_poscar"));
@@ -1616,6 +1618,7 @@ namespace pflow {
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
+      if(vpflow.flag("FIND_CLOSED_PACKING_PLANE")){pflow::findClosedPackingPlane(cin); _PROGRAMRUN=true;} //COCO190808
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
       //DX+CO END

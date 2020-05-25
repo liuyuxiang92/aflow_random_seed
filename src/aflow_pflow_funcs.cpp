@@ -1561,6 +1561,54 @@ namespace pflow {
   }
 } // namespace pflow
 
+namespace pflow {
+  bool findClosedPackingPlane(istream& input){xstructure xstr_in(input,IOAFLOW_AUTO);return findClosedPackingPlane(xstr_in);} //CO20191110
+  bool findClosedPackingPlane(const xstructure& xstr_in){ //CO20191110
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::findClosedPackingPlane():";
+
+    if(LDEBUG){cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;}
+
+    xstructure xstr_grid(xstr_in);
+    xstr_grid.GenerateGridAtoms(3); //-3:3 in every direction
+    const deque<_atom>& grid_atoms=xstr_grid.grid_atoms;
+
+    if(LDEBUG){cerr << soliloquy << " grid_atoms=" << endl;for(uint i=0;i<grid_atoms.size();i++){cerr << "i=" << i << ": cpos=" << grid_atoms[i].cpos << endl;}}
+
+    aurostd::xcombos xc(grid_atoms.size(),4,'C');  //need to check coplanarity: requires 4 points
+    vector<int> combo;
+
+    while(xc.increment()){
+      combo=xc.getCombo();
+      const _atom& a1=grid_atoms[combo[0]];
+      const _atom& a2=grid_atoms[combo[1]];
+      const _atom& a3=grid_atoms[combo[2]];
+      const _atom& a4=grid_atoms[combo[3]];
+
+      if(LDEBUG){
+        cerr << soliloquy << " checking coplanarity of:" << endl;
+        cerr << a1.cpos << endl;
+        cerr << a2.cpos << endl;
+        cerr << a3.cpos << endl;
+        cerr << a4.cpos << endl;
+      }
+
+
+      //check if they are coplanar
+      //use formula from https://en.wikipedia.org/wiki/Coplanarity
+      if(aurostd::isequal( aurostd::scalar_product( aurostd::vector_product( a2.cpos-a1.cpos , a4.cpos-a1.cpos ) , a3.cpos-a1.cpos ) , 0.0)){
+        if(LDEBUG){
+          cerr << soliloquy << " found coplanar set" << endl;
+
+
+        }
+      }
+    }
+
+    return true;
+  }
+} // namespace pflow
+
 // ***************************************************************************
 // ParseChemFormula
 // ***************************************************************************

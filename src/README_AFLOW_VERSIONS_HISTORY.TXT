@@ -1,3 +1,6 @@
+3.2.4 - 2020/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+        -- adding findClosedPackingPlane (to be finished) (CO)
 3.2.3 - 2020/05/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
 	-- Bug fixes in KBIN::ExtractSystemName() (ME)
