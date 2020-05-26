@@ -15,11 +15,6 @@
 // Aflow core libraries
 #include "../aflow.h"
 #include "../AUROSTD/aurostd.h"
-//The functions in the header file "aflow_qha_operations.h" include various vector and matrix operations.//
-//These functions are used to calculate eigenvalues and eigenvectors of complex symmetric Hermitian matrices and .//
-//Also perform other operations involved in calculating quasiharmonic properties.//
-//These functions have been built based on vectorview concepts//
-#include "aflow_qha_operations.h"
 
 //ME20190219 - Define the checksum algorithm used for APL hibernate files
 #define APL_CHECKSUM_ALGO  string("Fletcher32")
@@ -420,7 +415,6 @@ namespace apl {
   };
 
 }  // namespace apl
-
 
 // ***************************************************************************
 
@@ -1453,6 +1447,11 @@ namespace apl {
 // ***************************************************************************
 // Linear and nonlinear fitting functions, this functions compute fitting parameters correctly
 //although chi-square matrix is not computing correctly [PN]
+//The functions in the header file "aflow_qha_operations.h" include various vector and matrix operations.//
+//These functions are used to calculate eigenvalues and eigenvectors of complex symmetric Hermitian matrices and .//
+//Also perform other operations involved in calculating quasiharmonic properties.//
+//These functions have been built based on vectorview concepts//
+#include "aflow_qha_operations.h"
 #define FIT_LIMIT 0.001
 namespace apl {
   class aflowFITTING {
