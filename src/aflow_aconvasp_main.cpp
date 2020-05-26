@@ -10771,15 +10771,13 @@ namespace pflow {
     } else if (type == _LOGGER_NOTICE_) {
 
       ////////////////////////////////////////////////////////////////////////////
-      // START Raw logger
+      // START Notice logger
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
         // borrowed from APL/aflow_apl.h
         if(fancy_print) printf("\033[32m");  // green
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
+        for(uint i=0;i<message_parts.size();i++) {
           oss << "00000";
           oss << "  ";
 
@@ -10790,7 +10788,7 @@ namespace pflow {
           oss << " ";
           oss << soliloquy;
           oss << " ";
-          oss << message_parts[i]; //CO20181226 //message;
+          oss << message_parts[i];
           oss << Message(aflags,message_metadata,filename);
           oss << endl;
         }
@@ -10798,23 +10796,21 @@ namespace pflow {
         oss.flush();
       }
       // write to log
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
+      for(uint i=0;i<message_parts.size();i++) {
         FileMESSAGE << "00000";
         FileMESSAGE << "  ";
         FileMESSAGE << "NOTICE";
         FileMESSAGE << " ";
         FileMESSAGE << soliloquy;
         FileMESSAGE << " ";
-        FileMESSAGE << message_parts[i]; //CO20181226 //message;
+        FileMESSAGE << message_parts[i];
         FileMESSAGE << Message(aflags,message_metadata,filename);
         FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
       ////////////////////////////////////////////////////////////////////////////
-      // END Raw logger
+      // END Notice logger
       ////////////////////////////////////////////////////////////////////////////
 
     } else {
