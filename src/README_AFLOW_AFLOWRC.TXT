@@ -1261,7 +1261,7 @@ DEFAULT_APL_MSQRDISP_FILE
   default: "displacements.out"
 
 DEFAULT_APL_GVEL_FILE
-  description: Output file for the mean square displacements.
+  description: Output file for the group velocities.
   type: string
   default: "group_velocities.out"
 
@@ -1468,7 +1468,7 @@ DEFAULT_AAPL_IRRQPTS_FILE
   default: "irred_qpoints.out"
 
 DEFAULT_AAPL_GVEL_FILE
-  description: Output file for the group velocities of the phonon modes used for thermal conductivity calculations.
+  description: Output file for the group velocities of the phonon modes and frequencies used for thermal conductivity calculations.
   type: string
   default: "group_velocities.out"
 

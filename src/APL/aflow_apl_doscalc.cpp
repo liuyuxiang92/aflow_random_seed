@@ -35,12 +35,12 @@ namespace apl {
   }
 
   DOSCalculator::DOSCalculator(const DOSCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   DOSCalculator& DOSCalculator::operator=(const DOSCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
     return *this;
   }
