@@ -49,8 +49,6 @@ namespace apl {
 // BEGIN: Supplemental classes for APL, AAPL, and QHA
 // ***************************************************************************
 
-// Supercell definition has to come before PhononCalculator,
-// ForceConstantCalculator, ClusterSet, and AnharmonicIFCs
 namespace apl {
 
   class Supercell : public xStream {
@@ -163,7 +161,6 @@ namespace apl {
 }  // namespace apl
 
 // ***************************************************************************
-// QMesh definition has to come before PhononCalculator
 
 namespace apl {
 
@@ -304,10 +301,8 @@ namespace apl {
 // ***************************************************************************
 
 // ***************************************************************************
-// BEGIN: Force constant calculators
+// BEGIN: Automatic Phonon Library (APL)
 // ***************************************************************************
-// These class definitions have to come before PhononCalculator and
-// TCONDCalculator.
 
 // ***************************************************************************
 
@@ -320,7 +315,6 @@ namespace apl {
 
 namespace apl {
 
-  // ForceConstantCalculator has to come before PhononCalculator
   class ForceConstantCalculator : public xStream {
     protected:
       Supercell* _supercell;
@@ -424,237 +418,9 @@ namespace apl {
       void saveState(const string&);  // ME20200112
       void readFromStateFile(const string&);  // ME20200112
   };
-}
-
-namespace apl {
-
-  // _cluster holds a single cluster
-  struct _cluster {
-    vector<int> atoms;  // List of atoms inside the cluster
-    int fgroup;  // Index pointing to the factor group that transforms the cluster into another cluster
-    int permutation;  // Index pointing to the permutation that transforms the cluster into another cluster
-  };
-
-  // _ineq_distortions contains a list of inequivalent distortion and its equivalent
-  // distortions for a given set of atoms
-  struct _ineq_distortions {
-    vector<int> atoms;  // A list of atoms involved in the distortions
-    vector<int> clusters;  // A list of cluster sets that use these distortions for their force constant calculations
-    vector<vector<vector<int> > > distortions; // Map of distortions. The distortions vectors need to be defined elsewhere. 
-    vector<vector<int> > rotations;  // The factor group that holds the rotation to transform the distortions
-    vector<vector<vector<int> > > transformation_maps;  // A map containing the transformation of the atoms for each distortion
-  };
-
-  // _linearCombinations is a structure to store linear combinations.
-  struct _linearCombinations {
-    vector<vector<int> > indices;  // Cartesian indices of each linear combination
-    vector<vector<double> > coefficients;  // Coefficients of each linear combination
-    vector<int> independent;  // The linearly independent values
-    vector<int> dependent;  // The linearly dependent values
-    // indep2depMap maps the independent coefficients to the coefficients that
-    // depend on them. This is used for the IFC correction method.
-    vector<vector<int> > indep2depMap;
-  };
-
-  class ClusterSet : public xStream {
-    // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
-    public:
-      ClusterSet(ostream& oss=std::cout);
-      ClusterSet(ofstream&, ostream& oss=std::cout);
-      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
-      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
-      ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-      ~ClusterSet();  // Destructor
-      const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear();
-      void initialize(const Supercell&, int, int, double, ofstream&, ostream& oss=std::cout);
-      void initialize(const Supercell&, int, int, double);
-      void readClusterSetFromFile(const string&);
-
-      vector<_cluster> clusters;
-      vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
-      double cutoff;  // Cutoff radius in Angstroms
-      string directory;  // Directory for logging
-      vector<xvector<double> > distortion_vectors;  // List of distortion vectors
-      vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
-      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
-      vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
-      vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
-      int nifcs;  // Number of force constants for each set of atoms.
-      int order;  // Order of the cluster, i.e. the order of the force constant to be calculated.
-      xstructure pcell;  // Structure of the primitive cell.
-      vector<int> pc2scMap;  // Atom map from the primitive cell to the supercell.
-      vector<vector<int> > permutations;  // List of possible permutations for the cluster
-      xstructure scell;  // Structure of the supercell.
-      vector<int> sc2pcMap;  // Atom map from the supercell to the primitive cell.
-      xvector<int> sc_dim;  // Dimensions of the supercell.
-      vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
-
-      const _cluster& getCluster(const int& i) const;  //ME20190520
-      void build();
-      void buildDistortions();
-      void writeClusterSetToFile(const string&);
-
-    private:
-      void free();
-      void copy(const ClusterSet&);
-
-      double getMaxRad(const xstructure&, int);
-      void buildShells();
-      vector<_cluster> buildClusters();
-      vector<vector<int> > getSymmetryMap();
-      vector<vector<int> > getPermutations(int);
-
-      // Clusters
-      void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
-      int getNumUniqueAtoms(const vector<int>&);
-      vector<int> getComposition(const vector<int>&);
-      bool sameComposition(const vector<int>&, const vector<int>&);
-      int equivalenceCluster(const vector<int>&, const vector<int>&,
-          const vector<vector<int> >&, const vector<vector<int> >&);
-      vector<int> translateToPcell(const vector<int>&, int);
-      int comparePermutations(const vector<int>&, const vector<int>&);
-      bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
-      void getSymOp(_cluster&, const vector<int>&);
-
-      // Distortions
-      vector<xvector<double> > getCartesianDistortionVectors();
-      vector<_ineq_distortions> initializeIneqDists();
-      int sameDistortions(const _cluster&, const vector<_ineq_distortions>&);
-      vector<vector<int> > getTestDistortions(const vector<int>&);
-      void getInequivalentDistortions(const vector<vector<int> >&, _ineq_distortions&);
-      void appendDistortion(_ineq_distortions&, vector<int>,
-          const int& eq=-1, const int& fg=-1);
-      bool allZeroDistortions(const vector<int>&, const vector<int>&);
-      bool allAtomsMatch(const int&, const vector<int>&);
-      int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
-          const vector<vector<vector<int> > >&, const vector<int>&);
-      vector<int> getTransformationMap(const int&, const int&);
-      vector<_ineq_distortions> getHigherOrderDistortions();
-
-      // Linear Combinations
-      vector<_linearCombinations> getLinearCombinations();
-      vector<vector<int> > getInvariantSymOps(const _cluster&);
-      vector<vector<double> > buildCoefficientMatrix(const vector<vector<int> >&);
-      vector<vector<double> > getRREF(vector<vector<double> >);
-
-      // File I/O
-      string writeParameters();
-      string writeInequivalentClusters();
-      string writeClusters(const vector<_cluster>&);
-      string writeLinearCombinations(const _linearCombinations&);
-      string writeInequivalentDistortions();
-      string writeIneqDist(const _ineq_distortions&);
-      string writeHigherOrderDistortions();
-
-      bool checkCompatibility(uint&, const vector<string>&);
-      void readInequivalentClusters(uint&, const vector<string>&);
-      vector<_cluster> readClusters(uint&, const vector<string>&);
-      _linearCombinations readLinearCombinations(uint&, const vector<string>&);
-      void readInequivalentDistortions(uint&, const vector<string>&);
-      _ineq_distortions readIneqDist(uint&, const vector<string>&);
-      void readHigherOrderDistortions(uint&, const vector<string>&);
-  };
 
 }  // namespace apl
 
-// ***************************************************************************
-
-namespace apl {
-
-  class AnharmonicIFCs : public xStream {
-    // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
-    public:
-      AnharmonicIFCs(ostream& oss=std::cout);
-      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
-      AnharmonicIFCs(const AnharmonicIFCs&);
-      const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
-      ~AnharmonicIFCs();
-      void clear();
-      void initialize(const Supercell&, int, const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
-      void initialize(const Supercell&, int, const aurostd::xoption&);
-
-      void setOptions(double, int, double, double, bool);
-      const string& getDirectory() const;
-      void setDirectory(const string&);
-      int getOrder() const;
-
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
-      bool calculateForceConstants();
-      const vector<vector<double> >& getForceConstants() const;
-      vector<vector<int> > getClusters() const;
-      void writeIFCsToFile(const string&);
-
-    private:
-      ClusterSet clst;
-
-      vector<_xinput> xInputs;
-      bool _useZeroStateForces;
-      bool initialized;
-      string directory;
-      vector<vector<int> > cart_indices;  // A list of all Cartesian indices
-      double distortion_magnitude;  // The magnitude of the distortions in Angstroms
-      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
-      int max_iter;  // Number of iterations for the sum rules
-      double mixing_coefficient;  // The mixing coefficient for the SCF procedure
-      int order;  // The order of the IFCs
-      double sumrule_threshold;  // Convergence threshold for the sum rules
-
-      void free();
-      void copy(const AnharmonicIFCs&);
-
-      string buildRunName(const vector<int>&, const vector<int>&, int, int);
-      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
-
-      vector<vector<int> > getCartesianIndices();
-
-      vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
-      vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
-      int getTransformedAtom(const vector<int>&, const int&);
-      void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
-      vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
-          const vector<vector<vector<xvector<double> > > >&);
-      double finiteDifference(const vector<vector<xvector<double> > >&, int,
-          const vector<int>&, const vector<int>&);
-
-      // Symmetrization Functions
-      vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
-      typedef vector<std::pair<vector<int>, vector<double> > > tform;
-      typedef vector<vector<vector<vector<int> > > > v4int;
-      void getTensorTransformations(v4int&, vector<vector<tform> >&);
-      vector<vector<int> > getReducedClusters();
-      void applyLinCombs(vector<vector<double> >&);
-      void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
-      void applyPermutations(vector<int>, vector<vector<double> >&);
-      void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
-          vector<vector<double> >&, vector<vector<double> >&);
-      void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
-          const vector<vector<double> >&,
-          const vector<vector<int> >&, const v4int&);
-      vector<double> getCorrectionTerms(const int&,
-          const vector<vector<int> >&,
-          const vector<vector<double> >&,
-          const vector<vector<double> >&,
-          const vector<vector<double> >&);
-      uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
-
-      // File I/O
-      string writeParameters();
-      string writeIFCs();
-      bool checkCompatibility(uint&, const vector<string>&);
-      vector<vector<double> > readIFCs(uint&, const vector<string>&);
-  };
-
-}  //namespace apl
-
-
-// ***************************************************************************
-// END: Force constant calculators
-// ***************************************************************************
-
-// ***************************************************************************
-// BEGIN: Automatic Phonon Library (APL)
-// ***************************************************************************
 
 // ***************************************************************************
 
@@ -686,6 +452,7 @@ namespace apl {
 
 namespace apl {
 
+  class AnharmonicIFCs;  // Forward declaration
   class PhononCalculator : public xStream {
     private:
       // USER PARAMETERS
@@ -795,6 +562,8 @@ namespace apl {
 
 }  // namespace apl
 
+// ***************************************************************************
+
 namespace apl {
 
   class PathBuilder {
@@ -902,12 +671,7 @@ namespace apl {
 
 namespace apl {
 
-#define MIN_FREQ_TRESHOLD -0.1  //in AMU
-#define RAW2Hz 15.6333046177
-#define AMU2Kg 1.66053904
-#define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue threshold in AMU
-  class DOSCalculator  //ME20190424
-  { //CO20200106 - patching for auto-indenting
+  class DOSCalculator {
     protected:
       PhononCalculator* _pc;
       bool _pc_set;
@@ -1087,6 +851,228 @@ namespace apl {
 
 // ***************************************************************************
 // BEGIN ME: Automatic Anharmonic Phonon Library (AAPL)
+// ***************************************************************************
+
+namespace apl {
+
+  // _cluster holds a single cluster
+  struct _cluster {
+    vector<int> atoms;  // List of atoms inside the cluster
+    int fgroup;  // Index pointing to the factor group that transforms the cluster into another cluster
+    int permutation;  // Index pointing to the permutation that transforms the cluster into another cluster
+  };
+
+  // _ineq_distortions contains a list of inequivalent distortion and its equivalent
+  // distortions for a given set of atoms
+  struct _ineq_distortions {
+    vector<int> atoms;  // A list of atoms involved in the distortions
+    vector<int> clusters;  // A list of cluster sets that use these distortions for their force constant calculations
+    vector<vector<vector<int> > > distortions; // Map of distortions. The distortions vectors need to be defined elsewhere. 
+    vector<vector<int> > rotations;  // The factor group that holds the rotation to transform the distortions
+    vector<vector<vector<int> > > transformation_maps;  // A map containing the transformation of the atoms for each distortion
+  };
+
+  // _linearCombinations is a structure to store linear combinations.
+  struct _linearCombinations {
+    vector<vector<int> > indices;  // Cartesian indices of each linear combination
+    vector<vector<double> > coefficients;  // Coefficients of each linear combination
+    vector<int> independent;  // The linearly independent values
+    vector<int> dependent;  // The linearly dependent values
+    // indep2depMap maps the independent coefficients to the coefficients that
+    // depend on them. This is used for the IFC correction method.
+    vector<vector<int> > indep2depMap;
+  };
+
+  class ClusterSet : public xStream {
+    // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
+    public:
+      ClusterSet(ostream& oss=std::cout);
+      ClusterSet(ofstream&, ostream& oss=std::cout);
+      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
+      ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
+      ~ClusterSet();  // Destructor
+      const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
+      void clear();
+      void initialize(const Supercell&, int, int, double, ofstream&, ostream& oss=std::cout);
+      void initialize(const Supercell&, int, int, double);
+      void readClusterSetFromFile(const string&);
+
+      vector<_cluster> clusters;
+      vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
+      double cutoff;  // Cutoff radius in Angstroms
+      string directory;  // Directory for logging
+      vector<xvector<double> > distortion_vectors;  // List of distortion vectors
+      vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
+      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
+      vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
+      vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
+      int nifcs;  // Number of force constants for each set of atoms.
+      int order;  // Order of the cluster, i.e. the order of the force constant to be calculated.
+      xstructure pcell;  // Structure of the primitive cell.
+      vector<int> pc2scMap;  // Atom map from the primitive cell to the supercell.
+      vector<vector<int> > permutations;  // List of possible permutations for the cluster
+      xstructure scell;  // Structure of the supercell.
+      vector<int> sc2pcMap;  // Atom map from the supercell to the primitive cell.
+      xvector<int> sc_dim;  // Dimensions of the supercell.
+      vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
+
+      const _cluster& getCluster(const int& i) const;  //ME20190520
+      void build();
+      void buildDistortions();
+      void writeClusterSetToFile(const string&);
+
+    private:
+      void free();
+      void copy(const ClusterSet&);
+
+      double getMaxRad(const xstructure&, int);
+      void buildShells();
+      vector<_cluster> buildClusters();
+      vector<vector<int> > getSymmetryMap();
+      vector<vector<int> > getPermutations(int);
+
+      // Clusters
+      void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
+      int getNumUniqueAtoms(const vector<int>&);
+      vector<int> getComposition(const vector<int>&);
+      bool sameComposition(const vector<int>&, const vector<int>&);
+      int equivalenceCluster(const vector<int>&, const vector<int>&,
+          const vector<vector<int> >&, const vector<vector<int> >&);
+      vector<int> translateToPcell(const vector<int>&, int);
+      int comparePermutations(const vector<int>&, const vector<int>&);
+      bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
+      void getSymOp(_cluster&, const vector<int>&);
+
+      // Distortions
+      vector<xvector<double> > getCartesianDistortionVectors();
+      vector<_ineq_distortions> initializeIneqDists();
+      int sameDistortions(const _cluster&, const vector<_ineq_distortions>&);
+      vector<vector<int> > getTestDistortions(const vector<int>&);
+      void getInequivalentDistortions(const vector<vector<int> >&, _ineq_distortions&);
+      void appendDistortion(_ineq_distortions&, vector<int>,
+          const int& eq=-1, const int& fg=-1);
+      bool allZeroDistortions(const vector<int>&, const vector<int>&);
+      bool allAtomsMatch(const int&, const vector<int>&);
+      int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
+          const vector<vector<vector<int> > >&, const vector<int>&);
+      vector<int> getTransformationMap(const int&, const int&);
+      vector<_ineq_distortions> getHigherOrderDistortions();
+
+      // Linear Combinations
+      vector<_linearCombinations> getLinearCombinations();
+      vector<vector<int> > getInvariantSymOps(const _cluster&);
+      vector<vector<double> > buildCoefficientMatrix(const vector<vector<int> >&);
+      vector<vector<double> > getRREF(vector<vector<double> >);
+
+      // File I/O
+      string writeParameters();
+      string writeInequivalentClusters();
+      string writeClusters(const vector<_cluster>&);
+      string writeLinearCombinations(const _linearCombinations&);
+      string writeInequivalentDistortions();
+      string writeIneqDist(const _ineq_distortions&);
+      string writeHigherOrderDistortions();
+
+      bool checkCompatibility(uint&, const vector<string>&);
+      void readInequivalentClusters(uint&, const vector<string>&);
+      vector<_cluster> readClusters(uint&, const vector<string>&);
+      _linearCombinations readLinearCombinations(uint&, const vector<string>&);
+      void readInequivalentDistortions(uint&, const vector<string>&);
+      _ineq_distortions readIneqDist(uint&, const vector<string>&);
+      void readHigherOrderDistortions(uint&, const vector<string>&);
+  };
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class AnharmonicIFCs : public xStream {
+    // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
+    public:
+      AnharmonicIFCs(ostream& oss=std::cout);
+      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
+      AnharmonicIFCs(const AnharmonicIFCs&);
+      const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
+      ~AnharmonicIFCs();
+      void clear();
+      void initialize(const Supercell&, int, const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
+      void initialize(const Supercell&, int, const aurostd::xoption&);
+
+      void setOptions(double, int, double, double, bool);
+      const string& getDirectory() const;
+      void setDirectory(const string&);
+      int getOrder() const;
+
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
+      bool calculateForceConstants();
+      const vector<vector<double> >& getForceConstants() const;
+      vector<vector<int> > getClusters() const;
+      void writeIFCsToFile(const string&);
+
+    private:
+      ClusterSet clst;
+
+      vector<_xinput> xInputs;
+      bool _useZeroStateForces;
+      bool initialized;
+      string directory;
+      vector<vector<int> > cart_indices;  // A list of all Cartesian indices
+      double distortion_magnitude;  // The magnitude of the distortions in Angstroms
+      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
+      int max_iter;  // Number of iterations for the sum rules
+      double mixing_coefficient;  // The mixing coefficient for the SCF procedure
+      int order;  // The order of the IFCs
+      double sumrule_threshold;  // Convergence threshold for the sum rules
+
+      void free();
+      void copy(const AnharmonicIFCs&);
+
+      string buildRunName(const vector<int>&, const vector<int>&, int, int);
+      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
+
+      vector<vector<int> > getCartesianIndices();
+
+      vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
+      vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
+      int getTransformedAtom(const vector<int>&, const int&);
+      void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
+      vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
+          const vector<vector<vector<xvector<double> > > >&);
+      double finiteDifference(const vector<vector<xvector<double> > >&, int,
+          const vector<int>&, const vector<int>&);
+
+      // Symmetrization Functions
+      vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
+      typedef vector<std::pair<vector<int>, vector<double> > > tform;
+      typedef vector<vector<vector<vector<int> > > > v4int;
+      void getTensorTransformations(v4int&, vector<vector<tform> >&);
+      vector<vector<int> > getReducedClusters();
+      void applyLinCombs(vector<vector<double> >&);
+      void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
+      void applyPermutations(vector<int>, vector<vector<double> >&);
+      void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
+          vector<vector<double> >&, vector<vector<double> >&);
+      void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
+          const vector<vector<double> >&,
+          const vector<vector<int> >&, const v4int&);
+      vector<double> getCorrectionTerms(const int&,
+          const vector<vector<int> >&,
+          const vector<vector<double> >&,
+          const vector<vector<double> >&,
+          const vector<vector<double> >&);
+      uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
+
+      // File I/O
+      string writeParameters();
+      string writeIFCs();
+      bool checkCompatibility(uint&, const vector<string>&);
+      vector<vector<double> > readIFCs(uint&, const vector<string>&);
+  };
+
+}  //namespace apl
+
 // ***************************************************************************
 
 namespace apl {
@@ -1764,6 +1750,8 @@ namespace apl { //PN20180705
 
 // ***************************************************************************
 // ***************************************************************************
+#define RAW2Hz 15.6333046177
+#define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue threshold in AMU
 namespace apl
 {
   class QHA:public MVops

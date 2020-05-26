@@ -18,9 +18,7 @@
 #endif
 //CO END
 
-#define MIN_FREQ_TRESHOLD -0.1
-
-using namespace std;
+static const double MIN_FREQ_THRESHOLD = -0.1;
 
 namespace apl {
 
@@ -203,10 +201,10 @@ namespace apl {
 #endif
     //CO END
 
-    //if freq > MIN_FREQ_TRESHOLD considerd as +ve freq [PN]
+    //if freq > MIN_FREQ_THRESHOLD considerd as +ve freq [PN]
     for (uint i = 0; i < _freqs.size(); i++) {
       for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
-        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_TRESHOLD)) _freqs[i][j] = 0.00;
+        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_THRESHOLD)) _freqs[i][j] = 0.00;
       }
     }
     //PN END
@@ -221,7 +219,7 @@ namespace apl {
       }
     }
     _maxFreq += 1.0;
-    if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    if (_minFreq < MIN_FREQ_THRESHOLD) _minFreq -= 1.0;
     else _minFreq = 0.0;
   }
 
@@ -683,7 +681,7 @@ namespace apl {
   }
 
   bool DOSCalculator::hasNegativeFrequencies() const {
-    return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
+    return (_minFreq < MIN_FREQ_THRESHOLD ? true : false);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
