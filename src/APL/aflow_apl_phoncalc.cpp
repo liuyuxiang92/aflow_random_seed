@@ -1193,7 +1193,7 @@ namespace apl {
       delete threads[t];
     }
 #else
-    calculateGroupVelocitiesThread(0, nQPs, freq, gvel);
+    calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);
 #endif
     return gvel;
   }

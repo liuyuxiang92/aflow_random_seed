@@ -135,7 +135,7 @@ namespace apl {
 
   void AnharmonicIFCs::setDirectory(const string& dir) {
     directory = dir;
-    clst.directory = dir;;
+    clst.directory = dir;
   }
 
   //initialize////////////////////////////////////////////////////////////////
