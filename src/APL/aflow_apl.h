@@ -1900,6 +1900,8 @@ namespace apl
       double FreeEnergy(double T, int id);
       double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
       double electronicFreeEnergy(double T, int id);
+      double ChemicalPotential(double T, int Vid);
+      double IDOS(double e, double sigma, xEIGENVAL &eig);
       xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
       double InternalEnergyFit(double T, double V);
@@ -1941,11 +1943,13 @@ namespace apl
       bool runQHA, runQHA3P, runSCQHA;
       bool isInitialized;
       bool includeElectronicContribution;
+      bool doSommerfeldExpansion;
       int Ntemperatures;
       int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
       int N_EOSvolumes;  ///< number of volumes/calculations for EOS calc
       int Nbranches;       ///< number of phonon dispersion branches
       int NatomsOrigCell;  ///< number of atoms in original cell
+      int Nelectrons;
       //int NatomsSupercell; ///< number of atoms in supercell
       xstructure origStructure;
       vector<double> Temperatures;

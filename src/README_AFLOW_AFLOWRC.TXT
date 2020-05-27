@@ -1329,6 +1329,11 @@ DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   type: bool
   default: 0
 
+DEFAULT_QHA_SOMMERFELD_EXPANSION
+  description: Defines if electronic contribution to the free energy is calculated using Sommerfeld expansion.
+  type: bool
+  default: 0
+
 DEFAULT_QHA_SCQHA_PDIS_T
   description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
   type: string
