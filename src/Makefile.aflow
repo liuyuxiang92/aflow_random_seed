@@ -11,7 +11,7 @@ aflow.o: aflow.cpp $(AFLOW_H_DEPS) aflow_test.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_aconvasp.o: aflow_aconvasp.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
-aflow_aconvasp_main.o: aflow_aconvasp_main.cpp APL/aflow_apl.h APL/aflow_qha_operations.h $(AFLOW_H_DEPS) aflow_cce.h aflow_chull.h aflow_contrib_shidong_cluster_expansion.h aflow_contrib_shidong_main.h aflow_gfa.h aflow_pocc.h aflow_pocc_old.h aflow_symmetry_spacegroup.h
+aflow_aconvasp_main.o: aflow_aconvasp_main.cpp APL/aflow_apl.h APL/aflow_qha_operations.h $(AFLOW_H_DEPS) aflow_bader.h aflow_cce.h aflow_chull.h aflow_contrib_shidong_cluster_expansion.h aflow_contrib_shidong_main.h aflow_gfa.h aflow_pocc.h aflow_pocc_old.h aflow_symmetry_spacegroup.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_ael_elastic_fit.o: aflow_ael_elastic_fit.cpp $(AFLOW_H_DEPS) aflow_ael_elasticity.h aflow_agl_debye.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
@@ -167,7 +167,7 @@ aflow_xpseudopotentials.o: aflow_xpseudopotentials.cpp $(AFLOW_H_DEPS) aflow_xps
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_database.o: aflowlib_database.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
-aflowlib_libraries.o: aflowlib_libraries.cpp $(AFLOW_H_DEPS) aflow_gnuplot_funcs.cpp aflow_matlab_funcs.cpp
+aflowlib_libraries.o: aflowlib_libraries.cpp $(AFLOW_H_DEPS) aflow_bader.h aflow_gnuplot_funcs.cpp aflow_matlab_funcs.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_libraries_scrubber.o: aflowlib_libraries_scrubber.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
