@@ -911,6 +911,121 @@ namespace pflow {
 
 }  // namespace pflow
 
+//[CO20200526 - EASY TEMPLATE CLASS]namespace pflow {
+//[CO20200526 - EASY TEMPLATE CLASS]  class AQueue : public xStream {
+//[CO20200526 - EASY TEMPLATE CLASS]    public:
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY PUBLIC CLASS METHODS - START
+//[CO20200526 - EASY TEMPLATE CLASS]      //constructors - START
+//[CO20200526 - EASY TEMPLATE CLASS]      AQueue(ostream& oss=cout);
+//[CO20200526 - EASY TEMPLATE CLASS]      AQueue(ofstream& FileMESSAGE,ostream& oss=cout);
+//[CO20200526 - EASY TEMPLATE CLASS]      AQueue(const AQueue& b);
+//[CO20200526 - EASY TEMPLATE CLASS]      //constructors - STOP
+//[CO20200526 - EASY TEMPLATE CLASS]      ~AQueue();
+//[CO20200526 - EASY TEMPLATE CLASS]      const AQueue& operator=(const AQueue& other);
+//[CO20200526 - EASY TEMPLATE CLASS]      void clear();
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY PUBLIC CLASS METHODS - STOP
+//[CO20200526 - EASY TEMPLATE CLASS]      
+//[CO20200526 - EASY TEMPLATE CLASS]      //general attributes
+//[CO20200526 - EASY TEMPLATE CLASS]      bool m_initialized;
+//[CO20200526 - EASY TEMPLATE CLASS]      
+//[CO20200526 - EASY TEMPLATE CLASS]      //initialization methods
+//[CO20200526 - EASY TEMPLATE CLASS]      bool initialize(ostream& oss);
+//[CO20200526 - EASY TEMPLATE CLASS]      bool initialize(ofstream& FilMESSAGE,ostream& oss);
+//[CO20200526 - EASY TEMPLATE CLASS]    private:
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY private CLASS METHODS - START
+//[CO20200526 - EASY TEMPLATE CLASS]      void free();
+//[CO20200526 - EASY TEMPLATE CLASS]      void copy(const AQueue& b);
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY END CLASS METHODS - END
+//[CO20200526 - EASY TEMPLATE CLASS]  };
+//[CO20200526 - EASY TEMPLATE CLASS]}
+
+enum queue_system { //CO20200526
+  QUEUE_SLURM,
+  QUEUE_TORQUE
+};
+
+enum node_status { //CO20200526
+  NODE_FREE,
+  NODE_OCCUPIED,
+  NODE_FULL,
+  NODE_DOWN,
+  NODE_OFFLINE
+};
+
+namespace pflow {
+  struct ANode {  //CO20200526
+    string m_name;
+    node_status m_state;
+    uint m_ncpus;
+    string m_properties;  //needed to match with queues
+  };
+  struct APartition {  //CO20200526
+    string m_name;
+    string m_neednodes;   //needed to match with queues //also seems to be available ONLY to root user, so we hack for QRATS  //http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
+    vector<uint> m_inodes;
+  };
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  class AQueue : public xStream {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      AQueue(ostream& oss=cout);
+      AQueue(ofstream& FileMESSAGE,ostream& oss=cout);
+      AQueue(const aurostd::xoption& vpflow,ostream& oss=cout);
+      AQueue(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss=cout);
+      AQueue(const AQueue& b);
+      //constructors - STOP
+      ~AQueue();
+      const AQueue& operator=(const AQueue& other);
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - STOP
+      
+      //general attributes
+      bool m_initialized;
+      aurostd::xoption m_flags;
+      queue_system m_qsys;
+      vector<APartition> m_partitions;
+      vector<ANode> m_nodes;
+      
+      //initialization methods
+      bool initialize(ostream& oss);
+      bool initialize(ofstream& FilMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,ofstream& FilMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const aurostd::xoption& vpflow);
+
+      //setters
+      void setFlags(const aurostd::xoption& vpflow);
+
+      //getters
+      uint getNNodes() const;
+      uint getNCPUS() const;
+      uint getNNodes(const APartition& partition) const;
+      uint getNCPUS(const APartition& partition) const;
+      uint getNNodes(const APartition& partition,const node_status& state) const;
+      uint getNCPUS(const APartition& partition,const node_status& state) const;
+
+      //methods
+      bool readQueue();
+      void addPartition(const APartition& partition);
+      void addNode(const ANode& node);
+    private:
+      //NECESSARY private CLASS METHODS - START
+      void free();
+      void copy(const AQueue& b);
+      //NECESSARY END CLASS METHODS - END
+  };
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  string getQueueStatus(const aurostd::xoption& vpflow);
+}
+
 #endif
 // ***************************************************************************
 // *                                                                         *

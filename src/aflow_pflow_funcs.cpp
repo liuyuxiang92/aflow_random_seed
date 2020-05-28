@@ -7378,6 +7378,299 @@ namespace pflow {
   }
 }
 
+//[CO20200526 - EASY TEMPLATE CLASS]namespace pflow {
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::AQueue(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::AQueue(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::AQueue(const AQueue& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+//[CO20200526 - EASY TEMPLATE CLASS]  
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::~AQueue() {xStream::free();free();}
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  const AQueue& AQueue::operator=(const AQueue& other) {
+//[CO20200526 - EASY TEMPLATE CLASS]    if(this!=&other) {copy(other);}
+//[CO20200526 - EASY TEMPLATE CLASS]    return *this;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  void AQueue::clear() {free();}  //clear PUBLIC
+//[CO20200526 - EASY TEMPLATE CLASS]  void AQueue::free() {
+//[CO20200526 - EASY TEMPLATE CLASS]    m_initialized=false;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]  
+//[CO20200526 - EASY TEMPLATE CLASS]  void AQueue::copy(const AQueue& b) {  //copy PRIVATE
+//[CO20200526 - EASY TEMPLATE CLASS]    m_initialized=b.m_initialized;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]  
+//[CO20200526 - EASY TEMPLATE CLASS]  bool AQueue::initialize(ostream& oss) {
+//[CO20200526 - EASY TEMPLATE CLASS]    xStream::initialize(oss);
+//[CO20200526 - EASY TEMPLATE CLASS]    return initialize();
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  bool AQueue::initialize(ofstream& FileMESSAGE,ostream& oss) {
+//[CO20200526 - EASY TEMPLATE CLASS]    xStream::initialize(FileMESSAGE,oss);
+//[CO20200526 - EASY TEMPLATE CLASS]    return initialize();
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  bool AQueue::initialize() {
+//[CO20200526 - EASY TEMPLATE CLASS]    free();
+//[CO20200526 - EASY TEMPLATE CLASS]    return false;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]}
+
+#define _AQUEUE_DEBUG_ true
+
+namespace pflow {
+  uint AQueue::getNNodes(const APartition& partition) const {return partition.m_inodes.size();}
+  uint AQueue::getNCPUS(const APartition& partition) const {
+    uint ncpus=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
+    return ncpus;
+  }
+  uint AQueue::getNNodes(const APartition& partition,const node_status& state) const {
+    uint nnodes=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){
+      if(m_nodes[partition.m_inodes[i]].m_state==state){nnodes+=1;}
+    }
+    return nnodes;
+  }
+  uint AQueue::getNCPUS(const APartition& partition,const node_status& state) const {
+    uint ncpus=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){
+      if(m_nodes[partition.m_inodes[i]].m_state==state){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
+    }
+    return ncpus;
+  }
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  AQueue::AQueue(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
+  AQueue::AQueue(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  AQueue::AQueue(const aurostd::xoption& vpflow,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow);}
+  AQueue::AQueue(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow);}
+  AQueue::AQueue(const AQueue& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  
+  AQueue::~AQueue() {xStream::free();free();}
+  
+  const AQueue& AQueue::operator=(const AQueue& other) {
+    if(this!=&other) {copy(other);}
+    return *this;
+  }
+
+  void AQueue::clear() {free();}  //clear PUBLIC
+  void AQueue::free() {
+    m_initialized=false;
+    m_flags.clear();
+    m_qsys=QUEUE_SLURM;
+  }
+  
+  void AQueue::copy(const AQueue& b) {  //copy PRIVATE
+    m_initialized=b.m_initialized;
+    m_flags=b.m_flags;
+    m_qsys=b.m_qsys;
+  }
+  
+  bool AQueue::initialize(ostream& oss) {
+    xStream::initialize(oss);
+    return initialize();
+  }
+  bool AQueue::initialize(ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
+  bool AQueue::initialize(const aurostd::xoption& vpflow,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(vpflow);
+  }
+  bool AQueue::initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow);
+  }
+
+  bool AQueue::initialize() {
+    free();
+    return false;
+  }
+  bool AQueue::initialize(const aurostd::xoption& vpflow) {
+    free();
+    setFlags(vpflow);
+    return true;
+  }
+
+  void AQueue::setFlags(const aurostd::xoption& vpflow){m_flags=vpflow;}
+  
+  uint AQueue::getNNodes() const {return m_nodes.size();}
+  uint AQueue::getNCPUS() const {
+    uint ncpus=0;
+    for(uint i=0;i<m_nodes.size();i++){ncpus+=m_nodes[i].m_ncpus;}
+    return ncpus;
+  }
+
+  void AQueue::addPartition(const APartition& partition){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy="pflow::AQueue::addPartition():";
+    if(LDEBUG){cerr << soliloquy << " adding partition=" << partition.m_name << endl;}
+    m_partitions.push_back(partition);
+    if(m_partitions.back().m_neednodes.empty()){  //only available if user is root
+      if(XHOST.hostname!="qrats.materials.duke.edu"){ //protection, ideally the aflow user would be "root"
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not sure how to define partitions for HOST="+XHOST.hostname,_RUNTIME_ERROR_);
+      }
+      //hack
+      if(m_partitions.back().m_name=="priority"){m_partitions.back().m_neednodes="sharedCompute";}
+      else if(m_partitions.back().m_name=="debug"){m_partitions.back().m_neednodes="debug";}
+      else if(m_partitions.back().m_name=="batch"){m_partitions.back().m_neednodes="sharedCompute";}
+      else if(m_partitions.back().m_name=="research"){m_partitions.back().m_neednodes="sharedCompute";}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown queue="+m_partitions.back().m_name,_RUNTIME_ERROR_);}
+    }
+  }
+
+  void AQueue::addNode(const ANode& node){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy="pflow::AQueue::addNode():";
+    if(LDEBUG){
+      cerr << soliloquy << " adding ";
+      if(node.m_state==NODE_FREE){cerr << "FREE";}
+      else if(node.m_state==NODE_OCCUPIED){cerr << "OCCUPIED";}
+      else if(node.m_state==NODE_FULL){cerr << "FULL";}
+      else if(node.m_state==NODE_DOWN){cerr << "DOWN";}
+      else if(node.m_state==NODE_OFFLINE){cerr << "OFFLINE";}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown node.state",_RUNTIME_ERROR_);}
+      cerr << " node=" << node.m_name << endl;
+    }
+    m_nodes.push_back(node);
+    bool found=false;
+    for(uint i=0;i<m_partitions.size();i++){
+      if(m_nodes.back().m_properties.find(m_partitions[i].m_neednodes)!=string::npos){
+        m_partitions[i].m_inodes.push_back(m_nodes.size()-1);found=true;
+      }
+    }
+    if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find queue given node properties=\""+m_nodes.back().m_properties+"\"",_RUNTIME_ERROR_);}
+  }
+
+  bool AQueue::readQueue() {
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy="pflow::AQueue::readQueue():";
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    if(aurostd::IsCommandAvailable("squeue")){m_qsys=QUEUE_SLURM;}
+    else if(aurostd::IsCommandAvailable("pbsnodes")){m_qsys=QUEUE_TORQUE;}
+    else{
+      if(LDEBUG){cerr << soliloquy << " cannot identify queuing system" << endl;}
+      return false;
+    }
+    
+    if(LDEBUG){
+      cerr << soliloquy << " m_qsys=";
+      if(m_qsys==QUEUE_SLURM){cerr << "SLURM";}
+      if(m_qsys==QUEUE_TORQUE){cerr << "TORQUE";}
+      cerr << endl;
+    }
+
+    vector<string> lines,tokens;
+    uint iline=0,i=0;
+    string line="",key="",value="";
+    bool VERBOSE_FILE=false;
+    if(m_qsys==QUEUE_SLURM){
+
+    }
+    else if(m_qsys==QUEUE_TORQUE){
+
+      //get queues first
+      if(!aurostd::IsCommandAvailable("qstat")){
+        if(LDEBUG){cerr << soliloquy << " no qstat command found for TORQUE configuration" << endl;}
+        return false;
+      }
+      //'qstat -f' gives FULL job information, but takes a long time
+      lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("qstat")+" -f -Q"));
+      APartition partition;
+      partition.m_name="";
+      partition.m_neednodes="";
+      for(iline=0;iline<lines.size();iline++){
+        line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+        if(line.empty()){continue;}
+        if(VERBOSE_FILE){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+        if(line.find("Queue:")!=string::npos){
+          if(!partition.m_name.empty()){addPartition(partition);}
+          aurostd::string2tokens(line,tokens,":");
+          if(tokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()!=2",_RUNTIME_ERROR_);}
+          partition.m_name=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
+          partition.m_neednodes=""; //clear
+        }
+      }
+      if(!partition.m_name.empty()){addPartition(partition);}
+      if(LDEBUG){cerr << soliloquy << " found " << m_partitions.size() << " partitions" << endl;}
+
+      //run pbsnodes
+      if(!aurostd::IsCommandAvailable("pbsnodes")){
+        if(LDEBUG){cerr << soliloquy << " no pbsnodes command found for TORQUE configuration" << endl;}
+        return false;
+      }
+      lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("pbsnodes")));
+      ANode node;
+      node.m_name="";
+      node.m_properties="";
+      for(iline=0;iline<lines.size();iline++){
+        line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+        if(line.empty()){continue;}
+        if(VERBOSE_FILE){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+        if(line.find('=')==string::npos){
+          if(!node.m_properties.empty()){addNode(node);} //we have node information loaded up
+          node.m_name=line;
+          node.m_properties="";  //reset node
+          continue;
+        }
+        else{
+          aurostd::string2tokens(line,tokens,"=");
+          if(!tokens.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!tokens.size()",_RUNTIME_ERROR_);}
+          key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
+          value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
+          if(VERBOSE_FILE){cerr << soliloquy << " key=" << key << endl;}
+          if(key=="state"){
+            if(value.find("down")!=string::npos){node.m_state=NODE_DOWN;} //down first so we can rectify
+            else if(value.find("offline")!=string::npos){node.m_state=NODE_OFFLINE;} //offline next
+            else if(value.find("job-exclusive")!=string::npos){node.m_state=NODE_OCCUPIED;}
+            else if(value.find("free")!=string::npos){node.m_state=NODE_FREE;}
+          }
+          else if(key=="np"){node.m_ncpus=aurostd::string2utype<uint>(value);}
+          else if(key=="properties"){node.m_properties=value;}  //needed to match with queue
+          else if(key=="jobs"){
+            //START HERE
+          }
+        }
+      }
+      if(!node.m_properties.empty()){addNode(node);} //we have node information loaded up
+      if(LDEBUG){cerr << soliloquy << " found " << m_nodes.size() << " nodes" << endl;}
+      //if(LDEBUG){cerr << soliloquy << " XHOST.command(\"showq\")=" << XHOST.command("showq") << endl;}
+    }
+
+    if(LDEBUG){
+      cerr << soliloquy << " " << XHOST.hostname << " has " << getNNodes() << " nodes (" << getNCPUS() << " cpus)" << endl;
+      bool add_comma=false;
+      for(i=0;i<m_partitions.size();i++){
+        add_comma=false;
+        cerr << soliloquy << " " << m_partitions[i].m_name << ":";
+        if(getNCPUS(m_partitions[i],NODE_FREE)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_FREE) << " free nodes (" << getNCPUS(m_partitions[i],NODE_FREE) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_OCCUPIED)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OCCUPIED) << " occupied nodes (" << getNCPUS(m_partitions[i],NODE_OCCUPIED) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_FULL)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_FULL) << " full nodes (" << getNCPUS(m_partitions[i],NODE_FULL) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_DOWN)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_DOWN) << " down nodes (" << getNCPUS(m_partitions[i],NODE_DOWN) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_OFFLINE)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OFFLINE) << " offline nodes (" << getNCPUS(m_partitions[i],NODE_OFFLINE) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i])>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i]) << " TOTAL nodes (" << getNCPUS(m_partitions[i]) << " cpus)";if(add_comma==false){add_comma=true;}}
+        cerr << endl;
+      }
+    }
+
+    return true;
+  }
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  string getQueueStatus(const aurostd::xoption& vpflow){  //CO20200526
+    AQueue aqueue(vpflow);
+    aqueue.readQueue();
+    return "";
+  }
+}
+
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
