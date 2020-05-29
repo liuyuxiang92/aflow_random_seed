@@ -1901,7 +1901,7 @@ namespace apl
       double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
       double electronicFreeEnergy(double T, int id);
       double ChemicalPotential(double T, int Vid);
-      double IDOS(double e, double sigma, xEIGENVAL &eig);
+      double IDOS(double e, double T, xEIGENVAL &eig);
       xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
       double InternalEnergyFit(double T, double V);

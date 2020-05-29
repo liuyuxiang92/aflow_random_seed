@@ -1,3 +1,6 @@
+3.2.4 - 2020/05/29
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+        -- Added calculation of electronic contribution to the free energy. (AS)
 3.2.3 - 2020/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)

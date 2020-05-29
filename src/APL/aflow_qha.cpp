@@ -588,7 +588,8 @@ namespace apl
     for (option  = kflags.KBIN_MODULE_OPTIONS.qhaflags.begin();
         option != kflags.KBIN_MODULE_OPTIONS.qhaflags.end(); ++option){
       if (option->keyword=="EOS") isEOS = option->option;
-      if (option->keyword=="INCLUDE_ELE") includeElectronicContribution = option->option;
+      if (option->keyword=="INCLUDE_ELEC_CONTRIB")
+        includeElectronicContribution = option->option;
       if (option->keyword=="SOMMERFELD_EXPANSION") doSommerfeldExpansion=option->option;
       if (option->keyword=="GP_FINITE_DIFF") isGP_FD = option->option;
       if (option->keyword=="IGNORE_IMAGINARY") ignore_imaginary = option->option;
@@ -771,29 +772,6 @@ namespace apl
           createSubdirectoriesStaticRun(xflags, aflags, kflags);
         }
       }
-
-//      cout << "================================================================================" << std::endl;
-//
-//
-//      DOSatEf();
-//      cout << "Sommerfeld" << std::endl;
-//      for (double T=50; T<=1000; T+=100){
-//        cout << T << ' ';
-//        xvector<double> F = electronicFreeEnergySommerfeld(T);
-//        for (int i=1; i<=N_EOSvolumes; i++) cout << F[i] << ' ';
-//        cout << std::endl;
-//      }
-//
-//      cout << "Summation over eigenvals" << std::endl;
-//      for (double T=50; T<=1000; T+=100){
-//        cout << T << ' ';
-//        for (int id=0; id<N_EOSvolumes; id++){
-//          cout << electronicFreeEnergy(T, id) << ' ';
-//        }
-//        cout << std::endl;
-//      }
-//
-//      exit(0);
 
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
@@ -1817,19 +1795,18 @@ namespace apl
   /// is turned on. Although, eigenvalues for spin up and spin down should be the same,
   /// I encountered a situation when the small differences in the values of eigenvalues
   /// for spin up and down down lead to wrong electronic free energy for spin down,
-  /// while the calculion was correct for spin up.
+  /// while the calculation was correct for spin up.
   double QHAN::electronicFreeEnergy(double T, int Vid)
   {
-//    cout << "begin electronicFreeEnergy" << std::endl;
      static const double Tmin = 0.1;
      if (T < Tmin) return 0.0;
-     double U = 0, S = 0;
+     double U = 0.0, S = 0.0;
      xEIGENVAL eig = static_eigvals[Vid];
      double mu  = ChemicalPotential(T, Vid);
      double mu0 = ChemicalPotential(Tmin, Vid);
-     double E = 0;
-     double f, f0;
-     double weight = 0;
+     double E = 0.0;
+     double f = 0.0, f0 = 0.0;
+     double weight = 0.0;
      for (uint k=0; k<eig.number_kpoints; k++){
        weight = (2-eig.spin)*eig.vweight[k];// factor 2 if non-magnetic and 1 otherwise
        for (uint s=0; s<=eig.spin; s++){
@@ -1844,7 +1821,6 @@ namespace apl
      }
      S *= KBOLTZEV;
 
-//    cout << "end electronicFreeEnergy" << std::endl;
      return U - T*S;
   }
 
@@ -2364,9 +2340,9 @@ namespace apl
       // stop if energy minimum is no longer within a given set of volumes
       if (!isMinimumWithinBounds(F)){
         msg = "Calculation is stopped at T=" + aurostd::utype2string<double>(T) + " [K]";
-        msg+= "since there is no free energy minimum within a given volume range.";
+        msg+= " since there is no free energy minimum within a given volume range.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_MESSAGE_);
+            *p_oss, _LOGGER_WARNING_);
         break;
       }
 
@@ -2439,13 +2415,14 @@ namespace apl
     double T = 0.0;
 
     for (int Tid = 0; Tid < Ntemperatures; Tid++){
+      T = Temperatures[Tid];
+      file << "# T = " << T << " K" << std::endl;
+      if (includeElectronicContribution && doSommerfeldExpansion){
+        Felec = electronicFreeEnergySommerfeld(T);
+      }
       for (int Vid = 0; Vid < N_EOSvolumes; Vid++){
-        T = Temperatures[Tid];
-        if (includeElectronicContribution){
-          if (doSommerfeldExpansion) Felec += electronicFreeEnergySommerfeld(T);
-          else{
-            for (int id=0;id<N_EOSvolumes;id++) Felec[id+1]+=electronicFreeEnergy(T,id);
-          }
+        if (includeElectronicContribution && !doSommerfeldExpansion){
+          Felec[Vid+1]=electronicFreeEnergy(T,Vid);
         }
 
         file << setw(TW) << EOSvolumes[Vid]    << setw(SW) << ' '
