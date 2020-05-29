@@ -952,17 +952,28 @@ enum node_status { //CO20200526
   NODE_OFFLINE
 };
 
+enum cpus_status { //CO20200526
+  CPUS_FREE,
+  CPUS_OCCUPIED,
+  CPUS_TOTAL,
+};
+
 namespace pflow {
+  //ANode stays a struct until we need more than just free
   struct ANode {  //CO20200526
     string m_name;
     node_status m_state;
     uint m_ncpus;
+    uint m_ncpus_occupied;  //if we need to collect job information later, then this should become a getter based on job count
     string m_properties;  //needed to match with queues
+    void free();
   };
+  //APartition stays a struct until we need more than just free
   struct APartition {  //CO20200526
     string m_name;
-    string m_neednodes;   //needed to match with queues //also seems to be available ONLY to root user, so we hack for QRATS  //http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
+    string m_properties_node;   //needed to match with queues //also seems to be available ONLY to root user, so we hack for QRATS  //http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
     vector<uint> m_inodes;
+    void free();
   };
 }
 
@@ -1007,7 +1018,7 @@ namespace pflow {
       uint getNNodes(const APartition& partition) const;
       uint getNCPUS(const APartition& partition) const;
       uint getNNodes(const APartition& partition,const node_status& state) const;
-      uint getNCPUS(const APartition& partition,const node_status& state) const;
+      uint getNCPUS(const APartition& partition,const node_status& state_node,const cpus_status& state_cpus=CPUS_TOTAL) const;
 
       //methods
       bool readQueue();

@@ -7417,30 +7417,25 @@ namespace pflow {
 
 #define _AQUEUE_DEBUG_ true
 
+//CO20200526 - queueing class
 namespace pflow {
-  uint AQueue::getNNodes(const APartition& partition) const {return partition.m_inodes.size();}
-  uint AQueue::getNCPUS(const APartition& partition) const {
-    uint ncpus=0;
-    for(uint i=0;i<partition.m_inodes.size();i++){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
-    return ncpus;
-  }
-  uint AQueue::getNNodes(const APartition& partition,const node_status& state) const {
-    uint nnodes=0;
-    for(uint i=0;i<partition.m_inodes.size();i++){
-      if(m_nodes[partition.m_inodes[i]].m_state==state){nnodes+=1;}
-    }
-    return nnodes;
-  }
-  uint AQueue::getNCPUS(const APartition& partition,const node_status& state) const {
-    uint ncpus=0;
-    for(uint i=0;i<partition.m_inodes.size();i++){
-      if(m_nodes[partition.m_inodes[i]].m_state==state){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
-    }
-    return ncpus;
+  void ANode::free(){
+    m_name="";
+    m_state=NODE_OFFLINE;
+    m_ncpus=0;
+    m_ncpus_occupied=0;
+    m_properties="";
   }
 }
 
-//CO20200526 - queueing class
+namespace pflow {
+  void APartition::free(){
+    m_name="";
+    m_properties_node="";
+    m_inodes.clear();
+  }
+}
+
 namespace pflow {
   AQueue::AQueue(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
   AQueue::AQueue(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
@@ -7503,28 +7498,72 @@ namespace pflow {
     for(uint i=0;i<m_nodes.size();i++){ncpus+=m_nodes[i].m_ncpus;}
     return ncpus;
   }
+  uint AQueue::getNNodes(const APartition& partition) const {return partition.m_inodes.size();}
+  uint AQueue::getNCPUS(const APartition& partition) const {
+    uint ncpus=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
+    return ncpus;
+  }
+  uint AQueue::getNNodes(const APartition& partition,const node_status& state) const {
+    uint nnodes=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){
+      if(m_nodes[partition.m_inodes[i]].m_state==state){nnodes+=1;}
+    }
+    return nnodes;
+  }
+  uint AQueue::getNCPUS(const APartition& partition,const node_status& state_node,const cpus_status& state_cpus) const {
+    uint ncpus=0;
+    if(state_cpus==CPUS_TOTAL){
+      for(uint i=0;i<partition.m_inodes.size();i++){
+        if(m_nodes[partition.m_inodes[i]].m_state==state_node){
+          ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;
+        }
+      }
+    }
+    else if(state_cpus==CPUS_FREE){
+      for(uint i=0;i<partition.m_inodes.size();i++){
+        if(m_nodes[partition.m_inodes[i]].m_state==state_node){
+          ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus-m_nodes[partition.m_inodes[i]].m_ncpus_occupied;
+        }
+      }
+    }
+    else if(state_cpus==CPUS_OCCUPIED){
+      for(uint i=0;i<partition.m_inodes.size();i++){
+        if(m_nodes[partition.m_inodes[i]].m_state==state_node){
+          ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus_occupied;
+        }
+      }
+    }
+    return ncpus;
+  }
 
-  void AQueue::addPartition(const APartition& partition){
+  void AQueue::addPartition(const APartition& _partition){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy="pflow::AQueue::addPartition():";
+    m_partitions.push_back(_partition);
+    APartition& partition=m_partitions.back();
     if(LDEBUG){cerr << soliloquy << " adding partition=" << partition.m_name << endl;}
-    m_partitions.push_back(partition);
-    if(m_partitions.back().m_neednodes.empty()){  //only available if user is root
+    if(partition.m_properties_node.empty()){  //only available if user is root
       if(XHOST.hostname!="qrats.materials.duke.edu"){ //protection, ideally the aflow user would be "root"
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not sure how to define partitions for HOST="+XHOST.hostname,_RUNTIME_ERROR_);
       }
       //hack
-      if(m_partitions.back().m_name=="priority"){m_partitions.back().m_neednodes="sharedCompute";}
-      else if(m_partitions.back().m_name=="debug"){m_partitions.back().m_neednodes="debug";}
-      else if(m_partitions.back().m_name=="batch"){m_partitions.back().m_neednodes="sharedCompute";}
-      else if(m_partitions.back().m_name=="research"){m_partitions.back().m_neednodes="sharedCompute";}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown queue="+m_partitions.back().m_name,_RUNTIME_ERROR_);}
+      if(partition.m_name=="priority"){partition.m_properties_node="sharedCompute";}
+      else if(partition.m_name=="debug"){partition.m_properties_node="debug";}
+      else if(partition.m_name=="batch"){partition.m_properties_node="sharedCompute";}
+      else if(partition.m_name=="research"){partition.m_properties_node="sharedCompute";}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown queue="+partition.m_name,_RUNTIME_ERROR_);}
     }
   }
 
-  void AQueue::addNode(const ANode& node){
+  void AQueue::addNode(const ANode& _node){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy="pflow::AQueue::addNode():";
+    m_nodes.push_back(_node);
+    ANode& node=m_nodes.back();
+    //determine OCCUPIED vs. FULL
+    if(node.m_state==NODE_FREE && node.m_ncpus_occupied>0){node.m_state=NODE_OCCUPIED;}
+    if(node.m_state==NODE_OCCUPIED && node.m_ncpus_occupied>=node.m_ncpus){node.m_state=NODE_FULL;}
     if(LDEBUG){
       cerr << soliloquy << " adding ";
       if(node.m_state==NODE_FREE){cerr << "FREE";}
@@ -7535,14 +7574,13 @@ namespace pflow {
       else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown node.state",_RUNTIME_ERROR_);}
       cerr << " node=" << node.m_name << endl;
     }
-    m_nodes.push_back(node);
     bool found=false;
     for(uint i=0;i<m_partitions.size();i++){
-      if(m_nodes.back().m_properties.find(m_partitions[i].m_neednodes)!=string::npos){
+      if(node.m_properties.find(m_partitions[i].m_properties_node)!=string::npos){
         m_partitions[i].m_inodes.push_back(m_nodes.size()-1);found=true;
       }
     }
-    if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find queue given node properties=\""+m_nodes.back().m_properties+"\"",_RUNTIME_ERROR_);}
+    if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find queue given node properties=\""+node.m_properties+"\"",_RUNTIME_ERROR_);}
   }
 
   bool AQueue::readQueue() {
@@ -7581,9 +7619,9 @@ namespace pflow {
       }
       //'qstat -f' gives FULL job information, but takes a long time
       lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("qstat")+" -f -Q"));
-      APartition partition;
+      APartition partition;partition.free();
       partition.m_name="";
-      partition.m_neednodes="";
+      partition.m_properties_node="";
       for(iline=0;iline<lines.size();iline++){
         line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
         if(line.empty()){continue;}
@@ -7592,8 +7630,16 @@ namespace pflow {
           if(!partition.m_name.empty()){addPartition(partition);}
           aurostd::string2tokens(line,tokens,":");
           if(tokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()!=2",_RUNTIME_ERROR_);}
+          partition.free(); //reset
           partition.m_name=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
-          partition.m_neednodes=""; //clear
+        }
+        else{
+          aurostd::string2tokens(line,tokens,"=");
+          if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!tokens.size()",_RUNTIME_ERROR_);
+          key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
+          value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
+          if(VERBOSE_FILE){cerr << soliloquy << " key=" << key << endl;}
+          if(key=="resources_default.neednodes"){partition.m_properties_node=value;}  //really only works for root, but we leave here for now
         }
       }
       if(!partition.m_name.empty()){addPartition(partition);}
@@ -7605,22 +7651,20 @@ namespace pflow {
         return false;
       }
       lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("pbsnodes")));
-      ANode node;
-      node.m_name="";
-      node.m_properties="";
+      ANode node;node.free();
       for(iline=0;iline<lines.size();iline++){
         line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
         if(line.empty()){continue;}
         if(VERBOSE_FILE){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
         if(line.find('=')==string::npos){
           if(!node.m_properties.empty()){addNode(node);} //we have node information loaded up
+          node.free();  //reset node
           node.m_name=line;
-          node.m_properties="";  //reset node
           continue;
         }
         else{
           aurostd::string2tokens(line,tokens,"=");
-          if(!tokens.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!tokens.size()",_RUNTIME_ERROR_);}
+          if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!tokens.size()",_RUNTIME_ERROR_);
           key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
           value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
           if(VERBOSE_FILE){cerr << soliloquy << " key=" << key << endl;}
@@ -7633,7 +7677,8 @@ namespace pflow {
           else if(key=="np"){node.m_ncpus=aurostd::string2utype<uint>(value);}
           else if(key=="properties"){node.m_properties=value;}  //needed to match with queue
           else if(key=="jobs"){
-            //START HERE
+            aurostd::string2tokens(value,tokens,",");
+            node.m_ncpus_occupied=tokens.size();  //easy, this is all we need for now
           }
         }
       }
@@ -7649,7 +7694,7 @@ namespace pflow {
         add_comma=false;
         cerr << soliloquy << " " << m_partitions[i].m_name << ":";
         if(getNCPUS(m_partitions[i],NODE_FREE)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_FREE) << " free nodes (" << getNCPUS(m_partitions[i],NODE_FREE) << " cpus)";if(add_comma==false){add_comma=true;}}
-        if(getNCPUS(m_partitions[i],NODE_OCCUPIED)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OCCUPIED) << " occupied nodes (" << getNCPUS(m_partitions[i],NODE_OCCUPIED) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_OCCUPIED)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OCCUPIED) << " occupied nodes (" << getNCPUS(m_partitions[i],NODE_OCCUPIED,CPUS_FREE) << " cpus free, " << getNCPUS(m_partitions[i],NODE_OCCUPIED,CPUS_OCCUPIED) << " cpus occupied)";if(add_comma==false){add_comma=true;}}
         if(getNCPUS(m_partitions[i],NODE_FULL)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_FULL) << " full nodes (" << getNCPUS(m_partitions[i],NODE_FULL) << " cpus)";if(add_comma==false){add_comma=true;}}
         if(getNCPUS(m_partitions[i],NODE_DOWN)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_DOWN) << " down nodes (" << getNCPUS(m_partitions[i],NODE_DOWN) << " cpus)";if(add_comma==false){add_comma=true;}}
         if(getNCPUS(m_partitions[i],NODE_OFFLINE)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OFFLINE) << " offline nodes (" << getNCPUS(m_partitions[i],NODE_OFFLINE) << " cpus)";if(add_comma==false){add_comma=true;}}
