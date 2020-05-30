@@ -7663,7 +7663,7 @@ namespace pflow {
 #define DELIM_PROPERTIES_NODE ","
 
   bool AQueue::addNode(const ANode& _node){
-    bool LDEBUG=(TRUE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy="pflow::AQueue::addNode():";
     uint inode=0;
     for(inode=0;inode<m_nodes.size();inode++){
