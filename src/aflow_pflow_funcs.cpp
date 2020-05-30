@@ -7660,12 +7660,25 @@ namespace pflow {
     return partition_added;
   }
 
+#define DELIM_PROPERTIES_NODE ","
+
   bool AQueue::addNode(const ANode& _node){
-    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy="pflow::AQueue::addNode():";
-    uint i=0;
-    for(i=0;i<m_nodes.size();i++){
-      if(m_nodes[i].m_name==_node.m_name){return false;}
+    uint inode=0;
+    for(inode=0;inode<m_nodes.size();inode++){
+      if(m_nodes[inode].m_name==_node.m_name){
+        ANode& node=m_nodes[inode];
+        if(node.m_properties!=_node.m_properties&&node.m_properties.find(_node.m_properties)==string::npos){  //QUSER patch: a comma-separated string is important for quser where each node is listed N times for each partition it is associated with
+          //from http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
+          //"TORQUE does not currently provide a simple mechanism for mapping queues to nodes. However, schedulers such as Moab and Maui can provide this functionality."
+          //since properties can be anything, we add additional matching queues as a comma-separated string
+          if(!node.m_properties.empty()){node.m_properties+=DELIM_PROPERTIES_NODE;}
+          if(!_node.m_properties.empty()){node.m_properties+=_node.m_properties;}
+          if(LDEBUG){cerr << soliloquy << " adding properties=\"" << _node.m_properties << "\" to node=" << node.m_name << " properties (NEW properties=" << node.m_properties << ")" << endl;}
+        }
+        return false;
+      }
     }
     bool node_added=false;
     m_nodes.push_back(_node);m_nodes.back().m_index=m_nodes.size()-1;node_added=true;
@@ -7692,15 +7705,20 @@ namespace pflow {
     //get partition
     bool found=false;
     node.m_vipartitions.clear();
-    uint ipartition=0;
+    uint ipartition=0,iproperty=0;
+    //parse node.m_properties by DELIM_PROPERTIES_NODE
+    vector<string> vproperties_node;
+    aurostd::string2tokens(node.m_properties,vproperties_node,DELIM_PROPERTIES_NODE);
+    //search for node-partition matches
     for(ipartition=0;ipartition<m_partitions.size();ipartition++){
       APartition& partition=m_partitions[ipartition];
-      //[no arbitrary matches, must be exact]if(node.m_properties.find(partition.m_properties_node)!=string::npos)
-      if(node.m_properties==partition.m_properties_node){
-        partition.m_inodes.push_back(node.m_index);
-        node.m_vipartitions.push_back(ipartition);
-        found=true;
-        if(LDEBUG){cerr << soliloquy << " mapping node=" << node.m_name << " to partition=" << partition.m_name << endl;}
+      for(iproperty=0;iproperty<vproperties_node.size();iproperty++){
+        if(vproperties_node[iproperty]==partition.m_properties_node){
+          partition.m_inodes.push_back(node.m_index);
+          node.m_vipartitions.push_back(ipartition);
+          found=true;
+          if(LDEBUG){cerr << soliloquy << " mapping node=" << node.m_name << " to partition=" << partition.m_name << endl;}
+        }
       }
     }
     if(!found){
@@ -7788,28 +7806,29 @@ namespace pflow {
       }
       lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("sinfo")+" -N -l"));
       APartition _partition;_partition.free();
-      ANode node;node.free();
+      ANode _node;_node.free();
       for(iline=0;iline<lines.size();iline++){
         if(lines[iline].find("NODELIST")!=string::npos){continue;}  //skip date and header
         line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
         if(line.empty()){continue;}
         if(VERBOSE_FILE){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
-        node.free();
+        _node.free();
         aurostd::string2tokens(line,tokens," ");
         if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()<11",_RUNTIME_ERROR_);
-        node.m_name=tokens[0];
+        _node.m_name=tokens[0];
         //tokens[2] is partition, addPartition() takes care of checking that it's not already in the list
         _partition.free();
         _partition.m_name=tokens[2];aurostd::StringSubst(_partition.m_name,"*","");  //this signifies default queue, we don't care
         addPartition(_partition);
-        node.m_properties=_partition.m_name; //for node-partition mapping() later
+        _node.m_properties=_partition.m_name; //for node-partition mapping() later
         //tokens[3] is state
-        if(tokens[3].find('*')!=string::npos){node.m_status=NODE_DOWN;}  //catch first, doesn't matter what state it is in, IT'S NOT RESPONDING
+        if(tokens[3].find('*')!=string::npos){_node.m_status=NODE_DOWN;}  //catch first, doesn't matter what state it is in, IT'S NOT RESPONDING
         else if(tokens[3]=="allocated+"||tokens[3]=="allocated"||tokens[3]=="alloc"||
           tokens[3]=="completing"||tokens[3]=="comp"||
-          FALSE){node.m_status=NODE_FULL;}  //most likely to appear first, quicker to appear at the top
-        else if(tokens[3]=="mixed"){node.m_status=NODE_OCCUPIED;}
-        else if(tokens[3]=="reserved"||tokens[3]=="resv"||tokens[3]=="unknown"||tokens[3]=="unk"){node.m_status=NODE_OFFLINE;}
+          FALSE){_node.m_status=NODE_FULL;}  //most likely to appear first, quicker to appear at the top
+        else if(tokens[3]=="idle"){_node.m_status=NODE_FREE;}
+        else if(tokens[3]=="mixed"||tokens[3]=="mix"){_node.m_status=NODE_OCCUPIED;}
+        else if(tokens[3]=="reserved"||tokens[3]=="resv"||tokens[3]=="unknown"||tokens[3]=="unk"){_node.m_status=NODE_OFFLINE;}
         else if(tokens[3]=="down"||
             tokens[3]=="drained"||tokens[3]=="drain"||tokens[3]=="draining"||tokens[3]=="drng"||
             tokens[3]=="fail"||tokens[3]=="failing"||tokens[3]=="failg"||
@@ -7818,11 +7837,12 @@ namespace pflow {
             tokens[3]=="perfctrs"||tokens[3]=="npc"||
             tokens[3]=="power_down"||tokens[3]=="powering_down"||tokens[3]=="pow_dn"||
             tokens[3]=="power_up"||tokens[3]=="powering_up"||tokens[3]=="pow_up"||
-            FALSE){node.m_status=NODE_DOWN;} //leave for last, many variants to consider
+            tokens[3]=="no_respond"||
+            FALSE){_node.m_status=NODE_DOWN;} //leave for last, many variants to consider
         //tokens[4] is ncpus
         if(!aurostd::isfloat(tokens[4])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens[4] is NOT a float (ncpus)",_RUNTIME_ERROR_);}
-        node.m_ncpus=aurostd::string2utype<double>(tokens[4]);
-        addNode(node);
+        _node.m_ncpus=aurostd::string2utype<double>(tokens[4]);
+        addNode(_node);
       }
       if(LDEBUG){cerr << soliloquy << " found " << m_partitions.size() << " partitions" << endl;}
       if(LDEBUG){cerr << soliloquy << " found " << m_nodes.size() << " nodes" << endl;}
