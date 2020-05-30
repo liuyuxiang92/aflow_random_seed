@@ -1023,7 +1023,7 @@ namespace pflow {
       //methods
       bool readQueue();
       void addPartition(const APartition& partition);
-      void addNode(const ANode& node);
+      void addNode(const ANode& node,bool add_partition=false);
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
