@@ -939,9 +939,11 @@ namespace pflow {
 //[CO20200526 - EASY TEMPLATE CLASS]  };
 //[CO20200526 - EASY TEMPLATE CLASS]}
 
-enum queue_system { //CO20200526
-  QUEUE_SLURM,
-  QUEUE_TORQUE
+enum job_status { //CO20200526
+  JOB_RUNNING,
+  JOB_QUEUED,
+  JOB_HELD,
+  JOB_DONE
 };
 
 enum node_status { //CO20200526
@@ -958,27 +960,50 @@ enum cpus_status { //CO20200526
   CPUS_TOTAL,
 };
 
+enum queue_system { //CO20200526
+  QUEUE_SLURM,
+  QUEUE_TORQUE
+};
+
 namespace pflow {
+  //AJob stays a struct until we need more than just free
+  struct AJob { //CO20200526
+    uint m_index; //reflection to m_jobs
+    uint m_id;
+    string m_user;
+    job_status m_status;
+    uint m_ncpus; //this is a "total" ncpus for the job (NOT an index)
+    vector<uint> m_vinodes;
+    vector<uint> m_vncpus;  //this is ncpus split across nodes (NOT an index)
+    vector<uint> m_vipartitions;
+    void free();
+  };
   //ANode stays a struct until we need more than just free
   struct ANode {  //CO20200526
+    uint m_index; //reflection to m_nodes
     string m_name;
-    node_status m_state;
+    node_status m_status;
     uint m_ncpus;
     uint m_ncpus_occupied;  //if we need to collect job information later, then this should become a getter based on job count
     string m_properties;  //needed to match with queues
+    vector<uint> m_vijobs;
+    vector<uint> m_vipartitions;
     void free();
   };
   //APartition stays a struct until we need more than just free
   struct APartition {  //CO20200526
+    uint m_index; //reflection to m_partitions
     string m_name;
     string m_properties_node;   //needed to match with queues //also seems to be available ONLY to root user, so we hack for QRATS  //http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
     vector<uint> m_inodes;
+    vector<uint> m_vijobs;
     void free();
   };
 }
 
 //CO20200526 - queueing class
 namespace pflow {
+  uint getTORQUEIDFromString(const string& torqueid_str);
   class AQueue : public xStream {
     public:
       //NECESSARY PUBLIC CLASS METHODS - START
@@ -1000,6 +1025,7 @@ namespace pflow {
       queue_system m_qsys;
       vector<APartition> m_partitions;
       vector<ANode> m_nodes;
+      vector<AJob> m_jobs;
       
       //initialization methods
       bool initialize(ostream& oss);
@@ -1019,11 +1045,15 @@ namespace pflow {
       uint getNCPUS(const APartition& partition) const;
       uint getNNodes(const APartition& partition,const node_status& state) const;
       uint getNCPUS(const APartition& partition,const node_status& state_node,const cpus_status& state_cpus=CPUS_TOTAL) const;
+      uint partitionName2Index(const string& name) const;
 
       //methods
       bool readQueue();
-      void addPartition(const APartition& partition);
-      void addNode(const ANode& node,bool add_partition=false);
+      bool addJob(const AJob& _job);
+      bool addPartition(const APartition& _partition);
+      bool addNode(const ANode& _node);
+      void nodePartitionMapping(ANode& node);
+      void jobMapping(AJob& job);
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
