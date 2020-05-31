@@ -7678,6 +7678,7 @@ namespace pflow {
     for(inode=0;inode<m_nodes.size();inode++){
       if(m_nodes[inode].m_name==_node.m_name){
         ANode& node=m_nodes[inode];
+        //the find()!=string::npos could be problematic if we have queues like 'fast' and 'faster'
         if(node.m_properties!=_node.m_properties&&node.m_properties.find(_node.m_properties)==string::npos){  //QUSER patch: a comma-separated string is important for quser where each node is listed N times for each partition it is associated with
           //from http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
           //"TORQUE does not currently provide a simple mechanism for mapping queues to nodes. However, schedulers such as Moab and Maui can provide this functionality."
