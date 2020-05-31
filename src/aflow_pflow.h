@@ -1049,17 +1049,26 @@ namespace pflow {
       uint partitionName2Index(const string& name) const;
 
       //methods
-      bool readQueue();
-      bool addJob(const AJob& _job);
-      bool addPartition(const APartition& _partition);
-      bool addNode(const ANode& _node);
-      void nodePartitionMapping(ANode& node);
-      void jobMapping(AJob& job);
+      void getQueue();  //wrapper around processQueue() with try's for failed external calls
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
       void copy(const AQueue& b);
       //NECESSARY END CLASS METHODS - END
+      
+      void processQueue();  //main processer for external queue commands (pbsnodes, qstat, squeue, etc.)
+      
+      void readNodesPartitionsSLURM();
+      void readJobsSLURM();
+      void readPartitionsTORQUE();
+      void readNodesJobsTORQUE();
+      void readJobsTORQUE();
+
+      bool addJob(const AJob& _job);
+      bool addPartition(const APartition& _partition);
+      bool addNode(const ANode& _node);
+      void nodePartitionMapping(ANode& node);
+      void jobMapping(AJob& job);
   };
 }
 

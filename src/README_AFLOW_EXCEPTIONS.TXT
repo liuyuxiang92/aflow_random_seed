@@ -128,7 +128,8 @@ Code     Error Type          Error                     Name of Constant
   43                         mismatch                  _INDEX_MISMATCH_
   50     Runtime Error       generic                   _RUNTIME_ERROR_
   51                         not initialized           _RUNTIME_INIT_
-  52                         SQL error                 _RUNTIME_SQL_
+  52                         external command failed   _RUNTIME_EXTERNAL_
+  53                         SQL error                 _RUNTIME_SQL_
   60     Allocation Error    generic                   _ALLOC_ERROR_
   61                         could not allocate        _ALLOC_ALLOCATE_
   62                         insufficient memory       _ALLOC_INSUFFICIENT_
@@ -199,7 +200,11 @@ Code     Error Type          Error                     Name of Constant
   51. Not initialized: Used when an uninitialized object is used. The increment operator in xcombos
                        may throw such an error.
 
-  52. SQL Error: Used when SQLite returns an error.
+  52. external command not found: Used when an external subsystem call cannot be found.
+
+  53. external command failed: Used when an external subsystem call fails.
+  
+  54. SQL Error: Used when SQLite returns an error.
 
 [61 - 69] Allocation Error: Errors associated with memory allocation.
 
