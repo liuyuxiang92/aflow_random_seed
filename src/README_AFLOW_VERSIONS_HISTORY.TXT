@@ -4,6 +4,7 @@
         -- adding findClosedPackingPlane, to be finished (CO)
         -- testing new structure enumeration algorithm, to be finished (CO)
         -- removing whitespaces and hyphens from chull input injected from web (CO)
+        -- patching IsDirectory() and IsFile(), used to trip over directory/file permissions (CO)
 3.2.3 - 2020/05/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
 	-- Bug fixes in KBIN::ExtractSystemName() (ME)
