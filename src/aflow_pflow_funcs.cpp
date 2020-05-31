@@ -7415,7 +7415,7 @@ namespace pflow {
 //[CO20200526 - EASY TEMPLATE CLASS]  }
 //[CO20200526 - EASY TEMPLATE CLASS]}
 
-#define _AQUEUE_DEBUG_ true
+#define _AQUEUE_DEBUG_ false
 
 //CO20200526 - queueing class
 namespace pflow {
