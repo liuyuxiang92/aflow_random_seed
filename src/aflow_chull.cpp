@@ -239,6 +239,7 @@ namespace chull {
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
       return FALSE;
     }
+    inputs=aurostd::RemoveWhiteSpaces(inputs);  //CO20200531 - sometimes web injects spaces
     vector<string> tokens_comma;
     uint nary;
     string original_input;
