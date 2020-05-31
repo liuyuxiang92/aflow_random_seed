@@ -7415,7 +7415,7 @@ namespace pflow {
 //[CO20200526 - EASY TEMPLATE CLASS]  }
 //[CO20200526 - EASY TEMPLATE CLASS]}
 
-#define _AQUEUE_DEBUG_ false
+#define _AQUEUE_DEBUG_ true
 
 //CO20200526 - queueing class
 namespace pflow {
@@ -7673,8 +7673,13 @@ namespace pflow {
           //from http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
           //"TORQUE does not currently provide a simple mechanism for mapping queues to nodes. However, schedulers such as Moab and Maui can provide this functionality."
           //since properties can be anything, we add additional matching queues as a comma-separated string
-          if(!node.m_properties.empty()){node.m_properties+=DELIM_PROPERTIES_NODE;}
-          if(!_node.m_properties.empty()){node.m_properties+=_node.m_properties;}
+          //[sort]if(!node.m_properties.empty()){node.m_properties+=DELIM_PROPERTIES_NODE;}
+          //[sort]if(!_node.m_properties.empty()){node.m_properties+=_node.m_properties;}
+          vector<string> tokens;
+          aurostd::string2tokens(node.m_properties,tokens,DELIM_PROPERTIES_NODE);
+          tokens.push_back(_node.m_properties);
+          std::sort(tokens.begin(),tokens.end());
+          node.m_properties=aurostd::joinWDelimiter(tokens,DELIM_PROPERTIES_NODE);
           if(LDEBUG){cerr << soliloquy << " adding properties=\"" << _node.m_properties << "\" to node=" << node.m_name << " properties (NEW properties=" << node.m_properties << ")" << endl;}
         }
         return false;
