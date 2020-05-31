@@ -7561,6 +7561,15 @@ namespace pflow {
     return ncpus;
   }
 
+  uint AQueue::nodeName2Index(const string& name) const {
+    string soliloquy="pflow::AQueue::nodeName2Index():";
+    for(uint inode=0;inode<m_nodes.size();inode++){
+      if(m_nodes[inode].m_name==name){
+        return inode;
+      }
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No node found with name="+name,_INPUT_UNKNOWN_);
+  }
   uint AQueue::partitionName2Index(const string& name) const {
     string soliloquy="pflow::AQueue::partitionName2Index():";
     for(uint ipartition=0;ipartition<m_partitions.size();ipartition++){
@@ -7851,6 +7860,49 @@ namespace pflow {
       }
       if(LDEBUG){cerr << soliloquy << " found " << m_partitions.size() << " partitions" << endl;}
       if(LDEBUG){cerr << soliloquy << " found " << m_nodes.size() << " nodes" << endl;}
+
+      //run squeue
+      if(!aurostd::IsCommandAvailable("squeue")){
+        if(LDEBUG){cerr << soliloquy << " no squeue command found for TORQUE configuration" << endl;}
+        return false;
+      }
+      lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("squeue")+" --format=\"\%.18i %.9P %.8j \%.8u %.2t %.10M \%.6D \%C \%R\"")); //man squeue
+      AJob _job;_job.free();
+      for(iline=0;iline<lines.size();iline++){
+        if(lines[iline].find("JOBID")!=string::npos){continue;}  //skip date and header
+        line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+        if(line.empty()){continue;}
+        if(VERBOSE_FILE){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+        aurostd::string2tokens(line,tokens," ");
+        //tokens[0] is job id
+        if(!aurostd::isfloat(tokens[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!aurostd::isfloat(tokens[0])",_RUNTIME_ERROR_);}
+        _job.free();
+        _job.m_id=aurostd::string2utype<uint>(tokens[0]);
+        //tokens[1] is partition
+        aurostd::string2tokens(tokens[1],tokens2,",");
+        for(i=0;i<tokens2.size();i++){
+          _job.m_vipartitions.push_back(partitionName2Index(tokens2[i]));
+        }
+        //tokens[4] is status
+        //https://curc.readthedocs.io/en/latest/running-jobs/squeue-status-codes.html
+        if(tokens[4]=="PD"){_job.m_status=JOB_QUEUED;}
+        else if(tokens[4]=="R"||tokens[4]=="ST"){_job.m_status=JOB_RUNNING;}  //ST because it retains cores
+        else if(tokens[4]=="S"){_job.m_status=JOB_HELD;} //S because cores are given up for other jobs (transition state)
+        else if(tokens[4]=="CD"||tokens[4]=="CG"||
+            tokens[4]=="F"||
+            tokens[4]=="PR"||
+            FALSE){_job.m_status=JOB_DONE;}
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown job status="+tokens[4],_RUNTIME_ERROR_);}
+        //tokens[7] is ncpus
+        if(!aurostd::isfloat(tokens[7])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!aurostd::isfloat(tokens[7])",_RUNTIME_ERROR_);}
+        _job.m_ncpus=aurostd::string2utype<uint>(tokens[7]);
+        //tokens[8] is node if running
+        if(_job.m_status==JOB_RUNNING){
+          _job.m_vinodes.push_back(nodeName2Index(tokens[8]));
+          _job.m_vncpus.push_back(_job.m_ncpus);
+        }
+        addJob(_job);
+      }
     }
     else if(m_qsys==QUEUE_TORQUE){
 
@@ -7990,6 +8042,8 @@ namespace pflow {
           addJob(_job);
         }
       }
+
+      //may need showq later for node-specific submission
     }
 
     //get node mappings

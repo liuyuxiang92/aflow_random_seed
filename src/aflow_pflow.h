@@ -1045,6 +1045,7 @@ namespace pflow {
       uint getNCPUS(const APartition& partition) const;
       uint getNNodes(const APartition& partition,const node_status& state) const;
       uint getNCPUS(const APartition& partition,const node_status& state_node,const cpus_status& state_cpus=CPUS_TOTAL) const;
+      uint nodeName2Index(const string& name) const;
       uint partitionName2Index(const string& name) const;
 
       //methods
