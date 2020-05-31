@@ -7802,12 +7802,14 @@ namespace pflow {
       try {processQueue();SUCCESS=true;}
       catch(aurostd::xerror& err) {
         SUCCESS=false;
-        if(err.error_code!=_RUNTIME_EXTERNAL_FAIL_){
-          pflow::logger(err.whereFileName(),err.whereFunction(),err.what(),std::cout,_LOGGER_ERROR_);
-          attempts=ATTEMPTS_GETQUEUE_MAX;
+        if(err.error_code!=_RUNTIME_EXTERNAL_FAIL_){attempts=ATTEMPTS_GETQUEUE_MAX;}
+        if(attempts<ATTEMPTS_GETQUEUE_MAX){
+          if(1||LDEBUG){cerr << soliloquy << " failed attempt, trying to process queue again" << endl;}
+          aurostd::Sleep(2);
         }
-        if(1||LDEBUG){cerr << soliloquy << " failed attempt, trying to process queue again" << endl;}
-        aurostd::Sleep(2);
+      }
+      if(SUCCESS==false){
+        pflow::logger(err.whereFileName(),err.whereFunction(),err.what(),std::cout,_LOGGER_ERROR_);
       }
     }
   }
