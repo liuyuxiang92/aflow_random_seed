@@ -7807,9 +7807,11 @@ namespace pflow {
           if(1||LDEBUG){cerr << soliloquy << " failed attempt, trying to process queue again" << endl;}
           aurostd::Sleep(2);
         }
-      }
-      if(SUCCESS==false){
-        pflow::logger(err.whereFileName(),err.whereFunction(),err.what(),std::cout,_LOGGER_ERROR_);
+        else{
+          if(SUCCESS==false){
+            pflow::logger(err.whereFileName(),err.whereFunction(),err.what(),std::cout,_LOGGER_ERROR_);
+          }
+        }
       }
     }
   }
