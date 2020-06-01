@@ -7469,13 +7469,16 @@ namespace pflow {
   }
 
   void AQueue::clear() {free();}  //clear PUBLIC
-  void AQueue::free() {
-    m_initialized=false;
-    m_flags.clear();
+  void AQueue::freeQueue() {
     m_qsys=QUEUE_SLURM;
     m_partitions.clear();
     m_nodes.clear();
     m_jobs.clear();
+  }
+  void AQueue::free() {
+    m_initialized=false;
+    m_flags.clear();
+    freeQueue();
   }
   
   void AQueue::copy(const AQueue& b) {  //copy PRIVATE
@@ -7799,7 +7802,7 @@ namespace pflow {
     bool SUCCESS=false;
     uint attempts=0;
     while(attempts++<ATTEMPTS_GETQUEUE_MAX && SUCCESS==false){
-      try {processQueue();SUCCESS=true;}
+      try {freeQueue();processQueue();SUCCESS=true;}
       catch(aurostd::xerror& err) {
         SUCCESS=false;
         if(err.error_code!=_RUNTIME_EXTERNAL_FAIL_){attempts=ATTEMPTS_GETQUEUE_MAX;}

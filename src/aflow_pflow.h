@@ -1056,6 +1056,7 @@ namespace pflow {
       void copy(const AQueue& b);
       //NECESSARY END CLASS METHODS - END
       
+      void freeQueue();
       void processQueue();  //main processer for external queue commands (pbsnodes, qstat, squeue, etc.)
       
       void readNodesPartitionsSLURM();
