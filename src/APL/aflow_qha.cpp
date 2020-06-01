@@ -449,11 +449,13 @@ namespace apl
     runQHA   = false; runQHA3P = false; runSCQHA = false;
     isInitialized = false;
     includeElectronicContribution = false;
+    doSommerfeldExpansion = false;
     Ntemperatures = 0;
     N_GPvolumes = 3;
     N_EOSvolumes = 0;
     Nbranches = 0;
     NatomsOrigCell = 0;
+    Nelectrons = 0;
     origStructure.clear();
     Temperatures.clear();
     GPvolumes.clear();
@@ -499,11 +501,13 @@ namespace apl
     runSCQHA          = qha.runSCQHA;
     isInitialized     = qha.isInitialized;
     includeElectronicContribution = qha.includeElectronicContribution;
+    doSommerfeldExpansion = qha.doSommerfeldExpansion;
     Ntemperatures     = qha.Ntemperatures;
     N_GPvolumes       = qha.N_GPvolumes;
     N_EOSvolumes      = qha.N_EOSvolumes;
     Nbranches         = qha.Nbranches;
     NatomsOrigCell    = qha.NatomsOrigCell;
+    Nelectrons        = qha.Nelectrons;
     origStructure     = qha.origStructure;
     Temperatures      = qha.Temperatures;
     GPvolumes         = qha.GPvolumes;
@@ -584,7 +588,9 @@ namespace apl
     for (option  = kflags.KBIN_MODULE_OPTIONS.qhaflags.begin();
         option != kflags.KBIN_MODULE_OPTIONS.qhaflags.end(); ++option){
       if (option->keyword=="EOS") isEOS = option->option;
-      if (option->keyword=="INCLUDE_ELE") includeElectronicContribution = option->option;
+      if (option->keyword=="INCLUDE_ELEC_CONTRIB")
+        includeElectronicContribution = option->option;
+      if (option->keyword=="SOMMERFELD_EXPANSION") doSommerfeldExpansion=option->option;
       if (option->keyword=="GP_FINITE_DIFF") isGP_FD = option->option;
       if (option->keyword=="IGNORE_IMAGINARY") ignore_imaginary = option->option;
 
@@ -774,7 +780,7 @@ namespace apl
             coefEOSVolumes, xflags, aflags, kflags, aflowin, false);
 
         if (eos_data_available){
-          if (includeElectronicContribution) DOSatEf();
+          if (includeElectronicContribution && doSommerfeldExpansion) DOSatEf();
           if (LDEBUG) writeFrequencies();
           writeFVT();
 
@@ -1140,6 +1146,8 @@ namespace apl
       Efermi_V.push_back(doscar.Efermi);
       E0_V.push_back(outcar.energy_cell/outcar.natoms);
 
+      Nelectrons = outcar.nelectrons;
+
       static_eigvals.push_back(xEIGENVAL(subdirectories_static[i]+'/'+"EIGENVAL.static"));
       static_ibzkpts.push_back(xIBZKPT(subdirectories_static[i]+'/'+"IBZKPT.static"));
     }
@@ -1273,7 +1281,13 @@ namespace apl
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-    if (includeElectronicContribution) E += electronicFreeEnergySommerfeld(T);
+    if (includeElectronicContribution){
+      if (doSommerfeldExpansion) E += electronicFreeEnergySommerfeld(T);
+      else{
+        for (int id=0; id<N_EOSvolumes; id++) E[id+1]+=electronicFreeEnergy(T, id);
+      }
+    }
+
     xvector<double> p = fitToEOSmodel(E, eos_method);
     return evalEOSmodel(V, p, eos_method);
   }
@@ -1399,30 +1413,30 @@ namespace apl
   ///
   /// @param id selects the volume at which corresponding data was obtained 
   ///
-  double QHAN::electronicFreeEnergy(double T, int id)
-  {
-    double EelecT = 0; double SelecT = 0; double FelecT = 0; double Eelec0K = 0;
-    double f = 0.0, f0 = 0.0;
+  //double QHAN::electronicFreeEnergy(double T, int id)
+  //{
+  //  double EelecT = 0; double SelecT = 0; double FelecT = 0; double Eelec0K = 0;
+  //  double f = 0.0, f0 = 0.0;
 
-    double dE = (max(energies_V[id])-min(energies_V[id]))/(energies_V[id].size()-1);
-    for (uint i=0; i<edos_V[id].size(); i++){
-      f0 = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], 0);
-      f  = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], T);
+  //  double dE = (max(energies_V[id])-min(energies_V[id]))/(energies_V[id].size()-1);
+  //  for (uint i=0; i<edos_V[id].size(); i++){
+  //    f0 = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], 0);
+  //    f  = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], T);
 
-      Eelec0K += energies_V[id][i] * edos_V[id][i] * f0;
-      EelecT  += energies_V[id][i] * edos_V[id][i] * f;
-      // limit of values for f->0 or f->1 is 0
-      if (f>0 && f<1) SelecT -= (f*log(f) + (1-f)*log(1-f)) * edos_V[id][i];
-    }
+  //    Eelec0K += energies_V[id][i] * edos_V[id][i] * f0;
+  //    EelecT  += energies_V[id][i] * edos_V[id][i] * f;
+  //    // limit of values for f->0 or f->1 is 0
+  //    if (f>0 && f<1) SelecT -= (f*log(f) + (1-f)*log(1-f)) * edos_V[id][i];
+  //  }
 
-    EelecT  *= dE;
-    Eelec0K *= dE;
-    SelecT  *= KBOLTZEV*dE;
+  //  EelecT  *= dE;
+  //  Eelec0K *= dE;
+  //  SelecT  *= KBOLTZEV*dE;
 
-    FelecT = (EelecT-Eelec0K) - T*SelecT;
+  //  FelecT = (EelecT-Eelec0K) - T*SelecT;
 
-    return FelecT;
-  }
+  //  return FelecT;
+  //}
 
   /// Calculates the equilibrium volume at a given temperature.
   /// @param qha_method defines what kind of QHA calculation is performed.
@@ -1448,7 +1462,13 @@ namespace apl
         break;
     }
 
-    if (includeElectronicContribution) E += electronicFreeEnergySommerfeld(T);
+    if (includeElectronicContribution){
+      if (doSommerfeldExpansion) E += electronicFreeEnergySommerfeld(T);
+      else{
+        for (int id=0; id<N_EOSvolumes; id++) E[id+1]+=electronicFreeEnergy(T, id);
+      }
+    }
+
     fitToEOSmodel(E, eos_method);
 
     return EOS_volume_at_equilibrium;
@@ -1654,6 +1674,154 @@ namespace apl
       DOS_Ef[id+1] = (2-static_eigvals[id].spin)*DEf; // factor 2 if non-magnetic and 1 otherwise
     }
     return DOS_Ef;
+  }
+
+  /// Calculates integrated DOS as a function of energy and temperature.
+  double QHAN::IDOS(double e, double T, xEIGENVAL &eig)
+  {
+    double res = 0.0;
+    double weight = 0.0;
+    for (uint k=0; k<eig.number_kpoints; k++){
+      weight = (2-eig.spin)*eig.vweight[k];// factor 2 if non-magnetic and 1 otherwise
+      for (uint b=0; b<eig.number_bands; b++){
+        for (uint s=0; s<=eig.spin; s++){
+          res += weight*aurostd::FermiDirac(eig.venergy[k][b][s], e, T);
+        }
+      }
+    }
+    return res;
+  }
+
+  /// Returns the chemical potential at a given temperature for a given volume id.
+  ///
+  /// Chemical potential is found as a solution of the equation IDOS(T)-Nelectrons = 0,
+  /// where IDOS(T) = integral over the energy region of DOS(E)*FermiDirac(E, mu, T),
+  /// where mu is a chemical potential.
+  /// Equation is solved using the bisection method and bracketing interval is
+  /// automatically determined starting with the Fermi energy at the one end of the
+  /// interval.
+  double QHAN::ChemicalPotential(double T, int Vid)
+  {
+    // step taken to determine the bracketing interval
+    static const double dE = max(0.01, KBOLTZEV*T);
+    static const string function = "ChemicalPotential():";
+
+    bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
+    if (LDEBUG) cerr << function << "begin" << std::endl;
+
+    // Fermi energy is used as a starting guess for the value of chemical potential
+    double guess = Efermi_V[Vid];
+    double f = IDOS(guess, T, static_eigvals[Vid]) - Nelectrons;
+    if (abs(f) < AUROSTD_ROUNDOFF_TOL) return guess;
+
+    double left_end = 0.0, middle = 0.0, right_end = 0.0;
+    double f_at_left_end = 0.0, f_at_middle = 0.0, f_at_right_end = 0.0;
+
+    // The value of the initial guess is used to bracket the root.
+    // Since IDOS is monotonically increasing function another end of the bracketing 
+    // interval is found by stepping in the direction of increase, if IDOS value at
+    // "guess" energy is lower than the number of electrons, or in the direction of
+    // decrease in the opposite case until the bracketing interval is found (opposite
+    // signs of IDOS-number_of_electrons at bracketing interval ends).
+    left_end = right_end = guess;
+    if (sign(f) > 0){
+      f_at_right_end = f;
+      do {
+        left_end -= dE;
+        f_at_left_end = IDOS(left_end, T, static_eigvals[Vid]) - Nelectrons;
+      } while (sign(f_at_left_end) == sign(f_at_right_end));
+    }
+    else{
+      f_at_left_end = f;
+      do {
+        right_end += dE;
+        f_at_right_end = IDOS(right_end, T, static_eigvals[Vid]) - Nelectrons;
+      } while (sign(f_at_left_end) == sign(f_at_right_end));
+    }
+
+    middle = (left_end + right_end)/2;
+    f_at_middle = IDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
+
+    if (LDEBUG){
+      cerr << function << "Bracketing interval was determined." << std::endl;
+      cerr << function << "left_end= "  << left_end  << "middle= ";
+      cerr << middle  << "right_end= "  << right_end  << std::endl;
+      cerr << function << "f_left= " << f_at_left_end;
+      cerr << "f_middle= " << f_at_middle << "f_right= ";
+      cerr << f_at_right_end << std::endl;
+    }
+
+  // Iterate until the convergence criterion is reached:
+  // f(middle) is sufficiently close to zero or the bracketing interval is sufficiently
+  // small. The latter is used to avoid the infinite loop.
+  // For T->0 it is likely that IDOS is not smooth but is step-like due to numerical
+  // discretization.
+  // Meanwhile, do a sanity check that the function has opposite signs at the interval 
+  // ends.
+    while ((sign(f_at_left_end) != sign(f_at_right_end)) && 
+        (abs(f_at_middle)>_ZERO_TOL_) && (abs(left_end-right_end) > _ZERO_TOL_)){
+      if (sign(f_at_left_end) == sign(f_at_middle)){
+        std::swap(left_end, middle);
+        std::swap(f_at_left_end, f_at_middle);
+      }
+
+      if (sign(f_at_right_end) == sign(f_at_middle)){
+        std::swap(right_end, middle);
+        std::swap(f_at_right_end, f_at_middle);
+      }
+
+      middle = 0.5*(left_end + right_end);
+      f_at_middle = IDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
+  
+      if (LDEBUG){
+        cerr << function << "left_end= "  << left_end  << "middle= ";
+        cerr << middle  << "right_end= "  << right_end  << std::endl;
+        cerr << function << "f_left= " << f_at_left_end;
+        cerr << "f_middle= " << f_at_middle << "f_right= ";
+        cerr << f_at_right_end << std::endl;
+      }
+    }
+
+    if (LDEBUG) cerr << function << "end" << std::endl;
+    return middle;
+  }
+
+  /// Calculates the electronic free energy at a given tempearture for a given volume id.
+  ///
+  /// Electronic free energy is calculated as a weighted sum over energy eigenvalues
+  /// with occupancies as defined by Fermi-Dirac statistics.
+  ///
+  /// Notice: there might be a problem for non-magnetic system when magnetic calculation
+  /// is turned on. Although, eigenvalues for spin up and spin down should be the same,
+  /// I encountered a situation when the small differences in the values of eigenvalues
+  /// for spin up and down down lead to wrong electronic free energy for spin down,
+  /// while the calculation was correct for spin up.
+  double QHAN::electronicFreeEnergy(double T, int Vid)
+  {
+     static const double Tmin = 0.1;
+     if (T < Tmin) return 0.0;
+     double U = 0.0, S = 0.0;
+     xEIGENVAL eig = static_eigvals[Vid];
+     double mu  = ChemicalPotential(T, Vid);
+     double mu0 = ChemicalPotential(Tmin, Vid);
+     double E = 0.0;
+     double f = 0.0, f0 = 0.0;
+     double weight = 0.0;
+     for (uint k=0; k<eig.number_kpoints; k++){
+       weight = (2-eig.spin)*eig.vweight[k];// factor 2 if non-magnetic and 1 otherwise
+       for (uint s=0; s<=eig.spin; s++){
+         for (uint b=0; b<eig.number_bands; b++){
+           E = eig.venergy[k][b][0];
+           f = aurostd::FermiDirac(E, mu, T); f0 = aurostd::FermiDirac(E, mu0, Tmin);
+           U += E * weight*(f - f0);
+
+           if (f>0 && f<1) S -= (f*log(f) + (1-f)*log(1-f)) * weight;
+         }
+       }
+     }
+     S *= KBOLTZEV;
+
+     return U - T*S;
   }
 
   /// Calculates the electronic free energy using the Sommerfeld expansion.
@@ -2162,14 +2330,19 @@ namespace apl
           break;
       }
 
-      if (includeElectronicContribution) F += electronicFreeEnergySommerfeld(T);
+      if (includeElectronicContribution){
+        if (doSommerfeldExpansion) F += electronicFreeEnergySommerfeld(T);
+        else{
+          for (int id=0; id<N_EOSvolumes; id++) F[id+1]+=electronicFreeEnergy(T, id);
+        }
+      }
 
       // stop if energy minimum is no longer within a given set of volumes
       if (!isMinimumWithinBounds(F)){
         msg = "Calculation is stopped at T=" + aurostd::utype2string<double>(T) + " [K]";
-        msg+= "since there is no free energy minimum within a given volume range.";
+        msg+= " since there is no free energy minimum within a given volume range.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_MESSAGE_);
+            *p_oss, _LOGGER_WARNING_);
         break;
       }
 
@@ -2242,9 +2415,16 @@ namespace apl
     double T = 0.0;
 
     for (int Tid = 0; Tid < Ntemperatures; Tid++){
+      T = Temperatures[Tid];
+      file << "# T = " << T << " K" << std::endl;
+      if (includeElectronicContribution && doSommerfeldExpansion){
+        Felec = electronicFreeEnergySommerfeld(T);
+      }
       for (int Vid = 0; Vid < N_EOSvolumes; Vid++){
-        T = Temperatures[Tid];
-        if (includeElectronicContribution) Felec = electronicFreeEnergySommerfeld(T);
+        if (includeElectronicContribution && !doSommerfeldExpansion){
+          Felec[Vid+1]=electronicFreeEnergy(T,Vid);
+        }
+
         file << setw(TW) << EOSvolumes[Vid]    << setw(SW) << ' '
           << setw(TW) << FreeEnergy(T, Vid) << setw(SW) << ' '
           << setw(TW) << Felec[Vid+1]       << setw(SW) << ' '

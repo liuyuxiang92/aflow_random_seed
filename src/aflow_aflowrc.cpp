@@ -578,6 +578,10 @@
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 #define AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              FALSE
 #define         DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB")
+//AS20200528 BEGIN
+#define AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION              FALSE
+#define         DEFAULT_QHA_SOMMERFELD_EXPANSION              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_SOMMERFELD_EXPANSION")
+//AS20200528 END
 #define AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T                      string("50,100,600")
 #define         DEFAULT_QHA_SCQHA_PDIS_T                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_SCQHA_PDIS_T")
 //AS20200508 BEGIN
@@ -1363,6 +1367,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
     aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
     aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
+    aflowrc::load_default("DEFAULT_QHA_SOMMERFELD_EXPANSION", AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION);//AS20200528
     aflowrc::load_default("DEFAULT_QHA_SCQHA_PDIS_T", AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T);
     //AS20200508 BEGIN
     aflowrc::load_default("DEFAULT_QHA_GP_FINITE_DIFF", AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF);
@@ -1910,6 +1915,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
     aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
+    aflowrc << "DEFAULT_QHA_SOMMERFELD_EXPANSION=" << AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION  << endl;//AS20200528
     aflowrc << "DEFAULT_QHA_SCQHA_PDIS_T=\"" << AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T << "\"" << endl;
     //AS20200508 BEGIN
     aflowrc << "DEFAULT_QHA_GP_FINITE_DIFF=" << AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF  << endl;
@@ -2423,6 +2429,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_SOMMERFELD_EXPANSION\")=" << DEFAULT_QHA_SOMMERFELD_EXPANSION << endl;//AS20200528
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_SCQHA_PDIS_T\")=\"" << DEFAULT_QHA_SCQHA_PDIS_T << "\"" << endl;
     //AS20200508 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_FINITE_DIFF\")=" << DEFAULT_QHA_GP_FINITE_DIFF << endl;
