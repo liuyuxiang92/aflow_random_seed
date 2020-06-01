@@ -1150,9 +1150,32 @@ check_slab:
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER="32." && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
-		if [ -z "$$SC" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check  './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t'" && exit 0; fi && \
-		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
+	@echo "Running CHULL test 1 - output files for MnPd" && COMMAND="./aflow --chull --alloy=MnPd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_MnPd_hull.json" ] || [ ! -f "aflow_MnPd_hull.txt" ] || [ ! -f "aflow_MnPd_hull.pdf" ]; then echo "CHULL did not return MnPd output files. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_MnPd_hull.json aflow_MnPd_hull.txt aflow_MnPd_hull.pdf
+	@echo "Running CHULL test 2 - output files for AgAuCd" && COMMAND="./aflow --chull --alloy=AgAuCd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_AgAuCd_hull.json" ] || [ ! -f "aflow_AgAuCd_hull.txt" ] || [ ! -f "aflow_AgAuCd_hull.pdf" ]; then echo "CHULL did not return AgAuCd output files. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_AgAuCd_hull.json aflow_AgAuCd_hull.txt aflow_AgAuCd_hull.pdf
+	@echo "Running CHULL test 3 - distance from hull of Mn2Pd3" && ANSWER="62." && COMMAND="./aflow --chull --alloy=MnPd --d2h=aflow:9001c322296fc162" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a distance, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2Pd3, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@echo "Running CHULL test 4 - stability criterion of Te2Zr" && ANSWER="49." && COMMAND="./aflow --chull --alloy=TeZr --sc=aflow:570e80d4daa0a9d4" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Te2Zr, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@echo "Running CHULL test 5 - stability criterion of Mn3Pd5" && ANSWER="13." && COMMAND="./aflow --chull --alloy=MnPd --sc=aflow:4fc97e549ca17d4e" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn3Pd5, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@echo "Running CHULL test 6 - stability criterion of Mn2PdPt" && ANSWER="32." && COMMAND="./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2PdPt, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@echo "Running CHULL test 7 - MnPd hull energy at x=0.25" && ANSWER="-235." && COMMAND="./aflow --chull --alloy=MnPd --hull_energy=0.25" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a MnPd hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at x=0.25, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@echo "Running CHULL test 8 - CuZr hull energy at x=0.5" && ANSWER="-158." && COMMAND="./aflow --chull --alloy=CuZr --hull_energy=0.5" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a CuZr hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at x=0.5, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
 	@echo "CHULL tests passed"
 .PHONY: check_pocc
 check_pocc:
