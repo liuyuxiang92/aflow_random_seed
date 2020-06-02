@@ -1150,9 +1150,9 @@ check_slab:
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - output files for MnPd" && COMMAND="./aflow --chull --alloy=MnPd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && \
+	@echo "Running CHULL test 1 - output files for MnPd" && COMMAND="./aflow --chull --alloy=MnPd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && echo $$RESPONSE && \
 		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ ! -f "aflow_MnPd_hull.json" ] || [ ! -f "aflow_MnPd_hull.txt" ] || [ ! -f "aflow_MnPd_hull.pdf" ]; then echo "CHULL did not return MnPd output files. Try: '$$COMMAND'" && ls && exit 1; fi && \
+		if [ ! -f "aflow_MnPd_hull.json" ] || [ ! -f "aflow_MnPd_hull.txt" ] || [ ! -f "aflow_MnPd_hull.pdf" ]; then echo "CHULL did not return MnPd output files. Try: '$$COMMAND'" && exit 1; fi && \
 		rm -f aflow_MnPd_hull.json aflow_MnPd_hull.txt aflow_MnPd_hull.pdf
 	@echo "Running CHULL test 2 - output files for AgAuCd" && COMMAND="./aflow --chull --alloy=AgAuCd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && \
 		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
