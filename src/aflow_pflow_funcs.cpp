@@ -8242,7 +8242,7 @@ namespace pflow {
   string getQueueStatus(const aurostd::xoption& vpflow){  //CO20200526
     AQueue aqueue(vpflow);
     aqueue.getQueue();
-    cerr << aqueue.getPercentage("aflow","batch",JOB_RUNNING) << endl;
+    //[only test on qrats]cerr << aqueue.getPercentage("aflow","batch",JOB_RUNNING) << endl;
     return "";
   }
 }
