@@ -7442,6 +7442,29 @@ namespace pflow {
     m_vijobs.clear();
     m_vipartitions.clear();
   }
+  bool ANode::isStatus(const node_status& status) const {
+    //[keep silent]bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    //[keep silent]string soliloquy="pflow::ANode::isStatus():";
+    //[keep silent]if(LDEBUG){
+    //[keep silent]  //status
+    //[keep silent]  if(status==NODE_FREE){cerr << soliloquy << " status==NODE_FREE" << endl;}
+    //[keep silent]  else if(status==NODE_OCCUPIED){cerr << soliloquy << " status==NODE_OCCUPIED" << endl;}
+    //[keep silent]  else if(status==NODE_FULL){cerr << soliloquy << " status==NODE_FULL" << endl;}
+    //[keep silent]  else if(status==NODE_DOWN){cerr << soliloquy << " status==NODE_DOWN" << endl;}
+    //[keep silent]  else if(status==NODE_OFFLINE){cerr << soliloquy << " status==NODE_OFFLINE" << endl;}
+    //[keep silent]  else if(status==NODE_OPERATIONAL){cerr << soliloquy << " status==NODE_OPERATIONAL" << endl;}
+    //[keep silent]  else if(status==NODE_NONOPERATIONAL){cerr << soliloquy << " status==NODE_NONOPERATIONAL" << endl;}
+    //[keep silent]  //m_status
+    //[keep silent]  if(m_status==NODE_FREE){cerr << soliloquy << " m_status==NODE_FREE" << endl;}
+    //[keep silent]  else if(m_status==NODE_OCCUPIED){cerr << soliloquy << " m_status==NODE_OCCUPIED" << endl;}
+    //[keep silent]  else if(m_status==NODE_FULL){cerr << soliloquy << " m_status==NODE_FULL" << endl;}
+    //[keep silent]  else if(m_status==NODE_DOWN){cerr << soliloquy << " m_status==NODE_DOWN" << endl;}
+    //[keep silent]  else if(m_status==NODE_OFFLINE){cerr << soliloquy << " m_status==NODE_OFFLINE" << endl;}
+    //[keep silent]}
+    if(status==NODE_OPERATIONAL && (m_status==NODE_FREE||m_status==NODE_OCCUPIED||m_status==NODE_FULL)){return true;}
+    else if(status==NODE_NONOPERATIONAL && (m_status==NODE_DOWN||m_status==NODE_OFFLINE)){return true;}
+    return m_status==status;
+  }
 }
 
 namespace pflow {
@@ -7531,37 +7554,71 @@ namespace pflow {
     for(uint i=0;i<partition.m_inodes.size();i++){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
     return ncpus;
   }
-  uint AQueue::getNNodes(const APartition& partition,const node_status& state) const {
+  uint AQueue::getNNodes(const APartition& partition,const node_status& status) const {
     uint nnodes=0;
     for(uint i=0;i<partition.m_inodes.size();i++){
-      if(m_nodes[partition.m_inodes[i]].m_status==state){nnodes+=1;}
+      if(m_nodes[partition.m_inodes[i]].isStatus(status)){nnodes+=1;}
     }
     return nnodes;
   }
-  uint AQueue::getNCPUS(const APartition& partition,const node_status& state_node,const cpus_status& state_cpus) const {
+  uint AQueue::getNCPUS(const APartition& partition,const node_status& status_node,const cpus_status& status_cpus) const {
     uint ncpus=0;
-    if(state_cpus==CPUS_TOTAL){
+    if(status_cpus==CPUS_TOTAL){
       for(uint i=0;i<partition.m_inodes.size();i++){
-        if(m_nodes[partition.m_inodes[i]].m_status==state_node){
+        if(m_nodes[partition.m_inodes[i]].isStatus(status_node)){
           ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;
         }
       }
     }
-    else if(state_cpus==CPUS_FREE){
+    else if(status_cpus==CPUS_FREE){
       for(uint i=0;i<partition.m_inodes.size();i++){
-        if(m_nodes[partition.m_inodes[i]].m_status==state_node){
+        if(m_nodes[partition.m_inodes[i]].isStatus(status_node)){
           ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus-m_nodes[partition.m_inodes[i]].m_ncpus_occupied;
         }
       }
     }
-    else if(state_cpus==CPUS_OCCUPIED){
+    else if(status_cpus==CPUS_OCCUPIED){
       for(uint i=0;i<partition.m_inodes.size();i++){
-        if(m_nodes[partition.m_inodes[i]].m_status==state_node){
+        if(m_nodes[partition.m_inodes[i]].isStatus(status_node)){
           ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus_occupied;
         }
       }
     }
     return ncpus;
+  }
+  uint AQueue::getNCPUS(const string& user,const string& partition,const job_status& status) const {
+    string soliloquy="pflow::AQueue::getNCPUS():";
+    uint ipartition=partitionName2Index(partition);
+    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+    return getNCPUS(user,m_partitions[ipartition],status);
+  }
+  uint AQueue::getNCPUS(const string& user,const APartition& partition,const job_status& status) const {
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy="pflow::AQueue::getNCPUS():";
+    uint ncpus=0;
+    uint ijob=0;
+    if(LDEBUG){cerr << soliloquy << " partition=" << partition.m_name << endl;}
+    for(uint i=0;i<partition.m_vijobs.size();i++){
+      ijob=partition.m_vijobs[i];
+      if(ijob>m_jobs.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
+      const AJob& job=m_jobs[ijob];
+      if(job.m_user==user && job.m_status==status){
+        if(LDEBUG){cerr << soliloquy << " job=" << job.m_id << " ncpus=" << job.m_ncpus << endl;}
+        ncpus+=job.m_ncpus;
+      }
+    }
+    return ncpus;
+  }
+  double AQueue::getPercentage(const string& user,const string& partition,const job_status& status) const {
+    string soliloquy="pflow::AQueue::getPercentage():";
+    uint ipartition=partitionName2Index(partition);
+    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+    return getPercentage(user,m_partitions[ipartition],status);
+  }
+  double AQueue::getPercentage(const string& user,const APartition& partition,const job_status& status) const {
+    uint denom=getNCPUS(partition,NODE_OPERATIONAL);
+    if(denom==0){return 0.0;}
+    return (double)getNCPUS(user,partition,status)/(double)denom;
   }
 
   uint AQueue::nodeName2Index(const string& name) const {
@@ -7626,12 +7683,14 @@ namespace pflow {
           for(j=0;j<job.m_vinodes.size()&&found_node==false;j++){
             if(job.m_vinodes[j]==inode){
               if(LDEBUG){cerr << soliloquy << " adding " << ncpus << " cpus to job=" << job.m_id << ",inode=" << job.m_vinodes[j] << endl;}
+              job.m_ncpus+=ncpus;
               job.m_vncpus[j]+=ncpus;
               found_node=true;
             }
           }
           if(!found_node){
             if(LDEBUG){cerr << soliloquy << " job=" << job.m_id << " is also running on inode=" << inode << " with " << ncpus << " cpus" << endl;}
+            job.m_ncpus+=ncpus;
             job.m_vinodes.push_back(inode);
             job.m_vncpus.push_back(ncpus);
           }
@@ -7711,7 +7770,7 @@ namespace pflow {
       else if(node.m_status==NODE_FULL){cerr << "FULL";}
       else if(node.m_status==NODE_DOWN){cerr << "DOWN";}
       else if(node.m_status==NODE_OFFLINE){cerr << "OFFLINE";}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown node.state",_RUNTIME_ERROR_);}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown node.status",_RUNTIME_ERROR_);}
       cerr << " node=" << node.m_name << endl;
     }
     return node_added;
@@ -7763,6 +7822,7 @@ namespace pflow {
       ipartition=job.m_vipartitions[i];
       if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
       APartition& partition=m_partitions[ipartition];
+      partition.m_vijobs.push_back(job.m_index);
       if(LDEBUG){cerr << soliloquy << " mapping job=" << job.m_id << " to partition=" << partition.m_name << endl;}
     }
     //map RUNNING job to node
@@ -7849,8 +7909,8 @@ namespace pflow {
       _partition.m_name=tokens[2];aurostd::StringSubst(_partition.m_name,"*","");  //this signifies default queue, we don't care
       addPartition(_partition);
       _node.m_properties=_partition.m_name; //for node-partition mapping() later
-      //tokens[3] is state
-      if(tokens[3].find('*')!=string::npos){_node.m_status=NODE_DOWN;}  //catch first, doesn't matter what state it is in, IT'S NOT RESPONDING
+      //tokens[3] is status
+      if(tokens[3].find('*')!=string::npos){_node.m_status=NODE_DOWN;}  //catch first, doesn't matter what status it is in, IT'S NOT RESPONDING
       else if(tokens[3]=="allocated+"||tokens[3]=="allocated"||tokens[3]=="alloc"||
         tokens[3]=="completing"||tokens[3]=="comp"||
         FALSE){_node.m_status=NODE_FULL;}  //most likely to appear first, quicker to appear at the top
@@ -8118,6 +8178,19 @@ namespace pflow {
       //if(LDEBUG){cerr << soliloquy << " XHOST.command(\"showq\")=" << XHOST.command("showq") << endl;}
     }
 
+    //get mappings now - clear first START
+    for(uint inode=0;inode<m_nodes.size();inode++){
+      ANode& node=m_nodes[inode];
+      node.m_vijobs.clear();
+      node.m_vipartitions.clear();
+    }
+    for(uint ipartition=0;ipartition<m_partitions.size();ipartition++){
+      APartition& partition=m_partitions[ipartition];
+      partition.m_inodes.clear();
+      partition.m_vijobs.clear();
+    }
+    //get mappings now - clear first END
+
     //get node mappings
     for(uint inode=0;inode<m_nodes.size();inode++){
       ANode& node=m_nodes[inode];
@@ -8169,6 +8242,7 @@ namespace pflow {
   string getQueueStatus(const aurostd::xoption& vpflow){  //CO20200526
     AQueue aqueue(vpflow);
     aqueue.getQueue();
+    cerr << aqueue.getPercentage("aflow","batch",JOB_RUNNING) << endl;
     return "";
   }
 }

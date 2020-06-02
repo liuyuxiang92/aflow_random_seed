@@ -951,7 +951,9 @@ enum node_status { //CO20200526
   NODE_OCCUPIED,
   NODE_FULL,
   NODE_DOWN,
-  NODE_OFFLINE
+  NODE_OFFLINE,
+  NODE_OPERATIONAL,     //NOT ASSIGNED - this is an aggregate of free+occupied+full
+  NODE_NONOPERATIONAL,  //NOT ASSIGNED - this is an aggregate of down+offline
 };
 
 enum cpus_status { //CO20200526
@@ -989,6 +991,7 @@ namespace pflow {
     vector<uint> m_vijobs;
     vector<uint> m_vipartitions;
     void free();
+    bool isStatus(const node_status& status) const;
   };
   //APartition stays a struct until we need more than just free
   struct APartition {  //CO20200526
@@ -1043,8 +1046,12 @@ namespace pflow {
       uint getNCPUS() const;
       uint getNNodes(const APartition& partition) const;
       uint getNCPUS(const APartition& partition) const;
-      uint getNNodes(const APartition& partition,const node_status& state) const;
-      uint getNCPUS(const APartition& partition,const node_status& state_node,const cpus_status& state_cpus=CPUS_TOTAL) const;
+      uint getNNodes(const APartition& partition,const node_status& status) const;
+      uint getNCPUS(const APartition& partition,const node_status& status_node,const cpus_status& status_cpus=CPUS_TOTAL) const;
+      uint getNCPUS(const string& user,const string& partition,const job_status& status) const;
+      uint getNCPUS(const string& user,const APartition& partition,const job_status& status) const;
+      double getPercentage(const string& user,const string& partition,const job_status& status) const;
+      double getPercentage(const string& user,const APartition& partition,const job_status& status) const;
       uint nodeName2Index(const string& name) const;
       uint partitionName2Index(const string& name) const;
 
