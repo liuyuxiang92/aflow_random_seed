@@ -4189,7 +4189,7 @@ namespace aurostd {
     struct stat s;
     if( stat(path.c_str(),&s) != 0 ){return FALSE;} //error
     if( s.st_mode & S_IFREG ){      //CO20200531 - still trips if file exists but is not accessible
-      ifstream f(path);             //CO20200531 - see if file is accessible by user
+      ifstream f(path.c_str());     //CO20200531 - see if file is accessible by user
       if(!f.good()){return FALSE;}  //CO20200531 - see if file is accessible by user
       return TRUE;
     }
