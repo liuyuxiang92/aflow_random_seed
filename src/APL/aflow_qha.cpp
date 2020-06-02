@@ -478,6 +478,7 @@ namespace apl
     omegaV_mesh.clear();
     omegaV_mesh_EOS.clear();
     gp_ph_dispersions.clear();
+    eos_ph_dispersions.clear();
     eos_vib_thermal_properties.clear();
     subdirectories_apl_gp.clear();
     subdirectories_apl_eos.clear();
@@ -531,6 +532,7 @@ namespace apl
     omegaV_mesh       = qha.omegaV_mesh;
     omegaV_mesh_EOS   = qha.omegaV_mesh_EOS;
     gp_ph_dispersions = qha.gp_ph_dispersions;
+    eos_ph_dispersions = qha.eos_ph_dispersions;
     eos_vib_thermal_properties = qha.eos_vib_thermal_properties;
     subdirectories_apl_eos  = qha.subdirectories_apl_eos;
     subdirectories_apl_gp   = qha.subdirectories_apl_gp;
@@ -804,6 +806,8 @@ namespace apl
           writeThermalProperties(EOS_POLYNOMIAL, QHA_CALC);
           writeThermalProperties(EOS_MURNAGHAN, QHA_CALC);
           writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHA_CALC);
+
+          writeTphononDispersions(QHA_CALC);
         }
       }
 
@@ -825,6 +829,8 @@ namespace apl
               writeThermalProperties(EOS_POLYNOMIAL, QHA3P_CALC);
               writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
               writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHA3P_CALC);
+
+              writeTphononDispersions(QHA3P_CALC);
             }
           }
 
@@ -832,7 +838,7 @@ namespace apl
             RunSCQHA(EOS_POLYNOMIAL, true);
             RunSCQHA(EOS_POLYNOMIAL, false);
 
-            writeTphononDispersions();
+            writeTphononDispersions(SCQHA_CALC);
           }
         }
       }
@@ -1092,6 +1098,7 @@ namespace apl
         }
       }
       else {
+        eos_ph_dispersions.push_back(pdisc.createEIGENVAL());
         eos_vib_thermal_properties.push_back(ThermalPropertiesCalculator(dosc,
               *p_FileMESSAGE));
 
@@ -1170,6 +1177,25 @@ namespace apl
       static_eigvals.push_back(xEIGENVAL(subdirectories_static[i]+'/'+"EIGENVAL.static"));
       static_ibzkpts.push_back(xIBZKPT(subdirectories_static[i]+'/'+"IBZKPT.static"));
     }
+  }
+
+  /// Returns a frequency obtained by approximation of frequency-volume dependence
+  /// to a polynomial.
+  ///
+  /// The following polynomial is used:
+  /// w = a + b*V  + c*V**2 + d*V**3
+  ///
+  double QHAN::calcFrequencyFit(double V, xvector<double> &xomega)
+  {
+    string function = "calcFrequencyFit():";
+    // set all weight in fit to 1
+    xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
+    xvector<double> Vpoly(4); for (int i=1; i<=4; i++) Vpoly[i] = pow(V,i-1);
+
+    aurostd::cematrix lsfit(gp_fit_matrix);
+    lsfit.LeastSquare(xomega,s);
+
+    return scalar_product(Vpoly, lsfit.GetFitVector());
   }
 
   /// Calculates the Grueneisen parameter of an individual vibrational mode for a
@@ -2680,14 +2706,27 @@ namespace apl
     }
   }
 
-  void QHAN::writeTphononDispersions()
+  void QHAN::writeTphononDispersions(QHAmethod qha_method)
   {
     string function = "QHAN::writeTphononDispersions():", msg = "";
-    double T = 0.0, V =0.0;
-    xvector<double> xomega(N_GPvolumes);
+    double T = 0.0, V = 0.0;
+    xvector<double> xomega;
     for (uint i=0; i<ph_disp_temperatures.size(); i++){
       T = ph_disp_temperatures[i];
-      V = SCQHAgetEquilibriumVolume(T);
+      switch(qha_method){
+        case (QHA_CALC):
+          xomega = xvector<double>(N_EOSvolumes);
+          V = getEqVolumeT(T, EOS_POLYNOMIAL, qha_method);
+          break;
+        case (QHA3P_CALC):
+          xomega = xvector<double>(N_GPvolumes);
+          V = getEqVolumeT(T, EOS_POLYNOMIAL, qha_method);
+          break;
+        case (SCQHA_CALC):
+          xomega = xvector<double>(N_GPvolumes);
+          V = SCQHAgetEquilibriumVolume(T);
+          break;
+      }
 
       string msg = "Writing phonon dispersions corresponding to a ";
       msg += aurostd::utype2string<double>(T) + " (K) temperature.";
@@ -2695,12 +2734,21 @@ namespace apl
           _LOGGER_MESSAGE_);
 
       // we will save T-dependent phonon bands in xEIGENVAL
-      xEIGENVAL eig(gp_ph_dispersions.front());
+      xEIGENVAL eig;
+      switch (qha_method){
+        case(QHA_CALC):
+          eig = eos_ph_dispersions.front();
+          break;
+        case(QHA3P_CALC):
+        case(SCQHA_CALC):
+          eig = gp_ph_dispersions.front();
+          break;
+      }
       eig.Vol = V;
       eig.temperature = T;
 
       xstructure struc = origStructure;
-      struc.SetVolume(V);
+      struc.InflateVolume(V/struc.GetVolume());
       xvector<double> lattice(3);
       lattice[1] = struc.a * 1E-10;
       lattice[2] = struc.b * 1E-10;
@@ -2711,18 +2759,39 @@ namespace apl
       //venergy.at(kpoint number).at(band number).at(spin number)
       for (uint q=0; q<eig.venergy.size(); q++){
         for (int branch=0; branch<Nbranches; branch++){
-          for (int Vid=0; Vid<N_GPvolumes; Vid++){
-            xomega[Vid+1] = gp_ph_dispersions[Vid].venergy[q][branch][0];
+          switch (qha_method){
+            case (QHA_CALC):
+              for (int Vid=0; Vid<N_EOSvolumes; Vid++){
+                xomega[Vid+1] = eos_ph_dispersions[Vid].venergy[q][branch][0];
+              }
+              eig.venergy[q][branch][0] = calcFrequencyFit(V, xomega);
+              break;
+            case (QHA3P_CALC):
+            case (SCQHA_CALC):
+              for (int Vid=0; Vid<N_GPvolumes; Vid++){
+                xomega[Vid+1] = gp_ph_dispersions[Vid].venergy[q][branch][0];
+              }
+              eig.venergy[q][branch][0] = extrapolateFrequency(V, xomega);
+              break;
           }
-
-          eig.venergy[q][branch][0] = extrapolateFrequency(V, xomega);
         }
       }
 
       stringstream eig_stream;
       eig_stream << eig;
 
-      string filename = DEFAULT_QHA_FILE_PREFIX+"scqha.";
+      string filename = DEFAULT_QHA_FILE_PREFIX;
+      switch (qha_method){
+        case (QHA_CALC):
+          filename += "qha.";
+          break;
+        case (QHA3P_CALC):
+          filename += "qha3p.";
+          break;
+        case (SCQHA_CALC):
+          filename += "scqha.";
+          break;
+      }
       filename += aurostd::utype2string<double>(T)+DEFAULT_QHA_TPHDISP_FILE;
       aurostd::stringstream2file(eig_stream, filename);
       if (!aurostd::FileExist(filename)){

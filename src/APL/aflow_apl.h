@@ -1893,6 +1893,7 @@ namespace apl
       const QHAN& operator=(const QHAN &qha);
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
       void clear();
+      double calcFrequencyFit(double V, xvector<double> &xomega);
       double calcGrueneisen(double V, xvector<double> &xomega, double &w);
       double calcGrueneisenFD(const xvector<double> &xomega);
       void   calcCVandGP(double T, double &CV, double &GP);
@@ -1929,7 +1930,7 @@ namespace apl
       void   writeAverageGPfiniteDifferences();
       void   writeGPmeshFD();
       void   writeFrequencies();
-      void   writeTphononDispersions();
+      void   writeTphononDispersions(QHAmethod qha_method);
       // members
       xoption apl_options;
       string system_title;
@@ -1977,6 +1978,7 @@ namespace apl
       vector<vector<vector<double> > > omegaV_mesh;
       vector<vector<vector<double> > > omegaV_mesh_EOS;
       vector<xEIGENVAL> gp_ph_dispersions;
+      vector<xEIGENVAL> eos_ph_dispersions;
       vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
       //
       vector<string> subdirectories_apl_eos;
