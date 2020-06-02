@@ -144,6 +144,9 @@ SQLITE_OBJ=$(SQLITE_C:.c=.o)
 #MAKEFILES=Makefile Makefile.aflow	#CO20200508 - special makefile variable, DO NOT USE
 MFS=Makefile Makefile.aflow
 
+#for incrementing within a recipe
+COUNTER_FILE=.aflow_counter
+
 #CO20200508 - all MUST come first
 #CO20200508 - .PHONY rules do NOT get 'Makefile' as dependence
 .PHONY: all
@@ -1150,33 +1153,45 @@ check_slab:
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - output files for MnPd" && COMMAND="./aflow --chull --alloy=MnPd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && echo $$RESPONSE && \
-		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ ! -f "aflow_MnPd_hull.json" ] || [ ! -f "aflow_MnPd_hull.txt" ] || [ ! -f "aflow_MnPd_hull.pdf" ]; then echo "CHULL did not return MnPd output files. Try: '$$COMMAND'" && exit 1; fi && \
-		rm -f aflow_MnPd_hull.json aflow_MnPd_hull.txt aflow_MnPd_hull.pdf
-	@echo "Running CHULL test 2 - output files for AgAuCd" && COMMAND="./aflow --chull --alloy=AgAuCd --o=j,t,p" RESPONSE=$$(eval "$$COMMAND") && \
-		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ ! -f "aflow_AgAuCd_hull.json" ] || [ ! -f "aflow_AgAuCd_hull.txt" ] || [ ! -f "aflow_AgAuCd_hull.pdf" ]; then echo "CHULL did not return AgAuCd output files. Try: '$$COMMAND'" && exit 1; fi && \
-		rm -f aflow_AgAuCd_hull.json aflow_AgAuCd_hull.txt aflow_AgAuCd_hull.pdf
-	@echo "Running CHULL test 3 - distance from hull of Mn2Pd3" && ANSWER="62." && COMMAND="./aflow --chull --alloy=MnPd --d2h=aflow:9001c322296fc162" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+	@rm -f $(COUNTER_FILE) && echo "STARTING CHULL" >> $(COUNTER_FILE)
+	@ALLOY="MnPd" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - text/json output files for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=j,t" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return text/json output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.json" ] || [ ! -f "aflow_$${ALLOY}_hull.txt" ]; then echo "CHULL did not return $$ALLOY text/json output files. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.json aflow_$${ALLOY}_hull.txt
+#travis does not have pdflatex
+	@ALLOY="MnPd" && if [ -z "$$TRAVIS" ]; then COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - PDF output for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=p" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return a PDF, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.pdf" ]; then echo "CHULL did not return a PDF for $$ALLOY. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.pdf; fi
+	@ALLOY="AgAuCd" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - text/json output files for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=j,t" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return text/json output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.json" ] || [ ! -f "aflow_$${ALLOY}_hull.txt" ]; then echo "CHULL did not return $$ALLOY text/json output files. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.json aflow_$${ALLOY}_hull.txt
+#travis does not have pdflatex
+	@ALLOY="AgAuCd" && if [ -z "$$TRAVIS" ]; then COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - PDF output for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=p" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return a PDF, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.pdf" ]; then echo "CHULL did not return a PDF for $$ALLOY. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.pdf; fi
+	@ALLOY="MnPd" && COMPOUND="Mn2Pd3" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - distance from hull of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="62." && COMMAND="./aflow --chull --alloy=$$ALLOY --d2h=aflow:9001c322296fc162" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a distance, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2Pd3, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
-	@echo "Running CHULL test 4 - stability criterion of Te2Zr" && ANSWER="49." && COMMAND="./aflow --chull --alloy=TeZr --sc=aflow:570e80d4daa0a9d4" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="TeZr" && COMPOUND="Te2Zr" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - stability criterion of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="49." && COMMAND="./aflow --chull --alloy=$$ALLOY --sc=aflow:570e80d4daa0a9d4" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Te2Zr, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
-	@echo "Running CHULL test 5 - stability criterion of Mn3Pd5" && ANSWER="13." && COMMAND="./aflow --chull --alloy=MnPd --sc=aflow:4fc97e549ca17d4e" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPd" && COMPOUND="Mn3Pd5" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - stability criterion of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="13." && COMMAND="./aflow --chull --alloy=$$ALLOY --sc=aflow:4fc97e549ca17d4e" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn3Pd5, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
-	@echo "Running CHULL test 6 - stability criterion of Mn2PdPt" && ANSWER="32." && COMMAND="./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPdPt" && COMPOUND="Mn2PdPt" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - stability criterion of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="32." && COMMAND="./aflow --chull --alloy=$$ALLOY --sc=aflow:fb9eaa58604ce774" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2PdPt, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
-	@echo "Running CHULL test 7 - MnPd hull energy at x=0.25" && ANSWER="-235." && COMMAND="./aflow --chull --alloy=MnPd --hull_energy=0.25" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPd" && STOICH="x=0.25" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - $$ALLOY hull energy at $$STOICH" | tee -a $(COUNTER_FILE) && ANSWER="-235." && COMMAND="./aflow --chull --alloy=$$ALLOY --hull_energy=0.25" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a MnPd hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at x=0.25, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
-	@echo "Running CHULL test 8 - CuZr hull energy at x=0.5" && ANSWER="-158." && COMMAND="./aflow --chull --alloy=CuZr --hull_energy=0.5" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a $$ALLOY hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at $$STOICH, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="CuZr" && STOICH="x=0.5" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l) && echo "Running CHULL test $$COUNTER - $$ALLOY hull energy at $$STOICH" | tee -a $(COUNTER_FILE) && ANSWER="-158." && COMMAND="./aflow --chull --alloy=$$ALLOY --hull_energy=0.5" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
-		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a CuZr hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at x=0.5, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a $$ALLOY hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at $$STOICH, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
 	@echo "CHULL tests passed"
+	@rm -f $(COUNTER_FILE)
 .PHONY: check_pocc
 check_pocc:
 	@echo "Running POCC test 1 - unique structures count of C5HfMoNbTaTi" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Ti --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
