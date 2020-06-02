@@ -458,6 +458,7 @@ namespace apl
     Nelectrons = 0;
     origStructure.clear();
     Temperatures.clear();
+    ph_disp_temperatures.clear();
     GPvolumes.clear();
     EOSvolumes.clear();
     coefGPVolumes.clear();
@@ -510,6 +511,7 @@ namespace apl
     Nelectrons        = qha.Nelectrons;
     origStructure     = qha.origStructure;
     Temperatures      = qha.Temperatures;
+    ph_disp_temperatures = qha.ph_disp_temperatures;
     GPvolumes         = qha.GPvolumes;
     EOSvolumes        = qha.EOSvolumes;
     coefGPVolumes     = qha.coefGPVolumes;
@@ -636,6 +638,21 @@ namespace apl
             if (tokens[i].find("QHA3P")!=std::string::npos) runQHA3P = true;
             if (tokens[i].find("SCQHA")!=std::string::npos) runSCQHA = true;
           }
+        }
+      }
+
+      // list of temperatures for temperature-dependent phonon dispersions
+      if (option->keyword=="SCQHA_PDIS_T"){
+        tokens.clear();
+        aurostd::string2tokens(option->content_string, tokens, ",");
+        if (!tokens.size()){
+          string message = "Wrong setting in [AFLOW_QHA]SCQHA_PDIS_T: list of ";
+          message += "temperatures is not given.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
+              _INPUT_NUMBER_);
+        }
+        for (uint i=0; i<tokens.size(); i++){
+          ph_disp_temperatures.push_back(aurostd::string2utype<double>(tokens[i]));
         }
       }
     }
@@ -814,6 +831,8 @@ namespace apl
           if (runSCQHA){
             RunSCQHA(EOS_POLYNOMIAL, true);
             RunSCQHA(EOS_POLYNOMIAL, false);
+
+            writeTphononDispersions();
           }
         }
       }
@@ -1973,6 +1992,44 @@ namespace apl
     return VPgamma;
   }
 
+  /// Calculates equilibrium volume for a given temperatures using SCQHA self-consistent
+  /// loop procedure.
+  /// Check for details:
+  /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
+  /// and https://doi.org/10.1016/j.commatsci.2016.04.012
+  double QHAN::SCQHAgetEquilibriumVolume(double T)
+  {
+    string function = "SCQHAgetEquilibriumVolume():";
+    const static int max_scqha_iteration = 10000;
+    const static double Vtol = 1e-5;
+    const static double dV = 1e-3;
+    xvector<double> E = aurostd::vector2xvector<double>(E0_V);
+    xvector<double> fit_params = fitToEOSmodel(E, EOS_POLYNOMIAL);
+    double V_static_eq = EOSpolyGetEqVolume(fit_params, min(EOSvolumes), max(EOSvolumes));
+
+    double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
+    double Vnew = 0.0;
+    // to avoid division by zero in the self-consistent loop,
+    // the initial volume is taken to be 10% bigger
+    double V = 1.1 * V_static_eq;
+    int iter = 0;
+    while (iter++ < max_scqha_iteration){
+      Pe   = dEOSpoly(V, fit_params);
+      VPg  = VPgamma(T, V);
+      Vnew = VPg/Pe;
+      if (abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
+    }
+
+    if (iter == max_scqha_iteration){
+      string msg="Maximum number of iterations in self consistent loop is reached";
+      msg += " at T="+aurostd::utype2string<double>(T)+"K.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
+          *p_oss, _LOGGER_MESSAGE_);
+    }
+
+    return V;
+  }
+
   /// Performs SCQHA calculations.
   /// There are two implementations:
   /// 1) perform a self-consistent loop for the initial nonzero temperature and extrapolate
@@ -1989,8 +2046,13 @@ namespace apl
     const double dV = 1e-3;
     const double Vtol = 1e-5;
 
-    string function = "QHAN::RunSCQHA():", msg = "";
-    pflow::logger(QHA_ARUN_MODE, function, "", currentDirectory, *p_FileMESSAGE, *p_oss,
+    string function = "QHAN::RunSCQHA():", msg = "Running SCQHA ";
+    if (all_iterations_self_consistent)
+      msg += "with all temperature steps computed self-consistenly.";
+    else
+      msg += "with temperature steps computed using V *= (1 + beta*dT) approximation.";
+
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     // get the equilibrium volume from the fit to the EOS model fitted to the set of 
@@ -2615,6 +2677,58 @@ namespace apl
     if (!aurostd::stringstream2file(file, filename)){
       msg = "Error writing to " + filename + "file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    }
+  }
+
+  void QHAN::writeTphononDispersions()
+  {
+    string function = "QHAN::writeTphononDispersions():", msg = "";
+    double T = 0.0, V =0.0;
+    xvector<double> xomega(N_GPvolumes);
+    for (uint i=0; i<ph_disp_temperatures.size(); i++){
+      T = ph_disp_temperatures[i];
+      V = SCQHAgetEquilibriumVolume(T);
+
+      string msg = "Writing phonon dispersions corresponding to a ";
+      msg += aurostd::utype2string<double>(T) + " (K) temperature.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+          _LOGGER_MESSAGE_);
+
+      // we will save T-dependent phonon bands in xEIGENVAL
+      xEIGENVAL eig(gp_ph_dispersions.front());
+      eig.Vol = V;
+      eig.temperature = T;
+
+      xstructure struc = origStructure;
+      struc.SetVolume(V);
+      xvector<double> lattice(3);
+      lattice[1] = struc.a * 1E-10;
+      lattice[2] = struc.b * 1E-10;
+      lattice[3] = struc.c * 1E-10;
+      eig.lattice = lattice;
+      eig.carstring = "TPHON";
+
+      //venergy.at(kpoint number).at(band number).at(spin number)
+      for (uint q=0; q<eig.venergy.size(); q++){
+        for (int branch=0; branch<Nbranches; branch++){
+          for (int Vid=0; Vid<N_GPvolumes; Vid++){
+            xomega[Vid+1] = gp_ph_dispersions[Vid].venergy[q][branch][0];
+          }
+
+          eig.venergy[q][branch][0] = extrapolateFrequency(V, xomega);
+        }
+      }
+
+      stringstream eig_stream;
+      eig_stream << eig;
+
+      string filename = DEFAULT_QHA_FILE_PREFIX+"scqha.";
+      filename += aurostd::utype2string<double>(T)+DEFAULT_QHA_TPHDISP_FILE;
+      aurostd::stringstream2file(eig_stream, filename);
+      if (!aurostd::FileExist(filename)){
+        msg = "Cannot open "+filename+" file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
     }
   }
 }

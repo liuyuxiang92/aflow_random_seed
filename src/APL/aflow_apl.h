@@ -1920,6 +1920,7 @@ namespace apl
       double InternalEnergyTaylorExpansion(double T, double V);
       // SCQHA
       double VPgamma(double T, double V);
+      double SCQHAgetEquilibriumVolume(double T);
       void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
       // output
       void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
@@ -1928,6 +1929,7 @@ namespace apl
       void   writeAverageGPfiniteDifferences();
       void   writeGPmeshFD();
       void   writeFrequencies();
+      void   writeTphononDispersions();
       // members
       xoption apl_options;
       string system_title;
@@ -1953,6 +1955,7 @@ namespace apl
       //int NatomsSupercell; ///< number of atoms in supercell
       xstructure origStructure;
       vector<double> Temperatures;
+      vector<double> ph_disp_temperatures;///< temperatures for T-dependent phonon dispersions
       vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
       vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
       vector<double> coefGPVolumes; ///< multiplication coefficient w.r.t initial volume

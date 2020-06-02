@@ -606,6 +606,10 @@
 #define AFLOWRC_DEFAULT_QHA_FVT_FILE                          string("FVT.out")
 #define         DEFAULT_QHA_FVT_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_QHA_FVT_FILE")
 //AS20200508 END
+//AS20200601 BEGIN
+#define AFLOWRC_DEFAULT_QHA_TPHDISP_FILE                      string(".phdisp.out")
+#define         DEFAULT_QHA_TPHDISP_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_TPHDISP_FILE")
+//AS20200601 END
 
 // DEFAULT AAPL
 //// DEFAULT AAPL VALUES
@@ -1381,6 +1385,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_FREQS_FILE", AFLOWRC_DEFAULT_QHA_FREQS_FILE);
     aflowrc::load_default("DEFAULT_QHA_FVT_FILE", AFLOWRC_DEFAULT_QHA_FVT_FILE);
     //AS20200508 END
+    aflowrc::load_default("DEFAULT_QHA_TPHDISP_FILE", AFLOWRC_DEFAULT_QHA_TPHDISP_FILE);//AS20200601
 
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
@@ -1928,6 +1933,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_FREQS_FILE=\"" << AFLOWRC_DEFAULT_QHA_FREQS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_FVT_FILE=\"" << AFLOWRC_DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
+    aflowrc << "DEFAULT_QHA_TPHDISP_FILE=\"" << AFLOWRC_DEFAULT_QHA_TPHDISP_FILE << "\"" << endl;//AS20200601
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
@@ -2442,6 +2448,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FREQS_FILE\")=\"" << DEFAULT_QHA_FREQS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FVT\")=\"" << DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_TPHDISP_FILE\")=\"" << DEFAULT_QHA_TPHDISP_FILE << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
