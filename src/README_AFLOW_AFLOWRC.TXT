@@ -1334,7 +1334,7 @@ DEFAULT_QHA_SOMMERFELD_EXPANSION
   type: bool
   default: 0
 
-DEFAULT_QHA_SCQHA_PDIS_T
+DEFAULT_QHA_PDIS_T
   description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
   type: string
   default: "50,100,600"
