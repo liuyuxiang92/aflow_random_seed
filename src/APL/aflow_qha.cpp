@@ -644,7 +644,7 @@ namespace apl
       }
 
       // list of temperatures for temperature-dependent phonon dispersions
-      if (option->keyword=="SCQHA_PDIS_T"){
+      if (option->keyword=="PDIS_T"){
         tokens.clear();
         aurostd::string2tokens(option->content_string, tokens, ",");
         if (!tokens.size()){

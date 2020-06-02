@@ -1,7 +1,7 @@
 3.2.4 - 2020/05/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added calculation of electronic contribution to the free energy. (AS)
-        -- Added calculation of temperature-dependent phonon dispersions when SCQHA method is used. (AS)
+        -- Added calculation of temperature-dependent phonon dispersions. (AS)
 3.2.3 - 2020/05/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
 	-- Bug fixes in KBIN::ExtractSystemName() (ME)
