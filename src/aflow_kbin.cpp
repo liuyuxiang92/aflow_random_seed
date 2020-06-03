@@ -1437,7 +1437,7 @@ namespace KBIN {
             if(kflags.KBIN_PHONONS_CALCULATION_QHA)
             { //PN20180719
               vector<string> tokens;
-              aurostd::xoption USER_QHA_OPTION; USER_QHA_OPTION.xscheme = "QHA,QHA3P,SCQHA"; 
+              aurostd::xoption USER_QHA_OPTION; USER_QHA_OPTION.xscheme = "QHA,QHA3P,SCQHA,QHANP";
               USER_QHA_OPTION.options2entry(AflowIn, string("[AFLOW_QHA]MODE="), USER_QHA_OPTION.option, USER_QHA_OPTION.xscheme);
               tokens.clear();
               if(USER_QHA_OPTION.option)
@@ -1475,6 +1475,12 @@ namespace KBIN {
                     }
                   }
 
+                  //AS20200602 workaround to enable QHANP calculation (will be deleted in the future)
+                  if(tokens[i].length()==5){
+                    if (tokens[i].find("QHANP")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA=true;
+                    }
+                  }
                   if(tokens[i].length()==5){
                     if (tokens[i].find("QHA3P")!=std::string::npos){
                       kflags.KBIN_PHONONS_CALCULATION_QHA3P=true;

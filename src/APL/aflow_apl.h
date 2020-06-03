@@ -1874,7 +1874,8 @@ namespace apl
 namespace apl
 {
   enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
-  enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC};
+  enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC, QHANP_CALC};
+  enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
   /// Calculates QHA-related properties
   ///
@@ -1914,11 +1915,11 @@ namespace apl
       double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
           QHAmethod qha_method);
       // QHA3P and SCQHA
-      double extrapolateFrequency(double V, const xvector<double> &xomega);
-      double extrapolateGamma(double V, const xvector<double> &xomega);
+      double extrapolateFrequency(double V, const xvector<double> &xomega, QHAmethod qha_method);
+      double extrapolateGamma(double V, const xvector<double> &xomega, QHAmethod qha_method);
       // QHA3P
-      double FreeEnergyTaylorExpansion(double T, int Vid);
-      double InternalEnergyTaylorExpansion(double T, double V);
+      double FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
+      double InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
       double VPgamma(double T, double V);
       double SCQHAgetEquilibriumVolume(double T);
@@ -1943,24 +1944,29 @@ namespace apl
       bool isEOS;
       bool isGP_FD;
       bool ignore_imaginary;
-      bool runQHA, runQHA3P, runSCQHA;
+      bool runQHA, runQHA3P, runSCQHA, runQHANP;
       bool isInitialized;
       bool includeElectronicContribution;
       bool doSommerfeldExpansion;
       int Ntemperatures;
       int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
       int N_EOSvolumes;  ///< number of volumes/calculations for EOS calc
+      int N_QHANPvolumes; ///< number of volumes/calculations for QHANP calc
       int Nbranches;       ///< number of phonon dispersion branches
       int NatomsOrigCell;  ///< number of atoms in original cell
       int Nelectrons;
+      int TaylorExpansionOrder;
+      double gp_distortion;
       //int NatomsSupercell; ///< number of atoms in supercell
       xstructure origStructure;
       vector<double> Temperatures;
       vector<double> ph_disp_temperatures;///< temperatures for T-dependent phonon dispersions
       vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
       vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
+      vector<double> QHANPvolumes; ///< a set of volumes for QHANP calculation
       vector<double> coefGPVolumes; ///< multiplication coefficient w.r.t initial volume
       vector<double> coefEOSVolumes;
+      vector<double> coefQHANPVolumes;
       xvector<double> DOS_Ef;
       // data necessary to calculate thermodynamic properties
       vector<double> Efermi_V; ///< Fermi energy vs V
@@ -1977,12 +1983,14 @@ namespace apl
       xmatrix<double> gp_fit_matrix;
       vector<vector<vector<double> > > omegaV_mesh;
       vector<vector<vector<double> > > omegaV_mesh_EOS;
+      vector<vector<vector<double> > > omegaV_mesh_QHANP;
       vector<xEIGENVAL> gp_ph_dispersions;
       vector<xEIGENVAL> eos_ph_dispersions;
       vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
       //
       vector<string> subdirectories_apl_eos;
       vector<string> subdirectories_apl_gp;
+      vector<string> subdirectories_apl_qhanp;
       vector<string> subdirectories_static;
       vector<string> arun_runnames_static;
       _xinput xinput;
@@ -1992,7 +2000,7 @@ namespace apl
       void read();
       bool runAPLcalculations(const vector<string> &subdirectories,
           const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
-          _kflags &kflags, string &aflowin, bool gp=true);
+          _kflags &kflags, string &aflowin, QHAtype type);
       void readStaticCalculationsData();
       void calculate();
       void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,

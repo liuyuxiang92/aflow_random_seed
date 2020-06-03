@@ -39,6 +39,8 @@ using std::auto_ptr;
 #define DEBUG_QHA_GP_FIT false // toggles debug output related to the fit functionality
 // in the calcGrueneisen function
 
+#define BINOM(n,m) aurostd::factorial(n)/(aurostd::factorial(m)*aurostd::factorial(n-m))
+
 //=============================================================================
 //              Definitions of the NonlinearFit class members
 
@@ -446,23 +448,28 @@ namespace apl
     supercellopts.clear();
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
-    runQHA   = false; runQHA3P = false; runSCQHA = false;
+    runQHA   = false; runQHA3P = false; runSCQHA = false; runQHANP = false;
     isInitialized = false;
     includeElectronicContribution = false;
     doSommerfeldExpansion = false;
     Ntemperatures = 0;
     N_GPvolumes = 3;
     N_EOSvolumes = 0;
+    N_QHANPvolumes = 0;
     Nbranches = 0;
     NatomsOrigCell = 0;
     Nelectrons = 0;
+    TaylorExpansionOrder = 0;
+    gp_distortion = 0.0;
     origStructure.clear();
     Temperatures.clear();
     ph_disp_temperatures.clear();
     GPvolumes.clear();
     EOSvolumes.clear();
+    QHANPvolumes.clear();
     coefGPVolumes.clear();
     coefEOSVolumes.clear();
+    coefQHANPVolumes.clear();
     DOS_Ef.clear();
     Efermi_V.clear();
     E0_V.clear();
@@ -482,6 +489,7 @@ namespace apl
     eos_vib_thermal_properties.clear();
     subdirectories_apl_gp.clear();
     subdirectories_apl_eos.clear();
+    subdirectories_apl_qhanp.clear();
     subdirectories_static.clear();
     arun_runnames_static.clear();
     xinput.clear();
@@ -501,22 +509,28 @@ namespace apl
     runQHA            = qha.runQHA;
     runQHA3P          = qha.runQHA3P;
     runSCQHA          = qha.runSCQHA;
+    runQHANP          = qha.runQHANP;
     isInitialized     = qha.isInitialized;
     includeElectronicContribution = qha.includeElectronicContribution;
     doSommerfeldExpansion = qha.doSommerfeldExpansion;
     Ntemperatures     = qha.Ntemperatures;
     N_GPvolumes       = qha.N_GPvolumes;
     N_EOSvolumes      = qha.N_EOSvolumes;
+    N_QHANPvolumes    = qha.N_QHANPvolumes;
     Nbranches         = qha.Nbranches;
     NatomsOrigCell    = qha.NatomsOrigCell;
     Nelectrons        = qha.Nelectrons;
+    TaylorExpansionOrder = qha.TaylorExpansionOrder;
+    gp_distortion     = qha.gp_distortion;
     origStructure     = qha.origStructure;
     Temperatures      = qha.Temperatures;
     ph_disp_temperatures = qha.ph_disp_temperatures;
     GPvolumes         = qha.GPvolumes;
     EOSvolumes        = qha.EOSvolumes;
+    QHANPvolumes      = qha.QHANPvolumes;
     coefGPVolumes     = qha.coefGPVolumes;
     coefEOSVolumes    = qha.coefEOSVolumes;
+    coefQHANPVolumes  = qha.coefQHANPVolumes;
     DOS_Ef            = qha.DOS_Ef;
     Efermi_V          = qha.Efermi_V;
     E0_V              = qha.E0_V;
@@ -536,6 +550,7 @@ namespace apl
     eos_vib_thermal_properties = qha.eos_vib_thermal_properties;
     subdirectories_apl_eos  = qha.subdirectories_apl_eos;
     subdirectories_apl_gp   = qha.subdirectories_apl_gp;
+    subdirectories_apl_qhanp   = qha.subdirectories_apl_qhanp;
     subdirectories_static   = qha.subdirectories_static;
     arun_runnames_static    = qha.arun_runnames_static;
     xinput            = qha.xinput;
@@ -585,7 +600,7 @@ namespace apl
 
     // parse QHA-related aflow.in options
     string dirname = "";
-    double gp_distortion = 0.0;
+    gp_distortion = 0.0;
     vector<double> eosrange(3);
     vector<string> tokens;
     vector<xoption>::iterator option;
@@ -619,12 +634,21 @@ namespace apl
         gp_distortion = option->content_double/100.0;
       }
 
+      if (option->keyword=="TAYLOR_EXPANSION_ORDER"){
+        TaylorExpansionOrder = option->content_int;
+        if (TaylorExpansionOrder <= 0){
+          string message = "Wrong setting in [AFLOW_QHA]TAYLOR_EXPANSION_ORDER.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
+              _INPUT_ILLEGAL_);
+        }
+      }
+
       // note: QHA, QHA3P and SCQHA could run "simultaneously"
       if (option->keyword=="MODE"){
         tokens.clear();
         aurostd::string2tokens(option->content_string, tokens, ",");
 
-        if ((tokens.size()<1) || (tokens.size() > 3)){
+        if ((tokens.size()<1) || (tokens.size() > 4)){
           string message = "Wrong setting in ";
           message += "[AFLOW_QHA]MODE. ";
           message += "Specify as MODE=QHA,QHA3P,SCQHA";
@@ -639,6 +663,7 @@ namespace apl
           else if (tokens[i].length()==5){
             if (tokens[i].find("QHA3P")!=std::string::npos) runQHA3P = true;
             if (tokens[i].find("SCQHA")!=std::string::npos) runSCQHA = true;
+            if (tokens[i].find("QHANP")!=std::string::npos) runQHANP = true;
           }
         }
       }
@@ -674,7 +699,7 @@ namespace apl
 
 
     // determine the names for the directories used for the EOS calculation
-    if (isEOS || runQHA3P || runSCQHA){
+    if (isEOS || runQHA3P || runSCQHA || runQHANP){
       eosrange[0] = 1.0 + eosrange[0]/100.0;
       eosrange[1] = 1.0 + eosrange[1]/100.0;
       eosrange[2] = eosrange[2]/100.0;
@@ -708,6 +733,22 @@ namespace apl
 
         coefEOSVolumes.push_back(i);
         EOSvolumes.push_back(i*Volume/NatomsOrigCell);
+      }
+    }
+
+    double coef = 0.0;
+    // determine the names for the directories used for the QHANP calculation
+    if (runQHANP){
+      N_QHANPvolumes = 2*TaylorExpansionOrder + 1;
+
+      // get a set of volumes that would be used for the QHANP calculation
+      for (int i=0; i<N_QHANPvolumes; i++){
+        coef = 1.0 + (-TaylorExpansionOrder + i)*gp_distortion; //dV = 2*gp_distortion
+        subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
+            "_PHONON_" + aurostd::utype2string(coef, precision_format));
+
+        coefQHANPVolumes.push_back(coef);
+        QHANPvolumes.push_back(coef*Volume/NatomsOrigCell);
       }
     }
 
@@ -780,10 +821,10 @@ namespace apl
       bool eos_data_available = false;
       bool gp_data_available = false;
 
-      // QHA3P and SCQHA require a set of static EOS calculations.
+      // QHA3P, QHANP and SCQHA require a set of static EOS calculations.
       // But for a QHA calculation, the EOS flag is used to toggle these types of 
       // calculations.
-      if (isEOS || runQHA3P || runSCQHA){
+      if (isEOS || runQHA3P || runSCQHA || runQHANP){
         if (checkStaticCalculations() == N_EOSvolumes){
           readStaticCalculationsData();
         }
@@ -796,7 +837,7 @@ namespace apl
       // This flag is used when one is interested in T-dependent properties.
       if (isEOS && runQHA){
         eos_data_available = runAPLcalculations(subdirectories_apl_eos,
-            coefEOSVolumes, xflags, aflags, kflags, aflowin, false);
+            coefEOSVolumes, xflags, aflags, kflags, aflowin, QHA_EOS);
 
         if (eos_data_available){
           if (includeElectronicContribution && doSommerfeldExpansion) DOSatEf();
@@ -811,12 +852,23 @@ namespace apl
         }
       }
 
+      bool qhanp_data_available = false;
+      if (runQHANP){
+        qhanp_data_available = runAPLcalculations(subdirectories_apl_qhanp, 
+            coefQHANPVolumes, xflags, aflags, kflags, aflowin, QHA_TE);
+        if (qhanp_data_available){
+          writeThermalProperties(EOS_POLYNOMIAL, QHANP_CALC);
+          writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
+          writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHANP_CALC);
+        }
+      }
+
       // QHA3P and SCQHA require that mode-dependent Grueneisen parameters are
       // calculated via a finite difference numerical derivative.
       // For a QHA calculation, use the GP_FD flag to turn on this type of calculation.
       if (isGP_FD || runQHA3P || runSCQHA){
         gp_data_available = runAPLcalculations(subdirectories_apl_gp, coefGPVolumes,
-            xflags, aflags, kflags, aflowin);
+            xflags, aflags, kflags, aflowin, QHA_FD);
 
         if (gp_data_available){
           if (runQHA || runQHA3P){
@@ -924,7 +976,7 @@ namespace apl
   /// 
   bool QHAN::runAPLcalculations(const vector<string> &subdirectories,
       const vector<double> &coefVolumes, _xflags &xflags,
-      _aflags &aflags, _kflags &kflags, string &aflowin, bool gp)
+      _aflags &aflags, _kflags &kflags, string &aflowin, QHAtype type)
   {
     string function = "QHAN::runAPLcalculations():";
     string msg = "Reading phonon DOS and dispersion relations.";
@@ -1078,45 +1130,59 @@ namespace apl
 
       // we have two different sets of data: one for the finite difference Grueneisen
       // parameter calculation and one for the EOS APL calculation
-      if (gp){
-        gp_ph_dispersions.push_back(pdisc.createEIGENVAL());
+      vector<xvector<double> > freqs = dosc.getFreqs();
+      switch (type){
+        case(QHA_FD):
+          gp_ph_dispersions.push_back(pdisc.createEIGENVAL());
 
-        // allocate memory at the first run (entire chunk of memory is required because
-        // data will be reordered)
-        if (i==0){
-          omegaV_mesh = vector<vector<vector<double> > > (Nqpoints,
-              vector<vector<double> >(Nbranches, vector<double>(N_GPvolumes)));
-        }
-
-        vector<xvector<double> > freqs = dosc.getFreqs();
-
-        for (int q=0; q<Nqpoints; q++){
-          for (int branch=0; branch<Nbranches; branch++){
-            // clean imaginary frequencies in case if user wants to ignore them
-            omegaV_mesh[q][branch][i] = freqs[q][branch+1] < 0 ? 0 : freqs[q][branch+1];
+          // allocate memory at the first run (entire chunk of memory is required because
+          // data will be reordered)
+          if (i==0){
+            omegaV_mesh = vector<vector<vector<double> > > (Nqpoints,
+                vector<vector<double> >(Nbranches, vector<double>(N_GPvolumes)));
           }
-        }
-      }
-      else {
-        eos_ph_dispersions.push_back(pdisc.createEIGENVAL());
-        eos_vib_thermal_properties.push_back(ThermalPropertiesCalculator(dosc,
-              *p_FileMESSAGE));
 
-        // allocate memory at the first run (an entire chunk of memory is required because
-        // data will be reordered)
-        if (i==0){
-          omegaV_mesh_EOS = vector<vector<vector<double> > > (Nqpoints,
-              vector<vector<double> >(Nbranches, vector<double>(N_EOSvolumes)));
-        }
-
-        vector<xvector<double> > freqs = dosc.getFreqs();
-
-        for (int q=0; q<Nqpoints; q++){
-          for (int branch=0; branch<Nbranches; branch++){
-            // clean imaginary frequencies in case if user wants to ignore them
-            omegaV_mesh_EOS[q][branch][i] = freqs[q][branch+1] < 0 ? 0 : freqs[q][branch+1];
+          for (int q=0; q<Nqpoints; q++){
+            for (int branch=0; branch<Nbranches; branch++){
+              // clean imaginary frequencies in case if user wants to ignore them
+              omegaV_mesh[q][branch][i] = freqs[q][branch+1] < 0 ? 0 : freqs[q][branch+1];
+            }
           }
-        }
+          break;
+        case (QHA_EOS):
+          eos_ph_dispersions.push_back(pdisc.createEIGENVAL());
+          eos_vib_thermal_properties.push_back(ThermalPropertiesCalculator(dosc,
+                *p_FileMESSAGE));
+
+          // allocate memory at the first run (an entire chunk of memory is required because
+          // data will be reordered)
+          if (i==0){
+            omegaV_mesh_EOS = vector<vector<vector<double> > > (Nqpoints,
+                vector<vector<double> >(Nbranches, vector<double>(N_EOSvolumes)));
+          }
+
+          for (int q=0; q<Nqpoints; q++){
+            for (int branch=0; branch<Nbranches; branch++){
+              // clean imaginary frequencies in case if user wants to ignore them
+              omegaV_mesh_EOS[q][branch][i] = freqs[q][branch+1] < 0 ? 0 : freqs[q][branch+1];
+            }
+          }
+          break;
+        case (QHA_TE):
+          // allocate memory at the first run (entire chunk of memory is required because
+          // data will be reordered)
+          if (i==0){
+            omegaV_mesh_QHANP = vector<vector<vector<double> > > (Nqpoints,
+                vector<vector<double> >(Nbranches, vector<double>(N_QHANPvolumes)));
+          }
+
+          for (int q=0; q<Nqpoints; q++){
+            for (int branch=0; branch<Nbranches; branch++){
+              // clean imaginary frequencies in case if user wants to ignore them
+              omegaV_mesh_QHANP[q][branch][i] = freqs[q][branch+1] < 0 ? 0 : freqs[q][branch+1];
+            }
+          }
+          break;
       }
     }
 
@@ -1312,8 +1378,9 @@ namespace apl
     xvector<double> E(N_EOSvolumes);
     switch(qha_method){
       case (QHA3P_CALC):
+      case (QHANP_CALC):
         for (int i=E.lrows; i<=E.urows; i++){
-          E[i] = FreeEnergyTaylorExpansion(T, i-1);
+          E[i] = FreeEnergyTaylorExpansion(T, i-1, qha_method);
         }
         break;
       case(QHA_CALC):
@@ -1492,8 +1559,9 @@ namespace apl
     xvector<double> E(N_EOSvolumes);
     switch(qha_method){
       case (QHA3P_CALC):
+      case (QHANP_CALC):
         for (int i=E.lrows; i<=E.urows; i++){
-          E[i] = FreeEnergyTaylorExpansion(T, i-1);
+          E[i] = FreeEnergyTaylorExpansion(T, i-1, qha_method);
         }
         break;
       case(QHA_CALC):
@@ -1883,32 +1951,111 @@ namespace apl
 
   /// Returns the frequency extrapolated by a Taylor expansion.
   ///
-  double QHAN::extrapolateFrequency(double V, const xvector<double> &xomega)
+  double QHAN::extrapolateFrequency(double V, const xvector<double> &xomega,
+      QHAmethod qha_method)
   {
-    double dwdV = (xomega[1]-xomega[3])/(GPvolumes[0]-GPvolumes[2]);
-    double d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
-      pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
+    double result = 0.0;
+    switch(qha_method){
+      case(QHA3P_CALC):
+      case(SCQHA_CALC):
+        {
+          double dwdV = (xomega[1]-xomega[3])/(GPvolumes[0]-GPvolumes[2]);
+          double d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
+            pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
 
-    double dV = (V-GPvolumes[1]);
-    return xomega[2] + dwdV*dV + 0.5*d2wdV2*pow(dV,2);
+          double dV = (V-GPvolumes[1]);
+          result = xomega[2] + dwdV*dV + 0.5*d2wdV2*pow(dV,2);
+        }
+        break;
+      case(QHANP_CALC):
+        {
+          // volume-derivative of frequency is calculated using central finite 
+          // differences:
+          // d^n w/dV^2 = Sum_i=0^n (-1)^i binomial(n,i) w(V0 + (n/2-i)*dV)/dV^n
+          //
+          // Frequency itself is extrapolated using Taylor expansion
+          double V0 = QHANPvolumes[TaylorExpansionOrder];
+          int order_begin = 0, order_end = 0;
+          double deriv = 0.0;
+          // iterate to calculate derivatives up to a given order
+          for (int order=1; order<=TaylorExpansionOrder; order++){
+            deriv = 0.0; // derivative of a given order
+            // example for TE of 3rd order, we need the following data:
+            // data:            |0|1|2|3|4|5|6|
+            // value itself     | | | |*| | | |
+            // 1st derivative   | | |*| |*| | |
+            // 2nd derivative   | |*| |*| |*| |
+            // 3rd derivative   |*| |*| |*| |*|
+            // example: for 2nd derivative order_begin = 1 and order_end = 5
+            order_begin = TaylorExpansionOrder - order;
+            order_end = order_begin + 2*order;
+            for (int i=order_begin, j=order; i<=order_end; i+=2, j--){
+              deriv += std::pow(-1,j) * BINOM(order, j) * xomega[i+1];
+            }
+            deriv /= pow(2*gp_distortion*V0, order);
+            result += deriv * pow(V-V0,order)/aurostd::factorial(order);
+          }
+          result += xomega[TaylorExpansionOrder+1];
+        }
+        break;
+      case(QHA_CALC):
+        // todo: error here
+        break;
+    }
+    return result;
   }
 
   /// Returns the Grueneisen parameter extrapolated by a Taylor expansion.
   ///
-  double QHAN::extrapolateGamma(double V, const xvector<double> &xomega)
+  double QHAN::extrapolateGamma(double V, const xvector<double> &xomega,
+      QHAmethod qha_method)
   {
-    double gamma = 0;
-    double V0 = GPvolumes[1];
-    double w  = extrapolateFrequency(V, xomega);
-
-    double dwdV = 0, d2wdV2 = 0;
+    double gamma = 0.0;
+    double w  = extrapolateFrequency(V, xomega, qha_method);
 
     if (w>1e-6){
-      dwdV = (xomega[1]-xomega[3])/(GPvolumes[0]-GPvolumes[2]);
-      d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
-        pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
+      switch (qha_method){
+        case (QHA3P_CALC):
+        case (SCQHA_CALC):
+          {
+            double dwdV = 0, d2wdV2 = 0;
+            double V0 = GPvolumes[1];
+            dwdV = (xomega[1]-xomega[3])/(GPvolumes[0]-GPvolumes[2]);
+            d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
+              pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
 
-      gamma = -V/w*(dwdV + d2wdV2 * (V-V0));
+            gamma = -V/w*(dwdV + d2wdV2 * (V-V0));
+          }
+          break;
+        case (QHANP_CALC):
+          {
+            // volume-derivative of frequency is calculated using central finite 
+            // differences:
+            // d^n w/dV^2 = Sum_i=0^n (-1)^i binomial(n,i) w(V0 + (n/2-i)*dV)/dV^n
+            //
+            // Frequency itself is extrapolated using Taylor expansion
+            double V0 = QHANPvolumes[TaylorExpansionOrder];
+            int order_begin = 0, order_end = 0;
+            double deriv = 0.0;
+            // iterate to calculate derivatives up to a given order
+            for (int order=1; order<=TaylorExpansionOrder; order++){
+              deriv = 0.0; // derivative of a given order
+              order_begin = TaylorExpansionOrder - order;
+              order_end = order_begin + 2*order;
+              for (int i=order_begin, j=order; i<=order_end; i+=2, j--){
+                deriv += std::pow(-1,j) * BINOM(order, j) * xomega[i+1];
+              }
+              deriv /= pow(2*gp_distortion*V0, order);
+              // gamma = -V/w dw/dV: reduce power in (V-V0)^order expression
+              gamma += deriv * pow(V-V0,order-1)/aurostd::factorial(order-1);
+            }
+            gamma *= -V/w;
+          }
+          break;
+        case (QHA_CALC):
+          // TODO error
+           break;
+      }
     }
 
     return gamma;
@@ -1918,7 +2065,7 @@ namespace apl
   /// using a Taylor expansion of the frequencies.
   /// This function is used in the QHA3P and SCQHA methods.
   /// 
-  double QHAN::FreeEnergyTaylorExpansion(double T, int Vid)
+  double QHAN::FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method)
   {
     if (T < _ZERO_TOL_) return E0_V[Vid];
 
@@ -1928,11 +2075,14 @@ namespace apl
     double beta = 1.0/KBOLTZEV/T;
     int NQpoints = 0;
     xvector<double> xomega;
-    for (uint q=0; q<omegaV_mesh.size(); q++){
-      for (int branch=0; branch<Nbranches; branch++){
-        xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
 
-        w = extrapolateFrequency(EOSvolumes[Vid], xomega) * THz2Hz *
+    vector<vector<vector<double> > > &omegaV = qha_method == QHA3P_CALC ? omegaV_mesh : omegaV_mesh_QHANP;
+
+    for (uint q=0; q<omegaV.size(); q++){
+      for (int branch=0; branch<Nbranches; branch++){
+        xomega = aurostd::vector2xvector(omegaV[q][branch]);
+
+        w = extrapolateFrequency(EOSvolumes[Vid], xomega, qha_method) * THz2Hz *
           PLANCKSCONSTANTEV_h;
         fi = 0.5*w;
 
@@ -1953,7 +2103,7 @@ namespace apl
   /// Calculates the vibrational internal energy obtained using a Taylor expansion of
   /// the frequencies.
   /// This function is used in the QHA3P and SCQHA methods.
-  double QHAN::InternalEnergyTaylorExpansion(double T, double V)
+  double QHAN::InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method)
   {
     if (T<_ZERO_TOL_) return 0.0;
 
@@ -1961,11 +2111,14 @@ namespace apl
     double beta = 1.0/KBOLTZEV/T;
     int NQpoints = 0;
     xvector<double> xomega;
-    for (uint q=0; q<omegaV_mesh.size(); q++){
-      for (int branch=0; branch<Nbranches; branch++){
-        xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
 
-        w = extrapolateFrequency(V, xomega) * THz2Hz * PLANCKSCONSTANTEV_h;
+    vector<vector<vector<double> > > &omegaV = qha_method == QHA3P_CALC ? omegaV_mesh : omegaV_mesh_QHANP;
+
+    for (uint q=0; q<omegaV.size(); q++){
+      for (int branch=0; branch<Nbranches; branch++){
+        xomega = aurostd::vector2xvector(omegaV[q][branch]);
+
+        w = extrapolateFrequency(V, xomega, qha_method) * THz2Hz * PLANCKSCONSTANTEV_h;
         ui = 0.5*w;
 
         if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w*beta)-1.0);
@@ -2001,13 +2154,13 @@ namespace apl
       for (int branch=0; branch<Nbranches; branch++){
         xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
 
-        w = extrapolateFrequency(V, xomega) * THz2Hz * PLANCKSCONSTANTEV_h;
+        w = extrapolateFrequency(V, xomega, SCQHA_CALC) * THz2Hz * PLANCKSCONSTANTEV_h;
         ui = 0.5*w;
 
         if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w*beta)-1.0);
 
         ui *= qpWeights[q];
-        VPgamma += ui * extrapolateGamma(V, xomega);
+        VPgamma += ui * extrapolateGamma(V, xomega, SCQHA_CALC);
       }
       NQpoints += qpWeights[q];
     }
@@ -2223,10 +2376,10 @@ namespace apl
       for (uint q=0; q<NIrQpoints; q++){
         for (uint branch=0; branch<omegaV_mesh[q].size(); branch++){
           xvector<double> xomega = aurostd::vector2xvector(omegaV_mesh[q][branch]);
-          w = extrapolateFrequency(V, xomega);
+          w = extrapolateFrequency(V, xomega, SCQHA_CALC);
           w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
 
-          w0K = extrapolateFrequency(V0K, xomega);
+          w0K = extrapolateFrequency(V0K, xomega, SCQHA_CALC);
           w0K *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
 
           ui = 0.5*w;
@@ -2248,12 +2401,12 @@ namespace apl
               pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
             d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
 
-            gamma = extrapolateGamma(V, xomega);
+            gamma = extrapolateGamma(V, xomega, SCQHA_CALC);
 
             Bgamma  += (ui - T*Cvi*pow(betaT,2)*KBOLTZEV)*pow(gamma, 2);
             Bdgamma -= ui*((1+gamma)*gamma - pow(V,2)/w*d2wdV2);
 
-            GP += extrapolateGamma(V, xomega) * Cvi;
+            GP += extrapolateGamma(V, xomega, SCQHA_CALC) * Cvi;
             CV += Cvi;
             Feq  += fi;
           }
@@ -2319,6 +2472,9 @@ namespace apl
     // type of qha calculation
     string qha = "";
     switch(qha_method){
+      case (QHANP_CALC):
+        qha = "qhanp";
+        break;
       case (QHA3P_CALC):
         qha = "qha3p";
         break;
@@ -2385,7 +2541,9 @@ namespace apl
 
     switch(qha_method){
       case(QHA3P_CALC):
-        for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergyTaylorExpansion(0, Vid);
+      case(QHANP_CALC):
+        for (int Vid=0; Vid<N_EOSvolumes; Vid++)
+          F[Vid+1] = FreeEnergyTaylorExpansion(0, Vid, qha_method);
         break;
       case(QHA_CALC):
         for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(0, Vid);
@@ -2407,7 +2565,9 @@ namespace apl
 
       switch(qha_method){
         case(QHA3P_CALC):
-          for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergyTaylorExpansion(T, Vid);
+        case(QHANP_CALC):
+          for (int Vid=0; Vid<N_EOSvolumes; Vid++) 
+            F[Vid+1] = FreeEnergyTaylorExpansion(T, Vid, qha_method);
           break;
         case(QHA_CALC):
           for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(T, Vid);
@@ -2726,9 +2886,14 @@ namespace apl
           xomega = xvector<double>(N_GPvolumes);
           V = SCQHAgetEquilibriumVolume(T);
           break;
+        case (QHANP_CALC):
+          msg = "T-dependent phonon dispersion calculation is not supported for QHANP method";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          return;
+          break;
       }
 
-      string msg = "Writing phonon dispersions corresponding to a ";
+      msg = "Writing phonon dispersions corresponding to a ";
       msg += aurostd::utype2string<double>(T) + " (K) temperature.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
           _LOGGER_MESSAGE_);
@@ -2742,6 +2907,9 @@ namespace apl
         case(QHA3P_CALC):
         case(SCQHA_CALC):
           eig = gp_ph_dispersions.front();
+          break;
+        case (QHANP_CALC):
+          // not supported, this case is handled eariler
           break;
       }
       eig.Vol = V;
@@ -2771,7 +2939,10 @@ namespace apl
               for (int Vid=0; Vid<N_GPvolumes; Vid++){
                 xomega[Vid+1] = gp_ph_dispersions[Vid].venergy[q][branch][0];
               }
-              eig.venergy[q][branch][0] = extrapolateFrequency(V, xomega);
+              eig.venergy[q][branch][0] = extrapolateFrequency(V, xomega, SCQHA_CALC);
+              break;
+            case (QHANP_CALC):
+              // not supported
               break;
           }
         }
@@ -2790,6 +2961,9 @@ namespace apl
           break;
         case (SCQHA_CALC):
           filename += "scqha.";
+          break;
+        case (QHANP_CALC):
+          //not supported
           break;
       }
       filename += aurostd::utype2string<double>(T)+DEFAULT_QHA_TPHDISP_FILE;
