@@ -2042,7 +2042,8 @@ namespace plotter {
     string ymin[nprops] = {"", "", "0", "0"};
 
     // Get data
-    string thermo_file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    string thermo_file = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
     //ME20200413 - Since multiple data files are plotted, the user file
     // name functions as base file name.
     string user_file_name = plotoptions.getattachedscheme("FILE_NAME_USER");
@@ -2085,7 +2086,8 @@ namespace plotter {
   void PLOT_TCOND(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_TCOND(plotoptions,out,FileMESSAGE,oss);}  //CO20200404
   void PLOT_TCOND(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     plotoptions.push_attached("EXTENSION", "thermal_conductivity");
-    string tcond_file = DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE;
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    string tcond_file = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE;
     if (aurostd::EFileExist(tcond_file)) {
       plotoptions.push_attached("DATA_FILE", tcond_file);
       plotoptions.push_attached("KEYWORD", "AAPL_THERMAL_CONDUCTIVITY");
