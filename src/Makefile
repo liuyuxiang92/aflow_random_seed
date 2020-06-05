@@ -206,6 +206,26 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
+# commands to cut/paste to generate stuff SC20200601
+pseudo: 
+	rm -f aflow_xpseudopotentials_data.cpp
+	touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+	make -j
+	rm -f aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+	# subst "/common/VASP/" "" aflow_xpseudopotentials_data.cpp
+	cat aflow_xpseudopotentials_data.cpp | grep -c TITEL
+	cat aflow_xpseudopotentials_data.cpp | grep structure | grep -v N/A | wc
+	make -j
+
+###################################################################################################
 .PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
 apl2agr: Makefile
