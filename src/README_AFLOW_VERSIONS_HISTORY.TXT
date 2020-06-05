@@ -2,6 +2,8 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- Bug fixes to xPOTCAR (exits) (CO+ME)
         -- Bug fixes to Wyckoff positions (DX)
+        -- adding in CHULL workshop unit tests (CO)
+        -- adding exits to CCE unit tests (CO)
         -- Bug fixes to aurostd::isDirectory() and isFile() (CO)
         -- Bug fixes in KBIN::ExtractSystemName() (ME)
         -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
