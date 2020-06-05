@@ -1630,10 +1630,10 @@ namespace aurostd {
     vfiles.clear();
     string Directory(CleanFileName(_Directory));
     DIR *dp;
-    struct dirent *ep;
-    string file;
     dp=opendir(Directory.c_str());
     if(dp!=NULL) {
+      struct dirent *ep;
+      string file;
       while((ep=readdir(dp))) {
         file=(ep->d_name);
         if(file!="." && file!="..")
@@ -4169,7 +4169,13 @@ namespace aurostd {
     string path=CleanFileName(_path);
     struct stat s;
     if( stat(path.c_str(),&s) != 0 ){return FALSE;} //error
-    if( s.st_mode & S_IFDIR ){return TRUE;}
+    if( s.st_mode & S_IFDIR ){      //CO20200531 - still trips if directory exists but is not accessible
+      DIR *dp;                      //CO20200531 - see if directory is accessible by user
+      dp=opendir(path.c_str());     //CO20200531 - see if directory is accessible by user
+      if(dp==NULL) {return FALSE;}  //CO20200531 - see if directory is accessible by user
+      (void) closedir (dp);         //CO20200531 - see if directory is accessible by user
+      return TRUE;
+    }
     return FALSE;
   }
 
@@ -4182,7 +4188,11 @@ namespace aurostd {
     string path=CleanFileName(_path);
     struct stat s;
     if( stat(path.c_str(),&s) != 0 ){return FALSE;} //error
-    if( s.st_mode & S_IFREG ){return TRUE;}
+    if( s.st_mode & S_IFREG ){      //CO20200531 - still trips if file exists but is not accessible
+      ifstream f(path.c_str());     //CO20200531 - see if file is accessible by user
+      if(!f.good()){return FALSE;}  //CO20200531 - see if file is accessible by user
+      return TRUE;
+    }
     return FALSE;
   }
   //CO END

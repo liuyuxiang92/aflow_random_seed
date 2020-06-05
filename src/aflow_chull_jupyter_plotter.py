@@ -10,7 +10,7 @@ from plotly.offline import init_notebook_mode, iplot
 
 # Base class for plotting
 class Plotter:
-    def __init__(self, aflow_path='~/bin/aflow'):
+    def __init__(self, aflow_path='aflow'):
         # Set-up notebook for offline mode
         init_notebook_mode(connected=True)
 
