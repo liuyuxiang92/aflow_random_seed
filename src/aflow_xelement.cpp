@@ -548,9 +548,9 @@ namespace xelement {
       for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
-    if(Z!=0) (*this)=xelement(Z);
+    if(Z!=0) {(*this)=xelement(Z);return;}  //CO20200520
     
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_FILE_NOT_FOUND_); //CO20200520
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
   }
 
   // ********************************************************************************************************************************************************
