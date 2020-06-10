@@ -997,51 +997,84 @@ namespace apl
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
 
+      // save the corresponing structure into PHPOSCAR
+      string phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      if (!aurostd::EFileExist(phposcarfile)){
+        xinput.xvasp.str.is_vasp5_poscar_format = true;
+        stringstream poscar;
+        poscar << xinput.xvasp.str;
+        aurostd::stringstream2file(poscar, phposcarfile);
+      }
+
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xinput.getXStr());
       phcalc.getSupercell().build(supercellopts);
       phcalc.setDirectory(subdirectories[i]);
       phcalc.setNCPUs(kflags);
 
-      auto_ptr<apl::ForceConstantCalculator> fccalc;
-
-      if (apl_options.getattachedscheme("ENGINE") == string("DM")){
-        apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
-            *p_FileMESSAGE, *p_oss);
-        fccalc.reset(dmPC);
-
-        // set options for direct method phonon calculations
-        dmPC->setGeneratePlusMinus(apl_options.flag("AUTO_DIST"),apl_options.flag("DPM"));
-        dmPC->setGenerateOnlyXYZ(apl_options.flag("XYZONLY"));
-        dmPC->setDistortionSYMMETRIZE(apl_options.flag("SYMMETRIZE"));
-        dmPC->setDistortionINEQUIVONLY(apl_options.flag("INEQUIVONLY"));
-        dmPC->setDistortionMagnitude(aurostd::string2utype<double>(
-              apl_options.getattachedscheme("DIST_MAGNITUDE")));
-        dmPC->setCalculateZeroStateForces(apl_options.flag("ZEROSTATE"));
-      }
-      else{
-        fccalc.reset(new apl::LinearResponsePC(phcalc.getSupercell(), *p_FileMESSAGE,
-              *p_oss));
-      }
-      fccalc->setPolarMaterial(apl_options.flag("POLAR"));
-      fccalc->setDirectory(subdirectories[i]);
-
-      // set the name of the subdirectory
-      xinput.setDirectory(subdirectories[i]);
-
-      // if it is the first run, create APL subdirectories with corresponding aflow.in
-      // files and skip to the next volume calculation
-      if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, aflowin)){
-        apl_data_calculated = false;
-        continue;
+      string hibernation_file = subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX + 
+        DEFAULT_APL_HARMIFC_FILE;
+      bool was_awakened = false;
+      if (aurostd::EFileExist(hibernation_file)){
+        msg = "Reading hibernation file...";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_MESSAGE_);
+        try{
+          phcalc.awake();
+          was_awakened = true;
+        } catch (aurostd::xerror& e){
+          was_awakened = false;
+          pflow::logger(QHA_ARUN_MODE, function, e.error_message, currentDirectory,
+              *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          msg = "Reading data from the hibernation file failed.";
+          msg += " Force constants and the relevant data will be recalculated.";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_WARNING_);
+        }
       }
 
-      // check if APL calculation is ready and calculate the force constants
-      if (!fccalc->run()){
-        apl_data_calculated = false;
-        continue;
+      if (!was_awakened){
+        auto_ptr<apl::ForceConstantCalculator> fccalc;
+  
+        if (apl_options.getattachedscheme("ENGINE") == string("DM")){
+          apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
+              *p_FileMESSAGE, *p_oss);
+          fccalc.reset(dmPC);
+  
+          // set options for direct method phonon calculations
+          dmPC->setGeneratePlusMinus(apl_options.flag("AUTO_DIST"),apl_options.flag("DPM"));
+          dmPC->setGenerateOnlyXYZ(apl_options.flag("XYZONLY"));
+          dmPC->setDistortionSYMMETRIZE(apl_options.flag("SYMMETRIZE"));
+          dmPC->setDistortionINEQUIVONLY(apl_options.flag("INEQUIVONLY"));
+          dmPC->setDistortionMagnitude(aurostd::string2utype<double>(
+                apl_options.getattachedscheme("DIST_MAGNITUDE")));
+          dmPC->setCalculateZeroStateForces(apl_options.flag("ZEROSTATE"));
+        }
+        else{
+          fccalc.reset(new apl::LinearResponsePC(phcalc.getSupercell(), *p_FileMESSAGE,
+                *p_oss));
+        }
+        fccalc->setPolarMaterial(apl_options.flag("POLAR"));
+        fccalc->setDirectory(subdirectories[i]);
+  
+        // set the name of the subdirectory
+        xinput.setDirectory(subdirectories[i]);
+  
+        // if it is the first run, create APL subdirectories with corresponding aflow.in
+        // files and skip to the next volume calculation
+        if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, aflowin)){
+          apl_data_calculated = false;
+          continue;
+        }
+  
+        // check if APL calculation is ready and calculate the force constants
+        if (!fccalc->run()){
+          apl_data_calculated = false;
+          continue;
+        }
+        fccalc->hibernate();
+        phcalc.setHarmonicForceConstants(*fccalc);
       }
-      phcalc.setHarmonicForceConstants(*fccalc);
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and
       // phonon dispersions
