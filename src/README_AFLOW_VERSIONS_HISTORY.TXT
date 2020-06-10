@@ -34,6 +34,7 @@
         -- CCE corrections added for nitrides (RF)
         -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
         -- Added check for required binaries to plotter. (ME)
+        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
         -- Fixed broken system name for aflow_proto. (ME)
         -- Fixed plotter title and file names when ANRL parameters are present. (ME)

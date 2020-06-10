@@ -2232,7 +2232,7 @@ namespace plotter {
     vector<double> row;
     vector<string> vcontent;
     string keyword = plotoptions.getattachedscheme("KEYWORD");
-    string path_to_file = plotoptions.getattachedscheme("DIRECTORY") + plotoptions.getattachedscheme("DATA_FILE");
+    string path_to_file = plotoptions.getattachedscheme("DATA_FILE");
     string startstring = "[" + keyword + "]START";
     string stopstring = "[" + keyword + "]STOP";
     string systemstring = "[" + keyword + "]SYSTEM=";
