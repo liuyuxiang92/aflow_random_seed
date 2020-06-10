@@ -2799,7 +2799,7 @@ namespace SYM {
     // clean up cases of -+ or +-
     coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
     coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-    
+
     return coordinate;
   }
 }
