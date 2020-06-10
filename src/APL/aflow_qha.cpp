@@ -1088,11 +1088,14 @@ namespace apl
       }
 
       if (phcalc.getSupercell().projectToPrimitive()){
-        // if projection to primitive was successful update origStructure
-        double Volume = origStructure.GetVolume();
-        origStructure = phcalc.getSupercell().getInputStructure();
-        origStructure.InflateVolume(Volume/origStructure.GetVolume());
-        NatomsOrigCell = origStructure.atoms.size();
+        // if projection to primitive was successful update origStructure on the last
+        // iteration
+        if (i==subdirectories.size()-1){
+          double Volume = origStructure.GetVolume();
+          origStructure = phcalc.getSupercell().getInputStructure();
+          origStructure.InflateVolume(Volume/origStructure.GetVolume());
+          NatomsOrigCell = origStructure.atoms.size();
+        }
       }
       else{
         msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
