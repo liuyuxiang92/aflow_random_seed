@@ -1744,7 +1744,7 @@ namespace KBIN {
   // leave as is. Aborting is not desirable for instances where VASP does not
   // need to be run (e.g. post-processing).
   void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {
-    string vaspVersion = getVASPVersionString(kflags.KBIN_BIN);
+    string vaspVersion = getVASPVersionNumber(kflags.KBIN_BIN); //CO20200610
     if (vaspVersion.empty()) {
       string function = "KBIN::convertPOSCARFormat()";
       stringstream message;

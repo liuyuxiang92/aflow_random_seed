@@ -8,6 +8,7 @@
         -- Bug fixes for xelement, adding populate() function for CCE (CO)
         -- Bug fixes in POCC: missing POTCAR suffix for LIB6 and EFileNotEmpty() cerr verbose (CO)
         -- Bug fixes in KBIN::ExtractSystemName() (ME)
+        -- Bug fixes in KBIN::getVASPVersion() (CO)
         -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- added check for broken REST-API to aflow_chull_python.py (MB)

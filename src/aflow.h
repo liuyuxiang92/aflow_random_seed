@@ -2828,6 +2828,8 @@ namespace KBIN {
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   string getVASPVersionString(const string&);  //ME20190219
+  string getVASPVersionNumber(const string&);  //CO20200610
+  double getVASPVersion(const string&);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
