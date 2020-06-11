@@ -4086,7 +4086,7 @@ namespace KBIN {
       aurostd::string2file("","./POTCAR");
       if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
       //execute2string does not work well here...
-      aurostd::execute(binfile);
+      aurostd::execute(binfile + " > /dev/null 2>&1");  //ME20200610 - no output from vasp
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(aurostd::FileExist("OUTCAR")){
         vector<string> vlines;
@@ -4165,7 +4165,6 @@ namespace KBIN {
     //isfloat() does not work here: "35 3Apr08" is considered float: 35
     string version_str_num="";
     for(uint i=0;i<version_str.size();i++){
-      cerr << version_str[i] << endl;
       if(isdigit(version_str[i]) || version_str[i]=='.'){
         version_str_num+=version_str[i];
       }else{break;}
