@@ -1748,7 +1748,7 @@ namespace KBIN {
     if (vaspVersion.empty()) {
       string function = "KBIN::convertPOSCARFormat()";
       stringstream message;
-      message << "Could not find VASP binary file " << kflags.KBIN_BIN << "."
+      message << "Could not determine VASP version " << kflags.KBIN_BIN << "."
         << " POSCAR may have the wrong format.";
       pflow::logger(_AFLOW_FILE_NAME_, function, message, std::cout, _LOGGER_WARNING_);
       return;
