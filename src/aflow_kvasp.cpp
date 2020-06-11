@@ -4067,7 +4067,7 @@ namespace KBIN {
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::getVASPVersionString():";
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
@@ -4084,10 +4084,10 @@ namespace KBIN {
       aurostd::string2file("","./KPOINTS");
       aurostd::string2file("","./POSCAR");
       aurostd::string2file("","./POTCAR");
-      if(LDEBUG){cerr << soliloquy << " ls[1]=\"" << aurostd::execute2string("ls") << "\"" << endl;}
+      if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
       //execute2string does not work well here...
       aurostd::execute(binfile);
-      if(LDEBUG){cerr << soliloquy << " ls[2]=\"" << aurostd::execute2string("ls") << "\"" << endl;}
+      if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(aurostd::FileExist("OUTCAR")){
         vector<string> vlines;
         aurostd::file2vectorstring("OUTCAR",vlines);
@@ -4155,7 +4155,7 @@ namespace KBIN {
     return versionString;
   }
   string getVASPVersionNumber(const string& binfile) {  //CO20200610
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::getVASPVersionNumber():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionString(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
@@ -4175,7 +4175,7 @@ namespace KBIN {
     return version_str_num;
   }
   double getVASPVersion(const string& binfile) {  //CO20200610
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::getVASPVersion():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionNumber(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
