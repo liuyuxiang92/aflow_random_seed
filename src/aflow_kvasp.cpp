@@ -4067,7 +4067,7 @@ namespace KBIN {
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::getVASPVersionString():";
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
@@ -4086,7 +4086,7 @@ namespace KBIN {
       aurostd::string2file("","./POTCAR");
       if(LDEBUG){cerr << soliloquy << " ls[1]=\"" << aurostd::execute2string("ls") << "\"" << endl;}
       //execute2string does not work well here...
-      aurostd::execute(binfile);
+      aurostd::execute(binfile + " > /dev/null 2>&1");
       if(LDEBUG){cerr << soliloquy << " ls[2]=\"" << aurostd::execute2string("ls") << "\"" << endl;}
       if(aurostd::FileExist("OUTCAR")){
         vector<string> vlines;
@@ -4155,7 +4155,7 @@ namespace KBIN {
     return versionString;
   }
   string getVASPVersionNumber(const string& binfile) {  //CO20200610
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::getVASPVersionNumber():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionString(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
@@ -4165,7 +4165,6 @@ namespace KBIN {
     //isfloat() does not work here: "35 3Apr08" is considered float: 35
     string version_str_num="";
     for(uint i=0;i<version_str.size();i++){
-      cerr << version_str[i] << endl;
       if(isdigit(version_str[i]) || version_str[i]=='.'){
         version_str_num+=version_str[i];
       }else{break;}
@@ -4175,7 +4174,7 @@ namespace KBIN {
     return version_str_num;
   }
   double getVASPVersion(const string& binfile) {  //CO20200610
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::getVASPVersion():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionNumber(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
