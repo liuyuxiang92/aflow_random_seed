@@ -2103,8 +2103,6 @@ namespace apl
   /// 
   double QHAN::FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method)
   {
-    if (T < _ZERO_TOL_) return E0_V[Vid];
-
     double w = 0.0; // extrapolated frequency at V_id volume
     double F = 0.0; // Free energy
     double fi = 0.0;
