@@ -2959,28 +2959,33 @@ namespace compare{
 // groupWyckoffPositions
 // ***************************************************************************
 namespace compare{
-  bool groupWyckoffPositions(xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions){
+  bool groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions){
 
     // Groups the Wyckoff positions via species 
     // Obtains information from xstructure
     // Assumes xstr.SpaceGroup_ITC() has been called, otherwise, this will fail
 
+    return groupWyckoffPositions(xstr.wyckoff_sites_ITC, grouped_positions);
+  }
+}
+namespace compare{
+  bool groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions){
     uint type_count = 0; //DX20190425 - add type indicator
 
-    for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
+    for(uint i=0;i<wyckoff_sites_ITC.size();i++){
       //DX20191030 [OBOSLETE] vector<string> tokens;
-      //DX20191030 [OBOSLETE] aurostd::string2tokens(xstr.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");  
+      //DX20191030 [OBOSLETE] aurostd::string2tokens(wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");
       //DX20191030 [OBOSLETE] uint multiplicity = aurostd::string2utype<uint>(tokens[0]);     
       //DX20191030 [OBOSLETE] string letter = aurostd::string2utype<string>(tokens[1]);     
       //DX20191030 [OBOSLETE] string site_symmetry = aurostd::string2utype<string>(tokens[2]);     
-      uint multiplicity = xstr.wyckoff_sites_ITC[i].multiplicity; //DX20191031 
-      string letter = xstr.wyckoff_sites_ITC[i].letter; //DX20191031
-      string site_symmetry = xstr.wyckoff_sites_ITC[i].site_symmetry; //DX20191031
+      uint multiplicity = wyckoff_sites_ITC[i].multiplicity; //DX20191031
+      string letter = wyckoff_sites_ITC[i].letter; //DX20191031
+      string site_symmetry = wyckoff_sites_ITC[i].site_symmetry; //DX20191031
 
       bool element_found = false;
       uint element_index = 0;
       for(uint j=0;j<grouped_positions.size();j++){
-        if(KBIN::VASP_PseudoPotential_CleanName(xstr.wyckoff_sites_ITC[i].type) == KBIN::VASP_PseudoPotential_CleanName(grouped_positions[j].element)){ //DX20190329 - remove pseudopotential info   
+        if(KBIN::VASP_PseudoPotential_CleanName(wyckoff_sites_ITC[i].type) == KBIN::VASP_PseudoPotential_CleanName(grouped_positions[j].element)){ //DX20190329 - remove pseudopotential info
           element_found = true;
           element_index = j;
           break;
@@ -2988,11 +2993,11 @@ namespace compare{
       }
       if(element_found == false){
         GroupedWyckoffPosition tmp;
-        tmp.type = type_count; //DX20190425 - added type   
-        tmp.element = KBIN::VASP_PseudoPotential_CleanName(xstr.wyckoff_sites_ITC[i].type); //DX20190329 - remove pseudopotential info   
-        tmp.site_symmetries.push_back(site_symmetry);          
-        tmp.multiplicities.push_back(multiplicity);          
-        tmp.letters.push_back(letter); //DX20190208 - add Wyckoff letters      
+        tmp.type = type_count; //DX20190425 - added type
+        tmp.element = KBIN::VASP_PseudoPotential_CleanName(wyckoff_sites_ITC[i].type); //DX20190329 - remove pseudopotential info
+        tmp.site_symmetries.push_back(site_symmetry);
+        tmp.multiplicities.push_back(multiplicity);
+        tmp.letters.push_back(letter); //DX20190208 - add Wyckoff letters
         grouped_positions.push_back(tmp);
         type_count++; //DX20190425
       }
@@ -3003,10 +3008,6 @@ namespace compare{
       }
     }
 
-    //cerr << "xstr: " << xstr << endl;
-    //for(uint j=0;j<grouped_positions.size();j++){
-    //  cerr << "grouped wyckoffs: " << grouped_positions[j] << endl;
-    //}
     return true;
   }
 }

@@ -63,7 +63,26 @@ namespace LATTICE {
     return "";
   }
 }
-//DX20191031 END
+//DX 20191031 - END
+
+//DX20200427 - START
+namespace LATTICE {
+  uint Conventional2PrimitiveRatio(char& lattice_centering){
+
+    if(lattice_centering == 'P'){ return 1; }
+    else if(lattice_centering == 'C'){ return 2; }
+    else if(lattice_centering == 'I'){ return 2; }
+    else if(lattice_centering == 'R'){ return 3; }
+    else if(lattice_centering == 'F'){ return 4; }
+    else{
+      string function_name = "LATTICE::Conventional2PrimitiveRatio():";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_centering+" is not a possible lattice centering.",_VALUE_ILLEGAL_);
+    }
+
+    return 1;
+  }
+}
+//DX20200427 - END
 
 // ***************************************************************************
 namespace LATTICE {

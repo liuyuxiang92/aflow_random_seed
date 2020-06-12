@@ -217,6 +217,131 @@ namespace SYM {
   }
 } //namespace SYM
 
+//DX20190418 - START
+// ******************************************************************************
+// spacegroup2latticeAndCentering
+// ******************************************************************************
+// Categorize space group into the corresponding lattice and centering (1 of 14)
+namespace SYM {
+  string spacegroup2latticeAndCentering(uint sg_number){
+
+    string lattice_and_centering = "";
+
+    // ---------------------------------------------------------------------------
+    // triclinic
+    if(sg_number >= 1 && sg_number <= 2){
+      lattice_and_centering = "aP";
+    }
+
+    // ---------------------------------------------------------------------------
+    // monoclinic
+    if(sg_number >= 3 && sg_number <= 15){
+      // simple monoclinic
+      if(sg_number == 3 || sg_number == 4 || sg_number == 6 || sg_number == 7 ||
+         sg_number == 10 || sg_number == 11 || sg_number == 13 || sg_number == 14){
+        lattice_and_centering = "mP";
+      }
+      // base-centered monoclinic
+      else if(sg_number == 5 || sg_number == 8 || sg_number == 9 || sg_number == 12 || sg_number == 15){
+        lattice_and_centering = "mC";
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // orthrohombic
+    if(sg_number >= 16 && sg_number <= 74){
+      // simple orthorhombic
+      if ((sg_number >= 16 && sg_number <= 19) || (sg_number >= 25 && sg_number <= 34) || (sg_number >= 47 && sg_number <= 62)){
+        lattice_and_centering = "oP";
+      }
+      // base-centered orthorhombic
+      else if((sg_number >= 20 && sg_number <= 21) || (sg_number >= 35 && sg_number <= 41) || (sg_number >= 63 && sg_number <= 68)){
+        lattice_and_centering = "oC";
+      }
+      // face-centered orthorhombic
+      else if((sg_number == 22) || (sg_number >= 42 && sg_number <= 43) || (sg_number >= 69 && sg_number <= 70)){
+        lattice_and_centering = "oF";
+      }
+      // body-centered orthorhombic
+      else if((sg_number >= 23 && sg_number <= 24) || (sg_number >= 44 && sg_number <= 46) || (sg_number >= 71 && sg_number <= 74)){
+        lattice_and_centering = "oI";
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // tetragonal
+    if(sg_number >= 75 && sg_number <= 142){
+      // simple tetragonal
+      if((sg_number >= 75 && sg_number <= 78) || (sg_number == 81) || (sg_number >= 83 && sg_number <= 86) ||
+         (sg_number >= 89 && sg_number <= 96) || (sg_number >= 99 && sg_number <= 106) || (sg_number >= 111 && sg_number <= 118) ||
+         (sg_number >= 123 && sg_number <= 138)){
+        lattice_and_centering = "tP";
+      }
+      // body-centered tetragonal
+      else if((sg_number >= 79 && sg_number <= 80) || (sg_number == 82) || (sg_number >= 87 && sg_number <= 88) ||
+              (sg_number >= 97 && sg_number <= 98) || (sg_number >= 107 && sg_number <= 110) || (sg_number >= 119 && sg_number <= 122) ||
+              (sg_number >= 139 && sg_number <= 142)){
+        lattice_and_centering = "tI";
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // trigonal
+    if(sg_number >= 143 && sg_number <= 167){
+      // trigonal
+      if((sg_number >= 143 && sg_number <= 145) || (sg_number == 147) || (sg_number >= 149 && sg_number <= 154) ||
+         (sg_number >= 156 && sg_number <= 159) || (sg_number >= 162 && sg_number <= 165)){
+        lattice_and_centering = "hP";
+      }
+      // rhombohedral
+      else if((sg_number == 146) || (sg_number == 148) || (sg_number == 155) ||
+              (sg_number >= 160 && sg_number <= 161) || (sg_number >= 166 && sg_number <= 167)){
+        lattice_and_centering = "hR";
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // hexagonal
+    if(sg_number >= 168 && sg_number <= 194){
+      lattice_and_centering = "hP";
+    }
+
+    // ---------------------------------------------------------------------------
+    // cubic
+    if(sg_number >= 195 && sg_number <= 230){
+      // simple cubic
+      if(sg_number == 195 || sg_number == 198 || sg_number == 200 || sg_number == 201 || sg_number == 205 || sg_number == 207 ||
+         sg_number == 208 || sg_number == 212 || sg_number == 213 || sg_number == 215 || sg_number == 218 || sg_number == 221 ||
+         sg_number == 222 || sg_number == 223 || sg_number == 224){
+        lattice_and_centering = "cP";
+      }
+      // face-centered cubic
+      else if(sg_number == 196 || sg_number == 202 || sg_number == 203 || sg_number == 209 || sg_number == 210 || sg_number == 216 ||
+              sg_number == 219 || sg_number == 225 || sg_number == 226 || sg_number == 227 || sg_number == 228){
+        lattice_and_centering = "cF";
+      }
+      // body-centered cubic
+      else if(sg_number == 197 || sg_number == 199 || sg_number == 204 || sg_number == 206 || sg_number == 211 || sg_number == 214 ||
+              sg_number == 217 || sg_number == 220 || sg_number == 229 || sg_number == 230){
+        lattice_and_centering = "cI";
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // error
+    if(lattice_and_centering.size() == 0){
+      string function_name = XPID + "SYM::spacegroup2latticeAndCentering():";
+      stringstream message;
+      message << "Could not classify space group into a Bravais lattice (most likely ranges are incorrect).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
+
+    return lattice_and_centering;
+
+  }
+}
+//DX20190418 - END
+
 // ******************************************************************************
 // isEnantimorphicPair
 // ******************************************************************************
@@ -2679,25 +2804,196 @@ namespace SYM {
   }
 } //namespace SYM
 
-//DX20191029 START
+//DX20191029 - START
+// ******************************************************************************
+// wyckoffsite_ITC::getWyckoffFromLetter()
+// ******************************************************************************
+void wyckoffsite_ITC::getWyckoffFromLetter(uint space_group_number, const string& Wyckoff_letter, int setting){
+
+  SymmetryInformationITC ITC_sym_info;
+  string space_group_setting=aurostd::utype2string<int>(setting);
+  ITC_sym_info.initsgs(space_group_setting);
+  string space_group_string = ITC_sym_info.gl_sgs[space_group_number - 1];
+
+  getWyckoffFromLetter(space_group_string, Wyckoff_letter);
+}
+
+void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, const string& Wyckoff_letter){
+
+  bool LDEBUG = (FALSE || XHOST.DEBUG);
+  string function_name = XPID + "wyckoffsite_ITC::getWyckoffFromLetter()";
+  stringstream message;
+
+  //DX 20191030 - use tokens instead of stringstream assignment - START
+  vector<string> all_positions;
+  vector<string> all_Wyckoff_strings, Wyckoff_tokens;
+  vector<string> components;
+  vector<vector<string> > equations_no_centering;
+  //string multiplicity, letter, site_symmetry, position;
+
+  // split up Wyckoff positions
+  aurostd::string2tokens(space_group_string, all_Wyckoff_strings, "\n");
+
+  for(uint i=2; i<all_Wyckoff_strings.size();i++){ //DX 20191107 starting at 2 since the first two lines are header and centering, repectively
+    aurostd::string2tokens(all_Wyckoff_strings[i], Wyckoff_tokens, " ");
+
+    // expected sequence: "24 h ..2 (x, y, z) (x, 0, z) ..."
+    if(Wyckoff_tokens.size()>3){
+      letter = Wyckoff_tokens[1];
+      if(letter == Wyckoff_letter){
+        //if(isdigit(Wyckoff_tokens[0])){
+          multiplicity = aurostd::string2utype<uint>(Wyckoff_tokens[0]);
+        //}
+        //else{
+        //  message << "The first position of the Wyckoff string is not a number (multiplicity): " << all_Wyckoff_strings[i];
+        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        //}
+        site_symmetry = Wyckoff_tokens[2];
+        for(uint t=3;t<Wyckoff_tokens.size();t++){ //DX 20191030 - need loop to get all positions
+          string position = aurostd::RemoveWhiteSpaces(Wyckoff_tokens[t]); position = aurostd::RemoveCharacter(position,'\n');
+          if(position.size()!=0){
+            components.clear();
+            aurostd::string2tokens(position,components,",");
+            vector<string> vec_pos;
+            for(uint t=0;t<components.size();t++){
+              string component = aurostd::StringSubst(components[t],"(",""); component = aurostd::StringSubst(component,")","");
+              vec_pos.push_back(component);
+            }
+            equations_no_centering.push_back(vec_pos);
+          }
+        }
+        break; //DX20200423 - moved break outside of loop
+      }
+    }
+  }
+  //DX 20191030 - remove stringstream assignment (used to be here)
+  //DX 20191030 - use tokens instead of stringstream assignment - END
+
+  if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): ";
+    for(uint i=0;i<equations_no_centering.size();i++){
+      cerr << aurostd::joinWDelimiter(equations_no_centering[i],",") << endl;
+    }
+  }
+
+  stringstream tmp_Wyckoff_equation;
+  for(uint i=0;i<SYM::get_centering(space_group_string).size();i++) {
+    for(uint j=0;j<equations_no_centering.size();j++){
+      vector<string> vec_pos;
+      for(uint k=0;k<equations_no_centering[j].size();k++){
+        tmp_Wyckoff_equation << equations_no_centering[j][k];
+        tmp_Wyckoff_equation << "+" << SYM::get_centering(space_group_string)[i][k];
+        vec_pos.push_back(tmp_Wyckoff_equation.str());
+        tmp_Wyckoff_equation.str(std::string());
+        tmp_Wyckoff_equation.clear();
+      }
+      equations.push_back(vec_pos);
+    }
+  }
+
+  if(LDEBUG) {cerr << function_name << ": Wyckoff positions with centering(s): ";
+    for(uint i=0;i<equations.size();i++){
+      cerr << aurostd::joinWDelimiter(equations[i],",") << endl;
+    }
+  }
+
+  /*
+  vector<vector<string> > non_shifted_Wyckoff_positions;
+  vector<string> tokens;
+  //format positions
+  for(uint i=0;i<all_positions.size();i++){
+    aurostd::string2tokens(all_positions[i],tokens,",");
+    vector<string> vec_pos;
+    for(uint t=0;t<tokens.size();t++){
+      string pos = aurostd::StringSubst(tokens[t],"(",""); pos = aurostd::StringSubst(pos,")","");
+      vec_pos.push_back(pos);
+    }
+    non_shifted_Wyckoff_positions.push_back(vec_pos);
+  }
+
+  vector<vector<string> > all_Wyckoff_positions;
+
+  stringstream tmp_Wyckoff_equation;
+  for(uint i=0;i<get_centering(spaceg).size();i++) {
+    for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
+      vector<string> vec_pos;
+      for(uint k=0;k<non_shifted_Wyckoff_positions[j].size();k++){
+        tmp_Wyckoff_equation << non_shifted_Wyckoff_positions[j][k];
+        tmp_Wyckoff_equation << "+" << get_centering(spaceg)[i][k];
+        vec_pos.push_back(tmp_Wyckoff_equation.str());
+        tmp_Wyckoff_equation.str(std::string());
+        tmp_Wyckoff_equation.clear();
+      }
+      all_Wyckoff_positions.push_back(vec_pos);
+    }
+  }
+
+  if(LDEBUG) {
+    vector<string> tmp;
+    for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
+    cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+  }
+  return all_Wyckoff_positions;
+*/
+}
+
+// ******************************************************************************
+// numberAtomsInConventionalCell()
+// ******************************************************************************
+namespace SYM {
+  uint numberAtomsInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites){
+
+    // get the number of atoms from the Wyckoff positions
+    // i.e., number atoms in conventional cell
+
+    uint natoms = 0;
+    for(uint i=0;i<Wyckoff_sites.size();i++){ natoms+=Wyckoff_sites[i].multiplicity; }
+    return natoms;
+
+  }
+}
+
+// ******************************************************************************
+// numberEachTypeFromWyckoff()
+// ******************************************************************************
+namespace SYM {
+  vector<uint> numberEachTypeFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_sites){
+
+    // get the number of each atom type from the Wyckoff positions
+
+    vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
+    compare::groupWyckoffPositions(Wyckoff_sites, grouped_Wyckoff_positions);
+
+    vector<uint> number_of_each_type;
+    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
+      uint number_of_type =0;
+      for(uint j=0;j<grouped_Wyckoff_positions[i].multiplicities.size();j++){
+        number_of_type += grouped_Wyckoff_positions[i].multiplicities[j];
+      }
+      number_of_each_type.push_back(number_of_type);
+    }
+    return number_of_each_type;
+  }
+}
+
+//DX 20191029 - START
 // ******************************************************************************
 // findWyckoffEquations
 // ******************************************************************************
 namespace SYM {
-  vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting, 
-      string& Wyckoff_letter, uint Wyckoff_multiplicity){
+  vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting,
+      string& Wyckoff_letter, uint Wyckoff_multiplicity, bool convert2frac){ //DX20200423 - add convert2frac
 
     SymmetryInformationITC ITC_sym_info;
     ITC_sym_info.initsgs(space_group_setting);
     string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1];
-    return findWyckoffEquations(spacegroupstring, Wyckoff_letter, Wyckoff_multiplicity);
+    return findWyckoffEquations(spacegroupstring, Wyckoff_letter, Wyckoff_multiplicity, convert2frac);
   }
 }
 //DX20191029 END
 
 // ---------------------------------------------------------------------------
 namespace SYM {
-  vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multiplicity){
+  vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multiplicity, bool convert2frac, bool keep_multiplication_symbol){ //DX20200423 - add convert2frac
     vector<string> positions;
     vector<vector<string> > testvvstring = get_wyckoff_pos(spacegroupstring, Wyckoff_multiplicity, Wyckoff_letter);
     vector<vector<vector<string> > > testvvvstring; testvvvstring.push_back(testvvstring); // quick fix, should probably fix (DX)
@@ -2707,7 +3003,7 @@ namespace SYM {
         string equation = "";
         vector<string> eqn;
         for (uint k = 0; k < 3; k++) { 
-          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k])); //DX20190723 - condensed lines below (in previous version) into function
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k], convert2frac, keep_multiplication_symbol)); //DX 20190723 - condensed lines below (in previous version) into function //DX20200423 - add convert2frac, keep_mulitiplication_symbol
         }
         equation = aurostd::joinWDelimiter(eqn,",");
         positions.push_back(equation);
@@ -2723,7 +3019,7 @@ namespace SYM {
 // formatWyckoffPosition
 // ******************************************************************************
 namespace SYM {
-  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate){
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate, bool convert2frac, bool keep_multiplication_symbol){
 
     // put variables first (e.g., 1/2+x -> x+1/2)
     // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
@@ -2762,7 +3058,12 @@ namespace SYM {
       // ---------------------------------------------------------------------------
       // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
       else {
-        ss_eqn << sd_num.dbl << sd_num.chr;
+        if(keep_multiplication_symbol){ //DX20200428
+          ss_eqn << sd_num.dbl << "*" << sd_num.chr;
+        }
+        else{
+          ss_eqn << sd_num.dbl << sd_num.chr;
+        }
         vec_coord.push_back(ss_eqn.str());
       }
       ss_eqn.str("");
@@ -2776,8 +3077,17 @@ namespace SYM {
     }
     //DX20191030 - added case for double only AND not double only - START
     if(double_only){
-      string running_frac = aurostd::dbl2frac(running_double,false); //DX20190724 - now namespace aurostd
-      ss_eqn << running_frac;
+      if(convert2frac){ //DX20190419
+        string running_frac = aurostd::dbl2frac(running_double,false);
+        ss_eqn << running_frac;
+      } //DX20190419
+      //DX20190419 - START
+      else{
+        ss_eqn << running_double;
+      }
+      //DX20190419 - END
+      //string running_frac = aurostd::dbl2frac(running_double,false); //DX20190724 - now namespace aurostd
+      //ss_eqn << running_frac;
       vec_coord.push_back(ss_eqn.str());
       ss_eqn.str("");
     }
@@ -3091,7 +3401,8 @@ namespace SYM {
                   //cerr << endl;
                   first_wyckoff = false;
                   // ========== Store Wyckoff Position ========== //
-                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; //DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.index = tmp_equivalent_atoms_shifted[ix].type; //DX20200427
                   tmp_Wyckoff_site.type = tmp_equivalent_atoms_shifted[ix].name;
                   //DX20191010 - update partial occupation value - START
                   if(CCell.partial_occupation_flag){
@@ -3692,7 +4003,11 @@ namespace SYM{
       if(!containschar(oss.str())) {
         if(havechar(oss.str(), '/')) {
           //DX20200313 [OBSOLETE] num += frac2dbl(oss.str());
-          num += aurostd::frac2dbl(oss.str()); //DX20200313
+          num += aurostd::frac2dbl(oss.str()); // DX20200313
+        } else if(havechar(oss.str(), '*')) {
+          vector<string> tokens; aurostd::string2tokens(oss.str(),tokens,"*");
+          if(tokens.size()==2){ num += atof(tokens[0].c_str())*atof(tokens[1].c_str()); }
+          else { throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::simplify","Expected two fields surrounding '*': "+oss.str(),_RUNTIME_ERROR_); }
         } else {
           num += atof(oss.str().c_str());
         }

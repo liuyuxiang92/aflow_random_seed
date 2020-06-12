@@ -465,11 +465,13 @@ namespace SYM {
   void get_certain_wyckoff_pos(string spaceg, int mult, string site_symmetry, vector<string>& site_symmetries, vector<string>& letters, vector<string>& positions);
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position);
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity);
+  uint numberAtomsInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites); //DX20200512
+  vector<uint> numberEachTypeFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_sites); //DX20200512
   vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting,
-      string& Wyckoff_letter, uint Wyckoff_multiplicity); //DX20191029
-  vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity); //DX20190128 
-  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate); //DX20190723
-  string reorderWyckoffPosition(const string& orig_position); //DX20190708
+      string& Wyckoff_letter, uint Wyckoff_multiplicity, bool convert2frac=true); //DX 20191029 //DX20200423 - add convert2frac
+  vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity, bool convert2frac=true, bool keep_multiplication_symbol=false); //DX 20190128 //DX20200423 - add convert2frac, keep_multiplication_symbol
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate, bool convert2frac=true, bool keep_multiplication_symbol=false); //DX 20190723 //DX20200423 - add convert2frac, keep_multiplication_symbol
+  string reorderWyckoffPosition(const string& orig_position); //DX 20190708
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, xvector<double>& new_shift);
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring,
       deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted,
@@ -708,6 +710,7 @@ namespace SYM {
       vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
+  string spacegroup2latticeAndCentering(uint space_group_number); //DX20190418
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX20181010
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num);
   void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX20190805 - return to void

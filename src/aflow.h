@@ -1352,19 +1352,27 @@ class wyckoffsite_ITC { //Also for wyckoff sites
     wyckoffsite_ITC(const wyckoffsite_ITC& b);
     ~wyckoffsite_ITC(void);
     // OPERATORS                                                  // --------------------------------------
-    const wyckoffsite_ITC& operator=(const wyckoffsite_ITC& b);             // some operators
-    bool operator<(const wyckoffsite_ITC& b) const;                          // < operator //DX20190130 - so we can sort by Wyckoff letter, then by species
-    friend ostream& operator<<(ostream&,const wyckoffsite_ITC&);       // ostream
+    const wyckoffsite_ITC& operator=(const wyckoffsite_ITC& b);   // some operators
+    bool operator<(const wyckoffsite_ITC& b) const;               // < operator //DX20190130 - so we can sort by Wyckoff letter, then by species
+    friend ostream& operator<<(ostream&,const wyckoffsite_ITC&);  // ostream
     // CONTENT
     xvector<double> coord;
-    string type; //chemical label etc
+    uint index; //index //DX20200427
+    string type; //chemical label etc //DX20200427
     string wyckoffSymbol;
     string letter;                                                //DX20190128 - add Wyckoff letter
     string site_symmetry;                                         //DX20190128 - add Wyckoff site symmetry
     uint multiplicity;                                            //DX20190128 - add Wyckoff multiplicity
     double site_occupation;                                       //DX20190128 - add Wyckoff site occupation
     vector<vector<string> > equations;                            //DX20190128 - add Wyckoff equations
-  private:                                                       // ---------------------------------------
+    uint parameter_index;                                         //DX20200513 - for ANRL parameter
+    // initializers
+    void getWyckoffFromLetter(uint space_group_number,            //DX20200501
+        const string& Wyckoff_letter,
+        int setting=SG_SETTING_1);
+    void getWyckoffFromLetter(const string& space_group_string,   //DX20200501
+        const string& Wyckoff_letter);
+  private:                                                        // ---------------------------------------
     void free();                                                  // to free everything
 };
 
@@ -1443,6 +1451,9 @@ bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
 bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
 bool sortAtomsDist(const _atom& a1,const _atom& a2);		// sort atoms by dist  //CO20180420
 bool sortAtomsEquiv(const _atom& a1,const _atom& a2); // cluster by equivalent atoms //CO20190116
+// sort Wyckoff positions //DX20200515
+bool sortWyckoffByLetter(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // sort Wyckoff positions by Wyckoff letter
+bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // sort Wyckoff positions by atom type
 
 class xstructure {
   public:
@@ -2613,6 +2624,8 @@ namespace anrl {
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
   string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
   xstructure rhl2hex(xstructure& str, double& a, double& c); 
+  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout); //DX20200528
+  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200528
 }
 
 // ----------------------------------------------------------------------------
@@ -4144,6 +4157,7 @@ namespace LATTICE {
   string Lattice2TypeAndCentering(const string& lattice_type); //DX20191031
   string SpaceGroup2Lattice(uint sg);
   string SpaceGroup2LatticeTypeAndCentering(uint sg); //DX20191031
+  uint Conventional2PrimitiveRatio(char& lattice_centering); //DX20200427
   uint Lattice2SpaceGroup(string lattice,vector<uint>& vsg);
   string SpaceGroup2LatticeVariation(uint sg,const xstructure& str);
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);

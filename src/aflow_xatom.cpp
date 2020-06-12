@@ -1460,6 +1460,7 @@ void _kpoint::TransformKpoint(const xmatrix<double>& P){
 
 wyckoffsite_ITC::wyckoffsite_ITC() {
   coord.clear();
+  index=0; //DX20200427
   type="";
   wyckoffSymbol="";
   letter=""; //DX20180128 - add Wyckoff letter
@@ -1467,6 +1468,7 @@ wyckoffsite_ITC::wyckoffsite_ITC() {
   multiplicity=0; //DX20180128 - add Wyckoff multiplicity
   site_occupation=1.0; //DX20191010 - add site occupation (default: 1.0)
   equations.clear(); //DX20180128 - add Wyckoff multiplicity
+  parameter_index=0; //DX20200513
 }
 
 // destructor
@@ -1483,6 +1485,7 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
   if(this != &b) {
     free();
     coord=b.coord;
+    index=b.index; //DX20200501
     type=b.type;
     wyckoffSymbol=b.wyckoffSymbol;
     letter=b.letter; //DX20180128 - add Wyckoff letter
@@ -1490,6 +1493,7 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
     multiplicity=b.multiplicity; //DX20180128 - add Wyckoff multiplicity
     site_occupation=b.site_occupation; //DX20191010 - add site occupation
     equations=b.equations; //DX20180128 - add Wyckoff multiplicity
+    parameter_index=b.parameter_index; //DX20200513
   }
   return *this;
 }
@@ -1516,6 +1520,7 @@ bool wyckoffsite_ITC::operator<(const wyckoffsite_ITC& b) const {       // opera
 wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   free();
   coord=b.coord;
+  index=b.index; //DX20200501
   type=b.type;
   wyckoffSymbol=b.wyckoffSymbol;
   letter=b.letter; //DX20180128 - add Wyckoff letter
@@ -1523,18 +1528,21 @@ wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   multiplicity=b.multiplicity; //DX20180128 - add Wyckoff multiplicity
   site_occupation=b.site_occupation; //DX20191010 - add site occupation
   equations=b.equations; //DX20180128 - add Wyckoff multiplicity
+  parameter_index=b.parameter_index; //DX20200513
 }
 
 // operator <<
 ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
   //DX20171212 [OBSOLETE] oss << "wyckoffsite_ITC operator<< " << endl;
   oss << " coord: "<< site.coord << endl;
+  oss << " index: "<< site.index << endl; //DX20200501
   oss << " type: "<< site.type << endl;
   oss << " letter: "<< site.letter << endl;
   oss << " site_symmetry: "<< site.site_symmetry << endl;
   oss << " multiplicity: "<< site.multiplicity << endl;
   oss << " wyckoffSymbol: "<< site.wyckoffSymbol << endl;
   oss << " site_occupation: " << site.site_occupation << endl; //DX20191010 - add site occupation
+  oss << " parameter_index: " << site.parameter_index << endl; //DX20200513
   oss << " equations: " << endl; //DX20191010 - add site occupation
   for(uint i=0;i<site.equations.size();i++){
     oss << "  " << aurostd::joinWDelimiter(site.equations[i],",") << endl;
@@ -3530,8 +3538,34 @@ bool sortAtomsDist(const _atom& a1,const _atom& a2) {
 bool sortAtomsEquiv(const _atom& a1,const _atom& a2){
   if(a1.type!=a2.type){return a1.type<a2.type;} //this is generally implied by equivalent, but not so for POCC, so keep
   if(a1.equivalent!=a2.equivalent){return a1.equivalent<a2.equivalent;}
-  return sortAtomsTypes(a1,a2); //CO20180705, pocc values!
-} //CO20190101
+  return sortAtomsTypes(a1,a2); //CO 180705, pocc values!
+} //CO190101
+
+// ---------------------------------------------------------------------------
+// Wyckoff sorting function (by Wyckoff letter) //DX20200515
+bool sortWyckoffByLetter(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b) {
+  // compare letter
+  if(a.letter<b.letter){ return true; }
+  // if letters the same, sort by type
+  else if(a.letter==b.letter){
+    if(a.type<b.type){ return true; }
+    else { return false; }
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// Wyckoff sorting function (by atom type) //DX20200515
+bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b) {
+  // compare type
+  if(a.type<b.type){ return true; }
+  // if types the same, sort by letter
+  else if(a.type==b.type){
+    if(a.letter<b.letter){ return true; }
+    else { return false; }
+  }
+  return false;
+}
 
 // **************************************************************************
 // Xstructure operator>>  INPUT_XSTRUCTURE_INPUT

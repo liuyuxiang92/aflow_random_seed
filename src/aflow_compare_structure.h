@@ -4,7 +4,7 @@
 // *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
-// AFLOW-XtalMatch (compare crystal structures) - Functions
+// AFLOW-XtalFinder (compare crystal structures) - Functions
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 
@@ -250,7 +250,8 @@ namespace compare{
   void calculateSymmetries(vector<StructurePrototype>& structures, uint& num_proc);  //DX20190118
   void calculateSymmetry(xstructure& xstr, vector<string>& vpearsons, vector<uint>& vsgroups,
       vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions);
-  bool groupWyckoffPositions(xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
+  bool groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
+  bool groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200512
   bool groupWyckoffPositionsFromGroupedString(uint& space_group_number, uint& setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions);
   string printWyckoffString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize=false);
   vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(const vector<GroupedWyckoffPosition>& grouped_Wyckoffs); //DX20190219
