@@ -1192,6 +1192,9 @@ check_chull:
 		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return a PDF, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
 		if [ ! -f "aflow_$${ALLOY}_hull.pdf" ]; then echo "CHULL did not return a PDF for $$ALLOY. Try: '$$COMMAND'" && exit 1; fi && \
 		rm -f aflow_$${ALLOY}_hull.pdf; fi
+	@ALLOY="AlCo" && COMPOUND="Al17Co12" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - distance from hull of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="242." && COMMAND="./aflow --chull --alloy=$$ALLOY --d2h=aflow:ef70a469857d3c47" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a distance, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
 	@ALLOY="MnPd" && COMPOUND="Mn2Pd3" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - distance from hull of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="62." && COMMAND="./aflow --chull --alloy=$$ALLOY --d2h=aflow:9001c322296fc162" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a distance, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
 		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
