@@ -2737,7 +2737,7 @@ namespace SYM {
     string coordinate = "";
     vector<string> vec_coord;
     double running_double = 0.0;
-    bool double_only = false;
+    bool double_only = true; //DX20200609 - set default to true and toggle for any variable in j
 
     for(uint j=0;j<sd_coordinate.size();j++){
       sdouble sd_num = sd_coordinate[j];
@@ -2746,24 +2746,27 @@ namespace SYM {
       if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
         ss_eqn << sd_num.chr;
         vec_coord.push_back(ss_eqn.str());
+        double_only = false; //DX20200609
       }
       // ---------------------------------------------------------------------------
       // if a variable with negative unit factor (-1x -> -x)
       else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
         ss_eqn << "-" << sd_num.chr;
         vec_coord.push_back(ss_eqn.str());
+        double_only = false; //DX20200609
       }
       // ---------------------------------------------------------------------------
       // if a number (no variable)
       else if(sd_num.chr == '\0'){
         running_double+=sd_num.dbl;
-        double_only = true;
+        //DX20200609 [OBSOLETE - doesn't account for other j's] double_only = true;
       }
       // ---------------------------------------------------------------------------
       // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
       else {
         ss_eqn << sd_num.dbl << sd_num.chr;
         vec_coord.push_back(ss_eqn.str());
+        double_only = false; //DX20200609
       }
       ss_eqn.str("");
     }

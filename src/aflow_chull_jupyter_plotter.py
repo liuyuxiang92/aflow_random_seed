@@ -10,12 +10,12 @@ from plotly.offline import init_notebook_mode, iplot
 
 # Base class for plotting
 class Plotter:
-    def __init__(self, aflow_path='aflow'):
+    def __init__(self, aflow_executable = 'aflow'):
         # Set-up notebook for offline mode
         init_notebook_mode(connected=True)
 
         # Load CHull in case a new json must be created
-        self.chull = CHull(aflow_executable=aflow_path)
+        self.chull = CHull(aflow_executable=aflow_executable)
 
     def plot(self, alloy):
         # seperate alloy into elements
