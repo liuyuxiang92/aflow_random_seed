@@ -6141,8 +6141,14 @@ namespace aflowlib {
 
           content = "";
           if (vflags.flag("FLAG::ELECTRONIC")) {
-            string system_name = KBIN::ExtractSystemName(directory_LIB);
-            content = aurostd::efile2string(directory_RAW + "/" + system_name + "_bandsdata.json");
+            //ME20200616 - Made less dependent on file name conventions
+            //string system_name = KBIN::ExtractSystemName(directory_LIB);
+            vector<string> vfiles;
+            aurostd::DirectoryLS(directory_RAW, vfiles);
+            uint nfiles = vfiles.size();
+            for (uint f = 0; f < nfiles; f++) {
+              if (vfiles[f].find("_bandsdata.json") != string::npos) content = aurostd::efile2string(directory_RAW + "/" + vfiles[f]);
+            }
           }
           aflowlib_json << ", \"bandsdata\":" << (content.empty()?"null":content);
         }
