@@ -974,10 +974,6 @@ namespace anrl {
       message << "No parameters provided; add parameter values with --params=... or use tabulated enumeration suffix (see aflow --protos)" << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    if(aurostd::string2utype<double>(vparameters_library[0])<=0.0){ //CO20181226 forget signbit, also include 0
-      vparameters_library[0]="1.0"; //fix
-      parameters=aurostd::joinWDelimiter(vparameters_library,",");
-    }
 
     return parameters;
   }
@@ -1354,6 +1350,14 @@ namespace anrl {
     aurostd::string2tokens(parameters,vparameters_temp,",");
     vector<double> vparameters = aurostd::vectorstring2vectordouble(vparameters_temp);
     
+    // ---------------------------------------------------------------------------
+    // check for automatic volume scaling (i.e., first parameter is negative)
+    if(vparameters[0]<=0.0){ //CO20181226 forget signbit, also include 0
+      vparameters[0]=1.0; //fix
+      vparameters_temp[0]="1.0"; //fix
+      parameters=aurostd::joinWDelimiter(vparameters_temp,",");
+    }
+
     if(vparameters.size() != parameter_list.size()){
       message << "The number of input parameters does not match the number required by the lattice and Wyckoff positions: ";
       message << "input parameters=" << parameters << " vs ";
