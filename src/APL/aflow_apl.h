@@ -1973,10 +1973,6 @@ namespace apl
       vector<double> E0_V;     ///< total energy vs V
       vector<xEIGENVAL> static_eigvals;
       vector<xIBZKPT>   static_ibzkpts;
-      vector<vector<double> > energies_V; ///< electronic energy bins vs V
-      vector<vector<double> > edos_V; ///< electronic DOS
-      vector<vector<double> > frequencies_V; ///< phonon frequency bins vs V
-      vector<vector<double> > pdos_V; ///< phonon DOS
       vector<int> qpWeights;
       vector<xvector<double> > qPoints;
       // data needed for Grueneisen parameter calculation
@@ -1996,15 +1992,17 @@ namespace apl
       _xinput xinput;
       string currentDirectory;
       // methods
-      int  checkStaticCalculations();
+      int  checkStaticCalculations(vector<vector<bool> > &file_is_present);
       void read();
       bool runAPLcalculations(const vector<string> &subdirectories,
           const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
           _kflags &kflags, string &aflowin, QHAtype type);
-      void readStaticCalculationsData();
+      bool readStaticCalculationsData();
       void calculate();
       void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
-          const _kflags &kflags);
+          const _kflags &kflags, const vector<vector<bool> > &list);
+      void printMissingStaticFiles(const vector<vector<bool> > & list,
+          const vector<string> &subdirectories);
       void free();
       void copy(const QHAN &qha);
   };

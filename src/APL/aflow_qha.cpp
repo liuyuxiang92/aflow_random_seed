@@ -41,6 +41,8 @@ using std::auto_ptr;
 
 #define BINOM(n,m) aurostd::factorial(n)/(aurostd::factorial(m)*aurostd::factorial(n-m))
 
+enum DATA_FILE {DF_DIRECTORY, DF_OUTCAR, DF_EIGENVAL, DF_IBZKPT};
+
 //=============================================================================
 //              Definitions of the NonlinearFit class members
 
@@ -475,10 +477,6 @@ namespace apl
     E0_V.clear();
     static_eigvals.clear();
     static_ibzkpts.clear();
-    energies_V.clear();
-    edos_V.clear();
-    frequencies_V.clear();
-    pdos_V.clear();
     qpWeights.clear();
     qPoints.clear();
     gp_fit_matrix.clear();
@@ -536,10 +534,6 @@ namespace apl
     E0_V              = qha.E0_V;
     static_eigvals    = qha.static_eigvals;
     static_ibzkpts    = qha.static_ibzkpts;
-    energies_V        = qha.energies_V;
-    edos_V            = qha.edos_V;
-    frequencies_V     = qha.frequencies_V;
-    pdos_V            = qha.pdos_V;
     qpWeights         = qha.qpWeights;
     qPoints           = qha.qPoints;
     gp_fit_matrix     = qha.gp_fit_matrix;
@@ -818,28 +812,39 @@ namespace apl
     }
 
     try{
-      bool eos_data_available = false;
+      bool eos_static_data_available = false;
+      bool eos_apl_data_available = false;
       bool gp_data_available = false;
 
       // QHA3P, QHANP and SCQHA require a set of static EOS calculations.
       // But for a QHA calculation, the EOS flag is used to toggle these types of 
       // calculations.
-      if (isEOS || runQHA3P || runSCQHA || runQHANP){
-        if (checkStaticCalculations() == N_EOSvolumes){
-          readStaticCalculationsData();
+      if ((runQHA && isEOS) || runQHA3P || runSCQHA || runQHANP){
+        msg = "Checking if all required files from static DFT calculations exist.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_MESSAGE_);
+        vector<vector<bool> > file_is_present(subdirectories_static.size(),
+            vector<bool>(4));
+
+        uint n_static_calcs = checkStaticCalculations(file_is_present);
+        if (n_static_calcs == subdirectories_static.size()){
+          eos_static_data_available = readStaticCalculationsData();
         }
         else{
-          createSubdirectoriesStaticRun(xflags, aflags, kflags);
+          if (n_static_calcs > 0) printMissingStaticFiles(file_is_present, 
+              subdirectories_static);
+
+          createSubdirectoriesStaticRun(xflags, aflags, kflags, file_is_present);
         }
       }
 
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
       if (isEOS && runQHA){
-        eos_data_available = runAPLcalculations(subdirectories_apl_eos,
+        eos_apl_data_available = runAPLcalculations(subdirectories_apl_eos,
             coefEOSVolumes, xflags, aflags, kflags, aflowin, QHA_EOS);
 
-        if (eos_data_available){
+        if (eos_apl_data_available && eos_static_data_available){
           if (includeElectronicContribution && doSommerfeldExpansion) DOSatEf();
           if (LDEBUG) writeFrequencies();
           writeFVT();
@@ -877,7 +882,7 @@ namespace apl
             writeGPmeshFD();
             writeAverageGPfiniteDifferences();
 
-            if (runQHA3P){
+            if (runQHA3P && eos_static_data_available){
               writeThermalProperties(EOS_POLYNOMIAL, QHA3P_CALC);
               writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
               writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHA3P_CALC);
@@ -886,7 +891,7 @@ namespace apl
             }
           }
 
-          if (runSCQHA){
+          if (runSCQHA && eos_static_data_available){
             RunSCQHA(EOS_POLYNOMIAL, true);
             RunSCQHA(EOS_POLYNOMIAL, false);
 
@@ -905,8 +910,9 @@ namespace apl
   /// Creates subdirectories with aflow.in for a set of static DFT calculations.
   ///
   void QHAN::createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
-      const _kflags &kflags)
+      const _kflags &kflags, const vector<vector<bool> > &file_is_present)
   {
+    string function = "QHAN:createSubdirectoriesStaticRun():", msg = "";
     // use static_bands calculations to get a reasonable electronic DOS
     xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = true;
     xinput.xvasp.AVASP_flag_RUN_STATIC             = false;
@@ -919,6 +925,19 @@ namespace apl
     stringstream aflow;
 
     for (uint i=0; i<subdirectories_static.size(); i++){
+      // if electronic contributions are not required neglect that EIGENVAL or IBZKPT 
+      // is missing
+      if (includeElectronicContribution){
+        if (file_is_present[i][DF_EIGENVAL] && file_is_present[i][DF_IBZKPT] &&
+            file_is_present[i][DF_DIRECTORY] && file_is_present[i][DF_OUTCAR]) continue;
+      }
+      else if (file_is_present[i][DF_DIRECTORY] &&
+               file_is_present[i][DF_OUTCAR]) continue;
+
+      msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+        *p_oss, _LOGGER_MESSAGE_);
+
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefEOSVolumes[i]);
 
@@ -937,9 +956,7 @@ namespace apl
   /// Checks if all required static calculations exist and returns the number of
   /// finished calculations.
   /// 
-  /// If not all calculations are finished, it returns 0.
-  /// 
-  int QHAN::checkStaticCalculations()
+  int QHAN::checkStaticCalculations(vector<vector<bool> > &file_is_present)
   {
     string function = "QHAN::checkStaticCalculations():", msg = "";
 
@@ -951,25 +968,113 @@ namespace apl
     }
 
     int count = 0;
-    string dosfile = "", outcarfile = "";
+    string outcarfile = "", eigenvfile = "", ibzkptfile = "";
+    bool all_files_are_present = true;
     for (uint i=0; i<subdirectories_static.size(); i++){
-      dosfile    = subdirectories_static[i]+'/'+"DOSCAR.static";
-      outcarfile = subdirectories_static[i]+'/'+"OUTCAR.static";
-      if ((aurostd::EFileExist(dosfile) || aurostd::FileExist(dosfile)) &&
-          (aurostd::EFileExist(outcarfile) || aurostd::FileExist(outcarfile))){
-        count++;
+      all_files_are_present = true;
+
+      if (aurostd::FileExist(subdirectories_static[i]))
+        file_is_present[i][DF_DIRECTORY] = true;
+      else
+        all_files_are_present = false;
+
+      outcarfile = subdirectories_static[i]+"/OUTCAR.static";
+      if (aurostd::EFileExist(outcarfile) || aurostd::FileExist(outcarfile))
+        file_is_present[i][DF_OUTCAR] = true;
+      else
+        all_files_are_present = false;
+
+      if (includeElectronicContribution){
+        eigenvfile = subdirectories_static[i]+"/EIGENVAL.static";
+        ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
+
+        if (aurostd::EFileExist(eigenvfile) || (aurostd::FileExist(eigenvfile)))
+          file_is_present[i][DF_EIGENVAL] = true;
+        else
+          all_files_are_present = false;
+
+        if (aurostd::EFileExist(ibzkptfile) || (aurostd::FileExist(ibzkptfile)))
+          file_is_present[i][DF_IBZKPT] = true;
+        else
+          all_files_are_present = false;
       }
-      else{
-        msg = "QHA is not able to proceed: the ";
-        msg += subdirectories_static[i] + " directory is missing.";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_WARNING_);
-        return 0;
-      }
+      if (all_files_are_present) count++;
     }
 
     return count;
   }
+
+  void QHAN::printMissingStaticFiles(const vector<vector<bool> > & list, 
+    const vector<string> &subdirectories)
+  {
+    string function = "QHAN::printMissingStaticFiles():";
+    string msg = "";
+    for (uint i=0; i<subdirectories.size(); i++){
+      if (!list[i][DF_DIRECTORY]){
+        msg = "Directory " + subdirectories[i] + " is missing.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_ERROR_);
+      }
+      else{
+        if (!list[i][DF_OUTCAR]){
+          msg = "File " + subdirectories[i] + "/OUTCAR.static is missing.";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_ERROR_);
+        }
+        if (includeElectronicContribution){
+          if(!list[i][DF_EIGENVAL]){
+            msg = "File " + subdirectories[i] + "/EIGENVAL.static is missing.";
+            pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
+          }
+
+          if(!list[i][DF_IBZKPT]){
+            msg = "File " + subdirectories[i] + "/IBZKPT.static is missing.";
+            pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
+          }
+        }
+      }
+    }
+  }
+/*      file_is_missing = false;
+
+      if (!aurostd::FileExist(subdirectories_static[i])){
+        file_is_missing = true;
+        msg = "QHA is not able to proceed: the ";
+        msg += subdirectories_static[i] + " directory is missing.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_WARNING_);
+      }
+
+      outcarfile = subdirectories_static[i]+"/OUTCAR.static";
+      if (!(aurostd::EFileExist(outcarfile) || aurostd::FileExist(outcarfile))){
+        file_is_missing = true;
+        msg = "File " + outcarfile + " is missing";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_WARNING_);
+      }
+
+      if (includeElectronicContribution){
+        eigenvfile = subdirectories_static[i]+"/EIGENVAL.static";
+        ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
+
+        if (!(aurostd::EFileExist(eigenvfile) || (aurostd::FileExist(eigenvfile)))){
+          file_is_missing = true;
+          msg = "File " + eigenvfile + " is missing";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_WARNING_);
+        }
+
+        if (!(aurostd::EFileExist(ibzkptfile) || (aurostd::FileExist(ibzkptfile)))){
+          file_is_missing = true;
+          msg = "File " + ibzkptfile + " is missing";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_WARNING_);
+        }
+
+        if (!file_is_missing) count++;
+      }*/
 
   /// Creates a set of EOS APL subdirectories with corresponding aflow.in or gathers
   /// and processes data from finished APL calculations.
@@ -1226,7 +1331,7 @@ namespace apl
   }
 
   /// Reads data from a set of static DFT calculations.
-  void QHAN::readStaticCalculationsData()
+  bool QHAN::readStaticCalculationsData()
   {
     string function = "QHAN::readStaticCalculationsData():";
     string msg = "";
@@ -1237,12 +1342,13 @@ namespace apl
       msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
-      return;
+      return false;
     }
 
-    xDOSCAR doscar;
+    bool data_read_success = true;
+
     xOUTCAR outcar;
-    string outcarfile = "", dosfile = "";
+    string outcarfile = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
       msg = "Reading data from the static DFT calculation in the ";
       msg += subdirectories_static[i] + " directory.";
@@ -1250,35 +1356,37 @@ namespace apl
           *p_oss, _LOGGER_MESSAGE_);
 
       outcarfile = subdirectories_static[i]+'/'+"OUTCAR.static";
-      outcar.GetPropertiesFile(outcarfile);
-
-      dosfile = subdirectories_static[i]+'/'+"DOSCAR.static";
-      doscar.GetPropertiesFile(dosfile);
-
-      vector<double> edos(doscar.number_energies);
-      vector<double> energies = aurostd::deque2vector(doscar.venergy);
-
-      for (uint j=0; j<doscar.number_energies; j++){
-        // sum spin contributions if we deal with magnetic calculation
-        for (uint s=0; s<doscar.vDOS.at(0).at(0).size(); s++){
-          // if Methfessel-Paxton method was used some of the DOS values might
-          // be negative => fix them to be zero
-          if (doscar.vDOS[0][0][s][j]>=0){
-            edos[j] += doscar.vDOS[0][0][s][j]/doscar.number_atoms;
-          }
-        }
+      if (!outcar.GetPropertiesFile(outcarfile)){
+        msg = "Could not read the " + outcarfile + " file";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
+          *p_oss, _LOGGER_ERROR_);
+        data_read_success = false;
       }
 
-      edos_V.push_back(edos);
-      energies_V.push_back(energies);
-      Efermi_V.push_back(doscar.Efermi);
+      Efermi_V.push_back(outcar.Efermi);
       E0_V.push_back(outcar.energy_cell/outcar.natoms);
 
       Nelectrons = outcar.nelectrons;
 
-      static_eigvals.push_back(xEIGENVAL(subdirectories_static[i]+'/'+"EIGENVAL.static"));
-      static_ibzkpts.push_back(xIBZKPT(subdirectories_static[i]+'/'+"IBZKPT.static"));
+      static_eigvals.push_back(xEIGENVAL(subdirectories_static[i]+"/EIGENVAL.static"));
+      static_ibzkpts.push_back(xIBZKPT(subdirectories_static[i]+"/IBZKPT.static"));
+
+      if (!static_eigvals.back().m_initialized){
+        msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_ERROR_);
+        data_read_success = false;
+      }
+
+//      if (!static_ibzkpts.back().m_initialized){
+//        msg = "Could not read the " + subdirectories_static[i]+"/IBZKPT.static file.";
+//        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+//          *p_oss, _LOGGER_ERROR_);
+//        data_read_success = false;
+//      }
     }
+
+    return data_read_success;
   }
 
   /// Returns a frequency obtained by approximation of frequency-volume dependence
