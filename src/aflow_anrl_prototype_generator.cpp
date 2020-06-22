@@ -30,9 +30,9 @@ namespace anrl {
     // mode : specifies primitive(=0) or the conventional(=1) lattice
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getLattice():";
+    string function_name = XPID + "anrl::getLattice():";
     stringstream message;
-      
+
     if(LDEBUG){ cerr << function_name << " Lattice mode=" << mode; }
 
     // ---------------------------------------------------------------------------
@@ -92,11 +92,11 @@ namespace anrl {
     // mode : specifies primitive(=0) or the conventional(=1) lattice
     // NOTE : the lattice_and_centering input is not required; triclinic 
     //        systems only have one centering option (P)
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getTriclinicLattice():";
+    string function_name = XPID + "anrl::getTriclinicLattice():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // check the number of inputs 
     if(lattice_parameter_values.size() != 6){
@@ -160,7 +160,7 @@ namespace anrl {
     // mode : specifies primitive(=0) or the conventional(=1) lattice
     
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getMonoclinicLattice():";
+    string function_name = XPID + "anrl::getMonoclinicLattice():";
     stringstream message;
     
     // ---------------------------------------------------------------------------
@@ -238,11 +238,11 @@ namespace anrl {
     // space_group_letter : needed to differentiate between the A, and C
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getOrthorhombicLattice():";
+    string function_name = XPID + "anrl::getOrthorhombicLattice():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // check the number of inputs 
     if(lattice_parameter_values.size() != 3){
@@ -340,11 +340,11 @@ namespace anrl {
     // with the relevant lattice parameters.
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getTetragonalLattice():";
+    string function_name = XPID + "anrl::getTetragonalLattice():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // check the number of inputs 
     if(lattice_parameter_values.size() != 2){
@@ -415,11 +415,11 @@ namespace anrl {
     // populates with the relevant lattice parameters.
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
-  
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getHexagonalLattice():";
+    string function_name = XPID + "anrl::getHexagonalLattice():";
     stringstream message;
-     
+
     // ---------------------------------------------------------------------------
     // check number of inputs
     if(lattice_parameter_values.size() != 2){
@@ -490,11 +490,11 @@ namespace anrl {
     // populates with the relevant lattice parameters.
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getCubicLattice():";
+    string function_name = XPID + "anrl::getCubicLattice():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // check number of inputs
     if(lattice_parameter_values.size() != 1){
@@ -572,9 +572,9 @@ namespace anrl {
     // plugging in the parameter values into the Wyckoff equations 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getAtomsFromWyckoff():";
+    string function_name = XPID + "anrl::getAtomsFromWyckoff():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // variables 
     deque<_atom> atoms_conventional_cell;
@@ -637,11 +637,11 @@ namespace anrl {
     // The format is : x1, y1, z1, x2, y2, z2, x3, ...
     // Note: Wyckoff_positions are updated, i.e., the corresponding parameter
     // index is assigned so we can substitute values later
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::determineWyckoffVariables():";
+    string function_name = XPID + "anrl::determineWyckoffVariables():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // variables
     vector<string> Wyckoff_parameter_list;
@@ -742,7 +742,7 @@ namespace anrl {
     // (alphabetic) in accordance with the ANRL convention.
     // The format is : x1, y1, z1, x2, y2, z2, x3, ...
     
-    string function_name = "anrl::applyWyckoffValues():";
+    string function_name = XPID + "anrl::applyWyckoffValues():";
     stringstream message;
     
     // ---------------------------------------------------------------------------
@@ -813,7 +813,7 @@ namespace anrl {
     //   2) multiple instances of a variable Wyckoff position with the same 
     //      parameters
 
-    string function_name = "anrl::containsDuplicateWyckoffCoordinate():";
+    string function_name = XPID + "anrl::containsDuplicateWyckoffCoordinate():";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -872,7 +872,7 @@ namespace anrl {
     // and equations
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::getWyckoffSitesFromANRL():";
+    string function_name = XPID + "anrl::getWyckoffSitesFromANRL():";
     stringstream message;
 
     vector<wyckoffsite_ITC> wyckoff_sites_ITC;
@@ -934,11 +934,10 @@ namespace anrl {
       const string& variables, 
       bool& keep_anrl_lattice_parameter){ 
 
-    //
     // bool must be reference: toggles automatic volume scaling later
-        
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::extractANRLPrototypeParameterValues():";
+    string function_name = XPID + "anrl::extractANRLPrototypeParameterValues():";
     stringstream message;
 
     // index 
@@ -985,22 +984,22 @@ namespace anrl {
 namespace anrl {
 	bool structureAndLabelConsistent(const xstructure& _xstr, 
 			const string& label_input, 
-			string& label_and_params_calculated){
-
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "anrl::structureAndLabelConsistent():";
+      string& label_and_params_calculated){
 
     // Checks if the created structure is consistent with the label;
     // it is possible that the provided parameters elevate the structure
     // to a higher symmetry 
 
-		xstructure xstr = _xstr; //copy
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "anrl::structureAndLabelConsistent():";
 
-		// ---------------------------------------------------------------------------
+    xstructure xstr = _xstr; //copy
+
+    // ---------------------------------------------------------------------------
     // determine label from structure (reverse process) 
     label_and_params_calculated = structure2anrl(xstr, true); // true=calculate sym
 
-		// cannot do a strict string comparison of labels, symmetry analysis may
+    // cannot do a strict string comparison of labels, symmetry analysis may
     // change origin (i.e., Wyckoff letters); need to check if labels are  
     // isopointal (check SG and Wyckoff multiplicities and site symmetries)
 
@@ -1100,11 +1099,11 @@ namespace anrl {
     // Wyckoff variables: x, y, and z 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::PrototypeANRL_Generator()";
+    string function_name = XPID + "anrl::PrototypeANRL_Generator()";
     stringstream message;
-   
+
     xstructure str;
-    
+
     // ---------------------------------------------------------------------------
     // determine print mode 
     uint print_mode = _PROTO_GENERATOR_GEOMETRY_FILE_; // no equations
@@ -1724,7 +1723,7 @@ namespace symbolic {
     // (e.g., sin, cos, exponentials, etc.)
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "symbolic::string2symbolic():";
+    string function_name = XPID + "symbolic::string2symbolic():";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -1772,7 +1771,7 @@ namespace symbolic {
     Symbolic diff = a - b;
 
     if(VERBOSE){ 
-      string function_name = "symbolic::isEqual():";
+      string function_name = XPID + "symbolic::isEqual():";
       cerr << function_name << " a-b=" << diff << endl;
     }
 
@@ -1791,7 +1790,7 @@ namespace symbolic {
     bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE A NESTED FUNCTION
 
     if(VERBOSE){ 
-      string function_name = "symbolic::isEqualVector():";
+      string function_name = XPID + "symbolic::isEqualVector():";
       cerr << function_name << " a_vec-b_vec=" << (a_vec-b_vec) << endl;
     }
 
@@ -1872,11 +1871,11 @@ namespace anrl {
   Symbolic SymbolicANRLPrimitiveLattices(const string& lattice_and_centering, const char& space_group_letter){ 
     
     // Grab symbolic representation of primitive lattice in the ANRL convention.
-    
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::SymbolicANRLPrimitiveLattices():";
 
-		if(LDEBUG){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "anrl::SymbolicANRLPrimitiveLattices():";
+
+    if(LDEBUG){
       cerr << function_name << " lattice and centering: " << lattice_and_centering << endl;
       cerr << function_name << " first character of space group symbol: " << space_group_letter << endl;
     }
@@ -2030,8 +2029,8 @@ namespace anrl {
     // Convert equations (vector<vector<string> >) to symbolic notation.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-		string function_name = "anrl::equations2SymbolicEquations()";
-		stringstream message;
+    string function_name = XPID + "anrl::equations2SymbolicEquations()";
+    stringstream message;
 
     vector<Symbolic> symbolic_equations;
 
@@ -2070,10 +2069,10 @@ namespace anrl {
  
     // converts Cartesian coordinates to lattice coordinates
     // perhaps put in terms of c2f?
-    
-		bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::cartesian2lattice():";
-   
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "anrl::cartesian2lattice():";
+
     // ---------------------------------------------------------------------------
     // calculate volume (symbolic) 
     Symbolic volume = lattice.row(0)|((lattice.row(1)%(lattice.row(2))).transpose()); // | is dot product, % is cross product
@@ -2179,7 +2178,7 @@ namespace anrl {
     // convert equations to lattice equations for centered lattice (C, I, F).
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl:getEquationsForCenteredLattices():";
+    string function_name = XPID + "anrl:getEquationsForCenteredLattices():";
     stringstream message;
 
     vector<Symbolic> lattice_equations;
@@ -2284,9 +2283,9 @@ namespace anrl {
     // add symbolic equations to atom.fpos_equation or atom.cpos_equation
     // converts from variables from Symbolic to string
     // DEFAULT: update atom.fpos_equation
- 
-		bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "anrl::addSymbolicEquation2Atoms():";
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "anrl::addSymbolicEquation2Atoms():";
     stringstream message;
 
     // ---------------------------------------------------------------------------
