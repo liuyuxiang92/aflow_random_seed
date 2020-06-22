@@ -986,7 +986,10 @@ namespace anrl {
 	bool structureAndLabelConsistent(const xstructure& _xstr, 
 			const string& label_input, 
 			string& label_and_params_calculated){
-    
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "anrl::structureAndLabelConsistent():";
+
     // Checks if the created structure is consistent with the label;
     // it is possible that the provided parameters elevate the structure
     // to a higher symmetry 
@@ -1006,16 +1009,46 @@ namespace anrl {
 
     // ---------------------------------------------------------------------------
     // check space groups
-    if(compare::matchableSpaceGroups(xstr.space_group_ITC, aurostd::string2utype<uint>(label_fields[2]))){
-      return true;
+    uint space_group_in_label = aurostd::string2utype<uint>(label_fields[2]);
+    if(!compare::matchableSpaceGroups(xstr.space_group_ITC, space_group_in_label)){
+      if(LDEBUG){
+        cerr << function_name << " the calculated and label-designated space groups are incommensurate: "
+          << "calculated=" << xstr.space_group_ITC << " vs "
+          << "label= " << space_group_in_label << endl;
+      }
+      return false;
     }
 
     // ---------------------------------------------------------------------------
     // check Wyckoff positions
-    // TO DO ADD WYCKOFF MULTIPLICITY/SITE SYMMETRY CHECK
 
+    // get Wyckoff information from label and format to compare
+    vector<vector<string> > Wyckoff_fields = compare::convertANRLWyckoffString2GroupedPositions(label_input);
+    vector<GroupedWyckoffPosition> grouped_Wyckoff_positions_label;
+    compare::groupWyckoffPositionsFromGroupedString(space_group_in_label,
+        xstr.setting_ITC,
+        Wyckoff_fields,
+        grouped_Wyckoff_positions_label);
 
-    return false;
+    // get Wyckoff information from xstructure and format to compare
+    vector<GroupedWyckoffPosition> grouped_Wyckoff_positions_structure;
+    compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions_structure);
+    string Wyckoff_string_structure = anrl::groupedWyckoffPosition2ANRLString(grouped_Wyckoff_positions_structure, true);
+
+    if(!compare::matchableWyckoffPositions(grouped_Wyckoff_positions_label,
+          grouped_Wyckoff_positions_structure,
+          true)){ // same_species=true
+      if(LDEBUG){
+        cerr << function_name << " the calculated and label-designated Wyckoff positions are incommensurate: "
+          << "calculated=" << Wyckoff_string_structure << " vs "
+          << "label= " << label_input << endl;
+      }
+      return false;
+    }
+
+    // ---------------------------------------------------------------------------
+    // all tests passed; the structure and label are commensurate
+    return true;
   }
 }
 
@@ -1455,7 +1488,8 @@ namespace anrl {
     str.num_parameters = parameter_list.size(); 
     str.num_lattice_parameters = lattice_parameter_list.size(); 
     str.prototype_parameter_list = parameter_list; 
-    str.prototype_parameter_values = parameter_values; 
+    str.prototype_parameter_values = parameter_values;
+    str.setting_ITC=setting;
    
     // ---------------------------------------------------------------------------
     // convert RHL to HEX setting ([--hex] option)

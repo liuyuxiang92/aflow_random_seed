@@ -3016,7 +3016,10 @@ namespace compare{
 // groupWyckoffPositions
 // ***************************************************************************
 namespace compare{
-  bool groupWyckoffPositionsFromGroupedString(uint& space_group_number, uint& setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions){
+  bool groupWyckoffPositionsFromGroupedString(uint space_group_number,
+      uint setting,
+      vector<vector<string> >& grouped_Wyckoff_string,
+      vector<GroupedWyckoffPosition>& grouped_positions){
 
     // Groups the Wyckoff positions via species 
     // Obtains information from the string of the following form: a,f,g;b,c;a,a
