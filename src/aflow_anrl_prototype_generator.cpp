@@ -1059,24 +1059,19 @@ namespace anrl {
       string& parameters,
       deque<string> &vatomX,
       deque<double> &vvolumeX,
-      ostream& logstream){
+      ostream& logstream,
+      bool silence_logger){
 
     ofstream FileMESSAGE;
     
-    // ---------------------------------------------------------------------------
-    // if no FileMESSAGE, the default behavior is to not print logger info
-    // (i.e., command line)
-    bool original_quiet_status = XHOST.QUIET;
-    XHOST.QUIET=true;
-
     xstructure prototype = PrototypeANRL_Generator(label, 
         parameters, 
         vatomX, 
         vvolumeX, 
         FileMESSAGE, 
-        logstream);
+        logstream,
+        silence_logger);
 
-    XHOST.QUIET = original_quiet_status; // re-set original status
     return prototype;
   }
 }
@@ -1087,7 +1082,8 @@ namespace anrl {
       deque<string> &vatomX,
       deque<double> &vvolumeX,
       ofstream& FileMESSAGE,
-      ostream& logstream){ 
+      ostream& logstream,
+      bool silence_logger){
 
 		// Returns a ANRL prototype structure based on the label and internal 
     // degrees of freedom.
@@ -1120,7 +1116,7 @@ namespace anrl {
     else{
       message << "Printing geometry file only";
     }
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     
     // ---------------------------------------------------------------------------
     // declare variables
@@ -1160,11 +1156,11 @@ namespace anrl {
       }
     }
     message << "The input label is " << label_anrl;
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     
     if(number_id.size()){
       message << "The preset parameters " << number_id << " will be extracted (if they exist)"; 
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1176,7 +1172,7 @@ namespace anrl {
         found=TRUE;
         ifound=i;
         message << "This prototype label exists in the AFLOW library (part 1 or 2) label=" << label_anrl << "; index=" << ifound;
-        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
       }
     }
 
@@ -1185,7 +1181,7 @@ namespace anrl {
     if(!found) {
       message << "This label does not currently exist in the AFLOW library label=" << label_anrl;
       message << " Consider adding it to the library.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     }
     
     // -------------------------------------------------------------------------
@@ -1211,7 +1207,7 @@ namespace anrl {
             keep_anrl_lattice_parameter);
       }
       message << "Extracted the following parameters (internal degrees of freedom) from the AFLOW parameters= " << parameters;
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1219,7 +1215,7 @@ namespace anrl {
     aurostd::string2tokens(label_anrl,tokens,"_");
       
     message << "The AFLOW label has been partitioned into " << tokens.size() << " fields : " << aurostd::joinWDelimiter(tokens, " ");
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
 
     if(tokens.size()<4){ 
       message << "Number of fields in label is too small, should be 4 or more: label" << label_anrl;
@@ -1469,11 +1465,11 @@ namespace anrl {
     uint ratio_conventional2primitive = LATTICE::Conventional2PrimitiveRatio(lattice_centering);
     if(!aurostd::isequal(ratio_calculated, ratio_conventional2primitive)){
       if(!(ratio_calculated==1 && lattice_centering=='R' && setting==SG_SETTING_ANRL)){
-      message << "The calculated ratio and the expected conventional2primtive ratio do not match: calculated=" << ratio_calculated << " vs expected=" << ratio_conventional2primitive;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "The calculated ratio and the expected conventional2primtive ratio do not match: calculated=" << ratio_calculated << " vs expected=" << ratio_conventional2primitive;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
     }
-    
+
     // ---------------------------------------------------------------------------
     // create xstructure
     str.iomode=IOVASP_AUTO;

@@ -2624,8 +2624,8 @@ namespace anrl {
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
   string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
   xstructure rhl2hex(xstructure& str, double& a, double& c); 
-  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout); //DX20200528
-  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200528
+  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout, bool silence_logger=true); //DX20200528 - command line = no logger
+  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ofstream& FileMESSAGE, ostream& logstream=cout, bool silence_logger=false); //DX20200528 - internal = logger
 }
 
 // ----------------------------------------------------------------------------
