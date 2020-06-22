@@ -33,7 +33,7 @@ namespace anrl {
     string function_name = XPID + "anrl::getLattice():";
     stringstream message;
 
-    if(LDEBUG){ cerr << function_name << " Lattice mode=" << mode; }
+    if(LDEBUG){ cerr << function_name << " Lattice mode=" << mode << endl; }
 
     // ---------------------------------------------------------------------------
     // triclinic crystal system

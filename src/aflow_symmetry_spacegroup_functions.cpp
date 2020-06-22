@@ -3988,6 +3988,10 @@ namespace SYM{
     if(str[0] == ' ') {
       str.erase(str.begin(), str.begin() + 1);
     }
+    // if contains double negative, make positive //DX20200622
+    if(aurostd::substring2bool(str,"--")){
+      aurostd::StringSubst(str,"--","");
+    }
     sdouble out;
     vector<sdouble> out_vec;
     double num = 0;
