@@ -1004,10 +1004,14 @@ namespace anrl {
     vector<string> label_fields;
     aurostd::string2tokens(label_input,label_fields,"_");
 
+    // ---------------------------------------------------------------------------
+    // check space groups
     if(compare::matchableSpaceGroups(xstr.space_group_ITC, aurostd::string2utype<uint>(label_fields[2]))){
       return true;
     }
 
+    // ---------------------------------------------------------------------------
+    // check Wyckoff positions
     // TO DO ADD WYCKOFF MULTIPLICITY/SITE SYMMETRY CHECK
 
 
@@ -1631,138 +1635,6 @@ namespace anrl {
 // ---------------------------------------------------------------------------
 // GENERIC SYMBOLIC MATH FUNCTIONS
 // (if more functions are added, perhaps make a new file: aflow_symbolic.cpp)
-
-// *************************************************************************** 
-// pflow::symbolic_test()
-// *************************************************************************** 
-namespace pflow {
-  string symbolic_test(void){
-
-    // string symbolic_test(void); //DX 20181116 - symbolic math test
-    // vpflow.flag("SYMBOLIC_MATH_TEST",aurostd::args2flag(argv,cmds,"--symbolic_math_test")); //DX20181116 - symbolic math test
-    // if(vpflow.flag("SYMBOLIC_MATH_TEST")) {cout << pflow::symbolic_test(); _PROGRAMRUN=true;}
-    
-    stringstream oss;
-    Symbolic alpha("alpha");
-    Symbolic X, XI, dX, result, frac, two_a;
-    Symbolic lattice("L",3,3);
-   
-    Symbolic a("a");
-    Symbolic b("b");
-    Symbolic c("c");
-    Symbolic beta("beta");
-    lattice = ((1/2*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
-	               (1.0/2.0*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
-	               (c*cos(beta), _SYMBOLIC_ZERO_ , c*sin(beta)));
-
-    cerr << "lattice: " << lattice << endl;
-    
-    two_a = ((a)+(a));
-    cerr << "two_a: " << two_a << endl;
-    
-    frac = (a+a)*1/a;
-    cerr << "frac: " << frac << endl;
-    cerr << "double(frac): " << double(frac) << endl;
-
-    cerr << "[0]" << endl;
-    Symbolic two("two",1); 
-    cerr << "[1]" << endl;
-    Symbolic half("half",1); 
-    cerr << "[2]" << endl;
-    Symbolic combine;
-    cerr << "[3]" << endl;
-    two(0) = (2);
-    cerr << "[4]" << endl;
-    half(0) = (0.5);
-    cerr << "[5]" << endl;
-    combine = (two|half);
-    cerr << "[6]" << endl;
-
-    cerr << "combine: " << combine << endl;
-
-    X = ( ( cos(alpha), sin(alpha) ),
-          (-sin(alpha), cos(alpha) ) );
-
-    oss << X << endl;
-
-    XI = X[alpha == -alpha]; oss << XI << endl;
-    dX = df(X, alpha);       oss << dX << endl;
-
-    result = XI * dX;        oss << result << endl;
-    result = result[(cos(alpha)^2) == 1 - (sin(alpha)^2)];
-    oss << result << endl;
-  
-   
-    int n=2;
-    result = n^(alpha);
-    cerr << "n^alpha: " << result << endl;
-  
-    Symbolic x("x");
-    //Symbolic y("y");
-    Symbolic constant = Symbolic(1);
-    string component = "0.125*x-0.5";
-    vector<SYM::sdouble> sdouble_test = SYM::simplify(component);
-    Symbolic combined;
-    for(uint i=0;i<sdouble_test.size();i++){
-      cerr << "sdouble_test: " << sdouble_test[i].dbl << " " << sdouble_test[i].chr << endl;
-      if(sdouble_test[i].chr != '\0'){
-        stringstream ss_char; ss_char << sdouble_test[i].chr;
-        combined += Symbolic(sdouble_test[i].dbl)*Symbolic(ss_char.str());
-        cerr << "Symbolic(sdouble_test[i].dbl): " << Symbolic(sdouble_test[i].dbl) << endl;
-        cerr << "Symbolic(sdouble_test[i].chr): " << Symbolic(ss_char.str()) << endl;
-      }
-      else{
-        combined += Symbolic(sdouble_test[i].dbl);
-      cerr << "Symbolic(sdouble_test[i].dbl): " << Symbolic(sdouble_test[i].dbl) << endl;
-      }
-    }
-    cerr << "combined: " << combined << endl;
-    //combined = combined.subst(x==1).simplify();
-    cerr << "combined: " << combined << endl;
-
-    Symbolic test_sym = 0.1250000001*x-0.5;
-    cerr << "equal: " << (combined == test_sym) << endl;
-    if(combined == test_sym){cerr << "yes" << endl; }
-
-    //cerr << "coeff (x): " << combined.coeff(x,0) << endl;
-    //cerr << "coeff (y): " << combined.coeff(y,0) << endl;
-    //cerr << "coeff (_SYMBOLIC_ZERO_): " << combined.coeff(zero,1) << endl;
-    cerr << "coeff (constant): " << combined.coeff(constant,1) << endl;
-    //Symbolic sym_comp(sdouble_test);
-    cerr << typeid(combined).name() << endl;
-    //CastPtr<const Product> p(x);
-    //list<Symbolic> factors = CastPtr<const Product>(combined)->factors;
-    //cerr << factors.size() << endl;
-    //cerr << CastPtr<const Product>(combined)->factors << endl;
-    //list<Symbolic>::iterator it;
-    //for(it=factors.begin();it!=factors.end(); it++){
-    //  cerr << "factor: " << it->factors << endl;
-    //}
-
-    //Symbolic sym_comp(component);
-    //cerr << "double(component): " << double(combined) << endl;
-    
-
-    //Symbolic sym_comp = Symbolic("0.125");
-    //cerr << "double(component): " << double(sym_comp) << endl;
-
-    string equation = "0.125,0.125,0.125";
-    vector<string> tokens; aurostd::string2tokens(equation,tokens,",");
-    Symbolic position("pos", 3);
-    for(uint j=0;j<tokens.size();j++){
-      cerr << tokens[j] << endl;
-      stringstream ss_token; ss_token << tokens[j];
-      position(j) = Symbolic(ss_token.str());
-    }
-    cerr << "position: " << position << endl;
-    for(uint j=0;j<3;j++){
-      cerr << "double?:" << double(position(j)) << endl;
-    }
-
-
-    return oss.str();
-  }
-}
 
 // *************************************************************************** 
 // SymbolicWyckoffSite initializeSymbolicWyckoffSite() 
