@@ -1076,7 +1076,7 @@ namespace anrl {
         FileMESSAGE, 
         logstream);
 
-    XHOST.QUIET = original_quiet_status;
+    XHOST.QUIET = original_quiet_status; // re-set original status
     return prototype;
   }
 }
@@ -1136,7 +1136,7 @@ namespace anrl {
 
     vector<string> tokens;
     string label_anrl="";
-    string number_id = ""; //for predefined anrls //DX 20191207
+    string number_id = ""; //for predefined anrls //DX20191207
     string label_permutations=""; deque<uint> vpermutation;
     
     // ---------------------------------------------------------------------------
@@ -1339,7 +1339,7 @@ namespace anrl {
     }
 
     // ---------------------------------------------------------------------------
-    // ===== Determine parameters ===== //
+    // determine parameters
     vector<string> parameter_list, lattice_parameter_list, Wyckoff_parameter_list;
     vector<double> parameter_values, lattice_parameter_values, Wyckoff_parameter_values;
     
@@ -1372,7 +1372,7 @@ namespace anrl {
     // -------------------------------------------------------------------------
     // if no parameters provided and more than one is needed
     if(parameters.size()==0 && parameter_list.size()!=1){
-      message << "No parameters provided. Since it is a new prototype label with more than one degree of freedom,";
+      message << "No parameters provided. Since this is a new prototype label with more than one degree of freedom,";
       message << "you must add parameter values with --params=..." << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
@@ -1477,7 +1477,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // create xstructure
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(space_group_number)+DOI_ANRL; //CO190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(space_group_number)+DOI_ANRL; //CO20190520
     str.scale=1.0;
     str.lattice = lattice_primitive;
     str.atoms = atoms_primitive_cell;
@@ -1505,7 +1505,7 @@ namespace anrl {
       str.atoms.at(iat).name_is_given=TRUE;
       str.atoms.at(iat).number=iat;//iat;    // reference position for convasp
       str.atoms.at(iat).basis=iat;//iat;     // position in the basis
-      if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX 20180618
+      if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX20180618
         str.atoms.at(iat).cpos=F2C(str.lattice,str.atoms.at(iat).fpos);
       }
       str.num_each_type.at(str.atoms.at(iat).type)++;
@@ -1565,10 +1565,9 @@ namespace anrl {
 #endif
     }
     
-
     // ---------------------------------------------------------------------------
     // DONE
-    if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX 20180618
+    if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX20180618
       xvector<double> data(6);
       data=Getabc_angles(str.lattice,DEGREES);
       str.a=data[1];str.b=data[2];str.c=data[3];str.alpha=data[4];str.beta=data[5];str.gamma=data[6];
@@ -1585,7 +1584,7 @@ namespace anrl {
       if(LDEBUG) { cerr << function_name << " ATOMX" << endl;}
       if(LDEBUG) { cerr << function_name << " vatomX.size()=" << vatomX.size() << endl;}
       if(LDEBUG) { cerr << function_name << " vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;}
-      if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX 20180618
+      if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX20180618
         std::deque<_atom> atoms;
         atoms=str.atoms;
         // STRIP ALL ATOMS
@@ -1597,7 +1596,7 @@ namespace anrl {
           if(vpermutation.size()>0 || vatomX.size()>0) { atoms.at(i).name=vatomX.at(atoms.at(i).type); }  // PERMUTATIONS AND ATOMX
           //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
           str.AddAtom(atoms.at(i));
-          //DX 20181205 - Volume scaling by atomic species - START
+          // DX20181205 - Volume scaling by atomic species - START
           // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
           if(scale_volume_by_species==true){
             double volume=0.0;
@@ -1607,11 +1606,11 @@ namespace anrl {
                 if(LDEBUG) { cerr << function_name << " volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
               }
             }
-            //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-            str.SetVolume(volume);  //CO190205 - more robust
+            //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+            str.SetVolume(volume);  //CO20190205 - more robust
             str.neg_scale=TRUE;
           }
-          //DX 20181205 - Volume scaling by atomic species - END
+          //DX20181205 - Volume scaling by atomic species - END
         }
       }
       str.SpeciesPutAlphabetic();
@@ -1619,8 +1618,8 @@ namespace anrl {
 
 		// ---------------------------------------------------------------------------
 		// fix title of geometry file 
-    aurostd::StringSubst(str.title,label,aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO181216
-    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO181216
+    aurostd::StringSubst(str.title,label,aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO20181216
+    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO20181216
     
 		// ---------------------------------------------------------------------------
     // if this is a new prototype (i.e., not in library), we should check the 
@@ -1655,7 +1654,7 @@ namespace anrl {
 // AFLOW implementation:
 // The SymbolicC++ header files are included with AFLOW (compiled locally)
 // Below are generic helper functions, e.g., convert string to Symbolic 
-// representation and ANRL prototype sepcific functions
+// representation and ANRL prototype specific functions
 //
 // Generic functions are in the "symbolic" namespace, and 
 // ANRL specific functions are in the "anrl" namespace
@@ -2068,7 +2067,7 @@ namespace anrl {
   Symbolic cartesian2lattice(const Symbolic& lattice, const Symbolic& cartesian_coordinate){ 
  
     // converts Cartesian coordinates to lattice coordinates
-    // perhaps put in terms of c2f?
+    // this is the symbolic math equivalent to C2F()
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "anrl::cartesian2lattice():";
