@@ -4,22 +4,22 @@
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - David Hicks - 2018
-// FILE "ANRL/aflow_anrl_AB3C6_cI80_206_a_d_e.cpp"
+// FILE "ANRL/aflow_anrl_AB3C6_cI80_206_b_d_e.cpp"
 
-#ifndef _AFLOW_ANRL_AB3C6_cI80_206_a_d_e_CPP // AFLOW_REMOVE_GREP
-#define _AFLOW_ANRL_AB3C6_cI80_206_a_d_e_CPP // AFLOW_REMOVE_GREP
+#ifndef _AFLOW_ANRL_AB3C6_cI80_206_b_d_e_CPP // AFLOW_REMOVE_GREP
+#define _AFLOW_ANRL_AB3C6_cI80_206_b_d_e_CPP // AFLOW_REMOVE_GREP
 #include "../aflow.h" // AFLOW_REMOVE_GREP
 
 namespace anrl {
-  uint WebANRL_AB3C6_cI80_206_a_d_e(stringstream &web,bool LDEBUG);
+  uint WebANRL_AB3C6_cI80_206_b_d_e(stringstream &web,bool LDEBUG);
 }
 
 namespace anrl {
-  uint PrototypeANRL_AB3C6_cI80_206_a_d_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
-    // system AB3C6_cI80_206_a_d_e
+  uint PrototypeANRL_AB3C6_cI80_206_b_d_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
+    // system AB3C6_cI80_206_b_d_e
 
     if(XHOST.vflag_control.flag("WWW")) {
-      WebANRL_AB3C6_cI80_206_a_d_e(web,LDEBUG); // PLUG WEB STUFF
+      WebANRL_AB3C6_cI80_206_b_d_e(web,LDEBUG); // PLUG WEB STUFF
 #ifdef _ANRL_NOWEB_
       cout << "no web" << endl;
 #else
@@ -39,19 +39,19 @@ namespace anrl {
     anrl::PrototypeANRL_Consistency(vparameters.size(),nparameters,prototype,label,
         Strukturbericht,Pearson_symbol,spacegroup,params,print_mode);    
 
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: FOUND" << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: label=" << label << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: nspecies=" << nspecies << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: natoms=" << natoms << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: spacegroup=" << spacegroup << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: nunderscores=" << nunderscores << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: nparameters=" <<  nparameters << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: Pearson_symbol=" << Pearson_symbol << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: params=" << params << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: Strukturbericht=" << Strukturbericht << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: prototype=" << prototype << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: dialect=" << dialect << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: vparameters.size()=" << vparameters.size() << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: FOUND" << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: label=" << label << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: nspecies=" << nspecies << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: natoms=" << natoms << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: spacegroup=" << spacegroup << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: nunderscores=" << nunderscores << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: nparameters=" <<  nparameters << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: Pearson_symbol=" << Pearson_symbol << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: params=" << params << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: Strukturbericht=" << Strukturbericht << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: prototype=" << prototype << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: dialect=" << dialect << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: vparameters.size()=" << vparameters.size() << endl;}
 
     xvector<double> xn(3);   xn(1)=1.0;xn(2)=0.0;xn(3)=0.0;
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
@@ -65,12 +65,12 @@ namespace anrl {
     }
 
     uint i=0;
-    double a=vparameters.at(i++);                  if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: a=" << a << endl;}
+    double a=vparameters.at(i++);                  if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: a=" << a << endl;}
 
-    double x2=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: x2=" << x2 << endl;}
-    double x3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: x3=" << x3 << endl;}
-    double y3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: y3=" << y3 << endl;}
-    double z3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_a_d_e: z3=" << z3 << endl;}
+    double x2=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: x2=" << x2 << endl;}
+    double x3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: x3=" << x3 << endl;}
+    double y3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: y3=" << y3 << endl;}
+    double z3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C6_cI80_206_b_d_e: z3=" << z3 << endl;}
 
     str.iomode=IOVASP_AUTO;
     str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
@@ -352,11 +352,11 @@ namespace anrl {
 } // namespace anrl
 
 namespace anrl {
-  uint WebANRL_AB3C6_cI80_206_a_d_e(stringstream& web,bool LDEBUG) {
+  uint WebANRL_AB3C6_cI80_206_b_d_e(stringstream& web,bool LDEBUG) {
 #ifndef _ANRL_NOWEB_
 #endif
 
-    if(LDEBUG) {cerr << "anrl:: WebANRL_AB3C6_cI80_206_a_d_e: web.str().size()=" << web.str().size() << endl;}
+    if(LDEBUG) {cerr << "anrl:: WebANRL_AB3C6_cI80_206_b_d_e: web.str().size()=" << web.str().size() << endl;}
 
     return web.str().size();
   }

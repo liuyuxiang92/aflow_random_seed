@@ -244,7 +244,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A_cP8_205_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 233
   uint PrototypeANRL_AB_cP16_205_c_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 234
   uint PrototypeANRL_AB2_cP12_205_a_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 235
-  uint PrototypeANRL_AB3C6_cI80_206_a_d_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 236
+  uint PrototypeANRL_AB3C6_cI80_206_b_d_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 236
   uint PrototypeANRL_A_cI16_206_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 237
   uint PrototypeANRL_A_cP20_213_cd(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 238
   uint PrototypeANRL_A3B4C_cP8_215_d_e_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 239
@@ -2029,9 +2029,9 @@ namespace anrl {
       PrototypeANRL_AB2_cP12_205_a_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
     // ---------------------------------------------------------------------------
-    // 236 // ./aflow --proto=AB3C6_cI80_206_a_d_e --params=9.4,-0.0344,0.338,0.1,0.125
-    if(vlabel.at(ifound)=="AB3C6_cI80_206_a_d_e") {
-      PrototypeANRL_AB3C6_cI80_206_a_d_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // 236 // ./aflow --proto=AB3C6_cI80_206_b_d_e --params=9.4,-0.0344,0.338,0.1,0.125
+    if(vlabel.at(ifound)=="AB3C6_cI80_206_b_d_e") {
+      PrototypeANRL_AB3C6_cI80_206_b_d_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
     // ---------------------------------------------------------------------------
     // 237 // ./aflow --proto=A_cI16_206_c --params=4.11971,0.1001
