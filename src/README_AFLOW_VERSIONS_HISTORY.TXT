@@ -2,6 +2,7 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- Bug fixes to xPOTCAR (exits) (CO+ME)
         -- Bug fixes to Wyckoff positions (DX)
+        -- Bug fixes for overwriting symmetry output files text/json (DX)
         -- adding in CHULL workshop unit tests (CO)
         -- adding exits to CCE unit tests (CO)
         -- Bug fixes to aurostd::isDirectory() and isFile() (CO)
