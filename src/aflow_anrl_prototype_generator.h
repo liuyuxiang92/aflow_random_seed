@@ -31,6 +31,84 @@
 #endif
 
 /*
+
+   class xprototype {
+         // label/params info
+         string catalog;                                    // prototype catalog 'anrl' or 'htqc'
+         string label;                                      // label (e.g., 201 or AB_cF8_225_a_b)
+         vector<string> parameter_list;                     // list of degrees of freedom (a,b/a,c/a,alpha,beta,gamma,x1,y1,z1,x2,...)
+         vector<double> parameter_values;                   // values for degrees of freedom
+         string parameter_set_id;                           // parameter set enumertion (e.g., 001, 002, 003, etc.)
+         string weblink;                                    // link to the corresponding CrystalDatabase web page
+
+         // symmetry
+         vector<uint> stoichiometry;                        // reduced stoichiometry for prototype (e.g., equicompositional ternary=1:1:1)
+         string Pearson_symbol;                             // Pearson symbol
+         uint space_group_number;                           // space group number
+         string space_group_symbol_H_M;                     // space group symbol Hermann-Mauguin (optional or use AFLOW lookup table)
+         string space_group_symbol_Hall;                    // space group symbol Hall (optional or use AFLOW lookup table)
+         string space_group_symbol_Schoenflies;             // space group symbol Schoenflies (optional or use AFLOW lookup table)
+         vector<vector<string> > Wyckoff_letters;           // list of Wyckoff letters grouped by species ([[a,b],[c,d,e],[f,g,h,i],...])
+         vector<vector<string> > Wyckoff_site_symmetries;   // list of Wyckoff site symmetries grouped by species ([mmm],[2mm,m2m],[mm2],...]) (optional, I can grab from look-up table)
+         vector<vector<uint> > Wyckoff_multiplicities;      // list of Wyckoff multiplicities grouped by species ([48],[24,24],[12,12,12][4,4,4,4],...]) (optional, I can grab from look-up table)
+
+         // designations
+         string prototype_material;                         // common prototype material, e.g., NaCl
+         string common_name;                                // common prototype name, e.g., half-Heusler
+         string mineral_name;                               // mineral name, e.g., corundum
+         string phase;                                      // compound phase designation (alpha, beta, gamma, delta, etc.) (if applicable)
+         string strukturbericht;                            // Strukturbericht designation (if applicable)
+         vector<string> similar_materials;                  // list of similar compounds (if in same order as stoichiometry we can easily decorate prototypes)
+         vector<string> comments;                           // noteworthy comments (included in ANRL document and webpage)
+         string title;                                      // title (for ANRL document/webpage)
+
+   };
+
+// stannite example
+_AFLOW_PROTOTYPE_ENCYCLOPEDIA_="http://aflow.org/CrystalDatabase/"
+
+catalog="anrl";
+label="A2BC4D_tI16_121_d_a_i_b";
+parameter_list.push_back("a");parameter_list.push_back("c/a");parameter_list.push_back("x4");parameter_list.push_back("z4");
+parameter_values.push_back(5.46);parameter_values.push_back(1.96428571429);parameter_values.push_back(0.245);parameter_values.push_back(0.132);
+parameter_set_id="001";
+weblink=_AFLOW_PROTOTYPE_ENCYCLOPEDIA_+"A2BC4D_tI16_121_d_a_i_b.html";
+
+stoichiometry.push_back(2);stoichiometry.push_back(1);stoichiometry.push_back(4);stoichiometry.push_back(1);
+Pearson_symbol="tI16";
+space_group_number=121;
+space_group_symbol_H_M="I-42m"; // or lookup table
+space_group_symbol_Hall="I -4 2"; // or lookup table
+space_group_symbol_Schoenflies="D_{2d}^{11}"; // or lookup table
+
+vector<string> Wyckoff_tmp; 
+// letters 
+Wyckoff_tmp.push_back("d");Wyckoff_letters.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+Wyckoff_tmp.push_back("a");Wyckoff_letters.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+Wyckoff_tmp.push_back("i);Wyckoff_letters.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+Wyckoff_tmp.push_back("b");Wyckoff_letters.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+// site symmetries
+Wyckoff_tmp.push_back("-4..");Wyckoff_site_symmetries.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+Wyckoff_tmp.push_back("-42m");Wyckoff_site_symmetries.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+Wyckoff_tmp.push_back("..m);Wyckoff_site_symmetries.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+Wyckoff_tmp.push_back("-42m");Wyckoff_site_symmetries.push_back(Wyckoff_tmp);Wyckoff_tmp.clear();
+// site symmetries
+vector<uint> Wyckoff_mult_tmp;
+Wyckoff_mult_tmp.push_back(4);Wyckoff_multiplicities.push_back(Wyckoff_mult_tmp);Wyckoff_mult_tmp.clear();
+Wyckoff_mult_tmp.push_back(2);Wyckoff_multiplicities.push_back(Wyckoff_mult_tmp);Wyckoff_mult_tmp.clear();
+Wyckoff_mult_tmp.push_back(8);Wyckoff_multiplicities.push_back(Wyckoff_mult_tmp);Wyckoff_mult_tmp.clear();
+Wyckoff_mult_tmp.push_back(2);Wyckoff_multiplicities.push_back(Wyckoff_mult_tmp);Wyckoff_mult_tmp.clear();
+
+prototype_material="Cu2FeS4Sn";
+common_name=NNN;
+mineral_name="stannite";
+phase=NNN;
+strukturbericht="H2_{6}";
+similar_materials.push_back("Cu2CdSe4Sn");similar_materials.push_back("CoCu2S4Sn");similar_materials.push_back("Cu2GeHgS4");similar_materials.push_back("Cu2HgS4Sn");similar_materials.push_back("Ag2FeS4Sn");
+comments="If $c=2a$, $x=1/4$, and $z=3/8$, the atoms are on the sites of the diamond ($A4$) structure. If, in addition, the Cu, Fe, and Sn atoms are replaced by a single atom type, the crystal reduces to the zincblende ($B3$) structure."
+title="Stannite (Cu2FeS4Sn, H2_{6}) Structure";
+
+ 
 namespace prototype {
   class Prototype{
     public:

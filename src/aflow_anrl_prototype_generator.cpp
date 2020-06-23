@@ -2139,7 +2139,7 @@ namespace anrl{
     else if(lattice_and_centering == "oP" || lattice_and_centering == "oC" || 
         lattice_and_centering == "oI" || lattice_and_centering == "oF"){
 	    xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+                     (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
                      (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
     else if(lattice_and_centering == "tP" || lattice_and_centering == "tI"){
