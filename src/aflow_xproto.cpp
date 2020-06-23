@@ -630,9 +630,13 @@ namespace aflowlib {
         if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << label << endl;
       }
       //DX20190708 END
-      //return anrl::PrototypeANRL(oss,label,parameters,vatomX,vvolumeX,volume_in,mode,flip_option);
-      //return anrl::PrototypeANRL_Generator(label,xstr,parameters,print_mode,LDEBUG); // DX20200423
+#ifdef USE_HARDCODED_PROTOTYPES
+      // hard-coded prototype generator (requires ANRL/ subdirectory)
+      return anrl::PrototypeANRL(oss,label,parameters,vatomX,vvolumeX,volume_in,mode,flip_option);
+#else
+      // generic prototype generator
       return anrl::PrototypeANRL_Generator(label,parameters,vatomX,vvolumeX); // DX20200423
+#endif
     }
     // done
 

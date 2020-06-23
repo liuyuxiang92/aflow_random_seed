@@ -17,6 +17,13 @@
 #define NNN   -123456
 //[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
+// hard-coded prototype generator (ANRL/ subdirectory required) //DX20200623
+// if you want to uncomment below, do the following sequence:
+// 1) set COMPILE_ANRL_SUBDIRECTORY to true in aflow_makefile.cpp
+// 2) compile
+// 3) run aflow --makefile
+// 3) then uncomment the line below
+// #define USE_HARDCODED_PROTOTYPES
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX

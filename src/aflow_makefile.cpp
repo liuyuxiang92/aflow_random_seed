@@ -15,6 +15,8 @@
 #define _DEBUG_MAKEFILE_ true
 #define EXCLUDE_DATA true
 
+#define COMPILE_ANRL_SUBDIRECTORY false //DX20200623 
+
 namespace makefile {
   void trimPath(string& filename){
     //get rid of ".", "..", etc.
@@ -347,7 +349,7 @@ namespace makefile {
     vector<string> vsubdirectories;
     vsubdirectories.push_back(directory);
     vsubdirectories.push_back(directory+"/APL");
-    vsubdirectories.push_back(directory+"/ANRL");
+    if(COMPILE_ANRL_SUBDIRECTORY){vsubdirectories.push_back(directory+"/ANRL");} //DX20200623 - add if-statement
     vsubdirectories.push_back(directory+"/SQLITE");
     std::sort(vsubdirectories.begin(),vsubdirectories.end()); //sort before adding AUROSTD, which must come first
 
@@ -400,17 +402,19 @@ namespace makefile {
     if(LDEBUG){cerr << soliloquy << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
     //ANRL
     vector<string> vcpp_anrl;
-    dir=directory+"/ANRL";
-    trimPath(dir);
-    aurostd::DirectoryLS(dir,vfs);
-    std::sort(vfs.begin(),vfs.end());
-    for(j=0;j<vfs.size();j++){
-      file=dir+"/"+vfs[j];
-      if(aurostd::IsFile(file)){
-        if(vfs[j].size()>4 && vfs[j].find(".cpp")==vfs[j].size()-4 && 
-            vfs[j].find("aflow_anrl_A")!=string::npos && 
-            vfs[j].find("aflow_anrl_sigma")!=string::npos &&  //DX - you may need to add here eventually
-            true){vcpp_anrl.push_back(file);}
+    if(COMPILE_ANRL_SUBDIRECTORY){
+      dir=directory+"/ANRL";
+      trimPath(dir);
+      aurostd::DirectoryLS(dir,vfs);
+      std::sort(vfs.begin(),vfs.end());
+      for(j=0;j<vfs.size();j++){
+        file=dir+"/"+vfs[j];
+        if(aurostd::IsFile(file)){
+          if(vfs[j].size()>4 && vfs[j].find(".cpp")==vfs[j].size()-4 && 
+              vfs[j].find("aflow_anrl_A")!=string::npos && 
+              vfs[j].find("aflow_anrl_sigma")!=string::npos &&  //DX - you may need to add here eventually
+              true){vcpp_anrl.push_back(file);}
+        }
       }
     }
 
@@ -469,6 +473,7 @@ namespace makefile {
             if(file.find("aflow_xpseudopotentials_data.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
             //[CO20200521 - OBSOLETE]if(file.find("aflow_aflowrc.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
             if(file.find("aflow_xproto_library_default.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
+            if(COMPILE_ANRL_SUBDIRECTORY&&file.find("aflow_anrl_list.cpp")!=string::npos&&!(file.find("ANRL/")!=string::npos)){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}//DX20200623 
             if(skip_file){
               vdep_aflow.push_back(file);  //add to aflow dependencies
               continue;
@@ -557,7 +562,7 @@ namespace makefile {
     if(vdep_aflow.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vdep_aflow," ") << endl;}  //SC variables - hack
     if(vfile_obj.size()){makefile_definitions_ss << "AFLOW_OBJS=" << aurostd::joinWDelimiter(vfile_obj," ") << endl;}  //SC variables - hack
     if(vhpp_aflow.size()){makefile_definitions_ss << "AFLOW_HPPS=" << aurostd::joinWDelimiter(vhpp_aflow," ") << endl;} //SC variables - hack
-    if(vcpp_anrl.size()){makefile_definitions_ss << "ANRL_CPPS=" << aurostd::joinWDelimiter(vcpp_anrl," ") << endl;} //SC variables - hack
+    if(COMPILE_ANRL_SUBDIRECTORY&&vcpp_anrl.size()){makefile_definitions_ss << "ANRL_CPPS=" << aurostd::joinWDelimiter(vcpp_anrl," ") << endl;} //SC variables - hack //DX20200623 - added COMPILE_ANRL_SUBDIRECTORY
 
     //join together
     stringstream makefile_aflow;

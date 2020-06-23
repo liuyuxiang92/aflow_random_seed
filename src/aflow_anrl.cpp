@@ -1680,16 +1680,16 @@ namespace anrl {
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions_structure);
     string Wyckoff_string_structure = anrl::groupedWyckoffPosition2ANRLString(grouped_Wyckoff_positions_structure, true);
 
-    if(!compare::matchableWyckoffPositions(grouped_Wyckoff_positions_label,
-          grouped_Wyckoff_positions_structure,
-          true)){ // same_species=true
-      if(LDEBUG){
-        cerr << function_name << " the calculated and label-designated Wyckoff positions are incommensurate: "
-          << "calculated=" << Wyckoff_string_structure << " vs "
-          << "label= " << label_input << endl;
-      }
-      return false;
-    }
+    //if(!compare::matchableWyckoffPositions(grouped_Wyckoff_positions_label,
+    //      grouped_Wyckoff_positions_structure,
+    //      true)){ // same_species=true
+    //  if(LDEBUG){
+    //    cerr << function_name << " the calculated and label-designated Wyckoff positions are incommensurate: "
+    //      << "calculated=" << Wyckoff_string_structure << " vs "
+    //      << "label= " << label_input << endl;
+    //  }
+    //  return false;
+    //}
 
     // ---------------------------------------------------------------------------
     // all tests passed; the structure and label are commensurate
@@ -2968,7 +2968,7 @@ namespace anrl {
 #endif // COMPILE_SYMBOLIC
 
 
-#ifdef COMPILE_HARDCODED_PROTOTYPES
+#ifdef USE_HARDCODED_PROTOTYPES
 // ***************************************************************************
 // !!! OLD PROTOTOYPE GENERATOR (HARD-CODED ANRL FILES) !!!
 // The 
@@ -6873,7 +6873,7 @@ namespace anrl {
     return str;
   }
 }
-#endif // COMPILE_HARDCODED_PROTOTYPES
+#endif // USE_HARDCODED_PROTOTYPES
 
 #endif // _AFLOW_ANRL_CPP
 
