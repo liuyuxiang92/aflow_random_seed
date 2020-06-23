@@ -3841,6 +3841,7 @@ namespace anrl {
       //     str.comp_each_type.at(str.atoms.at(iat).type)+=1.0; inside code
       str.species.at(str.atoms.at(iat).type)=str.atoms.at(iat).name;	
     }
+    str.sym_eps = SYM::defaultTolerance(str); //DX20200623 - need sym_eps for AddAtom later (otherwise it breaks for systems like A12B6C_cF608_210_4h_2h_e, A12B36CD12_cF488_210_h_3h_a_fg) 
 
     // ---------------------------------------------------------------------------
     // DONE

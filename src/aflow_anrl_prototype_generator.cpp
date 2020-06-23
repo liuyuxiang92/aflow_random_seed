@@ -1449,7 +1449,7 @@ namespace anrl {
     }
 
     if(LDEBUG){
-      cerr << function_name << " atoms in the primitive cell:" << endl;
+      cerr << function_name << " atoms in the primitive cell (" << atoms_primitive_cell.size() << "):" << endl;
       for(uint i=0;i<atoms_primitive_cell.size();i++){
         cerr << atoms_primitive_cell[i] << " " << atoms_primitive_cell[i].name << endl;
       }
@@ -1477,6 +1477,7 @@ namespace anrl {
     str.scale=1.0;
     str.lattice = lattice_primitive;
     str.atoms = atoms_primitive_cell;
+    str.sym_eps = SYM::defaultTolerance(str); // need sym_eps for AddAtom later (otherwise it breaks for systems like A12B6C_cF608_210_4h_2h_e)
 
     // ---------------------------------------------------------------------------
     // add ANRL info to xstructure
