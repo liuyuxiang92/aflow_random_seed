@@ -79,6 +79,7 @@ namespace init {
 
     XHOST.user=aurostd::execute2string("whoami");  //AS SOON AS POSSIBLE
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
+    if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
