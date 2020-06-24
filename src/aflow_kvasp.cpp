@@ -4068,7 +4068,7 @@ namespace KBIN {
   // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="KBIN::getVASPVersionString():";
+    string soliloquy= XPID + "KBIN::getVASPVersionString():";
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
