@@ -17,8 +17,8 @@
    "outputs": [],
    "source": [
     "alloy = 'AFLOW_ALLOY_INSERT_HERE'\n",
-    "# NOTE: If your aflow is not installed in home then replace aflow_path below with the path\n",
-    "plotter = Plotter(aflow_path='aflow')\n",
+    "# NOTE: If your aflow is not installed in your path, then replace aflow_executable below with the path\n",
+    "plotter = Plotter(aflow_executable = 'aflow')\n",
     "plotter.plot(alloy)\n",
     "# NOTE: For 2D plot double click to the right of point to go to compound link\n",
     "# For ternary plot double click on point and then click on the pop-up banner to go to compound link\n",

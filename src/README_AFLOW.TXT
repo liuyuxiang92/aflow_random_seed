@@ -707,7 +707,7 @@ available modes: EXPLICIT, IMPLICIT, EXTERNAL
   [VASP_KPOINTS_MODE_EXPLICIT]STOP
   This helps because instead of specifying KPOINTS with the
   "[VASP_KPOINTS_FILE]" strings, everything between the ...]START
-  and ...]STOP keys are copied inside a KPOINTS.
+  and ...]STOP keys are copied inside a KPOINTS file.
   This option is very useful trick to cut/paste long KPOINTSs
   without adding the "[VASP_KPOINTS_FILE]"
   strings ad the beginning of each line.
