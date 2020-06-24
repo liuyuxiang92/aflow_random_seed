@@ -226,7 +226,7 @@ namespace plotter {
     }
     // ME20200609
     // Check the pdflatex version - old versions need to use different
-    // compilation routes Since the version string formats can be
+    // compilation routes. Since the version string formats can be
     // inconsistent, the copyright year will be used as a proxy.
     uint pdflatex_version = 0;
     if (XHOST.is_command("pdflatex")) {
