@@ -1420,6 +1420,7 @@ ANRL Label                                       Pearson   SG symbol           S
 A2BCD4_tI16_82_ac_b_d_g-001.ABCD/BCAD/           tI16      I-4                 -         Cu2(Zn,Fe)SnS4      #82       Kesterite, 12 protos [Can. Mineral., 16, 131-137 (1978)] (C. Oses)
 CABD/DBAC/BADC/ADBC/ACDB/CDAB/DACB/
 DCBA/CBDA/BDCA   
+A2B3_cI80_206_ad_e.{AB}                          tI80      Ia-3                -         NZn                 #206      NZn (ICSD #84918) (R. Friedrich)
 
 *****************************************************************************************************************************************************
 ANRL - fcc/sc derivative structures - BINARIES (Y. Lederer)

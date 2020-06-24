@@ -699,6 +699,10 @@ namespace anrl {
     vproto.push_back("AB3C4_hR8_166_a_bc_2c;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
     vproto.push_back("ABC2_hR8_166_c_c_abc;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
     vproto.push_back("AB3C4_cP8_221_a_c_bd;3;8;221;5;1;cP8;a;-;-;-");
+    // -------------------------------------------------------------------------
+    // misc prototypes (from R. Friedrich) //DX20200624
+    // -------------------------------------------------------------------------
+    vproto.push_back("A2B3_cI80_206_ad_e;2;40;206;4;5;cI80;a,x2,x3,y3,z3;-;NZn;NZn (ICSD #84918)");
     // done now produce
 
     // FROM PROTO LIST
@@ -3359,6 +3363,12 @@ namespace anrl {
       if(anrl_label=="AB3C4_cP8_221_a_c_bd"){
         vparameters.push_back("1.0");
       }
+      // misc structures (R. Friedrich)
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B3_cI80_206_ad_e"){
+        vparameters.push_back("9.8892799651,0.7716,0.1259,0.6002,0.6475");
+      }
+
     }
     if(library=="" && !keep_original_lattice_parameter){
       //DX 20190314 - loop over parameters - START
@@ -3377,7 +3387,7 @@ namespace anrl {
           vparameters=tmp;
         }
         else{
-          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices.";
+          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choice(s).";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }

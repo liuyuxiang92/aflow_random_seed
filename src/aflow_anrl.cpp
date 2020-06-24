@@ -675,6 +675,11 @@ namespace anrl { // put them in order
   uint PrototypeANRL_AB3C4_hR8_166_a_bc_2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-62
   uint PrototypeANRL_ABC2_hR8_166_c_c_abc(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-63
   uint PrototypeANRL_AB3C4_cP8_221_a_c_bd(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-64
+  // -------------------------------------------------------------------------
+  // misc prototypes (from R. Friedrich)
+  // -------------------------------------------------------------------------
+  // binary nitrides
+  uint PrototypeANRL_A2B3_cI80_206_ad_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-1
 }
 
 // *************************************************************************** 
@@ -3809,6 +3814,14 @@ namespace anrl {
     if(found && vlabel.at(ifound)=="AB3C4_cP8_221_a_c_bd")
       PrototypeANRL_AB3C4_cP8_221_a_c_bd(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
+
+    // -------------------------------------------------------------------------
+    // misc prototypes (from R. Friedrich)
+    // -------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // Friedrich-1 // ./aflow --proto=A2B3_cI80_206_ad_e --params=9.8892799651,0.7716,0.1259,0.6002,0.6475
+    if(found && vlabel.at(ifound)=="A2B3_cI80_206_ad_e")
+      PrototypeANRL_A2B3_cI80_206_ad_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
 
 
     //DX PUT THEM HERE WITH THE ORDER OF THE PAPER

@@ -2741,7 +2741,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // get unique permutations of prototype (representative) structures
     if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){ 
-      message << "Determining the unique permuations for each prototype.";
+      message << "Determining the unique permutations for each prototype.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       // find unique permutations of prototype
       for(uint i=0;i<final_prototypes.size();i++){
