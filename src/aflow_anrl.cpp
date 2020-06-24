@@ -24,7 +24,7 @@ namespace anrl {
       string Pearson_symbol,uint spacegroup,string params,uint print_mode) { //DX20180710 - added print_mode info //DX20200207 - oss no longer needed
 
     if(vparameters_size!=nparameters && print_mode!=1) { //DX20180710 - if equations only (print_mode==1), we do not need the parameters
-      string function_name = "PrototypeANRL_Consistency()";
+      string function_name = "PrototypeANRL_Consistency():";
       stringstream message;
       message << "anrl::PrototypeANRL" << endl;
       message << " Prototype                   : " << prototype << endl;
@@ -271,7 +271,7 @@ namespace anrl {
   vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting ){
     // get lattice parameter values from the XSTRUCTURE
 
-    string function_name = XPID + "anrl::getANRLLatticeParameterValuesFromABCAngles()";
+    string function_name = XPID + "anrl::getANRLLatticeParameterValuesFromABCAngles():";
 
     // extract lattice parameters from xstructure
     vector<double> all_lattice_parameters;
@@ -350,6 +350,7 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   uint getANRLSettingChoice(int spacegroup){ //DX20191031 - remove reference
+    
     // ANRL setting choice
     // rhl: rhombohedral setting: setting=1
     // monoclinic: unique axis-b: setting=1
@@ -374,9 +375,10 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   string structure2anrl(istream& input, aurostd::xoption& vpflow) { 
+    
     // determine anrl label, parameters, and parameter values of the input structure
 
-    string function_name = XPID + "anrl::structure2anrl()";
+    string function_name = XPID + "anrl::structure2anrl():";
 
     string directory="";
     bool recalculate_symmetry = true; //DX20191030
@@ -492,7 +494,7 @@ namespace anrl {
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
 
-    string function_name = XPID + "anrl::structure2anrl()";
+    string function_name = XPID + "anrl::structure2anrl():";
     ostringstream oss;
     stringstream message;
     ofstream FileMESSAGE;
@@ -1741,7 +1743,7 @@ namespace anrl {
     // Wyckoff variables: x, y, and z 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "anrl::PrototypeANRL_Generator()";
+    string function_name = XPID + "anrl::PrototypeANRL_Generator():";
     stringstream message;
 
     xstructure str;
@@ -2671,7 +2673,7 @@ namespace anrl {
     // Convert equations (vector<vector<string> >) to symbolic notation.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "anrl::equations2SymbolicEquations()";
+    string function_name = XPID + "anrl::equations2SymbolicEquations():";
     stringstream message;
 
     vector<Symbolic> symbolic_equations;
@@ -3638,7 +3640,7 @@ namespace anrl {
     //   { vector<string> tokens;aurostd::string2tokens(label,tokens,"."); if(tokens.size()>1) XHOST.DEBUG=TRUE; }
     // XHOST.DEBUG=TRUE;
 
-    string function_name = "anrl::PrototypeANRL()";
+    string function_name = "anrl::PrototypeANRL():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) { cerr << "anrl::PrototypeANRL(ostream &oss,string label,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option)" << endl;}
     if(LDEBUG) { cerr << function_name << ": label=" << label << endl;}

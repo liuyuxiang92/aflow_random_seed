@@ -18,6 +18,7 @@
 #include "aflow_xproto_library_default.cpp"
 #include "aflow_symmetry_spacegroup.h" //DX20181009
 #include "aflow_compare_structure.h" //DX20181009
+//#include "aflow_anrl.h" //DX20200624
 
 #define _EPS_ 0.02
 //#define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75 //CO20171023 - see aflow.h

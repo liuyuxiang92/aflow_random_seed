@@ -397,11 +397,9 @@ template <class T> T abs(const T &x)
 template <> Rational<Verylong>::operator double() const;
 
 #define LIBSYMBOLICCPLUSPLUS
-
 template <> Rational<Verylong>::operator double() const { return div(p,q); }
 
 #undef LIBSYMBOLICCPLUSPLUS
-
 template <class T>
 Rational<T> zero(Rational<T>) { return Rational<T>(zero(T())); }
 

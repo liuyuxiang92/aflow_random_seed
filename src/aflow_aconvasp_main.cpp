@@ -29,6 +29,7 @@
 #include "aflow_gfa.h" //DF20190329
 #include "aflow_cce.h" //RF20200203
 #include "APL/aflow_apl.h"  //ME20200330
+//#include "aflow_anrl.h"  //DX20200624
 
 extern double NearestNeighbour(const xstructure& a);
 

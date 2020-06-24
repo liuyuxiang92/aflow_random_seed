@@ -38,8 +38,8 @@ template <class T> T norm1(const Vector<T> &v)
 }
 
 double norm1(const Vector<double> &v);
-
 #define LIBSYMBOLICCPLUSPLUS
+
 double norm1(const Vector<double> &v)
 {
    double result(0);

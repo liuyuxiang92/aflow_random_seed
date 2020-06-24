@@ -201,7 +201,6 @@ Symbolic integrate(const Symbolic &s,const Symbolic &x,unsigned int i)
  return r;
 }
 
-
 #endif
 #endif
 

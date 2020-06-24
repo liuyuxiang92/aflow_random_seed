@@ -178,6 +178,56 @@ namespace prototype {
 */
 
 namespace anrl{
+ /* 
+  // ---------------------------------------------------------------------------
+  // get existing prototype information
+  uint PrototypeANRL_LoadList(vector<string>& vproto,
+      vector<string>& vproto_label,
+      vector<uint>& vproto_nspecies,
+      vector<uint>& vproto_natoms,
+      vector<uint>& vproto_spacegroup,
+      vector<uint>& vproto_nunderscores,
+      vector<uint>& vproto_nparameters,
+      vector<string>& vproto_Pearson_symbol,
+      vector<string>& vproto_params,
+      vector<string>& vproto_Strukturbericht,
+      vector<string>& vproto_prototype,
+      vector<string>& vproto_dialect);
+  vector<string> getANRLParameters(string anrl_label,
+      string library="",
+      int choice=-1,
+      bool keep_original_lattice_parameter=false); //DX20181009 //DX20190227 - added keep_original_lattice_parameter
+  bool vproto2tokens(string proto,
+      string& label,
+      uint& nspecies,
+      uint& natoms,
+      uint& spacegroup,
+      uint& nunderscores,
+      uint& nparameters,
+      string& Pearson_symbol,
+      string& params,
+      string& Strukturbericht,
+      string& prototype,
+      string& dialect);
+  
+  // ---------------------------------------------------------------------------
+  // map structure to label and internal degrees of freedom 
+  string structure2anrl(istream& input, aurostd::xoption& vpflow);           // xoption
+  string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX20191031 - added recalculate_symmetry
+  string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO20190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
+  xstructure rhl2hex(xstructure& str, double& a, double& c); 
+  
+  // ---------------------------------------------------------------------------
+  // helper functions to determine label and internal degrees of freedom 
+  uint getANRLSettingChoice(int spacegroup); //DX20191031 - removed reference
+  string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize);
+  vector<string> getANRLLatticeParameterString(char& lattice_type);
+  vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting); //DX20191031
+  vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting); //DX20191031
+  vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting); //DX20191031
+*/  
   // ---------------------------------------------------------------------------
   // get lattice functions (primitive/conventional) - ITC/ANRL standard
   xmatrix<double> getLattice(const string& lattice_and_centering, const char& space_group_letter, const vector<double>& lattice_parameter_values, uint mode=0);
@@ -190,7 +240,7 @@ namespace anrl{
   
   // ---------------------------------------------------------------------------
   // functions to determine atomic positions from Wyckoff and parameters
-  string extractANRLPrototypeParameterValues(const string& label_anrl, const string& number_id, const string& variables, bool& keep_anrl_lattice_parameter); 
+  //string extractANRLPrototypeParameterValues(const string& label_anrl, const string& number_id, const string& variables, bool& keep_anrl_lattice_parameter); 
   deque<_atom> getAtomsFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_positions, const xmatrix<double>& lattice_conventional);
   vector<string> determineWyckoffVariables(vector<wyckoffsite_ITC>& Wyckoff_positions);
   void applyWyckoffValues(const vector<double>& Wyckoff_parameter_values,vector<wyckoffsite_ITC>& Wyckoff_positions); //perhaps add this as a method to wyckoffsite_ITC?
@@ -199,7 +249,38 @@ namespace anrl{
   
   // ---------------------------------------------------------------------------
   // checking functions
+  //vector<uint> extractStoichiometry(string& anrl_label);
+  //bool PrototypeANRL_Consistency(uint vparameters_size,uint proto_nparameters,string proto_prototype,
+  //    string proto_label,string proto_Strukturbericht,string proto_Pearson_symbol,
+  //    uint proto_spacegroup, string proto_params, uint print_mode); //DX20180710 - added print_mode //DX20200207 - oss no longer needed
   bool structureAndLabelConsistent(const xstructure& _xstr, const string& label_input, string& label_and_params_calculated);
+  /*
+  // ---------------------------------------------------------------------------
+  // generic prototype generator (main function)
+  xstructure PrototypeANRL_Generator(string& label,
+      string& parameters,
+      deque<string> &vatomX,
+      deque<double> &vvolumeX,
+      ostream& logstream=cout,
+      bool silence_logger=true); //DX20200528 - command line = no logger
+  xstructure PrototypeANRL_Generator(string& label,
+      string& parameters,
+      deque<string> &vatomX,
+      deque<double> &vvolumeX,
+      ofstream& FileMESSAGE,
+      ostream& logstream=cout,
+      bool silence_logger=false); //DX20200528 - internal = logger
+  
+  // ---------------------------------------------------------------------------
+  // [OLD] hard-coded generator (requires ANRL/ subdirectory)
+  xstructure PrototypeANRL(ostream &oss,
+      string label,
+      string parameters,
+      deque<string> &vatomX,
+      deque<double> &vvolumeX,
+      double volume_in,
+      int mode,
+      bool flip_option);*/
 }
 //SYMBOLIC
 
