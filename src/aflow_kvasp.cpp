@@ -4175,7 +4175,7 @@ namespace KBIN {
   }
   double getVASPVersion(const string& binfile) {  //CO20200610
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="KBIN::getVASPVersion():";
+    string soliloquy= XPID + "KBIN::getVASPVersion():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionNumber(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
     //converting to double SHOULD reduce 4.6.35->4.6
