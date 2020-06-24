@@ -3738,10 +3738,10 @@ namespace aflowlib {
         TXT2+=str_relax.species_pp_version.at(0);
         cout << data.anrl_label_orig << endl;
         // A1
-        if(data.anrl_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe")) { // A1
+        if(data.anrl_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe" || s=="Kr")) { // A1
           cout << TXT1 << "A1" << TXT2 << endl;}
         // A2
-        if(data.anrl_label_orig=="A_cI2_229_a" && (s=="Ba" || s=="Cr" || s=="Fe" || s=="K" || s=="Li" || s=="Mo" || s=="Na" || s=="Nb" || s=="Ta" || s=="V" || s=="W" || s=="Cs")) { // A2
+        if(data.anrl_label_orig=="A_cI2_229_a" && (s=="Ba" || s=="Cr" || s=="Fe" || s=="K" || s=="Li" || s=="Mo" || s=="Na" || s=="Nb" || s=="Ta" || s=="V" || s=="W" || s=="Cs" || s=="Eu")) { // A2
           cout << TXT1 << "A2" << TXT2 << endl;}
         // A3
         if(data.anrl_label_orig=="A_hP2_194_c" && (s=="Be" || s=="Cd" || s=="Co" || s=="Dy" || s=="Hf" || s=="Hg" || s=="Ho" || s=="Mg" || s=="Os" || s=="Re" || s=="Ru" || s=="Sc" || s=="Tc" || s=="Ti" || s=="Tl" || s=="Y" || s=="Zn" || s=="Zr" || s=="He")) { // A3
@@ -3782,6 +3782,10 @@ namespace aflowlib {
         // A16
         if(data.anrl_label_orig=="A_oF128_70_4h" && (s=="S")) { // A16
           cout << TXT1 << "A16" << TXT2 << endl;}
+        if(data.anrl_label_orig=="A_hR12_166_2h" && (s=="B")) { // ICSD_56992
+          cout << TXT1 << "ICSD_56992" << TXT2 << endl;}
+       if(data.anrl_label_orig=="A_hR3_166_ac" && (s=="Sm")) { // C19
+          cout << TXT1 << "C19" << TXT2 << endl;}
       }
     }
 
@@ -4700,7 +4704,7 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " beginning BADER calculation--please be patient" << endl;
     bader_functions::Flags2BaderCommands(bader_flags,bader_options,oss);
     //DX+CO START
-    bader_functions::BaderCalc(bader_flags,bader_options,data.prototype,vspecies,num_each_type,vZVAL,cutoffs,downsample_ratios,directory_RAW,oss);
+    bader_functions::BaderCalc(bader_flags,bader_options,KBIN::ExtractSystemName(directory_LIB),vspecies,num_each_type,vZVAL,cutoffs,downsample_ratios,directory_RAW,oss);  //CO+ME20200601 - no data.prototype, use ExtractSystemName() //data.prototype
     //DX+CO END
     if(AFLOWLIB_VERBOSE) cout << oss.str();
 

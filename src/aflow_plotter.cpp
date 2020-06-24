@@ -224,7 +224,27 @@ namespace plotter {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
       }
     }
-    string binaries = "gnuplot,pdflatex,repstopdf,convert";
+    // ME20200609
+    // Check the pdflatex version - old versions need to use different
+    // compilation routes. Since the version string formats can be
+    // inconsistent, the copyright year will be used as a proxy.
+    uint pdflatex_version = 0;
+    if (XHOST.is_command("pdflatex")) {
+      string versionstring = aurostd::execute2string(XHOST.command("pdflatex") + " --version");
+      vector<string> vstring;
+      aurostd::string2vectorstring(versionstring, vstring);
+      versionstring = vstring[2];
+      aurostd::string2tokens(versionstring, vstring);
+      pdflatex_version = aurostd::string2utype<uint>(vstring[1]);
+    }
+
+    string binaries = "gnuplot,convert";
+    // ME20200609 - old pdfatex versions cannot process eps files
+    if (pdflatex_version >= 2010) {
+      binaries += ",pdflatex,repstopdf";
+    } else {
+      binaries += ",latex,dvips,ps2pdf";
+    }
     vector<string> missing_binaries, required_binaries;
     aurostd::string2tokens(binaries, required_binaries, ",");
     for (uint i = 0; i < required_binaries.size(); i++) {
@@ -250,7 +270,14 @@ namespace plotter {
       aurostd::execute(XHOST.command("gnuplot") + " \"" + filename + ".plt\"");
       if(LDEBUG) cerr << soliloquy << "directory_tmp = " << directory_tmp << endl;
       if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
-      aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
+      // ME20200609 - old pdfatex versions cannot process eps files
+      if (pdflatex_version >= 2010) {
+        aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
+      } else {
+        aurostd::execute(XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
+        aurostd::execute(XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1");
+        aurostd::execute(XHOST.command("ps2pdf") + " " + filename_latex + ".ps");
+      }
       // Convert to the desired format if not pdf
       if (format != "pdf") {
         aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format);   // to avoid C: ... Carbon:PBE = C: in windows
@@ -2205,7 +2232,7 @@ namespace plotter {
     vector<double> row;
     vector<string> vcontent;
     string keyword = plotoptions.getattachedscheme("KEYWORD");
-    string path_to_file = plotoptions.getattachedscheme("DIRECTORY") + plotoptions.getattachedscheme("DATA_FILE");
+    string path_to_file = plotoptions.getattachedscheme("DATA_FILE");
     string startstring = "[" + keyword + "]START";
     string stopstring = "[" + keyword + "]STOP";
     string systemstring = "[" + keyword + "]SYSTEM=";

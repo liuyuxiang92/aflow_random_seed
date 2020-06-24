@@ -165,7 +165,12 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  bool structuresGenerated(const string& directory){return aurostd::EFileNotEmpty(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);}
+  bool structuresGenerated(const string& directory){
+    string file=directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;
+    if(!aurostd::EFileExist(file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
+    if(aurostd::EFileNotEmpty(file)){return true;}
+    return false;
+  }
   xstructure extractPARTCAR(const string& AflowIn){
     string soliloquy = XPID + "pocc::extractPARTCAR():";
     stringstream ss_pocc_structure;
