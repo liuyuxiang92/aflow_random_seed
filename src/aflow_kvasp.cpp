@@ -4156,7 +4156,7 @@ namespace KBIN {
   }
   string getVASPVersionNumber(const string& binfile) {  //CO20200610
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="KBIN::getVASPVersionNumber():";
+    string soliloquy= XPID + "KBIN::getVASPVersionNumber():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionString(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
     if(version_str.empty()){return "";}
