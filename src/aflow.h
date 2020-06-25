@@ -22,7 +22,7 @@
 // 1) set COMPILE_ANRL_SUBDIRECTORY to true in aflow_makefile.cpp
 // 2) compile
 // 3) run aflow --makefile
-// 3) then uncomment the line below
+// 4) then uncomment the line below
 // #define USE_HARDCODED_PROTOTYPES
 
 //COMMON TOLERANCES

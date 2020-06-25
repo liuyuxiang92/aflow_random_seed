@@ -3036,7 +3036,8 @@ namespace compare{
     string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1]; //DX20190215
     for(uint i=0;i<grouped_Wyckoff_string.size();i++){
       GroupedWyckoffPosition tmp;
-      tmp.element = aurostd::utype2string<uint>(i);   
+      tmp.type = i; //DX20200625
+      tmp.element = aurostd::utype2string<uint>(i); //DX20200625 - this is just a placeholder since atoms were not fed in
       for(uint j=0;j<grouped_Wyckoff_string[i].size();j++){
         string Wyckoff_letter = grouped_Wyckoff_string[i][j];
         uint Wyckoff_multiplicity = 0;

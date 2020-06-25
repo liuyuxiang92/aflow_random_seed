@@ -15,6 +15,8 @@
 #include "aflow_pflow.h"
 #include "aflow_anrl.h"
 
+#define _DEBUG_ANRL_ false //DX20200625
+
 // ***************************************************************************
 // anrl::PrototypeANRL_Consistency()
 // *************************************************************************** 
@@ -492,7 +494,7 @@ namespace anrl {
 namespace anrl {
   string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
 
     string function_name = XPID + "anrl::structure2anrl():";
     ostringstream oss;
@@ -677,7 +679,7 @@ namespace anrl {
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getLattice():";
     stringstream message;
 
@@ -741,7 +743,7 @@ namespace anrl {
     // NOTE : the lattice_and_centering input is not required; triclinic 
     //        systems only have one centering option (P)
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getTriclinicLattice():";
     stringstream message;
 
@@ -807,7 +809,7 @@ namespace anrl {
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
     
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getMonoclinicLattice():";
     stringstream message;
     
@@ -887,7 +889,7 @@ namespace anrl {
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getOrthorhombicLattice():";
     stringstream message;
 
@@ -989,7 +991,7 @@ namespace anrl {
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getTetragonalLattice():";
     stringstream message;
 
@@ -1064,7 +1066,7 @@ namespace anrl {
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getHexagonalLattice():";
     stringstream message;
 
@@ -1139,7 +1141,7 @@ namespace anrl {
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getCubicLattice():";
     stringstream message;
 
@@ -1219,7 +1221,7 @@ namespace anrl {
     // create atoms (deque<_atom>) from the Wyckoff positions by 
     // plugging in the parameter values into the Wyckoff equations 
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getAtomsFromWyckoff():";
     stringstream message;
 
@@ -1286,7 +1288,7 @@ namespace anrl {
     // Note: Wyckoff_positions are updated, i.e., the corresponding parameter
     // index is assigned so we can substitute values later
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::determineWyckoffVariables():";
     stringstream message;
 
@@ -1519,7 +1521,7 @@ namespace anrl {
     // (e.g., 4a, 2b, c) get the Wyckoff letter, multiplicity, site symmetry, 
     // and equations
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getWyckoffSitesFromANRL():";
     stringstream message;
 
@@ -1584,7 +1586,7 @@ namespace anrl {
 
     // bool must be reference: toggles automatic volume scaling later
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::extractANRLPrototypeParameterValues():";
     stringstream message;
 
@@ -1638,7 +1640,7 @@ namespace anrl {
     // it is possible that the provided parameters elevate the structure
     // to a higher symmetry 
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::structureAndLabelConsistent():";
 
     xstructure xstr = _xstr; //copy
@@ -1682,16 +1684,23 @@ namespace anrl {
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions_structure);
     string Wyckoff_string_structure = anrl::groupedWyckoffPosition2ANRLString(grouped_Wyckoff_positions_structure, true);
 
-    //if(!compare::matchableWyckoffPositions(grouped_Wyckoff_positions_label,
-    //      grouped_Wyckoff_positions_structure,
-    //      true)){ // same_species=true
-    //  if(LDEBUG){
-    //    cerr << function_name << " the calculated and label-designated Wyckoff positions are incommensurate: "
-    //      << "calculated=" << Wyckoff_string_structure << " vs "
-    //      << "label= " << label_input << endl;
-    //  }
-    //  return false;
-    //}
+    // print grouped Wyckoff sequences
+    if(LDEBUG){
+      print(grouped_Wyckoff_positions_label);
+      cerr << "-------------------------" << endl;
+      print(grouped_Wyckoff_positions_structure);
+    }
+
+    if(!compare::matchableWyckoffPositions(grouped_Wyckoff_positions_label,
+          grouped_Wyckoff_positions_structure,
+          false)){ // same_species=false - the structure MAY be decorated, but the label is NOT
+      if(LDEBUG){
+        cerr << function_name << " the calculated and label-designated Wyckoff positions are incommensurate: "
+          << "calculated=" << Wyckoff_string_structure << " vs "
+          << "label= " << label_input << endl;
+      }
+      return false;
+    }
 
     // ---------------------------------------------------------------------------
     // all tests passed; the structure and label are commensurate
@@ -1742,7 +1751,7 @@ namespace anrl {
     // lattice variables: a, b, c, alpha, beta, gamma AND
     // Wyckoff variables: x, y, and z 
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::PrototypeANRL_Generator():";
     stringstream message;
 
@@ -2366,7 +2375,7 @@ namespace symbolic {
     // positions, we need to add more operators/functions 
     // (e.g., sin, cos, exponentials, etc.)
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "symbolic::string2symbolic():";
     stringstream message;
 
@@ -2516,7 +2525,7 @@ namespace anrl {
     
     // Grab symbolic representation of primitive lattice in the ANRL convention.
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::SymbolicANRLPrimitiveLattices():";
 
     if(LDEBUG){
@@ -2672,7 +2681,7 @@ namespace anrl {
     
     // Convert equations (vector<vector<string> >) to symbolic notation.
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::equations2SymbolicEquations():";
     stringstream message;
 
@@ -2714,7 +2723,7 @@ namespace anrl {
     // converts Cartesian coordinates to lattice coordinates
     // this is the symbolic math equivalent to C2F()
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::cartesian2lattice():";
 
     // ---------------------------------------------------------------------------
@@ -2821,7 +2830,7 @@ namespace anrl {
     
     // convert equations to lattice equations for centered lattice (C, I, F).
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl:getEquationsForCenteredLattices():";
     stringstream message;
 
@@ -2928,7 +2937,7 @@ namespace anrl {
     // converts from variables from Symbolic to string
     // DEFAULT: update atom.fpos_equation
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::addSymbolicEquation2Atoms():";
     stringstream message;
 
@@ -2973,7 +2982,12 @@ namespace anrl {
 #ifdef USE_HARDCODED_PROTOTYPES
 // ***************************************************************************
 // !!! OLD PROTOTOYPE GENERATOR (HARD-CODED ANRL FILES) !!!
-// The 
+// Below are the functions for hard-coded ANRL CPP files
+// To toggle back to this generator, do the following:
+// 1) set COMPILE_ANRL_SUBDIRECTORY to true in aflow_makefile.cpp
+// 2) compile
+// 3) run aflow --makefile
+// 4) then uncomment the line "#define USE_HARDCODED_PROTOTYPES" in aflow.h
 
 // ***************************************************************************
 namespace anrl { // put them in order
@@ -3641,7 +3655,7 @@ namespace anrl {
     // XHOST.DEBUG=TRUE;
 
     string function_name = "anrl::PrototypeANRL():";
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     if(LDEBUG) { cerr << "anrl::PrototypeANRL(ostream &oss,string label,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option)" << endl;}
     if(LDEBUG) { cerr << function_name << ": label=" << label << endl;}
     if(LDEBUG) { cerr << function_name << ": parameters=" << parameters << endl;}
