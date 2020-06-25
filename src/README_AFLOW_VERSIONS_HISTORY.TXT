@@ -8,12 +8,13 @@
         -- Bug fixes to aurostd::isDirectory() and isFile() (CO)
         -- Bug fixes for xelement, adding populate() function for CCE (CO)
         -- Bug fixes in POCC: missing POTCAR suffix for LIB6 and EFileNotEmpty() cerr verbose (CO)
-        -- Bug fixes in KBIN::ExtractSystemName() (ME)
         -- Bug fixes in KBIN::getVASPVersion() (CO)
         -- Bug fixes in POCC: extending m_Egap.size() if metal is found among ARUNs (CO)
         -- Bug fixes in XHOST: adding another way to get XHOST.home, might fail on OSX (CO)
+        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
 3.2.3 - 2020/05/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+        -- Bug fixes in KBIN::ExtractSystemName() (ME)
         -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- added check for broken REST-API to aflow_chull_python.py (MB)
@@ -40,7 +41,6 @@
         -- CCE corrections added for nitrides (RF)
         -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
         -- Added check for required binaries to plotter. (ME)
-        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
         -- Fixed broken system name for aflow_proto. (ME)
         -- Fixed plotter title and file names when ANRL parameters are present. (ME)
