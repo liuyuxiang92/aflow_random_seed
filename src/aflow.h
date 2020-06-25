@@ -3388,14 +3388,14 @@ class xIBZKPT : public xStream { //CO20200404 - xStream integration for logging
     bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
-    
+
     xIBZKPT(const xIBZKPT& b);                                    // constructor copy
     ~xIBZKPT();                                                   // kill everything
     const xIBZKPT& operator=(const xIBZKPT &b);                   // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
-    
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     uint nweights;                                                // for aflowlib_libraries.cpp
@@ -3423,12 +3423,12 @@ class xKPOINTS : public xStream { //CO20200404 - xStream integration for logging
     bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
-    
+
     xKPOINTS(const xKPOINTS& b);                                   // constructor copy
     ~xKPOINTS();                                                    // kill everything
     const xKPOINTS& operator=(const xKPOINTS &b);                  // copy
     void clear(void);                                              // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3467,7 +3467,7 @@ class xCHGCAR : public xStream { //CO20200404 - xStream integration for logging
     ~xCHGCAR();                                                    // kill everything
     const xCHGCAR& operator=(const xCHGCAR &b);                    // copy
     void clear(void);                                              // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
