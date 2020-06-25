@@ -8,7 +8,7 @@ VERBOSE=False   #CO20200520
 
 class CHull:
 
-    def __init__(self, aflow_executable='aflow'):
+    def __init__(self, aflow_executable = 'aflow'):
         self.aflow_executable = aflow_executable
 
     def aflow_command(self, cmd):

@@ -1744,11 +1744,11 @@ namespace KBIN {
   // leave as is. Aborting is not desirable for instances where VASP does not
   // need to be run (e.g. post-processing).
   void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {
-    string vaspVersion = getVASPVersionString(kflags.KBIN_BIN);
+    string vaspVersion = getVASPVersionNumber(kflags.KBIN_BIN); //CO20200610
     if (vaspVersion.empty()) {
       string function = "KBIN::convertPOSCARFormat()";
       stringstream message;
-      message << "Could not find VASP binary file " << kflags.KBIN_BIN << "."
+      message << "Could not determine VASP version " << kflags.KBIN_BIN << "."
         << " POSCAR may have the wrong format.";
       pflow::logger(_AFLOW_FILE_NAME_, function, message, std::cout, _LOGGER_WARNING_);
       return;

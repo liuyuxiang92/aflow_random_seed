@@ -24,10 +24,12 @@ namespace xelement {
       // constructor destructor                              // constructor/destructor
       xelement();                                            // default, just allocate
       xelement(uint);                                        // look at it by Z
-      xelement(string);                                      // look at it by symbol or name
+      xelement(const string&);                               // look at it by symbol or name  //CO20200520
       ~xelement();                                           // kill everything
       const xelement& operator=(const xelement &b);          // copy
       void clear();
+      void populate(const string& element); //CO20200520
+      void populate(uint ZZ); //CO20200520
       // content                                             // content
       bool verbose;
       // [AFLOW]START=DECLARATION
@@ -139,6 +141,7 @@ namespace xelement {
 
     private:                                                    //
       void free();                                              // free space
+      void copy(const xelement& b);                             // copy space //CO20200520
   };
 }
 

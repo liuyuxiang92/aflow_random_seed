@@ -166,7 +166,12 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  bool structuresGenerated(const string& directory){return aurostd::EFileNotEmpty(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);}
+  bool structuresGenerated(const string& directory){
+    string file=directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;
+    if(!aurostd::EFileExist(file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
+    if(aurostd::EFileNotEmpty(file)){return true;}
+    return false;
+  }
   xstructure extractPARTCAR(const string& AflowIn){
     string soliloquy = XPID + "pocc::extractPARTCAR():";
     stringstream ss_pocc_structure;
@@ -887,7 +892,10 @@ namespace pocc {
         if(m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()",_INDEX_MISMATCH_);}
         if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
           message << "Mismatch SPIN-ON/SPIN-OFF settings, attempting to rectify";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
-          if(m_xdoscar.viDOS.size()==1){m_xdoscar.convertSpinOFF2ON();} //make duplicate for spin-off
+          if(m_xdoscar.viDOS.size()==1){ //make duplicate for spin-off
+            m_xdoscar.convertSpinOFF2ON();
+            m_Egap.push_back(m_Egap.back());  //need to extend m_Egap too
+          }
           else if(xdoscar.viDOS.size()==1){xdoscar.convertSpinOFF2ON();}
           if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.viDOS.size()!=xdoscar.viDOS.size() ["+aurostd::utype2string(m_xdoscar.viDOS.size())+"!="+aurostd::utype2string(xdoscar.viDOS.size())+"]",_INDEX_MISMATCH_);

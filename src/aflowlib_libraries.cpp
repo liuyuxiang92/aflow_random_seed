@@ -3784,7 +3784,7 @@ namespace aflowlib {
           cout << TXT1 << "A16" << TXT2 << endl;}
         if(data.anrl_label_orig=="A_hR12_166_2h" && (s=="B")) { // ICSD_56992
           cout << TXT1 << "ICSD_56992" << TXT2 << endl;}
-       if(data.anrl_label_orig=="A_hR3_166_ac" && (s=="Sm")) { // C19
+        if(data.anrl_label_orig=="A_hR3_166_ac" && (s=="Sm")) { // C19
           cout << TXT1 << "C19" << TXT2 << endl;}
       }
     }
