@@ -76,7 +76,8 @@ namespace LATTICE {
     else if(lattice_centering == 'F'){ return 4; }
     else{
       string function_name = "LATTICE::Conventional2PrimitiveRatio():";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_centering+" is not a possible lattice centering.",_VALUE_ILLEGAL_);
+      stringstream message; message << lattice_centering << " is not a possible lattice centering.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
     }
 
     return 1;
