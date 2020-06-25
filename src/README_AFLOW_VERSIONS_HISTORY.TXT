@@ -1,5 +1,5 @@
-3.2.3 - 2020/05/22
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+3.2.4 - 2020/06/25
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Bug fixes to xPOTCAR (exits) (CO+ME)
         -- Bug fixes to Wyckoff positions (DX)
         -- Bug fixes for overwriting symmetry output files text/json (DX)
@@ -12,6 +12,8 @@
         -- Bug fixes in KBIN::getVASPVersion() (CO)
         -- Bug fixes in POCC: extending m_Egap.size() if metal is found among ARUNs (CO)
         -- Bug fixes in XHOST: adding another way to get XHOST.home, might fail on OSX (CO)
+3.2.3 - 2020/05/22
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- added check for broken REST-API to aflow_chull_python.py (MB)
