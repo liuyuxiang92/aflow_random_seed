@@ -3768,7 +3768,7 @@ namespace aflowlib {
         if(data.anrl_label_orig=="A_hR1_166_a" && (s=="Hg")) { // A10
           cout << TXT1 << "A10" << TXT2 << endl;}
         // A11
-        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga")) { // A11
+        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="Br")) { // A11 
           cout << TXT1 << "A11" << TXT2 << endl;}
         // A12
         if(data.anrl_label_orig=="A_cI58_217_ac2g" && (s=="Mn")) { // A12
