@@ -26,7 +26,7 @@
 
 #include <typeinfo>
 
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 class Cloning
@@ -169,14 +169,14 @@ template <class T> CastPtr<T>::~CastPtr() {}
 template <class T> T *CastPtr<T>::operator->() const
 {
  T *tp = dynamic_cast<T*>(value);
- if(tp == 0) throw bad_cast();
+ if(tp == 0) throw std::bad_cast();
  return tp;
 }
 
 template <class T> T &CastPtr<T>::operator*() const
 {
  T *tp = dynamic_cast<T*>(value);
- if(tp == 0) throw bad_cast();
+ if(tp == 0) throw std::bad_cast();
  return *tp;
 }
 } //namespace symbolic //DX20200625

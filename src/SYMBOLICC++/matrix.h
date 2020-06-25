@@ -32,7 +32,7 @@
 #include <utility>
 #include "identity.h"
 #include "vector.h"
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 // definition of class Matrix
@@ -96,7 +96,7 @@ template <class T> class Matrix
       Matrix<T> kron(const Matrix<T>&) const;
       Matrix<T> dsum(const Matrix<T>&) const;
       Matrix<T> hadamard(const Matrix<T>&) const;
-      pair<Matrix<T>, Matrix<T> > LU() const;
+      std::pair<Matrix<T>, Matrix<T> > LU() const;
 
       ostream &output(ostream&) const;
       istream &input(istream&);
@@ -459,7 +459,7 @@ Matrix<T> hadamard(const Matrix<T> &s,const Matrix<T> &m)
 { return s.hadamard(m); }
 
 template <class T>
-pair<Matrix<T>, Matrix<T> > Matrix<T>::LU() const
+std::pair<Matrix<T>, Matrix<T> > Matrix<T>::LU() const
 {
  assert(rowNum == colNum);
  Matrix<T> L(rowNum,colNum,zero(T()));
@@ -481,7 +481,7 @@ pair<Matrix<T>, Matrix<T> > Matrix<T>::LU() const
 }
 
 template <class T>
-pair<Matrix<T>, Matrix<T> > LU(const Matrix<T> &m)
+std::pair<Matrix<T>, Matrix<T> > LU(const Matrix<T> &m)
 { return m.LU(); }
 
 template <class T> 
@@ -555,7 +555,7 @@ template <class T> istream & Matrix<T>::input(istream &s)
          s >> mat[i][j];
          if(! s.good())
          {
-            s.clear(s.rdstate() | ios::badbit);
+            s.clear(s.rdstate() | std::ios::badbit);
             return s;
          }
       }

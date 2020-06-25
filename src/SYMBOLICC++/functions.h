@@ -24,7 +24,7 @@
 #ifndef SYMBOLIC_CPLUSPLUS_FUNCTIONS
 
 #include <cmath>
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 #ifdef  SYMBOLIC_FORWARD
 #ifndef SYMBOLIC_CPLUSPLUS_FUNCTIONS_FORWARD
@@ -133,7 +133,7 @@ class Power: public Symbol
          Symbolic subst(const Symbolic &x,const Symbolic &y,int &n) const;
          Symbolic df(const Symbolic&) const;
          Symbolic integrate(const Symbolic&) const;
-         PatternMatches match_parts(const Symbolic &s, const list<Symbolic>&) const;
+         PatternMatches match_parts(const Symbolic &s, const std::list<Symbolic>&) const;
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
@@ -539,7 +539,7 @@ void Power::print(ostream &o) const
 
 Simplified Power::simplify() const
 {
- list<Symbolic>::iterator i, j;
+ std::list<Symbolic>::iterator i, j;
  const Symbolic &b = parameters.front().simplify();
  const Symbolic &n = parameters.back().simplify();
  if(n == 0) return Number<int>(1);
@@ -623,7 +623,7 @@ Expanded Power::expand() const
  {
   CastPtr<const Sum> s(*n);
   Product p;
-  list<Symbolic>::const_iterator k, k1;
+  std::list<Symbolic>::const_iterator k, k1;
   for(k=s->summands.begin();k!=s->summands.end();++k)
    for(++(k1=k);k1!=s->summands.end();++k1)
     if(!k->commute(*k1)) return Power(b,n);
@@ -637,7 +637,7 @@ Expanded Power::expand() const
  {
   CastPtr<const Product> p(*b);
   Product r;
-  list<Symbolic>::const_iterator k, k1;
+  std::list<Symbolic>::const_iterator k, k1;
   for(k=p->factors.begin();k!=p->factors.end();++k)
    for(++(k1=k);k1!=p->factors.end();++k1)
     if(!k->commute(*k1)) return Power(b,n);
@@ -717,7 +717,7 @@ Symbolic Power::integrate(const Symbolic &s) const
 }
 
 PatternMatches
-Power::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+Power::match_parts(const Symbolic &s, const std::list<Symbolic> &p) const
 {
  PatternMatches l;
  if(s.type() == typeid(Power))
@@ -775,8 +775,8 @@ Symbolic Derivative::subst(const Symbolic &x,const Symbolic &y,int &n) const
 {
  if(*this == x) return y;
 
- list<Symbolic>::const_iterator i;
- list<Symbolic>::iterator j;
+ std::list<Symbolic>::const_iterator i;
+ std::list<Symbolic>::iterator j;
 
  if(x.type() == type() &&
     parameters.front() == CastPtr<const Derivative>(x)->parameters.front())
@@ -824,7 +824,7 @@ Symbolic Derivative::subst(const Symbolic &x,const Symbolic &y,int &n) const
 
 Symbolic Derivative::df(const Symbolic &s) const
 {
- list<Symbolic>::const_iterator i;
+ std::list<Symbolic>::const_iterator i;
 
  if(parameters.front().type() == typeid(Symbol))
  {
@@ -848,8 +848,8 @@ Symbolic Derivative::df(const Symbolic &s) const
 
 int Derivative::compare(const Symbolic &s) const
 {
- list<Symbolic>::const_iterator i;
- list<Symbolic>::iterator j;
+ std::list<Symbolic>::const_iterator i;
+ std::list<Symbolic>::iterator j;
 
  if(s.type() != type()) return 0;
  // make a copy of s
@@ -869,8 +869,8 @@ int Derivative::compare(const Symbolic &s) const
 Symbolic Derivative::integrate(const Symbolic &s) const
 {
  int n = 0, n1;
- list<Symbolic>::const_iterator i, i1 = parameters.end();
- list<Symbolic>::iterator j;
+ std::list<Symbolic>::const_iterator i, i1 = parameters.end();
+ std::list<Symbolic>::iterator j;
 
  for(i=parameters.begin();i!=parameters.end();++i,++n)
   if(*i == s) { i1 = i; n1 = n; }
@@ -913,7 +913,7 @@ Symbolic Integral::subst(const Symbolic &x,const Symbolic &y,int &n) const
 {
  if(*this == x) { ++n; return y; }
 
- list<Symbolic>::const_iterator i = parameters.begin();
+ std::list<Symbolic>::const_iterator i = parameters.begin();
  Symbolic dy = i->subst(x,y,n);
  for(++i;i!=parameters.end();++i)
   //DX20200625 - subst "::" with "symbolic::" - dy = ::integrate(dy, i->subst(x,y,n));
@@ -924,8 +924,8 @@ Symbolic Integral::subst(const Symbolic &x,const Symbolic &y,int &n) const
 Symbolic Integral::df(const Symbolic &s) const
 {
  int n = 0, n1;
- list<Symbolic>::const_iterator i, i1 = parameters.end();
- list<Symbolic>::iterator j;
+ std::list<Symbolic>::const_iterator i, i1 = parameters.end();
+ std::list<Symbolic>::iterator j;
 
  for(i=parameters.begin();i!=parameters.end();++i,++n)
   if(*i == s) { i1 = i; n1 = n; }

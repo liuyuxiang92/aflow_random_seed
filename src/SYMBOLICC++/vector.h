@@ -30,7 +30,7 @@
 #include <iostream>
 #include <vector>
 #include "identity.h"
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 // definition of class Vector
@@ -294,7 +294,7 @@ template <class T> istream& Vector<T>::input(istream &s)
       s >> vector<T>::at(i); // read in entries
       if(! s.good())
       {
-         s.clear(s.rdstate() | ios::badbit);
+         s.clear(s.rdstate() | std::ios::badbit);
          return s;
       }
    }

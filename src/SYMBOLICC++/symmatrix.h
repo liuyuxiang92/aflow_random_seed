@@ -24,7 +24,7 @@
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX
 
 #include "matrix.h"
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 #ifdef  SYMBOLIC_FORWARD
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_FORWARD
@@ -47,7 +47,7 @@ class SymbolicMatrix
 {
  public: SymbolicMatrix(const SymbolicMatrix&);
          SymbolicMatrix(const Matrix<Symbolic>&);
-         SymbolicMatrix(const list<list<Symbolic> >&);
+         SymbolicMatrix(const std::list<std::list<Symbolic> >&);
          SymbolicMatrix(const string&,int,int);
          SymbolicMatrix(const char*,int,int);
          SymbolicMatrix(const Symbolic&,int,int);
@@ -63,9 +63,9 @@ class SymbolicMatrix
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
-         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match(const Symbolic&, const std::list<Symbolic>&) const;
          PatternMatches match_parts(const Symbolic&,
-                                    const list<Symbolic>&) const;
+                                    const std::list<Symbolic>&) const;
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
@@ -89,11 +89,11 @@ SymbolicMatrix::SymbolicMatrix(const Matrix<Symbolic> &s)
 : Matrix<Symbolic>(s)
 {}
 
-SymbolicMatrix::SymbolicMatrix(const list<list<Symbolic> > &sl)
+SymbolicMatrix::SymbolicMatrix(const std::list<std::list<Symbolic> > &sl)
 {
  int cols = 0, k, l;
- list<Symbolic>::const_iterator j;
- list<list<Symbolic> >::const_iterator i;
+ std::list<Symbolic>::const_iterator j;
+ std::list<std::list<Symbolic> >::const_iterator i;
 
  for(i=sl.begin();i!=sl.end();++i)
   if(int(i->size()) > cols) cols = i->size();
@@ -234,7 +234,7 @@ int SymbolicMatrix::commute(const Symbolic &s) const
 }
 
 PatternMatches
-SymbolicMatrix::match(const Symbolic &s, const list<Symbolic> &p) const
+SymbolicMatrix::match(const Symbolic &s, const std::list<Symbolic> &p) const
 {
  PatternMatches l;
  if(type() != s.type())
@@ -262,7 +262,7 @@ SymbolicMatrix::match(const Symbolic &s, const list<Symbolic> &p) const
 }
  
 PatternMatches
-SymbolicMatrix::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+SymbolicMatrix::match_parts(const Symbolic &s, const std::list<Symbolic> &p) const
 {
  PatternMatches l = s.match(*this, p);
 

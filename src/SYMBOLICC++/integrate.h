@@ -53,8 +53,8 @@ Symbolic integrate(const Symbolic &,const Symbolic &,unsigned int);
 namespace symbolic{ //DX20200625
 Symbolic integrate(const Symbolic &f,const Symbolic &x)
 {
- list<Equations> eq;
- list<Equations>::iterator i;
+ std::list<Equations> eq;
+ std::list<Equations>::iterator i;
  UniqueSymbol a, b, c;
 
  eq = (exp(a*x)).match(f, (a,b));

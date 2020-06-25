@@ -25,7 +25,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <complex>
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 template <class T> T zero(T) { static const T z = T() - T(); return z; }
@@ -77,10 +77,10 @@ template <> double one(double) { return (double) 1.0; }
 
 namespace symbolic{ //DX20200625
 template <class T>
-complex<T> zero(complex<T>) { return complex<T>(zero(T())); }
+std::complex<T> zero(std::complex<T>) { return std::complex<T>(zero(T())); }
 
 template <class T>
-complex<T> one(complex<T>) { return complex<T>(one(T())); }
+std::complex<T> one(std::complex<T>) { return std::complex<T>(one(T())); }
 } //namespace symbolic //DX20200625
 
 #endif

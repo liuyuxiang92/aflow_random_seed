@@ -32,7 +32,7 @@
 #include <vector>
 #include <ctype.h>
 #include "identity.h"
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 template <class T>
@@ -168,7 +168,7 @@ template <class T> Rational<T>::Rational(const string &s)
 
 template <class T> Rational<T>::Rational(const double &d)
 {
- static int base = numeric_limits<double>::radix;
+ static int base = std::numeric_limits<double>::radix;
  static vector<Rational<T> > digits(0);
  static Rational<T> rbase("0");
  Rational<T> rint("0"), rfrac("0"), rfact;
@@ -363,7 +363,7 @@ istream & Rational<T>::input(istream &s)
       s >> d;                 // read denominator
       if(! s.good())
       {
-         s.clear(s.rdstate() | ios::badbit);
+         s.clear(s.rdstate() | std::ios::badbit);
          return s;
       }
    }

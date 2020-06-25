@@ -25,7 +25,7 @@
 
 #include <list>
 
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 #ifdef  SYMBOLIC_FORWARD
 #ifndef SYMBOLIC_CPLUSPLUS_EQUATION_FORWARD
@@ -46,7 +46,7 @@ namespace symbolic{ //DX20200625
 class Equation: public CloningSymbolicInterface
 {
  public: Symbolic lhs, rhs;
-	 list<Symbolic> free;
+	 std::list<Symbolic> free;
          Equation(const Equation&);
          Equation(const Equation&, const Symbolic &);
          Equation(const Symbolic&,const Symbolic&);
@@ -61,9 +61,9 @@ class Equation: public CloningSymbolicInterface
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
-         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match(const Symbolic&, const std::list<Symbolic>&) const;
          PatternMatches match_parts(const Symbolic&,
-                                    const list<Symbolic>&) const;
+                                    const std::list<Symbolic>&) const;
 
          operator bool() const;
          operator int() const;
@@ -142,7 +142,7 @@ int Equation::commute(const Symbolic &s) const
 //DX 20190313 - need to use argument somehow, simple fix - END
 
 PatternMatches
-Equation::match(const Symbolic &s, const list<Symbolic> &p) const
+Equation::match(const Symbolic &s, const std::list<Symbolic> &p) const
 {
  PatternMatches l;
 
@@ -158,7 +158,7 @@ Equation::match(const Symbolic &s, const list<Symbolic> &p) const
 }
 
 PatternMatches
-Equation::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+Equation::match_parts(const Symbolic &s, const std::list<Symbolic> &p) const
 { return s.match(*this, p); }
 
 Equation::operator bool() const

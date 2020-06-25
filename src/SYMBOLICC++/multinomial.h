@@ -32,7 +32,7 @@
 #include <utility>  // for pair
 #include <vector>
 #include "identity.h"
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 // Assumption : T has typecasts defined and can act as a numeric data type
 
@@ -81,14 +81,14 @@ class Multinomial
 
  protected:
    void remove_zeros(void);
-   pair<Multinomial<T>,Multinomial<T> >
+   std::pair<Multinomial<T>,Multinomial<T> >
     reconcile(const Multinomial<T>&,const Multinomial<T>&) const;
    vector<string> toarray(void) const;
    string variable;
    enum { number, univariate, multivariate } type;
    T n;                               //number
-   list<pair<T,int> > u;              //univariate
-   list<pair<Multinomial<T>,int> > m; //multivariate
+   std::list<std::pair<T,int> > u;              //univariate
+   std::list<std::pair<Multinomial<T>,int> > m; //multivariate
 };
 
 
@@ -113,7 +113,7 @@ variable(""), type(number), n(c) {}
 
 template <class T>
 Multinomial<T>::Multinomial(string x): variable(x),type(univariate)
-{u.push_back(pair<T,int>(one(T()),1));}
+{u.push_back(std::pair<T,int>(one(T()),1));}
 
 template <class T>
 Multinomial<T>& Multinomial<T>::operator=(const T &c)
@@ -136,20 +136,20 @@ template <class T>
 Multinomial<T> Multinomial<T>::operator-() const
 {
  Multinomial<T> p2(*this);
- typename list<pair<T,int> >::iterator i = p2.u.begin();
- typename list<pair<T,int> >::iterator j = p2.m.begin();
+ typename std::list<std::pair<T,int> >::iterator i = p2.u.begin();
+ typename std::list<std::pair<T,int> >::iterator j = p2.m.begin();
  for(;i!= p2.u.end();i++) i->first = -(i->first);
  for(;j!= p2.v.end();j++) j->first = -(j->first);
  return p2;
 }
 
 template <class T>
-list <pair<T,int> >
-merge(const list <pair<T,int> > &l1,const list <pair<T,int> > &l2)
+list <std::pair<T,int> >
+merge(const list <std::pair<T,int> > &l1,const list <std::pair<T,int> > &l2)
 {
- list <pair<T,int> > l;
- typename list<pair<T,int> >::const_iterator i = l1.begin();
- typename list<pair<T,int> >::const_iterator j = l2.begin();
+ list <std::pair<T,int> > l;
+ typename std::list<std::pair<T,int> >::const_iterator i = l1.begin();
+ typename std::list<std::pair<T,int> >::const_iterator j = l2.begin();
  while(i!=l1.end() && j!=l2.end())
  {
   if     (i->second<j->second) l.push_back(*(j++));
@@ -170,7 +170,7 @@ Multinomial<T>
 Multinomial<T>::operator+(const Multinomial<T> &p) const
 {
  Multinomial<T> p2;
- pair<Multinomial<T>,Multinomial<T> > xy = reconcile(*this,p);
+ std::pair<Multinomial<T>,Multinomial<T> > xy = reconcile(*this,p);
  
  switch(xy.first.type)
  {
@@ -195,16 +195,16 @@ Multinomial<T>::operator-(const Multinomial<T> &p) const
 { return (*this) + (-p); }
 
 template <class T>
-list <pair<T,int> >
-distribute(const list <pair<T,int> > &l1,const list <pair<T,int> > &l2)
+list <std::pair<T,int> >
+distribute(const list <std::pair<T,int> > &l1,const list <std::pair<T,int> > &l2)
 {
- list <pair<T,int> > l;
- typename list<pair<T,int> >::const_iterator i;
- typename list<pair<T,int> >::const_iterator j;
+ list <std::pair<T,int> > l;
+ typename std::list<std::pair<T,int> >::const_iterator i;
+ typename std::list<std::pair<T,int> >::const_iterator j;
 
  for(i=l1.begin();i!=l1.end();i++)
  {
-  list <pair<T,int> > t;
+  list <std::pair<T,int> > t;
   for(j=l2.begin();j!=l2.end();j++)
    t.push_back(make_pair(i->first * j->first,i->second + j->second));
   l = merge(l,t);
@@ -216,8 +216,8 @@ template <class T>
 Multinomial<T> Multinomial<T>::operator*(const Multinomial<T> &p) const
 {
  Multinomial<T> p2;
- typename list<pair<T,int> >::const_iterator i, j;
- pair<Multinomial<T>,Multinomial<T> > xy = reconcile(*this,p);
+ typename std::list<std::pair<T,int> >::const_iterator i, j;
+ std::pair<Multinomial<T>,Multinomial<T> > xy = reconcile(*this,p);
 
  switch(xy.first.type)
  {
@@ -298,8 +298,8 @@ template <class T>
 Multinomial<T> Multinomial<T>::Diff(const string &x) const
 {
  Multinomial<T> p2;
- typename list<pair<T,int> >::const_iterator i = u.begin();
- typename list<pair<Multinomial<T>,int> >::const_iterator j = m.begin();
+ typename std::list<std::pair<T,int> >::const_iterator i = u.begin();
+ typename std::list<std::pair<Multinomial<T>,int> >::const_iterator j = m.begin();
 
  if(type==number) return Multinomial<T>(zero(T()));
  if(type==univariate)
@@ -328,7 +328,7 @@ Multinomial<T> Multinomial<T>::Diff(const string &x) const
 template <class T>
 int Multinomial<T>::operator==(const Multinomial<T> &p) const
 {
- pair<Multinomial<T>,Multinomial<T> > xy = reconcile(*this,p);
+ std::pair<Multinomial<T>,Multinomial<T> > xy = reconcile(*this,p);
 
  xy.first.remove_zeros();
  xy.second.remove_zeros();
@@ -362,8 +362,8 @@ Multinomial<T>::toarray(void) const
 {
  ostringstream o;
  vector<string> v;
- typename list<pair<T,int> >::const_iterator i = u.begin();
- typename list<pair<Multinomial<T>,int> >::const_iterator j = m.begin();
+ typename std::list<std::pair<T,int> >::const_iterator i = u.begin();
+ typename std::list<std::pair<Multinomial<T>,int> >::const_iterator j = m.begin();
 
  switch(type)
  {
@@ -401,7 +401,7 @@ template <class T>
 ostream &Multinomial<T>::output(ostream &o) const
 {
  int k;
- typename list<pair<T,int> >::const_iterator i = u.begin();
+ typename std::list<std::pair<T,int> >::const_iterator i = u.begin();
 
  switch(type)
  {
@@ -434,7 +434,7 @@ template <class T>
 void Multinomial<T>::remove_zeros(void)
 {
  {
-  typename list<pair<T,int> >::iterator i, j;
+  typename std::list<std::pair<T,int> >::iterator i, j;
   for(i=j=u.begin();i!=u.end();)
   {
    j++;
@@ -443,7 +443,7 @@ void Multinomial<T>::remove_zeros(void)
   }
  }
  {
-  typename list<pair<Multinomial<T>,int> >::iterator i, j;
+  typename std::list<std::pair<Multinomial<T>,int> >::iterator i, j;
   for(i=j=m.begin();i!=m.end();)
   {
    j++;
@@ -455,7 +455,7 @@ void Multinomial<T>::remove_zeros(void)
 }
 
 template <class T>
-pair<Multinomial<T>,Multinomial<T> >
+std::pair<Multinomial<T>,Multinomial<T> >
 Multinomial<T>::reconcile(const Multinomial<T> &x,
                           const Multinomial<T> &y) const
 {
@@ -486,7 +486,7 @@ Multinomial<T>::reconcile(const Multinomial<T> &x,
    t1.type = t2.type = multivariate;
    t1.u.clear();
    t1.m.push_back(make_pair(x,0));
-   typename list<pair<T,int> >::const_iterator i = y.u.begin();
+   typename std::list<std::pair<T,int> >::const_iterator i = y.u.begin();
    for(;i!=y.u.end();i++)
    {
     Multinomial<T> t3(x.variable);
@@ -503,7 +503,7 @@ Multinomial<T>::reconcile(const Multinomial<T> &x,
    t1.type = t2.type = multivariate;
    t2.u.clear();
    t2.m.push_back(make_pair(y,0));
-   typename list<pair<T,int> >::const_iterator i = x.u.begin();
+   typename std::list<std::pair<T,int> >::const_iterator i = x.u.begin();
    for(;i!=x.u.end();i++)
    {
     Multinomial<T> t3(y.variable);
@@ -537,7 +537,7 @@ Multinomial<T>::reconcile(const Multinomial<T> &x,
    Multinomial<T> t(x.variable);
    t.type = multivariate;
    t.u.clear();
-   typename list<pair<T,int> >::const_iterator i = x.u.begin();
+   typename std::list<std::pair<T,int> >::const_iterator i = x.u.begin();
    for(;i!=x.u.end();i++)
    {
     Multinomial<T> t3(y.m.front().first.variable);
@@ -569,7 +569,7 @@ Multinomial<T>::reconcile(const Multinomial<T> &x,
   }
  }
 
- pair<Multinomial<T>,Multinomial<T> > p;
+ std::pair<Multinomial<T>,Multinomial<T> > p;
  p = reconcile(y,x);
  return make_pair(p.second,p.first);
 }

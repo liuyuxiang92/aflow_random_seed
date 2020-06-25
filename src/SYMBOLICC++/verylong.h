@@ -34,7 +34,7 @@
 #include <limits>
 #include <string>
 #include "identity.h"
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 class Verylong
@@ -148,19 +148,19 @@ Verylong::~Verylong() { }
 Verylong::operator int() const
 {
    int number, factor = 1;
-   static Verylong max0(numeric_limits<int>::max());
-   static Verylong min0(numeric_limits<int>::min()+1);
+   static Verylong max0(std::numeric_limits<int>::max());
+   static Verylong min0(std::numeric_limits<int>::min()+1);
    string::const_reverse_iterator j=vlstr.rbegin();
 
    if(*this > max0)
    {
      cerr << "Error: Conversion Verylong->integer is not possible" << endl;
-     return numeric_limits<int>::max();
+     return std::numeric_limits<int>::max();
    }
    else if(*this < min0)
    {
      cerr << "Error: Conversion Verylong->integer is not possible" << endl;
-     return numeric_limits<int>::min();
+     return std::numeric_limits<int>::min();
    }
 
    number = *j - '0';
@@ -487,7 +487,7 @@ double div(const Verylong &u,const Verylong &v)
    Verylong w,y,b,c;
    int d, count;
    // number of significant digits
-   int decno = numeric_limits<double>::digits;
+   int decno = std::numeric_limits<double>::digits;
 
    if(v == Verylong::zero) 
    {

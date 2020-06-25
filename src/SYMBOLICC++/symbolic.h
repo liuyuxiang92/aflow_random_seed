@@ -26,7 +26,7 @@
 #include <iostream>
 #include <typeinfo>
 #include <list>
-using namespace std;
+//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 #ifdef  SYMBOLIC_FORWARD
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLIC_FORWARD
@@ -57,7 +57,7 @@ class SymbolicInterface
          virtual ~SymbolicInterface();
 
          virtual void print(ostream&) const = 0;
-         virtual const type_info &type() const;
+         virtual const std::type_info &type() const;
          virtual Symbolic subst(const Symbolic&,
                                 const Symbolic&,int &n) const = 0;
          virtual Simplified simplify() const = 0;
@@ -69,10 +69,10 @@ class SymbolicInterface
          virtual int commute(const Symbolic&) const = 0;
          // match *this (as a pattern) against an expression
          virtual PatternMatches match(const Symbolic&,
-                                      const list<Symbolic>&) const = 0;
+                                      const std::list<Symbolic>&) const = 0;
          // match parts of *this (as an expression) against a pattern
          virtual PatternMatches match_parts(const Symbolic&,
-                                            const list<Symbolic>&) const = 0;
+                                            const std::list<Symbolic>&) const = 0;
 };
 
 class CloningSymbolicInterface : public SymbolicInterface, public Cloning
@@ -90,7 +90,7 @@ class SymbolicProxy: public SymbolicInterface,
          SymbolicProxy();
 
          void print(ostream&) const;
-         const type_info &type() const;
+         const std::type_info &type() const;
          Symbolic subst(const Symbolic&,const Symbolic&,int &n) const;
          Simplified simplify() const;
          int compare(const Symbolic&) const;
@@ -99,9 +99,9 @@ class SymbolicProxy: public SymbolicInterface,
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
-         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match(const Symbolic&, const std::list<Symbolic>&) const;
          PatternMatches match_parts(const Symbolic&,
-                                      const list<Symbolic>&) const;
+                                      const std::list<Symbolic>&) const;
 
          SymbolicProxy &operator=(const CloningSymbolicInterface&);
          SymbolicProxy &operator=(const SymbolicProxy&);
@@ -141,8 +141,8 @@ class Symbolic: public SymbolicProxy
          Symbolic(const string&,int,int);
          Symbolic(const char*,int,int);
          Symbolic(const Symbolic&,int,int);
-         Symbolic(const list<Symbolic>&);
-         Symbolic(const list<list<Symbolic> >&);
+         Symbolic(const std::list<Symbolic>&);
+         Symbolic(const std::list<std::list<Symbolic> >&);
          ~Symbolic();
 
          SymbolicProxy &operator=(const CloningSymbolicInterface&);
@@ -151,12 +151,12 @@ class Symbolic: public SymbolicProxy
          SymbolicProxy &operator=(const double&);
          SymbolicProxy &operator=(const string&);
          SymbolicProxy &operator=(const char*);
-         SymbolicProxy &operator=(const list<Symbolic>&);
-         SymbolicProxy &operator=(const list<list<Symbolic> >&);
+         SymbolicProxy &operator=(const std::list<Symbolic>&);
+         SymbolicProxy &operator=(const std::list<std::list<Symbolic> >&);
          Symbolic operator[](const Equation&) const;
          Symbolic operator[](const Equations&) const;
          Symbolic operator[](const Symbolic&) const;
-         Symbolic operator[](const list<Symbolic>&) const;
+         Symbolic operator[](const std::list<Symbolic>&) const;
          Symbolic &operator()(int);
          Symbolic &operator()(int,int);
          const Symbolic &operator()(int) const;
@@ -225,7 +225,7 @@ SymbolicInterface::SymbolicInterface(const SymbolicInterface &s)
 
 SymbolicInterface::~SymbolicInterface() {}
 
-const type_info &SymbolicInterface::type() const
+const std::type_info &SymbolicInterface::type() const
 { return typeid(*this); }
 
 
@@ -259,7 +259,7 @@ SymbolicProxy::SymbolicProxy() {}
 void SymbolicProxy::print(ostream &o) const
 { (*this)->print(o); }
 
-const type_info &SymbolicProxy::type() const
+const std::type_info &SymbolicProxy::type() const
 { return (*this)->type(); }
 
 Symbolic SymbolicProxy::subst(const Symbolic &x,
@@ -294,11 +294,11 @@ int SymbolicProxy::commute(const Symbolic &s) const
 { return (*this)->commute(s); }
 
 PatternMatches
-SymbolicProxy::match(const Symbolic &s, const list<Symbolic> &p) const
+SymbolicProxy::match(const Symbolic &s, const std::list<Symbolic> &p) const
 { return (*this)->match(s,p); }
 
 PatternMatches
-SymbolicProxy::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+SymbolicProxy::match_parts(const Symbolic &s, const std::list<Symbolic> &p) const
 { return (*this)->match_parts(s,p); }
 
 SymbolicProxy &SymbolicProxy::operator=(const CloningSymbolicInterface &s)
@@ -411,14 +411,14 @@ Symbolic::Symbolic(const char *s,int n,int m)
 Symbolic::Symbolic(const Symbolic &s,int n,int m)
  : SymbolicProxy(SymbolicMatrix(s,n,m)) {}
 
-Symbolic::Symbolic(const list<Symbolic> &l)
+Symbolic::Symbolic(const std::list<Symbolic> &l)
 {
- list<list<Symbolic> > ll;
+ std::list<std::list<Symbolic> > ll;
  ll.push_back(l);
  (*this) = SymbolicMatrix(ll);
 }
 
-Symbolic::Symbolic(const list<list<Symbolic> > &l)
+Symbolic::Symbolic(const std::list<std::list<Symbolic> > &l)
  : SymbolicProxy(SymbolicMatrix(l)) {}
 
 Symbolic::~Symbolic() {}
@@ -450,10 +450,10 @@ SymbolicProxy &Symbolic::operator=(const string &s)
 SymbolicProxy &Symbolic::operator=(const char *s)
 { return *this = Symbolic(s); }
 
-SymbolicProxy &Symbolic::operator=(const list<Symbolic> &l)
+SymbolicProxy &Symbolic::operator=(const std::list<Symbolic> &l)
 { return *this = Symbolic(l); }
 
-SymbolicProxy &Symbolic::operator=(const list<list<Symbolic> > &l)
+SymbolicProxy &Symbolic::operator=(const std::list<std::list<Symbolic> > &l)
 { return *this = Symbolic(l); }
 
 Symbolic Symbolic::operator[](const Equation &p) const
@@ -479,10 +479,10 @@ Symbolic Symbolic::operator[](const Symbolic &p) const
  return *this;
 }
 
-Symbolic Symbolic::operator[](const list<Symbolic> &l) const
+Symbolic Symbolic::operator[](const std::list<Symbolic> &l) const
 {
  Symbolic result(*this);
- for(list<Symbolic>::const_iterator i=l.begin();i!=l.end();++i)
+ for(std::list<Symbolic>::const_iterator i=l.begin();i!=l.end();++i)
   result = result[*i];
  return result;
 }
@@ -580,7 +580,7 @@ Symbolic Symbolic::subst(const Equation &e,int &n) const
 {
  int nsubs = 0;
  Symbolic lhs, rhs, r;
- list<Equations>::iterator i;
+ std::list<Equations>::iterator i;
  // use the existing substitution for equations without binding variables
  if(e.free.empty()) return subst(e.lhs,e.rhs,n);
 

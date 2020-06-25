@@ -66,8 +66,8 @@
 #undef  SYMBOLIC_FORWARD
 
 namespace symbolic{ //DX20200625
-typedef list<Equation> Equations;
-typedef list<Equations> PatternMatches;
+typedef std::list<Equation> Equations;
+typedef std::list<Equations> PatternMatches;
 } //namespace symbolic //DX20200625
 
 // declarations of classes without definitions
@@ -159,27 +159,27 @@ template<> Symbolic one(Symbolic);
 Equations operator,(const Equation &,const Equation &);
 Equations operator,(const Equations &,const Equation &);
 Equations operator,(const Equation &,const Equations &);
-list<Symbolic> operator,(const Symbolic &,const Symbolic &);
-list<Symbolic> operator,(const int &,const Symbolic &);
-list<Symbolic> operator,(const double &,const Symbolic &);
-list<Symbolic> operator,(const Symbolic &,const int &);
-list<Symbolic> operator,(const Symbolic &,const double &);
-list<Symbolic> operator,(const list<Symbolic> &,const Symbolic &);
-list<Symbolic> operator,(const list<Symbolic> &,const int &);
-list<Symbolic> operator,(const list<Symbolic> &,const double &);
-list<Symbolic> operator,(const Symbolic &,const list<Symbolic> &);
-list<Symbolic> operator,(const int &,const list<Symbolic> &);
-list<Symbolic> operator,(const double &,const list<Symbolic> &);
-list<list<Symbolic> >
-operator,(const list<Symbolic> &,const list<Symbolic> &);
-list<list<Symbolic> >
-operator,(const list<list<Symbolic> > &,const list<Symbolic> &);
-list<list<Symbolic> >
-operator,(const list<Symbolic> &,const list<list<Symbolic> > &);
+std::list<Symbolic> operator,(const Symbolic &,const Symbolic &);
+std::list<Symbolic> operator,(const int &,const Symbolic &);
+std::list<Symbolic> operator,(const double &,const Symbolic &);
+std::list<Symbolic> operator,(const Symbolic &,const int &);
+std::list<Symbolic> operator,(const Symbolic &,const double &);
+std::list<Symbolic> operator,(const std::list<Symbolic> &,const Symbolic &);
+std::list<Symbolic> operator,(const std::list<Symbolic> &,const int &);
+std::list<Symbolic> operator,(const std::list<Symbolic> &,const double &);
+std::list<Symbolic> operator,(const Symbolic &,const std::list<Symbolic> &);
+std::list<Symbolic> operator,(const int &,const std::list<Symbolic> &);
+std::list<Symbolic> operator,(const double &,const std::list<Symbolic> &);
+std::list<std::list<Symbolic> >
+operator,(const std::list<Symbolic> &,const std::list<Symbolic> &);
+std::list<std::list<Symbolic> >
+operator,(const std::list<std::list<Symbolic> > &,const std::list<Symbolic> &);
+std::list<std::list<Symbolic> >
+operator,(const std::list<Symbolic> &,const std::list<std::list<Symbolic> > &);
 Equation operator,(const Symbolic &, const Equation &);
-Equation operator,(const list<Symbolic> &, const Equation &);
+Equation operator,(const std::list<Symbolic> &, const Equation &);
 ostream &operator<<(ostream &,const Equations &);
-ostream &operator<<(ostream &,const list<Symbolic> &);
+ostream &operator<<(ostream &,const std::list<Symbolic> &);
 Symbolic tr(const Symbolic &);
 Symbolic trace(const Symbolic &);
 Symbolic det(const Symbolic &);
@@ -482,75 +482,75 @@ operator,(const Equation &x,const Equations &y)
  return l;
 }
 
-list<Symbolic>
+std::list<Symbolic>
 operator,(const Symbolic &x,const Symbolic &y)
 {
- list<Symbolic> l;
+ std::list<Symbolic> l;
  l.push_back(x);
  l.push_back(y);
  return l;
 }
 
-list<Symbolic> operator,(const int &x,const Symbolic &y)
+std::list<Symbolic> operator,(const int &x,const Symbolic &y)
 { return (Symbolic(x), y); }
 
-list<Symbolic> operator,(const double &x,const Symbolic &y)
+std::list<Symbolic> operator,(const double &x,const Symbolic &y)
 { return (Symbolic(x), y); }
 
-list<Symbolic> operator,(const Symbolic &x,const int &y)
+std::list<Symbolic> operator,(const Symbolic &x,const int &y)
 { return (x,Symbolic(y)); }
 
-list<Symbolic> operator,(const Symbolic &x,const double &y)
+std::list<Symbolic> operator,(const Symbolic &x,const double &y)
 { return (x,Symbolic(y)); }
 
-list<Symbolic>
-operator,(const list<Symbolic> &x,const Symbolic &y)
+std::list<Symbolic>
+operator,(const std::list<Symbolic> &x,const Symbolic &y)
 {
- list<Symbolic> l(x);
+ std::list<Symbolic> l(x);
  l.push_back(y);
  return l;
 }
 
-list<Symbolic> operator,(const list<Symbolic> &x,const int &y)
+std::list<Symbolic> operator,(const std::list<Symbolic> &x,const int &y)
 { return (x, Symbolic(y)); }
 
-list<Symbolic> operator,(const list<Symbolic> &x,const double &y)
+std::list<Symbolic> operator,(const std::list<Symbolic> &x,const double &y)
 { return (x, Symbolic(y)); }
 
-list<Symbolic>
-operator,(const Symbolic &x,const list<Symbolic> &y)
+std::list<Symbolic>
+operator,(const Symbolic &x,const std::list<Symbolic> &y)
 {
- list<Symbolic> l(y);
+ std::list<Symbolic> l(y);
  l.push_front(x);
  return l;
 }
 
-list<Symbolic> operator,(const int &x,const list<Symbolic> &y)
+std::list<Symbolic> operator,(const int &x,const std::list<Symbolic> &y)
 { return (Symbolic(x), y); }
 
-list<Symbolic> operator,(const double &x,const list<Symbolic> &y)
+std::list<Symbolic> operator,(const double &x,const std::list<Symbolic> &y)
 { return (Symbolic(x), y); }
 
-list<list<Symbolic> >
-operator,(const list<Symbolic> &x,const list<Symbolic> &y)
+std::list<std::list<Symbolic> >
+operator,(const std::list<Symbolic> &x,const std::list<Symbolic> &y)
 {
- list<list<Symbolic> > l;
+ std::list<std::list<Symbolic> > l;
  l.push_back(x); l.push_back(y);
  return l;
 }
 
-list<list<Symbolic> >
-operator,(const list<list<Symbolic> > &x,const list<Symbolic> &y)
+std::list<std::list<Symbolic> >
+operator,(const std::list<std::list<Symbolic> > &x,const std::list<Symbolic> &y)
 {
- list<list<Symbolic> > l(x);
+ std::list<std::list<Symbolic> > l(x);
  l.push_back(y);
  return l;
 }
 
-list<list<Symbolic> >
-operator,(const list<Symbolic> &x,const list<list<Symbolic> > &y)
+std::list<std::list<Symbolic> >
+operator,(const std::list<Symbolic> &x,const std::list<std::list<Symbolic> > &y)
 {
- list<list<Symbolic> > l(y);
+ std::list<std::list<Symbolic> > l(y);
  l.push_front(x);
  return l;
 }
@@ -572,10 +572,10 @@ Equation operator,(const Symbolic &x, const Equation &e)
  return p;
 }
 
-Equation operator,(const list<Symbolic> &x, const Equation &e)
+Equation operator,(const std::list<Symbolic> &x, const Equation &e)
 {
  Equation p = e;
- list<Symbolic>::const_reverse_iterator i;
+ std::list<Symbolic>::const_reverse_iterator i;
  for(i=x.rbegin(); i!=x.rend(); ++i)
   if(i->type() != typeid(UniqueSymbol) && i->type() == typeid(Symbol))
   {
@@ -601,9 +601,9 @@ ostream &operator<<(ostream &o,const Equations &e)
  return o;
 }
 
-ostream &operator<<(ostream &o,const list<Symbolic> &e)
+ostream &operator<<(ostream &o,const std::list<Symbolic> &e)
 {
- list<Symbolic>::const_iterator i = e.begin();
+ std::list<Symbolic>::const_iterator i = e.begin();
  o << "[ ";
  while(i != e.end())
  {
