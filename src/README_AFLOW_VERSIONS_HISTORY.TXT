@@ -1,5 +1,6 @@
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         -- Bug fixes to xPOTCAR (exits) (CO+ME)
         -- Bug fixes to Wyckoff positions (DX)
         -- Bug fixes for overwriting symmetry output files text/json (DX)
@@ -11,7 +12,6 @@
         -- Bug fixes in KBIN::getVASPVersion() (CO)
         -- Bug fixes in POCC: extending m_Egap.size() if metal is found among ARUNs (CO)
         -- Bug fixes in XHOST: adding another way to get XHOST.home, might fail on OSX (CO)
-        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         (AFLOW: aconvasp_main.cpp, aflow.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, avasp.cpp, chull.cpp, chull_jupyter.json, chull_jupyter_plotter.py, chull_python.py, compare_structure_function.cpp, init.cpp, ivasp.cpp, kvasp.cpp, lattice.cpp, Makefile, Makefile.aflow, makefile.cpp, makefile.h, ovasp.cpp, plotter.cpp, pocc.cpp, README_AFLOW.TXT, symmetry_spacegroup_functions.cpp, symmetry_spacegroup_ITC_library.cpp, xelement.cpp, xelement.h, xpseudopotentials.cpp, xpseudopotentials_data.cpp)
         (AUROSTD: main.cpp)
 3.2.3 - 2020/05/22
