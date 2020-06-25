@@ -30,6 +30,7 @@
 #include "identity.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <class T> class Derive
 {
    private:
@@ -187,5 +188,6 @@ ostream &Derive<T>::output(ostream &s) const { return s << u; }
 template <class T>
 ostream &operator << (ostream &s,const Derive<T> &r)
 { return r.output(s); }
+} //namespace symbolic //DX20200625
 
 #endif

@@ -32,7 +32,9 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_PRODUCT_FORWARD
 #define SYMBOLIC_CPLUSPLUS_PRODUCT_FORWARD
 
+namespace symbolic{ //DX20200625
 class Product;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -41,6 +43,7 @@ class Product;
 #ifndef SYMBOLIC_CPLUSPLUS_PRODUCT_DECLARE
 #define SYMBOLIC_CPLUSPLUS_PRODUCT_DECLARE
 
+namespace symbolic{ //DX20200625
 class Product: public CloningSymbolicInterface
 {
  public: list<Symbolic> factors;
@@ -67,6 +70,7 @@ class Product: public CloningSymbolicInterface
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -78,6 +82,7 @@ class Product: public CloningSymbolicInterface
 #define SYMBOLIC_CPLUSPLUS_PRODUCT_DEFINE
 #define SYMBOLIC_CPLUSPLUS_PRODUCT
 
+namespace symbolic{ //DX20200625
 Product::Product() {}
 
 Product::Product(const Product &s)
@@ -591,7 +596,8 @@ Symbolic Product::integrate(const Symbolic &s) const
  {
   Product p;
   for(i=factors.begin();i!=factors.end();++i)
-   if(i == i1) p.factors.push_back(::integrate(*i,s));
+   //DX20200625 - subst "::" with "symbolic::" - if(i == i1) p.factors.push_back(::integrate(*i,s));
+   if(i == i1) p.factors.push_back(symbolic::integrate(*i,s)); //DX20200625 - subst "::" with "symbolic::"
    else        p.factors.push_back(*i);
   return p;
  }
@@ -857,6 +863,7 @@ Product::match_parts(const Symbolic &s, const list<Symbolic> &p) const
  }
  return l;
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

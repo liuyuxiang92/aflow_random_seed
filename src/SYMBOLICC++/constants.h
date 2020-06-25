@@ -27,6 +27,7 @@
 #ifndef SYMBOLIC_CPLUSPLUS_CONSTANTS_DECLARE
 #define SYMBOLIC_CPLUSPLUS_CONSTANTS_DECLARE
 
+namespace symbolic{ //DX20200625
 namespace SymbolicConstant
 {
  static const Symbolic i = Symbolic(Power(Symbolic(-1),
@@ -35,6 +36,7 @@ namespace SymbolicConstant
  static const Symbolic e       ("e");
  static const Symbolic _pi      ("pi");
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

@@ -34,9 +34,11 @@
 #ifndef SYMBOLIC_CPLUSPLUS_SOLVE_DECLARE
 #define SYMBOLIC_CPLUSPLUS_SOLVE_DECLARE
 
+namespace symbolic{ //DX20200625
 Equations solve(const Symbolic &, const Symbolic &);
 Equations solve(const Equation &, const Symbolic &);
 list<Equations> solve(const Equations &, const list<Symbolic> &);
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -47,6 +49,7 @@ list<Equations> solve(const Equations &, const list<Symbolic> &);
 #ifndef SYMBOLIC_CPLUSPLUS_SOLVE_DEFINE
 #define SYMBOLIC_CPLUSPLUS_SOLVE_DEFINE
 
+namespace symbolic{ //DX20200625
 Equations solve(const Symbolic &e, const Symbolic &x)
 {
  Equations soln;
@@ -154,6 +157,7 @@ list<Equations> solve(const Equations &e, const list<Symbolic> &l)
 
  return soln;
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

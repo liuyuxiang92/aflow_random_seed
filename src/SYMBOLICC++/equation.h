@@ -31,7 +31,9 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_EQUATION_FORWARD
 #define SYMBOLIC_CPLUSPLUS_EQUATION_FORWARD
 
+namespace symbolic{ //DX20200625
 class Equation;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -40,6 +42,7 @@ class Equation;
 #ifndef SYMBOLIC_CPLUSPLUS_EQUATION_DECLARE
 #define SYMBOLIC_CPLUSPLUS_EQUATION_DECLARE
 
+namespace symbolic{ //DX20200625
 class Equation: public CloningSymbolicInterface
 {
  public: Symbolic lhs, rhs;
@@ -67,6 +70,7 @@ class Equation: public CloningSymbolicInterface
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -78,6 +82,7 @@ class Equation: public CloningSymbolicInterface
 #define SYMBOLIC_CPLUSPLUS_EQUATION_DEFINE
 #define SYMBOLIC_CPLUSPLUS_EQUATION
 
+namespace symbolic{ //DX20200625
 Equation::Equation(const Equation &s)
 : CloningSymbolicInterface(s), lhs(s.lhs), rhs(s.rhs), free(s.free) {}
 
@@ -112,7 +117,8 @@ Symbolic Equation::df(const Symbolic &s) const
 { return Equation(lhs.df(s),rhs.df(s)); }
 
 Symbolic Equation::integrate(const Symbolic &s) const
-{ return Equation(::integrate(lhs,s),::integrate(rhs,s)); }
+//DX20200625 - need to put subst "::" with "symbolic::" - { return Equation(::integrate(lhs,s),::integrate(rhs,s)); }
+{ return Equation(symbolic::integrate(lhs,s),symbolic::integrate(rhs,s)); } //DX20200625 - subst "::" with "symbolic::"
 
 Symbolic Equation::coeff(const Symbolic &s) const
 //DX 20190313 [OBSOLETE] { return 0; }
@@ -160,6 +166,7 @@ Equation::operator bool() const
 
 Equation::operator int() const
 { return lhs.compare(rhs); }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

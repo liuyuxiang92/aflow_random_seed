@@ -31,6 +31,7 @@
 #include "identity.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <class T> class Quaternion
 {
    private:
@@ -171,5 +172,6 @@ ostream & operator << (ostream &s,const Quaternion<T> &arg)
 template <class T>
 istream & operator >> (istream &s,Quaternion<T> &arg)
 { return arg.input(s); }
+} //namespace symbolic //DX20200625
 
 #endif

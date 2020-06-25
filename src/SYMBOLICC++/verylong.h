@@ -36,6 +36,7 @@
 #include "identity.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 class Verylong
 {
    private:
@@ -101,11 +102,13 @@ class Verylong
       friend ostream & operator << (ostream&,const Verylong&);
       friend istream & operator >> (istream&,Verylong&);
 };
+} //namespace symbolic //DX20200625
 
 #define LIBSYMBOLICCPLUSPLUS
 
 // Class Data
 
+namespace symbolic{ //DX20200625
 const Verylong Verylong::zero = Verylong("0");
 
 const Verylong Verylong::one = Verylong("1");
@@ -590,10 +593,13 @@ Verylong Verylong::mult10(int num) const
 
 template <> Verylong zero(Verylong) { return Verylong::zero; }
 template <> Verylong one(Verylong) { return Verylong::one; }
+} //namespace symbolic //DX20200625
 
 #undef LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 template <> Verylong zero(Verylong);
 template <> Verylong one(Verylong);
+} //namespace symbolic //DX20200625
 
 #endif

@@ -36,8 +36,10 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_NUMBER_FORWARD
 #define SYMBOLIC_CPLUSPLUS_NUMBER_FORWARD
 
+namespace symbolic{ //DX20200625
 class Numeric;
 template <class T> class Number;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -46,6 +48,7 @@ template <class T> class Number;
 #ifndef SYMBOLIC_CPLUSPLUS_NUMBER_DECLARE
 #define SYMBOLIC_CPLUSPLUS_NUMBER_DECLARE
 
+namespace symbolic{ //DX20200625
 class Numeric: public CloningSymbolicInterface
 {
  public: Numeric();
@@ -163,6 +166,7 @@ Number<void> operator%(const Numeric&,const Number<void>&);
 template <> Rational<Number<void> >::operator double() const;
 template <> Number<void> zero(Number<void>);
 template <> Number<void> one(Number<void>);
+} //namespace symbolic //DX20200625
 #endif
 #endif
 
@@ -173,6 +177,7 @@ template <> Number<void> one(Number<void>);
 #define SYMBOLIC_CPLUSPLUS_NUMBER_DEFINE
 #define SYMBOLIC_CPLUSPLUS_NUMBER
 
+namespace symbolic{ //DX20200625
 Numeric::Numeric() : CloningSymbolicInterface() {}
 
 Numeric::Numeric(const Numeric &n) : CloningSymbolicInterface(n) {}
@@ -697,6 +702,7 @@ Number<void> operator/(const Numeric &n1,const Number<void> &n2)
 
 Number<void> operator%(const Numeric &n1,const Number<void> &n2)
 { return Number<void>(n1) % n2; }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

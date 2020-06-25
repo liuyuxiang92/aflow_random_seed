@@ -32,12 +32,14 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLIC_FORWARD
 #define SYMBOLIC_CPLUSPLUS_SYMBOLIC_FORWARD
 
+namespace symbolic{ //DX20200625
 class CloningSymbolicInterface;
 class Expanded;
 class Simplified;
 class Symbolic;
 class SymbolicInterface;
 class SymbolicProxy;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -46,6 +48,7 @@ class SymbolicProxy;
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLIC_DECLARE
 #define SYMBOLIC_CPLUSPLUS_SYMBOLIC_DECLARE
 
+namespace symbolic{ //DX20200625
 class SymbolicInterface
 {
  public: int simplified, expanded;
@@ -197,6 +200,7 @@ class Symbolic: public SymbolicProxy
          Symbolic hadamard(const Symbolic&) const;
          Symbolic inverse() const;
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -212,6 +216,7 @@ class Symbolic: public SymbolicProxy
 // Implementation for SymbolicInterface          //
 ///////////////////////////////////////////////////
 
+namespace symbolic{ //DX20200625
 SymbolicInterface::SymbolicInterface()
 { simplified = expanded = 0; }
 
@@ -872,6 +877,7 @@ Symbolic Symbolic::inverse() const
  CastPtr<const SymbolicMatrix> m(*this);
  return SymbolicMatrix(m->inverse());
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

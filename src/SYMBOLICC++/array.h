@@ -31,6 +31,7 @@
 #include <vector>
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <int d> vector<int> dimensions(int d1, ...)
 {
    vector<int> dim;
@@ -337,5 +338,6 @@ ostream & operator << (ostream &s,const Array<T,1> &v)
    s << v.back() << "]";
    return s;
 }
+} //namespace symbolic //DX20200625
 
 #endif

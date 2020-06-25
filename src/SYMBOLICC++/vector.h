@@ -32,6 +32,7 @@
 #include "identity.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 // definition of class Vector
 template <class T> class Vector: public vector<T>
 {
@@ -302,4 +303,5 @@ template <class T> istream& Vector<T>::input(istream &s)
 
 template <class T> istream & operator >> (istream &s,Vector<T> &v)
 { return v.input(s); }
+} //namespace symbolic //DX20200625
 #endif

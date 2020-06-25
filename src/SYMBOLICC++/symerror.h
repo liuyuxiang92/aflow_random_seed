@@ -29,7 +29,9 @@
 #ifndef SYMBOLIC_CPLUSPLUS_ERRORS_FORWARD
 #define SYMBOLIC_CPLUSPLUS_ERRORS_FORWARD
 
+namespace symbolic{ //DX20200625
 class SymbolicError;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -38,6 +40,7 @@ class SymbolicError;
 #ifndef SYMBOLIC_CPLUSPLUS_ERRORS_DECLARE
 #define SYMBOLIC_CPLUSPLUS_ERRORS_DECLARE
 
+namespace symbolic{ //DX20200625
 class SymbolicError
 {
  public: typedef enum {
@@ -56,6 +59,7 @@ class SymbolicError
          SymbolicError(const error &e);
          string message() const;
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -66,6 +70,7 @@ class SymbolicError
 #ifndef SYMBOLIC_CPLUSPLUS_ERRORS_DEFINE
 #define SYMBOLIC_CPLUSPLUS_ERRORS_DEFINE
 
+namespace symbolic{ //DX20200625
 SymbolicError::SymbolicError(const error &e) : errornumber(e) {}
 
 string SymbolicError::message() const
@@ -94,6 +99,7 @@ string SymbolicError::message() const
         return "Unknown error";
  }
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

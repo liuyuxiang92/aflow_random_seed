@@ -65,8 +65,10 @@
 #include "symbolicc++.h"
 #undef  SYMBOLIC_FORWARD
 
+namespace symbolic{ //DX20200625
 typedef list<Equation> Equations;
 typedef list<Equations> PatternMatches;
+} //namespace symbolic //DX20200625
 
 // declarations of classes without definitions
 #define SYMBOLIC_DECLARE
@@ -76,6 +78,7 @@ typedef list<Equations> PatternMatches;
 // declarations for non-member functions
 // also used in definition phase for clarity
 
+namespace symbolic{ //DX20200625
 Symbolic expand(const SymbolicInterface&);
 ostream &operator<<(ostream &,const Symbolic &);
 ostream &operator<<(ostream &,const Equation &);
@@ -194,6 +197,7 @@ void pattern_match_AND(PatternMatches &, const PatternMatches &);
 void pattern_match_OR(PatternMatches &, const Equation&);
 void pattern_match_OR(PatternMatches &, const Equations&);
 void pattern_match_OR(PatternMatches &, const PatternMatches &);
+} //namespace symbolic //DX20200625
 
 // definitions for classes, member functions
 #define SYMBOLIC_DEFINE
@@ -205,6 +209,7 @@ void pattern_match_OR(PatternMatches &, const PatternMatches &);
 // definitions for non-member functions
 // also used in definition phase for clarity
 
+namespace symbolic{ //DX20200625
 Symbolic expand(const SymbolicInterface &s)
 { return s.expand(); }
 
@@ -730,6 +735,7 @@ void pattern_match_OR(PatternMatches &l, const PatternMatches &e)
   pattern_match_OR(l, *i);
 //l.insert(l.end(), e.begin(), e.end());
 }
+} //namespace symbolic //DX20200625
 
 #undef LIBSYMBOLICCPLUSPLUS
 

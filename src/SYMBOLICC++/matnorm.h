@@ -33,6 +33,7 @@
 #include "identity.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <class T> T norm1(const Matrix<T> &m)
 {
    T maxItem(0), temp;
@@ -57,4 +58,5 @@ template <class T> T normI(const Matrix<T> &m)
 
 template <class T> T normH(const Matrix<T> &m)
 { return sqrt((m*(m.transpose())).trace()); }
+} //namespace symbolic //DX20200625
 #endif

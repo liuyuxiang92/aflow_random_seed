@@ -27,6 +27,7 @@
 #include <complex>
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <class T> T zero(T) { static const T z = T() - T(); return z; }
 
 template <class T> T one(T)
@@ -48,9 +49,11 @@ template <> float zero(float);
 template <> float one(float);
 template <> double zero(double);
 template <> double one(double);
+} //namespace symbolic //DX20200625
 
 #define LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 template <> char zero(char) { return (char) 0; }
 template <> char one(char) { return (char) 1; }
 
@@ -68,13 +71,16 @@ template <> float one(float) { return (float) 1.0; }
 
 template <> double zero(double) { return (double) 0.0; }
 template <> double one(double) { return (double) 1.0; }
+} //namespace symbolic //DX20200625
 
 #undef LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 template <class T>
 complex<T> zero(complex<T>) { return complex<T>(zero(T())); }
 
 template <class T>
 complex<T> one(complex<T>) { return complex<T>(one(T())); }
+} //namespace symbolic //DX20200625
 
 #endif

@@ -38,6 +38,7 @@ using namespace std;
 
 // Multinomial class
 
+namespace symbolic{ //DX20200625
 template <class T>
 class Multinomial
 {
@@ -597,5 +598,6 @@ Multinomial<T> zero(Multinomial<T>) {return Multinomial<T>(zero(T()));}
 
 template <class T>
 Multinomial<T> one(Multinomial<T>) {return Multinomial<T>(one(T()));}
+} //namespace symbolic //DX20200625
 
 #endif

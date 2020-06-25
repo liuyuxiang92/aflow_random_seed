@@ -28,6 +28,7 @@
 
 using namespace std;
 
+namespace symbolic{ //DX20200625
 class Cloning
 {
  private: int refcount;
@@ -68,6 +69,7 @@ class CastPtr: public CloningPtr
           T *operator->() const;
           T &operator*() const;
 };
+} //namespace symbolic //DX20200625
 
 #define LIBSYMBOLICCPLUSPLUS
 
@@ -75,14 +77,17 @@ class CastPtr: public CloningPtr
 // Cloning Implementation    //
 ///////////////////////////////
 
+namespace symbolic{ //DX20200625
 Cloning::Cloning() : refcount(0), free_p(0) {}
 
 Cloning::Cloning(const Cloning &c) : refcount(c.refcount), free_p(c.free_p) { }
 
 Cloning::~Cloning() {}
+} //namespace symbolic //DX20200625
 
 #undef LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 template <class T> Cloning *Cloning::clone(const T &t)
 {
  T *tp = new T(t);
@@ -96,9 +101,11 @@ template <class T> void Cloning::free(Cloning *c)
  T *tp = dynamic_cast<T*>(c);
  if(tp != 0) delete tp;
 }
+} //namespace symbolic //DX20200625
 
 #define LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 void Cloning::reference(Cloning *c)
 { if(c != 0 && c->refcount != 0) c->refcount++; }
 
@@ -142,6 +149,7 @@ CloningPtr &CloningPtr::operator=(const CloningPtr &p)
  Cloning::reference(value = p.value);
  return *this;
 }
+} //namespace symbolic //DX20200625
 
 #undef LIBSYMBOLICCPLUSPLUS
 
@@ -149,6 +157,7 @@ CloningPtr &CloningPtr::operator=(const CloningPtr &p)
 // CastPtr Implementation    //
 ///////////////////////////////
 
+namespace symbolic{ //DX20200625
 template <class T> CastPtr<T>::CastPtr() : CloningPtr() {}
 
 template <class T> CastPtr<T>::CastPtr(const Cloning &p) : CloningPtr(p) {}
@@ -170,5 +179,6 @@ template <class T> T &CastPtr<T>::operator*() const
  if(tp == 0) throw bad_cast();
  return *tp;
 }
+} //namespace symbolic //DX20200625
 
 #endif

@@ -2173,7 +2173,7 @@ namespace anrl {
 #ifdef COMPILE_SYMBOLIC
       // ---------------------------------------------------------------------------
       // get symbolic lattice
-      Symbolic lattice_symbolic = SymbolicANRLPrimitiveLattices(lattice_and_centering_from_Pearson, space_group_letter);
+      symbolic::Symbolic lattice_symbolic = SymbolicANRLPrimitiveLattices(lattice_and_centering_from_Pearson, space_group_letter);
 
       // ---------------------------------------------------------------------------
       // re-sort to alphabetic/type ordering 
@@ -2189,21 +2189,21 @@ namespace anrl {
 
       // ---------------------------------------------------------------------------
       // convert to symbolic equations 
-      //vector<Symbolic> all_symbolic_equations;
+      //vector<symbolic::Symbolic> all_symbolic_equations;
       //for(uint i=0;i<Wyckoff_sites_ordered_by_type.size();i++){
-      //  vector<Symbolic> symbolic_equation = equations2SymbolicEquations(Wyckoff_sites_ordered_by_type[i].equations);
+      //  vector<symbolic::Symbolic> symbolic_equation = equations2SymbolicEquations(Wyckoff_sites_ordered_by_type[i].equations);
       //  all_symbolic_equations.insert(all_symbolic_equations.end(), symbolic_equation.begin(), symbolic_equation.end());
       //}
 
       // ---------------------------------------------------------------------------
       // transform to ANRL primitive cell 
-      //vector<Symbolic> reduced_symbolic_equation = convertEquations2FractionalEquations(lattice_and_centering_from_Pearson, lattice_symbolic, all_symbolic_equations);
+      //vector<symbolic::Symbolic> reduced_symbolic_equation = convertEquations2FractionalEquations(lattice_and_centering_from_Pearson, lattice_symbolic, all_symbolic_equations);
       for(uint i=0;i<Wyckoff_sites_symbolic.size();i++){
         Wyckoff_sites_symbolic[i].equations = convertEquations2FractionalEquations(lattice_and_centering_from_Pearson, lattice_symbolic, Wyckoff_sites_symbolic[i].equations);
       }
 
       substituteVariableWithParameterDesignation(Wyckoff_sites_symbolic); 
-      vector<Symbolic> symbolic_equations;
+      vector<symbolic::Symbolic> symbolic_equations;
       for(uint i=0;i<Wyckoff_sites_symbolic.size();i++){
         symbolic_equations.insert(symbolic_equations.end(), Wyckoff_sites_symbolic[i].equations.begin(), Wyckoff_sites_symbolic[i].equations.end());
       }
@@ -2521,7 +2521,7 @@ namespace symbolic {
 // anrl::SymbolicANRLPrimitiveLattices()
 // *************************************************************************** 
 namespace anrl {
-  Symbolic SymbolicANRLPrimitiveLattices(const string& lattice_and_centering, const char& space_group_letter){ 
+  symbolic::Symbolic SymbolicANRLPrimitiveLattices(const string& lattice_and_centering, const char& space_group_letter){
     
     // Grab symbolic representation of primitive lattice in the ANRL convention.
 
@@ -2533,18 +2533,18 @@ namespace anrl {
       cerr << function_name << " first character of space group symbol: " << space_group_letter << endl;
     }
 
-    Symbolic lattice("L",3,3);
+    symbolic::Symbolic lattice("L",3,3);
 
     // ---------------------------------------------------------------------------
     // create symbolic list of characters
-    Symbolic a("a");
-    Symbolic b("b");
-    Symbolic c("c");
-    Symbolic cx("cx");
-    Symbolic cy("cy");
-    Symbolic cz("cz");
-    Symbolic beta("beta");
-    Symbolic gamma("gamma");
+    symbolic::Symbolic a("a");
+    symbolic::Symbolic b("b");
+    symbolic::Symbolic c("c");
+    symbolic::Symbolic cx("cx");
+    symbolic::Symbolic cy("cy");
+    symbolic::Symbolic cz("cz");
+    symbolic::Symbolic beta("beta");
+    symbolic::Symbolic gamma("gamma");
 
     // ---------------------------------------------------------------------------
     // triclinic (aP)
@@ -2677,7 +2677,7 @@ namespace anrl {
 // anrl::equations2SymbolicEquations()
 // *************************************************************************** 
 namespace anrl {
-  vector<Symbolic> equations2SymbolicEquations(const vector<vector<string> >& equations){
+  vector<symbolic::Symbolic> equations2SymbolicEquations(const vector<vector<string> >& equations){
     
     // Convert equations (vector<vector<string> >) to symbolic notation.
 
@@ -2685,10 +2685,10 @@ namespace anrl {
     string function_name = XPID + "anrl::equations2SymbolicEquations():";
     stringstream message;
 
-    vector<Symbolic> symbolic_equations;
+    vector<symbolic::Symbolic> symbolic_equations;
 
     for(uint i=0;i<equations.size();i++){
-      Symbolic position("pos", 3);
+      symbolic::Symbolic position("pos", 3);
       if(equations[i].size()!=3){
         message << "Equation " << i << " does not have 3 coordinates (problem with ITC library coordinates): " << aurostd::joinWDelimiter(equations[i],",");
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_GENERIC_ERROR_);
@@ -2718,7 +2718,7 @@ namespace anrl {
 // anrl::cartesian2lattice()
 // *************************************************************************** 
 namespace anrl {
-  Symbolic cartesian2lattice(const Symbolic& lattice, const Symbolic& cartesian_coordinate){ 
+  symbolic::Symbolic cartesian2lattice(const symbolic::Symbolic& lattice, const symbolic::Symbolic& cartesian_coordinate){
  
     // converts Cartesian coordinates to lattice coordinates
     // this is the symbolic math equivalent to C2F()
@@ -2728,16 +2728,16 @@ namespace anrl {
 
     // ---------------------------------------------------------------------------
     // calculate volume (symbolic) 
-    Symbolic volume = lattice.row(0)|((lattice.row(1)%(lattice.row(2))).transpose()); // | is dot product, % is cross product
+    symbolic::Symbolic volume = lattice.row(0)|((lattice.row(1)%(lattice.row(2))).transpose()); // | is dot product, % is cross product
     if(LDEBUG){
       cerr << function_name << " symbolic volume=" << volume << endl;
     }
 
     // ---------------------------------------------------------------------------
     // determine transformation matrix (vectors) 
-    Symbolic b1 = (lattice.row(1)%(lattice.row(2)))/volume;
-    Symbolic b2 = (lattice.row(2)%(lattice.row(0)))/volume;
-    Symbolic b3 = (lattice.row(0)%(lattice.row(1)))/volume;
+    symbolic::Symbolic b1 = (lattice.row(1)%(lattice.row(2)))/volume;
+    symbolic::Symbolic b2 = (lattice.row(2)%(lattice.row(0)))/volume;
+    symbolic::Symbolic b3 = (lattice.row(0)%(lattice.row(1)))/volume;
     
 		if(LDEBUG){
       cerr << function_name << " transformation vectors b1=" << b1 << endl;
@@ -2747,7 +2747,7 @@ namespace anrl {
     
     // ---------------------------------------------------------------------------
     // convert to lattice coordinate 
-		Symbolic lattice_coordinate("latt_coord",3);
+    symbolic::Symbolic lattice_coordinate("latt_coord",3);
     lattice_coordinate(0)=(cartesian_coordinate|b1).simplify();
     lattice_coordinate(1)=(cartesian_coordinate|b2).simplify();
     lattice_coordinate(2)=(cartesian_coordinate|b3).simplify();
@@ -2764,23 +2764,23 @@ namespace anrl {
 // anrl::getXYZ2LatticeTransformation() 
 // *************************************************************************** 
 namespace anrl{
-  Symbolic getXYZ2LatticeTransformation(const string& lattice_and_centering){
+  symbolic::Symbolic getXYZ2LatticeTransformation(const string& lattice_and_centering){
     
     // gets transformation matrix from XYZ coordinates (ITC equations) to 
     // the Cartesian coordinates with respect to the lattice vectors.
    
-    Symbolic xyz2lattice("xyz2lattice",3,3);
+    symbolic::Symbolic xyz2lattice("xyz2lattice",3,3);
     
     // ---------------------------------------------------------------------------
     // create symbolic list of characters
-    Symbolic a("a");
-    Symbolic b("b");
-    Symbolic c("c");
-    Symbolic cx("cx");
-    Symbolic cy("cy");
-    Symbolic cz("cz");
-    Symbolic beta("beta");
-    Symbolic gamma("gamma");
+    symbolic::Symbolic a("a");
+    symbolic::Symbolic b("b");
+    symbolic::Symbolic c("c");
+    symbolic::Symbolic cx("cx");
+    symbolic::Symbolic cy("cy");
+    symbolic::Symbolic cz("cz");
+    symbolic::Symbolic beta("beta");
+    symbolic::Symbolic gamma("gamma");
 
     // ---------------------------------------------------------------------------
     if(lattice_and_centering == "aP"){
@@ -2824,9 +2824,9 @@ namespace anrl{
 // anrl::getEquationsForCenteredLattices() 
 // *************************************************************************** 
 namespace anrl {
-  vector<Symbolic> getEquationsForCenteredLattices(const string& lattice_and_centering, 
-      const Symbolic& lattice, 
-      const vector<Symbolic>& conventional_equations){ 
+  vector<symbolic::Symbolic> getEquationsForCenteredLattices(const string& lattice_and_centering,
+      const symbolic::Symbolic& lattice,
+      const vector<symbolic::Symbolic>& conventional_equations){
     
     // convert equations to lattice equations for centered lattice (C, I, F).
 
@@ -2834,17 +2834,17 @@ namespace anrl {
     string function_name = XPID + "anrl:getEquationsForCenteredLattices():";
     stringstream message;
 
-    vector<Symbolic> lattice_equations;
+    vector<symbolic::Symbolic> lattice_equations;
     
 		// ---------------------------------------------------------------------------
     // get symbolic transformation matrix for a particular lattice 
-    Symbolic xyz2lattice = getXYZ2LatticeTransformation(lattice_and_centering);
+    symbolic::Symbolic xyz2lattice = getXYZ2LatticeTransformation(lattice_and_centering);
     if(LDEBUG){ cerr << function_name << " symbolic transformation from xyz to lattice: " << xyz2lattice << endl; }
 
     // ---------------------------------------------------------------------------
     // transform symbolic coordinates 
     for(uint i=0;i<conventional_equations.size();i++){
-      Symbolic vec = xyz2lattice*conventional_equations[i];
+      symbolic::Symbolic vec = xyz2lattice*conventional_equations[i];
       lattice_equations.push_back(cartesian2lattice(lattice, vec).simplify());
     }
 
@@ -2872,7 +2872,7 @@ namespace anrl {
 
 		// ---------------------------------------------------------------------------
     // remove duplicates after bring in cell
-    vector<Symbolic> primitive_lattice_equations;
+    vector<symbolic::Symbolic> primitive_lattice_equations;
     for(uint i=0;i<lattice_equations.size();i++){
       bool is_unique_equation = true;
       for(uint j=0;j<primitive_lattice_equations.size();j++){
@@ -2896,13 +2896,13 @@ namespace anrl {
 // anrl::getEquationsForCenteredLattices() 
 // *************************************************************************** 
 namespace anrl {
-  vector<Symbolic> convertEquations2FractionalEquations(const string& lattice_and_centering, 
-      const Symbolic& lattice, 
-      const vector<Symbolic> conventional_equations){
+  vector<symbolic::Symbolic> convertEquations2FractionalEquations(const string& lattice_and_centering,
+      const symbolic::Symbolic& lattice,
+      const vector<symbolic::Symbolic> conventional_equations){
 
     // convert equations to lattice equations (fractional).
 
-    vector<Symbolic> transformed_equations;
+    vector<symbolic::Symbolic> transformed_equations;
 
     // ---------------------------------------------------------------------------
     // if C-, I-, F-centered, then the equations from ITC are xyz coordinates
@@ -2931,7 +2931,7 @@ namespace anrl {
 // symbolic::addSymbolicEquation2Atoms() 
 // *************************************************************************** 
 namespace anrl {
-  void addSymbolicEquation2Atoms(const vector<Symbolic>& equations, deque<_atom>& atoms, bool isfpos){
+  void addSymbolicEquation2Atoms(const vector<symbolic::Symbolic>& equations, deque<_atom>& atoms, bool isfpos){
    
     // add symbolic equations to atom.fpos_equation or atom.cpos_equation
     // converts from variables from Symbolic to string

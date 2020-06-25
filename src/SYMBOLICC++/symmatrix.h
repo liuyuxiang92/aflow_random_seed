@@ -30,7 +30,9 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_FORWARD
 #define SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_FORWARD
 
+namespace symbolic{ //DX20200625
 class SymbolicMatrix;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -39,6 +41,7 @@ class SymbolicMatrix;
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_DECLARE
 #define SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_DECLARE
 
+namespace symbolic{ //DX20200625
 class SymbolicMatrix
 : public CloningSymbolicInterface, public Matrix<Symbolic>
 {
@@ -66,6 +69,7 @@ class SymbolicMatrix
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -77,6 +81,7 @@ class SymbolicMatrix
 #define SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_DEFINE
 #define SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX
 
+namespace symbolic{ //DX20200625
 SymbolicMatrix::SymbolicMatrix(const SymbolicMatrix &s)
 : CloningSymbolicInterface(s), Matrix<Symbolic>(s) {}
 
@@ -193,7 +198,8 @@ Symbolic SymbolicMatrix::integrate(const Symbolic &s) const
  SymbolicMatrix m(rows(),cols());
  for(int r = rows()-1;r>=0;r--)
   for(int c = cols()-1;c>=0;c--)
-   m[r][c] = ::integrate(Matrix<Symbolic>::operator[](r)[c],s);
+   //DX20200625 - subst "::" with "symbolic::" - m[r][c] = ::integrate(Matrix<Symbolic>::operator[](r)[c],s);
+   m[r][c] = symbolic::integrate(Matrix<Symbolic>::operator[](r)[c],s); //DX20200625 - subst "::" with "symbolic::"
 
  return m;
 }
@@ -265,6 +271,7 @@ SymbolicMatrix::match_parts(const Symbolic &s, const list<Symbolic> &p) const
    pattern_match_OR(l, Matrix<Symbolic>::operator[](r)[c].match_parts(s, p));
  return l;
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

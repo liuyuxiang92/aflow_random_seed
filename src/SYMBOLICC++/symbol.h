@@ -31,8 +31,10 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOL_FORWARD
 #define SYMBOLIC_CPLUSPLUS_SYMBOL_FORWARD
 
+namespace symbolic{ //DX20200625
 class Symbol;
 class UniqueSymbol;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -41,6 +43,7 @@ class UniqueSymbol;
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOL_DECLARE
 #define SYMBOLIC_CPLUSPLUS_SYMBOL_DECLARE
 
+namespace symbolic{ //DX20200625
 class Symbol: public CloningSymbolicInterface
 {
  public: string name;
@@ -86,6 +89,7 @@ class UniqueSymbol: public Symbol
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -101,6 +105,7 @@ class UniqueSymbol: public Symbol
 // Implementation of Symbol         //
 //////////////////////////////////////
 
+namespace symbolic{ //DX20200625
 Symbol::Symbol(const Symbol &s)
 : CloningSymbolicInterface(s),
   name(s.name), parameters(s.parameters), commutes(s.commutes) {}
@@ -342,6 +347,7 @@ void UniqueSymbol::print(ostream &o) const
 
 int UniqueSymbol::compare(const Symbolic &s) const
 { return (type() == s.type() && p == CastPtr<UniqueSymbol>(s)->p); }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

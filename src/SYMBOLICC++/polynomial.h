@@ -34,6 +34,7 @@ using namespace std;
 
 //Polynomial class
 
+namespace symbolic{ //DX20200625
 template <class T>
 class Polynomial
 {
@@ -671,5 +672,6 @@ Polynomial<T> zero(Polynomial<T>) { return Polynomial<T>(zero(T())); }
 
 template <class T>
 Polynomial<T> one(Polynomial<T>) { return Polynomial<T>(one(T())); }
+} //namespace symbolic //DX20200625
 
 #endif

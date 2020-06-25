@@ -34,10 +34,12 @@
 #ifndef SYMBOLIC_CPLUSPLUS_INTEGRATE_DECLARE
 #define SYMBOLIC_CPLUSPLUS_INTEGRATE_DECLARE
 
+namespace symbolic{ //DX20200625
 Symbolic integrate(const Symbolic &,const Symbolic &);
 Symbolic integrate(const Symbolic &,const Symbolic &,
                    const Symbolic &,const Symbolic &);
 Symbolic integrate(const Symbolic &,const Symbolic &,unsigned int);
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -48,6 +50,7 @@ Symbolic integrate(const Symbolic &,const Symbolic &,unsigned int);
 #ifndef SYMBOLIC_CPLUSPLUS_INTEGRATE_DEFINE
 #define SYMBOLIC_CPLUSPLUS_INTEGRATE_DEFINE
 
+namespace symbolic{ //DX20200625
 Symbolic integrate(const Symbolic &f,const Symbolic &x)
 {
  list<Equations> eq;
@@ -200,6 +203,7 @@ Symbolic integrate(const Symbolic &s,const Symbolic &x,unsigned int i)
  while(i-- > 0) r = integrate(r,x);
  return r;
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

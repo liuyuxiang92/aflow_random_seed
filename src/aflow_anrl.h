@@ -23,7 +23,7 @@
 
 // Symbolic math variables
 #ifdef COMPILE_SYMBOLIC
-#define _SYMBOLIC_ZERO_ Symbolic(0)
+#define _SYMBOLIC_ZERO_ symbolic::Symbolic(0)
 #define _SYMBOLIC_TOL_ 1e-3 
 #define _ANRL_LATTICE_VARIABLES_  "a,b,c,alpha,beta,gamma,cx,cy,cz"
 #define _ANRL_TRIG_VARIABLES_  "sin,cos,tan,sec,csc,cot"
@@ -300,7 +300,7 @@ struct SymbolicWyckoffSite {
   string site_symmetry;
   uint multiplicity;
   double site_occupation;
-  vector<Symbolic> equations;
+  vector<symbolic::Symbolic> equations;
   uint parameter_index;
 };
 
@@ -321,17 +321,17 @@ namespace symbolic {
 // ---------------------------------------------------------------------------
 // ANRL symbolic functions 
 namespace anrl {
-  Symbolic SymbolicANRLPrimitiveLattices(const string& lattice_and_centering, const char& space_group_letter);
-  vector<Symbolic> equations2SymbolicEquations(const vector<vector<string> >& equations);
-  Symbolic cartesian2lattice(const Symbolic& lattice, const Symbolic& cartesian_coordinate); 
-  Symbolic getXYZ2LatticeTransformation(const string& lattice_and_centering);
-  vector<Symbolic> getEquationsForCenteredLattices(const string& lattice_and_centering, 
-      const Symbolic& lattice, 
-      const vector<Symbolic>& conventional_equations);  
-  vector<Symbolic> convertEquations2FractionalEquations(const string& lattice_and_centering, 
-      const Symbolic& lattice, 
-      const vector<Symbolic> conventional_equations);
-  void addSymbolicEquation2Atoms(const vector<Symbolic>& equations, deque<_atom>& atoms, bool isfpos=true);
+  symbolic::Symbolic SymbolicANRLPrimitiveLattices(const string& lattice_and_centering, const char& space_group_letter);
+  vector<symbolic::Symbolic> equations2SymbolicEquations(const vector<vector<string> >& equations);
+  symbolic::Symbolic cartesian2lattice(const symbolic::Symbolic& lattice, const symbolic::Symbolic& cartesian_coordinate);
+  symbolic::Symbolic getXYZ2LatticeTransformation(const string& lattice_and_centering);
+  vector<symbolic::Symbolic> getEquationsForCenteredLattices(const string& lattice_and_centering,
+      const symbolic::Symbolic& lattice,
+      const vector<symbolic::Symbolic>& conventional_equations);
+  vector<symbolic::Symbolic> convertEquations2FractionalEquations(const string& lattice_and_centering,
+      const symbolic::Symbolic& lattice,
+      const vector<symbolic::Symbolic> conventional_equations);
+  void addSymbolicEquation2Atoms(const vector<symbolic::Symbolic>& equations, deque<_atom>& atoms, bool isfpos=true);
 }
 #endif 
 

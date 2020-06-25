@@ -30,6 +30,7 @@
 #include "vector.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <class T> T norm1(const Vector<T> &v)
 {
    T result(0);
@@ -38,16 +39,20 @@ template <class T> T norm1(const Vector<T> &v)
 }
 
 double norm1(const Vector<double> &v);
+} //namespace symbolic //DX20200625
 #define LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 double norm1(const Vector<double> &v)
 {
    double result(0);
    for(int i=0;i<int(v.size());i++) result = result + fabs(v[i]);
    return result;
 }
+} //namespace symbolic //DX20200625
 #undef LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 template <class T> double norm2(const Vector<T> &v)
 {
    T result(0);
@@ -67,8 +72,10 @@ template <class T> T normI(const Vector<T> &v)
 }
 
 double normI(const Vector<double> &v);
+} //namespace symbolic //DX20200625
 
 #define LIBSYMBOLICCPLUSPLUS
+namespace symbolic{ //DX20200625
 double normI(const Vector<double> &v)
 {
    double maxItem(fabs(v[0])), temp;
@@ -79,8 +86,10 @@ double normI(const Vector<double> &v)
    }
    return maxItem;
 }
+} //namespace symbolic //DX20200625
 #undef LIBSYMBOLICCPLUSPLUS
 
+namespace symbolic{ //DX20200625
 template <class T> Vector<T> normalize(const Vector<T> &v)
 {
    Vector<T> result(v.size());
@@ -88,4 +97,5 @@ template <class T> Vector<T> normalize(const Vector<T> &v)
    for(int i=0;i<int(v.size());i++) result[i] = v[i]/length;
    return result;
 }
+} //namespace symbolic //DX20200625
 #endif

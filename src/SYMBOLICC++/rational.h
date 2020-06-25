@@ -34,6 +34,7 @@
 #include "identity.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 template <class T>
 class Rational
 {
@@ -392,18 +393,28 @@ template <class T> T abs(const T &x)
    if(x > zero(T())) return x;
    return -x;
 }
+} //namespace symbolic //DX20200625
 
 #include "verylong.h"
+
+namespace symbolic{ //DX20200625
 template <> Rational<Verylong>::operator double() const;
+} //namespace symbolic //DX20200625
 
 #define LIBSYMBOLICCPLUSPLUS
+
+namespace symbolic{ //DX20200625
 template <> Rational<Verylong>::operator double() const { return div(p,q); }
+} //namespace symbolic //DX20200625
 
 #undef LIBSYMBOLICCPLUSPLUS
+
+namespace symbolic{ //DX20200625
 template <class T>
 Rational<T> zero(Rational<T>) { return Rational<T>(zero(T())); }
 
 template <class T>
 Rational<T> one(Rational<T>) { return Rational<T>(one(T())); }
+} //namespace symbolic //DX20200625
 
 #endif

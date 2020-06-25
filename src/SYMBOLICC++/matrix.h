@@ -34,6 +34,7 @@
 #include "vector.h"
 using namespace std;
 
+namespace symbolic{ //DX20200625
 // definition of class Matrix
 template <class T> class Matrix
 {
@@ -563,4 +564,5 @@ template <class T> istream & Matrix<T>::input(istream &s)
 
 template <class T> istream & operator >> (istream &s,Matrix<T> &m)
 { return m.input(s); }
+} //namespace symbolic //DX20200625
 #endif

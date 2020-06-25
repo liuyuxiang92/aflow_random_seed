@@ -30,7 +30,9 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_SUM_FORWARD
 #define SYMBOLIC_CPLUSPLUS_SUM_FORWARD
 
+namespace symbolic{ //DX20200625
 class Sum;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -39,6 +41,7 @@ class Sum;
 #ifndef SYMBOLIC_CPLUSPLUS_SUM_DECLARE
 #define SYMBOLIC_CPLUSPLUS_SUM_DECLARE
 
+namespace symbolic{ //DX20200625
 class Sum: public CloningSymbolicInterface
 {
  public: list<Symbolic> summands;
@@ -64,6 +67,7 @@ class Sum: public CloningSymbolicInterface
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -75,6 +79,7 @@ class Sum: public CloningSymbolicInterface
 #define SYMBOLIC_CPLUSPLUS_SUM_DEFINE
 #define SYMBOLIC_CPLUSPLUS_SUM
 
+namespace symbolic{ //DX20200625
 Sum::Sum() {}
 
 Sum::Sum(const Sum &s)
@@ -298,7 +303,8 @@ Symbolic Sum::integrate(const Symbolic &s) const
  list<Symbolic>::const_iterator i;
  Sum r;
  for(i=summands.begin();i!=summands.end();++i)
-  r.summands.push_back(::integrate(*i,s));
+  //DX20200625 - subst "::" with "symbolic::" - r.summands.push_back(::integrate(*i,s));
+  r.summands.push_back(symbolic::integrate(*i,s)); //DX20200625 - subst "::" with "symbolic::"
  return r;
 }
 
@@ -430,6 +436,7 @@ Sum::match_parts(const Symbolic &s, const list<Symbolic> &p) const
 
  return l;
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif

@@ -30,6 +30,7 @@ using namespace std;
 #ifndef SYMBOLIC_CPLUSPLUS_FUNCTIONS_FORWARD
 #define SYMBOLIC_CPLUSPLUS_FUNCTIONS_FORWARD
 
+namespace symbolic{ //DX20200625
 class Sin;
 class Cos;
 class Sinh;
@@ -50,6 +51,7 @@ class Kronecker;
 class DirectSum;
 class Hadamard;
 class Gamma;
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -58,6 +60,7 @@ class Gamma;
 #ifndef SYMBOLIC_CPLUSPLUS_FUNCTIONS_DECLARE
 #define SYMBOLIC_CPLUSPLUS_FUNCTIONS_DECLARE
 
+namespace symbolic{ //DX20200625
 class Sin: public Symbol
 {
  public: Sin(const Sin&);
@@ -281,6 +284,7 @@ class Gamma: public Symbol
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
@@ -296,6 +300,7 @@ class Gamma: public Symbol
 // Implementation of Sin            //
 //////////////////////////////////////
 
+namespace symbolic{ //DX20200625
 Sin::Sin(const Sin &s) : Symbol(s) {}
 
 Sin::Sin(const Symbolic &s) : Symbol(Symbol("sin")[s]) {}
@@ -466,7 +471,8 @@ Simplified Log::simplify() const
  if(b.type() == typeid(Numeric)                     &&
     Number<void>(b).numerictype() == typeid(double) &&
     CastPtr<const Number<double> >(b)->n > 0.0)
-  return Product(Number<double>(log(CastPtr<const Number<double> >(b)->n)),
+  //DX20200625 - "log" is from the "std" namespace - return Product(Number<double>(log(CastPtr<const Number<double> >(b)->n)),
+  return Product(Number<double>(std::log(CastPtr<const Number<double> >(b)->n)), //DX20200625 - "log" is from the "std" namespace
                  Power(ln(a),-1)).simplify();
  return *this;
 }
@@ -581,7 +587,8 @@ Simplified Power::simplify() const
    nd = double(CastPtr<const Number<Rational<Number<void> > > >(n)->n);
   else return Power(b,n);
   if(bd >= 0.0 || int(nd) == nd)
-   return Number<double>(pow(bd,nd));
+   //DX20200625 - "pow" is from the "std" namespace - return Number<double>(pow(bd,nd));
+   return Number<double>(std::pow(bd,nd)); //DX20200625 - "pow" is from the "std" namespace
  }
  if(b.type() == typeid(Numeric) &&
     n.type() == typeid(Numeric) &&
@@ -596,7 +603,8 @@ Simplified Power::simplify() const
    bd = double(CastPtr<const Number<Rational<Number<void> > > >(b)->n);
   else return Power(b,n);
   if(bd >= 0.0 || int(nd) == nd)
-   return Number<double>(pow(bd,nd));
+   //DX20200625 - "pow" is from the "std" namespace - return Number<double>(pow(bd,nd));
+   return Number<double>(std::pow(bd,nd)); //DX20200625 - "pow" is from the "std" namespace
  }
  return Power(b,n);
 }
@@ -791,7 +799,8 @@ Symbolic Derivative::subst(const Symbolic &x,const Symbolic &y,int &n) const
    Symbolic newdf = y;
    j = l->parameters.begin();
    for(++j;j!=l->parameters.end();++j)
-    newdf = ::df(newdf,*j);
+    //DX20200625 - subst "::" with "symbolic::" - newdf = ::df(newdf,*j);
+    newdf = symbolic::df(newdf,*j); //DX20200625 - subst "::" with "symbolic::"
    return newdf;
   }
  }
@@ -907,7 +916,8 @@ Symbolic Integral::subst(const Symbolic &x,const Symbolic &y,int &n) const
  list<Symbolic>::const_iterator i = parameters.begin();
  Symbolic dy = i->subst(x,y,n);
  for(++i;i!=parameters.end();++i)
-  dy = ::integrate(dy, i->subst(x,y,n));
+  //DX20200625 - subst "::" with "symbolic::" - dy = ::integrate(dy, i->subst(x,y,n));
+  dy = symbolic::integrate(dy, i->subst(x,y,n)); //DX20200625 - subst "::" with "symbolic::"
  return dy;
 }
 
@@ -1149,6 +1159,7 @@ Simplified Gamma::simplify() const
  }
  return Gamma(s);
 }
+} //namespace symbolic //DX20200625
 
 #endif
 #endif
