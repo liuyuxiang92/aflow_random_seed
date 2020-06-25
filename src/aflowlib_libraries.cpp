@@ -5708,6 +5708,8 @@ namespace aflowlib {
     string directory_LIB;
     // OBSOLETE bool flag_files_LIB=FALSE;
     string PROJECT_LIBRARY;
+    string AflowInName = "";
+    string FileLockName = "";    
     if(LOCAL) {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
@@ -5763,17 +5765,33 @@ namespace aflowlib {
       // CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
       //   cerr << XPID << "CORMAC" << endl;exit(0);
       if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-        //	aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-        aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-        aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
+        // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+        // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+        // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
+	FileLockName = "agl.LOCK";
       }
+      if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
+	AflowInName="agl_aflow.in";
+      }
+      //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
+      //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
+      KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
       // cerr << XPID << "CORMAC" << endl;exit(0);
       // if(_AFLOWIN_=="aflow.in")
-      if (XHOST.QUIET) {      //CT20190903
-        aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
-      } else {
-        aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
+      if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
+	aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
+        aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
+	FileLockName = "ael.LOCK";
       }
+      if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
+	AflowInName="ael_aflow.in";
+      }      
+      KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
+      // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
+      // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
+      // [OBSOLETE] } else {
+      // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
+      // [OBSOLETE] }
     }
     if(LDEBUG) cerr << XPID << "aflowlib::LIB2LIB: END" << endl;
     return TRUE;

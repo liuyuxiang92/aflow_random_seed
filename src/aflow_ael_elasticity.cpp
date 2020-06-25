@@ -325,6 +325,17 @@ namespace KBIN {
 
     // Call AEL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
     uint aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
+    if (aelerror != 0) { //CT20200624: Check for error, aelerror=2 implies not an AEL main directory
+      if (aelerror == 2) {
+	cerr << _AELSTR_MESSAGE_ << "Not AEL main directory" << endl;
+	return;
+      } else {
+	aurostd::StringstreamClean(aus);
+	aus << _AELSTR_ERROR_ + "AEL set xvasp flags failed" << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	return;
+      }
+    }
 
     // Set AEL postprocess flag to true
     AEL_data.postprocess = true;
