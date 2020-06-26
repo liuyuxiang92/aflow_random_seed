@@ -1,5 +1,17 @@
-3.2.4 - 2020/06/25
+3.2.5 - 2020/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
+        -- extended CleanStringASCII_InPlace() to include ALL ASCII characters (CO)
+        -- added NELM and NELM_STATIC options to VASP_FORCE_OPTIONS and aflow.rc (CO)
+        -- added ISMEAR_SCHEME, ISMEAR_STATIC_SCHEME, and ISMEAR_STATIC_BANDS_SCHEME options to VASP_FORCE_OPTIONS and aflow.rc (CO)
+        -- added SIGMA, SIGMA_STATIC, and SIGMA_STATIC_BANDS options to VASP_FORCE_OPTIONS and aflow.rc (CO)
+        -- added MAX_VASP_NELM to aflow.rc and created a xwarning/xfixed scheme for NELM (CO)
+        -- patched generation of INCAR, removed duplicate lines like SYSTEM=XXXX (CO)
+        -- patched removal of NELM from INCAR vs. NELMIN (CO)
+        -- added XVASP_Afix_NELM() and XVASP_Afix_ISMEAR() (CO)
+        -- added auto-patches for EDDRMM errors (CO)
+        -- patched SYM errors/warnings, ignoring if ISYM=0 (CO+ME)
+        -- added NELM to xOUTCAR (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

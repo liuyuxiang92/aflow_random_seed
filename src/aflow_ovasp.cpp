@@ -44,6 +44,7 @@ void xOUTCAR::free() {
   vcontent.clear();             // for aflowlib_libraries.cpp
   filename="";                  // for aflowlib_libraries.cpp
   SYSTEM = "";                  // for aflowlib_libraries.cpp 
+  NELM=0;                       // for xwarnings  //CO20200624
   NIONS=0;                      // for aflowlib_libraries.cpp
   Efermi=0.0;                   // for aflowlib_libraries.cpp
   isLSCOUPLING=FALSE;           // for aflowlib_libraries.cpp
@@ -214,6 +215,7 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   vcontent.clear(); for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
   filename=b.filename;
   SYSTEM = b.SYSTEM; // camilo
+  NELM=b.NELM;  //CO20200624
   NIONS=b.NIONS;
   Efermi=b.Efermi;
   isLSCOUPLING=b.isLSCOUPLING;
@@ -353,6 +355,7 @@ ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  //SC20200330
   oss << " filename=" << xOUT.filename<< endl;
   oss << " vcontent.size()=" << xOUT.vcontent.size() << endl;
   oss << " SYSTEM=" << xOUT.SYSTEM << endl;
+  oss << " NELM=" << xOUT.NELM << endl; //CO20200624
   oss << " NIONS=" << xOUT.NIONS << endl;
   oss << " Efermi=" << xOUT.Efermi << endl;
   oss << " isLSCOUPLING=" << xOUT.isLSCOUPLING << endl;
@@ -669,10 +672,21 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // ----------------------------------------------------------------------
   if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
   if(LDEBUG) cerr << soliloquy << " LOAD KESONG STUFF (" << time_delay(seconds) << ")" << endl;
+  string anchor_word_NELM="NELM"; //CO20200624
   string anchor_word_NIONS="NIONS";
   string anchor_word_LSORBIT="LSORBIT =";
   string anchor_word_Efermi="E-fermi";
+  string tmp="";
   while(getline(sss,line)) {
+    if(line.find(anchor_word_NELM) !=string::npos) {  //CO20200624
+      aurostd::string2tokens(line,tokens,";");
+      if(tokens.size()<1){continue;}
+      tmp=tokens[0];
+      aurostd::string2tokens(tmp,tokens,"=");
+      if(tokens.size()<2){continue;}
+      tmp=tokens[1];
+      NELM=aurostd::string2utype<int>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tmp));
+    }
     if(line.find(anchor_word_NIONS) !=string::npos) {
       aurostd::string2tokens(line,tokens," ");
       NIONS=aurostd::string2utype<int>(tokens.at(tokens.size()-1)); //last one
@@ -688,6 +702,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       Efermi=aurostd::string2utype<double>(tokens.at(2));
     }
   }
+  if(LDEBUG) cerr << soliloquy << " NELM=" << NELM << endl; //exit(0);  //CO20200624
   if(LDEBUG) cerr << soliloquy << " NIONS=" << NIONS << endl; //exit(0);
   if(LDEBUG) cerr << soliloquy << " isLSCOUPLING=" << isLSCOUPLING << endl; //exit(0);
   if(LDEBUG) cerr << soliloquy << " Efermi=" << Efermi << endl; //exit(0);

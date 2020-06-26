@@ -265,6 +265,13 @@ namespace aurostd {
   unsigned long long int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
+
+enum FSIO {  //CO20200624 - for execute2string
+  stdout_fsio,
+  stderr_fsio,
+  stdouterr_fsio
+};
+
 namespace aurostd {
   void sizes(void) __xprototype;
   // aflow_aurostd.cpp
@@ -456,21 +463,22 @@ namespace aurostd {
   // about executing
   bool execute(ostringstream& command);
   bool execute(stringstream& command);
-  bool execute(string command);
-  bool execute(vector<string> vcommand);
-  bool execute(deque<string> dcommand);
+  bool execute(const string& command);
+  bool execute(const vector<string>& vcommand);
+  bool execute(const deque<string>& dcommand);
 #ifdef _stringcharstar_
   bool execute(char* command);
 #endif
   // Execute and report
-  string execute2string(ostringstream& command);
-  string execute2string(stringstream& command);
-  string execute2string(string command);
-  vector<string> execute2string(vector<string> vcommand);
-  deque<string> execute2string(deque<string> dcommand);
+  string execute2string(ostringstream& command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  string execute2string(stringstream& command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  string execute2string(const string& command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  vector<string> execute2string(const vector<string>& vcommand,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  deque<string> execute2string(const deque<string>& dcommand,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
 #ifdef _stringcharstar_
-  string execute2string(char* command);
+  string execute2string(char* command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
 #endif
+  string CleanCommand4Execute(const string& _command); //CO20200624
   template<class utype> utype execute2utype(ostringstream& command);
   template<class utype> utype execute2utype(stringstream& command);
   template<class utype> utype execute2utype(string command);

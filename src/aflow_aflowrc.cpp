@@ -254,56 +254,74 @@
 #define         DEFAULT_VASP_PREC_EDIFFG                      XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_EDIFFG")
 
 // OPTIONS // DONE
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR                   string("./INCAR")
-#define         DEFAULT_VASP_EXTERNAL_INCAR                   XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_INCAR")
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR                  string("./POSCAR")
-#define         DEFAULT_VASP_EXTERNAL_POSCAR                  XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POSCAR")
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR                  string("./POTCAR")
-#define         DEFAULT_VASP_EXTERNAL_POTCAR                  XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POTCAR")
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_KPOINTS                 string("./KPOINTS")
-#define         DEFAULT_VASP_EXTERNAL_KPOINTS                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_KPOINTS")
-#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_CONTROL                 string("./control.in")
-#define         DEFAULT_AIMS_EXTERNAL_CONTROL                 XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_CONTROL")
-#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM                    string("./geometry.in")
-#define         DEFAULT_AIMS_EXTERNAL_GEOM                    XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_GEOM")
-#define AFLOWRC_DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE             string("potpaw_PBE")
-#define         DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE             XHOST.adefault.getattachedscheme("DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME   string("ENERGY")
-#define         DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME   XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         2 //CO20181226
-#define         DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT") //CO20181226
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME         string("ACCURATE")
-#define         DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME         string("NORMAL")
-#define         DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME      string("NONE")
-#define         DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME      XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME         string("0")  
-#define         DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME         string("DEFAULT")
-#define         DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME        string("DEFAULT")
-#define         DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME        XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM                 TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_SYM                 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SYM") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN                TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_SPIN                XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 TRUE  //ME20190308 - remove spin after two relaxations if zero
-#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER               FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_BADER               XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_BADER") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ELF                 FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_ELF                 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_ELF") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM         FALSE   // TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_WAVECAR             FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_WAVECAR             XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_WAVECAR") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_CHGCAR              TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_CHGCAR              XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_CHGCAR") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_LSCOUPLING          FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_LSCOUPLING          XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_LSCOUPLING") 
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR                           string("./INCAR")
+#define         DEFAULT_VASP_EXTERNAL_INCAR                           XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_INCAR")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR                          string("./POSCAR")
+#define         DEFAULT_VASP_EXTERNAL_POSCAR                          XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POSCAR")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR                          string("./POTCAR")
+#define         DEFAULT_VASP_EXTERNAL_POTCAR                          XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POTCAR")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_KPOINTS                         string("./KPOINTS")
+#define         DEFAULT_VASP_EXTERNAL_KPOINTS                         XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_KPOINTS")
+#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_CONTROL                         string("./control.in")
+#define         DEFAULT_AIMS_EXTERNAL_CONTROL                         XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_CONTROL")
+#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM                            string("./geometry.in")
+#define         DEFAULT_AIMS_EXTERNAL_GEOM                            XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_GEOM")
+#define AFLOWRC_DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE                     string("potpaw_PBE")
+#define         DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE                     XHOST.adefault.getattachedscheme("DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME           string("ENERGY")
+#define         DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME           XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT                 2 //CO20181226
+#define         DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT                 XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT") //CO20181226
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME                 string("ACCURATE")
+#define         DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME                 string("NORMAL")
+#define         DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME              string("NONE")
+#define         DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME              XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME                 string("0")  
+#define         DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME                 string("DEFAULT")
+#define         DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME               1 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME               XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME        -5 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME        XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME  0 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME  XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA                       0.1 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_SIGMA                       XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_FORCE_OPTION_SIGMA")  //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC                0.05 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC                XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC")  //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS          0.05 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS          XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS")  //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM                        60  //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_NELM                        XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_NELM") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC                 120 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_NELM_STATIC                 XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_NELM_STATIC")  //CO20200624
+#define AFLOWRC_MAX_VASP_NELM                                         1000  //CO20200624
+#define         MAX_VASP_NELM                                         XHOST.adefault.getattachedutype<int>("MAX_VASP_NELM") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME                string("DEFAULT")
+#define         DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME                XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM                         TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_SYM                         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SYM") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN                        TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_SPIN                        XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1         FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2         TRUE  //ME20190308 - remove spin after two relaxations if zero
+#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER                       FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_BADER                       XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_BADER") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ELF                         FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_ELF                         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_ELF") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM                 FALSE   // TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM                 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_WAVECAR                     FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_WAVECAR                     XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_WAVECAR") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_CHGCAR                      TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_CHGCAR                      XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_CHGCAR") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_LSCOUPLING                  FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_LSCOUPLING                  XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_LSCOUPLING") 
 
 // AFLOW_LIBRARY AFLOW_PROJECT // DONE
 #define AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES             string("/common/AFLOW/LIBS/,/home/aflow/common/AFLOW/LIBS/,/fslhome/glh43/src/,/usr/local/bin/,/fslhome/fslcollab8/group/bin/,/home/auro/work/AFLOW3/,~/common/AFLOW/LIBS/,./,/nics/a/proj/aflow/common/AFLOW/LIBS/,/home/users/aflow/common/AFLOW/LIBS,/home/junkai/PROTO_DATABASE/,/projects/kyang-group/common/LIBS,/somewhere/")  // first is default, tokenized with ","
@@ -1202,6 +1220,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SIGMA",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_NELM",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_NELM_STATIC",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC); //CO20200624
+    aflowrc::load_default("MAX_VASP_NELM",AFLOWRC_MAX_VASP_NELM); //CO20200624
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SYM",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SPIN",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN);
@@ -1746,6 +1773,15 @@ namespace aflowrc {
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_SIGMA=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_NELM=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM << endl; //CO20200624
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_NELM_STATIC=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC << endl; //CO20200624
+    aflowrc << "MAX_VASP_NELM=" << AFLOWRC_MAX_VASP_NELM << endl; //CO20200624
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_SYM=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_SPIN=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN << endl;
@@ -2268,6 +2304,15 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_FORCE_OPTION_SIGMA\")=\"" << DEFAULT_VASP_FORCE_OPTION_SIGMA << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC\")=\"" << DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS\")=\"" << DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_NELM\")=" << DEFAULT_VASP_FORCE_OPTION_NELM << endl; //CO20200624
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_NELM_STATIC\")=" << DEFAULT_VASP_FORCE_OPTION_NELM_STATIC << endl; //CO20200624
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"MAX_VASP_NELM\")=" << MAX_VASP_NELM << endl; //CO20200624
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_SYM\")=" << DEFAULT_VASP_FORCE_OPTION_SYM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_SPIN\")=" << DEFAULT_VASP_FORCE_OPTION_SPIN << endl;

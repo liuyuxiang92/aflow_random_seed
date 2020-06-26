@@ -670,6 +670,51 @@ DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME
   choices: DEFAULT, METAL, INSULATOR, SEMICONDUCTOR
   default: DEFAULT
 
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME
+  description: Default VASP ISMEAR scheme.
+  type: int
+  default: 1
+
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME
+  description: Default VASP ISMEAR scheme for STATIC runs.
+  type: int
+  default: -5
+
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME
+  description: Default VASP ISMEAR scheme for STATIC_BANDS runs.
+  type: int
+  default: 0
+
+DEFAULT_VASP_FORCE_OPTION_SIGMA
+  description: Default VASP SIGMA value.
+  type: double
+  default: 0.01
+
+DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC
+  description: Default VASP SIGMA value for STATIC runs.
+  type: double
+  default: 0.05
+
+DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS
+  description: Default VASP SIGMA value for STATIC_BANDS runs.
+  type: double
+  default: 0.05
+
+DEFAULT_VASP_NELM
+  description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP runs.
+  type: int
+  default: 60
+
+DEFAULT_VASP_NELM_STATIC
+  description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP STATIC runs.
+  type: int
+  default: 120
+
+MAX_VASP_NELM
+  description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP should DEFAULT_VASP_FORCE_OPTION_NELM or DEFAULT_VASP_FORCE_OPTION_NELM_STATIC not be enough for convergence.
+  type: int
+  default: 1000
+
 DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME
   description: Default VASP Kerker mixing scheme settings. Defines AMIX/BMIX/AMIX_MAG/BMIX_MAG.
   type: string

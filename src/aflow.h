@@ -857,10 +857,22 @@ class _vflags {
     xoption KBIN_VASP_FORCE_OPTION_PSTRESS_EQUAL; // isentry and content_double
     // EDIFFG
     xoption KBIN_VASP_FORCE_OPTION_EDIFFG_EQUAL; // isentry and content_double
+    // NELM
+    xoption KBIN_VASP_FORCE_OPTION_NELM_EQUAL;  // isentry and content_double //CO20200624
+    // NELM_STATIC
+    xoption KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL;  // isentry and content_double //CO20200624
     // ISMEAR
     xoption KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL;  // isentry and content_double //CO20181129
     // SIGMA
     xoption KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL;  // isentry and content_double //CO20181129
+    // ISMEAR_STATIC
+    xoption KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL;  // isentry and content_double //CO20181129
+    // SIGMA_STATIC
+    xoption KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL;  // isentry and content_double //CO20181129
+    // ISMEAR_STATIC_BANDS
+    xoption KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL;  // isentry and content_double //CO20181129
+    // SIGMA_STATIC_BANDS
+    xoption KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL;  // isentry and content_double //CO20181129
     // RWIGS
     bool KBIN_VASP_FORCE_OPTION_RWIGS_STATIC;  
     xoption KBIN_VASP_FORCE_OPTION_SKIP_NOMIX;    // SKIP_NOMIX
@@ -2845,6 +2857,7 @@ namespace KBIN {
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
+  void VASP_CleanUp_INCAR(_xvasp& xvasp);
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
@@ -2920,7 +2933,10 @@ namespace KBIN {
   void XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,bool verbose,_aflags &aflags,ofstream &FileMESSAGE);
   void XVASP_Afix_NBANDS(_xvasp& xvasp,int& nbands,bool VERBOSE);
   void XVASP_Afix_POTIM(_xvasp& xvasp,double& potim,bool VERBOSE);
-  double XVASP_Afix_GENERIC(string mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double=0.0,int=0);
+  void XVASP_Afix_NELM(_xvasp& xvasp,int& potim,bool VERBOSE); //CO20200624
+  void XVASP_Afix_ISMEAR(_xvasp& xvasp,const string& mode,int scheme,bool VERBOSE); //CO20200624
+  double XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double param_double=0.0,int param_int=0); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  double XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& submode,double param_double=0.0,int param_int=0); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
 
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(string directory);  //ME20200217
@@ -3011,6 +3027,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string SYSTEM;
+    int NELM; //CO20200624
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;

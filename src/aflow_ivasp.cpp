@@ -591,8 +591,11 @@ namespace KBIN {
 // INCAR
 namespace KBIN {
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) { // AFLOW_FUNCTION_IMPLEMENTATION
-    if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::VASP_Produce_INCAR  empty AflowIn" << endl;exit(0);}
-    if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_INCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    string soliloquy=XPID+"KBIN::VASP_Produce_INCAR():";
+    //[CO20200624 - OBSOLETE]if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::VASP_Produce_INCAR  empty AflowIn" << endl;exit(0);}
+    if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"empty AflowIn",_FILE_NOT_FOUND_);}
+    //[CO20200624 - OBSOLETE]if(!kflags.AFLOW_MODE_VASP) {cerr << soliloquy << " should kflags.AFLOW_MODE_VASP be set ??" << endl;}
+    if(!kflags.AFLOW_MODE_VASP) {pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"kflags.AFLOW_MODE_VASP NOT set",std::cout,_LOGGER_WARNING_);}
     ostringstream aus;
     bool Krun=TRUE;
     xvasp.INCAR.str(std::string());
@@ -620,14 +623,14 @@ namespace KBIN {
     if(Krun && KBIN_VASP_INCAR_MODE_EMPTY) {  // [VASP_INCAR_MODE_EMPTY] construction
       aus << "00000  MESSAGE INCAR   generation EMPTY file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      xvasp.INCAR << "#AFLOW INCAR automatically generated" << endl;
+      xvasp.INCAR << "#AFLOW INCAR automatically generated (INCAR_MODE_EMPTY)" << endl; //CO20200624 - FIRST LINE!
     }
     // IMPLICIT ************************************************** INCAR
     if(Krun && vflags.KBIN_VASP_INCAR_MODE.flag("IMPLICIT")) {  // [VASP_INCAR_MODE_IMPLICIT] construction
       aus << "00000  MESSAGE INCAR   generation IMPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      xvasp.INCAR << "#AFLOW INCAR automatically generated (INCAR_MODE_IMPLICIT)" << endl; //CO20200624 - FIRST LINE!
       if(vflags.KBIN_VASP_INCAR_FILE.flag("SYSTEM_AUTO")) {
-        xvasp.INCAR << "#AFLOW INCAR automatically generated" << endl;
         xvasp.INCAR << "SYSTEM=" << xvasp.str.title << endl;
         xvasp.INCAR << "#PROTOTYPE=" << xvasp.str.prototype << endl;
         xvasp.INCAR << "#INFO=" << xvasp.str.info << endl;
@@ -641,12 +644,14 @@ namespace KBIN {
       if(vflags.KBIN_VASP_INCAR_FILE.flag("KEYWORD") && !vflags.KBIN_VASP_INCAR_MODE.flag("EXPLICIT_START_STOP")) {
         aus << "00000  MESSAGE INCAR   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xvasp.INCAR << "#AFLOW INCAR automatically generated (INCAR_MODE_EXPLICIT)" << endl; //CO20200624 - FIRST LINE!
         xvasp.INCAR << vflags.KBIN_VASP_INCAR_EXPLICIT.str(); //ME20181113
         // [OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xvasp.INCAR,"[VASP_INCAR_FILE]");
         // [ME20181226 OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xvasp.INCAR,"[VASP_INCAR_FILE]");
       } else if(!vflags.KBIN_VASP_INCAR_FILE.flag("KEYWORD") && vflags.KBIN_VASP_INCAR_MODE.flag("EXPLICIT_START_STOP")) {
         aus << "00000  MESSAGE INCAR   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xvasp.INCAR << "#AFLOW INCAR automatically generated (INCAR_MODE_EXPLICIT_START_STOP)" << endl; //CO20200624 - FIRST LINE!
         xvasp.INCAR << vflags.KBIN_VASP_INCAR_EXPLICIT_START_STOP.str();
         // [ME20181226 OBSOLETE] if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]STOP"))
         // [OBSOLETE]	aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xvasp.INCAR,"[VASP_INCAR_MODE_EXPLICIT]START","[VASP_INCAR_MODE_EXPLICIT]STOP");
@@ -705,6 +710,7 @@ namespace KBIN {
       string file;
       aus << "00000  MESSAGE INCAR   generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      xvasp.INCAR << "#AFLOW INCAR automatically generated (INCAR_MODE_EXTERNAL)" << endl; //CO20200624 - FIRST LINE!
       if(vflags.KBIN_VASP_INCAR_FILE.flag("COMMAND") && vflags.KBIN_VASP_INCAR_FILE.flag("FILE")) {
         aus << "EEEEE   [VASP_INCAR_MODE]FILE=  and  [VASP_INCAR_MODE]COMMAND=  can not be used together " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -762,13 +768,12 @@ namespace KBIN {
     }
     // INCAR DONE **************************************************
     xvasp.INCAR << "#incar" << endl;
+    VASP_CleanUp_INCAR(xvasp);  //CO20200624
     xvasp.INCAR_orig << xvasp.INCAR.str();
     xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
     return Krun;
   };  // KBIN::VASP_Produce_INCAR
 }
-
-
 
 namespace KBIN {
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
@@ -934,6 +939,24 @@ namespace KBIN {
       //  if(vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry || DEFAULT_VASP_FORCE_OPTION_ELF) KBIN::XVASP_INCAR_ELF(xvasp,vflags,vflags.KBIN_VASP_FORCE_OPTION_ELF.option); WILL BE DONE WHEN NEEDED
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
+
+    //CO20200624 - START
+    // NELM_EQUAL
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.isentry && xvasp.NRELAXING<=xvasp.NRELAX) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NELM=" << vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("NELM",xvasp,vflags,"",0,0.0,FALSE);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    }
+    
+    // NELM_STATIC_EQUAL
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NELM_STATIC=" << vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("NELM_STATIC",xvasp,vflags,"",0,0.0,FALSE);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    }
+    //CO20200624 - END
 
     // NSW_EQUAL
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_NSW_EQUAL) {           /*************** INCAR **************/
@@ -1145,7 +1168,7 @@ namespace KBIN {
     //CO20181128
     //this must come AFTER TYPE
     // with KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int
-    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.isentry) {      /*************** INCAR **************/
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.isentry && xvasp.NRELAXING<=xvasp.NRELAX) {      /*************** INCAR **************/
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]ISMEAR=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR",xvasp,vflags,"",0,0.0,FALSE);
@@ -1154,11 +1177,51 @@ namespace KBIN {
 
     //CO20181128
     //this must come AFTER TYPE
+    // with KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.isentry && xvasp.NRELAXING==xvasp.NRELAX+1) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]ISMEAR_STATIC=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR_STATIC",xvasp,vflags,"",0,0.0,FALSE);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    }
+    
+    //CO20181128
+    //this must come AFTER TYPE
+    // with KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX+1) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]ISMEAR_STATIC_BANDS=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR_STATIC_BANDS",xvasp,vflags,"",0,0.0,FALSE);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    }
+
+    //CO20181128
+    //this must come AFTER TYPE
     // with KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.content_double
-    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.isentry) {      /*************** INCAR **************/
-      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SIGMA=" << vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.content_double << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.isentry && xvasp.NRELAXING<=xvasp.NRELAX) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SIGMA=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_PREPARE_GENERIC("SIGMA",xvasp,vflags,"",0,0.0,FALSE);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    }
+    
+    //CO20181128
+    //this must come AFTER TYPE
+    // with KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.isentry && xvasp.NRELAXING==xvasp.NRELAX+1) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SIGMA_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("SIGMA_STATIC",xvasp,vflags,"",0,0.0,FALSE);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    }
+    
+    //CO20181128
+    //this must come AFTER TYPE
+    // with KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX+1) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SIGMA_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("SIGMA_STATIC_BANDS",xvasp,vflags,"",0,0.0,FALSE);
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
 
@@ -1256,11 +1319,38 @@ namespace KBIN {
 
     // ------------------------------------
     // end
+    VASP_CleanUp_INCAR(xvasp);  //CO20200624
     xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
     return Krun;
-  };  // KBIN::VASP_Produce_INCAR
+  };  // KBIN::VASP_Modify_INCAR
 }
 
+namespace KBIN {
+  void VASP_CleanUp_INCAR(_xvasp& xvasp){ //CO20200624
+    //remove duplicate lines - round 1 START
+    vector<string> vlines_orig,vlines;
+    aurostd::stream2vectorstring(xvasp.INCAR,vlines_orig);
+    bool found=false;
+    for(uint iline1=0;iline1<vlines_orig.size();iline1++){
+      found=false;
+      for(uint iline2=0;iline2<vlines.size()&&found==false;iline2++){
+        if(vlines_orig[iline1]==vlines[iline2]){found=true;} //find STRICT duplicate lines first
+      }
+      if(found){continue;}
+      vlines.push_back(vlines_orig[iline1]);
+    }
+    //remove duplicate lines - round 1 END
+    //ADD MORE CLEANING HERE
+    
+    //write out clean INCAR
+    xvasp.INCAR.clear();xvasp.INCAR.str(std::string());
+    //[need additional endl]xvasp.INCAR << aurostd::joinWDelimiter(vlines,"\n");
+    for(uint iline=0;iline<vlines.size();iline++){
+      if(iline==vlines.size()-1 && aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vlines[iline]).empty()){continue;} //remove last extra line
+      xvasp.INCAR << vlines[iline] << endl;
+    }
+  }
+}
 
 namespace KBIN {
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags) { // AFLOW_FUNCTION_IMPLEMENTATION
@@ -3117,6 +3207,24 @@ namespace KBIN {
     xvasp.INCAR.str(std::string());
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     imax=aurostd::GetNLinesString(FileContent);
+
+    //CO20200624 START - general RELAX patches to INCAR
+    bool nelm_patch=(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+    for(int i=1;i<=imax;i++) {
+      strline=aurostd::GetLineString(FileContent,i);
+      if( (nelm_patch && ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE))) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||
+          FALSE) {
+        if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_Relax_ON) " << endl;
+      } else {
+        if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+        if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+      }
+    }
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX [AFLOW] begin" << endl;
+    if(nelm_patch){xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int),_incarpad_) << "# Performing RELAX" << endl;}  //CO20200624
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX [AFLOW] end " << endl;
+    //CO20200624 STOP - general RELAX patches to INCAR
+
     // RELAX_MODE=ENERGY mode
     if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.xscheme=="ENERGY") {
       for(int i=1;i<=imax;i++) {
@@ -3213,7 +3321,10 @@ namespace KBIN {
           aurostd::substring2bool(strline,"IALGO",TRUE)    || aurostd::substring2bool(strline,"#IALGO",TRUE) || //SC from ICSD
           (aurostd::substring2bool(strline,"ALGO",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) ||  //SC from ICSD
           (aurostd::substring2bool(strline,"#ALGO",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) || //SC from ICSD
-          aurostd::substring2bool(strline,"ISIF",TRUE)   || aurostd::substring2bool(strline,"#ISIF",TRUE)) {
+          aurostd::substring2bool(strline,"ISIF",TRUE)   || aurostd::substring2bool(strline,"#ISIF",TRUE) ||
+          //[CO20200624 - OBSOLETE]aurostd::substring2bool(strline,"NELM",TRUE)   || aurostd::substring2bool(strline,"#NELM",TRUE) ||  //CO20200624
+          ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||  //CO20200624
+          FALSE) {
         if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_Static_ON) " << endl;
       } else {
         if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
@@ -3228,6 +3339,7 @@ namespace KBIN {
     if(vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && vflags.KBIN_VASP_FORCE_OPTION_ELF.option) xvasp.INCAR << aurostd::PaddedPOST("LELF=.TRUE.",_incarpad_) << "# Performing STATIC  (Elf ON)" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && !vflags.KBIN_VASP_FORCE_OPTION_ELF.option) xvasp.INCAR << aurostd::PaddedPOST("LELF=.FALSE.",_incarpad_) << "# Performing STATIC  (Elf OFF)" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << "ALGO=Normal      # Performing STATIC" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << "# Performing STATIC" << endl;  //CO20200624
     xvasp.INCAR << "LORBIT=10        # Performing STATIC" << endl; //CO20180130 get spinD
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "#removing IBRION, NSW, ISIF" << endl;
   }
@@ -3259,7 +3371,8 @@ namespace KBIN {
           aurostd::substring2bool(strline,"ISIF",TRUE) || aurostd::substring2bool(strline,"#ISIF",TRUE) ||
           aurostd::substring2bool(strline,"IBRION",TRUE) || aurostd::substring2bool(strline,"#IBRION",TRUE) ||
           aurostd::substring2bool(strline,"NSW",TRUE) || aurostd::substring2bool(strline,"#NSW",TRUE) ||
-          aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE) ||
+          //[CO20200624 - OBSOLETE]aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE) ||
+          ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||  //CO20200624
           aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) ||
           aurostd::substring2bool(strline,"LORBIT",TRUE) || aurostd::substring2bool(strline,"#LORBIT",TRUE) ||
           aurostd::substring2bool(strline,"RWIGS",TRUE) || aurostd::substring2bool(strline,"#RWIGS",TRUE) ||
@@ -3279,15 +3392,15 @@ namespace KBIN {
     // xvasp.INCAR << endl;
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC [AFLOW]" << endl;
     // xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=0",_incarpad_) << "# Performing RELAX_STATIC" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=-5",_incarpad_) << "# Performing RELAX_STATIC (tetrahedron method with Blochl corrections : wahyu/stefano 2009/10/09)" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int),_incarpad_) << "# Performing RELAX_STATIC (tetrahedron method with Blochl corrections : wahyu/stefano 2009/10/09)" << endl; //CO20200624
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << aurostd::PaddedPOST("",_incarpad_) << "# with -5 forces are not correct in metals, so it is good " << endl;
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << aurostd::PaddedPOST("",_incarpad_) << "# for semiconductors/insulator or for NO relaxations" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("SIGMA=0.05",_incarpad_) << "# Performing RELAX_STATIC (so the DOS will not spill too much from band edges)" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# Performing RELAX_STATIC (so the DOS will not spill too much from band edges)" << endl; //CO20200624
     if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("ALGO=Normal",_incarpad_) << "# Performing RELAX_STATIC (stefano from ICSD)" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("ISIF=2",_incarpad_) << "# Performing RELAX_STATIC (relax ions, but single step so no relax)" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("IBRION=2",_incarpad_) << "# Performing RELAX_STATIC (relax conj. grad, but single step so no relax)" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("NSW=0",_incarpad_) << "# Performing RELAX_STATIC (zero ionic steps, so no relax, just static)" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("NELM=120",_incarpad_) << "# Performing RELAX_STATIC" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << "# Performing RELAX_STATIC" << endl;  //CO20200624
     xvasp.INCAR << aurostd::PaddedPOST("NELMIN=2",_incarpad_) << "# Performing RELAX_STATIC" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("LORBIT=10",_incarpad_) << "# Performing RELAX_STATIC" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("LCHARG=.TRUE.",_incarpad_) << "# Performing RELAX_STATIC" << endl;
@@ -3343,7 +3456,8 @@ namespace KBIN {
           aurostd::substring2bool(strline,"ISIF",TRUE) || aurostd::substring2bool(strline,"#ISIF",TRUE) ||
           aurostd::substring2bool(strline,"IBRION",TRUE) || aurostd::substring2bool(strline,"#IBRION",TRUE) ||
           aurostd::substring2bool(strline,"NSW",TRUE) || aurostd::substring2bool(strline,"#NSW",TRUE) ||
-          aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE) ||
+          //[CO20200624 - OBSOLETE]aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE) ||
+          ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||  //CO20200624
           aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) ||
           aurostd::substring2bool(strline,"EMIN",TRUE) || aurostd::substring2bool(strline,"#EMIN",TRUE) || // Aleksey
           aurostd::substring2bool(strline,"EMAX",TRUE) || aurostd::substring2bool(strline,"#EMAX",TRUE) || // Aleksey
@@ -3365,14 +3479,14 @@ namespace KBIN {
     // xvasp.INCAR << endl;
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC_BANDS [AFLOW]" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_PREC.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("PREC=ACCURATE",_incarpad_) << "# Performing RELAX_STATIC_BANDS (aleksey)" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=0",_incarpad_) << "# Performing RELAX_STATIC_BANDS (put back Gauss, use 1 if metals)" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int),_incarpad_) << "# Performing RELAX_STATIC_BANDS (put back Gauss, use 1 if metals)" << endl; //CO20200624
     // xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=-5",_incarpad_) << "# Performing RELAX_STATIC (tetrahedron method with Blochl corrections : WSETYAWAN+SC20091009)" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("SIGMA=0.05",_incarpad_) << "# Performing RELAX_STATIC_BANDS (so the DOS will not spill too much from band edges)" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# Performing RELAX_STATIC_BANDS (so the DOS will not spill too much from band edges)" << endl; //CO20200624
     if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("ALGO=Normal",_incarpad_) << "# Performing RELAX_STATIC_BANDS (stefano from ICSD)" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("ISIF=2",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("IBRION=2",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("NSW=0 ",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("NELM=120",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;  //CO20200624
     xvasp.INCAR << aurostd::PaddedPOST("NELMIN=2",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("LORBIT=10",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;  //CO20180130 get spinD
     xvasp.INCAR << aurostd::PaddedPOST("ICHARG=11",_incarpad_) << "# Performing RELAX_STATIC_BANDS" << endl;
@@ -3787,6 +3901,48 @@ namespace KBIN {
     }
 
     // ***************************************************************************
+    // NELM NELM NELM NELM NELM NELM
+    bool nelm_patch=(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+    if(nelm_patch && command=="NELM") { //CO20200624
+      for(int i=1;i<=imax;i++) {
+        strline=aurostd::GetLineString(FileContent,i);
+        if( ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||
+            FALSE) {
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(NELM) NELM=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int) << ") " << endl;
+        } else {
+          if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+        }
+      }
+      // xvasp.INCAR << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing NELM=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int) << " [AFLOW] begin " << endl;
+      xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(NELM)" << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing NELM=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int) << " [AFLOW] end " << endl;
+      DONE=TRUE;
+    }
+    
+    // ***************************************************************************
+    // NELM_STATIC NELM_STATIC NELM_STATIC NELM_STATIC NELM_STATIC NELM_STATIC
+    if(command=="NELM_STATIC") { //CO20200624
+      for(int i=1;i<=imax;i++) {
+        strline=aurostd::GetLineString(FileContent,i);
+        if( ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||
+            FALSE) {
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(NELM_STATIC) NELM_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int) << ") " << endl;
+        } else {
+          if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+        }
+      }
+      // xvasp.INCAR << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing NELM_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int) << " [AFLOW] begin " << endl;
+      xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(NELM_STATIC)" << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing NELM_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int) << " [AFLOW] end " << endl;
+      DONE=TRUE;
+    }
+
+    // ***************************************************************************
+    // ***************************************************************************
     // ENMAX_MULTIPLY ENMAX_MULTIPLY ENMAX_MULTIPLY ENMAX_MULTIPLY ENMAX_MULTIPLY ENMAX_MULTIPLY
     if(command=="ENMAX_MULTIPLY") {
       for(int i=1;i<=imax;i++) {
@@ -3896,7 +4052,8 @@ namespace KBIN {
       for(int i=1;i<=imax;i++) {
         strline=aurostd::GetLineString(FileContent,i);
         if(aurostd::substring2bool(strline,"ISMEAR",TRUE) || aurostd::substring2bool(strline,"#ISMEAR",TRUE) || 
-            aurostd::substring2bool(strline,"SIGMA",TRUE) || aurostd::substring2bool(strline,"#SIGMA",TRUE)) {
+            //[CO20200624 - ISMEAR and SIGMA are decoupled inputs]aurostd::substring2bool(strline,"SIGMA",TRUE) || aurostd::substring2bool(strline,"#SIGMA",TRUE) ||
+            FALSE) {
           if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(ISMEAR) ISMEAR=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int) << ") " << endl;
         } else {
           if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
@@ -3907,6 +4064,50 @@ namespace KBIN {
       if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing ISMEAR=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int) << " [AFLOW] begin " << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(ISMEAR)" << endl;
       if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing ISMEAR=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int) << " [AFLOW] end " << endl;
+      DONE=TRUE;
+    }
+    // ***************************************************************************
+    
+    // ***************************************************************************
+    // ISMEAR_STATIC ISMEAR_STATIC ISMEAR_STATIC ISMEAR_STATIC ISMEAR_STATIC ISMEAR_STATIC
+    if(command=="ISMEAR_STATIC") { //CO20181129
+      for(int i=1;i<=imax;i++) {
+        strline=aurostd::GetLineString(FileContent,i);
+        if(aurostd::substring2bool(strline,"ISMEAR",TRUE) || aurostd::substring2bool(strline,"#ISMEAR",TRUE) || 
+            //[CO20200624 - ISMEAR and SIGMA are decoupled inputs]aurostd::substring2bool(strline,"SIGMA",TRUE) || aurostd::substring2bool(strline,"#SIGMA",TRUE) ||
+            FALSE) {
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(ISMEAR_STATIC) ISMEAR_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int) << ") " << endl;
+        } else {
+          if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+        }
+      }
+      // xvasp.INCAR << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing ISMEAR_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int) << " [AFLOW] begin " << endl;
+      xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(ISMEAR_STATIC)" << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing ISMEAR_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.content_int) << " [AFLOW] end " << endl;
+      DONE=TRUE;
+    }
+    // ***************************************************************************
+    
+    // ***************************************************************************
+    // ISMEAR_STATIC_BANDS ISMEAR_STATIC_BANDS ISMEAR_STATIC_BANDS ISMEAR_STATIC_BANDS ISMEAR_STATIC_BANDS ISMEAR_STATIC_BANDS
+    if(command=="ISMEAR_STATIC_BANDS") { //CO20181129
+      for(int i=1;i<=imax;i++) {
+        strline=aurostd::GetLineString(FileContent,i);
+        if(aurostd::substring2bool(strline,"ISMEAR",TRUE) || aurostd::substring2bool(strline,"#ISMEAR",TRUE) || 
+            //[CO20200624 - ISMEAR and SIGMA are decoupled inputs]aurostd::substring2bool(strline,"SIGMA",TRUE) || aurostd::substring2bool(strline,"#SIGMA",TRUE) ||
+            FALSE) {
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(ISMEAR_STATIC_BANDS) ISMEAR_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int) << ") " << endl;
+        } else {
+          if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+        }
+      }
+      // xvasp.INCAR << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing ISMEAR_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int) << " [AFLOW] begin " << endl;
+      xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(ISMEAR_STATIC_BANDS)" << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing ISMEAR_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int) << " [AFLOW] end " << endl;
       DONE=TRUE;
     }
     // ***************************************************************************
@@ -3927,6 +4128,46 @@ namespace KBIN {
       if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing SIGMA=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " [AFLOW] begin " << endl;
       xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(SIGMA)" << endl;
       if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing SIGMA=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " [AFLOW] end " << endl;
+      DONE=TRUE;
+    }
+    // ***************************************************************************
+    
+    // ***************************************************************************
+    // SIGMA_STATIC SIGMA_STATIC SIGMA_STATIC SIGMA_STATIC SIGMA_STATIC SIGMA_STATIC
+    if(command=="SIGMA_STATIC") { //CO20181129
+      for(int i=1;i<=imax;i++) {
+        strline=aurostd::GetLineString(FileContent,i);
+        if(aurostd::substring2bool(strline,"SIGMA",TRUE) || aurostd::substring2bool(strline,"#SIGMA",TRUE)) {
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(SIGMA_STATIC) SIGMA_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << ") " << endl;
+        } else {
+          if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+        }
+      }
+      // xvasp.INCAR << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing SIGMA_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " [AFLOW] begin " << endl;
+      xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(SIGMA_STATIC)" << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing SIGMA_STATIC=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " [AFLOW] end " << endl;
+      DONE=TRUE;
+    }
+    // ***************************************************************************
+    
+    // ***************************************************************************
+    // SIGMA_STATIC_BANDS SIGMA_STATIC_BANDS SIGMA_STATIC_BANDS SIGMA_STATIC_BANDS SIGMA_STATIC_BANDS SIGMA_STATIC_BANDS
+    if(command=="SIGMA_STATIC_BANDS") { //CO20181129
+      for(int i=1;i<=imax;i++) {
+        strline=aurostd::GetLineString(FileContent,i);
+        if(aurostd::substring2bool(strline,"SIGMA",TRUE) || aurostd::substring2bool(strline,"#SIGMA",TRUE)) {
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC(SIGMA_STATIC_BANDS) SIGMA_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << ") " << endl;
+        } else {
+          if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+        }
+      }
+      // xvasp.INCAR << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing SIGMA_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " [AFLOW] begin " << endl;
+      xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# KBIN::XVASP_INCAR_PREPARE_GENERIC(SIGMA_STATIC_BANDS)" << endl;
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing SIGMA_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " [AFLOW] end " << endl;
       DONE=TRUE;
     }
     // ***************************************************************************
@@ -4384,7 +4625,7 @@ namespace KBIN {
       // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
     }
     if(fix_aflowlin) {
-      // fix aflowlin
+      // fix aflow.in
       stringstream aus_exec;
       aus_exec << "cd " << xvasp.Directory << endl;
       aus_exec << "cat " << _AFLOWIN_ << " | sed \"s/\\[VASP_FORCE_OPTION\\]SPIN=/#\\[VASP_FORCE_OPTION\\]SPIN=/g\" | sed \"s/##\\[/#\\[/g\" > aflow.tmp && mv aflow.tmp " << _AFLOWIN_ << "" << endl;
@@ -4855,7 +5096,8 @@ namespace KBIN {
       for(int i=1;i<=imax;i++) {
         strline=aurostd::GetLineString(FileContent,i);
         if(aurostd::substring2bool(strline,"ALGO",TRUE) || aurostd::substring2bool(strline,"#ALGO",TRUE) || // Camilo
-            aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE) || // Camilo
+            //[CO20200624 - OBSOLETE]aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE) || // Camilo
+            ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||  //CO20200624
             aurostd::substring2bool(strline,"LOPTICS",TRUE) || aurostd::substring2bool(strline,"#LOPTICS",TRUE) || // Camilo
             aurostd::substring2bool(strline,"CSHIFT",TRUE) || aurostd::substring2bool(strline,"#CSHIFT",TRUE) || // Camilo
             aurostd::substring2bool(strline,"OMEGAMAX",TRUE) || aurostd::substring2bool(strline,"#OMEGAMAX",TRUE) || // Camilo
@@ -5117,7 +5359,8 @@ namespace KBIN {
     // mode=3 put max
     // mode=4 put odd
     // mode=5 put even
-    if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return; // don`t touch kpoints
+    // mode=6 ISYM=0
+    if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return; // don't touch kpoints
     // AFIX *************************************
     int kmax=xvasp.str.kpoints_kmax;
     // int k1=xvasp.str.kpoints_k1,k2=xvasp.str.kpoints_k2,k3=xvasp.str.kpoints_k3,kppra=xvasp.str.kpoints_kppra;
@@ -5167,7 +5410,7 @@ namespace KBIN {
     // mode *************************************
     if(mode==4) {
       KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run Reciprocal Rotation Matrix problems (KPOINTS_ODD) ");
-      aus << "00000  FIX RECIPROCAL - KLATTICE SYMMETRY MISMATCH FIX (KPOINTD_ODD) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  FIX RECIPROCAL - KLATTICE SYMMETRY MISMATCH FIX (KPOINTS_ODD) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,LQUIET);
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  // KBIN::XVASP_KPOINTS_ODD(xvasp);
       aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
@@ -5176,7 +5419,7 @@ namespace KBIN {
     // mode *************************************
     if(mode==5) {
       KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run Reciprocal Rotation Matrix problems (KPOINTS_EVEN) ");
-      aus << "00000  FIX RECIPROCAL - KLATTICE SYMMETRY MISMATCH FIX (KPOINTD_EVEN) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  FIX RECIPROCAL - KLATTICE SYMMETRY MISMATCH FIX (KPOINTS_EVEN) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,LQUIET);
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xeven,Yeven,Zeven"); //    KBIN::XVASP_KPOINTS_EVEN(xvasp);
       aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
@@ -5202,11 +5445,12 @@ namespace KBIN {
     xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
     xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
     // clean to restart ----------------------------------    
-    aurostd::execute("cat "+xvasp.Directory+"/vasp.out >> "+xvasp.Directory+"/aflow.error.rotmat");
-    deque<string> vrem;aurostd::string2tokens("aflow.tmp,CHG,CONTCAR,DOSCAR,EIGENVAL,IBZKPT,OUTCAR,OSZICAR,PCDAT,WAVECAR,aflow.qsub*,XDATCAR,vasprun.xml,vasp.out,core*",vrem,",");
-    for (uint i=0;i<vrem.size();i++)
-      aurostd::RemoveFile(xvasp.Directory+"/"+vrem.at(i));
-    if(!xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED")) aurostd::RemoveFile(xvasp.Directory+"/CHGCAR");
+    XVASP_Afix_Clean(xvasp,"aflow.error.rotmat"); //CO20200624
+    //[CO20200624 - OBSOLETE]aurostd::execute("cat "+xvasp.Directory+"/vasp.out >> "+xvasp.Directory+"/aflow.error.rotmat");
+    //[CO20200624 - OBSOLETE]deque<string> vrem;aurostd::string2tokens("aflow.tmp,CHG,CONTCAR,DOSCAR,EIGENVAL,IBZKPT,OUTCAR,OSZICAR,PCDAT,WAVECAR,aflow.qsub*,XDATCAR,vasprun.xml,vasp.out,core*",vrem,",");
+    //[CO20200624 - OBSOLETE]for (uint i=0;i<vrem.size();i++)
+    //[CO20200624 - OBSOLETE]  aurostd::RemoveFile(xvasp.Directory+"/"+vrem.at(i));
+    //[CO20200624 - OBSOLETE]if(!xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED")) aurostd::RemoveFile(xvasp.Directory+"/CHGCAR");
   }
 }
 
@@ -5254,7 +5498,7 @@ namespace KBIN {
     aus_exec << "echo \"NBANDS=\"" << nbands << " >> INCAR " << endl;
     // aus_exec << "echo \"# Performing KBIN::XVASP_Afix_NBANDS (new) [AFLOW] end\" >> INCAR " << endl;
     aurostd::execute(aus_exec);
-    // fix aflowlin
+    // fix aflow.in
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "cat " << _AFLOWIN_ << " | sed \"s/\\[VASP_FORCE_OPTION\\]NBANDS/#\\[VASP_FORCE_OPTION\\]NBANDS/g\" | sed \"s/##\\[/#\\[/g\" > aflow.tmp && mv aflow.tmp " << _AFLOWIN_ << "" << endl;
     aus_exec << "echo \"[VASP_FORCE_OPTION]NBANDS=" << nbands << "      // Self Correction\"" << " >> " << _AFLOWIN_ << " " << endl;
@@ -5267,6 +5511,7 @@ namespace KBIN {
   }
 
   void XVASP_Afix_POTIM(_xvasp& xvasp,double& potim,bool VERBOSE) {
+    string soliloquy=XPID+"KBIN::XVASP_Afix_POTIM():";  //CO20200624
     stringstream aus_exec;
     ifstream FileAUS;
     string FileNameAUS;
@@ -5277,7 +5522,7 @@ namespace KBIN {
     xOUTCAR OUTCAR_POTIM(xvasp.Directory+"/OUTCAR");
     potim=OUTCAR_POTIM.POTIM;
     if(potim==0) {                                            // GET BANDS FROM INCAR
-      if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_POTIM: GET POTIM FROM INCAR" << endl;
+      if(VERBOSE) cerr << soliloquy << " GET POTIM FROM INCAR" << endl;
       aurostd::execute("cat "+xvasp.Directory+"/INCAR | grep -v \"\\#\" | grep POTIM | sed \"s/=//g\" | sed \"s/POTIM//g\" > "+xvasp.Directory+"/aflow.tmp");
       FileNameAUS=xvasp.Directory+"/aflow.tmp";
       FileAUS.open(FileNameAUS.c_str(),std::ios::in);
@@ -5286,17 +5531,17 @@ namespace KBIN {
       FileAUS.clear();FileAUS.close();
       aurostd::RemoveFile(xvasp.Directory+"/aflow.tmp");
     }
-    if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_POTIM: potim=" << potim << endl;
+    if(VERBOSE) cerr << soliloquy << " potim=" << potim << endl;
     potim=potim/2.0;
     if(potim<0.01) potim=0.01;
-    if(VERBOSE) cerr << XPID << "KBIN::XVASP_Afix_POTIM: potim=" << potim << endl;
+    if(VERBOSE) cerr << soliloquy << " potim=" << potim << endl;
 
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "cat INCAR | sed \"s/POTIM/#POTIM/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl;
     aus_exec << "echo \"#fixed potim=\"" << potim << " >> INCAR " << endl;
     aus_exec << "echo \"POTIM=\"" << potim << " >> INCAR " << endl;
     aurostd::execute(aus_exec);
-    // fix aflowlin
+    // fix aflow.in
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "cat " << _AFLOWIN_ << " | sed \"s/\\[VASP_FORCE_OPTION\\]POTIM/#\\[VASP_FORCE_OPTION\\]POTIM/g\" | sed \"s/##\\[/#\\[/g\" > aflow.tmp && mv aflow.tmp " << _AFLOWIN_ << "" << endl;
     aus_exec << "echo \"[VASP_FORCE_OPTION]POTIM=" << potim << "      // Self Correction\"" << " >> " << _AFLOWIN_ << " " << endl;
@@ -5308,7 +5553,71 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  double XVASP_Afix_GENERIC(string mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double param_double,int param_int) {
+  void XVASP_Afix_NELM(_xvasp& xvasp,int& nelm,bool VERBOSE) {  //CO20200624
+    string soliloquy=XPID+"KBIN::XVASP_Afix_NELM():"; //CO20200624
+    stringstream aus_exec;
+    ifstream FileAUS;
+    string FileNameAUS;
+
+    // get NELM from OUTCAR
+    aurostd::RemoveFile(xvasp.Directory+"/aflow.tmp");
+    nelm=0;
+    xOUTCAR OUTCAR_NELM(xvasp.Directory+"/OUTCAR");
+    nelm=OUTCAR_NELM.NELM;
+    if(nelm==0) {                                            // GET BANDS FROM INCAR
+      if(VERBOSE) cerr << soliloquy << " GET NELM FROM INCAR" << endl;
+      string tmp=aurostd::execute2string("cat "+xvasp.Directory+"/INCAR | grep '^NELM\\b' | cut -d '=' -f2 | awk '{print $1}'");
+      if(!tmp.empty() && aurostd::isfloat(tmp)){nelm=aurostd::string2utype<int>(tmp);}
+    }
+    if(VERBOSE) cerr << soliloquy << " nelm=" << nelm << endl;
+    //[CO20200624 - no point in setting over and over again, just do in one shot]nelm=nelm*2.0;
+    nelm=MAX_VASP_NELM;
+    if(nelm>MAX_VASP_NELM) nelm=MAX_VASP_NELM;
+    if(VERBOSE) cerr << soliloquy << " nelm=" << nelm << endl;
+
+    aus_exec << "cd " << xvasp.Directory << endl;
+    aus_exec << "cat INCAR | sed \"s/NELM/#NELM/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl;
+    aus_exec << "echo \"#fixed nelm=\"" << nelm << " >> INCAR " << endl;
+    aus_exec << "echo \"NELM=\"" << nelm << " >> INCAR " << endl;
+    aurostd::execute(aus_exec);
+    //[CO20200624 - do NOT fix aflow.in, we don't know if we have NELM or NELM_STATIC]// fix aflow.in
+    //[CO20200624 - do NOT fix aflow.in, we don't know if we have NELM or NELM_STATIC]aus_exec << "cd " << xvasp.Directory << endl;
+    //[CO20200624 - do NOT fix aflow.in, we don't know if we have NELM or NELM_STATIC]aus_exec << "cat " << _AFLOWIN_ << " | sed \"s/\\[VASP_FORCE_OPTION\\]NELM/#\\[VASP_FORCE_OPTION\\]NELM/g\" | sed \"s/##\\[/#\\[/g\" > aflow.tmp && mv aflow.tmp " << _AFLOWIN_ << "" << endl;
+    //[CO20200624 - do NOT fix aflow.in, we don't know if we have NELM or NELM_STATIC]aus_exec << "echo \"[VASP_FORCE_OPTION]NELM=" << nelm << "      // Self Correction\"" << " >> " << _AFLOWIN_ << " " << endl;
+    //[CO20200624 - do NOT fix aflow.in, we don't know if we have NELM or NELM_STATIC]aurostd::execute(aus_exec);
+    // reload to restart ---------------------------------
+    xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
+    xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
+  }
+}
+
+namespace KBIN {
+  void XVASP_Afix_ISMEAR(_xvasp& xvasp,const string& mode,int scheme,bool VERBOSE) {  //CO20200624
+    stringstream aus_exec;
+    aus_exec << "cd " << xvasp.Directory << endl;
+    aus_exec << "cat INCAR | sed \"s/ISMEAR/#ISMEAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove ISMEAR
+    if(VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
+    string tmp=aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(scheme),_incarpad_)+"# Performing RELAX_STATIC ";
+    //https://www.vasp.at/wiki/index.php/ISMEAR
+    if(scheme==0){tmp+="(Gaussian)";}
+    else if(scheme==1){tmp+="(Methfessel-Paxton order 1)";}
+    else if(scheme==2){tmp+="(Methfessel-Paxton order 2)";}
+    else if(scheme==-1){tmp+="(Fermi)";}
+    else if(scheme==-4){tmp+="(tetrahedron)";}
+    else if(scheme==-5){tmp+="(tetrahedron with Bloechl corrections)";}
+    //[CO20200624 - OBSOLETE]aus_exec << "echo \"ISMEAR=2                                        # Performing RELAX_STATIC (Methfessel-Paxton order 2)\" >> INCAR " << endl;
+    aus_exec << "echo \"" << tmp << "\" >> INCAR " << endl;
+    if(VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] end\" >> INCAR " << endl;
+    aurostd::execute(aus_exec);
+  }
+}
+
+namespace KBIN {
+  double XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double param_double,int param_int) { //CO20200624 - adding submode
+    int submode=0;
+    return XVASP_Afix_GENERIC(mode,xvasp,kflags,vflags,submode,param_double,param_int);
+  }
+  double XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& submode,double param_double,int param_int) {
     string file_error,file_stream;
     stringstream aus_exec;
     double out=0.0;
@@ -5329,7 +5638,9 @@ namespace KBIN {
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
       // aus_exec << "echo \"#fixed symprec \" >> INCAR " << endl;
       // aus_exec << "echo \"SYMPREC=1e-6\" >> INCAR " << endl;
-      aus_exec << "echo \"SYMPREC=1e-7    # (fix=" << mode << "\" >> INCAR " << endl;
+      string tmp=aurostd::PaddedPOST("SYMPREC=1e-7",_incarpad_)+"# (fix="+mode+")";  //CO20200604
+      //[CO20200624]aus_exec << "echo \"SYMPREC=1e-7    # (fix=" << mode << "\" >> INCAR " << endl;
+      aus_exec << "echo \"" << tmp << "\" >> INCAR " << endl;
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] end\" >> INCAR " << endl;
       aurostd::execute(aus_exec);
     }
@@ -5346,7 +5657,7 @@ namespace KBIN {
     if(mode=="IBZKPT") {
       file_error="aflow.error.ibzkpt";
       reload_kpoints=TRUE;
-      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don`t touch kpoints
+      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don't touch kpoints
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "KBIN::XVASP_Afix_GENERIC MAKING (" << mode << ") BEGIN" << endl;
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  // KBIN::XVASP_KPOINTS_ODD(xvasp);  // this should put the origin in GAMMA ??
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "KBIN::XVASP_Afix_GENERIC MAKING (" << mode << ") END" << endl;
@@ -5356,7 +5667,7 @@ namespace KBIN {
     if(mode=="GAMMA_SHIFT") {
       file_error="aflow.error.gamma_shift";
       reload_kpoints=TRUE;
-      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don`t touch kpoints
+      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don't touch kpoints
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "KBIN::XVASP_Afix_GENERIC MAKING (" << mode << ") BEGIN" << endl;
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma");
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "KBIN::XVASP_Afix_GENERIC MAKING (" << mode << ") END" << endl;
@@ -5370,7 +5681,7 @@ namespace KBIN {
     if(mode=="MPICH139") {
       file_error="aflow.error.mpich139";
       reload_kpoints=TRUE;
-      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don`t touch kpoints
+      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don't touch kpoints
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "KBIN::XVASP_Afix_GENERIC MAKING (" << mode << ") BEGIN" << endl;
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS withoug bugging the origin
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS withoug bugging the origin
@@ -5382,17 +5693,54 @@ namespace KBIN {
     if(mode=="NKXYZ_IKPTD") {
       file_error="aflow.error.nkxyz_ikptd";
       reload_kpoints=TRUE;
-      // if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don`t touch kpoints MUST FIX ANYWAY
+      // if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don't touch kpoints MUST FIX ANYWAY
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // this should put the origin in GAMMA ??
       rewrite_kpoints=TRUE;
     }
     if(mode=="EDDRMM") {
+      //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
       file_error="aflow.error.eddrmm";
-      reload_kpoints=TRUE;
-      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don`t touch kpoints
-      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  // KBIN::XVASP_KPOINTS_ODD(xvasp);  // this should put the origin in GAMMA ??
-      xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0; // you go on gamma ONLY if you put shift =0 !!
-      rewrite_kpoints=TRUE;
+      if(submode==0){ //CO20200624
+        reload_kpoints=TRUE;
+        if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return 0.0; // don't touch kpoints
+        KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  // KBIN::XVASP_KPOINTS_ODD(xvasp);  // this should put the origin in GAMMA ??
+        xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0; // you go on gamma ONLY if you put shift =0 !!
+        rewrite_kpoints=TRUE;
+      }
+      //else if(submode==1) //DO NOT USE else if, we may change submode inside
+      if(submode==1){ //CO20200624
+        if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme=="NORMAL"){submode++;}
+        else{
+          reload_incar=TRUE;
+          vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme="NORMAL";
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("ALGO",xvasp,vflags,"",0,0.0,FALSE);
+          // [OBSOLETE] KBIN::XVASP_INCAR_ALGO(xvasp,vflags);
+          rewrite_incar=TRUE;
+        }
+      }
+      if(submode==2){ //CO20200624
+        if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme=="FAST"){submode++;}
+        else{
+          reload_incar=TRUE;
+          vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme="FAST";
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("ALGO",xvasp,vflags,"",0,0.0,FALSE);
+          // [OBSOLETE] KBIN::XVASP_INCAR_ALGO(xvasp,vflags);
+          rewrite_incar=TRUE;
+        }
+      }
+      if(submode==3){ //CO20200624
+        if(xvasp.NRELAXING<=xvasp.NRELAX){  //happens during relax
+          reload_incar=TRUE;
+          double potim;
+          KBIN::XVASP_Afix_POTIM(xvasp,potim,vflags.KBIN_VASP_INCAR_VERBOSE);
+          rewrite_incar=TRUE;
+        }else{  //happens during static/bands
+          //https://www.vasp.at/forum/viewtopic.php?f=4&t=11502
+          reload_incar=TRUE;
+          // fix INCAR
+          XVASP_Afix_ISMEAR(xvasp,mode,2,vflags.KBIN_VASP_INCAR_VERBOSE);
+        }
+      }
     }
     if(mode=="LREAL") {
       file_error="aflow.error.lreal";
@@ -5407,7 +5755,7 @@ namespace KBIN {
     if(mode=="EXCCOR") {
       file_error="aflow.error.exccor";
       reload_poscar=TRUE;
-      if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")) return 0.0; // don`t touch poscar
+      if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")) return 0.0; // don't touch poscar
       aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig"));
       xvasp.str.scale=xvasp.str.scale*1.0627;   // cubic root of 1.2
       xvasp.str.scale=xvasp.str.scale*1.0627;   // cubic root of 1.2
@@ -5456,10 +5804,17 @@ namespace KBIN {
       KBIN::XVASP_Afix_POTIM(xvasp,potim,vflags.KBIN_VASP_INCAR_VERBOSE);
       rewrite_incar=TRUE;
     }
+    if(mode=="NELM") {
+      file_error="aflow.error.nelm";
+      reload_incar=TRUE;
+      int nelm;
+      KBIN::XVASP_Afix_NELM(xvasp,nelm,vflags.KBIN_VASP_INCAR_VERBOSE);
+      rewrite_incar=TRUE;
+    }
     if(mode=="NATOMS") {
       file_error="aflow.error.natoms";
       reload_poscar=TRUE;
-      if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")) return 0.0; // don`t touch poscar
+      if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")) return 0.0; // don't touch poscar
       aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig"));
       xvasp.str.scale=xvasp.str.scale*pow(2.0,1.0/3.0);   // cubic root of 1.2
       KBIN::VASP_Produce_POSCAR(xvasp);
@@ -5491,7 +5846,7 @@ namespace KBIN {
     if(mode=="NPAR") {
       file_error="aflow.error.npar";
       reload_incar=TRUE;
-      // fix aflowlin
+      // fix aflow.in
       aus_exec << "cd " << xvasp.Directory << endl;
       aus_exec << "cat INCAR | sed \"s/NPAR/#NPAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove NPAR
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
@@ -5502,7 +5857,7 @@ namespace KBIN {
     if(mode=="NPARC") {
       file_error="aflow.error.nparc";
       reload_incar=TRUE;
-      // fix aflowlin
+      // fix aflow.in
       aus_exec << "cd " << xvasp.Directory << endl;
       aus_exec << "cat INCAR | sed \"s/NPAR/#NPAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove NPAR
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
@@ -5516,7 +5871,7 @@ namespace KBIN {
     if(mode=="NPARN") {
       file_error="aflow.error.nparn";
       reload_incar=TRUE;
-      // fix aflowlin
+      // fix aflow.in
       aus_exec << "cd " << xvasp.Directory << endl;
       aus_exec << "cat INCAR | sed \"s/NPAR/#NPAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove NPAR
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
@@ -5530,7 +5885,7 @@ namespace KBIN {
     if(mode=="NPAR_REMOVE") {
       file_error="aflow.error.npar_remove";
       reload_incar=TRUE;
-      // fix aflowlin
+      // fix aflow.in
       aus_exec << "cd " << xvasp.Directory << endl;
       aus_exec << "cat INCAR | sed \"s/NPAR/#REMOVED NPAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove NPAR
       if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
@@ -5545,7 +5900,7 @@ namespace KBIN {
       KBIN::XVASP_INCAR_PREPARE_GENERIC("ALGO",xvasp,vflags,"",0,0.0,FALSE);
       // [OBSOLETE] KBIN::XVASP_INCAR_ALGO(xvasp,vflags);
       aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
-      // fix aflowlin
+      // fix aflow.in
       aus_exec << "cd " << xvasp.Directory << endl;
       aus_exec << "cat " << _AFLOWIN_ << " | sed \"s/\\[VASP_FORCE_OPTION\\]ALGO/#\\[VASP_FORCE_OPTION\\]ALGO/g\" | sed \"s/##\\[/#\\[/g\" > aflow.tmp && mv aflow.tmp " << _AFLOWIN_ << "" << endl;
       aus_exec << "echo \"[VASP_FORCE_OPTION]ALGO=NORMAL      // Self Correction\"" << " >> " << _AFLOWIN_ << " " << endl;
@@ -5554,13 +5909,16 @@ namespace KBIN {
     if(mode=="DENTET") {
       file_error="aflow.error.dentet";
       reload_incar=TRUE;
-      // fix aflowlin
-      aus_exec << "cd " << xvasp.Directory << endl;
-      aus_exec << "cat INCAR | sed \"s/ISMEAR/#ISMEAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove ISMEAR
-      if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
-      aus_exec << "echo \"ISMEAR=2                                        # Performing RELAX_STATIC (Methfessel-Paxton order 2)\" >> INCAR " << endl;
-      if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] end\" >> INCAR " << endl;
-      aurostd::execute(aus_exec);
+      // fix INCAR
+      XVASP_Afix_ISMEAR(xvasp,mode,2,vflags.KBIN_VASP_INCAR_VERBOSE);
+      //[CO20200624 - OBSOLETE]aus_exec << "cd " << xvasp.Directory << endl;
+      //[CO20200624 - OBSOLETE]aus_exec << "cat INCAR | sed \"s/ISMEAR/#ISMEAR/g\" > aflow.tmp && mv aflow.tmp INCAR" << endl; // remove ISMEAR
+      //[CO20200624 - OBSOLETE]if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] begin\" >> INCAR " << endl;
+      //[CO20200624 - OBSOLETE]string tmp=aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(2),_incarpad_)+"# Performing RELAX_STATIC (Methfessel-Paxton order 2)";
+      //[CO20200624 - OBSOLETE]aus_exec << "echo \"ISMEAR=2                                        # Performing RELAX_STATIC (Methfessel-Paxton order 2)\" >> INCAR " << endl;
+      //[CO20200624 - OBSOLETE]aus_exec << "echo \"" << tmp << "\" >> INCAR " << endl;
+      //[CO20200624 - OBSOLETE]if(vflags.KBIN_VASP_INCAR_VERBOSE) aus_exec << "echo \"# Performing KBIN::XVASP_Afix (" << mode << ") [AFLOW] end\" >> INCAR " << endl;
+      //[CO20200624 - OBSOLETE]aurostd::execute(aus_exec);
     }
     // rewrite to restart ---------------------------------
     if(rewrite_incar) {aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));}

@@ -948,15 +948,18 @@ namespace aurostd {
     //[CO20190712 - slight optimization if we go backwards]for(uint i=0;i<s.length();i++)
     for(uint i=s.length()-1;i<s.length();i--)
     { //CO20200106 - patching for auto-indenting
-      if(!(
-            (s[i]>='A' && s[i]<='Z') || //LETTERS
-            (s[i]>='a' && s[i]<='z') || //letters
-            (s[i]>='0' && s[i]<='9') || //numbers
-            (s[i]=='.' || s[i]=='+' || s[i]=='-' || s[i]=='*' || s[i]=='/') ||  //operations
-            (s[i]=='_' || s[i]=='#' || s[i]=='&' || s[i]==':' || s[i]==',' || s[i]=='@' || s[i]=='$') ||  //punctuation1
-            (s[i]=='=' || s[i]=='|' || s[i]=='\'' || s[i]=='\"' || s[i]==' ') ||  //punctuation2
-            FALSE)
-        ){RemoveCharacterInPlace(s,s[i]);}
+      //[CO20200624 - not inclusive enough]if(!(
+      //[CO20200624 - not inclusive enough]      (s[i]>='A' && s[i]<='Z') || //LETTERS
+      //[CO20200624 - not inclusive enough]      (s[i]>='a' && s[i]<='z') || //letters
+      //[CO20200624 - not inclusive enough]      (s[i]>='0' && s[i]<='9') || //numbers
+      //[CO20200624 - not inclusive enough]      (s[i]=='.' || s[i]=='+' || s[i]=='-' || s[i]=='*' || s[i]=='/') ||  //operations
+      //[CO20200624 - not inclusive enough]      (s[i]=='_' || s[i]=='#' || s[i]=='&' || s[i]==':' || s[i]==',' || s[i]=='@' || s[i]=='$') ||  //punctuation1
+      //[CO20200624 - not inclusive enough]      (s[i]=='=' || s[i]=='|' || s[i]=='\'' || s[i]=='\"' || s[i]==' ') ||  //punctuation2
+      //[CO20200624 - not inclusive enough]      FALSE)
+      //[CO20200624 - not inclusive enough]  ){RemoveCharacterInPlace(s,s[i]);}
+      //https://stackoverflow.com/questions/48212992/how-to-find-out-if-there-is-any-non-ascii-character-in-a-string-with-a-file-path
+      //cerr << s[i] << " " << static_cast<unsigned int>(s[i]) << endl;
+      if(static_cast<unsigned int>(s[i])>127){RemoveCharacterInPlace(s,s[i]);}
     }
   }
 
@@ -2588,29 +2591,37 @@ namespace aurostd {
   // ***************************************************************************
   bool execute(ostringstream &command) {
     // cerr << "COMMAND " <<  command.str().c_str() << endl;
-    system(command.str().c_str());
+    //[CO20200624 - OBSOLETE]system(command.str().c_str());
+    execute(command.str()); //CO20200624
     aurostd::StringstreamClean(command);
     return TRUE;
   }
 
   bool execute(stringstream &command) {
     // cerr << "COMMAND " <<  command.str().c_str() << endl;
-    system(command.str().c_str());
+    //[CO20200624 - OBSOLETE]system(command.str().c_str());
+    execute(command.str()); //CO20200624
     aurostd::StringstreamClean(command);
     return TRUE;
   }
 
-  bool execute(string command) {
+  bool execute(const string& _command) {
+    string soliloquy=XPID+"AUROSTD::execute():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
+    string command=aurostd::CleanCommand4Execute(_command); //CO20200624
+    if(LDEBUG){cerr << soliloquy << " command.c_str()=\"" << command.c_str() << "\"" << endl;}
     system(command.c_str());
     //   command="";
     return TRUE;
   }
 
 #ifdef _stringcharstar_
-  bool execute(char* command) {
+  bool execute(char* _command) {
     // cerr << "COMMAND " <<  command << endl;
-    system(command);
+    //[CO20200624 - OBSOLETE]system(command);
+    string command=std::string(_command); //CO20200624
+    execute(command);
     return TRUE;
   }
 #endif
@@ -2618,12 +2629,12 @@ namespace aurostd {
   // ***************************************************************************
   // Execute vectors/deque of Strings
   // ***************************************************************************
-  bool execute(deque<string> vcommand) {
+  bool execute(const deque<string>& vcommand) {
     for(uint i=0;i<vcommand.size();i++)
       execute(vcommand[i]);
     return TRUE;
   }
-  bool execute(vector<string> vcommand) {
+  bool execute(const vector<string>& vcommand) {
     for(uint i=0;i<vcommand.size();i++)
       execute(vcommand[i]);
     return TRUE;
@@ -2632,12 +2643,23 @@ namespace aurostd {
   // ***************************************************************************
   // Execute & Report Streams/Strings/C_strings
   // ***************************************************************************
-  string execute2string(string command) {
+  string execute2string(const string& _command,FSIO fsio) { //CO20200624 - added file system IO mode
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"AUROSTD::execute2string():";
     // bool INIT_VERBOSE=TRUE;
     // cerr << "COMMAND " <<  command << endl;
+    
+    //CO20200624 START - some command cleanup
+    string command=aurostd::CleanCommand4Execute(_command);
+    if(command.find("; ")!=string::npos){command="( "+command+" )";}  //put to subshell for IO redirection
+    //CO20200624 END - some command cleanup
+    
     stringstream strstream,cmdstream;
     string file=aurostd::TmpFileCreate("execute_report");
-    cmdstream << command << " > " << file <<  endl;
+    if(fsio==stdouterr_fsio){cmdstream << command << " &> " << file;}  //CO20200624
+    else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file;} //CO20200624
+    else{cmdstream << command << " > " << file;} //CO20200624
+    if(LDEBUG){cerr << soliloquy << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}
     system(cmdstream.str().c_str());
     // command="";
     strstream << aurostd::file2string(file);
@@ -2649,41 +2671,64 @@ namespace aurostd {
     if(strout.length()>0)
       if(strout.at(strout.length()-1)=='\n')
         strout.erase(strout.length()-1);
+    if(LDEBUG){cerr << soliloquy << " strout=\"" << strout << "\"" << endl;}
     return strout;
   }
 
-  string execute2string(ostringstream &command) {
+  string execute2string(ostringstream &command,FSIO fsio) { //CO20200624 - added file system IO mode
     string command_str=command.str();
     aurostd::StringstreamClean(command);
-    return execute2string(command_str);
+    return execute2string(command_str,fsio);  //CO20200624
   }
 
-  string execute2string(stringstream &command) {
+  string execute2string(stringstream &command,FSIO fsio) { //CO20200624 - added file system IO mode
     string command_str=command.str();
     aurostd::StringstreamClean(command);
-    return execute2string(command_str);
+    return execute2string(command_str,fsio);  //CO20200624
   }
 
-  vector<string> execute2string(vector<string> vcommand) {
+  vector<string> execute2string(const vector<string>& vcommand,FSIO fsio) { //CO20200624 - added file system IO mode
     vector<string> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back(execute2string(vcommand[i]));
+      out.push_back(execute2string(vcommand[i],fsio));  //CO20200624
     return out;
   }
 
-  deque<string> execute2string(deque<string> vcommand) {
+  deque<string> execute2string(const deque<string>& vcommand,FSIO fsio) { //CO20200624 - added file system IO mode
     deque<string> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back(execute2string(vcommand[i]));
+      out.push_back(execute2string(vcommand[i],fsio));  //CO20200624
     return out;
   }
 
 #ifdef _stringcharstar_
-  string execute2string(char* command) {
+  string execute2string(char* command,FSIO fsio) { //CO20200624 - added file system IO mode
     string command_str=string(command);
-    return execute2string(command_str);
+    return execute2string(command_str,fsio);  //CO20200624
   }
 #endif
+  
+  string CleanCommand4Execute(const string& _command){ //CO20200624
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"AUROSTD::CleanCommand4Execute():";
+    if(LDEBUG){cerr << soliloquy << " command(pre )=\"" << _command << "\"" << endl;}
+    //CO20200624 START - some command cleanup
+    vector<string> tokens,tokens_new;
+    aurostd::string2vectorstring(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(_command),tokens);
+    string tmp="";
+    for(uint i=0;i<tokens.size();i++){
+      if(LDEBUG){cerr << soliloquy << " tokens[i=" << i << "](pre )=\"" << tokens[i] << "\"" << endl;}
+      tmp=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i]);
+      aurostd::CleanStringASCII_InPlace(tmp);
+      if(LDEBUG){cerr << soliloquy << " tokens[i=" << i << "](post)=\"" << tmp << "\"" << endl;}
+      if(!tmp.empty()){tokens_new.push_back(tmp);}
+    }
+    if(tokens_new.size()==0){return "";}
+    string command=aurostd::joinWDelimiter(tokens_new,"; ");
+    //CO20200624 END - some command cleanup
+    if(LDEBUG){cerr << soliloquy << " command(post)=\"" << command << "\"" << endl;}
+    return command;
+  }
 
   // ***************************************************************************
   // Execute & Report Int Streams/Strings/C_strings
