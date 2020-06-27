@@ -1,3 +1,7 @@
+3.2.5 - 2020/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- patching lib2raw index issues: LIB7/LIB did not exist (CO)
+        -- patching lib2raw index issues: string substitution of /core (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
