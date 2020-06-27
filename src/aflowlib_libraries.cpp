@@ -746,6 +746,7 @@ namespace aflowlib {
 // ***************************************************************************
 namespace aflowlib {
   string LIB2RAW_CheckProjectFromDirectory(string directory) {
+    string soliloquy=XPID+"aflowlib::LIB2RAW_CheckProjectFromDirectory():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "aflowlib::LIB2RAW_CheckProjectFromDirectory" << endl;  
     CheckMaterialServer("aflowlib::LIB2RAW_CheckProjectFromDirectory"); // must be in AFLOW_MATERIALS_SERVER
@@ -757,8 +758,10 @@ namespace aflowlib {
     aurostd::StringSubst(directory_pwd,"LIB2/RAW","LIB2/LIB"); // [HISTORIC]
 
     // if not found by PWD switch to directory
-    for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++)
+    for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++){
+      if(LDEBUG){cerr << soliloquy << " looking for " << vAFLOW_PROJECTS_DIRECTORIES.at(i) << " in " << directory << endl;}  //CO20200624
       if(aurostd::substring2bool(directory,vAFLOW_PROJECTS_DIRECTORIES.at(i))) PROJECT_LIBRARY=vAFLOW_PROJECTS_DIRECTORIES.at(i);
+    }
     if(PROJECT_LIBRARY!="NOTHING") {
       if(LDEBUG) cerr << XPID << "aflowlib::LIB2RAW_CheckProjectFromDirectory: FOUND from directory: " << PROJECT_LIBRARY << endl;
       return PROJECT_LIBRARY;
@@ -865,7 +868,7 @@ namespace aflowlib {
       for(uint i=0;i<tokens.size();i++) {
         aurostd::StringSubst(tokens.at(i),"/"+_AFLOWIN_,"");
         aurostd::StringSubst(tokens.at(i),"/"+_AFLOWLOCK_,"");
-        aurostd::StringSubst(tokens.at(i),"/core","");
+        if(tokens.at(i).size()>=5 && tokens.at(i)[tokens.at(i).size()-5]=='/' && tokens.at(i)[tokens.at(i).size()-4]=='c' && tokens.at(i)[tokens.at(i).size()-3]=='o' && tokens.at(i)[tokens.at(i).size()-2]=='r' && tokens.at(i)[tokens.at(i).size()-1]=='e'){tokens.at(i)=tokens.at(i).substr(0,tokens.at(i).size()-5);} //aurostd::StringSubst(tokens.at(i),"/core",""); //CO20200624 - prevent /home/corey -> /homey
         string cmd="aflow";
         if(XHOST.vflag_control.flag("BEEP")) cmd+=" --beep";
         if(flag_FORCE) cmd+=" --force";
@@ -1033,7 +1036,7 @@ namespace aflowlib {
       if(directory.at(directory.size()-1)=='/')  directory=directory.substr(0,directory.size()-1);
       aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");
       aurostd::StringSubst(directory,"/"+_AFLOWLOCK_,"");
-      aurostd::StringSubst(directory,"/core","");
+      if(directory.size()>=5 && directory[directory.size()-5]=='/' && directory[directory.size()-4]=='c' && directory[directory.size()-3]=='o' && directory[directory.size()-2]=='r' && directory[directory.size()-1]=='e'){directory=directory.substr(0,directory.size()-5);} //aurostd::StringSubst(directory,"/core",""); //CO20200624 - prevent /home/corey -> /homey
       aurostd::StringSubst(directory,"common/SCINT","common/ICSD");   // [HISTORIC]
       aurostd::StringSubst(directory,"common/ELPASOLITES","common/AURO");   // [HISTORIC]
       aurostd::StringSubst(directory,"LIBRARYX/RAW","LIBRARYX/LIB");   // [HISTORIC]
@@ -5723,7 +5726,7 @@ namespace aflowlib {
       if(directory.at(directory.size()-1)=='/')  directory=directory.substr(0,directory.size()-1);
       aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");
       aurostd::StringSubst(directory,"/"+_AFLOWLOCK_,"");
-      aurostd::StringSubst(directory,"/core","");
+      if(directory.size()>=5 && directory[directory.size()-5]=='/' && directory[directory.size()-4]=='c' && directory[directory.size()-3]=='o' && directory[directory.size()-2]=='r' && directory[directory.size()-1]=='e'){directory=directory.substr(0,directory.size()-5);} //aurostd::StringSubst(directory,"/core",""); //CO20200624 - prevent /home/corey -> /homey
       aurostd::StringSubst(directory,"common/SCINT","common/ICSD");   // [HISTORIC]
       aurostd::StringSubst(directory,"common/ELPASOLITES","common/AURO");   // [HISTORIC]
       aurostd::StringSubst(directory,"LIBRARYX/RAW","LIBRARYX/LIB");   // [HISTORIC]

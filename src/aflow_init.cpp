@@ -507,6 +507,8 @@ namespace init {
           if(aurostd::substring2bool(vstrs.at(i),"LIB7")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB7=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
           if(aurostd::substring2bool(vstrs.at(i),"LIB8")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB8=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
           if(aurostd::substring2bool(vstrs.at(i),"LIB9")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB9=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+        }else{  //CO20200624 - patch for LIB7 which has no LIB
+          if(aurostd::substring2bool(vstrs.at(i),"LIB7")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB7=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}  //CO20200624
         }
       }
     }
