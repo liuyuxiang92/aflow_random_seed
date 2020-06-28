@@ -1812,7 +1812,7 @@ namespace KBIN {
                   if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC STATIC
                     // check VASP version
                     double dversion=0.0;
-                    string sversion=aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR.static | grep vasp | head -1 | sed \"s/ /\\n/g\" | grep vasp | sed \"s/vasp\\.//g\"");
+                    string sversion=aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR.static | grep vasp | head -1 | sed \"s/ /\\n/g\" | grep vasp | sed \"s/vasp\\.//g\"");  //LOOK INTO USING getVASPVersionString()
                     vector<string> tokens; aurostd::string2tokensAdd(sversion,tokens,".");
                     if(tokens.size()>0) dversion+=aurostd::string2utype<double>(tokens.at(0));
                     if(tokens.size()>1) dversion+=aurostd::string2utype<double>(tokens.at(1))/10.0;
@@ -2211,11 +2211,12 @@ namespace KBIN {
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
     int nrun=0,maxrun=15;
-    int fix_NIRMAT=0,fix_eddrmm=0;
+    int submode=0;
+    int fix_NIRMAT=0;
+    int fix_eddrmm=0;
     int kpoints_k1=xvasp.str.kpoints_k1; double kpoints_s1=xvasp.str.kpoints_s1;
     int kpoints_k2=xvasp.str.kpoints_k2; double kpoints_s2=xvasp.str.kpoints_s2;
     int kpoints_k3=xvasp.str.kpoints_k3; double kpoints_s3=xvasp.str.kpoints_s3;
-    bool apply_new_kksym_fix=true; //CO20181226
 
     // get CPUS from PBS/SLURM
     // string ausenv;
@@ -2693,23 +2694,41 @@ namespace KBIN {
 
       // check VASP version
       double DVERSION=0.0;
-      xwarning.push_attached("SVERSION",aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR | grep vasp | head -1 | sed \"s/ /\\n/g\" | grep vasp | sed \"s/vasp\\.//g\""));
+      xwarning.push_attached("SVERSION",aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR | grep vasp | head -1 | sed \"s/ /\\n/g\" | grep vasp | sed \"s/vasp\\.//g\""));  //LOOK INTO USING getVASPVersionString()
       vector<string> vtokens; aurostd::string2tokensAdd(xwarning.getattachedscheme("SVERSION"),vtokens,".");
       if(vtokens.size()>0) DVERSION+=aurostd::string2utype<double>(vtokens.at(0));
       if(vtokens.size()>1) DVERSION+=aurostd::string2utype<double>(vtokens.at(1))/10.0;
       xwarning.push_attached("DVERSION",aurostd::utype2string((double) DVERSION));
 
 
-      if(nrun<maxrun) {  
+      if(nrun<maxrun) {
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  checking warnings" << endl;
         xmessage.flag("REACHED_ACCURACY",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","reached required accuracy"));
+
+        //WARNINGS START
+
+        //VASP's internal symmetry routines START
+        //CO20200624 - these are all related to VASP's internal symmetry routines
+        //they would all benefit from similar fixes
         xwarning.flag("KKSYM",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Reciprocal lattice and k-lattice belong to different class of lattices"));
         xwarning.flag("SGRCON",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine SGRCON"));
         xwarning.flag("NIRMAT",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Found some non-integer element in rotation matrix"));
+        xwarning.flag("IBZKPT",(!xmessage.flag("REACHED_ACCURACY") &&
+              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine IBZKPT")) );
+        xwarning.flag("SYMPREC",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","inverse of rotation matrix was not found (increase SYMPREC)"));
+        xwarning.flag("INVGRP",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine INVGRP"));
+        xwarning.flag("NKXYZ_IKPTD",(
+              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKX>IKPTD") ||
+              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKY>IKPTD") ||
+              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKZ>IKPTD") || 
+              FALSE));
+        //VASP's internal symmetry routines END
         xwarning.flag("BRMIX",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","BRMIX: very serious problems"));
         xwarning.flag("DAV",(!xmessage.flag("REACHED_ACCURACY") &&
               aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING: Sub-Space-Matrix is not hermitian in DAV")) );
         xwarning.flag("EDDDAV",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Error EDDDAV: Call to ZHEGV failed. Returncode"));
+        xwarning.flag("EDDRMM",(!xmessage.flag("REACHED_ACCURACY") &&
+              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING in EDDRMM: call to ZHEGV failed, returncode")) ); // && !xwarning.flag("ZPOTRF");
         xwarning.flag("ZPOTRF",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LAPACK: Routine ZPOTRF failed"));
         //ME20190620 - Avoid changing NBANDS in the aflow.in file just because VASP throws the warning that NBANDS is changed because of NPAR. However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
         if (aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out", "NBANDS")) {
@@ -2727,14 +2746,8 @@ namespace KBIN {
         xwarning.flag("MEMORY",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","AFLOW ERROR: AFLOW_MEMORY=")); // look for problem for distance
         // xwarning.flag("PSMAXN",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING: PSMAXN for non-local potential too small")); // look for problem for distance
         xwarning.flag("PSMAXN",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","REAL_OPT: internal ERROR"));
-        xwarning.flag("IBZKPT",(!xmessage.flag("REACHED_ACCURACY") &&
-              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine IBZKPT")) );
-        xwarning.flag("EDDRMM",(!xmessage.flag("REACHED_ACCURACY") &&
-              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING in EDDRMM: call to ZHEGV failed, returncode")) ); // && !xwarning.flag("ZPOTRF");
         xwarning.flag("REAL_OPTLAY_1",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","REAL_OPTLAY: internal error (1)"));
         xwarning.flag("REAL_OPT",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","REAL_OPT: internal ERROR"));
-        xwarning.flag("SYMPREC",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","inverse of rotation matrix was not found (increase SYMPREC)"));
-        xwarning.flag("INVGRP",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine INVGRP"));
         xwarning.flag("NPAR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","please rerun with NPAR=")); // not only npar==1
         xwarning.flag("NPARC",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NPAR = 4") &&
               aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NPAR=number of cores")) ); // fix with NPAR=cores in MPI
@@ -2745,10 +2758,7 @@ namespace KBIN {
             aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","shift your grid to Gamma") || //CO20190704
             aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Shift your grid to Gamma") || //CO20190704 - new VASP
             FALSE); //CO20190704
-        xwarning.flag("CSLOSHING",KBIN::VASP_CheckUnconvergedOSZICAR(xvasp.Directory)); // check from OSZICAR
-        xwarning.flag("NKXYZ_IKPTD",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKX>IKPTD") ||
-              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKY>IKPTD") ||
-              aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKZ>IKPTD")) );
+        xwarning.flag("CSLOSHING",KBIN::VASP_OSZICARUnconverged(xvasp.Directory)); // check from OSZICAR
         xwarning.flag("DENTET",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING: DENTET: can't reach specified precision")); // not only npar==1
         xwarning.flag("EFIELD_PEAD",
             aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","EFIELD_PEAD is too large") || //20190704
@@ -2761,7 +2771,6 @@ namespace KBIN {
         xwarning.flag("MPICH139",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES") &&
               aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","EXIT CODE: 139")) );
         if(xwarning.flag("MPICH11")) xwarning.flag("NBANDS",FALSE); // fix MPICH11 first
-
         if(xwarning.flag("NPARC") && (aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","NPAR=2") || // dont bother for small NPAR
               aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LRPA") ||
               aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LEPSILON") ||
@@ -2769,6 +2778,8 @@ namespace KBIN {
         if(xwarning.flag("NPARN") && (aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LRPA") ||
               aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LEPSILON") ||
               aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LOPTICS"))) xwarning.flag("NPARN",FALSE);  // dont touch NPARN if LRPA or LEPSILON or LOPTICS necessary
+        
+        //WARNINGS STOP
 
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [4]" << endl;
 
@@ -2786,46 +2797,46 @@ namespace KBIN {
         if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DSCF") && NBANDS_OUTCAR>1000) xwarning.flag("NBANDS",FALSE); // for safety
         
         // code to get xwarning.flag("NELM")
-        if(1) {
-          stringstream command,aus;
-          string tmp="";
-          int NELM=0,NSTEPS=0;
-          
-          command.str(std::string());command.clear();
-          //[CO20200624 - OBSOLETE]command << "cat " << xvasp.Directory << "/OUTCAR | grep NELM | sed \"s/;/\\n/g\" | head -1 | sed \"s/ //g\" | sed \"s/NELM=//g\"" << endl;
-          command << "cat " << xvasp.Directory << "/OUTCAR | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
-          tmp=aurostd::execute2string(command);
-          
-          if(0){
-            aus.str(std::string());aus.clear();
-            aus << "MMMMM  MESSAGE NELM GREP RESPONSE=\"" << tmp << "\"" << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
-          }
-          
-          if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
-          //[CO20200624 - OBSOLETE]aus >> NELM;
-          aus << "MMMMM  MESSAGE NELM=" << NELM << endl;
+        //if(1) {
+        stringstream command,aus;
+        string tmp="";
+        int NELM=0,NSTEPS=0;
+        
+        command.str(std::string());command.clear();
+        //[CO20200624 - OBSOLETE]command << "cat " << xvasp.Directory << "/OUTCAR | grep NELM | sed \"s/;/\\n/g\" | head -1 | sed \"s/ //g\" | sed \"s/NELM=//g\"" << endl;
+        command << "cat " << xvasp.Directory << "/OUTCAR | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
+        tmp=aurostd::execute2string(command);
+        
+        if(0){
+          aus.str(std::string());aus.clear();
+          aus << "MMMMM  MESSAGE NELM GREP RESPONSE=\"" << tmp << "\"" << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
-          
-          command.str(std::string());command.clear();
-          command << "cat " << xvasp.Directory << "/OSZICAR | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
-          tmp=aurostd::execute2string(command);
-          
-          if(0){
-            aus.str(std::string());aus.clear();
-            aus << "MMMMM  MESSAGE NSTEPS GREP RESPONSE=\"" << tmp << "\"" << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
-          }
-          
-          if(!tmp.empty() && aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
-          //[CO20200624 - OBSOLETE]aus >> NSTEPS;
-          aus << "MMMMM  MESSAGE NSTEPS=" << NSTEPS << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
-          
-          if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM) { xwarning.flag("NELM",TRUE); } else { xwarning.flag("NELM",FALSE); }
-          //[CO20200624 - OBSOLETE]cerr << "NELM=" << NELM << "  " << "NSTEPS=" << NSTEPS << "  " << "xwarning.flag(\"NELM\")=" << xwarning.flag("NELM") << endl;
-          //[CO20200624 - OBSOLETE]exit(0);
         }
+        
+        if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
+        //[CO20200624 - OBSOLETE]aus >> NELM;
+        aus << "MMMMM  MESSAGE NELM=" << NELM << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
+        
+        command.str(std::string());command.clear();
+        command << "cat " << xvasp.Directory << "/OSZICAR | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
+        tmp=aurostd::execute2string(command);
+        
+        if(0){
+          aus.str(std::string());aus.clear();
+          aus << "MMMMM  MESSAGE NSTEPS GREP RESPONSE=\"" << tmp << "\"" << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
+        }
+        
+        if(!tmp.empty() && aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
+        //[CO20200624 - OBSOLETE]aus >> NSTEPS;
+        aus << "MMMMM  MESSAGE NSTEPS=" << NSTEPS << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
+        
+        if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM) { xwarning.flag("NELM",TRUE); } else { xwarning.flag("NELM",FALSE); }
+        //[CO20200624 - OBSOLETE]cerr << "NELM=" << NELM << "  " << "NSTEPS=" << NSTEPS << "  " << "xwarning.flag(\"NELM\")=" << xwarning.flag("NELM") << endl;
+        //[CO20200624 - OBSOLETE]exit(0);
+        //}
 
 
         if(1) {
@@ -2889,6 +2900,7 @@ namespace KBIN {
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [6]" << endl;
 
         // ********* CHECK NBANDS PROBLEMS ******************
+        // keep increasing NBANDS until it works: Afix_NBANDS() will keep growing (no check for xfixed.flag("NBANDS"))
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK NBANDS PROBLEMS]" << endl;
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NBANDS") && !xfixed.flag("ALL")) { // check NBANDS
           if(xwarning.flag("NBANDS")) {
@@ -2901,6 +2913,8 @@ namespace KBIN {
           }
         }
         // ********* CHECK LRF_COMMUTATOR PROBLEMS ******************
+        // https://www.vasp.at/forum/viewtopic.php?f=4&t=8230
+        // run with higher version of VASP
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK LRF_COMMUTATOR PROBLEMS]" << endl;
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LRF_COMMUTATOR") && !xfixed.flag("ALL")) { // check LRF_COMMUTATOR
           if(0 && xwarning.flag("LRF_COMMUTATOR")) {
@@ -2926,88 +2940,97 @@ namespace KBIN {
         // }
         // ********* CHECK SYMMETRY PROBLEMS ******************
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK SYMMETRY PROBLEMS]" << endl;
-        if((xwarning.flag("KKSYM") || xwarning.flag("SGRCON") || xwarning.flag("NIRMAT")) && xfixed.flag("ISYM=0")){
-          aus << "MMMMM  IGNORING SYM WARNINGS: ISYM==0 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        //https://www.vasp.at/wiki/index.php/ISYM
+        //need to get ISYM and ISPIN (ISPIND too)
+        
+        //get ISYM
+        string isym_current_str=XVASP_INCAR_GET_ENTRY(xvasp,"ISYM");  //CO20200624 - preload incar
+        int isym_current=1; //CO20200624 - VASP default
+        if(!isym_current_str.empty()&&aurostd::isfloat(isym_current_str)){isym_current=aurostd::string2utype<int>(isym_current_str);}
+        //get ISPIND
+        string ispind_current_str=XVASP_INCAR_GET_ENTRY(xvasp,"ISPIND");  //CO20200624 - preload incar
+        int ispind_current=1; //CO20200624 - VASP default
+        if(!ispind_current_str.empty()&&aurostd::isfloat(ispind_current_str)){ispind_current=aurostd::string2utype<int>(ispind_current_str);}
+        //get ISPIN
+        string ispin_current_str=XVASP_INCAR_GET_ENTRY(xvasp,"ISPIN");  //CO20200624 - preload incar
+        int ispin_current=1; //CO20200624 - VASP default
+        if(!ispin_current_str.empty()&&aurostd::isfloat(ispin_current_str)){ispin_current=aurostd::string2utype<int>(ispin_current_str);}
+        
+        if((xwarning.flag("KKSYM") || xwarning.flag("SGRCON") || xwarning.flag("NIRMAT")) && 
+            ((ispind_current==2 && ispin_current==2 && isym_current==-1) || isym_current==0)){  //CO20200624 - needs to change if we do magnetic systems
+          aus << "MMMMM  IGNORING SYM WARNINGS: ISYM==" << isym_current << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xwarning.flag("KKSYM",FALSE);xwarning.flag("SGRCON",FALSE);xwarning.flag("NIRMAT",FALSE);
         }
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ROTMAT") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
-          if(xwarning.flag("KKSYM") || xwarning.flag("SGRCON") || xwarning.flag("NIRMAT")) {
-            if(xwarning.flag("NIRMAT")) {
+          //[CO20200624 - deal with SGRCON below]if(xwarning.flag("KKSYM") || xwarning.flag("SGRCON") || xwarning.flag("NIRMAT"))
+          if(xwarning.flag("NIRMAT") && !xfixed.flag("ALL")) {
+            xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
+            xvasp.str.kpoints_k2=kpoints_k2;xvasp.str.kpoints_s2=kpoints_s2;
+            xvasp.str.kpoints_k3=kpoints_k3;xvasp.str.kpoints_s3=kpoints_s3;
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NIRMAT problems ");
+            //[CO20200624 - OBSOLETE]if(fix_NIRMAT<=6) {
+            aus << "WWWWW  FIX NIRMAT (" << fix_NIRMAT << ") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            if(KBIN::XVASP_Afix_ROTMAT(xvasp,fix_NIRMAT,kflags,vflags,aflags,!XHOST.QUIET,FileMESSAGE)){
               fix_NIRMAT++;
+              xfixed.flag("ALL",TRUE);
+            }
+            //[CO20200624 - OBSOLETE]}
+            //[CO20200624 - OBSOLETE]else {
+            //[CO20200624 - OBSOLETE]  //ignore warning, Afix_ROTMAT(mode==6) is ISYM=0 (the nuclear option)
+            //[CO20200624 - OBSOLETE]  aus << "MMMMM  IGNORING NIRMAT WARNING: SYM IS OFF - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            //[CO20200624 - OBSOLETE]  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            //[CO20200624 - OBSOLETE]  //[CO20200624 - IGNORE WARNING]aus << "WWWWW  FIX NIRMAT (" << 0 << ") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            //[CO20200624 - OBSOLETE]  //[CO20200624 - IGNORE WARNING]aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            //[CO20200624 - OBSOLETE]  //[CO20200624 - IGNORE WARNING]KBIN::XVASP_Afix_ROTMAT(xvasp,0,kflags,vflags,aflags,!XHOST.QUIET,FileMESSAGE);
+            //[CO20200624 - OBSOLETE]  xfixed.flag("KKSYM",TRUE);xfixed.flag("SGRCON",TRUE);xfixed.flag("NIRMAT",TRUE);xfixed.flag("ALL",TRUE);
+            //[CO20200624 - OBSOLETE]  // if(nrun<maxrun) vasp_start=TRUE;
+            //[CO20200624 - OBSOLETE]}
+          } //[CO20200624 - OBSOLETE] else // JAN 2012
+          if(xwarning.flag("KKSYM") && !xfixed.flag("ALL")) {
+            //CO20181226 START - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
+            //recommended procedure (simple to difficult):
+            //1. G-centered
+            //2. SYMPREC
+            //3. KMAX
+            //4. ISYM=0
+            //[CO20200624 - OBSOLETE]if (!vflags.KBIN_VASP_FORCE_OPTION_SYM.option) xfixed.flag("KKSYM", true);  //ME20200304 - Do not fix when SYM=OFF
+            if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_G_SHIFT")==false && !xvasp.str.kpoints_kscheme.empty() && !(xvasp.str.kpoints_kscheme[0]=='G' || xvasp.str.kpoints_kscheme[0]=='g')){
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              aus << "WWWWW  FIX KKSYM (GAMMA_SHIFT) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags);  //use this over KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma") so we save error file
+              xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_G_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
+            }
+            if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_SYMPREC")==false){
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              aus << "WWWWW  FIX KKSYM (SYMPREC) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags);
+              xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_SYMPREC",TRUE);xfixed.flag("ALL",TRUE);
+            }
+            //CO20181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
+            if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_KMAX")==false){  //CO20181226 - no point running many times, max is max
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              aus << "WWWWW  FIX KKSYM (K1=K2=K3=KMAX) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
               xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
               xvasp.str.kpoints_k2=kpoints_k2;xvasp.str.kpoints_s2=kpoints_s2;
               xvasp.str.kpoints_k3=kpoints_k3;xvasp.str.kpoints_s3=kpoints_s3;
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NIRMAT problems ");
-              if(fix_NIRMAT<=6) {
-                aus << "WWWWW  FIX NIRMAT (" << (fix_NIRMAT<6?aurostd::utype2string(fix_NIRMAT):"ISYM=0") << ") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-                aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                KBIN::XVASP_Afix_ROTMAT(xvasp,fix_NIRMAT,!XHOST.QUIET,aflags,FileMESSAGE);
-                xfixed.flag("ALL",TRUE);
-                if(fix_NIRMAT==6){xfixed.flag("ISYM=0",TRUE);}
-              }
-              //[CO20200624 - OBSOLETE]else {
-              //[CO20200624 - OBSOLETE]  //ignore warning, Afix_ROTMAT(mode==6) is ISYM=0 (the nuclear option)
-              //[CO20200624 - OBSOLETE]  aus << "MMMMM  IGNORING NIRMAT WARNING: SYM IS OFF - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-              //[CO20200624 - OBSOLETE]  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-              //[CO20200624 - OBSOLETE]  //[CO20200624 - IGNORE WARNING]aus << "WWWWW  FIX NIRMAT (" << 0 << ") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-              //[CO20200624 - OBSOLETE]  //[CO20200624 - IGNORE WARNING]aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-              //[CO20200624 - OBSOLETE]  //[CO20200624 - IGNORE WARNING]KBIN::XVASP_Afix_ROTMAT(xvasp,0,!XHOST.QUIET,aflags,FileMESSAGE);
-              //[CO20200624 - OBSOLETE]  xfixed.flag("KKSYM",TRUE);xfixed.flag("SGRCON",TRUE);xfixed.flag("NIRMAT",TRUE);xfixed.flag("ALL",TRUE);
-              //[CO20200624 - OBSOLETE]  xfixed.flag("ISYM=0",TRUE);
-              //[CO20200624 - OBSOLETE]  // if(nrun<maxrun) vasp_start=TRUE;
-              //[CO20200624 - OBSOLETE]}
-            } else { // JAN 2012
-              //CO20181226 START - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
-              //recommended procedure (simple to difficult):
-              //1. G-centered
-              //2. SYMPREC
-              //3. KMAX
-              //4. ISYM=0
-              //[CO20200624 - OBSOLETE]if (!vflags.KBIN_VASP_FORCE_OPTION_SYM.option) xfixed.flag("KKSYM", true);  //ME20200304 - Do not fix when SYM=OFF
-              if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
-                if(xfixed.flag("KKSYM_ISYM")==false){xfixed.flag("KKSYM",FALSE);} //CO20181226 last step, and xwarning.flag("KKSYM") can be ignored if xfixed.flag("KKSYM_ISYM") applied
-                //aus << "WWWWW  APPLYING NEW FIXES FOR KKSYM - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-                //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_G_SHIFT")==false && !xvasp.str.kpoints_kscheme.empty() && !(xvasp.str.kpoints_kscheme[0]=='G' || xvasp.str.kpoints_kscheme[0]=='g')){
-                  KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
-                  aus << "WWWWW  FIX KKSYM (GAMMA_SHIFT) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-                  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                  KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags);
-                  xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_G_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
-                }
-                if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_SYMPREC")==false){
-                  aus << "WWWWW  FIX KKSYM (SYMPREC) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-                  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                  KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags);
-                  xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_SYMPREC",TRUE);xfixed.flag("ALL",TRUE);
-                }
-              }
-              //CO20181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
-              if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_KMAX")==false){  //CO20181226 - no point running many times, max is max
-                KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
-                aus << "WWWWW  FIX KKSYM (K1=K2=K3=KMAX) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-                aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
-                xvasp.str.kpoints_k2=kpoints_k2;xvasp.str.kpoints_s2=kpoints_s2;
-                xvasp.str.kpoints_k3=kpoints_k3;xvasp.str.kpoints_s3=kpoints_s3;
-                KBIN::XVASP_Afix_ROTMAT(xvasp,3,!XHOST.QUIET,aflags,FileMESSAGE);
-                xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_KMAX",TRUE);xfixed.flag("ALL",TRUE);
-              }
-              //CO20181226 START - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
-              if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
-                if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_ISYM")==false){
-                  KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
-                  //THE NUCLEAR OPTION
-                  aus << "WWWWW  FIX KKSYM (ISYM=0) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-                  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                  KBIN::XVASP_Afix_ROTMAT(xvasp,6,!XHOST.QUIET,aflags,FileMESSAGE);
-                  xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_ISYM",TRUE);xfixed.flag("ALL",TRUE);
-                  xfixed.flag("ISYM=0",TRUE);
-                }
-              }
-              //CO20181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
+              KBIN::XVASP_Afix_ROTMAT(xvasp,2,kflags,vflags,aflags,!XHOST.QUIET,FileMESSAGE);
+              xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_KMAX",TRUE);xfixed.flag("ALL",TRUE);
             }
+            //CO20181226 START - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
+            if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_ISYM")==false){
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              //THE NUCLEAR OPTION
+              aus << "WWWWW  FIX KKSYM (ISYM=0) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              KBIN::XVASP_Afix_ROTMAT(xvasp,5,kflags,vflags,aflags,!XHOST.QUIET,FileMESSAGE);
+              xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_ISYM",TRUE);xfixed.flag("ALL",TRUE);
+            }
+            //CO20181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
           }
         }
         // ********* CHECK SGRCON PROBLEMS ******************
@@ -3025,9 +3048,8 @@ namespace KBIN {
               //THE NUCLEAR OPTION
               aus << "WWWWW  FIX SGRCON (ISYM=0) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-              KBIN::XVASP_Afix_ROTMAT(xvasp,6,!XHOST.QUIET,aflags,FileMESSAGE);
+              KBIN::XVASP_Afix_ROTMAT(xvasp,5,kflags,vflags,aflags,!XHOST.QUIET,FileMESSAGE);
               xfixed.flag("SGRCON",TRUE);xfixed.flag("ALL",TRUE);
-              xfixed.flag("ISYM=0",TRUE);
             }
           }
         }
@@ -3116,11 +3138,12 @@ namespace KBIN {
         // ********* CHECK EDDRMM PROBLEMS ******************
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK EDDRMM PROBLEMS]" << endl;
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDRMM") && !xfixed.flag("ALL")) { // OPTIONS FOR EDDRMM
-          if(xwarning.flag("EDDRMM") && !xfixed.flag("EDDRMM") && fix_eddrmm<=3) {
+          if(xwarning.flag("EDDRMM")) {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  EDDRMM problems ");
             aus << "WWWWW  FIX EDDRMM - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("EDDRMM",xvasp,kflags,vflags,fix_eddrmm++);
+            KBIN::XVASP_Afix_GENERIC("EDDRMM",fix_eddrmm,xvasp,kflags,vflags);  //CO20200624 - adding fix_eddrmm
+            fix_eddrmm++;
             xfixed.flag("EDDRMM",TRUE);xfixed.flag("ALL",TRUE);
             // if(nrun<maxrun) vasp_start=TRUE;
           }
@@ -3278,7 +3301,8 @@ namespace KBIN {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  PSMAXN problems ");
             aus << "WWWWW  FIX PSMAXN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            enmax=KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags,enmax);
+            //[CO20200624 - OBSOLETE]enmax=KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags,enmax);
+            KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags,enmax);
             xfixed.flag("PSMAXN",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
@@ -3300,7 +3324,7 @@ namespace KBIN {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPARC problems ");
             aus << "WWWWW  FIX NPARC - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPARC",xvasp,kflags,vflags,0.0,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
+            KBIN::XVASP_Afix_GENERIC("NPARC",xvasp,kflags,vflags,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
             xfixed.flag("NPARC",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
@@ -3311,7 +3335,7 @@ namespace KBIN {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPARN problems ");
             aus << "WWWWW  FIX NPARN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPARN",xvasp,kflags,vflags,0.0,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
+            KBIN::XVASP_Afix_GENERIC("NPARN",xvasp,kflags,vflags,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
             xfixed.flag("NPARN",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
@@ -3322,7 +3346,7 @@ namespace KBIN {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPAR_REMOVE problems ");
             aus << "WWWWW  FIX NPAR_REMOVE - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPAR_REMOVE",xvasp,kflags,vflags,0.0,kflags.KBIN_MPI_NCPUS);  // this will be asked when NPAR is needed
+            KBIN::XVASP_Afix_GENERIC("NPAR_REMOVE",xvasp,kflags,vflags,kflags.KBIN_MPI_NCPUS);  // this will be asked when NPAR is needed
             xfixed.flag("NPAR_REMOVE",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
@@ -3356,7 +3380,7 @@ namespace KBIN {
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NELM") && !xfixed.flag("ALL")) { // check NELM
           if(xwarning.flag("NELM") && nelm<MAX_VASP_NELM) {  //only increase nelm so many times
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NELM problems ");
-            KBIN::XVASP_Afix_NELM(xvasp,nelm,!XHOST.QUIET);  // here it does the nelm_update
+            KBIN::XVASP_Afix_GENERIC_NELM(xvasp,nelm,!XHOST.QUIET);  // here it does the nelm_update
             xfixed.flag("NELM",TRUE);xfixed.flag("ALL",TRUE);
             aus << "WWWWW  FIX NELM = [" << nelm << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3914,21 +3938,48 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  bool VASP_CheckUnconvergedOSZICAR(string dir) {
-    uint ielectrons=0,issues=0,cutoff=3;
-    vector<string> vlines,vrelax,tokens;
-    aurostd::file2vectorstring(dir+"/OSZICAR",vlines);
-    for(uint i=0;i<vlines.size();i++)
-      if(aurostd::substring2bool(vlines.at(i),"F="))
-        vrelax.push_back(vlines.at(i-1));
-    if(vrelax.size()<cutoff) return FALSE; // no problem
-    // otherwise check for issues.
-    for(uint i=0;i<vrelax.size()&&i<cutoff;i++) {
-      aurostd::string2tokens(vrelax.at(i),tokens," ");
-      ielectrons=aurostd::string2utype<uint>(tokens.at(1));
-      if(ielectrons==60 || ielectrons==120) issues++;
-    }
-    if(issues==cutoff) return TRUE;
+  int VASP_getNELM(const string& dir){ //CO20200624
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::VASP_getNELM():";
+    stringstream command;command.str(std::string());command.clear();
+    //[CO20200624 - OBSOLETE]command << "cat " << dir << "/OUTCAR | grep NELM | sed \"s/;/\\n/g\" | head -1 | sed \"s/ //g\" | sed \"s/NELM=//g\"" << endl;
+    command << "cat " << dir << "/OUTCAR | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
+    string tmp=aurostd::execute2string(command);
+    if(LDEBUG){cerr << soliloquy << " NELM grep response=\"" << tmp << "\"" << endl;}
+    int NELM=60;  //VASP default
+    if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
+    return NELM;
+  }
+  int VASP_getNSTEPS(const string& dir){  //CO20200624
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::VASP_getNSTEPS():";
+    stringstream command;command.str(std::string());command.clear();
+    command << "cat " << dir << "/OSZICAR | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
+    string tmp=aurostd::execute2string(command);
+    if(LDEBUG){cerr << soliloquy << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
+    int NSTEPS=0;  //VASP default
+    if(!tmp.empty() && aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
+    return NSTEPS;
+  }
+  bool VASP_OSZICARUnconverged(const string& dir) {
+    //we only care about the last electronic SC steps
+    int NELM=KBIN::VASP_getNELM(dir);
+    int NSTEPS=KBIN::VASP_getNSTEPS(dir);
+    if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM){return true;}
+    //[CO20200624 - OBSOLETE]uint ielectrons=0,issues=0,cutoff=3;
+    //[CO20200624 - OBSOLETE]vector<string> vlines,vrelax,tokens;
+    //[CO20200624 - OBSOLETE]aurostd::file2vectorstring(dir+"/OSZICAR",vlines);
+    //[CO20200624 - OBSOLETE]for(uint i=0;i<vlines.size();i++)
+    //[CO20200624 - OBSOLETE]  if(aurostd::substring2bool(vlines.at(i),"F="))
+    //[CO20200624 - OBSOLETE]    vrelax.push_back(vlines.at(i-1));
+    //[CO20200624 - OBSOLETE]if(vrelax.size()<cutoff) return FALSE; // no problem
+    //[CO20200624 - OBSOLETE]// otherwise check for issues.
+    //[CO20200624 - OBSOLETE]for(uint i=0;i<vrelax.size()&&i<cutoff;i++) {
+    //[CO20200624 - OBSOLETE]  aurostd::string2tokens(vrelax.at(i),tokens," ");
+    //[CO20200624 - OBSOLETE]  ielectrons=aurostd::string2utype<uint>(tokens.at(1));
+    //[CO20200624 - OBSOLETE]  if(ielectrons==60 || ielectrons==120) issues++;
+    //[CO20200624 - OBSOLETE]}
+    //[CO20200624 - OBSOLETE]if(issues==cutoff) return TRUE;
     return FALSE;
   }
 } // namespace KBIN

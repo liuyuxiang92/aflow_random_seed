@@ -2836,7 +2836,9 @@ namespace KBIN {
   void VASP_Recycle(_xvasp xvasp,int relax_number);
   void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,string relax);
   void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,int relax_number);
-  bool VASP_CheckUnconvergedOSZICAR(string dir);
+  int VASP_getNELM(const string& dir); //CO20200624
+  int VASP_getNSTEPS(const string& dir);  //CO20200624
+  bool VASP_OSZICARUnconverged(const string& dir);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   string getVASPVersionString(const string&);  //ME20190219
@@ -2914,7 +2916,11 @@ namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,string ENTRY,string COMMENT,bool VERBOSE);
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  string XVASP_INCAR_GET_ENTRY(_xvasp& xvasp,const string& ENTRY,bool preload_incar=true); //CO20200624 - preload_incar ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
 
   bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
   bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
@@ -2930,13 +2936,21 @@ namespace KBIN {
   void XVASP_string2numbers(_xvasp& xvasp);
   void XVASP_numbers2string(_xvasp& xvasp);
   void XVASP_Afix_Clean(_xvasp& xvasp,string preserve_name);
-  void XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,bool verbose,_aflags &aflags,ofstream &FileMESSAGE);
+  bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags &aflags,bool verbose,ofstream &FileMESSAGE);
+  bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags &aflags,bool verbose,ofstream &FileMESSAGE);
   void XVASP_Afix_NBANDS(_xvasp& xvasp,int& nbands,bool VERBOSE);
-  void XVASP_Afix_POTIM(_xvasp& xvasp,double& potim,bool VERBOSE);
-  void XVASP_Afix_NELM(_xvasp& xvasp,int& potim,bool VERBOSE); //CO20200624
-  void XVASP_Afix_ISMEAR(_xvasp& xvasp,const string& mode,int scheme,bool VERBOSE); //CO20200624
-  double XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double param_double=0.0,int param_int=0); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
-  double XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& submode,double param_double=0.0,int param_int=0); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  //the following functions are all associated with XVASP_Afix_GENERIC()
+  bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,double& potim,bool VERBOSE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,int& potim,bool VERBOSE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_ISMEAR(_xvasp& xvasp,const string& mode,int scheme,bool VERBOSE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double& param_double); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& param_int); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double& param_double,int& param_int); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,int& submode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,int& submode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double& param_double); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,int& submode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& param_int); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_GENERIC(const string& mode,int& submode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double& param_double,int& param_int); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
 
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(string directory);  //ME20200217

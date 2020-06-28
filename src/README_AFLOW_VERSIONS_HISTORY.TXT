@@ -6,12 +6,29 @@
         -- added ISMEAR_SCHEME, ISMEAR_STATIC_SCHEME, and ISMEAR_STATIC_BANDS_SCHEME options to VASP_FORCE_OPTIONS and aflow.rc (CO)
         -- added SIGMA, SIGMA_STATIC, and SIGMA_STATIC_BANDS options to VASP_FORCE_OPTIONS and aflow.rc (CO)
         -- added MAX_VASP_NELM to aflow.rc and created a xwarning/xfixed scheme for NELM (CO)
+        -- patched VASP_OSZICARUnconverged() (CO)
         -- patched generation of INCAR, removed duplicate lines like SYSTEM=XXXX (CO)
         -- patched removal of NELM from INCAR vs. NELMIN (CO)
         -- added XVASP_Afix_NELM() and XVASP_Afix_ISMEAR() (CO)
         -- added auto-patches for EDDRMM errors (CO)
         -- patched SYM errors/warnings, ignoring if ISYM=0 (CO+ME)
         -- added NELM to xOUTCAR (CO)
+        -- patched XVASP_INCAR_REMOVE_ENTRY() to include ENTRIES2IGNORE (remove NELM, but not NELMIN), preload_incar (overwrite xvasp.INCAR), and rewrite_incar (overwrite ./INCAR) (CO)
+        -- added XVASP_INCAR_GET_ENTRY() to retrieve a particular parameter set in INCAR (CO)
+        -- consolidated XVASP_KPOINTS_KPOINTS() overloads (CO)
+        -- adding ISYM=-1 for magnetic systems (CO)
+        -- extensive consolidation of XVASP_INCAR_PREPARE_GENERIC() (CO)
+        TODO:
+        -- patch CSLOSHING/NELM
+        -- patch/consolidate Afix_GENERIC() and ROTMAT()
+        -- remove all "cat INCAR" ...
+        -- add SYMPREC to vflags so we can check if the patch has already been applied
+        -- create system of bools for whether a patch has been applied
+        -- change PREPARE_GENERIC so true/false corresponds to patch applied (do if/else then throw if no mode)
+        -- check gamma vs. shift/odd, make sure we don't retry over and over
+        -- change when kmax gets applied
+        -- add natoms cutoff for kmax to aflow.rc
+        -- remove NELM and NSTEPS from checks (CSLOSHING)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
