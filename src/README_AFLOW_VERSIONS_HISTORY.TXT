@@ -1,13 +1,14 @@
-3.2.4 - 2020/06/22
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+3.2.5 - 2020/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- Moved POCC progress bar into pflow. (ME)
         -- Added "Notice" from apl::Logger into pflow::logger. (ME)
         -- Modularized APL option parsing. (ME)
         -- Merged more pflow logging capabilities into APL. (ME)
         -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
         -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
-3.2.3 - 2020/05/22
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+3.2.4 - 2020/06/25
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         -- Bug fixes to xPOTCAR (exits) (CO+ME)
         -- Bug fixes to Wyckoff positions (DX)
         -- Bug fixes for overwriting symmetry output files text/json (DX)
@@ -16,8 +17,14 @@
         -- Bug fixes to aurostd::isDirectory() and isFile() (CO)
         -- Bug fixes for xelement, adding populate() function for CCE (CO)
         -- Bug fixes in POCC: missing POTCAR suffix for LIB6 and EFileNotEmpty() cerr verbose (CO)
-        -- Bug fixes in KBIN::ExtractSystemName() (ME)
         -- Bug fixes in KBIN::getVASPVersion() (CO)
+        -- Bug fixes in POCC: extending m_Egap.size() if metal is found among ARUNs (CO)
+        -- Bug fixes in XHOST: adding another way to get XHOST.home, might fail on OSX (CO)
+        (AFLOW: aconvasp_main.cpp, aflow.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, avasp.cpp, chull.cpp, chull_jupyter.json, chull_jupyter_plotter.py, chull_python.py, compare_structure_function.cpp, init.cpp, ivasp.cpp, kvasp.cpp, lattice.cpp, Makefile, Makefile.aflow, makefile.cpp, makefile.h, ovasp.cpp, plotter.cpp, pocc.cpp, README_AFLOW.TXT, symmetry_spacegroup_functions.cpp, symmetry_spacegroup_ITC_library.cpp, xelement.cpp, xelement.h)
+        (AUROSTD: main.cpp)
+3.2.3 - 2020/05/22
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+        -- Bug fixes in KBIN::ExtractSystemName() (ME)
         -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- added check for broken REST-API to aflow_chull_python.py (MB)
@@ -44,7 +51,6 @@
         -- CCE corrections added for nitrides (RF)
         -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
         -- Added check for required binaries to plotter. (ME)
-        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
         -- Fixed broken system name for aflow_proto. (ME)
         -- Fixed plotter title and file names when ANRL parameters are present. (ME)
