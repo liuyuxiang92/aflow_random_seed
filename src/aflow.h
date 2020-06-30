@@ -4402,10 +4402,12 @@ namespace KBIN {
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AGL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
+  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName);  //CT20200624
   // ----------------------------------------------------------------------------
   // aflow_ael_elasticity.cpp
   uint relaxStructureAEL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AEL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
+  void VASP_RunPhonons_AEL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName);  //CT20200624
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
