@@ -424,13 +424,13 @@ namespace KBIN {
 
     // First check if relaxation has already been performed
     for (uint i = 1; i <= num_relax; i++) {
-      string filename = aurostd::CleanFileName(xvasp.Directory) + "CONTCAR.relax" + aurostd::utype2string<int>(num_relax);
+      string filename = aurostd::CleanFileName(xvasp.Directory + "/CONTCAR.relax" + aurostd::utype2string<int>(i));  //CO20200624 - patching --run vs --run=1 bug
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Relaxation CONTCAR filename = " << filename << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if (aurostd::FileExist(filename) || aurostd::FileExist(filename + ".xz")) {
         aurostd::StringstreamClean(aus);
-        aus << _AGLSTR_MESSAGE_ + "Relaxation " << i << " has aleady completed"  << endl;  
+        aus << _AGLSTR_MESSAGE_ + "Relaxation " << i << " has already completed"  << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       } else {
         aurostd::StringstreamClean(aus);
@@ -441,7 +441,7 @@ namespace KBIN {
     }
     if (relax_complete) {
       aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ + "Relaxation has aleady completed"  << endl;  
+      aus << _AGLSTR_MESSAGE_ + "Relaxation has already completed"  << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 0;
     } else {
