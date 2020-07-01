@@ -5714,8 +5714,6 @@ namespace aflowlib {
     string directory_LIB="";
     // OBSOLETE bool flag_files_LIB=FALSE;
     string PROJECT_LIBRARY="";
-    string AflowInName = "";
-    string FileLockName = "";    
     if(LOCAL) {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
@@ -5748,9 +5746,23 @@ namespace aflowlib {
       vector<string> vmessage;vmessage.push_back(XHOST.sPID);vmessage.push_back("       dir="+directory_LIB);
       init::WaitTEMP(AFLOW_CORE_TEMPERATURE_LIB2RAW,cout,TRUE,vmessage);  // fixed at define at the beginning
     }
+    
+    bool run_directory=false;
+    string AflowInName = _AFLOWIN_;
+    string FileLockName = _AFLOWLOCK_;
 
-    if(pocc::structuresGenerated(directory_LIB)){KBIN::VASP_RunPOCC(directory_LIB);}  //CO20200624
+    //[CO20200624 - OBSOLETE]if(pocc::structuresGenerated(directory_LIB)){KBIN::VASP_RunPOCC(directory_LIB);}  //CO20200624
+    //[CO20200624 - OBSOLETE]else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
+    if(pocc::structuresGenerated(directory_LIB)){ //CO20200624
+      run_directory=true;
+      if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing")){
+        if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".old")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".old",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
+        else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".OLD")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".OLD",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
+        else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
+      }
+    }
     else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
+      run_directory=true;
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
         aurostd::RemoveFile(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext));
         aurostd::RemoveFile(directory_LIB+"/AGL.out"+XHOST.vext.at(iext));
@@ -5783,24 +5795,49 @@ namespace aflowlib {
       }
       //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
       //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
-      KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
+      //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
       // cerr << XPID << "CORMAC" << endl;exit(0);
       // if(_AFLOWIN_=="aflow.in")
       if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
-        aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
-        aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
+        //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
+        //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
         FileLockName = "ael.LOCK";
       }
       if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
         AflowInName="ael_aflow.in";
       }      
-      KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
+      //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
       // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
       // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
       // [OBSOLETE] } else {
       // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
       // [OBSOLETE] }
     }
+
+    //KBIN::RUN_Directory() should be used instead of individual post-processing functions
+    //otherwise we will have to program every single instance here
+    //this also ensures we compress everything at the end
+    if(run_directory){
+      _aflags aflags;aflags.Directory=directory_LIB;
+      
+      //save originals
+      string _AFLOWIN_orig=_AFLOWIN_;
+      string _AFLOWLOCK_orig=_AFLOWLOCK_;
+      bool XHOST_POSTPROCESS_orig=XHOST.POSTPROCESS;
+      
+      //set env for RUN_Directory()
+      _AFLOWIN_=AflowInName;
+      _AFLOWLOCK_=FileLockName;
+      XHOST.POSTPROCESS=TRUE;  //CO20200624 - VERY IMPORTANT: prevents VASP from running
+      if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".run");} //keep original LOCK
+      KBIN::RUN_Directory(aflags);
+
+      //return to original
+      _AFLOWIN_=_AFLOWIN_orig;
+      _AFLOWLOCK_=_AFLOWLOCK_orig;
+      XHOST.POSTPROCESS=XHOST_POSTPROCESS_orig;
+    }
+
     if(LDEBUG) cerr << soliloquy << " END" << endl;
     return TRUE;
   }
