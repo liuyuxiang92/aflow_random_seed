@@ -96,10 +96,33 @@ namespace pocc {
 } // namespace pocc
 
 namespace KBIN {
-  void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE) {
+  void VASP_RunPOCC(const string& directory,ostream& oss) {ofstream FileMESSAGE;return VASP_RunPOCC(directory,FileMESSAGE,oss);}
+  void VASP_RunPOCC(const string& directory,ofstream& FileMESSAGE,ostream& oss) {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy = XPID + "KBIN::VASP_RunPOCC():";
+    _xvasp xvasp;
+    string AflowIn_file="",AflowIn="";
+    _aflags aflags;aflags.Directory=directory;
+    
+    //get AflowIn
+    try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
+    catch(aurostd::xerror& err){
+      pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      FileMESSAGE.close();
+      return;
+    }
+    
+    _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,aflags);
+    _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,aflags,kflags);
+
+    if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AEL=" << kflags.KBIN_PHONONS_CALCULATION_AEL << endl;}
+    if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AGL=" << kflags.KBIN_PHONONS_CALCULATION_AGL << endl;}
+
+    return VASP_RunPOCC(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) {
     string soliloquy = XPID + "KBIN::VASP_RunPOCC():";
     stringstream message;
-    ostream& oss=cout;
 
     try{
       xstructure xstr_pocc=pocc::extractPARTCAR(AflowIn); //prefer to pull from AflowIn input vs. aflags
@@ -112,6 +135,7 @@ namespace KBIN {
       }
 
       //post-processing
+      pcalc.CleanPostProcessing();
       //pocc::patchStructuresFile(aflags,FileMESSAGE,oss);  //patch if needed
       pcalc.postProcessing();
     }
@@ -1188,7 +1212,10 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::getVTemperatures():";
 
     if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
-    if(temp_string.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temp_string.empty()",_INPUT_ILLEGAL_);}
+    if(temp_string.empty()){
+      vector<double> tmp;return tmp;  //return something, it will try again
+      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temp_string.empty()",_INPUT_ILLEGAL_);
+    }
 
     vector<string> tokens;
     if(aurostd::substring2bool(temp_string,":")){aurostd::string2tokens(temp_string,tokens,":");}
@@ -1224,6 +1251,26 @@ namespace pocc {
     return vtemperatures;
   }
 
+  void POccCalculator::CleanPostProcessing(){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::CleanPostProcessing():";
+    stringstream message;
+
+    if(LDEBUG){;} //keep busy
+
+    vector<string> vfiles;
+    aurostd::DirectoryLS(m_aflags.Directory,vfiles);
+
+    for(uint i=0;i<vfiles.size();i++){
+      if(vfiles[i].find(POCC_FILE_PREFIX+POCC_OUT_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //aflow.pocc.out
+      if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //DOSCAR.pocc_T0000K.xz
+      if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_orbitals_T2400K.png.xz
+      if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_species_T2400K.png.xz
+      if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_atoms_T2400K.png.xz
+    }
+
+  }
+
   //CT20200319 - added AEL/AGL option
   void POccCalculator::postProcessing(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
@@ -1256,6 +1303,7 @@ namespace pocc {
     if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")){v_temperatures.clear();v_temperatures=getVTemperatures(XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE"));}  //command line input
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);}  //user aflow.rc
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);}  //internal aflow.rc, will always work
+    if(v_temperatures.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_temperatures.empty()",_INPUT_ILLEGAL_);}
 
     //get zero-padding, since temperature cannot be negative, just get max
     m_temperatures_int=true;

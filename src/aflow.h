@@ -1050,7 +1050,7 @@ namespace init {
 uint AFLOW_getTEMP(vector<string> argv);
 uint AFLOW_monitor(vector<string> argv);
 double AFLOW_checkMEMORY(string="",double=102.0);
-bool CheckMaterialServer(string message);
+bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
 string aflow_get_time_string_short(void);
@@ -2557,9 +2557,9 @@ namespace aflowlib {
   string CALCULATED(string options);
   string CALCULATED_ICSD_RANDOM(void);
   // aflow_xproto_gus.cpp
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label);
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atA,string atB);
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atA,double volA,string atB,double volB,double vol_in);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label,string atA,string atB);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label,string atA,double volA,string atB,double volB,double vol_in);
 }
 
 extern string PrototypeBinaryGUS_Cache_Library[];
@@ -2803,8 +2803,10 @@ namespace FINDSYM {
 // aflow_kvasp.cpp
 
 namespace KBIN {
-  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,_aflags &aflags,_kflags& kflags);
-  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags& kflags);
+  _kflags VASP_Get_Kflags_from_AflowIN(const string &AflowIn,_aflags &aflags,ostream& oss=cout);
+  _kflags VASP_Get_Kflags_from_AflowIN(const string &AflowIn,ofstream &FileMESSAGE,_aflags &aflags,ostream& oss=cout);
+  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,_aflags &aflags,_kflags& kflags,ostream& oss=cout);
+  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags& kflags,ostream& oss=cout);
   bool VASP_Fix_Machine_Kflags_from_AflowIN(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags);
   bool VASP_Directory(ofstream& FileERROR,_aflags& aflags,_kflags& kflags);
   void VASP_BackupOriginal(_aflags aflags);
@@ -4387,7 +4389,9 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
 // ----------------------------------------------------------------------------
 // aflow_pocc //CO20180502
 namespace KBIN {
-  void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE);
+  void VASP_RunPOCC(const string& directory,ostream& oss=std::cout);  //CO20200624
+  void VASP_RunPOCC(const string& directory,ofstream& FileMESSAGE,ostream& oss=std::cout);  //CO20200624
+  void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=std::cout);
 }
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp

@@ -15,25 +15,25 @@
 // GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS GUS
 // ***************************************************************************
 namespace aflowlib {
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label) {
-    return aflowlib::PrototypeBinaryGUS(FileMESSAGE,label,"A",1.0,"B",1.0,0.0);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label) {
+    return aflowlib::PrototypeBinaryGUS(oss,label,"A",1.0,"B",1.0,0.0);
   }
 } // namespace aflowlib
 
 namespace aflowlib {
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atomA,string atomB) {
+  xstructure PrototypeBinaryGUS(ostream &oss,string label,string atomA,string atomB) {
     double atomvolumeA,atomvolumeB;
     //[CO20181106]atomvolumeA=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomA)); //CO20181128
     //[CO20181106]atomvolumeB=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomB)); //CO20181128
     atomvolumeA=GetAtomVolume(atomA); //CO20181128
     atomvolumeB=GetAtomVolume(atomB); //CO20181128
-    return aflowlib::PrototypeBinaryGUS(FileMESSAGE,label,atomA,atomvolumeA,atomB,atomvolumeB,0.0);
+    return aflowlib::PrototypeBinaryGUS(oss,label,atomA,atomvolumeA,atomB,atomvolumeB,0.0);
   }
 } // namespace aflowlib
 
 // ***************************************************************************
 namespace aflowlib {
-  string PrototypeBinaryGUS_Cache_LibraryS_Extract(ostream &FileMESSAGE,const string& auslat,const string& labelclean) {
+  string PrototypeBinaryGUS_Cache_LibraryS_Extract(ostream &oss,const string& auslat,const string& labelclean) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     ostringstream oaus;
     string FileLibrary="",structure_line="";
@@ -53,10 +53,10 @@ namespace aflowlib {
       } // cycle through AFLOW LIBRARY as postfix
       if(FileLibrary!="") {
         if(LDEBUG) { oaus << "00000  MESSAGE AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl; }
-        if(LDEBUG) { aurostd::PrintMessageStream(FileMESSAGE,oaus,XHOST.QUIET); }
+        if(LDEBUG) { aurostd::PrintMessageStream(oaus,XHOST.QUIET,oss); } //CO20200624
       } else {
         oaus << "WWWWW  AFLOW_LIBRARY not found! " << endl;
-        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
         exit(0);
       }
       // FOUND
@@ -79,7 +79,7 @@ namespace aflowlib {
 } // namespace aflowlib
 
 namespace aflowlib {
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,
+  xstructure PrototypeBinaryGUS(ostream &oss,string label,
       string atomA,double volumeA,
       string atomB,double volumeB,
       double volume_in) {
@@ -126,10 +126,10 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS FCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
         return str;
       } else {
-        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
       }
     }
     // --------- BCC found --------------
@@ -146,10 +146,10 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS BCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
         return str;
       } else {
-        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
       }
     }
     // --------- HCP found --------------
@@ -167,10 +167,10 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
         return str;
       } else {
-        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
       }
     }
     // --------- sc found --------------
@@ -187,16 +187,16 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
         return str;
       } else {
-        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
       }
     }
     // *********************************************************************
     if(structure_line.empty()) {
       oaus << "EEEEE  aflowlib::PrototypeBinaryGUS: lattice not found, label=" << label << endl;
-      aurostd::PrintErrorStream(FileMESSAGE,oaus,XHOST.QUIET);
+      aurostd::PrintErrorStream(oaus,XHOST.QUIET,oss);  //CO20200624
     }
     // clear up the structure from the beginning
     aurostd::string2tokens(structure_line,tokens," ");

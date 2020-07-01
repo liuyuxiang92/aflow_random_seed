@@ -12,6 +12,7 @@
 #include "aflowlib.h"
 #include "aflow_pflow.h"
 #include "aflow_bader.h"
+#include "aflow_pocc.h" //CO20200624
 #include "aflow_matlab_funcs.cpp" //CO20200508
 #include "aflow_gnuplot_funcs.cpp" //CO20200508
 
@@ -979,7 +980,7 @@ namespace aflowlib {
 // aflowlib::LIB2RAW
 // ***************************************************************************
 namespace aflowlib {
-  bool LIB2RAW(string options,bool flag_FORCE,bool LOCAL) {
+  bool LIB2RAW(const string& options,bool flag_FORCE,bool LOCAL) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aflowlib::LIB2RAW():";
     long double seconds_begin=aurostd::get_seconds();
@@ -987,8 +988,9 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
     // Call to LIB2LIB function to run postprocessing - added by CT20181212
     if(!LIB2LIB(options, flag_FORCE, LOCAL)) {
-      cerr << soliloquy << " LIB2LIB failed" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aflowlib::LIB2LIB() failed",_RUNTIME_ERROR_);
+      //[CO20200624 - OBSOLETE]cerr << soliloquy << " LIB2LIB failed" << endl;
+      //[CO20200624 - OBSOLETE]exit(0);
     }
     vector<string> tokens;
     if(!aurostd::substring2bool(options,"POCC")) {
@@ -1000,7 +1002,7 @@ namespace aflowlib {
 
     if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
-      init::ErrorOption(cout,options,"aflowlib::LIB2RAW",aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
+      init::ErrorOption(cout,options,soliloquy,aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
       exit(0);
     }
 
@@ -1031,7 +1033,7 @@ namespace aflowlib {
       PROJECT_LIBRARY=directory_LIB;
     } else {    //normal run
       //  cout << soliloquy << " AFLOW (" << VERSION << ")" << endl;
-      CheckMaterialServer("aflowlib::LIB2RAW"); // must be in AFLOW_MATERIALS_SERVER
+      CheckMaterialServer(soliloquy); // must be in AFLOW_MATERIALS_SERVER
       string directory=aurostd::CleanFileName(options);
       if(directory.at(directory.size()-1)=='/')  directory=directory.substr(0,directory.size()-1);
       aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");
@@ -5680,10 +5682,11 @@ namespace aflowlib {
 // ***************************************************************************
 // Added by CT20181212
 namespace aflowlib {
-  bool LIB2LIB(string options,bool flag_FORCE,bool LOCAL) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "aflowlib::LIB2LIB: BEGIN" << endl;
-    if(LDEBUG) cerr << XPID << "aflowlib::LIB2LIB: options=" << options << endl;
+  bool LIB2LIB(const string& options,bool flag_FORCE,bool LOCAL) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20200624
+    string soliloquy=XPID+"aflowlib::LIB2LIB():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
     vector<string> tokens;
 
     if(!aurostd::substring2bool(options,"POCC")) {
@@ -5693,7 +5696,7 @@ namespace aflowlib {
       tokens.push_back(options);
     }
 
-    if(LDEBUG) cerr << XPID << "aflowlib::LIB2LIB: tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
       init::ErrorOption(cout,options,"aflowlib::LIB2LIB",aurostd::liststring2string("aflow --lib2lib=directory","aflow --lib2lib=all[,dir]"));
       exit(0);
@@ -5708,9 +5711,9 @@ namespace aflowlib {
       }
     }
 
-    string directory_LIB;
+    string directory_LIB="";
     // OBSOLETE bool flag_files_LIB=FALSE;
-    string PROJECT_LIBRARY;
+    string PROJECT_LIBRARY="";
     string AflowInName = "";
     string FileLockName = "";    
     if(LOCAL) {
@@ -5722,8 +5725,8 @@ namespace aflowlib {
       directory_LIB=directory;
       PROJECT_LIBRARY=directory_LIB;
     } else {    //normal run
-      //  cout << XPID << "aflowlib::LIB2LIB: AFLOW (" << VERSION << ")" << endl;
-      CheckMaterialServer("aflowlib::LIB2LIB"); // must be in AFLOW_MATERIALS_SERVER
+      //  cout << soliloquy << " AFLOW (" << VERSION << ")" << endl;
+      CheckMaterialServer(soliloquy); // must be in AFLOW_MATERIALS_SERVER
       string directory=aurostd::CleanFileName(options);
       if(directory.at(directory.size()-1)=='/')  directory=directory.substr(0,directory.size()-1);
       aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");
@@ -5735,17 +5738,19 @@ namespace aflowlib {
       aurostd::StringSubst(directory,"LIB2/RAW","LIB2/LIB");
 
       PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(directory);
-      // cout << XPID << "aflowlib::LIB2LIB: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
-      cout << XPID << "aflowlib::LIB2LIB: AFLOW V" << string(AFLOW_VERSION) << endl;
-      cout << XPID << "aflowlib::LIB2LIB: directory=" << directory << endl;
-      cout << XPID << "aflowlib::LIB2LIB: hostname=" << XHOST.hostname << endl;
+      // cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
+      cout << soliloquy << " AFLOW V" << string(AFLOW_VERSION) << endl;
+      cout << soliloquy << " directory=" << directory << endl;
+      cout << soliloquy << " hostname=" << XHOST.hostname << endl;
       directory_LIB=directory;
       // wait for temperature (to avoid overheat)
       // WAIT FOR TEMPERATURE
       vector<string> vmessage;vmessage.push_back(XHOST.sPID);vmessage.push_back("       dir="+directory_LIB);
       init::WaitTEMP(AFLOW_CORE_TEMPERATURE_LIB2RAW,cout,TRUE,vmessage);  // fixed at define at the beginning
     }
-    if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
+
+    if(pocc::structuresGenerated(directory_LIB)){KBIN::VASP_RunPOCC(directory_LIB);}  //CO20200624
+    else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
         aurostd::RemoveFile(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext));
         aurostd::RemoveFile(directory_LIB+"/AGL.out"+XHOST.vext.at(iext));
@@ -5771,10 +5776,10 @@ namespace aflowlib {
         // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
         // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
         // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
-	FileLockName = "agl.LOCK";
+        FileLockName = "agl.LOCK";
       }
       if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
-	AflowInName="agl_aflow.in";
+        AflowInName="agl_aflow.in";
       }
       //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
       //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
@@ -5782,12 +5787,12 @@ namespace aflowlib {
       // cerr << XPID << "CORMAC" << endl;exit(0);
       // if(_AFLOWIN_=="aflow.in")
       if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
-	aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
+        aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
         aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
-	FileLockName = "ael.LOCK";
+        FileLockName = "ael.LOCK";
       }
       if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
-	AflowInName="ael_aflow.in";
+        AflowInName="ael_aflow.in";
       }      
       KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
       // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
@@ -5796,7 +5801,7 @@ namespace aflowlib {
       // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
       // [OBSOLETE] }
     }
-    if(LDEBUG) cerr << XPID << "aflowlib::LIB2LIB: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
     return TRUE;
   }
 }

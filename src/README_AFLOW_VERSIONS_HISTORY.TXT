@@ -4,6 +4,11 @@
         -- patching lib2raw index issues: LIB7/LIB did not exist (CO)
         -- patching lib2raw index issues: string substitution of /core (CO)
         -- patching --run vs --run=1 bug in AEL/AGL (CO)
+        -- cleaning up PrintMessageStream()/PrintWarningStream()/PrintErrorStream() (CO)
+        -- creating VASP_Get_Kflags_from_AflowIN() and separating from KBIN::RUN_Directory() (CO)
+        -- adding XHOST.POSTPROCESS hard stop for VASP_Run() function (--postprocess) (CO)
+        -- adding POCC postprocessing to LIB2LIB (CO)
+        -- reading kflags and vflags options from aflow.in before processing POCC (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

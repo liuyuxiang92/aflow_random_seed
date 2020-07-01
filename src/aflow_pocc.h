@@ -630,6 +630,7 @@ namespace pocc {
       void resetHNFMatrices();
       void resetSiteConfigurations();
 
+      void CleanPostProcessing();
       void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();

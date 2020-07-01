@@ -427,31 +427,43 @@ namespace aurostd {
   // remove comments
 
   // about printing
-  void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintMessageStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintMessageStream(ostringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintErrorStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintErrorStream(ostringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintWarningStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintWarningStream(ostringstream& stream,const bool& quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintMessageStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintErrorStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintWarningStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ostringstream& stream,bool quiet);
 
-  void PrintMessageStream(ofstream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintMessageStream(std::ostream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintMessageStream(ofstream& FileERROR,stringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintMessageStream(stringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintErrorStream(std::ostream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintErrorStream(stringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintWarningStream(std::ostream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,stringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintWarningStream(stringstream& stream,const bool& quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
+  void PrintMessageStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
+  void PrintErrorStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
+  void PrintWarningStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream& stream,bool quiet);
 
   // about executing
   bool execute(ostringstream& command);

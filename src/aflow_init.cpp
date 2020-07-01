@@ -1649,7 +1649,7 @@ uint AFLOW_monitor(vector<string> argv) {
 // CheckAFLOWLIBMaterialServer
 // ***************************************************************************
 bool CheckMaterialServer(void) {return CheckMaterialServer("");}
-bool CheckMaterialServer(string message) {
+bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_MATERIALS_SERVER) return TRUE;
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
