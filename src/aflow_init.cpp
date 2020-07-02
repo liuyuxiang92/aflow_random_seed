@@ -57,6 +57,7 @@ namespace init {
   bool InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& oss) {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG),found=FALSE;
+    string soliloquy=XPID+"init::InitMachine():";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
     int depth_short=20,depth_long=45;
     string position;
@@ -82,6 +83,8 @@ namespace init {
     if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
+    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp|--postprocess|--lib2raw=|--lib2lib=");  //CO20200624 - VERY important, prevents VASP from running
+    if(LDEBUG){cerr << soliloquy << " XHOST.AVOID_RUNNING_VASP=" << XHOST.AVOID_RUNNING_VASP << endl;}
 
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;

@@ -307,6 +307,7 @@ class _XHOST {
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CT20181212
+    bool AVOID_RUNNING_VASP; //CO20200624
     bool PSEUDOPOTENTIAL_GENERATOR; //SC20200327
     // HARDWARE/SOFTWARE
     string hostname,machine_type,tmpfs,user,group,home,shell,progname;

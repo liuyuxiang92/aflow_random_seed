@@ -5823,19 +5823,16 @@ namespace aflowlib {
       //save originals
       string _AFLOWIN_orig=_AFLOWIN_;
       string _AFLOWLOCK_orig=_AFLOWLOCK_;
-      bool XHOST_POSTPROCESS_orig=XHOST.POSTPROCESS;
       
       //set env for RUN_Directory()
       _AFLOWIN_=AflowInName;
       _AFLOWLOCK_=FileLockName;
-      XHOST.POSTPROCESS=TRUE;  //CO20200624 - VERY IMPORTANT: prevents VASP from running
       if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".run");} //keep original LOCK
       KBIN::RUN_Directory(aflags);
 
       //return to original
       _AFLOWIN_=_AFLOWIN_orig;
       _AFLOWLOCK_=_AFLOWLOCK_orig;
-      XHOST.POSTPROCESS=XHOST_POSTPROCESS_orig;
     }
 
     if(LDEBUG) cerr << soliloquy << " END" << endl;

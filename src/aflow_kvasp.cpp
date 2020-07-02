@@ -2876,7 +2876,7 @@ namespace KBIN {
     string soliloquy=XPID+"KBIN::VASP_Run():";
     if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  BEGIN" << endl;
 
-    if(XHOST.POSTPROCESS){  //CO20200624
+    if(XHOST.AVOID_RUNNING_VASP){  //CO20200624
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"VASP should NOT be running",_INPUT_ILLEGAL_);  //better to throw to avoid VASP_Backup(), etc.
       //return false;
     }
