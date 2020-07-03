@@ -4,22 +4,22 @@
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - David Hicks - 2020
-// FILE "ANRL/aflow_anrl_A2B3_cI80_206_ad_e.cpp"
+// FILE "ANRL/aflow_anrl_A2B3_cI80_199_a2b_2c.cpp"
 
-#ifndef _AFLOW_ANRL_A2B3_cI80_206_ad_e_CPP // AFLOW_REMOVE_GREP
-#define _AFLOW_ANRL_A2B3_cI80_206_ad_e_CPP // AFLOW_REMOVE_GREP
+#ifndef _AFLOW_ANRL_A2B3_cI80_199_a2b_2c_CPP // AFLOW_REMOVE_GREP
+#define _AFLOW_ANRL_A2B3_cI80_199_a2b_2c_CPP // AFLOW_REMOVE_GREP
 #include "../aflow.h" // AFLOW_REMOVE_GREP
 
 namespace anrl {
-  uint WebANRL_A2B3_cI80_206_ad_e(stringstream &web,bool LDEBUG);
+  uint WebANRL_A2B3_cI80_199_a2b_2c(stringstream &web,bool LDEBUG);
 }
 
 namespace anrl {
-  uint PrototypeANRL_A2B3_cI80_206_ad_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
-    // system A2B3_cI80_206_ad_e
+  uint PrototypeANRL_A2B3_cI80_199_a2b_2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
+    // system A2B3_cI80_199_a2b_2c
 
     if(XHOST.vflag_control.flag("WWW")) {
-      WebANRL_A2B3_cI80_206_ad_e(web,LDEBUG); // PLUG WEB STUFF
+      WebANRL_A2B3_cI80_199_a2b_2c(web,LDEBUG); // PLUG WEB STUFF
       #ifdef _ANRL_NOWEB_
       cout << "no web" << endl;
       #else
@@ -39,19 +39,19 @@ namespace anrl {
     anrl::PrototypeANRL_Consistency(vparameters.size(),nparameters,prototype,label,
         Strukturbericht,Pearson_symbol,spacegroup,params,print_mode);
 
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: FOUND" << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: label=" << label << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: nspecies=" << nspecies << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: natoms=" << natoms << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: spacegroup=" << spacegroup << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: nunderscores=" << nunderscores << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: nparameters=" <<  nparameters << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: Pearson_symbol=" << Pearson_symbol << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: params=" << params << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: Strukturbericht=" << Strukturbericht << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: prototype=" << prototype << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: dialect=" << dialect << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: vparameters.size()=" << vparameters.size() << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: FOUND" << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: label=" << label << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: nspecies=" << nspecies << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: natoms=" << natoms << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: spacegroup=" << spacegroup << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: nunderscores=" << nunderscores << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: nparameters=" <<  nparameters << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: Pearson_symbol=" << Pearson_symbol << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: params=" << params << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: Strukturbericht=" << Strukturbericht << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: prototype=" << prototype << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: dialect=" << dialect << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: vparameters.size()=" << vparameters.size() << endl;}
 
     xvector<double> xn(3);   xn(1)=1.0;xn(2)=0.0;xn(3)=0.0;
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
@@ -65,12 +65,17 @@ namespace anrl {
     }
 
     uint i=0;
-    double a=vparameters.at(i++);                  if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: a=" << a << endl;}
+    double a=vparameters.at(i++);                  if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: a=" << a << endl;}
     
-    double x2=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: x2=" << x2 << endl;}
-    double x3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: x3=" << x3 << endl;}
-    double y3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: y3=" << y3 << endl;}
-    double z3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_206_ad_e: z3=" << z3 << endl;}
+    double x1=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: x1=" << x1 << endl;}
+    double x2=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: x2=" << x2 << endl;}
+    double x3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: x3=" << x3 << endl;}
+    double x4=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: x4=" << x4 << endl;}
+    double y4=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: y4=" << y4 << endl;}
+    double z4=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: z4=" << z4 << endl;}
+    double x5=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: x5=" << x5 << endl;}
+    double y5=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: y5=" << y5 << endl;}
+    double z5=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B3_cI80_199_a2b_2c: z5=" << z5 << endl;}
         
     str.iomode=IOVASP_AUTO;
     str.title=label+" params="+parameters+" SG#="+aurostd::utype2string(spacegroup)+DOI_ANRL;
@@ -108,26 +113,26 @@ namespace anrl {
 
     
     atom.name="A"; atom.type=0;                                       // atom B1
-    atom.fpos(1)=0.0;atom.fpos(2)=0.0;atom.fpos(3)=0.0;                     // atom B1
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("0.0");// atom B1 // symbolic math for atom positions
+    atom.fpos(1)=2.0*x1;atom.fpos(2)=2.0*x1;atom.fpos(3)=2.0*x1;                     // atom B1
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("2.0*x1");atom.fpos_equation.push_back("2.0*x1");atom.fpos_equation.push_back("2.0*x1");// atom B1 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B1 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B1
     
     atom.name="A"; atom.type=0;                                       // atom B2
-    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=0.0;atom.fpos(3)=(1.0/2.0);                     // atom B2
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("(1.0/2.0)");// atom B2 // symbolic math for atom positions
+    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=0.0;atom.fpos(3)=((1.0/2.0)-2.0*x1);                     // atom B2
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("((1.0/2.0)-2.0*x1)");// atom B2 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B2 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B2
     
     atom.name="A"; atom.type=0;                                       // atom B3
-    atom.fpos(1)=0.0;atom.fpos(2)=(1.0/2.0);atom.fpos(3)=(1.0/2.0);                     // atom B3
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("(1.0/2.0)");// atom B3 // symbolic math for atom positions
+    atom.fpos(1)=0.0;atom.fpos(2)=((1.0/2.0)-2.0*x1);atom.fpos(3)=(1.0/2.0);                     // atom B3
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("((1.0/2.0)-2.0*x1)");atom.fpos_equation.push_back("(1.0/2.0)");// atom B3 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B3 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B3
     
     atom.name="A"; atom.type=0;                                       // atom B4
-    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=(1.0/2.0);atom.fpos(3)=0.0;                     // atom B4
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");// atom B4 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-2.0*x1);atom.fpos(2)=(1.0/2.0);atom.fpos(3)=0.0;                     // atom B4
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-2.0*x1)");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");// atom B4 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B4 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B4
     
@@ -168,182 +173,182 @@ namespace anrl {
     str.atoms.push_back(atom);                                        // atom B10
     
     atom.name="A"; atom.type=0;                                       // atom B11
-    atom.fpos(1)=(3.0/4.0);atom.fpos(2)=((3.0/4.0)-x2);atom.fpos(3)=-x2;                     // atom B11
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(3.0/4.0)");atom.fpos_equation.push_back("((3.0/4.0)-x2)");atom.fpos_equation.push_back("-x2");// atom B11 // symbolic math for atom positions
+    atom.fpos(1)=(1.0/4.0);atom.fpos(2)=((1.0/4.0)+x3);atom.fpos(3)=x3;                     // atom B11
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/4.0)");atom.fpos_equation.push_back("((1.0/4.0)+x3)");atom.fpos_equation.push_back("x3");// atom B11 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B11 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B11
     
     atom.name="A"; atom.type=0;                                       // atom B12
-    atom.fpos(1)=(1.0/4.0);atom.fpos(2)=((3.0/4.0)+x2);atom.fpos(3)=((1.0/2.0)+x2);                     // atom B12
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/4.0)");atom.fpos_equation.push_back("((3.0/4.0)+x2)");atom.fpos_equation.push_back("((1.0/2.0)+x2)");// atom B12 // symbolic math for atom positions
+    atom.fpos(1)=(3.0/4.0);atom.fpos(2)=((1.0/4.0)-x3);atom.fpos(3)=((1.0/2.0)-x3);                     // atom B12
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(3.0/4.0)");atom.fpos_equation.push_back("((1.0/4.0)-x3)");atom.fpos_equation.push_back("((1.0/2.0)-x3)");// atom B12 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B12 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B12
     
     atom.name="A"; atom.type=0;                                       // atom B13
-    atom.fpos(1)=-x2;atom.fpos(2)=(3.0/4.0);atom.fpos(3)=((3.0/4.0)-x2);                     // atom B13
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("-x2");atom.fpos_equation.push_back("(3.0/4.0)");atom.fpos_equation.push_back("((3.0/4.0)-x2)");// atom B13 // symbolic math for atom positions
+    atom.fpos(1)=x3;atom.fpos(2)=(1.0/4.0);atom.fpos(3)=((1.0/4.0)+x3);                     // atom B13
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("x3");atom.fpos_equation.push_back("(1.0/4.0)");atom.fpos_equation.push_back("((1.0/4.0)+x3)");// atom B13 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B13 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B13
     
     atom.name="A"; atom.type=0;                                       // atom B14
-    atom.fpos(1)=((1.0/2.0)+x2);atom.fpos(2)=(1.0/4.0);atom.fpos(3)=((3.0/4.0)+x2);                     // atom B14
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x2)");atom.fpos_equation.push_back("(1.0/4.0)");atom.fpos_equation.push_back("((3.0/4.0)+x2)");// atom B14 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x3);atom.fpos(2)=(3.0/4.0);atom.fpos(3)=((1.0/4.0)-x3);                     // atom B14
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x3)");atom.fpos_equation.push_back("(3.0/4.0)");atom.fpos_equation.push_back("((1.0/4.0)-x3)");// atom B14 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B14 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B14
     
     atom.name="A"; atom.type=0;                                       // atom B15
-    atom.fpos(1)=((3.0/4.0)-x2);atom.fpos(2)=-x2;atom.fpos(3)=(3.0/4.0);                     // atom B15
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((3.0/4.0)-x2)");atom.fpos_equation.push_back("-x2");atom.fpos_equation.push_back("(3.0/4.0)");// atom B15 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/4.0)+x3);atom.fpos(2)=x3;atom.fpos(3)=(1.0/4.0);                     // atom B15
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/4.0)+x3)");atom.fpos_equation.push_back("x3");atom.fpos_equation.push_back("(1.0/4.0)");// atom B15 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B15 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B15
     
     atom.name="A"; atom.type=0;                                       // atom B16
-    atom.fpos(1)=((3.0/4.0)+x2);atom.fpos(2)=((1.0/2.0)+x2);atom.fpos(3)=(1.0/4.0);                     // atom B16
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((3.0/4.0)+x2)");atom.fpos_equation.push_back("((1.0/2.0)+x2)");atom.fpos_equation.push_back("(1.0/4.0)");// atom B16 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/4.0)-x3);atom.fpos(2)=((1.0/2.0)-x3);atom.fpos(3)=(3.0/4.0);                     // atom B16
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/4.0)-x3)");atom.fpos_equation.push_back("((1.0/2.0)-x3)");atom.fpos_equation.push_back("(3.0/4.0)");// atom B16 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B16 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B16
     
     atom.name="B"; atom.type=1;                                       // atom B17
-    atom.fpos(1)=(y3+z3);atom.fpos(2)=(x3+z3);atom.fpos(3)=(x3+y3);                     // atom B17
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(y3+z3)");atom.fpos_equation.push_back("(x3+z3)");atom.fpos_equation.push_back("(x3+y3)");// atom B17 // symbolic math for atom positions
+    atom.fpos(1)=(y4+z4);atom.fpos(2)=(x4+z4);atom.fpos(3)=(x4+y4);                     // atom B17
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(y4+z4)");atom.fpos_equation.push_back("(x4+z4)");atom.fpos_equation.push_back("(x4+y4)");// atom B17 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B17 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B17
     
     atom.name="B"; atom.type=1;                                       // atom B18
-    atom.fpos(1)=((1.0/2.0)-y3+z3);atom.fpos(2)=(-x3+z3);atom.fpos(3)=((1.0/2.0)-x3-y3);                     // atom B18
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-y3+z3)");atom.fpos_equation.push_back("(-x3+z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3-y3)");// atom B18 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-y4+z4);atom.fpos(2)=(-x4+z4);atom.fpos(3)=((1.0/2.0)-x4-y4);                     // atom B18
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-y4+z4)");atom.fpos_equation.push_back("(-x4+z4)");atom.fpos_equation.push_back("((1.0/2.0)-x4-y4)");// atom B18 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B18 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B18
     
     atom.name="B"; atom.type=1;                                       // atom B19
-    atom.fpos(1)=(y3-z3);atom.fpos(2)=((1.0/2.0)-x3-z3);atom.fpos(3)=((1.0/2.0)-x3+y3);                     // atom B19
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(y3-z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3-z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3+y3)");// atom B19 // symbolic math for atom positions
+    atom.fpos(1)=(y4-z4);atom.fpos(2)=((1.0/2.0)-x4-z4);atom.fpos(3)=((1.0/2.0)-x4+y4);                     // atom B19
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(y4-z4)");atom.fpos_equation.push_back("((1.0/2.0)-x4-z4)");atom.fpos_equation.push_back("((1.0/2.0)-x4+y4)");// atom B19 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B19 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B19
     
     atom.name="B"; atom.type=1;                                       // atom B20
-    atom.fpos(1)=((1.0/2.0)-y3-z3);atom.fpos(2)=((1.0/2.0)+x3-z3);atom.fpos(3)=(x3-y3);                     // atom B20
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-y3-z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3-z3)");atom.fpos_equation.push_back("(x3-y3)");// atom B20 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-y4-z4);atom.fpos(2)=((1.0/2.0)+x4-z4);atom.fpos(3)=(x4-y4);                     // atom B20
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-y4-z4)");atom.fpos_equation.push_back("((1.0/2.0)+x4-z4)");atom.fpos_equation.push_back("(x4-y4)");// atom B20 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B20 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B20
     
     atom.name="B"; atom.type=1;                                       // atom B21
-    atom.fpos(1)=(x3+y3);atom.fpos(2)=(y3+z3);atom.fpos(3)=(x3+z3);                     // atom B21
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x3+y3)");atom.fpos_equation.push_back("(y3+z3)");atom.fpos_equation.push_back("(x3+z3)");// atom B21 // symbolic math for atom positions
+    atom.fpos(1)=(x4+y4);atom.fpos(2)=(y4+z4);atom.fpos(3)=(x4+z4);                     // atom B21
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x4+y4)");atom.fpos_equation.push_back("(y4+z4)");atom.fpos_equation.push_back("(x4+z4)");// atom B21 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B21 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B21
     
     atom.name="B"; atom.type=1;                                       // atom B22
-    atom.fpos(1)=((1.0/2.0)-x3-y3);atom.fpos(2)=((1.0/2.0)-y3+z3);atom.fpos(3)=(-x3+z3);                     // atom B22
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x3-y3)");atom.fpos_equation.push_back("((1.0/2.0)-y3+z3)");atom.fpos_equation.push_back("(-x3+z3)");// atom B22 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x4-y4);atom.fpos(2)=((1.0/2.0)-y4+z4);atom.fpos(3)=(-x4+z4);                     // atom B22
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x4-y4)");atom.fpos_equation.push_back("((1.0/2.0)-y4+z4)");atom.fpos_equation.push_back("(-x4+z4)");// atom B22 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B22 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B22
     
     atom.name="B"; atom.type=1;                                       // atom B23
-    atom.fpos(1)=((1.0/2.0)-x3+y3);atom.fpos(2)=(y3-z3);atom.fpos(3)=((1.0/2.0)-x3-z3);                     // atom B23
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x3+y3)");atom.fpos_equation.push_back("(y3-z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3-z3)");// atom B23 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x4+y4);atom.fpos(2)=(y4-z4);atom.fpos(3)=((1.0/2.0)-x4-z4);                     // atom B23
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x4+y4)");atom.fpos_equation.push_back("(y4-z4)");atom.fpos_equation.push_back("((1.0/2.0)-x4-z4)");// atom B23 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B23 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B23
     
     atom.name="B"; atom.type=1;                                       // atom B24
-    atom.fpos(1)=(x3-y3);atom.fpos(2)=((1.0/2.0)-y3-z3);atom.fpos(3)=((1.0/2.0)+x3-z3);                     // atom B24
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x3-y3)");atom.fpos_equation.push_back("((1.0/2.0)-y3-z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3-z3)");// atom B24 // symbolic math for atom positions
+    atom.fpos(1)=(x4-y4);atom.fpos(2)=((1.0/2.0)-y4-z4);atom.fpos(3)=((1.0/2.0)+x4-z4);                     // atom B24
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x4-y4)");atom.fpos_equation.push_back("((1.0/2.0)-y4-z4)");atom.fpos_equation.push_back("((1.0/2.0)+x4-z4)");// atom B24 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B24 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B24
     
     atom.name="B"; atom.type=1;                                       // atom B25
-    atom.fpos(1)=(x3+z3);atom.fpos(2)=(x3+y3);atom.fpos(3)=(y3+z3);                     // atom B25
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x3+z3)");atom.fpos_equation.push_back("(x3+y3)");atom.fpos_equation.push_back("(y3+z3)");// atom B25 // symbolic math for atom positions
+    atom.fpos(1)=(x4+z4);atom.fpos(2)=(x4+y4);atom.fpos(3)=(y4+z4);                     // atom B25
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x4+z4)");atom.fpos_equation.push_back("(x4+y4)");atom.fpos_equation.push_back("(y4+z4)");// atom B25 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B25 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B25
     
     atom.name="B"; atom.type=1;                                       // atom B26
-    atom.fpos(1)=(-x3+z3);atom.fpos(2)=((1.0/2.0)-x3-y3);atom.fpos(3)=((1.0/2.0)-y3+z3);                     // atom B26
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-x3+z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3-y3)");atom.fpos_equation.push_back("((1.0/2.0)-y3+z3)");// atom B26 // symbolic math for atom positions
+    atom.fpos(1)=(-x4+z4);atom.fpos(2)=((1.0/2.0)-x4-y4);atom.fpos(3)=((1.0/2.0)-y4+z4);                     // atom B26
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-x4+z4)");atom.fpos_equation.push_back("((1.0/2.0)-x4-y4)");atom.fpos_equation.push_back("((1.0/2.0)-y4+z4)");// atom B26 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B26 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B26
     
     atom.name="B"; atom.type=1;                                       // atom B27
-    atom.fpos(1)=((1.0/2.0)-x3-z3);atom.fpos(2)=((1.0/2.0)-x3+y3);atom.fpos(3)=(y3-z3);                     // atom B27
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x3-z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3+y3)");atom.fpos_equation.push_back("(y3-z3)");// atom B27 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x4-z4);atom.fpos(2)=((1.0/2.0)-x4+y4);atom.fpos(3)=(y4-z4);                     // atom B27
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x4-z4)");atom.fpos_equation.push_back("((1.0/2.0)-x4+y4)");atom.fpos_equation.push_back("(y4-z4)");// atom B27 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B27 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B27
     
     atom.name="B"; atom.type=1;                                       // atom B28
-    atom.fpos(1)=((1.0/2.0)+x3-z3);atom.fpos(2)=(x3-y3);atom.fpos(3)=((1.0/2.0)-y3-z3);                     // atom B28
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x3-z3)");atom.fpos_equation.push_back("(x3-y3)");atom.fpos_equation.push_back("((1.0/2.0)-y3-z3)");// atom B28 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)+x4-z4);atom.fpos(2)=(x4-y4);atom.fpos(3)=((1.0/2.0)-y4-z4);                     // atom B28
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x4-z4)");atom.fpos_equation.push_back("(x4-y4)");atom.fpos_equation.push_back("((1.0/2.0)-y4-z4)");// atom B28 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B28 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B28
     
     atom.name="B"; atom.type=1;                                       // atom B29
-    atom.fpos(1)=(-y3-z3);atom.fpos(2)=(-x3-z3);atom.fpos(3)=(-x3-y3);                     // atom B29
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-y3-z3)");atom.fpos_equation.push_back("(-x3-z3)");atom.fpos_equation.push_back("(-x3-y3)");// atom B29 // symbolic math for atom positions
+    atom.fpos(1)=(y5+z5);atom.fpos(2)=(x5+z5);atom.fpos(3)=(x5+y5);                     // atom B29
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(y5+z5)");atom.fpos_equation.push_back("(x5+z5)");atom.fpos_equation.push_back("(x5+y5)");// atom B29 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B29 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B29
     
     atom.name="B"; atom.type=1;                                       // atom B30
-    atom.fpos(1)=((1.0/2.0)+y3-z3);atom.fpos(2)=(x3-z3);atom.fpos(3)=((1.0/2.0)+x3+y3);                     // atom B30
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+y3-z3)");atom.fpos_equation.push_back("(x3-z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3+y3)");// atom B30 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-y5+z5);atom.fpos(2)=(-x5+z5);atom.fpos(3)=((1.0/2.0)-x5-y5);                     // atom B30
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-y5+z5)");atom.fpos_equation.push_back("(-x5+z5)");atom.fpos_equation.push_back("((1.0/2.0)-x5-y5)");// atom B30 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B30 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B30
     
     atom.name="B"; atom.type=1;                                       // atom B31
-    atom.fpos(1)=(-y3+z3);atom.fpos(2)=((1.0/2.0)+x3+z3);atom.fpos(3)=((1.0/2.0)+x3-y3);                     // atom B31
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-y3+z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3+z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3-y3)");// atom B31 // symbolic math for atom positions
+    atom.fpos(1)=(y5-z5);atom.fpos(2)=((1.0/2.0)-x5-z5);atom.fpos(3)=((1.0/2.0)-x5+y5);                     // atom B31
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(y5-z5)");atom.fpos_equation.push_back("((1.0/2.0)-x5-z5)");atom.fpos_equation.push_back("((1.0/2.0)-x5+y5)");// atom B31 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B31 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B31
     
     atom.name="B"; atom.type=1;                                       // atom B32
-    atom.fpos(1)=((1.0/2.0)+y3+z3);atom.fpos(2)=((1.0/2.0)-x3+z3);atom.fpos(3)=(-x3+y3);                     // atom B32
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+y3+z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3+z3)");atom.fpos_equation.push_back("(-x3+y3)");// atom B32 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-y5-z5);atom.fpos(2)=((1.0/2.0)+x5-z5);atom.fpos(3)=(x5-y5);                     // atom B32
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-y5-z5)");atom.fpos_equation.push_back("((1.0/2.0)+x5-z5)");atom.fpos_equation.push_back("(x5-y5)");// atom B32 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B32 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B32
     
     atom.name="B"; atom.type=1;                                       // atom B33
-    atom.fpos(1)=(-x3-y3);atom.fpos(2)=(-y3-z3);atom.fpos(3)=(-x3-z3);                     // atom B33
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-x3-y3)");atom.fpos_equation.push_back("(-y3-z3)");atom.fpos_equation.push_back("(-x3-z3)");// atom B33 // symbolic math for atom positions
+    atom.fpos(1)=(x5+y5);atom.fpos(2)=(y5+z5);atom.fpos(3)=(x5+z5);                     // atom B33
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x5+y5)");atom.fpos_equation.push_back("(y5+z5)");atom.fpos_equation.push_back("(x5+z5)");// atom B33 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B33 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B33
     
     atom.name="B"; atom.type=1;                                       // atom B34
-    atom.fpos(1)=((1.0/2.0)+x3+y3);atom.fpos(2)=((1.0/2.0)+y3-z3);atom.fpos(3)=(x3-z3);                     // atom B34
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x3+y3)");atom.fpos_equation.push_back("((1.0/2.0)+y3-z3)");atom.fpos_equation.push_back("(x3-z3)");// atom B34 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x5-y5);atom.fpos(2)=((1.0/2.0)-y5+z5);atom.fpos(3)=(-x5+z5);                     // atom B34
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x5-y5)");atom.fpos_equation.push_back("((1.0/2.0)-y5+z5)");atom.fpos_equation.push_back("(-x5+z5)");// atom B34 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B34 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B34
     
     atom.name="B"; atom.type=1;                                       // atom B35
-    atom.fpos(1)=((1.0/2.0)+x3-y3);atom.fpos(2)=(-y3+z3);atom.fpos(3)=((1.0/2.0)+x3+z3);                     // atom B35
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x3-y3)");atom.fpos_equation.push_back("(-y3+z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3+z3)");// atom B35 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x5+y5);atom.fpos(2)=(y5-z5);atom.fpos(3)=((1.0/2.0)-x5-z5);                     // atom B35
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x5+y5)");atom.fpos_equation.push_back("(y5-z5)");atom.fpos_equation.push_back("((1.0/2.0)-x5-z5)");// atom B35 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B35 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B35
     
     atom.name="B"; atom.type=1;                                       // atom B36
-    atom.fpos(1)=(-x3+y3);atom.fpos(2)=((1.0/2.0)+y3+z3);atom.fpos(3)=((1.0/2.0)-x3+z3);                     // atom B36
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-x3+y3)");atom.fpos_equation.push_back("((1.0/2.0)+y3+z3)");atom.fpos_equation.push_back("((1.0/2.0)-x3+z3)");// atom B36 // symbolic math for atom positions
+    atom.fpos(1)=(x5-y5);atom.fpos(2)=((1.0/2.0)-y5-z5);atom.fpos(3)=((1.0/2.0)+x5-z5);                     // atom B36
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x5-y5)");atom.fpos_equation.push_back("((1.0/2.0)-y5-z5)");atom.fpos_equation.push_back("((1.0/2.0)+x5-z5)");// atom B36 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B36 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B36
     
     atom.name="B"; atom.type=1;                                       // atom B37
-    atom.fpos(1)=(-x3-z3);atom.fpos(2)=(-x3-y3);atom.fpos(3)=(-y3-z3);                     // atom B37
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-x3-z3)");atom.fpos_equation.push_back("(-x3-y3)");atom.fpos_equation.push_back("(-y3-z3)");// atom B37 // symbolic math for atom positions
+    atom.fpos(1)=(x5+z5);atom.fpos(2)=(x5+y5);atom.fpos(3)=(y5+z5);                     // atom B37
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x5+z5)");atom.fpos_equation.push_back("(x5+y5)");atom.fpos_equation.push_back("(y5+z5)");// atom B37 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B37 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B37
     
     atom.name="B"; atom.type=1;                                       // atom B38
-    atom.fpos(1)=(x3-z3);atom.fpos(2)=((1.0/2.0)+x3+y3);atom.fpos(3)=((1.0/2.0)+y3-z3);                     // atom B38
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(x3-z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3+y3)");atom.fpos_equation.push_back("((1.0/2.0)+y3-z3)");// atom B38 // symbolic math for atom positions
+    atom.fpos(1)=(-x5+z5);atom.fpos(2)=((1.0/2.0)-x5-y5);atom.fpos(3)=((1.0/2.0)-y5+z5);                     // atom B38
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(-x5+z5)");atom.fpos_equation.push_back("((1.0/2.0)-x5-y5)");atom.fpos_equation.push_back("((1.0/2.0)-y5+z5)");// atom B38 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B38 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B38
     
     atom.name="B"; atom.type=1;                                       // atom B39
-    atom.fpos(1)=((1.0/2.0)+x3+z3);atom.fpos(2)=((1.0/2.0)+x3-y3);atom.fpos(3)=(-y3+z3);                     // atom B39
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x3+z3)");atom.fpos_equation.push_back("((1.0/2.0)+x3-y3)");atom.fpos_equation.push_back("(-y3+z3)");// atom B39 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)-x5-z5);atom.fpos(2)=((1.0/2.0)-x5+y5);atom.fpos(3)=(y5-z5);                     // atom B39
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x5-z5)");atom.fpos_equation.push_back("((1.0/2.0)-x5+y5)");atom.fpos_equation.push_back("(y5-z5)");// atom B39 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B39 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B39
     
     atom.name="B"; atom.type=1;                                       // atom B40
-    atom.fpos(1)=((1.0/2.0)-x3+z3);atom.fpos(2)=(-x3+y3);atom.fpos(3)=((1.0/2.0)+y3+z3);                     // atom B40
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)-x3+z3)");atom.fpos_equation.push_back("(-x3+y3)");atom.fpos_equation.push_back("((1.0/2.0)+y3+z3)");// atom B40 // symbolic math for atom positions
+    atom.fpos(1)=((1.0/2.0)+x5-z5);atom.fpos(2)=(x5-y5);atom.fpos(3)=((1.0/2.0)-y5-z5);                     // atom B40
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("((1.0/2.0)+x5-z5)");atom.fpos_equation.push_back("(x5-y5)");atom.fpos_equation.push_back("((1.0/2.0)-y5-z5)");// atom B40 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B40 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B40
     
@@ -353,11 +358,11 @@ namespace anrl {
 } // namespace anrl
 
 namespace anrl {
-  uint WebANRL_A2B3_cI80_206_ad_e(stringstream& web,bool LDEBUG) {
+  uint WebANRL_A2B3_cI80_199_a2b_2c(stringstream& web,bool LDEBUG) {
     #ifndef _ANRL_NOWEB_
     #endif
 
-    if(LDEBUG) {cerr << "anrl:: WebANRL_A2B3_cI80_206_ad_e: web.str().size()=" << web.str().size() << endl;}
+    if(LDEBUG) {cerr << "anrl:: WebANRL_A2B3_cI80_199_a2b_2c: web.str().size()=" << web.str().size() << endl;}
 
     return web.str().size();
   }
