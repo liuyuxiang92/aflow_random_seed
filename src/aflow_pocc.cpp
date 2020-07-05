@@ -192,7 +192,13 @@ namespace pocc {
 namespace pocc {
   bool structuresGenerated(const string& directory){
     string file=directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;
-    if(!aurostd::EFileExist(file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
+    if(!aurostd::EFileExist(file)){
+      //checking for old scheme
+      file=directory+"/"+"ARUN.POCC_01"+"/"+_AFLOWIN_;
+      //cerr << file << endl;
+      //exit(0);
+      return false;
+    } //CO20200606 - necessary because efile2tempfile is verbose
     if(aurostd::EFileNotEmpty(file)){return true;}
     return false;
   }

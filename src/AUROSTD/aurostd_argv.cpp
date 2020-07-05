@@ -460,7 +460,7 @@ namespace aurostd {
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
 
-  bool args2attachedflag(const vector<string>& argv,const string& s0) {  //CO20200624
+  bool args2attachedflag(const vector<string>& argv,const string& s0) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
@@ -472,7 +472,7 @@ namespace aurostd {  // namespace aurostd
     return FALSE;
   }
   
-  bool args2attachedflag(const vector<string>& argv,std::vector<string>& cmds,const string& s0) {  //CO20200624
+  bool args2attachedflag(const vector<string>& argv,std::vector<string>& cmds,const string& s0) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string s=aurostd::RemoveSpaces(s0);
     vector<string> tokens;

@@ -49,9 +49,9 @@ namespace aurostd {
   bool getproto_itemized_vector_string_from_input(vector<string> &argv,const string& s0,const string& s1,const string& s2,const string& s3,vector<string>& tokens,const string& delimiter=":") __xprototype;
 
   // args2attachedflag without/with commands
-  bool args2attachedflag(const vector<string>&,const string&) __xprototype;  //CO20200624
+  bool args2attachedflag(const vector<string>&,const string&) __xprototype;
   // args2attachedflag with commands
-  bool args2attachedflag(const vector<string>&,vector<string>&,const string&) __xprototype;  //CO20200624
+  bool args2attachedflag(const vector<string>&,vector<string>&,const string&) __xprototype;
   // args2attachedstring
   // [OBSOLETE] string args2attachedstring(vector<string>,const string&) __xprototype;
   // [OBSOLETE] string args2attachedstring(vector<string>,const string&,const string&) __xprototype;
