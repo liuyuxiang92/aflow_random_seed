@@ -192,13 +192,7 @@ namespace pocc {
 namespace pocc {
   bool structuresGenerated(const string& directory){
     string file=directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;
-    if(!aurostd::EFileExist(file)){
-      //checking for old scheme
-      file=directory+"/"+"ARUN.POCC_01"+"/"+_AFLOWIN_;
-      //cerr << file << endl;
-      //exit(0);
-      return false;
-    } //CO20200606 - necessary because efile2tempfile is verbose
+    if(!aurostd::EFileExist(file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
     if(aurostd::EFileNotEmpty(file)){return true;}
     return false;
   }
@@ -6971,11 +6965,17 @@ namespace pocc {
       arun_directory=m_vcontent[iline];
       aurostd::StringSubst(arun_directory,POSCAR_series_START_tag,"");
       aurostd::string2tokens(arun_directory,vtokens,"_");  //POCC_01_01_H0C0
-      if(vtokens.size()==3){  //POCC_01_H0C0
+      if(vtokens.size()==2){  //POCC_01
+        if(LDEBUG){cerr << soliloquy << " POCC_NN setting found (old POCC type)" << endl;}
+        if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure group index",_VALUE_ILLEGAL_);}
+        arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1];
+      }else if(vtokens.size()==3){  //POCC_01_H0C0
+        if(LDEBUG){cerr << soliloquy << " POCC_NN_HASH setting found (unique_supercells filetype)" << endl;}
         if(m_fileoptions.flag("TYPE::ALL_SUPERCELLS")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ALL_STRUCTURES setting but detected UNIQUE_STRUCTURES format",_FILE_WRONG_FORMAT_);}
         if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure group index",_VALUE_ILLEGAL_);}
         arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[2];
       }else if(vtokens.size()==4){  //POCC_01_01_H0C0
+        if(LDEBUG){cerr << soliloquy << " POCC_NN_NN_HASH setting found (all_supercells filetype)" << endl;}
         if(m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"UNIQUE_STRUCTURES setting but detected ALL_STRUCTURES format",_FILE_WRONG_FORMAT_);}
         if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure group index",_VALUE_ILLEGAL_);}
         if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure index",_VALUE_ILLEGAL_);}

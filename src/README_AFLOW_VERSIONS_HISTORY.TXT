@@ -10,6 +10,7 @@
         -- adding POCC postprocessing to LIB2LIB (CO)
         -- reading kflags and vflags options from aflow.in before processing POCC (CO)
         -- changing LIB2LIB() to run RUN_Directory() instead of individual post-processing functions (CO)
+        -- adding functionality to process LIB6/POCC:OLD calculations (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
