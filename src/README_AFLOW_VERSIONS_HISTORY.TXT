@@ -1,3 +1,8 @@
+3.2.i5 - 2020/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+        -- Made search --aflowlib more inclusive. (ME)
+        -- Fixed out of bounds error in init::AFLOW_Projects_Directories for missing LIB directories. (ME)
+        -- Added aurostd::_ishex. (ME)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

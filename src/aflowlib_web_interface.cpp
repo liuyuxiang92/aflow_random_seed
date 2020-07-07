@@ -5743,6 +5743,7 @@ namespace aflowlib {
       // **********************************************************************************************************
       // TRY AUID
       // **********************************************************************************************************
+      // ME20200707 - Also check for AUIDs without the aflow: prefix
       string option_orig = option;
       if ((option.size() == 16) && aurostd::_ishex(option)) option = "aflow:" + option;
       if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
@@ -5789,6 +5790,7 @@ namespace aflowlib {
           }
         }
       }
+      //ME20200707 - Restore
       option = option_orig;
 
       // **********************************************************************************************************
