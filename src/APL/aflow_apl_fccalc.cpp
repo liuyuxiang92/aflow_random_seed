@@ -171,7 +171,7 @@ namespace apl {
 
   bool ForceConstantCalculator::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& AflowIn) {
-    string function = "ForceConstantCalculator::runVASPCalculations():";
+    string function = "apl::ForceConstantCalculator::runVASPCalculations():";
     string message = "";
     if (!_initialized) {
       message = "Not initialized";
@@ -1735,7 +1735,7 @@ namespace apl {
 
   bool ForceConstantCalculator::calculateForceFields() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::runVASPCalculations():"; //CO20190218
+    string soliloquy="apl::ForceConstantCalculator::calculateForceFields():"; //CO20190218
     // Extract all forces ////////////////////////////////////////////////////
 
     //first pass, just find if outfile is found ANYWHERE

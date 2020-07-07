@@ -951,7 +951,7 @@ namespace apl {
           if (get_full_shells && countshell == cut_shell) {
             // For full shells, every atom of the last coordination shell
             // needs to be inside the supercell. If there is more than one
-            // periodic image that havs the same distance to the central atom,
+            // periodic image that has the same distance to the central atom,
             // this condition is not fulfilled.
             bool full_shell = true;
             for (uint i = gat; full_shell && (i < ngridatoms) && (distances[i] < distances[gat] + _APL_SHELL_TOL_); i++) {
