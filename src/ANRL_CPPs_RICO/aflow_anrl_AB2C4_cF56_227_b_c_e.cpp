@@ -4,22 +4,22 @@
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - David Hicks - 2020
-// FILE "ANRL/aflow_anrl_AB2C4_cF56_227_a_d_e.cpp"
+// FILE "ANRL/aflow_anrl_AB2C4_cF56_227_b_c_e.cpp"
 
-#ifndef _AFLOW_ANRL_AB2C4_cF56_227_a_d_e_CPP // AFLOW_REMOVE_GREP
-#define _AFLOW_ANRL_AB2C4_cF56_227_a_d_e_CPP // AFLOW_REMOVE_GREP
+#ifndef _AFLOW_ANRL_AB2C4_cF56_227_b_c_e_CPP // AFLOW_REMOVE_GREP
+#define _AFLOW_ANRL_AB2C4_cF56_227_b_c_e_CPP // AFLOW_REMOVE_GREP
 #include "../aflow.h" // AFLOW_REMOVE_GREP
 
 namespace anrl {
-  uint WebANRL_AB2C4_cF56_227_a_d_e(stringstream &web,bool LDEBUG);
+  uint WebANRL_AB2C4_cF56_227_b_c_e(stringstream &web,bool LDEBUG);
 }
 
 namespace anrl {
-  uint PrototypeANRL_AB2C4_cF56_227_a_d_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
-    // system AB2C4_cF56_227_a_d_e
+  uint PrototypeANRL_AB2C4_cF56_227_b_c_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
+    // system AB2C4_cF56_227_b_c_e
 
     if(XHOST.vflag_control.flag("WWW")) {
-      WebANRL_AB2C4_cF56_227_a_d_e(web,LDEBUG); // PLUG WEB STUFF
+      WebANRL_AB2C4_cF56_227_b_c_e(web,LDEBUG); // PLUG WEB STUFF
       #ifdef _ANRL_NOWEB_
       cout << "no web" << endl;
       #else
@@ -39,19 +39,19 @@ namespace anrl {
     anrl::PrototypeANRL_Consistency(vparameters.size(),nparameters,prototype,label,
         Strukturbericht,Pearson_symbol,spacegroup,params,print_mode);
 
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: FOUND" << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: label=" << label << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: nspecies=" << nspecies << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: natoms=" << natoms << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: spacegroup=" << spacegroup << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: nunderscores=" << nunderscores << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: nparameters=" <<  nparameters << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: Pearson_symbol=" << Pearson_symbol << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: params=" << params << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: Strukturbericht=" << Strukturbericht << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: prototype=" << prototype << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: dialect=" << dialect << endl;}
-    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: vparameters.size()=" << vparameters.size() << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: FOUND" << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: label=" << label << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: nspecies=" << nspecies << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: natoms=" << natoms << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: spacegroup=" << spacegroup << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: nunderscores=" << nunderscores << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: nparameters=" <<  nparameters << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: Pearson_symbol=" << Pearson_symbol << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: params=" << params << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: Strukturbericht=" << Strukturbericht << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: prototype=" << prototype << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: dialect=" << dialect << endl;}
+    if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: vparameters.size()=" << vparameters.size() << endl;}
 
     xvector<double> xn(3);   xn(1)=1.0;xn(2)=0.0;xn(3)=0.0;
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
@@ -65,9 +65,9 @@ namespace anrl {
     }
 
     uint i=0;
-    double a=vparameters.at(i++);                  if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: a=" << a << endl;}
+    double a=vparameters.at(i++);                  if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: a=" << a << endl;}
     
-    double x3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_a_d_e: x3=" << x3 << endl;}
+    double x3=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2C4_cF56_227_b_c_e: x3=" << x3 << endl;}
         
     str.iomode=IOVASP_AUTO;
     str.title=label+" params="+parameters+" SG#="+aurostd::utype2string(spacegroup)+DOI_ANRL;
@@ -105,38 +105,38 @@ namespace anrl {
 
     
     atom.name="A"; atom.type=0;                                       // atom B1
-    atom.fpos(1)=(1.0/8.0);atom.fpos(2)=(1.0/8.0);atom.fpos(3)=(1.0/8.0);                     // atom B1
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/8.0)");atom.fpos_equation.push_back("(1.0/8.0)");atom.fpos_equation.push_back("(1.0/8.0)");// atom B1 // symbolic math for atom positions
+    atom.fpos(1)=(3.0/8.0);atom.fpos(2)=(3.0/8.0);atom.fpos(3)=(3.0/8.0);                     // atom B1
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(3.0/8.0)");atom.fpos_equation.push_back("(3.0/8.0)");atom.fpos_equation.push_back("(3.0/8.0)");// atom B1 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B1 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B1
     
     atom.name="A"; atom.type=0;                                       // atom B2
-    atom.fpos(1)=(7.0/8.0);atom.fpos(2)=(7.0/8.0);atom.fpos(3)=(7.0/8.0);                     // atom B2
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(7.0/8.0)");atom.fpos_equation.push_back("(7.0/8.0)");atom.fpos_equation.push_back("(7.0/8.0)");// atom B2 // symbolic math for atom positions
+    atom.fpos(1)=(5.0/8.0);atom.fpos(2)=(5.0/8.0);atom.fpos(3)=(5.0/8.0);                     // atom B2
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(5.0/8.0)");atom.fpos_equation.push_back("(5.0/8.0)");atom.fpos_equation.push_back("(5.0/8.0)");// atom B2 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B2 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B2
     
     atom.name="B"; atom.type=1;                                       // atom B3
-    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=(1.0/2.0);atom.fpos(3)=(1.0/2.0);                     // atom B3
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("(1.0/2.0)");// atom B3 // symbolic math for atom positions
+    atom.fpos(1)=0.0;atom.fpos(2)=0.0;atom.fpos(3)=0.0;                     // atom B3
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("0.0");// atom B3 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B3 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B3
     
     atom.name="B"; atom.type=1;                                       // atom B4
-    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=(1.0/2.0);atom.fpos(3)=0.0;                     // atom B4
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");// atom B4 // symbolic math for atom positions
+    atom.fpos(1)=0.0;atom.fpos(2)=0.0;atom.fpos(3)=(1.0/2.0);                     // atom B4
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("(1.0/2.0)");// atom B4 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B4 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B4
     
     atom.name="B"; atom.type=1;                                       // atom B5
-    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=0.0;atom.fpos(3)=(1.0/2.0);                     // atom B5
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("(1.0/2.0)");// atom B5 // symbolic math for atom positions
+    atom.fpos(1)=0.0;atom.fpos(2)=(1.0/2.0);atom.fpos(3)=0.0;                     // atom B5
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");// atom B5 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B5 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B5
     
     atom.name="B"; atom.type=1;                                       // atom B6
-    atom.fpos(1)=0.0;atom.fpos(2)=(1.0/2.0);atom.fpos(3)=(1.0/2.0);                     // atom B6
-    atom.fpos_equation.clear();atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("(1.0/2.0)");// atom B6 // symbolic math for atom positions
+    atom.fpos(1)=(1.0/2.0);atom.fpos(2)=0.0;atom.fpos(3)=0.0;                     // atom B6
+    atom.fpos_equation.clear();atom.fpos_equation.push_back("(1.0/2.0)");atom.fpos_equation.push_back("0.0");atom.fpos_equation.push_back("0.0");// atom B6 // symbolic math for atom positions
     str.comp_each_type.at(atom.type)+=1.0;                            // atom B6 // if we need partial occupation
     str.atoms.push_back(atom);                                        // atom B6
     
@@ -194,11 +194,11 @@ namespace anrl {
 } // namespace anrl
 
 namespace anrl {
-  uint WebANRL_AB2C4_cF56_227_a_d_e(stringstream& web,bool LDEBUG) {
+  uint WebANRL_AB2C4_cF56_227_b_c_e(stringstream& web,bool LDEBUG) {
     #ifndef _ANRL_NOWEB_
     #endif
 
-    if(LDEBUG) {cerr << "anrl:: WebANRL_AB2C4_cF56_227_a_d_e: web.str().size()=" << web.str().size() << endl;}
+    if(LDEBUG) {cerr << "anrl:: WebANRL_AB2C4_cF56_227_b_c_e: web.str().size()=" << web.str().size() << endl;}
 
     return web.str().size();
   }

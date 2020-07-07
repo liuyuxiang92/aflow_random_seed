@@ -6120,6 +6120,7 @@ namespace compare{
 namespace compare{
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
+      const double& minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
       const int& type_match) {
 
@@ -6138,6 +6139,9 @@ namespace compare{
     bool VERBOSE=false;
 
     string function_name = XPID + "compare::findMatch():";
+
+    double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/4.0; //DX20200623
+    cerr << "SAFE_CUTOFF: " << _SAFE_MATCH_CUTOFF_ << endl;
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  // indices of atoms (index after sorting)
@@ -6214,7 +6218,7 @@ namespace compare{
         }
         // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
         //DX - running vector in each loop saves computations; fewer duplicate operations
-        if(incell_mod>0.25){
+        if(incell_mod>_SAFE_MATCH_CUTOFF_){
           for(uint m=0;m<l1.size();m++){
             a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
             for(uint n=0;n<l2.size();n++){
@@ -6230,11 +6234,11 @@ namespace compare{
                   dist = tmp;
                   min_xvec = tmp_xvec;
                 }
-                if(dist<0.25){ break; }
+                if(dist<_SAFE_MATCH_CUTOFF_){ break; }
               }
-              if(dist<0.25){ break; }
+              if(dist<_SAFE_MATCH_CUTOFF_){ break; }
             }
-            if(dist<0.25){ break; }
+            if(dist<_SAFE_MATCH_CUTOFF_){ break; }
           }
         }
         else{
@@ -6261,7 +6265,7 @@ namespace compare{
         vdiffs.push_back(dist);
         //DX20190701 - speed increase, not possible to match to anything else if less than quarter of an Angstrom
         // note this will truncate vdiffs, so if we need it, then do not use the break below
-        if(dist<0.25){
+        if(dist<_SAFE_MATCH_CUTOFF_){
           break;
         }
       }
@@ -8068,6 +8072,9 @@ namespace compare{
     bool supercell_method = false; //DX20200330
     double mis=AUROSTD_MAX_DOUBLE;
     double mag_dis=AUROSTD_MAX_DOUBLE; double mag_fail=AUROSTD_MAX_DOUBLE;
+
+    double minimum_interatomic_distance = aurostd::min(xstr1.dist_nn_min,xstr_supercell.dist_nn_min); //DX20200622
+
     xstructure proto;
     //xstructure xstr2_tmp = xstr2;
 
@@ -8195,7 +8202,7 @@ namespace compare{
             }
             vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,map_index_str1,map_index_str2,min_dists,type_match)){;
+            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
               if(VERBOSE){
                 for(uint m=0;m<map_index_str1.size();m++){
                   cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;

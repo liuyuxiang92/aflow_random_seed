@@ -448,6 +448,7 @@ namespace compare{
   //bool findMatch(const xstructure& xstr1, const xstructure& PROTO,vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, const int& type_match);
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
+      const double& minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
       const int& type_match); //DX20190716
   void clusterize(const xstructure& xstr1, const vector<uint>& im1, vector<string>& TYPE1,
