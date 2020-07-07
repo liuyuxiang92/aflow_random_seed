@@ -6141,7 +6141,6 @@ namespace compare{
     string function_name = XPID + "compare::findMatch():";
 
     double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/4.0; //DX20200623
-    cerr << "SAFE_CUTOFF: " << _SAFE_MATCH_CUTOFF_ << endl;
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  // indices of atoms (index after sorting)
