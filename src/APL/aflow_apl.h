@@ -1233,10 +1233,10 @@ namespace apl
     public:
       QHAN(ostream& oss=std::cout);
       QHAN(const QHAN& qha);
-      QHAN(string &tpt,_xinput &xinput, _kflags &kflags, xoption &supercellopts,
-          ofstream &messageFile, ostream &oss=std::cout);
-      void initialize(string &tpt,_xinput &xinput, _kflags &kflags,
-          xoption &supercellopts, ofstream &messageFile, ostream &oss);
+      QHAN(_xinput &xinput, _kflags &kflags, xoption &aplopts, ofstream &messageFile,
+          ostream &oss=std::cout);
+      void initialize(_xinput &xinput, _kflags &kflags, xoption &aplopts,
+          ofstream &messageFile, ostream &oss);
       ~QHAN();
       const QHAN& operator=(const QHAN &qha);
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);

@@ -440,7 +440,6 @@ namespace apl
   void QHAN::free()
   {
     system_title = "";
-    //supercellopts.clear();  // OBSOLETE ME20200518
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
     runQHA   = false; runQHA3P = false; runSCQHA = false; runQHANP = false;
@@ -493,7 +492,6 @@ namespace apl
 
     apl_options       = qha.apl_options;
     system_title      = qha.system_title;
-    //supercellopts     = qha.supercellopts;  // OBSOLETE ME20200518
     isEOS             = qha.isEOS;
     isGP_FD           = qha.isGP_FD;
     ignore_imaginary  = qha.ignore_imaginary;
@@ -548,15 +546,15 @@ namespace apl
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  QHAN::QHAN(string &tpt, _xinput &xinput, _kflags &kflags, xoption &apl_options,
+  QHAN::QHAN(_xinput &xinput, _kflags &kflags, xoption &apl_options,
       ofstream &messageFile, ostream &oss)
   {
-    initialize(tpt, xinput, kflags, apl_options, messageFile, oss);
+    initialize(xinput, kflags, apl_options, messageFile, oss);
   }
 
   /// Initializes the QHA class with all the necessary data.
   ///
-  void QHAN::initialize(string &tpt, _xinput &xinput, _kflags &kflags,
+  void QHAN::initialize(_xinput &xinput, _kflags &kflags,
       xoption &apl_options, ofstream &messageFile, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
@@ -574,7 +572,6 @@ namespace apl
     free();
 
     this->xinput = xinput;
-    //this->supercellopts = supercellopts;  // OBSOLETE ME20200518
     this->apl_options = apl_options;
 
     currentDirectory = xinput.xvasp.Directory; // remember the current directory
@@ -741,7 +738,7 @@ namespace apl
     }
 
     tokens.clear();
-    aurostd::string2tokens(tpt, tokens, string (" :"));
+    aurostd::string2tokens(apl_options.getattachedscheme("TPT"), tokens, string (" :"));
     if (tokens.size() != 3){
       stringstream msg;
       msg << "Wrong setting in ";

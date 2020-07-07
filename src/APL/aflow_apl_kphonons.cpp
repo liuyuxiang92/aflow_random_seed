@@ -1156,31 +1156,7 @@ namespace KBIN {
       kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
       kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
     if (NEW_QHA && run_any_qha){
-      // ME20200516 - APL options are recast into xoption now, so no need to
-      // distinguish between supercell_opts, aplopts, and qha.apl_options.
-      string USER_TPT = aplopts.getattachedscheme("TPT");
-      apl::QHAN qha(USER_TPT, xinput, kflags, aplopts, messageFile, oss);
-      //[OBSOLETE] qha.apl_options.push_attached("ENGINE", USER_ENGINE);
-      //[OBSOLETE] qha.apl_options.flag("AUTO_DIST", USER_AUTO_DISTORTIONS);
-      //[OBSOLETE] qha.apl_options.flag("DPM", USER_DPM);
-      //[OBSOLETE] qha.apl_options.flag("XYZONLY", USER_DISTORTIONS_XYZ_ONLY);
-      //[OBSOLETE] qha.apl_options.flag("SYMMETRIZE", USER_DISTORTIONS_SYMMETRIZE);
-      //[OBSOLETE] qha.apl_options.flag("INEQUIVONLY", USER_DISTORTIONS_INEQUIVONLY);
-      //[OBSOLETE] qha.apl_options.flag("ZEROSTATE", USER_ZEROSTATE);
-      //[OBSOLETE] qha.apl_options.flag("POLAR", USER_POLAR);
-      //[OBSOLETE] qha.apl_options.push_attached("DIST_MAGNITUDE",
-      //[OBSOLETE]     aurostd::utype2string<double>(USER_DISTORTION_MAGNITUDE));
-
-      //[OBSOLETE] qha.apl_options.push_attached("DOS_METHOD", USER_DOS_METHOD);
-      //[OBSOLETE] qha.apl_options.push_attached("DOS_MESH", DOS_MESH_SCHEME);
-      //[OBSOLETE] qha.apl_options.push_attached("DOS_NPOINTS",
-      //[OBSOLETE]     aurostd::utype2string<int>(USER_DOS_NPOINTS));
-      //[OBSOLETE] qha.apl_options.push_attached("DOS_SMEAR",
-      //[OBSOLETE]     aurostd::utype2string<double>(USER_DOS_SMEAR));
-      //[OBSOLETE] qha.apl_options.push_attached("DOS_NPOINTS",
-      //[OBSOLETE]     aurostd::utype2string<int>(USER_DOS_NPOINTS));
-      //[OBSOLETE] qha.apl_options.push_attached("BAND_NPOINTS",
-      //[OBSOLETE]     aurostd::utype2string<int>(USER_DC_NPOINTS));
+      apl::QHAN qha(xinput, kflags, aplopts, messageFile, oss);
 
       qha.system_title = phcalc._system;
       qha.run(xflags, aflags, kflags, AflowIn);
