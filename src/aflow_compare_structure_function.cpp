@@ -1013,6 +1013,7 @@ namespace compare {
         }
         structure_tmp.structure_representative = xstr1;
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
+        structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = directory+"/"+vfiles[i];
         structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
         structure_tmp.elements = compare::getElements(xstr1);
@@ -1124,6 +1125,7 @@ namespace compare {
           catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX20190801
         }
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
+        structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = designation.str();
         structure_tmp.stoichiometry = compare::getStoichiometry(structure_tmp.structure_representative,same_species);
         structure_tmp.elements = compare::getElements(structure_tmp.structure_representative);
@@ -1204,6 +1206,7 @@ namespace compare {
       }
       structure_tmp.structure_representative = xstr;
       structure_tmp.structure_representative.ReScale(1.0); //DX20190715
+      structure_tmp.structure_representative.BringInCell(); //DX20200707
       structure_tmp.structure_representative_name = filenames[i];
       structure_tmp.stoichiometry = compare::getStoichiometry(xstr,same_species);
       structure_tmp.elements = compare::getElements(xstr);
@@ -1425,6 +1428,11 @@ namespace compare {
       return false;
     }
 
+    // ---------------------------------------------------------------------------
+    // pre-condition structures 
+    structure.ReScale(1.0); //DX20200707
+    structure.BringInCell(); //DX20200707
+
     return true;
   }
 }
@@ -1504,6 +1512,7 @@ namespace compare{
         cerr << "string: " << name << endl;
       }
     }
+    cerr << "ICSD substring: " << ICSD_substring << " (name=" << name << ")" << endl;
     return ICSD_substring;
   }
 }
@@ -1520,21 +1529,43 @@ namespace compare{
     string min_ICSD = "";
     int min_num = 1e9;
     for(uint i=0;i<ICSD_entries.size();i++){
-      if(ICSD_entries[i].empty()){ continue; } //DX20191108 - if not an ICSD, skip
+      if(ICSD_entries[i].empty()){ cerr << "no icsd entries" << endl; continue; } //DX20191108 - if not an ICSD, skip
       vector<string> tokens;
       aurostd::string2tokens(ICSD_entries[i],tokens,"_"); 
-      string num_string = tokens[tokens.size()-1];
-      for(uint j=0;j<num_string.size();j++){
-        if(isalpha(num_string[j])){
-          num_string.erase(num_string.begin()+j);
+      //DX20200706 [find ICSD number, more robust] - START
+      string num_string = "";
+      for(uint j=0;j<tokens.size();j++){
+        if(aurostd::substring2bool(tokens[j],"ICSD")){ 
+          if(j+1<tokens.size()){
+            num_string = tokens[j+1];
+            break;
+          }
+          else{ break; }  
         }
       }
-      int num = aurostd::string2utype<int>(tokens[tokens.size()-1]); // ICSD number is aways of the form (Ag1_ICSD_######)
+      int num=1e9;
+      if(num_string.size()!=0){
+        if(aurostd::substring2bool(num_string,".")){
+          vector<string> sub_tokens;
+          aurostd::string2tokens(num_string,sub_tokens,"."); 
+          num_string = sub_tokens[0];
+        }
+        num = aurostd::string2utype<int>(num_string);
+      }
+      //DX20200706 [find ICSD number, more robust] - END
+      //DX20200706 [OBSOLETE - not robust] string num_string = tokens[tokens.size()-1];
+      //DX20200706 [OBSOLETE - not robust] for(uint j=0;j<num_string.size();j++){
+      //DX20200706 [OBSOLETE - not robust]   if(isalpha(num_string[j])){
+      //DX20200706 [OBSOLETE - not robust]     num_string.erase(num_string.begin()+j);
+      //DX20200706 [OBSOLETE - not robust]   }
+      //DX20200706 [OBSOLETE - not robust] }
+      //DX20200706 [OBSOLETE - not robust] int num = aurostd::string2utype<int>(tokens[tokens.size()-1]); // ICSD number is aways of the form (Ag1_ICSD_######)
       if(num < min_num){
         min_ICSD = ICSD_entries[i];
         min_num = num;
       }
     }
+    cerr << "min_icsd: " << min_ICSD << endl;
     return min_ICSD;
   }
 }
@@ -1837,6 +1868,7 @@ namespace compare{
       StructurePrototype str_proto_tmp;
       str_proto_tmp.structure_representative = xstr_tmp;
       str_proto_tmp.structure_representative.ReScale(1.0); //DX20190715
+      str_proto_tmp.structure_representative.BringInCell(); //DX20200707
       str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
       str_proto_tmp.structure_representative_generated = true;
       //DX20190730 - ORIG - str_proto_tmp.structure_representative_source = "permutation";
@@ -2097,6 +2129,7 @@ namespace compare{
       StructurePrototype str_proto_tmp;
       str_proto_tmp.structure_representative = xstr_tmp;
       str_proto_tmp.structure_representative.ReScale(1.0); //DX20190715
+      str_proto_tmp.structure_representative.BringInCell(); //DX20200707
       str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
       str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
       str_proto_tmp.structure_representative_generated = true;

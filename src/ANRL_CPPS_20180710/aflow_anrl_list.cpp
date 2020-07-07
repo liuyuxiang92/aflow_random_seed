@@ -736,9 +736,11 @@ namespace anrl {
     vproto.push_back("AB4C_mP12_13_f_2g_e;3;12;13;5;12;mP12;a,b/a,c/a,beta,y1,y2,x3,y3,z3,x4,y4,z4;-/-;MgO4W/NiO4W;MgO4W (ICSD #67903)/NiO4W (ICSD #16685)");
     vproto.push_back("AB3C_mP40_14_2e_6e_2e;3;40;14;5;34;mP40;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10;-;MgO3Si;MgO3Si (ICSD #30895)");
     vproto.push_back("A2B3C_mC24_15_2e_af_e;3;12;15;5;10;mC24;a,b/a,c/a,beta,y2,y3,y4,x5,y5,z5;-;Li2O3Zr;Li2O3Zr (ICSD #94893)");
+    vproto.push_back("AB3C_mC40_15_2e_3f_f;3;20;18;5;18;mC40;a,b/a,c/a,beta,y1,y2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;NaO3V;NaO3V (ICSD #2103)");
     vproto.push_back("A2B3C_mC48_15_aef_3f_2e;3;24;15;5;19;mC48;a,b/a,c/a,beta,y2,y3,y4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8;-;Li2O3Ti;Li2O3Ti (ICSD #162215)");
     vproto.push_back("A4BC7_mC48_15_2f_e_e3f;3;24;15;5;21;mC48;a,b/a,c/a,beta,y1,y2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;Al4CaO7;Al4CaO7 (ICSD #14270)");
     vproto.push_back("AB3C_mC60_15_cf_e4f_ef;3;30;15;5;24;mC60;a,b/a,c/a,beta,y2,y3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9;-;CaO3Si;CaO3Si (ICSD #87694)");
+    vproto.push_back("ABC2_oP16_33_a_a_2a;3;16;33;5;15;oP16;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;FeNaO2;FeNaO2 (ICSD #186309)");
     vproto.push_back("A2B3C_oC24_36_b_ab_a;3;12;36;5;13;oC24;a,b/a,c/a,y1,z1,y2,z2,x3,y3,z3,x4,y4,z4;-/-;Li2O3Si/Na2O3Si;Li2O3Si (ICSD #28192)/Na2O3Si (ICSD #24664)");
     vproto.push_back("A2B5C_oP32_58_eg_3gh_g;3;32;58;5;17;oP32;a,b/a,c/a,z1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,z7;-;Al2O5Si;Al2O5Si (ICSD #30679)");
     vproto.push_back("AB2C4_oC28_63_c_ac_fg;3;14;63;5;9;oC28;a,b/a,c/a,y2,y3,y4,z4,x5,y5;-;CrNa2O4;CrNa2O4 (ICSD #76001)");
@@ -3472,7 +3474,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A5B2_oP14_59_a2e_e"){
-        vparameters.push_back("3.2076870978,3.23007856337,1.22558922558,0.999,0.1457,0.469,0.3189,0.997,0.14882,0.1083");
+        vparameters.push_back("3.2077,3.2300714,1.2255822,0.999,0.3957,0.469,0.5689,0.997,0.39882,0.1083");
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_oP8_62_c_c"){ //DX20200703 - there are other structures with this label in part1 and part2
@@ -3512,7 +3514,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B2_cF80_227_f_e"){
-        vparameters.push_back("10.7531348348,0.865,0.73");
+        vparameters.push_back("10.7531,0.24,0.895");
       }
       // -------------------------------------------------------------------------
       // ternaries
@@ -3612,7 +3614,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC4_tI24_88_a_b_f"){
-        vparameters.push_back("5.7543123731,2.29690513528,0.8831,0.7638,0.4223");
+        vparameters.push_back("5.7543,2.2969084,0.8831,0.5138,0.2973");
         vparameters.push_back("5.7062,2.20627,0.2638,0.1105,0.4568");
       }
       // ---------------------------------------------------------------------------

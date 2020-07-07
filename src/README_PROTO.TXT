@@ -1556,9 +1556,11 @@ AB4C_mP12_13_f_2g_e-001.{ABC}                    mP12      P2/c                -
 AB4C_mP12_13_f_2g_e-002.{ABC}                    mP12      P2/c                -         NiO4W               #13       NiO4W, ICSD #16685
 AB3C_mP40_14_2e_6e_2e-001.{ABC}                  mP40      P2_{1}/c            -         MgO3Si              #14       MgO3Si, ICSD #30895
 A2B3C_mC24_15_2e_af_e-001.{ABC}                  mC24      C2/c                -         Li2O3Zr             #15       Li2O3Zr, ICSD #94893
+AB3C_mC40_15_2e_3f_f-001.{ABC}                   mC40      C2/c                -         NaO3V               #15       NaO3V, ICSD #2103
 A2B3C_mC48_15_aef_3f_2e-001.{ABC}                mC48      C2/c                -         Li2O3Ti             #15       Li2O3Ti, ICSD #162215
 A4BC7_mC48_15_2f_e_e3f-001.{ABC}                 mC48      C2/c                -         Al4CaO7             #15       Al4CaO7, ICSD #14270
 AB3C_mC60_15_cf_e4f_ef-001.{ABC}                 mC60      C2/c                -         CaO3Si              #15       CaO3Si, ICSD #87694
+ABC2_oP16_33_a_a_2a-001.{ABC}                    oP16      Pna2_{1}            -         FeNaO2;             #33       FeNaO2, ICSD #186309
 A2B3C_oC24_36_b_ab_a-001.{ABC}                   oC24      Cmc2_{1}            -         Li2O3Si             #36       Li2O3Si, ICSD #28192
 A2B3C_oC24_36_b_ab_a-002.{ABC}                   oC24      Cmc2_{1}            -         Na2O3Si             #36       Na2O3Si, ICSD #24664
 A2B5C_oP32_58_eg_3gh_g-001.{ABC}                 oP32      Pnnm                -         Al2O5Si             #58       Al2O5Si, ICSD #30679

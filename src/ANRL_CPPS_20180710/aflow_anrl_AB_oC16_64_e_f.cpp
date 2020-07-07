@@ -77,6 +77,9 @@ namespace anrl {
     str.title=label+" params="+parameters+" SG#="+aurostd::utype2string(spacegroup)+DOI_ANRL;
     str.scale=1.0;
 
+    a1=(1.0/2.0)*a*xn-(1.0/2.0)*b*yn;
+    a2=(1.0/2.0)*a*xn+(1.0/2.0)*b*yn;
+    a3=c*zn;
     
     str.lattice(1,1)=a1(1);str.lattice(1,2)=a1(2);str.lattice(1,3)=a1(3);
     str.lattice(2,1)=a2(1);str.lattice(2,2)=a2(2);str.lattice(2,3)=a2(3);
@@ -84,6 +87,14 @@ namespace anrl {
 
     // symbolic representation of lattice vectors
     vector<string> a1_equation, a2_equation, a3_equation;
+    a1_equation.push_back("(1.0/2.0)*a");a1_equation.push_back("-(1.0/2.0)*b");a1_equation.push_back("0");
+    a2_equation.push_back("(1.0/2.0)*a");a2_equation.push_back("(1.0/2.0)*b");a2_equation.push_back("0");
+    a3_equation.push_back("0");a3_equation.push_back("0");a3_equation.push_back("c");
+    str.symbolic_math_lattice.push_back(a1_equation);
+    str.symbolic_math_lattice.push_back(a2_equation);
+    str.symbolic_math_lattice.push_back(a3_equation);
+
+    str.num_lattice_parameters = 3;
     
     str.num_parameters = vparameters.size();
     vector<string> parameter_list; aurostd::string2tokens(params,parameter_list,",");
