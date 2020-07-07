@@ -79,6 +79,7 @@ namespace init {
 
     XHOST.user=aurostd::execute2string("whoami");  //AS SOON AS POSSIBLE
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
+    if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
@@ -109,7 +110,7 @@ namespace init {
     XHOST.sTID="";
     XHOST.showTID=aurostd::args2flag(argv,cmds,"--showTID");
     if(XHOST.showTID) XHOST.sTID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment
-    
+
     //    if(XHOST.showPID) XHOST.sPID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment  //CO20200502 - threadID
     //   XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // for the time being (LIB4)
 
@@ -870,7 +871,9 @@ namespace init {
 
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
-      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
+      deque<string> vshort; //  aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
+      for(uint ishort=0;ishort<=64;ishort++)
+        vshort.push_back(aurostd::utype2string(ishort));
       for(uint ishort=0;ishort<vshort.size();ishort++) {
         if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
           XHOST.vflag_control.flag("MULTI=SH",TRUE);

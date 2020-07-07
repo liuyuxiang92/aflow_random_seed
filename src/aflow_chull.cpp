@@ -10144,7 +10144,7 @@ namespace chull {
               if(print_scriterion || print_np1){
                 main_TEX_ss << " & ";
                 //main_TEX_ss << "\\multicolumn{" << (print_scriterion?num_cols_scriterion:0)+(print_np1?num_cols_np1:0) << "}{r}{";
-                main_TEX_ss << "\\cellcolor{white}\\normalsize{" + (print_scriterion?scriterion_data_ss.str():"") + (print_np1?", ":"") + (print_np1?np1_data_ss.str():"") << "}";
+                main_TEX_ss << "\\cellcolor{white}\\normalsize{" + (print_scriterion?scriterion_data_ss.str():"") + (print_scriterion&&print_np1?", ":"") + (print_np1?np1_data_ss.str():"") << "}";
                 //main_TEX_ss << "}";
               }
               main_TEX_ss << " \\\\[0.05cm]" << endl;  //0.1cm

@@ -739,12 +739,15 @@ namespace LATTICE {
 
     //DX20200217 - move tolerance info after copying, otherwise we may overwrite
     double eps = 0.001;
+    uint sym_change_count = 0; //DX20200525
     if(str_sp.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
       eps=str_sp.sym_eps;
+      sym_change_count = str_sp.sym_eps_change_count; //DX20200525
     }
     else if(str_sp.sym_eps==AUROSTD_NAN){ //DX20200217 - calculate if not done so already
       eps=SYM::defaultTolerance(str_sp);
       str_sp.sym_eps = eps;
+      str_sp.sym_eps_change_count = 0; //DX20200525
     }
 
     //DX20190304 - moved above GetPrimitive - START
@@ -852,6 +855,7 @@ namespace LATTICE {
     crystal_system=str_sp.crystal_system;
 
     eps = str_sp.sym_eps;
+    sym_change_count = str_sp.sym_eps_change_count; //DX20200525
 
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4]" << endl;
 
@@ -1922,6 +1926,7 @@ namespace LATTICE {
 
       // copy eps information despite failure (for tolerance scan)
       str_sp.sym_eps = str_sc.sym_eps = eps; //DX20200217
+      str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_change_count; //DX20200525
 
       //    if(str_in.title!="NO_RECURSION")
       /*

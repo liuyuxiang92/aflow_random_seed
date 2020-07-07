@@ -2828,6 +2828,8 @@ namespace KBIN {
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   string getVASPVersionString(const string&);  //ME20190219
+  string getVASPVersionNumber(const string&);  //CO20200610
+  double getVASPVersion(const string&);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3341,14 +3343,23 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA=""); // returns i
 bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& gs,double& enthalpy_atom,double& volume_atom,double& spin_atom);
 
 // -------------------------------------------------------------------------------------------------
-class xVASPRUNXML {
+class xVASPRUNXML : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xVASPRUNXML();                                                // default, just allocate
-    ~xVASPRUNXML();                                               // kill everything
-    xVASPRUNXML(const string& fileIN,bool=TRUE);                  // constructor from filename QUIET
+    xVASPRUNXML(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xVASPRUNXML(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xVASPRUNXML(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xVASPRUNXML(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xVASPRUNXML(const xVASPRUNXML& b);                            // constructor copy
+    ~xVASPRUNXML();                                               // kill everything
     const xVASPRUNXML& operator=(const xVASPRUNXML &b);           // copy
     void clear(void);                                             // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     double natoms;                                                // for aflowlib_libraries.cpp
@@ -3368,14 +3379,23 @@ class xVASPRUNXML {
     void copy(const xVASPRUNXML& b); //
 };
 // -------------------------------------------------------------------------------------------------
-class xIBZKPT {
+class xIBZKPT : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xIBZKPT();                                                    // default, just allocate
-    ~xIBZKPT();                                                   // kill everything
-    xIBZKPT(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
+    xIBZKPT(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xIBZKPT(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xIBZKPT(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xIBZKPT(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xIBZKPT(const xIBZKPT& b);                                    // constructor copy
+    ~xIBZKPT();                                                   // kill everything
     const xIBZKPT& operator=(const xIBZKPT &b);                   // copy
     void clear(void);                                             // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     uint nweights;                                                // for aflowlib_libraries.cpp
@@ -3394,14 +3414,23 @@ class xIBZKPT {
     void copy(const xIBZKPT& b); //
 };
 // -------------------------------------------------------------------------------------------------
-class xKPOINTS {
+class xKPOINTS : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xKPOINTS();                                                    // default, just allocate
-    ~xKPOINTS();                                                    // kill everything
-    xKPOINTS(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
+    xKPOINTS(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xKPOINTS(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xKPOINTS(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xKPOINTS(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xKPOINTS(const xKPOINTS& b);                                   // constructor copy
+    ~xKPOINTS();                                                    // kill everything
     const xKPOINTS& operator=(const xKPOINTS &b);                  // copy
     void clear(void);                                              // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     string title;                                                  // first line
@@ -3424,14 +3453,23 @@ class xKPOINTS {
     void copy(const xKPOINTS& b); //
 };
 // -------------------------------------------------------------------------------------------------
-class xCHGCAR {
+class xCHGCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xCHGCAR();                                                     // default, just allocate
-    ~xCHGCAR();                                                    // kill everything
-    xCHGCAR(const string& fileIN,bool=TRUE);                       // constructor from filename QUIET
+    xCHGCAR(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xCHGCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xCHGCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xCHGCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xCHGCAR(const xCHGCAR& b);                                     // constructor copy
+    ~xCHGCAR();                                                    // kill everything
     const xCHGCAR& operator=(const xCHGCAR &b);                    // copy
     void clear(void);                                              // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     xvector<int>     grid; // N*N*N                                // triplet of grid

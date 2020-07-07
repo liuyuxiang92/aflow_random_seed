@@ -4492,6 +4492,7 @@ namespace compare{
 
         // Store the figure of misfit
         comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX20191218
+        if(comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS")){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX20200608
       }
     }
     //SINGLE THREAD - END

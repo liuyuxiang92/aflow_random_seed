@@ -4067,10 +4067,55 @@ namespace KBIN {
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy= XPID + "KBIN::getVASPVersionString():";
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
     if (fullPathBinaryName.empty()) return "";
+
+    //CO20200610 START - run a dumb vasp to get vasp.out and grab version
+    if(1){
+      string pwddir=aurostd::getPWD();
+      string tmpdir=aurostd::TmpDirectoryCreate("VASP_VERSION");
+      chdir(tmpdir.c_str());
+      stringstream empty;empty.str("");
+      aurostd::string2file("","./INCAR");
+      aurostd::string2file("","./KPOINTS");
+      aurostd::string2file("","./POSCAR");
+      aurostd::string2file("","./POTCAR");
+      if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
+      //execute2string does not work well here...
+      aurostd::execute(binfile + " > /dev/null 2>&1");  //ME20200610 - no output from vasp
+      if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
+      if(aurostd::FileExist("OUTCAR")){
+        vector<string> vlines;
+        aurostd::file2vectorstring("OUTCAR",vlines);
+        for(uint iline=0;iline<vlines.size();iline++){
+          if(LDEBUG){cerr << soliloquy << " vlines[iline]=\"" << vlines[iline] << "\"" << endl;}
+          if(vlines[iline].find("vasp.")!=string::npos){
+            if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
+            vector<string> tokens;
+            aurostd::string2tokens(vlines[iline],tokens," ");
+            for(uint i=0;i<tokens.size();i++){
+              if(tokens[i].find("vasp.")!=string::npos){
+                chdir(pwddir.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
+                aurostd::RemoveDirectory(tmpdir);
+#endif
+                return tokens[i];
+              }
+            }
+          }
+        }
+      }
+
+      chdir(pwddir.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
+      aurostd::RemoveDirectory(tmpdir);
+#endif
+    }
+    //CO20200610 END - run a dumb vasp to get vasp.out and grab version
 
     // Open the binary
     ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
@@ -4090,7 +4135,8 @@ namespace KBIN {
             (buffer[i + 2] == 's') &&
             (buffer[i + 3] == 'p') &&
             (buffer[i + 4] == '.')) {
-          int j = i + 5;
+          //[CO20200610 - include vasp. in string]int j = i + 5;
+          int j=i;
           while (buffer[j] != ' ')
             versionString.push_back(buffer[j++]);
           break;
@@ -4107,6 +4153,33 @@ namespace KBIN {
     infile.clear();
 
     return versionString;
+  }
+  string getVASPVersionNumber(const string& binfile) {  //CO20200610
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy= XPID + "KBIN::getVASPVersionNumber():";
+    string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionString(binfile));
+    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    if(version_str.empty()){return "";}
+    aurostd::StringSubst(version_str,"vasp.",""); //remove 'vasp.'
+    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    //isfloat() does not work here: "35 3Apr08" is considered float: 35
+    string version_str_num="";
+    for(uint i=0;i<version_str.size();i++){
+      if(isdigit(version_str[i]) || version_str[i]=='.'){
+        version_str_num+=version_str[i];
+      }else{break;}
+    }
+    if(LDEBUG){cerr << soliloquy << " version_str_num=\"" << version_str_num << "\"" << endl;}
+    if(version_str_num.empty()){return "";}  //repetita iuvant
+    return version_str_num;
+  }
+  double getVASPVersion(const string& binfile) {  //CO20200610
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy= XPID + "KBIN::getVASPVersion():";
+    string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionNumber(binfile));
+    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    //converting to double SHOULD reduce 4.6.35->4.6
+    return aurostd::string2utype<double>(version_str);
   }
 }  // namespace KBIN
 
