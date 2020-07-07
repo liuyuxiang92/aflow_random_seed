@@ -5668,7 +5668,7 @@ namespace aflowlib {
     vector<string> voptions;
     aurostd::string2tokens(options,voptions,",");
     if(voptions.size()==0) {
-      init::ErrorOption(cout,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
+      init::ErrorOption(cerr,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
       exit(0);
     } 
 
