@@ -77,12 +77,13 @@ namespace pocc {
     }
 
     //other flags
-    _xvasp xvasp;_kflags kflags;
-    _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags);
+    _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
+    _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
 
     pocc::POccCalculator pcalc;
     try{
       pcalc.initialize(aflags,kflags,vflags,FileMESSAGE,oss);
+      _xvasp xvasp;
       pcalc.generateStructures(xvasp);
     }
     catch(aurostd::xerror& err){
@@ -92,6 +93,84 @@ namespace pocc {
     }
     FileMESSAGE.close();
     return true;
+  }
+} // namespace pocc
+
+namespace pocc {
+  void poccOld2New(ostream& oss){ofstream FileMESSAGE;return poccOld2New(FileMESSAGE,oss);}
+  void poccOld2New(ofstream& FileMESSAGE,ostream& oss){
+    bool LDEBUG=(TRUE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pocc::poccOld2New():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    //aflags
+    _aflags aflags;
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+
+    //aflow.in
+    string AflowIn_file,AflowIn;
+    try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
+    catch(aurostd::xerror& err){
+      pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return;
+    }
+
+    //other flags
+    _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
+    _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
+
+    if(!kflags.KBIN_POCC){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not a POCC run",_INPUT_MISSING_);}
+
+    if(!vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No POCC ordered structures found in "+_AFLOWIN_,_INPUT_MISSING_);}
+
+    if(LDEBUG){
+      for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++){
+        cerr << soliloquy << " vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i=" << i << "]=" << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+        cerr << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE[i] << endl;
+      }
+    }
+
+    message << "Writing " << POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    stringstream unique_structures_ss;
+    for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++){
+      unique_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
+      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_START_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+      unique_structures_ss << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE[i];
+      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+      unique_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
+    }
+    aurostd::stringstream2file(unique_structures_ss,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);
+
+    vector<string> vlines_orig,vlines;
+    aurostd::file2vectorstring(AflowIn_file,vlines_orig); //keep comments
+    bool reading_explicit=false;
+    uint iline=0;
+    for(iline=0;iline<vlines_orig.size();iline++){
+      const string& line=vlines_orig[iline];
+      if(line.find(_VASP_POSCAR_MODE_EXPLICIT_STOP_)!=string::npos){reading_explicit=false;}
+      else if(line.find(_VASP_POSCAR_MODE_EXPLICIT_START_)!=string::npos){reading_explicit=true;}
+      else{
+        if(reading_explicit==false){vlines.push_back(line);}
+      }
+    }
+    string search="[AFLOW] **********";  //in case AFLOWIN_SEPARATION_LINE changes in length
+    for(iline=vlines.size()-1;iline<vlines.size();iline--){
+      if(vlines[iline].find(search)==string::npos){break;} //separation line not found
+      if((iline-1)<vlines.size() && vlines[iline-1].find(search)!=string::npos){vlines.pop_back();} //double separation line found, remove last one
+    }
+    string AflowIn_file_ORIG=AflowIn_file;aurostd::StringSubst(AflowIn_file_ORIG,".in",".ORIG.in");
+    aurostd::file2file(AflowIn_file,AflowIn_file_ORIG);
+    message << "Saving " << AflowIn_file << " as " << AflowIn_file_ORIG;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Rewriting " << AflowIn_file;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+    stringstream aflowin_ss;for(uint i=0;i<vlines.size();i++){aflowin_ss << vlines[i] << endl;}
+    aurostd::stringstream2file(aflowin_ss,AflowIn_file);
+    
+    if(LDEBUG){cerr << soliloquy << " END" << endl;}
+
+    return;
   }
 } // namespace pocc
 
@@ -191,8 +270,8 @@ namespace pocc {
 
 namespace pocc {
   bool structuresGenerated(const string& directory){
-    string file=directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;
-    if(!aurostd::EFileExist(file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
+    string file="";
+    if(!aurostd::EFileExist(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
     if(aurostd::EFileNotEmpty(file)){return true;}
     return false;
   }

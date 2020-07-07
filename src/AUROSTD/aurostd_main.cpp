@@ -2133,7 +2133,7 @@ namespace aurostd {
     string decompressed_file=""; //CO20190808
     efile2tempfile(FileName,decompressed_file);  //CO20190808
     bool fileempty=FileEmpty(decompressed_file);
-    RemoveFile(decompressed_file);
+    if(FileName!=decompressed_file){RemoveFile(decompressed_file);} //CO20200624 - remove tmp file IFF it is a tmp file
     return fileempty;
   }
   bool EFileNotEmpty(const string& FileName) {  //CO20190808

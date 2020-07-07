@@ -26,6 +26,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
+#include "aflow_pocc.h"  //CO20200624
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -329,6 +330,7 @@ int main(int _argc,char **_argv) {
     AFLOW_PTHREADS::FLAG=AFLOW_PTHREADS::Check_Threads(argv,!XHOST.QUIET);
 
     bool Arun=FALSE;
+    if(!Arun && aurostd::args2flag(argv,cmds,"--pocc_old2new|--pocc_o2n"))  {Arun=TRUE;pocc::poccOld2New();} //CO20200624
     if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--generate_makefile|--makefile"))  {Arun=TRUE;makefile::createMakefileAFLOW(".");}  //CO20200508 - if calling from command-line, you should be sitting inside aflow directory (will write out Makefile.aflow)
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {

@@ -11,6 +11,8 @@
         -- reading kflags and vflags options from aflow.in before processing POCC (CO)
         -- changing LIB2LIB() to run RUN_Directory() instead of individual post-processing functions (CO)
         -- adding functionality to process LIB6/POCC:OLD calculations (CO)
+        -- adding --pocc_old2new to convert aflow.in of old pocc calculations to one that works for new pocc algorithm (CO)
+        -- patching bug in aurostd::EFileEmpty() - remove file IFF it is a temporary file (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

@@ -114,9 +114,9 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
         ss.str("");
         ss << "POCC_" << setfill('0') << setw(2) <<(i+1);
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
-        ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]START." <<ss.str() << endl;
+        ssxstr_sorted << _VASP_POSCAR_MODE_EXPLICIT_START_ << ss.str() << endl;  //CO20200624
         ssxstr_sorted << vecgroupxstr_sorted.at(i);
-        ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
+        ssxstr_sorted << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << ss.str() << endl; //CO20200624
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
       }
     } else {  //START CO
@@ -150,9 +150,9 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
         ss.str("");
         ss << "POCC_" << setfill('0') << setw(2) <<(i+1);
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
-        ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]START." <<ss.str() << endl;
+        ssxstr_sorted << _VASP_POSCAR_MODE_EXPLICIT_START_ << ss.str() << endl;  //CO20200624
         ssxstr_sorted << pcalc.getUniqueSuperCell(i); //vecgroupxstr_sorted.at(i);
-        ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
+        ssxstr_sorted << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << ss.str() << endl; //CO20200624
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
       }
     }
@@ -2875,9 +2875,9 @@ namespace pocc {
       ss.str("");
       ss << setfill('0') << setw(6) <<(i+1);
       oss << AFLOWIN_SEPARATION_LINE<< endl;
-      oss << "[VASP_POSCAR_MODE_EXPLICIT]START." <<ss.str() << endl;
+      oss << _VASP_POSCAR_MODE_EXPLICIT_START_ << ss.str() << endl;  //CO20200624
       oss << groupxstr.at(i);
-      oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
+      oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << ss.str() << endl; //CO20200624
       oss << AFLOWIN_SEPARATION_LINE<< endl;
     }
     aus << "0000 MESSAGE    Printing derivate POSCARs " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
@@ -3156,9 +3156,9 @@ namespace pocc {
       ss.str("");
       ss << setfill('0') << setw(6) <<(i+1);
       oss << AFLOWIN_SEPARATION_LINE<< endl;
-      oss << "[VASP_POSCAR_MODE_EXPLICIT]START." <<ss.str() << endl;
+      oss << _VASP_POSCAR_MODE_EXPLICIT_START_ << ss.str() << endl;  //CO20200624
       oss << vxstr_final_alphabetic.at(i);
-      oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
+      oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << ss.str() << endl; //CO20200624
       oss << AFLOWIN_SEPARATION_LINE<< endl;
     }
     aus << "0000 MESSAGE    Printing sorted derivate POSCARs " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
@@ -3385,8 +3385,8 @@ void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_af
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XPID + "ExtracAllPOSCARSFromAflowin():";
   vxstr.clear();
-  string POSCAR_START_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]START.";
-  string POSCAR_STOP_DELIMITER="[VASP_POSCAR_MODE_EXPLICIT]STOP.";
+  string POSCAR_START_DELIMITER=_VASP_POSCAR_MODE_EXPLICIT_START_; //CO20200624
+  string POSCAR_STOP_DELIMITER=_VASP_POSCAR_MODE_EXPLICIT_STOP_; //CO20200624
   vector<string> vKBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING;
   aurostd::substring2strings(str_aflowin,vKBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING,POSCAR_START_DELIMITER);
   // load up the structures
@@ -3483,7 +3483,7 @@ namespace pocc {
       string command, aflow_pocc_out;
       command = "grep \"\\[VASP_POSCAR_MODE_EXPLICIT\\]START\\.\" " + aflowin;
       aflow_pocc_out = aurostd::execute2string(command);
-      aurostd::StringSubst(aflow_pocc_out,"[VASP_POSCAR_MODE_EXPLICIT]START.",""); //replace string
+      aurostd::StringSubst(aflow_pocc_out,_VASP_POSCAR_MODE_EXPLICIT_START_,""); //replace string  //CO20200624
       aurostd::string2vectorstring(aflow_pocc_out,vrun);
 
       //Check files

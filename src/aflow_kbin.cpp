@@ -239,7 +239,7 @@ namespace KBIN {
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO20191110
     string soliloquy = XPID + "KBIN::getAflowInFromAFlags():";
-    AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
+    AflowIn_file=aurostd::CleanFileName(aflags.Directory+"/"+_AFLOWIN_); //CO20200624
     if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::file2string(AflowIn_file,AflowIn);

@@ -91,6 +91,9 @@ namespace pocc {
   double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
   double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
   double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
+
+  void poccOld2New(ostream& oss=cout);
+  void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
 } // namespace pocc
 
 namespace pocc {

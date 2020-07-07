@@ -179,6 +179,9 @@ extern string _AFLOWLOCK_;
 #define VASPLS_BIN_POSTFIX_DEFAULT       "LS"
 #define GRND_BIN_DEFAULT                 "./grnd_intel"
 
+#define _VASP_POSCAR_MODE_EXPLICIT_START_ "[VASP_POSCAR_MODE_EXPLICIT]START."  //CO20200624
+#define _VASP_POSCAR_MODE_EXPLICIT_STOP_ "[VASP_POSCAR_MODE_EXPLICIT]STOP."  //CO20200624
+
 // --------------------------------------------------------------------------
 // definitions for projects
 // [OBSOLETE] #define SERVER_PROJECT_GNDSTATE       string("/common/GNDSTATE")
