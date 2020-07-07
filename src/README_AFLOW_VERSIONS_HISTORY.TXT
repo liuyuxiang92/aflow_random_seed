@@ -6,6 +6,9 @@
         -- Merged more pflow logging capabilities into APL. (ME)
         -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
         -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
+        -- Added calculation of electronic contribution to the free energy. (AS)
+        -- Added calculation of temperature-dependent phonon dispersions. (AS)
+        -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

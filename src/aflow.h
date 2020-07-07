@@ -3011,6 +3011,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;
+    int nelectrons; //AS20200528
     double natoms;                                                // for aflowlib_libraries.cpp
     double energy_cell,energy_atom;                               // for aflowlib_libraries.cpp
     double enthalpy_cell,enthalpy_atom;                           // for aflowlib_libraries.cpp

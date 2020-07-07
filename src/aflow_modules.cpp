@@ -515,8 +515,11 @@ namespace KBIN {
     opt.keyword="EOS"; opt.option = DEFAULT_QHA_EOS; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="EOS_DISTORTION_RANGE"; opt.xscheme = DEFAULT_QHA_EOS_DISTORTION_RANGE; qhaflags.push_back(opt); opt.clear();
     opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="TAYLOR_EXPANSION_ORDER"; opt.xscheme = utype2string<double>(DEFAULT_QHA_TAYLOR_EXPANION_ORDER); qhaflags.push_back(opt); opt.clear();//AS20200602
     opt.keyword="INCLUDE_ELEC_CONTRIB"; opt.option = DEFAULT_QHA_INCLUDE_ELEC_CONTRIB; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
-    opt.keyword="SCQHA_PDIS_T"; opt.xscheme = DEFAULT_QHA_SCQHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
+    //AS20200528
+    opt.keyword="SOMMERFELD_EXPANSION"; opt.option = DEFAULT_QHA_SOMMERFELD_EXPANSION; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="PDIS_T"; opt.xscheme = DEFAULT_QHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
     //AS20200508 BEGIN
     opt.keyword="GP_FINITE_DIFF"; opt.option = DEFAULT_QHA_GP_FINITE_DIFF; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="IGNORE_IMAGINARY"; opt.option = DEFAULT_QHA_IGNORE_IMAGINARY; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
@@ -538,8 +541,10 @@ namespace KBIN {
     if(key=="EOS"){return true;}
     if(key=="EOS_DISTORTION_RANGE"){return true;}
     if(key=="GP_DISTORTION"){return true;}
+    if(key=="TAYLOR_EXPANSION_ORDER"){return false;}//AS20200602
     if(key=="INCLUDE_ELEC_CONTRIB"){return true;}
-    if(key=="SCQHA_PDIS_T"){return false;}
+    if(key=="SOMMERFELD_EXPANSION"){return true;}//AS20200528
+    if(key=="PDIS_T"){return false;}
     //AS20200508 BEGIN
     if(key=="GP_FINITE_DIFF"){return true;}
     if(key=="IGNORE_IMAGINARY"){return false;}
