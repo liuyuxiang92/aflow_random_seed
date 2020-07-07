@@ -349,7 +349,9 @@ namespace apl {
     } else if (method == "MINATOMS") {
       int minatoms = aurostd::string2utype<int>(value);
       int natoms = (int) _inStructure.atoms.size();
-      // ME20200516 - Use the shortest lattice vector as the starting point
+      // ME20200516 - Use the shortest lattice vector as the starting point.
+      // The initial sphere needs to be inside the unit cell to catch 1x1x1
+      // cells.
       double radius = std::min(std::min(_inStructure.a, _inStructure.b), _inStructure.c)/2.0 - 0.1;
       for ( ; natoms < minatoms; radius += 0.01) {
         dims = LatticeDimensionSphere(_inStructure.lattice, radius);
@@ -909,10 +911,10 @@ namespace apl {
     vector<double> distances;
     vector<int> gridatoms_indices;
     xvector<int> dims(3), dims_prev(3);
-    xvector<double> fpos, fpos_image;
+    xvector<double> cpos_image, a_component, ab_component;
     xmatrix<double> scell_lattice = _inStructure.lattice;
     xmatrix<double> scell_matrix = aurostd::identity((double) 0, 3);
-    xmatrix<double> scell_f2c(3, 3), scell_c2f;
+    vector<xvector<double> > l1, l2, l3;
     uint iat = 0, gat = 0, at = 0, ngridatoms = 0, countshell = 0;
 
     // Set the starting radius to half the length of the smallest lattice vector
@@ -926,8 +928,12 @@ namespace apl {
       scell_matrix[2][2] = dims[2];
       scell_matrix[3][3] = dims[3];
       scell_lattice = scell_matrix * _inStructure.lattice;
-      scell_f2c = trasp(scell_lattice);
-      scell_c2f = inverse(scell_f2c);
+      l1.clear(); l2.clear(); l3.clear();
+      for (int i = -1; i <= 1; i++) {
+        l1.push_back(i * scell_lattice(1));
+        l2.push_back(i * scell_lattice(2));
+        l3.push_back(i * scell_lattice(3));
+      }
       _inStructure.GenerateGridAtoms(0, dims[1] - 1, 0, dims[2] - 1, 0, dims[3] - 1);
       ngridatoms = _inStructure.grid_atoms.size();
       distances.clear();
@@ -956,15 +962,14 @@ namespace apl {
             bool full_shell = true;
             for (uint i = gat; full_shell && (i < ngridatoms) && (distances[i] < distances[gat] + _APL_SHELL_TOL_); i++) {
               at = gridatoms_indices[i];
-              fpos = scell_c2f * _inStructure.grid_atoms[at].cpos;
               uint image_count = 0;
               for (double nx = -1; full_shell && (nx <= 1); nx++) {
-                fpos_image[1] = fpos[1] + nx;
+                a_component = _inStructure.grid_atoms[at].cpos + l1[nx + 1];
                 for (double ny = -1; full_shell && (ny <= 1); ny++) {
-                  fpos_image[2] = fpos[2] + ny;
+                  ab_component = a_component + l2[ny + 1];
                   for (double nz = -1; full_shell && (nz <= 1); nz++) {
-                    fpos_image[3] = fpos[3] + nz;
-                    if (aurostd::modulus(scell_f2c * fpos_image - cpos_iat) < distances[gat] + _APL_SHELL_TOL_) {
+                    cpos_image = ab_component + l3[nz + 1];
+                    if (aurostd::modulus(cpos_image - cpos_iat) < distances[gat] + _APL_SHELL_TOL_) {
                       image_count++;
                       full_shell = (image_count < 2);
                     }
