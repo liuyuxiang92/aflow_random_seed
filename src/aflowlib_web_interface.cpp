@@ -5743,6 +5743,8 @@ namespace aflowlib {
       // **********************************************************************************************************
       // TRY AUID
       // **********************************************************************************************************
+      string option_orig = option;
+      if ((option.size() == 16) && aurostd::_ishex(option)) option = "aflow:" + option;
       if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
         if(LDEBUG) cout << "WEB_Aflowlib_Entry: option=" << option << endl;
         string auid=aurostd::tolower(option);
@@ -5787,6 +5789,7 @@ namespace aflowlib {
           }
         }
       }
+      option = option_orig;
 
       // **********************************************************************************************************
       // TRY DIRECTORY
@@ -5860,6 +5863,9 @@ namespace aflowlib {
       // TRY ICSD LINK
       // **********************************************************************************************************
       if(!vflags.flag("FLAG::FOUND")) { // icsd link
+        //ME20200707 - Remove possible icsd: prefix
+        option_orig = option;
+        if (option.find("icsd") == 0) option = option.substr(5);
         string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+option;
         aurostd::StringSubst(directory_ICSD2LINK,"ICSD:","icsd:");
         aurostd::StringSubst(directory_ICSD2LINK,"icsd:icsd:","icsd:");    
@@ -5877,6 +5883,8 @@ namespace aflowlib {
           label=directory;
           //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
         }
+        //ME20200707 - Restore
+        option = option_orig;
       }
 
       // **********************************************************************************************************
