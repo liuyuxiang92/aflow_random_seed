@@ -3871,14 +3871,6 @@ namespace anrl {
     if(found && vlabel.at(ifound)=="AB3C4_cP8_221_a_c_bd")
       PrototypeANRL_AB3C4_cP8_221_a_c_bd(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
-    
-    // misc prototypes (from R. Friedrich)
-    // -------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // Friedrich-1 // ./aflow --proto=A2B3_cI80_206_ad_e --params=9.8892799651,0.7716,0.1259,0.6002,0.6475
-    if(found && vlabel.at(ifound)=="A2B3_cI80_206_ad_e")
-      PrototypeANRL_A2B3_cI80_206_ad_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-  
     // -------------------------------------------------------------------------
     // oxide prototypes (from R. Friedrich)
     // -------------------------------------------------------------------------
