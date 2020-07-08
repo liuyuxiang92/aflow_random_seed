@@ -1924,7 +1924,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     string pocc_params_add_on=":POCC_"+xvasp.AVASP_pocc_parameters;
     system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     if(!xvasp.AVASP_pocc_tol.empty()){
-      string pocc_params_add_on=":TOL_"+xvasp.AVASP_pocc_tol;
+      string pocc_tol_str_tmp=xvasp.AVASP_pocc_tol;
+      aurostd::StringSubst(pocc_tol_str_tmp,":","_"); //TOL_0.001_0.001 - first is site tol, second is stoich tol
+      string pocc_params_add_on=":TOL_"+pocc_tol_str_tmp; //CO20200624 - xvasp.AVASP_pocc_tol;
       system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     }
   }
