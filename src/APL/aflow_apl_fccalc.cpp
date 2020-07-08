@@ -965,8 +965,10 @@ namespace apl {
         }
         if (tokens[1] == "VASP") {
           xInput.AFLOW_MODE_VASP = true;
+          break;
         } else if (tokens[1] == "AIMS") {
           xInput.AFLOW_MODE_AIMS = true;
+          break;
         } else {
           message = "Unknown AFLOW_MODE " + tokens[1] + ".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
