@@ -1,6 +1,12 @@
 3.2.5 - 2020/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- adding --lib2lib patches for AEL/AGL (CT)
+        -- Moved POCC progress bar into pflow. (ME)
+        -- Added "Notice" from apl::Logger into pflow::logger. (ME)
+        -- Modularized APL option parsing. (ME)
+        -- Merged more pflow logging capabilities into APL. (ME)
+        -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
+        -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
         -- patching lib2raw index issues: LIB7/LIB did not exist (CO)
         -- patching lib2raw index issues: string substitution of /core (CO)
         -- patching --run vs --run=1 bug in AEL/AGL (CO)

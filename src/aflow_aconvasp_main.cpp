@@ -916,7 +916,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   } else {
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
   }
-  //[OBSOLETE] vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
   if (aurostd::args2flag(argv, cmds, "--plotphdos")) {
     vpflow.flag("PLOT_PHDOS", true);
     vpflow.addattachedscheme("PLOT_PHDOS", "./", true);
@@ -1871,7 +1870,6 @@ namespace pflow {
       if(vpflow.flag("PLOT_BANDDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_BANDDOS"); plotter::PLOT_BANDDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOS",true); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOSALL")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOSALL",false); pltopts.push_attached("DATASET", "-1"); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
-      if(vpflow.flag("PLOTPHDISP")) {pflow::PLOT_PHDISP(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDOS"); plotter::PLOT_PHDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISP")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISP"); plotter::PLOT_PHDISP(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISPDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISPDOS"); plotter::PLOT_PHDISPDOS(pltopts); _PROGRAMRUN=true;}
@@ -10399,6 +10397,25 @@ namespace pflow {
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace pflow {
+
+  // ME20200512 - Created by CO for POCC.
+  const int BAR_WIDTH = 70;
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
+    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag
+    double progress = (double)current/(double)end;
+    int pos = BAR_WIDTH * progress;
+
+    oss << "[";
+    for (int i = 0; i < BAR_WIDTH; ++i) {
+      if (i < pos) oss << "=";
+      else if (i == pos) oss << ">";
+      else oss << " ";
+    }
+    oss << "] " << int(progress * 100.0) << " %\r";
+    oss.flush();
+    if(current==end){ oss << endl; }
+  }
+
   //***************************************************************************//
   // pflow::logger(const char& type,const string& function_name,string
   // _message,bool silent,ostream& oss,ofstream& FileMESSAGE)
@@ -10764,6 +10781,52 @@ namespace pflow {
 
       ////////////////////////////////////////////////////////////////////////////
       // END Raw logger
+      ////////////////////////////////////////////////////////////////////////////
+
+      // ME20200514
+    } else if (type == _LOGGER_NOTICE_) {
+
+      ////////////////////////////////////////////////////////////////////////////
+      // START Notice logger
+      ////////////////////////////////////////////////////////////////////////////
+
+      if(verbose) {
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[32m");  // green
+        for(uint i=0;i<message_parts.size();i++) {
+          oss << "00000";
+          oss << "  ";
+
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
+          oss << "NOTICE";
+
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
+          oss << message_parts[i];
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
+      }
+      // write to log
+      for(uint i=0;i<message_parts.size();i++) {
+        FileMESSAGE << "00000";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "NOTICE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
+        FileMESSAGE << message_parts[i];
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
+      }
+      FileMESSAGE.flush();
+
+      ////////////////////////////////////////////////////////////////////////////
+      // END Notice logger
       ////////////////////////////////////////////////////////////////////////////
 
     } else {
