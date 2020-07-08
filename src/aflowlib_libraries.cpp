@@ -501,7 +501,7 @@ namespace aflowlib {
     aurostd::string2tokens(options,tokens,",");
 
     if(tokens.size()>10) {
-      init::ErrorOption(cout,options,"aflowlib::ALIBRARIES","aflow --qhull[=Nb[,Pt[,Rh[,...]]]]");
+      init::ErrorOption(options,"aflowlib::ALIBRARIES","aflow --qhull[=Nb[,Pt[,Rh[,...]]]]");
       exit(0);
     }
 
@@ -826,12 +826,12 @@ namespace aflowlib {
 
     if(LDEBUG)  cerr << XPID << "aflowlib::LIB2RAW_ALL: tokens.size()=" << tokens.size() << endl;
     if(tokens.size()>2) {
-      init::ErrorOption(cout,options,"aflowlib::LIB2RAW_ALL",aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
+      init::ErrorOption(options,"aflowlib::LIB2RAW_ALL",aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
       exit(0);
     }
     if(tokens.size()>=1) {
       if(tokens.at(0)!="all")  {
-        init::ErrorOption(cout,options,"aflowlib::LIB2RAW_ALL",aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
+        init::ErrorOption(options,"aflowlib::LIB2RAW_ALL",aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
         exit(0);
       }
     }
@@ -1003,7 +1003,7 @@ namespace aflowlib {
 
     if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
-      init::ErrorOption(cout,options,soliloquy,aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
+      init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
       exit(0);
     }
 
@@ -5722,7 +5722,7 @@ namespace aflowlib {
 
     if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
-      init::ErrorOption(cout,options,"aflowlib::LIB2LIB",aurostd::liststring2string("aflow --lib2lib=directory","aflow --lib2lib=all[,dir]"));
+      init::ErrorOption(options,"aflowlib::LIB2LIB",aurostd::liststring2string("aflow --lib2lib=directory","aflow --lib2lib=all[,dir]"));
       exit(0);
     }
 

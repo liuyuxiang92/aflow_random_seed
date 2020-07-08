@@ -445,15 +445,15 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
-  void PrintErrorStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintErrorStream(ostringstream& stream,bool quiet); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
-  void PrintWarningStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintWarningStream(ostringstream& stream,bool quiet); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ostringstream& stream,bool quiet);
 
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,stringstream& stream,bool quiet);
@@ -464,15 +464,15 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
-  void PrintErrorStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintErrorStream(stringstream& stream,bool quiet);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
-  void PrintWarningStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintWarningStream(stringstream& stream,bool quiet);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream& stream,bool quiet);
 
   // about executing

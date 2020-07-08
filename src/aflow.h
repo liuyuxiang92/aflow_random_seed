@@ -1063,8 +1063,10 @@ string Message(string str1,string list2print);
 string Message(const _aflags& aflags,string="",string="");
 bool AFLOW_BlackList(string h);
 namespace init {
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,vector<string> vusage);
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,string vusage);
+  bool MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
+  bool MessageOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
+  bool ErrorOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
+  bool ErrorOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
 }
 
 // --------------------------------------------------------------------------

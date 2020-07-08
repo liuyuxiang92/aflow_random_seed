@@ -111,9 +111,11 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: usage
     if(vpflow.flag("COMPARE_PERMUTATION::USAGE")) {
-      stringstream ss_usage;
-      init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      return "";
     }
 
     // ---------------------------------------------------------------------------
@@ -338,20 +340,23 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: usage
     if(vpflow.flag("COMPARE_STRUCTURE::USAGE")) {
-      stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
       // material-type comparisons
       if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")){
         string usage_material_comparison="aflow --compare_materials -D <dir_path>";
         string options_material_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
       }
       // structure-type comparisons
       else if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")){
         string usage_structure_comparison="aflow --compare_structures -D <dir_path>";
         string options_structure_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--remove_duplicates|--remove_duplicate_compounds]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
       }
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      return "";
     }
 
     // ---------------------------------------------------------------------------

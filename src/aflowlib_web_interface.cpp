@@ -3993,10 +3993,10 @@ namespace aflowlib {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==0) {
-      if(mode=="AFLOWLIB_AUID2AURL") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2aurl=auid1,auid2....");
-      if(mode=="AFLOWLIB_AURL2AUID") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2auid=aurl1,aurl2....");
-      if(mode=="AFLOWLIB_AUID2LOOP") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2loop=auid1,auid2....");
-      if(mode=="AFLOWLIB_AURL2LOOP") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2loop=aurl1,aurl2....");
+      if(mode=="AFLOWLIB_AUID2AURL") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2aurl=auid1,auid2....");
+      if(mode=="AFLOWLIB_AURL2AUID") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2auid=aurl1,aurl2....");
+      if(mode=="AFLOWLIB_AUID2LOOP") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2loop=auid1,auid2....");
+      if(mode=="AFLOWLIB_AURL2LOOP") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2loop=aurl1,aurl2....");
       exit(0);
     } 
     // move on
@@ -4106,9 +4106,11 @@ namespace aflowlib {
     string options="";
 
     if(vpflow.flag("AFLUX::USAGE")) {
-      stringstream ss_usage;
-      init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      init::ErrorOption(vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
+      return "";
     }
 
     string summons = "";
@@ -4215,7 +4217,7 @@ namespace aflowlib {
 //[SC20200327 - OBSOLETE]    vector<string> voptions;
 //[SC20200327 - OBSOLETE]    aurostd::string2tokens(options,voptions,",");
 //[SC20200327 - OBSOLETE]    if(voptions.size()==0) {
-//[SC20200327 - OBSOLETE]      init::ErrorOption(cout,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
+//[SC20200327 - OBSOLETE]      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
 //[SC20200327 - OBSOLETE]      exit(0);
 //[SC20200327 - OBSOLETE]    } 
 //[SC20200327 - OBSOLETE]
@@ -5675,8 +5677,8 @@ namespace aflowlib {
     vector<string> voptions;
     aurostd::string2tokens(options,voptions,",");
     if(voptions.size()==0) {
-      init::ErrorOption(cerr,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
-      exit(0);
+      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
+      return 0; //CO20200624 - 0 is error here
     } 
 
     // move on

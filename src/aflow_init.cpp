@@ -1849,24 +1849,39 @@ bool AFLOW_BlackList(string h) {
 // init::ErrorOptions
 // ***************************************************************************
 namespace init {
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,vector<string> vusage) {
-    vector<string> tokens_options;
-    aurostd::string2tokens(options,tokens_options,",");
-
-    oss << "ERROR: " << routine << ":" << endl;
-    oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
+  bool MessageOption(const string& options, const string& routine,vector<string> vusage) {  //CO20200624
+    ostream& oss=cerr;
     string usage="       Usage: ";
     for(uint i=0;i<vusage.size();i++) {
       if(aurostd::substring2bool(vusage.at(i),"options:")) usage="              ";
       if(vusage.at(i)!="") oss << usage << vusage.at(i) << endl;
     }
     oss << "       options=[" << options << "]" << endl;
-    return TRUE;
+    return true;
   }
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,string usage) {
+  bool MessageOption(const string& options, const string& routine,string usage) { //CO20200624
     vector<string> vusage;
     aurostd::string2vectorstring(usage,vusage);
-    return ErrorOption(oss,options,routine,vusage);
+    return MessageOption(options,routine,vusage);
+  }
+  bool ErrorOption(const string& options, const string& routine,vector<string> vusage) {
+    string soliloquy=XPID+"init::ErrorOption():";
+    stringstream message;
+
+    vector<string> tokens_options;
+    aurostd::string2tokens(options,tokens_options,",");
+
+    message << "Routine " << routine << ": Wrong number/type of input parameters (" << tokens_options.size();
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_ERROR_);
+    //[CO20200624 - OBSOLETE]oss << "ERROR: " << routine << ":" << endl;
+    //[CO20200624 - OBSOLETE]oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
+    
+    return MessageOption(options,routine,vusage);
+  }
+  bool ErrorOption(const string& options, const string& routine,string usage) {
+    vector<string> vusage;
+    aurostd::string2vectorstring(usage,vusage);
+    return ErrorOption(options,routine,vusage);
   }
 }
 
@@ -1973,7 +1988,7 @@ namespace init {
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AFLOWLIB_DATE","aflowlib_date");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOWLIB_DATE","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOWLIB_DATE","string");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOWLIB_DATE","strings");  //CO+ME20200624
     nschema++;
 
     // schema is CAPITAL, content is not necessarily

@@ -46,7 +46,7 @@ namespace bader_functions {
     // output usage
     if(LDEBUG) cerr << soliloquy << "CHECK USAGE" << endl;
     if(vpflow.flag("BADER::USAGE")) {
-      init::ErrorOption(cout, "--usage", "pflow::BADER()", usage_options);
+      init::ErrorOption( "--usage", "pflow::BADER()", usage_options);
       return oss.str();
     }
     //FIRST STOP FOR CALLS MADE FROM COMMAND LINE
@@ -2108,7 +2108,7 @@ namespace bader_functions {
     // output usage
     if(LDEBUG) cerr << soliloquy << "CHECK USAGE" << endl;
     if(vpflow.flag("PREPARE_CHGCAR_4_JMOL::USAGE")) {
-      init::ErrorOption(cout, vpflow.getattachedscheme("PREPARE_CHGCAR_4_JMOL"), "bader_functions::prepare_CHGCAR_4_Jmol()", aurostd::liststring2string(usage_usage, usage_options));
+      init::ErrorOption( vpflow.getattachedscheme("PREPARE_CHGCAR_4_JMOL"), "bader_functions::prepare_CHGCAR_4_Jmol()", aurostd::liststring2string(usage_usage, usage_options));
       return oss.str();
     }
     if(LDEBUG) cerr << soliloquy << "GATHER CHGCAR_FILES" << endl;

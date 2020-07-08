@@ -151,7 +151,7 @@ namespace chull {
     usage_options.push_back(" ");
     // output usage
     if(vpflow.flag("CHULL::USAGE")) {
-      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption(cout, "--usage", "CHULL()", usage_options);}
+      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::MessageOption( "--usage", "CHULL()", usage_options);}
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
       return TRUE;
     }
@@ -235,7 +235,7 @@ namespace chull {
       message << "No input given for elements";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       //really drive the point home
-      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption(cout, "--alloy=" + vpflow.getattachedscheme("PFLOW::ALLOY"), "PFLOW()", usage_options);}
+      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption( "--alloy=" + vpflow.getattachedscheme("PFLOW::ALLOY"), "PFLOW()", usage_options);}
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
       return FALSE;
     }

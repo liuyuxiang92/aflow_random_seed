@@ -1493,7 +1493,7 @@ namespace KBIN {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=0) {
-      init::ErrorOption(cout,options,"KBIN::XClean","aflow --xclean");
+      init::ErrorOption(options,"KBIN::XClean","aflow --xclean");
       exit(0);
     }
 

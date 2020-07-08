@@ -2358,18 +2358,22 @@ namespace aurostd {
   // DeleteOstringStreams
   // ***************************************************************************
   void StringstreamClean(ostringstream &aus) {
-    aus.seekp(0,ios_base::beg);       // RESET
-    for(int i=0;i<BUFFER_MAXLEN;i++)  // RESET
-      aus<<(char)0;                   // RESET
-    aus.seekp(0,ios_base::beg);       // RESET
-    // aus.str(std::string());
+    aus.str(std::string()); //CO20200624
+    aus.clear();  //CO20200624
+    //[CO20200624 - fills stream with binary junk]aus.seekp(0,ios_base::beg);       // RESET
+    //[CO20200624 - fills stream with binary junk]for(int i=0;i<BUFFER_MAXLEN;i++)  // RESET
+    //[CO20200624 - fills stream with binary junk]  aus<<(char)0;                   // RESET
+    //[CO20200624 - fills stream with binary junk]aus.seekp(0,ios_base::beg);       // RESET
+    //[CO20200624 - fills stream with binary junk]// aus.str(std::string());
   }
   void StringstreamClean(stringstream &aus) {
-    aus.seekp(0,ios_base::beg);       // RESET
-    for(int i=0;i<BUFFER_MAXLEN;i++)  // RESET
-      aus<<(char)0;                   // RESET
-    aus.seekp(0,ios_base::beg);       // RESET
-    // aus.str(std::string());
+    aus.str(std::string()); //CO20200624
+    aus.clear();  //CO20200624
+    //[CO20200624 - fills stream with binary junk]aus.seekp(0,ios_base::beg);       // RESET
+    //[CO20200624 - fills stream with binary junk]for(int i=0;i<BUFFER_MAXLEN;i++)  // RESET
+    //[CO20200624 - fills stream with binary junk]  aus<<(char)0;                   // RESET
+    //[CO20200624 - fills stream with binary junk]aus.seekp(0,ios_base::beg);       // RESET
+    //[CO20200624 - fills stream with binary junk]// aus.str(std::string());
   }
 
 
@@ -2409,7 +2413,8 @@ namespace aurostd {
   // ***************************************************************************
   // Print Messages Errors and Warnings on and off streams.
   // ***************************************************************************
-#define ErrorBarString "EEEEE  ---------------------------------------------------------------------------------------------------------------------------- "
+#define ErrorBarString   "EEEEE  ---------------------------------------------------------------------------------------------------------------------------- "
+#define WarningBarString "WWWWW  ---------------------------------------------------------------------------------------------------------------------------- "
 
   //[CO20200624 - OBSOLETE]// with ostringstream
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream &FileERROR,ostringstream &stream,bool quiet) {
@@ -2429,9 +2434,56 @@ namespace aurostd {
   void PrintMessageStream(ostringstream &stream,bool quiet,std::ostream& oss) {ofstream FileMESSAGE;return PrintMessageStream(FileMESSAGE,stream,quiet,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
-    FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
-    if(osswrite) {if(!quiet) {oss << stream.str().c_str();oss.flush();}}
-    // cerr << stream.str().c_str(); cerr.flush();
+    //[CO20200624 - OBSOLETE]FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
+    //[CO20200624 - OBSOLETE]if(osswrite) {if(!quiet) {oss << stream.str().c_str();oss.flush();}}
+    //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
+    
+    //CO20181226 - split by newlines and print separately
+    vector<string> message_parts,_message_parts;
+    aurostd::string2vectorstring(stream.str(),_message_parts);
+    for(uint i=0;i<_message_parts.size();i++){
+      if(!aurostd::RemoveWhiteSpacesFromTheBack(_message_parts[i]).empty()){
+        message_parts.push_back(_message_parts[i]);
+      }
+    }
+    if(message_parts.size()==0){return;}
+
+    bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
+
+    for(uint i=0;i<message_parts.size();i++){FileMESSAGE << message_parts[i] << endl;}  //flush included in endl
+    if(verbose){
+      string::size_type loc;
+      string str2search="";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
+      string color="";
+      if(fancy_print){
+        string message=stream.str();
+        if(color.empty()){
+          //COMPLETE - START
+          str2search="  COMPLETE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
+          if(message.find(str2search)!=string::npos){color="\033[32m";} //green
+          //COMPLETE - END
+        }
+      }
+      if(color.empty()){fancy_print=false;}  //add others as needed
+      if(fancy_print) printf(color.c_str());  // color
+      for(uint i=0;i<message_parts.size();i++){
+        loc=(!str2search.empty()?message_parts[i].find(str2search):string::npos);
+        oss << message_parts[i].substr(0,loc);
+        if(loc!=string::npos){
+          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
+          if(fancy_print) printf(color.c_str());  // color
+          if(fancy_print) printf("\033[5m");      // bold/blink
+
+          oss << str2search;
+          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
+          if(fancy_print) printf(color.c_str());  // color
+          oss << message_parts[i].substr(loc+str2search.size(),string::npos);
+        }
+        oss << endl;  //flush included in endl
+      }
+      if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+    }
     aurostd::StringstreamClean(stream);
   }
 
@@ -2457,14 +2509,56 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintErrorStream(ostringstream &stream,bool quiet,std::ostream& oss) {ofstream FileERROR;return PrintErrorStream(FileERROR,stream,quiet,oss);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintErrorStream(FileERROR,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
-    if(quiet) {;} // phony just to keep quiet busy
-    if(osswrite) {;} // phony just to keep quiet busy
-    FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
-    oss << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
-    // cerr << stream.str().c_str(); cerr.flush();
+  //CO20200624 - no std::ostream& oss input: THIS MUST GO TO CERR
+  void PrintErrorStream(ostringstream &stream,bool quiet) {ofstream FileERROR;return PrintErrorStream(FileERROR,stream,quiet);} //CO20200624
+  void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileERROR,stream,quiet,osswrite);} //CO20200624
+  void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet,bool osswrite) {
+    //[CO20200624 - OBSOLETE]if(quiet) {;} // phony just to keep quiet busy
+    //[CO20200624 - OBSOLETE]if(osswrite) {;} // phony just to keep quiet busy
+    //[CO20200624 - OBSOLETE]FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
+    //[CO20200624 - OBSOLETE]oss << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
+    //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
+    
+    //CO20181226 - split by newlines and print separately
+    vector<string> message_parts,_message_parts;
+    aurostd::string2vectorstring(stream.str(),_message_parts);
+    for(uint i=0;i<_message_parts.size();i++){
+      if(!aurostd::RemoveWhiteSpacesFromTheBack(_message_parts[i]).empty()){
+        message_parts.push_back(_message_parts[i]);
+      }
+    }
+    if(message_parts.size()==0){return;}
+
+    bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
+
+    FileERROR << ErrorBarString << endl;
+    for(uint i=0;i<message_parts.size();i++){FileERROR << message_parts[i] << endl;}  //flush included in endl
+    FileERROR << ErrorBarString << endl;
+    if(verbose){
+      string::size_type loc;
+      string str2search="  ERROR ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
+      string color="\033[31m";  // red
+      if(fancy_print) printf(color.c_str());  // color
+      std::ostream& oss=std::cerr;
+      oss << ErrorBarString << endl;  //flush included in endl
+      for(uint i=0;i<message_parts.size();i++){
+        loc=message_parts[i].find(str2search);
+        oss << message_parts[i].substr(0,loc);
+        if(loc!=string::npos){
+          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
+          if(fancy_print) printf(color.c_str());  // color
+          if(fancy_print) printf("\033[5m");      // bold/blink
+          oss << str2search;
+          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
+          if(fancy_print) printf(color.c_str());  // color
+          oss << message_parts[i].substr(loc+str2search.size(),string::npos);
+        }
+        oss << endl;  //flush included in endl
+      }
+      oss << ErrorBarString << endl;  //flush included in endl
+      if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+    }
     aurostd::StringstreamClean(stream);
   }
 
@@ -2491,13 +2585,56 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintWarningStream(ostringstream &stream,bool quiet,std::ostream& oss) {ofstream FileWARNING;return PrintWarningStream(FileWARNING,stream,quiet,oss);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,ostringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintWarningStream(FileWARNING,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,ostringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
-    if(quiet) {;} // phony just to keep quiet busy
-    FileWARNING << stream.str().c_str(); FileWARNING.flush();
-    if(osswrite) {oss << stream.str().c_str();oss.flush();}
-    // cerr << stream.str().c_str(); cerr.flush();
+  //CO20200624 - no std::ostream& oss input: THIS MUST GO TO CERR
+  void PrintWarningStream(ostringstream &stream,bool quiet) {ofstream FileWARNING;return PrintWarningStream(FileWARNING,stream,quiet);} //CO20200624
+  void PrintWarningStream(ofstream &FileWARNING,ostringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileWARNING,stream,quiet,osswrite);} //CO20200624
+  void PrintWarningStream(ofstream &FileWARNING,ostringstream &stream,bool quiet,bool osswrite) {
+    //[CO20200624 - OBSOLETE]if(quiet) {;} // phony just to keep quiet busy
+    //[CO20200624 - OBSOLETE]FileWARNING << stream.str().c_str(); FileWARNING.flush();
+    //[CO20200624 - OBSOLETE]if(osswrite) {oss << stream.str().c_str();oss.flush();}
+    //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
+    
+    //CO20181226 - split by newlines and print separately
+    vector<string> message_parts,_message_parts;
+    aurostd::string2vectorstring(stream.str(),_message_parts);
+    for(uint i=0;i<_message_parts.size();i++){
+      if(!aurostd::RemoveWhiteSpacesFromTheBack(_message_parts[i]).empty()){
+        message_parts.push_back(_message_parts[i]);
+      }
+    }
+    if(message_parts.size()==0){return;}
+
+    bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
+
+    FileWARNING << WarningBarString << endl;
+    for(uint i=0;i<message_parts.size();i++){FileWARNING << message_parts[i] << endl;}  //flush included in endl
+    FileWARNING << WarningBarString << endl;
+    if(verbose){
+      string::size_type loc;
+      string str2search="  WARNING ";  //replicate old behavior, look for WARNING coming from logger() which has two pre spaces
+      string color="\033[33m\033[1m";  // yellow
+      if(fancy_print) printf(color.c_str());   // color
+      std::ostream& oss=std::cerr;
+      oss << WarningBarString << endl;  //flush included in endl
+      for(uint i=0;i<message_parts.size();i++){
+        loc=message_parts[i].find(str2search);
+        oss << message_parts[i].substr(0,loc);
+        if(loc!=string::npos){
+          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
+          if(fancy_print) printf(color.c_str());  // color
+          if(fancy_print) printf("\033[5m");      // bold/blink
+          oss << str2search;
+          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
+          if(fancy_print) printf(color.c_str());  // color
+
+          oss << message_parts[i].substr(loc+str2search.size(),string::npos);
+        }
+        oss << endl;  //flush included in endl
+      }
+      oss << WarningBarString << endl;  //flush included in endl
+      if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+    }
     aurostd::StringstreamClean(stream);
   }
 
@@ -2525,12 +2662,7 @@ namespace aurostd {
 
   void PrintMessageStream(stringstream &stream,bool quiet,std::ostream& oss) {ofstream FileMESSAGE;return PrintMessageStream(FileMESSAGE,stream,quiet,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
-    FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
-    if(osswrite) {if(!quiet) {oss << stream.str().c_str();oss.flush();}}
-    // cerr << stream.str().c_str(); cerr.flush();
-    aurostd::StringstreamClean(stream);
-  }
+  void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {ostringstream omess;omess << stream.str();return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);}
 
   //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
@@ -2554,16 +2686,9 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintErrorStream(stringstream &stream,bool quiet,std::ostream& oss) {ofstream FileERROR;return PrintErrorStream(FileERROR,stream,quiet,oss);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintErrorStream(FileERROR,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
-    if(quiet) {;} // phony just to keep quiet busy
-    if(osswrite) {;} // phony just to keep quiet busy
-    FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
-    oss << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
-    // cerr << stream.str().c_str(); cerr.flush();
-    aurostd::StringstreamClean(stream);
-  }
+  void PrintErrorStream(stringstream &stream,bool quiet) {ofstream FileERROR;return PrintErrorStream(FileERROR,stream,quiet);} //CO20200624
+  void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileERROR,stream,quiet,osswrite);} //CO20200624
+  void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintErrorStream(FileERROR,stream,quiet,osswrite);}
 
   //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
@@ -2588,15 +2713,9 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintWarningStream(stringstream &stream,bool quiet,std::ostream& oss) {ofstream FileWARNING;return PrintWarningStream(FileWARNING,stream,quiet,oss);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,stringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintWarningStream(FileWARNING,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
-    if(quiet) {;} // phony just to keep quiet busy
-    FileWARNING << stream.str().c_str(); FileWARNING.flush();
-    if(osswrite) {oss << stream.str().c_str();oss.flush();}
-    // cerr << stream.str().c_str(); cerr.flush();
-    aurostd::StringstreamClean(stream);
-  }
+  void PrintWarningStream(stringstream &stream,bool quiet) {ofstream FileWARNING;return PrintWarningStream(FileWARNING,stream,quiet);} //CO20200624
+  void PrintWarningStream(ofstream &FileWARNING,stringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileWARNING,stream,quiet,osswrite);} //CO20200624
+  void PrintWarningStream(ofstream &FileWARNING,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintWarningStream(FileWARNING,stream,quiet,osswrite);}
 
   //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy

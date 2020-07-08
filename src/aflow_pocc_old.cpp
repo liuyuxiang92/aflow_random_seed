@@ -2552,7 +2552,7 @@ namespace pocc {
     if(LDEBUG) {for(uint i=0;i<tokens.size();i++) cerr << "pocc::DIFF: tokens.at(i)=" << tokens.at(i) << endl;}
 
     if(tokens.size()<2) {
-      init::ErrorOption(cout,options,"pocc::DIFF","aflow --diff=POSCAR1,POSCAR2");
+      init::ErrorOption(options,"pocc::DIFF","aflow --diff=POSCAR1,POSCAR2");
       exit(0);
     }
     if(!aurostd::FileExist(tokens.at(0))) {cerr << tokens.at(0) << " does not exist!" <<endl; exit(1);}

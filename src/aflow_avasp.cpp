@@ -5646,7 +5646,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
       xvasp.AVASP_potential!=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN) {
     // bad potential
     aus << "EEEEE  PROTO_Generation_Binary_Aflowin potential is not VASP style: " << xvasp.AVASP_potential << endl;
-    aurostd::PrintErrorStream(aus,XHOST.QUIET,cerr);  //CO20200624
+    aurostd::PrintErrorStream(aus,XHOST.QUIET);  //CO20200624
     return FALSE;
   }
   // good potential

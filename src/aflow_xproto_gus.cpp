@@ -56,7 +56,7 @@ namespace aflowlib {
         if(LDEBUG) { aurostd::PrintMessageStream(oaus,XHOST.QUIET,oss); } //CO20200624
       } else {
         oaus << "WWWWW  AFLOW_LIBRARY not found! " << endl;
-        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET);  //CO20200624
         exit(0);
       }
       // FOUND
@@ -126,7 +126,7 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS FCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET);  //CO20200624
         return str;
       } else {
         structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
@@ -146,7 +146,7 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS BCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET);  //CO20200624
         return str;
       } else {
         structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
@@ -167,7 +167,7 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET);  //CO20200624
         return str;
       } else {
         structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
@@ -187,7 +187,7 @@ namespace aflowlib {
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
         oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-        aurostd::PrintWarningStream(oaus,XHOST.QUIET,oss);  //CO20200624
+        aurostd::PrintWarningStream(oaus,XHOST.QUIET);  //CO20200624
         return str;
       } else {
         structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(oss,title_database,labelclean);
@@ -196,7 +196,7 @@ namespace aflowlib {
     // *********************************************************************
     if(structure_line.empty()) {
       oaus << "EEEEE  aflowlib::PrototypeBinaryGUS: lattice not found, label=" << label << endl;
-      aurostd::PrintErrorStream(oaus,XHOST.QUIET,oss);  //CO20200624
+      aurostd::PrintErrorStream(oaus,XHOST.QUIET);  //CO20200624
     }
     // clear up the structure from the beginning
     aurostd::string2tokens(structure_line,tokens," ");

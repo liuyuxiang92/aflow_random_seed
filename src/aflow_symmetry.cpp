@@ -6645,7 +6645,7 @@ namespace SYM {
                 aus << "EEEEE  ERROR: modify KBIN_SYMMETRY_SGROUP_MAX_NUMBER in aflow.h and recompile." << endl;
                 aus << "EEEEE  ERROR: WARNING: by increasing KBIN_SYMMETRY_SGROUP_MAX_NUMBER you can use a lot of memory" << endl;
                 aus << "EEEEE  ERROR: and disk space if you decide to save the space group file (SGROUP_WRITE)." << endl;
-                aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET,osswrite);
                 return FALSE;
               }
               if(0) { // some printing
@@ -6750,7 +6750,7 @@ namespace SYM {
                 aus << "EEEEE  ERROR: modify KBIN_SYMMETRY_SGROUP_MAX_NUMBER in aflow.h and recompile." << endl;
                 aus << "EEEEE  ERROR: WARNING: by increasing KBIN_SYMMETRY_SGROUP_MAX_NUMBER you can use a lot of memory" << endl;
                 aus << "EEEEE  ERROR: and disk space if you decide to save the space group file (SGROUP_WRITE)." << endl;
-                aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET,osswrite);
                 return FALSE;
               }
               if(0) { // some printing

@@ -745,7 +745,7 @@ namespace sflow {
 
     if(mode=="JUSTAFTER" || mode=="AFTER") {
       if(tokens.size()!=1 ) {
-        init::ErrorOption(cout,options,"sflow::JUST","aflow --justafter=string < something");
+        init::ErrorOption(options,"sflow::JUST","aflow --justafter=string < something");
         exit(0);
       }
       vector<string> vline;
@@ -758,7 +758,7 @@ namespace sflow {
     }
     if(mode=="JUSTBEFORE" || mode=="BEFORE") {
       if(tokens.size()!=1 ) {
-        init::ErrorOption(cout,options,"sflow::JUST","aflow --justbefore=string < something");
+        init::ErrorOption(options,"sflow::JUST","aflow --justbefore=string < something");
         exit(0);
       }
       if(strout.find(tokens.at(0))==string::npos) cout << strout;
@@ -769,7 +769,7 @@ namespace sflow {
 
     if(mode=="JUSTBETWEEN" || mode=="BETWEEN") {
       if(tokens.size()>2) {
-        init::ErrorOption(cout,options,"sflow::JUST","aflow --justbetween=string_start[,string_stop] < something");
+        init::ErrorOption(options,"sflow::JUST","aflow --justbetween=string_start[,string_stop] < something");
         exit(0);
       }
 
@@ -872,7 +872,7 @@ namespace sflow {
     aurostd::string2tokens(options,tokens,",");
 
     if(tokens.size()!=2) {
-      init::ErrorOption(cout,options,"sflow::QSUB","aflow --qsub=N,file");
+      init::ErrorOption(options,"sflow::QSUB","aflow --qsub=N,file");
       exit(0);
     }
 
@@ -899,7 +899,7 @@ namespace sflow {
     aurostd::string2tokens(options,tokens,",");
 
     if(tokens.size()!=2) {
-      init::ErrorOption(cout,options,"sflow::QSUB","aflow --qsub=N,file");
+      init::ErrorOption(options,"sflow::QSUB","aflow --qsub=N,file");
       exit(0);
     }
 

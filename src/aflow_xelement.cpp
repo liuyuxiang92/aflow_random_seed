@@ -160,7 +160,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(LDEBUG) cerr << "tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0) {
-      init::ErrorOption(cout,options,"pflow::XelementPrint","aflow --element=Z|name|symbol[,property[,property]....]");
+      init::ErrorOption(options,"pflow::XelementPrint","aflow --element=Z|name|symbol[,property[,property]....]");
       exit(0);
     } 
     // move on
@@ -169,7 +169,7 @@ namespace pflow {
     // try with number
     if(tokens.size()>=1) if(aurostd::string2utype<uint>(species)>0) Z=aurostd::string2utype<uint>(species);
     if(Z>103) {
-      init::ErrorOption(cout,options,"pflow::XelementPrint",aurostd::liststring2string("aflow --element=Z|name|symbol[,property[,property]....]","Z outside [1,103] or name or symbol unrecognized"));
+      init::ErrorOption(options,"pflow::XelementPrint",aurostd::liststring2string("aflow --element=Z|name|symbol[,property[,property]....]","Z outside [1,103] or name or symbol unrecognized"));
     }
     // try with symbol
     if(Z==0) {

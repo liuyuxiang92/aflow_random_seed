@@ -7,6 +7,7 @@
         -- Merged more pflow logging capabilities into APL. (ME)
         -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
         -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
+        -- changed XHOST.vschema for aflowlib_date (CO+ME)
         -- patching lib2raw index issues: LIB7/LIB did not exist (CO)
         -- patching lib2raw index issues: string substitution of /core (CO)
         -- patching --run vs --run=1 bug in AEL/AGL (CO)
@@ -23,6 +24,14 @@
         -- patching pocc_tol :TOL_0.001:0.001 -> :TOL_0.001_0.001 (CO)
         -- adding overloads to get_date() variants for an input time structure (CO)
         -- adding lock_date to aflowlib.out via aflowlib_date ([0]=lock_date, [1]=lib2raw_date) (CO)
+        -- cleaned up PrintMessageStream()/PrintErrorStream()/PrintWarningStream() (CO)
+        -- included nice colors to screen for PrintMessageStream()/PrintErrorStream()/PrintWarningStream() (CO)
+        -- integrated PrintMessageStream()/PrintErrorStream()/PrintWarningStream() with logger() (CO)
+        -- force PrintErrorStream()/PrintWarningStream() to print to cerr for web (CO)
+        -- cleaned up ErrorOption() and integrated with logger() (CO)
+        -- patched StringstreamClean() which introduced junk binary characters before (CO)
+        -- added explanatory final message to --pocc_count_total command (CO)
+        -- added MessageOption() (vs. ErrorOption()) that does NOT throw error (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

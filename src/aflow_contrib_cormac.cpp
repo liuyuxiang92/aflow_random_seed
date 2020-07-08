@@ -30,7 +30,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::DEBYE","aflow --debye=THERMO[.bz2|.gz|.xz]");
+      init::ErrorOption(options,"pflow::DEBYE","aflow --debye=THERMO[.bz2|.gz|.xz]");
       exit(0);
     }
     string thermofilename="";
