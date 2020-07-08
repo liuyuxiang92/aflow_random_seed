@@ -2463,6 +2463,10 @@ namespace aurostd {
           str2search="  COMPLETE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
           if(message.find(str2search)!=string::npos){color="\033[32m";} //green
           //COMPLETE - END
+          //NOTICE - START
+          str2search="  NOTICE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
+          if(message.find(str2search)!=string::npos){color="\033[36m";} //blue
+          //NOTICE - END
         }
       }
       if(color.empty()){fancy_print=false;}  //add others as needed
@@ -2471,6 +2475,7 @@ namespace aurostd {
         loc=(!str2search.empty()?message_parts[i].find(str2search):string::npos);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
+          //colors see here: https://en.m.wikipedia.org/wiki/ANSI_escape_code
           if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
           if(fancy_print) printf(color.c_str());  // color
           if(fancy_print) printf("\033[5m");      // bold/blink
@@ -2614,6 +2619,7 @@ namespace aurostd {
       string::size_type loc;
       string str2search="  WARNING ";  //replicate old behavior, look for WARNING coming from logger() which has two pre spaces
       string color="\033[33m\033[1m";  // yellow
+      //string color="\033[35m";  // magenta
       if(fancy_print) printf(color.c_str());   // color
       std::ostream& oss=std::cerr;
       oss << WarningBarString << endl;  //flush included in endl

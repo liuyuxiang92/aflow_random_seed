@@ -1277,7 +1277,7 @@ namespace pocc {
       }
     }
     if(!found_all_QMVASPs){
-      message << "Waiting for complete VASP calculations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+      message << "Waiting for complete VASP calculations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
       return false;
     }
 
@@ -3666,6 +3666,8 @@ namespace pocc {
     if(total_permutations_count!=total_degeneracy){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected degeneracy count (does not match expected total permutations count)");
     }
+
+    if(m_p_flags.flag("POCC_COUNT_UNIQUE")){return;}  //so we don't bombard user with too much verbosity
 
     message << "Resorting unique supercell order by HNF matrix/site configuration indices";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);

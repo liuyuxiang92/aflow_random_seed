@@ -7702,8 +7702,6 @@ namespace pflow {
     pcalc.getTotalPermutationsCount();
     if(vpflow.flag("POCC_COUNT_TOTAL")){return pcalc.m_initialized;}
     pcalc.calculate();
-    message << "The AFLOW-POCC algorithm identified " << pcalc.l_supercell_sets.size() << " unique supercells";
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,oss,_LOGGER_MESSAGE_);
     if(vpflow.flag("POCC_COUNT_UNIQUE")){return pcalc.m_initialized;}
     oss << "Creating list of unique derivative supercells." << endl;  //CO20190116
     for(unsigned long long int i=0;i<pcalc.getUniqueSuperCellsCount();i++) {
