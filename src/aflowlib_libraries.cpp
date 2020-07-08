@@ -5014,7 +5014,7 @@ namespace aflowlib {
     aurostd::file2vectorstring(directory_RAW+"/"+_AFLOWLOCK_,vlock) ;
     _XHOST aus_XHOST;
     // ---------------------------------------------------------------
-    for(uint iline=0;iline<vlock.size()&&data.aflow_date.empty();iline++) //CO20200624 - adding aflow_date
+    for(uint iline=0;iline<vlock.size();iline++) //CO20200624 - adding aflow_date  //grab LAST date - data.aflow_date.empty()
       if(aurostd::substring2bool(vlock[iline],"date=") && aurostd::substring2bool(vlock[iline],"[") && aurostd::substring2bool(vlock[iline],"]")) {
         loc=vlock[iline].find("date=");
         tmp=vlock[iline].substr(loc,string::npos);
@@ -5025,7 +5025,6 @@ namespace aflowlib {
         aurostd::StringSubst(tmp,"date=",""); //just in case
         tmp=aflow_convert_time_ctime2aurostd(tmp);
         if(!tmp.empty()){data.aflow_date=tmp+"_GMT-5";}
-        //[CO20200624 - no grab last date]if(!data.aflow_data.empty()){break;}  //grab first date?
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflow_date = " << ((data.aflow_date.size())?data.aflow_date:"unavailable") << endl;
     // ---------------------------------------------------------------
