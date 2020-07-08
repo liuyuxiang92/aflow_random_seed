@@ -3940,7 +3940,7 @@ namespace anrl {
     if(found && vlabel.at(ifound)=="A2B3_hP15_144_2a_3a")
       PrototypeANRL_A2B3_hP15_144_2a_3a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
-    // Friedrich-oxide-15 // ./aflow --proto=A2B_hR3_166_c_a --params=5.7301593005,4.46193609022,0.256
+    // Friedrich-oxide-15 // ./aflow --proto=A2B_hR3_166_c_a --params5.73015,4.46193,0.744
     if(found && vlabel.at(ifound)=="A2B_hR3_166_c_a")
       PrototypeANRL_A2B_hR3_166_c_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------

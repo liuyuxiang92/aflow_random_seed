@@ -3029,6 +3029,11 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
+    // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
+    if(xstr_base.dist_nn_min==AUROSTD_NAN){ xstr_base.dist_nn_min=SYM::minimumDistance(xstr_base); }
+    if(xstr_test.dist_nn_min==AUROSTD_NAN){ xstr_test.dist_nn_min=SYM::minimumDistance(xstr_test); }
+
+    // ---------------------------------------------------------------------------
     // determine if structures are matchable (same species and/or same stoichiometry)
     int type_match=0;
     bool criteria_met = false;

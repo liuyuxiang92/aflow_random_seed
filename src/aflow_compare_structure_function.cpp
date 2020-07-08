@@ -1512,7 +1512,6 @@ namespace compare{
         cerr << "string: " << name << endl;
       }
     }
-    cerr << "ICSD substring: " << ICSD_substring << " (name=" << name << ")" << endl;
     return ICSD_substring;
   }
 }
@@ -1565,7 +1564,6 @@ namespace compare{
         min_num = num;
       }
     }
-    cerr << "min_icsd: " << min_ICSD << endl;
     return min_ICSD;
   }
 }
