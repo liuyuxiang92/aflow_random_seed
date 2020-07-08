@@ -123,7 +123,7 @@ namespace apl {
     xInputs.clear();
     _method = opts.getattachedscheme("ENGINE");
     _isPolarMaterial = opts.flag("POLAR");
-    if (_method == "DM") {
+    if (_method == "DM") {  // Direct method - see README_AFLOW_APL.TXT
       _calculateZeroStateForces = opts.flag("ZEROSTATE");
       string autopm = opts.getattachedscheme("DPM");
       AUTO_GENERATE_PLUS_MINUS = (!autopm.empty() && ((autopm[0] == 'A') || (autopm[0] == 'a')));
@@ -132,7 +132,7 @@ namespace apl {
       DISTORTION_SYMMETRIZE = opts.flag("DSYMMETRIZE");
       GENERATE_ONLY_XYZ = opts.flag("DXYZONLY");
       USER_GENERATE_PLUS_MINUS = opts.flag("DPM");
-    } else if (_method != "LR") {
+    } else if (_method != "LR") {  // Linear response - see README_AFLOW_APL.TXT
       message = "Unknown method " + _method + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
@@ -171,7 +171,7 @@ namespace apl {
 
   bool ForceConstantCalculator::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& AflowIn) {
-    string function = "ForceConstantCalculator::runVASPCalculations():";
+    string function = "apl::ForceConstantCalculator::runVASPCalculations():";
     string message = "";
     if (!_initialized) {
       message = "Not initialized";
@@ -196,9 +196,9 @@ namespace apl {
     xInput.xvasp.AVASP_arun_mode = "APL";
 
     bool stagebreak = false;
-    if (_method == "DM") {
+    if (_method == "DM") { // Direct method - see README_AFLOW_APL.TXT
       stagebreak = runVASPCalculationsDM(xInput, _aflowFlags, _kbinFlags, _xFlags, AflowIn);
-    } else if (_method == "LR") {
+    } else if (_method == "LR") {  // Linear response - see README_AFLOW_APL.TXT
       xInputs.push_back(xInput);
       stagebreak = runVASPCalculationsLR(xInputs[0], _aflowFlags, _kbinFlags, _xFlags, AflowIn);
     } else {
@@ -246,9 +246,9 @@ namespace apl {
     // Read Born effective charges and dielectric tensor
     if (_isPolarMaterial && !calculateBornChargesDielectricTensor(xInputs.back())) return false;
 
-    if (_method == "DM") {
+    if (_method == "DM") {  // Direct method - see README_AFLOW_APL.TXT
       if (!calculateForceConstantsDM()) return false;
-    } else if (_method == "LR") {
+    } else if (_method == "LR") {  // Linear response - see README_AFLOW_APL.TXT
       if (!readForceConstantsFromVasprun(xInputs[0])) return false;
     } else {
       return false;
@@ -898,7 +898,7 @@ namespace apl {
     out << AFLOWIN_SEPARATION_LINE << std::endl;
 
     // Distortion parameters for the direct method
-    if (_method == "DM") {
+    if (_method == "DM") {  // Direct method - see README_AFLOW_APL.TXT
       out << tag << "DISTORTION_MAGNITUDE=" << DISTORTION_MAGNITUDE << std::endl;
       out << tag << "DISTORTION_INEQUIVONLY=" << DISTORTION_INEQUIVONLY << std::endl;
       out << tag << "DISTORTIONS=START" << std::endl;
@@ -918,7 +918,7 @@ namespace apl {
       out << tag << "POLAR=" << _isPolarMaterial << std::endl;
       if (_isPolarMaterial) out << tag << "POLAR_RUNNAME=" << xInputs[idxRun].xvasp.AVASP_arun_runname << std::endl;
       out << AFLOWIN_SEPARATION_LINE << std::endl;
-    } else if (_method == "LR") {
+    } else if (_method == "LR") {  // Linear response - see README_AFLOW_APL.TXT
       out << tag << "POLAR=" << _isPolarMaterial << std::endl;
       out << AFLOWIN_SEPARATION_LINE << std::endl;
     }
@@ -965,8 +965,10 @@ namespace apl {
         }
         if (tokens[1] == "VASP") {
           xInput.AFLOW_MODE_VASP = true;
+          break;
         } else if (tokens[1] == "AIMS") {
           xInput.AFLOW_MODE_AIMS = true;
+          break;
         } else {
           message = "Unknown AFLOW_MODE " + tokens[1] + ".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
@@ -1735,7 +1737,7 @@ namespace apl {
 
   bool ForceConstantCalculator::calculateForceFields() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::runVASPCalculations():"; //CO20190218
+    string soliloquy="apl::ForceConstantCalculator::calculateForceFields():"; //CO20190218
     // Extract all forces ////////////////////////////////////////////////////
 
     //first pass, just find if outfile is found ANYWHERE

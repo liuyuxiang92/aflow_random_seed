@@ -2202,17 +2202,6 @@ namespace aurostd {
       return (c * (utype) (scalar_product(a, b)/scalar_product(a, a)));
     }
 
-  template<class utype> xvector<utype>
-    getVectorConvolution(const xvector<utype>& a, const xvector<utype>& b) {
-      if (a.rows != b.rows) {
-        string function = "aurostd::getVectorConvolution():";
-        string message = "Vectors must have the same number of rows.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
-      }
-      xvector<utype> v(a.rows);
-      for (int i = 0; i < v.rows; i++) v[i + v.lrows] = a[i + a.lrows] * b[i + b.lrows];
-      return v;
-    }
 }
 
 // ----------------------------------------------------------------------------

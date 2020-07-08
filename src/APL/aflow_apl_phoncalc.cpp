@@ -1147,7 +1147,7 @@ namespace apl {
 
 namespace apl {
 
-  // Calculate the group velocities on a q-point mesh using the Hellman-Feynman
+  // Calculate the group velocities on a q-point mesh using the Hellmann-Feynman
   // theorem. Group velocities will be in km/s (nm THz).
   vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh() {
     vector<vector<double> > freqs_placeholder;
@@ -1161,7 +1161,7 @@ namespace apl {
   }
 
   vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh(vector<vector<double> >& freqs, vector<xmatrix<xcomplex<double> > >& eigenvectors) {
-    string function = "PhononCalculator::calculateGroupVelocitiesOnMesh():";
+    string function = "apl::PhononCalculator::calculateGroupVelocitiesOnMesh():";
     string message = "";
     if (!_supercell.isConstructed()) {
       message = "Supercell not constructed yet.";
@@ -1218,7 +1218,7 @@ namespace apl {
   void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
     const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
     if (gvel.size() == 0) return;  // Nothing to write
-    string function = "PhononCalculator::writeGroupVelocitiesToFile():";
+    string function = "apl::PhononCalculator::writeGroupVelocitiesToFile():";
     string message = "";
     stringstream output;
 
