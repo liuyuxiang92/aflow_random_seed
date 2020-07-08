@@ -188,7 +188,7 @@ namespace apl
     if( ncpus == 1 )
       _logger.initProgressBar("Calculating taylor coefficients for SCQHA");
     else
-      _logger.initProgressBar("Calculating taylor coefficients for SCQHA  (" + stringify(ncpus) + " threads)");
+      _logger.initProgressBar("Calculating taylor coefficients for SCQHA  (" + aurostd::utype2string<int>(ncpus) + " threads)");
 
     // Distribute the calculation
     int startIndex, endIndex;

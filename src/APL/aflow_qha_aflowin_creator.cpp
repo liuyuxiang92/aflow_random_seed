@@ -27,7 +27,7 @@ namespace apl {
       _log << std::setprecision(8) << std::fixed;
     }
   // ***************************************************************************************
-  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); xStream::free();}
+  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear();}
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::clear()
   {
@@ -250,7 +250,7 @@ namespace apl {
     }
 
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::getDirectory();
+    string APL_DIR=ForceConstantCalculator::_directory;
     vector<_xinput> vaspRuns; 
     for(double i=Start; i<=End; i+=Inc){
 
@@ -423,7 +423,7 @@ namespace apl {
     }
 
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::getDirectory();
+    string APL_DIR=ForceConstantCalculator::_directory;
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=Start; i<=End; i+=Inc)
@@ -812,7 +812,7 @@ namespace apl {
   void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero(const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::getDirectory();
+    string APL_DIR=ForceConstantCalculator::_directory;
     vector<_xinput> vaspRuns; 
     for(double i=0; i<=0; i++)
     {
@@ -848,7 +848,7 @@ namespace apl {
   void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero_X(const _xinput& xInput, const _kflags& _kbinFlags, const _xflags& _xFlags)
   {
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::getDirectory();
+    string APL_DIR=ForceConstantCalculator::_directory;
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=0; i<=0; i++)
