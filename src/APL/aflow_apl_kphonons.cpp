@@ -16,7 +16,7 @@
 #define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
 //AS20200427
-#define NEW_QHA true
+#define NEW_QHA false
 
 //CO fixing cpp version issues with auto_ptr (depreciated)
 #if __cplusplus >= 201103L

@@ -636,7 +636,7 @@ namespace apl
         if ((tokens.size()<1) || (tokens.size() > 4)){
           string message = "Wrong setting in ";
           message += "[AFLOW_QHA]MODE. ";
-          message += "Specify as MODE=QHA,QHA3P,SCQHA";
+          message += "Specify as MODE=QHA,QHA3P,SCQHA,QHANP";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_NUMBER_);
         }
@@ -658,7 +658,7 @@ namespace apl
         tokens.clear();
         aurostd::string2tokens(option->content_string, tokens, ",");
         if (!tokens.size()){
-          string message = "Wrong setting in [AFLOW_QHA]SCQHA_PDIS_T: list of ";
+          string message = "Wrong setting in [AFLOW_QHA]PDIS_T: list of ";
           message += "temperatures is not given.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_NUMBER_);
@@ -721,12 +721,12 @@ namespace apl
       }
     }
 
-    double coef = 0.0;
     // determine the names for the directories used for the QHANP calculation
     if (runQHANP){
       N_QHANPvolumes = 2*TaylorExpansionOrder + 1;
 
       // get a set of volumes that would be used for the QHANP calculation
+      double coef = 0.0;
       for (int i=0; i<N_QHANPvolumes; i++){
         coef = 1.0 + (-TaylorExpansionOrder + i)*gp_distortion; //dV = 2*gp_distortion
         subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
@@ -915,15 +915,15 @@ namespace apl
 
     stringstream aflow;
 
+    // create aflow.in if there are no outputs with results in the directory:
+    // OUTCAR, EIGENVAL and IBZKPT. The last two are only required when electronic
+    // contribution is included
     for (uint i=0; i<subdirectories_static.size(); i++){
-      // if electronic contributions are not required neglect that EIGENVAL or IBZKPT 
-      // is missing
       if (includeElectronicContribution){
         if (file_is_present[i][DF_EIGENVAL] && file_is_present[i][DF_IBZKPT] &&
-            file_is_present[i][DF_DIRECTORY] && file_is_present[i][DF_OUTCAR]) continue;
+            file_is_present[i][DF_OUTCAR]) continue;
       }
-      else if (file_is_present[i][DF_DIRECTORY] &&
-               file_is_present[i][DF_OUTCAR]) continue;
+      else if (file_is_present[i][DF_OUTCAR]) continue;
 
       msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -995,6 +995,7 @@ namespace apl
     return count;
   }
 
+  /// Prints what data output files from static DFT calculations are missing.
   void QHAN::printMissingStaticFiles(const vector<vector<bool> > & list, 
     const vector<string> &subdirectories)
   {
@@ -1028,44 +1029,6 @@ namespace apl
       }
     }
   }
-/*      file_is_missing = false;
-
-      if (!aurostd::FileExist(subdirectories_static[i])){
-        file_is_missing = true;
-        msg = "QHA is not able to proceed: the ";
-        msg += subdirectories_static[i] + " directory is missing.";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_WARNING_);
-      }
-
-      outcarfile = subdirectories_static[i]+"/OUTCAR.static";
-      if (!(aurostd::EFileExist(outcarfile) || aurostd::FileExist(outcarfile))){
-        file_is_missing = true;
-        msg = "File " + outcarfile + " is missing";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_WARNING_);
-      }
-
-      if (includeElectronicContribution){
-        eigenvfile = subdirectories_static[i]+"/EIGENVAL.static";
-        ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
-
-        if (!(aurostd::EFileExist(eigenvfile) || (aurostd::FileExist(eigenvfile)))){
-          file_is_missing = true;
-          msg = "File " + eigenvfile + " is missing";
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-          *p_oss, _LOGGER_WARNING_);
-        }
-
-        if (!(aurostd::EFileExist(ibzkptfile) || (aurostd::FileExist(ibzkptfile)))){
-          file_is_missing = true;
-          msg = "File " + ibzkptfile + " is missing";
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-          *p_oss, _LOGGER_WARNING_);
-        }
-
-        if (!file_is_missing) count++;
-      }*/
 
   /// Creates a set of EOS APL subdirectories with corresponding aflow.in or gathers
   /// and processes data from finished APL calculations.
@@ -1348,13 +1311,6 @@ namespace apl
           *p_oss, _LOGGER_ERROR_);
         data_read_success = false;
       }
-
-//      if (!static_ibzkpts.back().m_initialized){
-//        msg = "Could not read the " + subdirectories_static[i]+"/IBZKPT.static file.";
-//        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-//          *p_oss, _LOGGER_ERROR_);
-//        data_read_success = false;
-//      }
     }
 
     return data_read_success;
@@ -1635,35 +1591,6 @@ namespace apl
     return energy;
   }
 
-  /// Calculates the electronic free energy using integration over the electronic DOS.
-  /// Currently this function does not work (to be fixed in the future)
-  ///
-  /// @param id selects the volume at which corresponding data was obtained 
-  ///
-  //double QHAN::electronicFreeEnergy(double T, int id)
-  //{
-  //  double EelecT = 0; double SelecT = 0; double FelecT = 0; double Eelec0K = 0;
-  //  double f = 0.0, f0 = 0.0;
-
-  //  double dE = (max(energies_V[id])-min(energies_V[id]))/(energies_V[id].size()-1);
-  //  for (uint i=0; i<edos_V[id].size(); i++){
-  //    f0 = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], 0);
-  //    f  = aurostd::FermiDirac(energies_V[id][i], Efermi_V[id], T);
-
-  //    Eelec0K += energies_V[id][i] * edos_V[id][i] * f0;
-  //    EelecT  += energies_V[id][i] * edos_V[id][i] * f;
-  //    // limit of values for f->0 or f->1 is 0
-  //    if (f>0 && f<1) SelecT -= (f*log(f) + (1-f)*log(1-f)) * edos_V[id][i];
-  //  }
-
-  //  EelecT  *= dE;
-  //  Eelec0K *= dE;
-  //  SelecT  *= KBOLTZEV*dE;
-
-  //  FelecT = (EelecT-Eelec0K) - T*SelecT;
-
-  //  return FelecT;
-  //}
 
   /// Calculates the equilibrium volume at a given temperature.
   /// @param qha_method defines what kind of QHA calculation is performed.
@@ -2069,6 +1996,7 @@ namespace apl
   double QHAN::extrapolateFrequency(double V, const xvector<double> &xomega,
       QHAmethod qha_method)
   {
+    string function = "QHAN::extrapolateFrequency(): ";
     double result = 0.0;
     switch(qha_method){
       case(QHA3P_CALC):
@@ -2113,8 +2041,11 @@ namespace apl
           result += xomega[TaylorExpansionOrder+1];
         }
         break;
-      case(QHA_CALC):
-        // todo: error here
+      default:
+        string message = "QHAN::extrapolateFrequency() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
+        message += " However, another method was requested.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
+              _INPUT_ILLEGAL_);
         break;
     }
     return result;
@@ -2122,7 +2053,7 @@ namespace apl
 
   /// Returns the Grueneisen parameter extrapolated by a Taylor expansion.
   ///
-  double QHAN::extrapolateGamma(double V, const xvector<double> &xomega,
+  double QHAN::extrapolateGrueneisen(double V, const xvector<double> &xomega,
       QHAmethod qha_method)
   {
     double gamma = 0.0;
@@ -2167,8 +2098,11 @@ namespace apl
             gamma *= -V/w;
           }
           break;
-        case (QHA_CALC):
-          // TODO error
+      default:
+        string message = "QHAN::extrapolateGrueneisen() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
+        message += " However, another method was requested.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
+              _INPUT_ILLEGAL_);
            break;
       }
     }
@@ -2273,7 +2207,7 @@ namespace apl
         if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w*beta)-1.0);
 
         ui *= qpWeights[q];
-        VPgamma += ui * extrapolateGamma(V, xomega, SCQHA_CALC);
+        VPgamma += ui * extrapolateGrueneisen(V, xomega, SCQHA_CALC);
       }
       NQpoints += qpWeights[q];
     }
@@ -2514,12 +2448,12 @@ namespace apl
               pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
             d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
 
-            gamma = extrapolateGamma(V, xomega, SCQHA_CALC);
+            gamma = extrapolateGrueneisen(V, xomega, SCQHA_CALC);
 
             Bgamma  += (ui - T*Cvi*pow(betaT,2)*KBOLTZEV)*pow(gamma, 2);
             Bdgamma -= ui*((1+gamma)*gamma - pow(V,2)/w*d2wdV2);
 
-            GP += extrapolateGamma(V, xomega, SCQHA_CALC) * Cvi;
+            GP += extrapolateGrueneisen(V, xomega, SCQHA_CALC) * Cvi;
             CV += Cvi;
             Feq  += fi;
           }

@@ -1263,7 +1263,7 @@ namespace apl
           QHAmethod qha_method);
       // QHA3P and SCQHA and QHANP
       double extrapolateFrequency(double V, const xvector<double> &xomega, QHAmethod qha_method);
-      double extrapolateGamma(double V, const xvector<double> &xomega, QHAmethod qha_method);
+      double extrapolateGrueneisen(double V, const xvector<double> &xomega, QHAmethod qha_method);
       // QHA3P
       double FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
       double InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
