@@ -56,7 +56,7 @@ namespace aflowlib {
       string aflowlib_date,aflowlib_version;                    // version/creation
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
       int aflowlib_entries_number;                              // their number
-      string aflow_version;                                     // version/creation
+      string aflow_date,aflow_version;                          // version/creation //CO20200624 - adding aflow_date
       string catalog;                                           // ICSD,LIB2, etc.
       string data_api,data_source,data_language;                // version/source/language
       string error_status;                                            // ERROR ??
@@ -364,7 +364,7 @@ namespace aflowlib {
 // ***************************************************************************
 // LIBS to RAWS of each entry
 namespace aflowlib {
-  uint GetSpeciesDirectory(string directory,vector<string>& vspecies);
+  uint GetSpeciesDirectory(const string& directory,vector<string>& vspecies);
 }
 namespace aflowlib {
   void XFIX_LIBRARY_ALL(string LIBRARY_IN,vector<string>);

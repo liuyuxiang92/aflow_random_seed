@@ -1668,19 +1668,23 @@ bool CheckMaterialServer(const string& message) { //CO20200624
 // aflow_get_time_string
 // ***************************************************************************
 string aflow_get_time_string(void) {
-#ifdef ALPHA
-  ostringstream aus;
-  string OUT;
-  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
-  system(aus.str().c_str());
-  ifstream FileAUS;
-  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
-  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
-  FileAUS >> OUT;
-  FileAUS.clear();FileAUS.close();
-  // return (char*) OUT.c_str();
-  return string("NotAvailable \n");
-#else
+  //OUTPUT: http://www.cplusplus.com/reference/ctime/ctime/
+  //Www Mmm dd hh:mm:ss yyyy
+  //Where Www is the weekday, Mmm the month (in letters), dd the day of the month, hh:mm:ss the time, and yyyy the year.
+  //The string is followed by a new-line character ('\n') and terminated with a null-character.
+//[CO20200624 - OBSOLETE]#ifdef ALPHA
+//[CO20200624 - OBSOLETE]  ostringstream aus;
+//[CO20200624 - OBSOLETE]  string OUT;
+//[CO20200624 - OBSOLETE]  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
+//[CO20200624 - OBSOLETE]  system(aus.str().c_str());
+//[CO20200624 - OBSOLETE]  ifstream FileAUS;
+//[CO20200624 - OBSOLETE]  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
+//[CO20200624 - OBSOLETE]  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
+//[CO20200624 - OBSOLETE]  FileAUS >> OUT;
+//[CO20200624 - OBSOLETE]  FileAUS.clear();FileAUS.close();
+//[CO20200624 - OBSOLETE]  // return (char*) OUT.c_str();
+//[CO20200624 - OBSOLETE]  return string("NotAvailable \n");
+//[CO20200624 - OBSOLETE]#else
   long ltime=time(NULL);
 
   string date=string(ctime(&ltime));
@@ -1688,7 +1692,29 @@ string aflow_get_time_string(void) {
     if(date.at(date.length()-1)=='\n')
       date.erase(date.length()-1);
   return date;
-#endif
+//[CO20200624 - OBSOLETE]#endif
+}
+string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
+  //refer to aflow_get_time_string()
+  //convert Www Mmm dd hh:mm:ss yyyy style to aurostd::get_datetime() one
+  string soliloquy=XPID+"aflow_convert_time_LOCK2aflowlib():";
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+  
+  vector<string> tokens;
+  aurostd::string2tokens(time_LOCK,tokens);
+  if(tokens.size()!=5){return "";}
+  
+  //https://en.cppreference.com/w/c/chrono/strftime
+  //'Www Mmm dd hh:mm:ss yyyy' === '%a %b %d %H:%M:%S %Y'
+  //https://stackoverflow.com/questions/19524720/using-strptime-converting-string-to-time-but-getting-garbage
+  struct tm tstruct;
+  if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
+
+  if(LDEBUG){cerr << soliloquy << " END" << endl;}
+  
+  return aurostd::get_datetime(&tstruct);
 }
 
 // ***************************************************************************
@@ -1777,8 +1803,9 @@ string Message(string list2print) {
   if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) oss << " - [host=" << XHOST.hostname << "]";
   if(aurostd::substring2bool(list2print,"pid") || aurostd::substring2bool(list2print,"PID")) oss << " - [PID=" << XHOST.PID << "]";  //CO20200502
   if(aurostd::substring2bool(list2print,"tid") || aurostd::substring2bool(list2print,"TID")) oss << " - [TID=" << XHOST.TID << "]";  //CO20200502
-  if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
-  if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
+  if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME") || 
+      aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
+  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
   //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
   if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
   if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) oss << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";

@@ -51,31 +51,41 @@ using aurostd::ran0;
 // ***************************************************************************
 // TIME evolution stuff
 namespace aurostd {
-  int get_day(void) { time_t t=time(0);struct tm *now=localtime(&t);return now->tm_mday;}
-  int get_month(void) { time_t t=time(0);struct tm *now=localtime(&t);return now->tm_mon+1;}
-  int get_year(void) { time_t t=time(0);struct tm *now=localtime(&t);return now->tm_year+1900;}
-  long int get_date(void) { return aurostd::get_year()*10000+aurostd::get_month()*100+aurostd::get_day();}
-  int get_hour(void) { time_t t=time(0);struct tm *now=localtime(&t);return now->tm_hour;}
-  int get_min(void) { time_t t=time(0);struct tm *now=localtime(&t);return now->tm_min;}
-  int get_sec(void) { time_t t=time(0);struct tm *now=localtime(&t);return now->tm_sec;}
+  int get_day(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_day(now);} //CO20200624
+  int get_day(tm* tstruct) {return tstruct->tm_mday;} //CO20200624
+  int get_month(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_month(now);} //CO20200624
+  int get_month(tm* tstruct) {return tstruct->tm_mon+1;}  //CO20200624
+  int get_year(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_year(now);}
+  int get_year(tm* tstruct) {return tstruct->tm_year+1900;} //CO20200624
+  long int get_date(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_date(now);}  //CO20200624
+  long int get_date(tm* tstruct) {return aurostd::get_year(tstruct)*10000+aurostd::get_month(tstruct)*100+aurostd::get_day(tstruct);}  //CO20200624
+  int get_hour(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_hour(now);}  //CO20200624
+  int get_hour(tm* tstruct) {return tstruct->tm_hour;}  //CO20200624
+  int get_min(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_min(now);}  //CO20200624
+  int get_min(tm* tstruct) {return tstruct->tm_min;}  //CO20200624
+  int get_sec(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_sec(now);}  //CO20200624
+  int get_sec(tm* tstruct) {return tstruct->tm_sec;}  //CO20200624
   long double get_seconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_sec+tim.tv_usec/1e6;}
-  long double get_seconds(long double reference_seconds) { return get_seconds()-reference_seconds;}
+  long double get_seconds(long double reference_seconds) {return get_seconds()-reference_seconds;}
   long double get_delta_seconds(long double& seconds_begin) {long double out=get_seconds()-seconds_begin;seconds_begin=get_seconds();return out;}
   long double get_mseconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_usec/1000.0;}
-  long double get_mseconds(long double reference_useconds) { return (aurostd::get_useconds()-reference_useconds)/1000.0;}
+  long double get_mseconds(long double reference_useconds) {return (aurostd::get_useconds()-reference_useconds)/1000.0;}
   long double get_delta_mseconds(long double& useconds_begin) {long double out=(aurostd::get_useconds()-useconds_begin)/1000.0;useconds_begin=aurostd::get_useconds()/1000.0;return out;}
   long double get_useconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_usec;}
-  long double get_useconds(long double reference_useconds) { return aurostd::get_useconds()-reference_useconds;}
+  long double get_useconds(long double reference_useconds) {return aurostd::get_useconds()-reference_useconds;}
   long double get_delta_useconds(long double& useconds_begin) {long double out=aurostd::get_useconds()-useconds_begin;useconds_begin=aurostd::get_useconds();return out;}
-  string get_time(void) {int h=get_hour(),m=get_min(),s=get_sec();return (h<10?"0":"")+aurostd::utype2string(h)+":"+(m<10?"0":"")+aurostd::utype2string(m)+":"+(s<10?"0":"")+aurostd::utype2string(s);}
-  string get_datetime(void) { return utype2string(get_date())+"_"+get_time();}
-  string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215
+  string get_time(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_time(now);} //CO20200624
+  string get_time(tm* tstruct) {int h=get_hour(tstruct),m=get_min(tstruct),s=get_sec(tstruct);return (h<10?"0":"")+aurostd::utype2string(h)+":"+(m<10?"0":"")+aurostd::utype2string(m)+":"+(s<10?"0":"")+aurostd::utype2string(s);} //CO20200624
+  string get_datetime(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_datetime(now);} //CO20200624
+  string get_datetime(tm* tstruct) {return utype2string(get_date(tstruct))+"_"+get_time(tstruct);}  //CO20200624
+  string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){time_t t=time(0);struct tm *now=localtime(&t);return get_datetime_formatted(now,date_delim,include_time,date_time_sep,time_delim);}  //CO20171215  //CO20200624
+  string get_datetime_formatted(tm* tstruct,const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215 //CO20200624
     stringstream misc_ss;
-    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day();
+    int y=aurostd::get_year(tstruct),b=aurostd::get_month(tstruct),d=aurostd::get_day(tstruct); //CO20200624
     misc_ss << y << date_delim << (b<10?"0":"") << b << date_delim << (d<10?"0":"") << d;
     if(include_time){
-      int h=get_hour(),m=get_min(),s=get_sec();
-      misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << time_delim << (s<10?"0":"") << s;
+      int h=get_hour(tstruct),m=get_min(tstruct),s=get_sec(tstruct);
+      misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << time_delim << (s<10?"0":"") << s; //CO20200624
     }
     return misc_ss.str();
   }
@@ -4437,6 +4447,7 @@ namespace aurostd {
   string utype2string(double from,bool roff,double tol) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,tol,DEFAULT_STREAM);}
   string utype2string(double from,int precision,bool roff,double tol) {return utype2string(from,precision,roff,tol,DEFAULT_STREAM);}
   string utype2string(double from,bool roff,char FORMAT) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,FORMAT);}
+  string utype2string(double from,int precision,char FORMAT) {return utype2string(from,precision,false,FORMAT);}  //CO20200624
   string utype2string(double from,int precision,bool roff,char FORMAT) {return utype2string(from,precision,roff,AUROSTD_ROUNDOFF_TOL,FORMAT);}
   string utype2string(double from,bool roff,double tol,char FORMAT) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,tol,FORMAT);}
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT) {

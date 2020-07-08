@@ -1057,6 +1057,7 @@ double AFLOW_checkMEMORY(string="",double=102.0);
 bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
+string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
 

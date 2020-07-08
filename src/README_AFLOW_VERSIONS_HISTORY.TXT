@@ -15,6 +15,8 @@
         -- patching bug in aurostd::EFileEmpty() - remove file IFF it is a temporary file (CO)
         -- soft patch for FR+web: cout->cerr in aflowlib::WEB_Aflowlib_Entry() (CO)
         -- patching pocc_tol :TOL_0.001:0.001 -> :TOL_0.001_0.001 (CO)
+        -- adding overloads to get_date() variants for an input time structure (CO)
+        -- adding aflow_date to aflowlib.out (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

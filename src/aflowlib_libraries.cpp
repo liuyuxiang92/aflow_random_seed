@@ -915,16 +915,17 @@ namespace aflowlib {
 // aflowlib::GetSpeciesDirectory
 // ***************************************************************************
 namespace aflowlib {
-  uint GetSpeciesDirectory(string directory,vector<string>& vspecies) {
+  uint GetSpeciesDirectory(const string& directory,vector<string>& vspecies) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: BEGIN" << endl;
+    string soliloquy=XPID+"aflowlib::GetSpeciesDirectory():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     vspecies.clear();vector<string> vs,tokens;
     stringstream oss;
-    string temp_file=aurostd::TmpFileCreate("getspecies");
+    //[CO20200624 - OBSOLETE]string temp_file=aurostd::TmpFileCreate("getspecies");
 
     if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << XPID << "ERROR - aflowlib::GetSpeciesDirectory: XHOST.vext.size()!=XHOST.vcat.size()" << endl;exit(0); }
 
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: [1]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [1]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check _AFLOWIN_.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext)+"\""+" | grep VASP_POTCAR_FILE"),vspecies);
@@ -932,7 +933,7 @@ namespace aflowlib {
         for(uint i=0;i<vspecies.size();i++) KBIN::VASP_PseudoPotential_CleanName(vspecies.at(i));
       }
     }
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: [2]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [2]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check POSCAR.orig.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.orig"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.orig"+XHOST.vext.at(iext)+"\""));
@@ -940,7 +941,7 @@ namespace aflowlib {
         if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
       }
     }
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: [3]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [3]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) {  // check POSCAR.relax1.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.relax1"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.relax1"+XHOST.vext.at(iext)+"\""));
@@ -948,7 +949,7 @@ namespace aflowlib {
         if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
       }
     }
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: [4]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [4]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check POSCAR.bands.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.bands"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.bands"+XHOST.vext.at(iext)+"\""));
@@ -956,14 +957,14 @@ namespace aflowlib {
         if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
       }
     }
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: [5]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [5]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check OUTCAR.relax1.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/OUTCAR.relax1"+XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/OUTCAR.relax1"+XHOST.vext.at(iext)+"\""+" | grep TITEL"),vs);
         for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs.at(i),tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
       }
     }
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: [6]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [6]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check OUTCAR.static.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/OUTCAR.static"+XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/OUTCAR.static"+XHOST.vext.at(iext)+"\""+" | grep TITEL"),vs);
@@ -971,7 +972,7 @@ namespace aflowlib {
       }
     }
     //  for(uint i=0;i<vspecies.size();i++) cerr << XPID << i << " - " << vspecies.at(i) << endl; exit(0);
-    if(LDEBUG) cerr << XPID << "aflowlib::GetSpeciesDirectory: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
     return vspecies.size();
   }
 }
@@ -1130,6 +1131,7 @@ namespace aflowlib {
 
     bool perform_LOCK=TRUE,perform_BANDS=FALSE,perform_BADER=FALSE,perform_MAGNETIC=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
+    bool perform_POCC=FALSE;  //CO20200624
     bool perform_PATCH=TRUE; // to inject updates while LIB2RAW
 
     for(uint iext=0;iext<XHOST.vext.size();iext++) {
@@ -1709,7 +1711,7 @@ namespace aflowlib {
         // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << soliloquy << " DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
         // DONE
         //      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
-        cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << endl;
+        cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
         if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
     }
@@ -5006,29 +5008,46 @@ namespace aflowlib {
     data.vloop.push_back("lock");
 
     vector<string> vlock,tokens;
+    string tmp="";
+    string::size_type loc;
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,_AFLOWLOCK_,directory_RAW,_AFLOWLOCK_,vfile,MESSAGE);  // OUTCAR.static
     aurostd::file2vectorstring(directory_RAW+"/"+_AFLOWLOCK_,vlock) ;
     _XHOST aus_XHOST;
     // ---------------------------------------------------------------
+    for(uint iline=0;iline<vlock.size()&&data.aflow_date.empty();iline++) //CO20200624 - adding aflow_date
+      if(aurostd::substring2bool(vlock[iline],"date=") && aurostd::substring2bool(vlock[iline],"[") && aurostd::substring2bool(vlock[iline],"]")) {
+        loc=vlock[iline].find("date=");
+        tmp=vlock[iline].substr(loc,string::npos);
+        loc=tmp.find("]");
+        tmp=tmp.substr(0,loc);
+        tmp=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tmp);
+        aurostd::StringSubst(tmp,"[","");aurostd::StringSubst(tmp,"]","");  //just in case
+        aurostd::StringSubst(tmp,"date=",""); //just in case
+        tmp=aflow_convert_time_ctime2aurostd(tmp);
+        if(!tmp.empty()){data.aflow_date=tmp+"_GMT-5";}
+        //[CO20200624 - no grab last date]if(!data.aflow_data.empty()){break;}  //grab first date?
+      }
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflow_date = " << ((data.aflow_date.size())?data.aflow_date:"unavailable") << endl;
+    // ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&data.aflow_version.empty();iline++)
-      if(aurostd::substring2bool(vlock.at(iline),"NFS") && aurostd::substring2bool(vlock.at(iline),"(") && aurostd::substring2bool(vlock.at(iline),")")) {
-        aurostd::string2tokens(vlock.at(iline),tokens);
+      if(aurostd::substring2bool(vlock[iline],"NFS") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {
+        aurostd::string2tokens(vlock[iline],tokens);
         data.aflow_version=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1));
         aurostd::StringSubst(data.aflow_version,"(","");aurostd::StringSubst(data.aflow_version,")","");
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflow_version = " << ((data.aflow_version.size())?data.aflow_version:"unavailable") << endl;
     // XHOST.CPU_Model ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_Model.empty();iline++)
-      if(aurostd::substring2bool(vlock.at(iline),"XHOST.CPU_Model") && aurostd::substring2bool(vlock.at(iline),":")) {
-        aurostd::string2tokens(vlock.at(iline),tokens,":");
+      if(aurostd::substring2bool(vlock[iline],"XHOST.CPU_Model") && aurostd::substring2bool(vlock[iline],":")) {
+        aurostd::string2tokens(vlock[iline],tokens,":");
         aus_XHOST.CPU_Model=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1));
         data.node_CPU_Model=aus_XHOST.CPU_Model;
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.CPU_Model = " << ((aus_XHOST.CPU_Model.size())?aus_XHOST.CPU_Model:"unavailable") << endl;
     // XHOST.CPU_Cores ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_Cores==0;iline++)
-      if(aurostd::substring2bool(vlock.at(iline),"XHOST.CPU_Cores") && aurostd::substring2bool(vlock.at(iline),":")) {
-        aurostd::string2tokens(vlock.at(iline),tokens,":");
+      if(aurostd::substring2bool(vlock[iline],"XHOST.CPU_Cores") && aurostd::substring2bool(vlock[iline],":")) {
+        aurostd::string2tokens(vlock[iline],tokens,":");
         aus_XHOST.CPU_Cores=aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1)));
         aus_XHOST.CPU_Cores=aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1)));
         data.node_CPU_Cores=aus_XHOST.CPU_Cores;
@@ -5036,16 +5055,16 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.CPU_Cores = " << ((aus_XHOST.CPU_Cores)?aurostd::utype2string<int>(aus_XHOST.CPU_Cores):"unavailable") << endl;
     // XHOST.CPU_MHz ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_MHz.empty();iline++)
-      if(aurostd::substring2bool(vlock.at(iline),"XHOST.CPU_MHz") && aurostd::substring2bool(vlock.at(iline),":")) {
-        aurostd::string2tokens(vlock.at(iline),tokens,":");
+      if(aurostd::substring2bool(vlock[iline],"XHOST.CPU_MHz") && aurostd::substring2bool(vlock[iline],":")) {
+        aurostd::string2tokens(vlock[iline],tokens,":");
         aus_XHOST.CPU_MHz=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1));
         data.node_CPU_MHz=ceil(aurostd::string2utype<double>(aus_XHOST.CPU_MHz));
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.CPU_MHz = " << ((aus_XHOST.CPU_MHz.size())?aus_XHOST.CPU_MHz:"unavailable") << endl;
     // XHOST.RAM_GB ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.RAM_GB<0.001;iline++)
-      if(aurostd::substring2bool(vlock.at(iline),"XHOST.RAM_GB") && aurostd::substring2bool(vlock.at(iline),":")) {
-        aurostd::string2tokens(vlock.at(iline),tokens,":");
+      if(aurostd::substring2bool(vlock[iline],"XHOST.RAM_GB") && aurostd::substring2bool(vlock[iline],":")) {
+        aurostd::string2tokens(vlock[iline],tokens,":");
         aus_XHOST.RAM_GB=ceil(aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1))));
         data.node_RAM_GB=aus_XHOST.RAM_GB;
       }

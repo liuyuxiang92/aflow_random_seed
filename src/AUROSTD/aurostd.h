@@ -239,12 +239,19 @@ template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<ut
 // TIME stuff
 namespace aurostd {
   int get_day(void);
+  int get_day(tm* tstruct); //CO20200624
   int get_month(void);
+  int get_month(tm* tsruct);  //CO20200624
   int get_year(void);
+  int get_year(tm* tstruct);  //CO20200624
   long int get_date(void);
+  long int get_date(tm* tstruct);  //CO20200624
   int get_hour(void);
+  int get_hour(tm* tstruct);  //CO20200624
   int get_min(void);
+  int get_min(tm* tstruct); //CO20200624
   int get_sec(void);
+  int get_sec(tm* tstruct); //CO20200624
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
@@ -255,8 +262,11 @@ namespace aurostd {
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
   string get_time(void);
+  string get_time(tm* tstruct); //CO20200624
   string get_datetime(void);
+  string get_datetime(tm* tstruct); //CO20200624
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
+  string get_datetime_formatted(tm* tstruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
   bool beep(uint=2000,uint=100); // standard values
 }
 // ----------------------------------------------------------------------------
@@ -683,6 +693,7 @@ namespace aurostd {
   string utype2string(double from,bool roff,double tol);
   string utype2string(double from,int precision,bool roff,double tol);
   string utype2string(double from,bool roff,char FORMAT);
+  string utype2string(double from,int precision,char FORMAT); //CO20200624
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);

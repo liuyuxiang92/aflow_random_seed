@@ -34,6 +34,7 @@ namespace aflowlib {
     aflowlib_version.clear();
     aflowlib_entries.clear();vaflowlib_entries.clear();
     aflowlib_entries_number=0;
+    aflow_date.clear(); //CO20200624 - adding aflow_date
     aflow_version.clear();
     catalog.clear();
     data_api="aapi1.2"; // new version of the API
@@ -241,6 +242,7 @@ namespace aflowlib {
     aflowlib_entries=b.aflowlib_entries;
     vaflowlib_entries.clear();for(uint i=0;i<b.vaflowlib_entries.size();i++) vaflowlib_entries.push_back(b.vaflowlib_entries.at(i));
     aflowlib_entries_number=b.aflowlib_entries_number;
+    aflow_date=b.aflow_date; //CO20200624 - adding aflow_date
     aflow_version=b.aflow_version;
     catalog=b.catalog;
     data_api=b.data_api;
@@ -564,6 +566,7 @@ namespace aflowlib {
         else if(keyword=="aflowlib_version") {aflowlib_version=content;}
         else if(keyword=="aflowlib_entries") {aflowlib_entries=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vaflowlib_entries.push_back(stokens.at(j));}
         else if(keyword=="aflowlib_entries_number") {aflowlib_entries_number=aurostd::string2utype<int>(content);}
+        else if(keyword=="aflow_date") {aflow_date=content;}  //CO20200624 - adding aflow_date
         else if(keyword=="aflow_version") {aflow_version=content;}
         else if(keyword=="catalog") {catalog=content;}
         else if(keyword=="data_api") {data_api=content;}
@@ -891,6 +894,7 @@ namespace aflowlib {
       oss << "aflowlib_version=" << aflowlib_version << (html?"<br>":"") << endl; 
       oss << "aflowlib_entries=" << aflowlib_entries << (html?"<br>":"") << endl; 
       oss << "aflowlib_entries_number=" << aflowlib_entries_number << (html?"<br>":"") << endl; 
+      oss << "aflow_date=" << aflow_date << (html?"<br>":"") << endl;   //CO20200624 - adding aflow_date
       oss << "aflow_version=" << aflow_version << (html?"<br>":"") << endl; 
       oss << "catalog=" << catalog << (html?"<br>":"") << endl; 
       oss << "data_api=" << data_api << (html?"<br>":"") << endl; 
@@ -1343,6 +1347,7 @@ namespace aflowlib {
       if(node_RAM_GB!=INF) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "node_RAM_GB=" << node_RAM_GB << eendl;
       // VERSION/DATE
       if(aflow_version.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_version=" << aflow_version << eendl;
+      if(aflow_date.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_date=" << aflow_date << eendl;  //CO20200624 - adding aflow_date
       if(catalog.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "catalog=" << catalog << eendl;
       sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflowlib_version=" << string(AFLOW_VERSION) << eendl;
       sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflowlib_date=" << aurostd::get_datetime() << "_GMT-5" << eendl;
@@ -3182,6 +3187,15 @@ namespace aflowlib {
         sscontent_json << "\"aflow_version\":\"" << aflow_version << "\"" << eendl;
       } else {
         if(PRINT_NULL) sscontent_json << "\"aflow_version\":null" << eendl;
+      }
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //////////////////////////////////////////////////////////////////////////
+      
+      //////////////////////////////////////////////////////////////////////////
+      if(aflow_date.size()) { //CO20200624 - adding aflow_date
+        sscontent_json << "\"aflow_date\":\"" << aflow_date << "\"" << eendl;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"aflow_date\":null" << eendl;
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
@@ -6159,8 +6173,8 @@ namespace aflowlib {
       // additional web output
       aflowlib_json << "," << "\"aflow_version\":\"" << AFLOW_VERSION << "\"";
       aflowlib_out << "|" << "aflow_version=" << AFLOW_VERSION;
-      aflowlib_json << "," << "\"aflow_date\":\"" << TODAY << "\"";
-      aflowlib_out << "|" << "aflow_date=" << TODAY;
+      aflowlib_json << "," << "\"aflow_build_date\":\"" << TODAY << "\""; //CO20200624 - aflow_date is reserved for date from LOCK
+      aflowlib_out << "|" << "aflow_build_date=" << TODAY;  //CO20200624 - aflow_date is reserved for date from LOCK
       //ME20191217 STOP
 
       // XHOST.machine_type
