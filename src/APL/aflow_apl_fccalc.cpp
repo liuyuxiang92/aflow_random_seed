@@ -123,7 +123,7 @@ namespace apl {
     xInputs.clear();
     _method = opts.getattachedscheme("ENGINE");
     _isPolarMaterial = opts.flag("POLAR");
-    if (_method == "DM") {
+    if (_method == "DM") {  // Direct method - see README_AFLOW_APL.TXT
       _calculateZeroStateForces = opts.flag("ZEROSTATE");
       string autopm = opts.getattachedscheme("DPM");
       AUTO_GENERATE_PLUS_MINUS = (!autopm.empty() && ((autopm[0] == 'A') || (autopm[0] == 'a')));
@@ -132,7 +132,7 @@ namespace apl {
       DISTORTION_SYMMETRIZE = opts.flag("DSYMMETRIZE");
       GENERATE_ONLY_XYZ = opts.flag("DXYZONLY");
       USER_GENERATE_PLUS_MINUS = opts.flag("DPM");
-    } else if (_method != "LR") {
+    } else if (_method != "LR") {  // Linear response - see README_AFLOW_APL.TXT
       message = "Unknown method " + _method + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
