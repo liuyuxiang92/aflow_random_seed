@@ -6,6 +6,11 @@
         -- Merged more pflow logging capabilities into APL. (ME)
         -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
         -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
+        -- Added 49 new ANRL prototype files for the nitrides and oxides (DX+RF)
+        -- Added 14 new parameter enumertions to existing ANRL labels for nitrides and oxides (DX+RF)
+        -- Updated README_PROTO.TXT with new nitrides and oxides (DX+RF)
+        -- Bug fixes in XtalFinder: precondition structures with BringInCell() for local geometry comparisons (DX)
+        -- Bug fixes in XtalFinder: use more robust matching protocol; accounts for undecorated prototypes (i.e., small volumes) (DX)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
