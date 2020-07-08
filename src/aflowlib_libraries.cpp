@@ -1614,6 +1614,11 @@ namespace aflowlib {
           aflowlib_data.vfiles.push_back(vdirectory.at(i));
       }
       // DO THE FINAL WRITING
+      
+      if(aflowlib_data.vaflowlib_date.size()!=1){ //CO20200624 - this means we didn't get the LOCK date, spit warning
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"LOCK date NOT found",_LOGGER_WARNING_);
+      }
+      aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime()+"_GMT-5"); //CO20200624 - adding LOCK date
 
       //     cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
       //      aurostd::LinkFile("../../"+_XENTRY_","directory_RAW+"/"+_XENTRY_);
@@ -5014,7 +5019,8 @@ namespace aflowlib {
     aurostd::file2vectorstring(directory_RAW+"/"+_AFLOWLOCK_,vlock) ;
     _XHOST aus_XHOST;
     // ---------------------------------------------------------------
-    for(uint iline=0;iline<vlock.size();iline++) //CO20200624 - adding aflow_date  //grab LAST date - data.aflow_date.empty()
+    data.vaflowlib_date.clear(); //clear here, 
+    for(uint iline=0;iline<vlock.size();iline++) //CO20200624 - adding lock date to vaflowlib_date  //grab LAST date - data.vaflowlib_date.empty()
       if(aurostd::substring2bool(vlock[iline],"date=") && aurostd::substring2bool(vlock[iline],"[") && aurostd::substring2bool(vlock[iline],"]")) {
         loc=vlock[iline].find("date=");
         tmp=vlock[iline].substr(loc,string::npos);
@@ -5024,9 +5030,9 @@ namespace aflowlib {
         aurostd::StringSubst(tmp,"[","");aurostd::StringSubst(tmp,"]","");  //just in case
         aurostd::StringSubst(tmp,"date=",""); //just in case
         tmp=aflow_convert_time_ctime2aurostd(tmp);
-        if(!tmp.empty()){data.aflow_date=tmp+"_GMT-5";}
+        if(!tmp.empty()){data.vaflowlib_date.clear();data.vaflowlib_date.push_back(tmp+"_GMT-5");}
       }
-    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflow_date = " << ((data.aflow_date.size())?data.aflow_date:"unavailable") << endl;
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date = " << ((data.vaflowlib_date.size())?data.vaflowlib_date.front():"unavailable") << endl;
     // ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&data.aflow_version.empty();iline++)
       if(aurostd::substring2bool(vlock[iline],"NFS") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {

@@ -53,10 +53,11 @@ namespace aflowlib {
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
       string title;                                             //ME20190125 - title of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
-      string aflowlib_date,aflowlib_version;                    // version/creation
+      string aflowlib_date;vector<string> vaflowlib_date;       // CONTAINS 2 DATES: [0]=lock_date, [1]=lib2raw_date
+      string aflowlib_version;                                  // version
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
       int aflowlib_entries_number;                              // their number
-      string aflow_date,aflow_version;                          // version/creation //CO20200624 - adding aflow_date
+      string aflow_version;                                     // version
       string catalog;                                           // ICSD,LIB2, etc.
       string data_api,data_source,data_language;                // version/source/language
       string error_status;                                            // ERROR ??

@@ -10410,6 +10410,12 @@ namespace pflow {
   // message can be string or stringstream (if stringstream, it gets cleared out)
   // oss = cout, cerr (as you prefer)
   // FileMESSAGE - logfile
+  void logger(const string& filename, const string& function_name, stringstream& message, const char& type, ostream& oss, bool silent, const string& message_metadata) {  // overload
+    string _message = message.str();
+    logger(filename, function_name, _message, oss, type, silent, message_metadata);
+    message.str("");
+  }
+
   void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, oss, type, silent, message_metadata);
@@ -10444,6 +10450,11 @@ namespace pflow {
     string _message = message.str();
     logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
+  }
+
+  void logger(const string& filename, const string& function_name, const string& _message, const char& type, ostream& oss, bool silent, const string& message_metadata) {  // overload
+    ofstream FileMESSAGE;
+    logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
   void logger(const string& filename, const string& function_name, const string& _message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
