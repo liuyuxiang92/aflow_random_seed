@@ -162,7 +162,7 @@ namespace apl
     }
     else
     {
-      msg="Calculating dynamical matrices along path (" + stringify(ncpus) + " threads)";
+      msg="Calculating dynamical matrices along path (" + aurostd::utype2string<int>(ncpus) + " threads)";
       _logger.initProgressBar(msg);
     }
 

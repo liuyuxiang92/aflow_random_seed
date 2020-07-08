@@ -22,12 +22,13 @@
 
 #include "aflow_apl.h"
 
-#if __cplusplus >= 201103L
-template <typename T>
-using auto_ptr = std::unique_ptr<T>;
-#else
-using std::auto_ptr;
-#endif
+// OBSOLTE ME20200516 - Not needed anymore
+//[OBSOLETE] #if __cplusplus >= 201103L
+//[OBSOLETE] template <typename T>
+//[OBSOLETE] using auto_ptr = std::unique_ptr<T>;
+//[OBSOLETE] #else
+//[OBSOLETE] using std::auto_ptr;
+//[OBSOLETE] #endif
 
 // Field width modifiers: used to format text during the output via std::setw function
 #define SW 5  // width of columns with blank space separator
@@ -443,7 +444,7 @@ namespace apl
   void QHAN::free()
   {
     system_title = "";
-    supercellopts.clear();
+    //supercellopts.clear();  // OBSOLETE ME20200518
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
     runQHA   = false; runQHA3P = false; runSCQHA = false;
@@ -490,7 +491,7 @@ namespace apl
 
     apl_options       = qha.apl_options;
     system_title      = qha.system_title;
-    supercellopts     = qha.supercellopts;
+    //supercellopts     = qha.supercellopts;  // OBSOLETE ME20200518
     isEOS             = qha.isEOS;
     isGP_FD           = qha.isGP_FD;
     ignore_imaginary  = qha.ignore_imaginary;
@@ -538,16 +539,16 @@ namespace apl
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  QHAN::QHAN(string &tpt, _xinput &xinput, _kflags &kflags, xoption &supercellopts,
+  QHAN::QHAN(string &tpt, _xinput &xinput, _kflags &kflags, xoption &apl_options,
       ofstream &messageFile, ostream &oss)
   {
-    initialize(tpt, xinput, kflags, supercellopts, messageFile, oss);
+    initialize(tpt, xinput, kflags, apl_options, messageFile, oss);
   }
 
   /// Initializes the QHA class with all the necessary data.
   ///
   void QHAN::initialize(string &tpt, _xinput &xinput, _kflags &kflags,
-      xoption &supercellopts, ofstream &messageFile, ostream &oss)
+      xoption &apl_options, ofstream &messageFile, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
     static const int precision_format = 3;
@@ -564,7 +565,8 @@ namespace apl
     free();
 
     this->xinput = xinput;
-    this->supercellopts = supercellopts;
+    //this->supercellopts = supercellopts;  // OBSOLETE ME20200518
+    this->apl_options = apl_options;
 
     currentDirectory = xinput.xvasp.Directory; // remember the current directory
 
@@ -916,49 +918,51 @@ namespace apl
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xinput.getXStr());
-      phcalc.getSupercell().build(supercellopts);
+      phcalc.getSupercell().build(apl_options);  // ME20200518
       phcalc.setDirectory(subdirectories[i]);
       phcalc.setNCPUs(kflags);
 
-      auto_ptr<apl::ForceConstantCalculator> fccalc;
+      // ME20200517 - New ForceConstantCalculator format
+      ForceConstantCalculator fccalc(phcalc.getSupercell(), apl_options, *p_FileMESSAGE, *p_oss);
+      //[OBSOLETE] auto_ptr<apl::ForceConstantCalculator> fccalc;
 
-      if (apl_options.getattachedscheme("ENGINE") == string("DM")){
-        apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
-            *p_FileMESSAGE, *p_oss);
-        fccalc.reset(dmPC);
+      //[OBSOLETE] if (apl_options.getattachedscheme("ENGINE") == string("DM")){
+      //[OBSOLETE]   apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
+      //[OBSOLETE]     *p_FileMESSAGE, *p_oss);
+      //[OBSOLETE]   fccalc.reset(dmPC);
 
-        // set options for direct method phonon calculations
-        dmPC->setGeneratePlusMinus(apl_options.flag("AUTO_DIST"),apl_options.flag("DPM"));
-        dmPC->setGenerateOnlyXYZ(apl_options.flag("XYZONLY"));
-        dmPC->setDistortionSYMMETRIZE(apl_options.flag("SYMMETRIZE"));
-        dmPC->setDistortionINEQUIVONLY(apl_options.flag("INEQUIVONLY"));
-        dmPC->setDistortionMagnitude(aurostd::string2utype<double>(
-              apl_options.getattachedscheme("DIST_MAGNITUDE")));
-        dmPC->setCalculateZeroStateForces(apl_options.flag("ZEROSTATE"));
-      }
-      else{
-        fccalc.reset(new apl::LinearResponsePC(phcalc.getSupercell(), *p_FileMESSAGE,
-              *p_oss));
-      }
-      fccalc->setPolarMaterial(apl_options.flag("POLAR"));
-      fccalc->setDirectory(subdirectories[i]);
+      //[OBSOLETE]   // set options for direct method phonon calculations
+      //[OBSOLETE]   dmPC->setGeneratePlusMinus(apl_options.flag("AUTO_DIST"),apl_options.flag("DPM"));
+      //[OBSOLETE]   dmPC->setGenerateOnlyXYZ(apl_options.flag("XYZONLY"));
+      //[OBSOLETE]   dmPC->setDistortionSYMMETRIZE(apl_options.flag("SYMMETRIZE"));
+      //[OBSOLETE]   dmPC->setDistortionINEQUIVONLY(apl_options.flag("INEQUIVONLY"));
+      //[OBSOLETE]   dmPC->setDistortionMagnitude(aurostd::string2utype<double>(
+      //[OBSOLETE]       apl_options.getattachedscheme("DIST_MAGNITUDE")));
+      //[OBSOLETE]   dmPC->setCalculateZeroStateForces(apl_options.flag("ZEROSTATE"));
+      //[OBSOLETE] }
+      //[OBSOLETE] else{
+      //[OBSOLETE]   fccalc.reset(new apl::LinearResponsePC(phcalc.getSupercell(), *p_FileMESSAGE,
+      //[OBSOLETE]         *p_oss));
+      //[OBSOLETE] }
+      //[OBSOLETE] fccalc->setPolarMaterial(apl_options.flag("POLAR"));
+      //[OBSOLETE] fccalc->setDirectory(subdirectories[i]);
 
       // set the name of the subdirectory
       xinput.setDirectory(subdirectories[i]);
 
       // if it is the first run, create APL subdirectories with corresponding aflow.in
       // files and skip to the next volume calculation
-      if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, aflowin)){
+      if (fccalc.runVASPCalculations(xinput, aflags, kflags, xflags, aflowin)){
         apl_data_calculated = false;
         continue;
       }
 
       // check if APL calculation is ready and calculate the force constants
-      if (!fccalc->run()){
+      if (!fccalc.run()){
         apl_data_calculated = false;
         continue;
       }
-      phcalc.setHarmonicForceConstants(*fccalc);
+      phcalc.setHarmonicForceConstants(fccalc);
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and
       // phonon dispersions
@@ -967,7 +971,8 @@ namespace apl
 
       vector<string> tokens;
 
-      aurostd::string2tokens(apl_options.getattachedscheme("DOS_MESH"), tokens, 
+      //ME20200518 - Changed keywords to correspond to rest of APL
+      aurostd::string2tokens(apl_options.getattachedscheme("DOSMESH"), tokens,
           string(" xX"));
       for (uint j=0; j<tokens.size(); j++){
         dos_mesh[j] = aurostd::string2utype<int>(tokens[j]);
@@ -975,10 +980,10 @@ namespace apl
 
       phcalc.initialize_qmesh(dos_mesh);
 
-      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOS_METHOD"),
+      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOSMETHOD"),
           dummy_dos_projections);
-      dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_NPOINTS")),
-          aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_SMEAR")));
+      dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
+          aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
       dosc.writePHDOSCAR(subdirectories[i]);
 
       if (dosc.hasNegativeFrequencies()){
@@ -986,7 +991,7 @@ namespace apl
         msg << "Phonon dispersions of the APL calculation in the " << subdirectories[i];
         msg << " directory contain imaginary frequencies." << std::endl;
         if (ignore_imaginary){
-          msg << "Imaginary part of the phonon dispersions and phonon DOS will be ignored.";
+          msg << "The imaginary parts of the phonon dispersions and phonon DOS will be ignored.";
           msg << " Check if the results are still meaningful!" << std::endl;
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
@@ -994,7 +999,7 @@ namespace apl
         else{
           msg << "QHA calculation will be stopped after checking all available APL calculations." << std::endl;
           msg << "Please check the phonon DOS and phonon dispersions." << std::endl;
-          msg << "Workaround: adjust the EOS_DISTORTION_RANGE option to exclude";
+          msg << "Workaround: adjust the EOS_DISTORTION_RANGE option to exclude ";
           msg << "the problematic calculations or ignore this error by setting "; 
           msg << "IGNORE_IMAGINARY=ON." << std::endl;
 
@@ -1020,8 +1025,9 @@ namespace apl
       Nbranches = phcalc.getNumberOfBranches();
 
       string USER_DC_INITLATTICE="";
+      //ME20200518 - Changed keyword to common APL keywords
       int USER_DC_NPOINTS = aurostd::string2utype<int>(
-          apl_options.getattachedscheme("BAND_NPOINTS"));
+          apl_options.getattachedscheme("DCPOINTS"));
       apl::PhononDispersionCalculator pdisc(phcalc);
       pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);

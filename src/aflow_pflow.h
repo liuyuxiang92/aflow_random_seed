@@ -22,6 +22,7 @@ static const char _LOGGER_COMPLETE_ = 'C';
 static const char _LOGGER_OPTION_ = 'O';
 static const char _LOGGER_RAW_ = 'R';
 static const char _LOGGER_MESSAGE_ = 'M';
+static const char _LOGGER_NOTICE_ = 'N';
 
 #define XRAY_THETA_TOL 1e-5;                                  //CO20190409
 
@@ -332,6 +333,7 @@ namespace pflow {
   ////////////////////////////////////////////////////////////////////////////////
   // START - added by Corey Oses - May 2017
   // effectively logs EVERYTHING, deals with cout and logger
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=std::cout);
   void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload

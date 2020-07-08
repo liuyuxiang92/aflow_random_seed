@@ -38,7 +38,6 @@ const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000
 const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY
 
 //some constants
-const int BAR_WIDTH = 70;
 const int A_START = 1, C_START = 1, F_START = 1;
 const int B_START = 0, D_START = 0, E_START = 0;
 
@@ -3186,22 +3185,6 @@ namespace pocc {
     return add2DerivativeStructuresList(psc,l_supercell_sets.begin(),l_supercell_sets.end());
   }
 
-  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff //CO20200404 - new web flag
-    double progress = (double)current/(double)end;
-    int pos = BAR_WIDTH * progress;
-
-    oss << "[";
-    for (int i = 0; i < BAR_WIDTH; ++i) {
-      if (i < pos) oss << "=";
-      else if (i == pos) oss << ">";
-      else oss << " ";
-    }
-    oss << "] " << int(progress * 100.0) << " %\r";
-    oss.flush();
-    if(current==end){ oss << endl; }
-  }
-
   void POccCalculator::getHNFMatSiteConfig(const POccSuperCell& psc,
       xmatrix<double>& _hnf_mat,
       vector<vector<int> >& _v_types_config){
@@ -3282,7 +3265,7 @@ namespace pocc {
     bool test_iterator_insertion=false; //short circuit
     xstructure a,b;
     uint starting_index=1;
-    updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
+    pflow::updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
     for(uint i=starting_index;i<vpsc.size();i++){
       const POccSuperCell& psc_b=vpsc[i];
       b=createXStructure(psc_b,n_hnf,hnf_count,types_config_permutations_count,true,false);  //PRIMITIVIZE==false, in general it is faster to find whether two structures are equivalent than it is to find primitive cell
@@ -3312,7 +3295,7 @@ namespace pocc {
         unique_structure_bins.push_back(vector<uint>(0));
         unique_structure_bins.back().push_back(i);
       }
-      updateProgressBar(i,vpsc.size(),*p_oss);
+      pflow::updateProgressBar(i,vpsc.size(),*p_oss);
     }
 
     //test of stupidity
@@ -3458,7 +3441,7 @@ namespace pocc {
     //NEW
     POccSuperCell psc;
     resetHNFMatrices();
-    updateProgressBar(current_iteration,total_permutations_count,*p_oss);
+    pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
     while(iterateHNFMatrix()){
       energy_analyzer.getCluster(hnf_mat);
       psc.m_hnf_index=hnf_index;
@@ -3471,7 +3454,7 @@ namespace pocc {
         psc.m_degeneracy=1; //degeneracy of 1
         add2DerivativeStructuresList(psc);
         site_config_index++;
-        updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
+        pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
       }
       hnf_index++;
     }
@@ -3504,7 +3487,7 @@ namespace pocc {
     //    add2DerivativeStructuresList(pds);
     //    //cerr << "DONE ADDING " << endl;
     //    site_config_index++;
-    //		updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
+    //		pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
     //    //cerr << "HERE10" << endl;
     //  }
     //  hnf_index++;
@@ -3741,13 +3724,13 @@ namespace pocc {
     }
 
     unsigned long long int current_iteration=0;
-    updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
+    pflow::updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
     POccSuperCell psc;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       psc=(*it).getSuperCell();
       psc.m_degeneracy=(*it).getDegeneracy(); //BEWARE OF DEGENERACY of this special POccSuperCell, representative of all supercells in that set
       v_xstr.push_back(createXStructure(psc,n_hnf,hnf_count,types_config_permutations_count,true,PRIMITIVIZE));
-      updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
+      pflow::updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
       //cout << AFLOWIN_SEPARATION_LINE << endl;
       //cout << createXStructure((*it),true);
       //cout << AFLOWIN_SEPARATION_LINE << endl;

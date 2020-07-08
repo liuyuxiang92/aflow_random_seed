@@ -122,7 +122,7 @@ namespace apl {
     if( ncpus == 1 )
       _logger.initProgressBar("Calculating dynamical matrices in k-mesh");
     else
-      _logger.initProgressBar("Calculating dynamical matrices in k-mesh (" + stringify(ncpus) + " threads)");
+      _logger.initProgressBar("Calculating dynamical matrices in k-mesh (" + aurostd::utype2string<int>(ncpus) + " threads)");
     _logger<<"Number of kpoints:: "<< (int)_kpoints.size() <<apl::endl;
 
     // Distribute the calculation
@@ -197,7 +197,7 @@ namespace apl {
     if( ncpus == 1 )
       _logger.initProgressBar("Calculating dynamical matrices along path");
     else
-      _logger.initProgressBar("Calculating dynamical matrices along path (" + stringify(ncpus) + " threads)");
+      _logger.initProgressBar("Calculating dynamical matrices along path (" + aurostd::utype2string<int>(ncpus) + " threads)");
     _logger<<"Number of kpoints:: "<< (int)_kpoints.size() <<apl::endl;
 
     // Distribute the calculation
