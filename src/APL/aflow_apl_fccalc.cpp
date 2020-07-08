@@ -196,9 +196,9 @@ namespace apl {
     xInput.xvasp.AVASP_arun_mode = "APL";
 
     bool stagebreak = false;
-    if (_method == "DM")   // Direct method - see README_AFLOW_APL.TXT{
+    if (_method == "DM") { // Direct method - see README_AFLOW_APL.TXT
       stagebreak = runVASPCalculationsDM(xInput, _aflowFlags, _kbinFlags, _xFlags, AflowIn);
-    } else if (_method == "LR")   // Linear response - see README_AFLOW_APL.TXT{
+    } else if (_method == "LR") {  // Linear response - see README_AFLOW_APL.TXT
       xInputs.push_back(xInput);
       stagebreak = runVASPCalculationsLR(xInputs[0], _aflowFlags, _kbinFlags, _xFlags, AflowIn);
     } else {
