@@ -9,6 +9,7 @@
         -- Added calculation of electronic contribution to the free energy. (AS)
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
+        -- Removed old QHA code, related infrastructure and dependencies. (AS)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
