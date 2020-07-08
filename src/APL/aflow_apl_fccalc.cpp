@@ -196,9 +196,9 @@ namespace apl {
     xInput.xvasp.AVASP_arun_mode = "APL";
 
     bool stagebreak = false;
-    if (_method == "DM") {
+    if (_method == "DM")   // Direct method - see README_AFLOW_APL.TXT{
       stagebreak = runVASPCalculationsDM(xInput, _aflowFlags, _kbinFlags, _xFlags, AflowIn);
-    } else if (_method == "LR") {
+    } else if (_method == "LR")   // Linear response - see README_AFLOW_APL.TXT{
       xInputs.push_back(xInput);
       stagebreak = runVASPCalculationsLR(xInputs[0], _aflowFlags, _kbinFlags, _xFlags, AflowIn);
     } else {
@@ -246,9 +246,9 @@ namespace apl {
     // Read Born effective charges and dielectric tensor
     if (_isPolarMaterial && !calculateBornChargesDielectricTensor(xInputs.back())) return false;
 
-    if (_method == "DM") {
+    if (_method == "DM") {  // Direct method - see README_AFLOW_APL.TXT
       if (!calculateForceConstantsDM()) return false;
-    } else if (_method == "LR") {
+    } else if (_method == "LR") {  // Linear response - see README_AFLOW_APL.TXT
       if (!readForceConstantsFromVasprun(xInputs[0])) return false;
     } else {
       return false;
@@ -898,7 +898,7 @@ namespace apl {
     out << AFLOWIN_SEPARATION_LINE << std::endl;
 
     // Distortion parameters for the direct method
-    if (_method == "DM") {
+    if (_method == "DM") {  // Direct method - see README_AFLOW_APL.TXT
       out << tag << "DISTORTION_MAGNITUDE=" << DISTORTION_MAGNITUDE << std::endl;
       out << tag << "DISTORTION_INEQUIVONLY=" << DISTORTION_INEQUIVONLY << std::endl;
       out << tag << "DISTORTIONS=START" << std::endl;
@@ -918,7 +918,7 @@ namespace apl {
       out << tag << "POLAR=" << _isPolarMaterial << std::endl;
       if (_isPolarMaterial) out << tag << "POLAR_RUNNAME=" << xInputs[idxRun].xvasp.AVASP_arun_runname << std::endl;
       out << AFLOWIN_SEPARATION_LINE << std::endl;
-    } else if (_method == "LR") {
+    } else if (_method == "LR") {  // Linear response - see README_AFLOW_APL.TXT
       out << tag << "POLAR=" << _isPolarMaterial << std::endl;
       out << AFLOWIN_SEPARATION_LINE << std::endl;
     }
