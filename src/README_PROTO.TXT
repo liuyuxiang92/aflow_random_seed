@@ -1571,7 +1571,7 @@ ABC4_tI24_88_a_b_f-001.{ABC}                     tI24      I4_{1}/a            -
 ABC4_tI24_88_a_b_f-002.{ABC}                     tI24      I4_{1}/a            -         CaMoO4              #88       CaMoO4, ICSD #417513
 A4BC2_tP28_91_2d_b_ac-001.{ABC}                  tP28      P4_{1}22            -         O4TiZn2             #91       O4TiZn2, ICSD #109093
 A2BC4_hP56_173_2b2c_ac_b5c-001.{ABC}             hP56      P6_{3}              -         Al2BaO4             #173      Al2BaO4, ICSD #246027
-AB2C4_cF56_227_b_c_e-001.{ABC}                   cF56      Fd-3m               -         MoNa2O4             #227      MoNa2O4, ICSD #151970 [DX-CONSOLIDATE]
+AB2C4_cF56_227_b_c_e-001.{ABC}                   cF56      Fd-3m               -         MoNa2O4             #227      MoNa2O4, ICSD #151970
     
 *****************************************************************************************************************************************************
 ANRL - nitrides - BINARIES (R. Friedrich)
