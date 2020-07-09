@@ -32,8 +32,6 @@
 #define DEBUG_QHA_GP_FIT false // toggles debug output related to the fit functionality
 // in the calcGrueneisen function
 
-#define BINOM(n,m) aurostd::factorial(n)/(aurostd::factorial(m)*aurostd::factorial(n-m))
-
 enum DATA_FILE {DF_DIRECTORY, DF_OUTCAR, DF_EIGENVAL, DF_IBZKPT};
 
 //=============================================================================
@@ -964,13 +962,13 @@ namespace apl
     for (uint i=0; i<subdirectories_static.size(); i++){
       all_files_are_present = true;
 
-      if (aurostd::FileExist(subdirectories_static[i]))
+      if (aurostd::IsDirectory(subdirectories_static[i]))
         file_is_present[i][DF_DIRECTORY] = true;
       else
         all_files_are_present = false;
 
       outcarfile = subdirectories_static[i]+"/OUTCAR.static";
-      if (aurostd::EFileExist(outcarfile) || aurostd::FileExist(outcarfile))
+      if (aurostd::EFileExist(outcarfile))
         file_is_present[i][DF_OUTCAR] = true;
       else
         all_files_are_present = false;
@@ -979,12 +977,12 @@ namespace apl
         eigenvfile = subdirectories_static[i]+"/EIGENVAL.static";
         ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
 
-        if (aurostd::EFileExist(eigenvfile) || (aurostd::FileExist(eigenvfile)))
+        if (aurostd::EFileExist(eigenvfile))
           file_is_present[i][DF_EIGENVAL] = true;
         else
           all_files_are_present = false;
 
-        if (aurostd::EFileExist(ibzkptfile) || (aurostd::FileExist(ibzkptfile)))
+        if (aurostd::EFileExist(ibzkptfile))
           file_is_present[i][DF_IBZKPT] = true;
         else
           all_files_are_present = false;
@@ -2033,7 +2031,7 @@ namespace apl
             order_begin = TaylorExpansionOrder - order;
             order_end = order_begin + 2*order;
             for (int i=order_begin, j=order; i<=order_end; i+=2, j--){
-              deriv += std::pow(-1,j) * BINOM(order, j) * xomega[i+1];
+              deriv += std::pow(-1,j) * combinations(order, j) * xomega[i+1];
             }
             deriv /= pow(2*gp_distortion*V0, order);
             result += deriv * pow(V-V0,order)/aurostd::factorial(order);
@@ -2089,7 +2087,7 @@ namespace apl
               order_begin = TaylorExpansionOrder - order;
               order_end = order_begin + 2*order;
               for (int i=order_begin, j=order; i<=order_end; i+=2, j--){
-                deriv += std::pow(-1,j) * BINOM(order, j) * xomega[i+1];
+                deriv += std::pow(-1,j) * combinations(order, j) * xomega[i+1];
               }
               deriv /= pow(2*gp_distortion*V0, order);
               // gamma = -V/w dw/dV: reduce power in (V-V0)^order expression
