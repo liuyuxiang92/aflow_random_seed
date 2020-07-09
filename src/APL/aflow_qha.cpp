@@ -1941,7 +1941,7 @@ namespace apl
     return middle;
   }
 
-  /// Calculates the electronic free energy at a given tempearture for a given volume id.
+  /// Calculates the electronic free energy at a given temperature for a given volume id.
   ///
   /// Electronic free energy is calculated as a weighted sum over energy eigenvalues
   /// with occupancies as defined by Fermi-Dirac statistics.
@@ -2540,13 +2540,13 @@ namespace apl
     // QHA calculation
     switch(eos_method){
       case(EOS_POLYNOMIAL):
-        filename += ".polynomial.";
+        filename += "polynomial.";
         break;
       case(EOS_BIRCH_MURNAGHAN):
-        filename += ".birch-murnaghan.";
+        filename += "birch-murnaghan.";
         break;
       case(EOS_MURNAGHAN):
-        filename += ".murnaghan.";
+        filename += "murnaghan.";
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
