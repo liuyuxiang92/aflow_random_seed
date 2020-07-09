@@ -1543,7 +1543,7 @@ namespace compare{
         }
       }
       int num=AUROSTD_MAX_INT;
-      if(num_string.size()!=0){
+      if(!num_string.empty()){
         if(aurostd::substring2bool(num_string,".")){
           vector<string> sub_tokens;
           aurostd::string2tokens(num_string,sub_tokens,"."); 
