@@ -126,7 +126,7 @@ namespace anrl {
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB3C_aP30_2_3i_9i_3i: sin(gamma)=" << sin(deg2rad*gamma)  << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG#="+aurostd::utype2string(spacegroup)+DOI_ANRL;
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL;
     str.scale=1.0;
 
     double cx=c*cos(deg2rad*beta);

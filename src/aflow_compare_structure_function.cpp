@@ -1528,7 +1528,7 @@ namespace compare{
     string min_ICSD = "";
     int min_num = 1e9;
     for(uint i=0;i<ICSD_entries.size();i++){
-      if(ICSD_entries[i].empty()){ cerr << "no icsd entries" << endl; continue; } //DX20191108 - if not an ICSD, skip
+      if(ICSD_entries[i].empty()){ continue; } //DX20191108 - if not an ICSD, skip
       vector<string> tokens;
       aurostd::string2tokens(ICSD_entries[i],tokens,"_"); 
       //DX20200706 [find ICSD number, more robust] - START
@@ -6118,7 +6118,7 @@ namespace compare{
 namespace compare{
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
-      const double& minimum_interatomic_distance, //DX20200622
+      double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
       const int& type_match) {
 
@@ -6138,7 +6138,15 @@ namespace compare{
 
     string function_name = XPID + "compare::findMatch():";
 
-    double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/4.0; //DX20200623
+    // ---------------------------------------------------------------------------
+    // Determines cutoff distance in which atoms map onto one another and are
+    // unlikely to match with other atoms based on the resolution of atoms
+    // (i.e., minimum interatomic distance). If mapping distances are below this
+    // value, then we do not need to check other possible atom mappings (offering
+    // a speed increase).
+    // DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING = 4.0 (default)
+    // Increase scaling to have a more stringent cutoff (slower, but more robust)
+    double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING; //DX20200623
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  // indices of atoms (index after sorting)

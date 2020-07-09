@@ -98,7 +98,7 @@ namespace anrl {
     double z12=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2BC4_hP56_173_2b2c_ac_b5c: z12=" << z12 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG#="+aurostd::utype2string(spacegroup)+DOI_ANRL;
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL;
     str.scale=1.0;
 
     a1=(1.0/2.0)*a*xn-(sqrt(3.0)/2.0)*a*yn;
