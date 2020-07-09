@@ -1490,18 +1490,18 @@ namespace compare{
 
     string ICSD_substring = "";
     bool ICSD_substring_found = false;
-    if(aurostd::substring2bool(name,"/")){
+    if(name.find("/") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
       vector<string> tokens;
       aurostd::string2tokens(name,tokens,"/");
       for(uint i=0;i<tokens.size();i++){
-        if(aurostd::substring2bool(tokens[i],"_ICSD_")){
+        if(tokens[i].find("_ICSD_") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
           ICSD_substring = tokens[i];
           ICSD_substring_found = true;
         }
       }
     }
     else {
-      if(aurostd::substring2bool(name,"_ICSD_")){ 
+      if(name.find("_ICSD_") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
         ICSD_substring = name;
         ICSD_substring_found = true;
       }
@@ -1534,7 +1534,7 @@ namespace compare{
       //DX20200706 [find ICSD number, more robust] - START
       string num_string = "";
       for(uint j=0;j<tokens.size();j++){
-        if(aurostd::substring2bool(tokens[j],"ICSD")){ 
+        if(tokens[j].find("ICSD") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
           if(j+1<tokens.size()){
             num_string = tokens[j+1];
             break;
@@ -1544,7 +1544,7 @@ namespace compare{
       }
       int num=AUROSTD_MAX_INT;
       if(!num_string.empty()){
-        if(aurostd::substring2bool(num_string,".")){
+        if(num_string.find(".") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
           vector<string> sub_tokens;
           aurostd::string2tokens(num_string,sub_tokens,"."); 
           num_string = sub_tokens[0];
@@ -4250,9 +4250,9 @@ namespace compare{
           ICSD_entries.push_back(findICSDName(comparison_schemes[i].structures_duplicate_names[j]));
         }
         string min_ICSD_entry = findMinimumICSDEntry(ICSD_entries);
-        if(!aurostd::substring2bool(comparison_schemes[i].structure_representative_name,min_ICSD_entry) && !min_ICSD_entry.empty()){ //DX20191108 - add not empty case
+        if((comparison_schemes[i].structure_representative_name.find(min_ICSD_entry) == std::string::npos) && !min_ICSD_entry.empty()){ //DX20191108 - add not empty case //DX20200709 - aurostd::substring2bool to find
           for(uint j=0;j<comparison_schemes[i].structures_duplicate_names.size();j++){
-            if(aurostd::substring2bool(comparison_schemes[i].structures_duplicate_names[j],min_ICSD_entry)){
+            if(comparison_schemes[i].structures_duplicate_names[j].find(min_ICSD_entry) != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
               string old_representative_ID = comparison_schemes[i].structure_representative_name;
               string old_representative_compound = comparison_schemes[i].structure_representative_compound;
               bool old_representative_generated = comparison_schemes[i].structure_representative_generated;
