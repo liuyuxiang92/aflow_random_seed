@@ -11,6 +11,7 @@
 #ifndef _AFLOWLIB_WEB_INTERFACE_CPP_
 #define _AFLOWLIB_WEB_INTERFACE_CPP_
 #include "aflow.h"
+#include "aflow_pocc.h" //CO20200624
 #include "aflowlib_webapp_entry.cpp"  //CO20170622 - BH JMOL stuff
 #include "aflowlib_webapp_bands.cpp"  //CO20180305 - GG bands stuff
 
@@ -3630,7 +3631,19 @@ namespace aflowlib {
 // auid2present
 // **************************************************************************
 namespace aflowlib {
-  bool _aflowlib_entry::directory2auid(string directory) {
+  string _aflowlib_entry::directory2MetadataAUIDjsonfile(const string& directory){  //CO20200624
+    string soliloquy=XPID+"_aflowlib_entry::directory2MetadataAUIDjsonfile():";
+    string json="";
+
+    _aflags aflags;aflags.Directory=directory;
+    pocc::POccCalculator pcalc(aflags);
+    pcalc.loadDataIntoCalculator();
+    for(uint i=0;i<pcalc.m_ARUN_directories.size();i++){cerr << soliloquy << " m_ARUN_directories[" << i << "]=" << pcalc.m_ARUN_directories[i] << endl;}
+    exit(0);
+
+    return "{"+json+"}";
+  }
+  bool _aflowlib_entry::directory2auid(const string& directory) { //CO20200624
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: BEGIN" << endl;
     auid="";
@@ -3804,7 +3817,7 @@ namespace aflowlib {
   string auid2directory(const string auid) {                                // gives AUID directory from existence of vauid
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "aflowlib::auid2directory: BEGIN" << endl;
-    string directory;
+    string directory="";  //CO20200624
     deque<string> vauid;
     aflowlib::auid2vauid(auid,vauid);
     if(vauid.size()>0) {

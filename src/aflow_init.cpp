@@ -1853,7 +1853,7 @@ bool AFLOW_BlackList(string h) {
 namespace init {
   bool MessageOption(const string& options, const string& routine,vector<string> vusage) {  //CO20200624
     ostream& oss=cerr;
-    string usage="       Usage: ";
+    string usage="      "+routine+" Usage: ";  //CO20200624
     for(uint i=0;i<vusage.size();i++) {
       if(aurostd::substring2bool(vusage.at(i),"options:")) usage="              ";
       if(vusage.at(i)!="") oss << usage << vusage.at(i) << endl;

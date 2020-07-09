@@ -57,6 +57,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (START)" << endl;
 
+    if(aflags.Directory.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aflags.Directory not set",_INPUT_MISSING_);}  //CO20200624 - prevent segfault
     if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
 
     // ***************************************************************************

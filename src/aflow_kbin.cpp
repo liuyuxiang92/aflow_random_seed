@@ -244,6 +244,7 @@ namespace KBIN {
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::file2string(AflowIn_file,AflowIn);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"AflowIn.size()="+aurostd::utype2string(AflowIn.size()),FileMESSAGE,oss,_LOGGER_MESSAGE_); //CO20200624 - check size!=0
   }
 }
 

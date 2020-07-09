@@ -1349,16 +1349,10 @@ namespace pocc {
 
   }
 
-  //CT20200319 - added AEL/AGL option
-  void POccCalculator::postProcessing(){
-    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::postProcessing():";
-    stringstream message;
-
+  void POccCalculator::loadDataIntoCalculator(){
+    string soliloquy=XPID+"POccCalculator::loadDataIntoCalculator():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
-
-    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-
+    
     POccStructuresFile psf;
     psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags,*p_FileMESSAGE,*p_oss);
     if(!psf.loadDataIntoCalculator((*this),false)){  //do not try DirectoryLS() yet
@@ -1371,6 +1365,19 @@ namespace pocc {
     }
     //StructuresAllFile2SupercellSets();  //this also works, just slower
     //StructuresUniqueFile2SupercellSets();
+  }
+
+  //CT20200319 - added AEL/AGL option
+  void POccCalculator::postProcessing(){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::postProcessing():";
+    stringstream message;
+
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    loadDataIntoCalculator();
     if(!QMVASPsFound()){return;}
     setDFTEnergies();
     setEFA();
@@ -1965,8 +1972,8 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
-      m_initialized=false;  //no point
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -1975,9 +1982,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setKFlags(kflags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -1986,9 +1993,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setVFlags(vflags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -1997,10 +2004,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setKFlags(kflags);
       setVFlags(vflags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -2019,7 +2026,7 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setPOccStructure(xstr_pocc);
       m_initialized=true;
     }
@@ -2216,9 +2223,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setPOccFlags(pocc_flags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -2227,10 +2234,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setKFlags(kflags);
       setPOccFlags(pocc_flags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -2239,10 +2246,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setVFlags(vflags);
       setPOccFlags(pocc_flags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -2251,11 +2258,11 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      loadPOccStructureFromAFlags(aflags);
+      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
       setKFlags(kflags);
       setVFlags(vflags);
       setPOccFlags(pocc_flags);
-      m_initialized=false;  //no point
+      m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
@@ -2363,11 +2370,18 @@ namespace pocc {
 
   void POccCalculator::setPOccFlags(const aurostd::xoption& pocc_flags) {m_p_flags=pocc_flags;}
 
-  void POccCalculator::loadPOccStructureFromAFlags(const _aflags& aflags) {
-    string soliloquy = XPID + "POccCalculator::loadPOccStructureFromAFlags():";
-    string AflowIn_file,AflowIn;
-    KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
+  void POccCalculator::loadFromAFlags() { //grabs from m_aflags
+    bool LDEBUG=(TRUE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
+    string soliloquy = XPID + "POccCalculator::loadFromAFlags():";
+    string AflowIn_file="",AflowIn="";
+    KBIN::getAflowInFromAFlags(m_aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
+    if(LDEBUG){cerr << soliloquy << " loaded aflow.in" << endl;}
+    m_kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,*p_oss);  //set them here if we can, they will get overwritten with input kflags
+    if(LDEBUG){cerr << soliloquy << " loaded kflags" << endl;}
+    m_vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,m_kflags,*p_oss); //set them here if we can, they will get overwritten with input vflags
+    if(LDEBUG){cerr << soliloquy << " loaded vflags" << endl;}
     setPOccStructure(pocc::extractPARTCAR(AflowIn));
+    if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;}
   }
 
   void POccCalculator::setPOccStructure(const xstructure& xstr_pocc) {
@@ -2389,8 +2403,12 @@ namespace pocc {
   }
 
 
-  void POccCalculator::setKFlags(const _kflags& kflags) {m_kflags=kflags;}
-  void POccCalculator::setVFlags(const _vflags& vflags) {m_vflags=vflags;}
+  void POccCalculator::setAFlags(const _aflags& aflags) {
+    POccCalculatorTemplate::setAFlags(aflags);
+    loadFromAFlags();  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+  }
+  void POccCalculator::setKFlags(const _kflags& kflags) {m_kflags.clear();m_kflags=kflags;}
+  void POccCalculator::setVFlags(const _vflags& vflags) {m_vflags.clear();m_vflags=vflags;}
 
   bool sortPOccSites(const POccUnit& p1,const POccUnit& p2){
     if(p1.v_occupants.size()!=p2.v_occupants.size()){
@@ -4532,8 +4550,8 @@ namespace pocc {
     //types2uffparams_map.clear(); for(uint i=0;i<b.types2uffparams_map.size();i++){types2uffparams_map.push_back(b.types2uffparams_map[i]);}
   }
 
-  void POccCalculatorTemplate::setPOccFlags(const aurostd::xoption& pocc_flags){m_p_flags=pocc_flags;}
-  void POccCalculatorTemplate::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
+  void POccCalculatorTemplate::setPOccFlags(const aurostd::xoption& pocc_flags){m_p_flags.clear();m_p_flags=pocc_flags;}
+  void POccCalculatorTemplate::setAFlags(const _aflags& aflags) {m_aflags.clear();m_aflags=aflags;}
 
   void POccCalculatorTemplate::setPOccStructure(const xstructure& _xstr_pocc){
     xstr_pocc=_xstr_pocc;
