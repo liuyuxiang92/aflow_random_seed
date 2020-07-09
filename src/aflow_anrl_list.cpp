@@ -263,7 +263,7 @@ namespace anrl {
     vproto.push_back("A_cP8_205_c;1;8;205;3;2;cP8;a,x1;-;N2;alpha-N2");
     vproto.push_back("AB_cP16_205_c_c;2;16;205;4;3;cP16;a,x1,x2;-;CuCl;SC16");
     vproto.push_back("AB2_cP12_205_a_c;2;12;205;4;2;cP12;a,x2;C2/-;FeS2/NaO2;Pyrite/NaO2 (ICSD #87178"); //DX20200703 - added binary oxide for R. Friedrich 
-    vproto.push_back("AB3C6_cI80_206_a_d_e;3;40;206;5;5;cI80;a,x2,x3,y3,z3;D5_3;(Mn,Fe)2O3;Bixbyite");
+    vproto.push_back("AB3C6_cI80_206_b_d_e;3;40;206;5;5;cI80;a,x2,x3,y3,z3;D5_3;(Mn,Fe)2O3;Bixbyite");
     vproto.push_back("A_cI16_206_c;1;8;206;3;2;cI16;a,x1;-;Si;BC8");
     vproto.push_back("A_cP20_213_cd;1;20;213;3;3;cP20;a,x1,y2;A13;Mn;betaMn");
     vproto.push_back("A3B4C_cP8_215_d_e_a;3;8;215;5;2;cP8;a,x3;H2_4;Cu3S4V;Sulvanite");

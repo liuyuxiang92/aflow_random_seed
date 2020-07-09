@@ -5061,9 +5061,9 @@ namespace anrl {
       PrototypeANRL_AB2_cP12_205_a_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
     // ---------------------------------------------------------------------------
-    // 236 // ./aflow --proto=AB3C6_cI80_206_a_d_e --params=9.4,-0.0344,0.338,0.1,0.125
-    if(vlabel.at(ifound)=="AB3C6_cI80_206_a_d_e") {
-      PrototypeANRL_AB3C6_cI80_206_a_d_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // 236 // ./aflow --proto=AB3C6_cI80_206_b_d_e --params=9.4,-0.0344,0.338,0.1,0.125
+    if(vlabel.at(ifound)=="AB3C6_cI80_206_b_d_e") {
+      PrototypeANRL_AB3C6_cI80_206_b_d_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
     // ---------------------------------------------------------------------------
     // 237 // ./aflow --proto=A_cI16_206_c --params=4.11971,0.1001
