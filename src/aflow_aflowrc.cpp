@@ -581,8 +581,8 @@
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 //AS20200602 BEGIN
-#define AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANION_ORDER             2
-#define         DEFAULT_QHA_TAYLOR_EXPANION_ORDER             XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_TAYLOR_EXPANION_ORDER")
+#define AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER             2
+#define         DEFAULT_QHA_TAYLOR_EXPANSION_ORDER             XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER")
 //AS20200602 END
 #define AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              FALSE
 #define         DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB")
@@ -601,6 +601,14 @@
 //// DEFAULT QHA FILES
 #define AFLOWRC_DEFAULT_QHA_FILE_PREFIX                       string("aflow.qha.")
 #define         DEFAULT_QHA_FILE_PREFIX                       XHOST.adefault.getattachedscheme("DEFAULT_QHA_FILE_PREFIX")
+//AS20200709 BEGIN
+#define AFLOWRC_DEFAULT_QHA3P_FILE_PREFIX                     string("aflow.qha3p.")
+#define         DEFAULT_QHA3P_FILE_PREFIX                     XHOST.adefault.getattachedscheme("DEFAULT_QHA3P_FILE_PREFIX")
+#define AFLOWRC_DEFAULT_QHANP_FILE_PREFIX                     string("aflow.qhanp.")
+#define         DEFAULT_QHANP_FILE_PREFIX                     XHOST.adefault.getattachedscheme("DEFAULT_QHANP_FILE_PREFIX")
+#define AFLOWRC_DEFAULT_SCQHA_FILE_PREFIX                     string("aflow.scqha.")
+#define         DEFAULT_SCQHA_FILE_PREFIX                     XHOST.adefault.getattachedscheme("DEFAULT_SCQHA_FILE_PREFIX")
+//AS20200709 END
 #define AFLOWRC_DEFAULT_QHA_GP_PATH_FILE                      string("gp.disp.out")
 #define         DEFAULT_QHA_GP_PATH_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_GP_PATH_FILE")
 #define AFLOWRC_DEFAULT_QHA_GP_MESH_FILE                      string("gp.mesh.out")
@@ -1371,7 +1379,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_EOS", AFLOWRC_DEFAULT_QHA_EOS);
     aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
     aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
-    aflowrc::load_default("DEFAULT_QHA_TAYLOR_EXPANION_ORDER", AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANION_ORDER);//AS20200602
+    aflowrc::load_default("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER", AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);//AS20200602
     aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
     aflowrc::load_default("DEFAULT_QHA_SOMMERFELD_EXPANSION", AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION);//AS20200528
     aflowrc::load_default("DEFAULT_QHA_PDIS_T", AFLOWRC_DEFAULT_QHA_PDIS_T);
@@ -1380,6 +1388,11 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_IGNORE_IMAGINARY", AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY);
     //// DEFAULT QHA FILES
     aflowrc::load_default("DEFAULT_QHA_FILE_PREFIX", AFLOWRC_DEFAULT_QHA_FILE_PREFIX);
+    //AS20200709 BEGIN
+    aflowrc::load_default("DEFAULT_QHA3P_FILE_PREFIX", AFLOWRC_DEFAULT_QHA3P_FILE_PREFIX);
+    aflowrc::load_default("DEFAULT_QHANP_FILE_PREFIX", AFLOWRC_DEFAULT_QHANP_FILE_PREFIX);
+    aflowrc::load_default("DEFAULT_SCQHA_FILE_PREFIX", AFLOWRC_DEFAULT_SCQHA_FILE_PREFIX);
+    //AS20200709 END
     aflowrc::load_default("DEFAULT_QHA_GP_PATH_FILE", AFLOWRC_DEFAULT_QHA_GP_PATH_FILE);
     aflowrc::load_default("DEFAULT_QHA_GP_MESH_FILE", AFLOWRC_DEFAULT_QHA_GP_MESH_FILE);
     aflowrc::load_default("DEFAULT_QHA_GP_AVG_FILE", AFLOWRC_DEFAULT_QHA_GP_AVG_FILE);
@@ -1921,7 +1934,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_EOS=" << AFLOWRC_DEFAULT_QHA_EOS  << endl;
     aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
-    aflowrc << "DEFAULT_QHA_TAYLOR_EXPANION_ORDER=" << AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANION_ORDER  << endl;//AS20200602
+    aflowrc << "DEFAULT_QHA_TAYLOR_EXPANSION_ORDER=" << AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER  << endl;//AS20200602
     aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
     aflowrc << "DEFAULT_QHA_SOMMERFELD_EXPANSION=" << AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION  << endl;//AS20200528
     aflowrc << "DEFAULT_QHA_PDIS_T=\"" << AFLOWRC_DEFAULT_QHA_PDIS_T << "\"" << endl;
@@ -1929,6 +1942,11 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_GP_FINITE_DIFF=" << AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF  << endl;
     aflowrc << "DEFAULT_QHA_IGNORE_IMAGINARY=" << AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY  << endl;
     aflowrc << "DEFAULT_QHA_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHA_FILE_PREFIX << "\"" << endl;
+    //AS20200709 BEGIN
+    aflowrc << "DEFAULT_QHA3P_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHA3P_FILE_PREFIX << "\"" << endl;
+    aflowrc << "DEFAULT_QHANP_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHANP_FILE_PREFIX << "\"" << endl;
+    aflowrc << "DEFAULT_SCQHA_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_SCQHA_FILE_PREFIX << "\"" << endl;
+    //AS20200709 END
     aflowrc << "DEFAULT_QHA_GP_PATH_FILE=\"" << AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF << "\"" << endl;
     aflowrc << "DEFAULT_QHA_GP_MESH_FILE=\"" << AFLOWRC_DEFAULT_QHA_GP_MESH_FILE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_GP_AVG_FILE=\"" << AFLOWRC_DEFAULT_QHA_GP_AVG_FILE << "\"" << endl;
@@ -2437,7 +2455,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS\")=" << DEFAULT_QHA_EOS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_TAYLOR_EXPANION_ORDER\")=" << DEFAULT_QHA_TAYLOR_EXPANION_ORDER << endl;//AS20200602
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_TAYLOR_EXPANSION_ORDER\")=" << DEFAULT_QHA_TAYLOR_EXPANSION_ORDER << endl;//AS20200602
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_SOMMERFELD_EXPANSION\")=" << DEFAULT_QHA_SOMMERFELD_EXPANSION << endl;//AS20200528
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDIS_T\")=\"" << DEFAULT_QHA_PDIS_T << "\"" << endl;
@@ -2445,6 +2463,11 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_FINITE_DIFF\")=" << DEFAULT_QHA_GP_FINITE_DIFF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_IGNORE_IMAGINARY\")=" << DEFAULT_QHA_IGNORE_IMAGINARY << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FILE_PREFIX\")=\"" << DEFAULT_QHA_FILE_PREFIX << "\"" << endl;
+    //AS20200709 BEGIN
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA3P_FILE_PREFIX\")=\"" << DEFAULT_QHA3P_FILE_PREFIX << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHANP_FILE_PREFIX\")=\"" << DEFAULT_QHANP_FILE_PREFIX << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_SCQHA_FILE_PREFIX\")=\"" << DEFAULT_SCQHA_FILE_PREFIX << "\"" << endl;
+    //AS20200709 END
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_PATH_FILE\")=\"" << DEFAULT_QHA_GP_PATH_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_MESH_FILE\")=\"" << DEFAULT_QHA_GP_MESH_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_AVG_FILE\")=\"" << DEFAULT_QHA_GP_AVG_FILE << "\"" << endl;

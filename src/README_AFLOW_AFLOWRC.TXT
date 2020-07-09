@@ -1364,6 +1364,21 @@ DEFAULT_QHA_FILE_PREFIX
   type: string
   default: "aflow.qha."
 
+DEFAULT_QHA3P_FILE_PREFIX
+  description: QHA3P file prefix. All QHA3P output files start with this prefix.
+  type: string
+  default: "aflow.qha3p."
+
+DEFAULT_QHANP_FILE_PREFIX
+  description: QHANP file prefix. All QHANP output files start with this prefix.
+  type: string
+  default: "aflow.qhanp."
+
+DEFAULT_SCQHA_FILE_PREFIX
+  description: SCQHA file prefix. All SCQHA output files start with this prefix.
+  type: string
+  default: "aflow.scqha."
+
 DEFAULT_QHA_GP_PATH_FILE
   description: Output file for mode-resolved Grueneisen parameter dispersion curve.
   type: string

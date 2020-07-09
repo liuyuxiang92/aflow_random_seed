@@ -515,7 +515,7 @@ namespace KBIN {
     opt.keyword="EOS"; opt.option = DEFAULT_QHA_EOS; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="EOS_DISTORTION_RANGE"; opt.xscheme = DEFAULT_QHA_EOS_DISTORTION_RANGE; qhaflags.push_back(opt); opt.clear();
     opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
-    opt.keyword="TAYLOR_EXPANSION_ORDER"; opt.xscheme = utype2string<double>(DEFAULT_QHA_TAYLOR_EXPANION_ORDER); qhaflags.push_back(opt); opt.clear();//AS20200602
+    opt.keyword="TAYLOR_EXPANSION_ORDER"; opt.xscheme = utype2string<double>(DEFAULT_QHA_TAYLOR_EXPANSION_ORDER); qhaflags.push_back(opt); opt.clear();//AS20200602
     opt.keyword="INCLUDE_ELEC_CONTRIB"; opt.option = DEFAULT_QHA_INCLUDE_ELEC_CONTRIB; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     //AS20200528
     opt.keyword="SOMMERFELD_EXPANSION"; opt.option = DEFAULT_QHA_SOMMERFELD_EXPANSION; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();

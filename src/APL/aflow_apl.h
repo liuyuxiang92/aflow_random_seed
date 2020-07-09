@@ -1229,16 +1229,16 @@ namespace apl
   /// This class will substitute old QHA class.
   /// The old QHA class will be kept until the new one is finished.
   ///
-  class QHAN : public xStream {
+  class QHA : public xStream {
     public:
-      QHAN(ostream& oss=std::cout);
-      QHAN(const QHAN& qha);
-      QHAN(_xinput &xinput, _kflags &kflags, xoption &aplopts, ofstream &messageFile,
+      QHA(ostream& oss=std::cout);
+      QHA(const QHA& qha);
+      QHA(_xinput &xinput, _kflags &kflags, xoption &aplopts, ofstream &FileMESSAGE,
           ostream &oss=std::cout);
       void initialize(_xinput &xinput, _kflags &kflags, xoption &aplopts,
-          ofstream &messageFile, ostream &oss);
-      ~QHAN();
-      const QHAN& operator=(const QHAN &qha);
+          ofstream &FileMESSAGE, ostream &oss);
+      ~QHA();
+      const QHA& operator=(const QHA &qha);
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
       void clear();
       double calcFrequencyFit(double V, xvector<double> &xomega);
@@ -1351,7 +1351,7 @@ namespace apl
       void printMissingStaticFiles(const vector<vector<bool> > & list,
           const vector<string> &subdirectories);
       void free();
-      void copy(const QHAN &qha);
+      void copy(const QHA &qha);
   };
 }
 //AS20200513 END
