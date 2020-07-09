@@ -916,7 +916,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   } else {
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
   }
-  //[OBSOLETE] vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
   if (aurostd::args2flag(argv, cmds, "--plotphdos")) {
     vpflow.flag("PLOT_PHDOS", true);
     vpflow.addattachedscheme("PLOT_PHDOS", "./", true);
@@ -1871,7 +1870,6 @@ namespace pflow {
       if(vpflow.flag("PLOT_BANDDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_BANDDOS"); plotter::PLOT_BANDDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOS",true); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOSALL")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOSALL",false); pltopts.push_attached("DATASET", "-1"); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
-      if(vpflow.flag("PLOTPHDISP")) {pflow::PLOT_PHDISP(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDOS"); plotter::PLOT_PHDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISP")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISP"); plotter::PLOT_PHDISP(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISPDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISPDOS"); plotter::PLOT_PHDISPDOS(pltopts); _PROGRAMRUN=true;}
@@ -6639,49 +6637,53 @@ namespace pflow {
     //while(symmetry_commensurate==FALSE)
     if(print == false) //DX20170803 - PRINT
     { //CO20200106 - patching for auto-indenting
-      for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+XHOST.vext.at(iext)) || //DX20200129
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+XHOST.vext.at(iext)) || //DX20171205 - Added pgroupk_xtal
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+XHOST.vext.at(iext))) {tocompress=TRUE;}
+      if(format=="txt"){ //DX20200623 - only overwrite the specified file format
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+XHOST.vext.at(iext)) || //DX20200129
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+XHOST.vext.at(iext)) || //DX20171205 - Added pgroupk_xtal
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+XHOST.vext.at(iext))) {tocompress=TRUE;}
+        }
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+"*");} //DX20200129
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+"*");} //DX20171205 - Added pgroupk_xtal
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+"*");}
+        }
       }
-      for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+"*");} //DX20200129
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+"*");} //DX20171205 - Added pgroupk_xtal
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_IATOMS_OUT+"*");}
-      }
-      for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+XHOST.vext.at(iext)) || //DX20200129
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+XHOST.vext.at(iext)) || //DX20171205 - Added pgroupk_xtal
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+XHOST.vext.at(iext)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+XHOST.vext.at(iext))) {tocompress=TRUE;}
-      }
-      for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+"*");} //DX20200129
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+"*");} //DX20180516 - added pgroupk_xtal
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+"*");}
+      else if(format=="json"){ //DX20200623 - only overwrite the specified file format
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+XHOST.vext.at(iext)) || //DX20200129
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+XHOST.vext.at(iext)) || //DX20171205 - Added pgroupk_xtal
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+XHOST.vext.at(iext)) ||
+              aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+XHOST.vext.at(iext))) {tocompress=TRUE;}
+        }
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+"*");} //DX20200129
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+"*");} //DX20180516 - added pgroupk_xtal
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+"*");}
+          if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+"*");}
+        }
       }
     }	
 
@@ -10395,6 +10397,25 @@ namespace pflow {
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace pflow {
+
+  // ME20200512 - Created by CO for POCC.
+  const int BAR_WIDTH = 70;
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
+    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag
+    double progress = (double)current/(double)end;
+    int pos = BAR_WIDTH * progress;
+
+    oss << "[";
+    for (int i = 0; i < BAR_WIDTH; ++i) {
+      if (i < pos) oss << "=";
+      else if (i == pos) oss << ">";
+      else oss << " ";
+    }
+    oss << "] " << int(progress * 100.0) << " %\r";
+    oss.flush();
+    if(current==end){ oss << endl; }
+  }
+
   //***************************************************************************//
   // pflow::logger(const char& type,const string& function_name,string
   // _message,bool silent,ostream& oss,ofstream& FileMESSAGE)
@@ -10749,6 +10770,52 @@ namespace pflow {
 
       ////////////////////////////////////////////////////////////////////////////
       // END Raw logger
+      ////////////////////////////////////////////////////////////////////////////
+
+      // ME20200514
+    } else if (type == _LOGGER_NOTICE_) {
+
+      ////////////////////////////////////////////////////////////////////////////
+      // START Notice logger
+      ////////////////////////////////////////////////////////////////////////////
+
+      if(verbose) {
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[32m");  // green
+        for(uint i=0;i<message_parts.size();i++) {
+          oss << "00000";
+          oss << "  ";
+
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
+          oss << "NOTICE";
+
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
+          oss << message_parts[i];
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
+      }
+      // write to log
+      for(uint i=0;i<message_parts.size();i++) {
+        FileMESSAGE << "00000";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "NOTICE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
+        FileMESSAGE << message_parts[i];
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
+      }
+      FileMESSAGE.flush();
+
+      ////////////////////////////////////////////////////////////////////////////
+      // END Notice logger
       ////////////////////////////////////////////////////////////////////////////
 
     } else {
@@ -12771,8 +12838,8 @@ namespace pflow {
             "                --usage",
             "                --potential=pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN ",
             "                --potential_complete",
-            "                --module=[APL | QHA | AAPL]",
-            "                --apl_superce=NxNxN",
+            "                --module=[APL|QHA|AAPL]",
+            "                --apl_supercell=NxNxN",
             "                --usage",
             "                --missing",
             "                --noautopp",

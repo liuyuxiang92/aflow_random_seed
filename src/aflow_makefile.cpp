@@ -566,8 +566,10 @@ namespace makefile {
 
     //join together
     stringstream makefile_aflow;
+    makefile_aflow << "# AUTOMATICALLY GENERATED AFLOW - BEGIN" << endl << endl;
     makefile_aflow << makefile_definitions_ss.str() << endl;
     makefile_aflow << makefile_rules_ss.str() << endl;
+    makefile_aflow << "# AUTOMATICALLY GENERATED AFLOW - END" << endl;
     if(aurostd::FileExist(directory+"/"+Makefile_aflow)){aurostd::file2file(directory+"/"+Makefile_aflow,directory+"/"+Makefile_aflow_OLD);}  //saving
     aurostd::stringstream2file(makefile_aflow,directory+"/"+Makefile_aflow);
   }

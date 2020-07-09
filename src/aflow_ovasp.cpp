@@ -7612,7 +7612,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   string line;
   if(filename=="") filename="stringstream";
   // crunching to eat the info
-  
+
   if(vcontent.size()==0){return false;} //CO+ME20200604 - file does not exist, don't spit out warnings for the workshops
 
   // GET AUID AS SOON AS POSSIBLE
@@ -8331,7 +8331,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   stringstream message;
   bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
-  
+
   long double seconds=aurostd::get_seconds();
   if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
@@ -8542,13 +8542,13 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   string soliloquy=XPID+"xKPOINTS::GetProperties():";
   stringstream message;
   bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
-  
+
   bool ERROR_flag=FALSE;
   clear(); // so it does not mess up vector/deque
-  
+
   long double seconds=aurostd::get_seconds();
   if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
-  
+
   content=stringstreamIN.str();
   vcontent.clear();
   vector<string> tokens;

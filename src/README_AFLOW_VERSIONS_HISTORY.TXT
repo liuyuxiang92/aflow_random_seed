@@ -1,10 +1,34 @@
-3.2.3 - 2020/05/22
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+3.2.5 - 2020/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- Moved POCC progress bar into pflow. (ME)
+        -- Added "Notice" from apl::Logger into pflow::logger. (ME)
+        -- Modularized APL option parsing. (ME)
+        -- Merged more pflow logging capabilities into APL. (ME)
+        -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
+        -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
+        -- Added 49 new ANRL prototype files for the nitrides and oxides (DX+RF)
+        -- Added 14 new parameter enumerations to existing ANRL labels for nitrides and oxides (DX+RF)
+        -- Updated README_PROTO.TXT with new nitrides and oxides (DX+RF)
+        -- Bug fixes in XtalFinder: precondition structures with BringInCell() for local geometry comparisons (DX)
+        -- Bug fixes in XtalFinder: use more robust matching protocol; accounts for undecorated prototypes (i.e., small volumes) (DX)
+3.2.4 - 2020/06/25
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
+        -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
         -- Bug fixes to xPOTCAR (exits) (CO+ME)
         -- Bug fixes to Wyckoff positions (DX)
+        -- Bug fixes for overwriting symmetry output files text/json (DX)
         -- adding in CHULL workshop unit tests (CO)
         -- adding exits to CCE unit tests (CO)
         -- Bug fixes to aurostd::isDirectory() and isFile() (CO)
+        -- Bug fixes for xelement, adding populate() function for CCE (CO)
+        -- Bug fixes in POCC: missing POTCAR suffix for LIB6 and EFileNotEmpty() cerr verbose (CO)
+        -- Bug fixes in KBIN::getVASPVersion() (CO)
+        -- Bug fixes in POCC: extending m_Egap.size() if metal is found among ARUNs (CO)
+        -- Bug fixes in XHOST: adding another way to get XHOST.home, might fail on OSX (CO)
+        (AFLOW: aconvasp_main.cpp, aflow.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, avasp.cpp, chull.cpp, chull_jupyter.json, chull_jupyter_plotter.py, chull_python.py, compare_structure_function.cpp, init.cpp, ivasp.cpp, kvasp.cpp, lattice.cpp, Makefile, Makefile.aflow, makefile.cpp, makefile.h, ovasp.cpp, plotter.cpp, pocc.cpp, README_AFLOW.TXT, symmetry_spacegroup_functions.cpp, symmetry_spacegroup_ITC_library.cpp, xelement.cpp, xelement.h)
+        (AUROSTD: main.cpp)
+3.2.3 - 2020/05/22
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- Bug fixes in KBIN::ExtractSystemName() (ME)
         -- Fixed PID/TID and XPID XTID in aflow.h aflow_init.cpp (SC)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)

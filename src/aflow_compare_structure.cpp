@@ -1587,6 +1587,7 @@ namespace compare {
     input_structure.natoms = xstr.atoms.size(); //DX20200421
     input_structure.ntypes = xstr.num_each_type.size(); //DX20200421
     input_structure.structure_representative.ReScale(1.0); //DX20191105
+    input_structure.structure_representative.BringInCell(); //DX20200707
     input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
     input_structure.elements = compare::getElements(xstr);
@@ -1674,6 +1675,7 @@ namespace compare {
           str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20200421
           str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20200421
           str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
+          str_proto_tmp.structure_representative.BringInCell(); //DX20200707
           str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
           str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directoryr
           str_proto_tmp.structure_representative_generated=true;
@@ -2346,6 +2348,7 @@ namespace compare {
 
     for(uint i=0;i<all_structures.size();i++){
       all_structures[i].structure_representative.ReScale(1.0); //DX20191105
+      all_structures[i].structure_representative.BringInCell(); //DX20200707
       //DX20191105 [MOVED LATER - SAME AS SYMMETRY] all_structures[i].LFA_environments= compare::computeLFAEnvironment(all_structures[i].structure_representative); //DX20190711
     }
 
@@ -2423,6 +2426,7 @@ namespace compare {
         entry.vstr[structure_index].SetSpecies(deque_species);
         str_proto_tmp.structure_representative = entry.vstr[structure_index];
         str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
+        str_proto_tmp.structure_representative.BringInCell(); //DX20200707
         str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
         str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directory
         str_proto_tmp.structure_representative_generated=true;
@@ -2741,7 +2745,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // get unique permutations of prototype (representative) structures
     if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){ 
-      message << "Determining the unique permuations for each prototype.";
+      message << "Determining the unique permutations for each prototype.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       // find unique permutations of prototype
       for(uint i=0;i<final_prototypes.size();i++){
