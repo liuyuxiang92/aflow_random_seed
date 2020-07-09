@@ -125,6 +125,7 @@
 namespace aurostd {
   // namespace aurostd
   //[CO20180729 OBSOLETE]template<class utype> bool _isfloat(utype) __xprototype;
+  bool _ishex(const string&) __xprototype;
   template<class utype> bool _isodd(utype) __xprototype;
   template<class utype> bool _iseven(utype) __xprototype;
   template<class utype> bool _isreal(utype) __xprototype;
