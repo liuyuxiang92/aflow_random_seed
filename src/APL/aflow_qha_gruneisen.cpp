@@ -190,8 +190,8 @@ namespace apl
     }
     else
     {
-      msg="Calculating Gruneisen parameters in mesh (" + stringify(ncpus) + " threads)";
-      //else if(_is_qha)msg=_SCQHA_MSG+"Calculating Gruneisen parameters in mesh (" + stringify(ncpus) + " threads)";
+      msg="Calculating Gruneisen parameters in mesh (" + aurostd::utype2string<int>(ncpus) + " threads)";
+      //else if(_is_qha)msg=_SCQHA_MSG+"Calculating Gruneisen parameters in mesh (" + aurostd::utype2string<int>(ncpus) + " threads)";
       _logger.initProgressBar(msg);
     }
 
@@ -290,8 +290,8 @@ namespace apl
     }
     else
     {
-      msg="Calculating Gruneisen parameters along path (" + stringify(ncpus) + " threads)";
-      //else if(_is_scqha)msg=_SCQHA_MSG+"Calculating Gruneisen parameters along path (" + stringify(ncpus) + " threads)";
+      msg="Calculating Gruneisen parameters along path (" + aurostd::utype2string<int>(ncpus) + " threads)";
+      //else if(_is_scqha)msg=_SCQHA_MSG+"Calculating Gruneisen parameters along path (" + aurostd::utype2string<int>(ncpus) + " threads)";
       _logger.initProgressBar(msg);
     }
 

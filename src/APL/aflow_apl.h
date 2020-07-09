@@ -9,60 +9,1346 @@
 #ifndef _AFLOW_APL_H_
 #define _AFLOW_APL_H_
 
-//#define USE_MKL 1
-
-// Almost generally used precision in the whole apl, however, somewhere it is
-// hard coded based on the tests and it work much better...
-#define _AFLOW_APL_EPS_ 1E-6
-extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
+// ME20200516 - Tolerance for what is consindered to be a different coordination shell
+#define _APL_SHELL_TOL_ 0.1
 
 // Aflow core libraries
 #include "../aflow.h"
 #include "../AUROSTD/aurostd.h"
-//The functions in the header file "aflow_qha_operations.h" include various vector and matrix operations.//
-//These functions are used to calculate eigenvalues and eigenvectors of complex symmetric Hermitian matrices and .//
-//Also perform other operations involved in calculating quasiharmonic properties.//
-//These functions have been built based on vectorview concepts//
-#include "aflow_qha_operations.h"
-//#define _AFLOW_APL_REGISTER_ register   // register ?
-#define _AFLOW_APL_REGISTER_
-
-// Create the version of GCC, we will uset it for multithread parts of code,
-// to check if the current compiling version of gcc is able to compile the
-// std::thead features
-#ifndef GCC_VERSION
-#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
 
 //ME20190219 - Define the checksum algorithm used for APL hibernate files
 #define APL_CHECKSUM_ALGO  string("Fletcher32")
 
-// Basic objects ...
 // ***************************************************************************
-// "aplexcept.h"
-// in aurostd.h // [OBSOLETE]
-//ME20200222 - APLStageBreak obsolete
-//[OBSOLETE] #include <stdexcept>
-//[OBSOLETE] namespace apl {
-//[OBSOLETE]   //
-//[OBSOLETE]   // OBSOLETE ME20191031 - use xerror
-//[OBSOLETE]   //class APLRuntimeError : public std::runtime_error {
-//[OBSOLETE]   // public:
-//[OBSOLETE]   //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
-//[OBSOLETE]   //};
-//[OBSOLETE]   //class APLLogicError : public std::logic_error {
-//[OBSOLETE]   // public:
-//[OBSOLETE]   //  APLLogicError(const std::string& s) : std::logic_error(s) {}
-//[OBSOLETE]   //};
-//[OBSOLETE]   //
-//[OBSOLETE]   class APLStageBreak : public std::exception {
-//[OBSOLETE]     public:
-//[OBSOLETE]       APLStageBreak() {}
-//[OBSOLETE]   };
-//[OBSOLETE] }
+
+// Interface
+namespace apl {
+
+  void validateParametersAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersSupercellAPL(xoption&);
+  void validateParametersDispersionsAPL(xoption&);
+  void validateParametersDosAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersAAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
+  void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
+  bool filesExistPhonons(_xinput&);
+  bool outfileFoundAnywherePhonons(vector<_xinput>&);
+  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, ostream&, bool=false);  // ME20191029
+  bool readForcesFromDirectory(_xinput&);  // ME20200219
+  void subtractZeroStateForces(vector<_xinput>&, bool);
+  void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME20190114
+
+}
 
 // ***************************************************************************
-// "logger.h"
+// BEGIN: Supplemental classes for APL, AAPL, and QHA
+// ***************************************************************************
+
+namespace apl {
+
+  class Supercell : public xStream {
+    private:
+      xstructure _inStructure;
+      xstructure _inStructure_original;  //CO
+      xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
+      //deque<_atom> _inStructure_atoms_original; //CO
+      xstructure _pcStructure;           //CO20180406 - for the path
+      xstructure _scStructure;
+      xstructure _scStructure_original;  //CO
+      xstructure _scStructure_light;     //CO, does not include HEAVY symmetry stuff
+      //deque<_atom> _scStructure_atoms_original; //CO
+      //CO START
+      bool _skew;                  //SYM::isLatticeSkewed(), same for pc and sc
+      bool _derivative_structure;  //vs. simple expanded_lattice, derivative structure's lattice has LESS symmetry, so be careful ApplyAtom()'ing
+      double _sym_eps;             //same for pc and sc
+      //CO END
+      bool _isShellRestricted;
+      int _maxShellID;
+      vector<double> _maxShellRadius;
+      bool _isConstructed;
+      bool _initialized;
+      vector<vector<vector<xvector<double> > > > phase_vectors;  // ME20200116
+
+      void calculateWholeSymmetry(xstructure&, bool=true);
+      xstructure calculatePrimitiveStructure() const;
+      bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME20200117
+      void free();
+      void copy(const Supercell&);
+
+    public:
+      Supercell(ostream& oss=std::cout);
+      Supercell(ofstream&, ostream& os=std::cout);
+      Supercell(const xstructure&, ofstream&, const string& directory="./", ostream& oss=std::cout); //CO20181226
+      Supercell(const string&, ofstream&, const string& directory="./", ostream& os=std::cout);  // ME20200112
+      Supercell(const Supercell&);
+      Supercell& operator=(const Supercell&);
+      ~Supercell();
+      void clear();
+      void initialize(const string&, ofstream&, ostream& oss=std::cout);
+      void initialize(const string&);  // ME20200212
+      void initialize(const xstructure&, ofstream&, bool=true, ostream& oss=std::cout);
+      void initialize(const xstructure&, bool=true);  // ME20191225
+      void clearSupercell();
+      //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
+      bool isConstructed();
+      void reset();
+      xvector<int> determineSupercellDimensions(const aurostd::xoption&);  // ME20191225
+      void build(aurostd::xoption&, bool = true);  // ME20191225
+      void build(const xvector<int>&, bool = true);  // ME20191225
+      void build(int, int, int, bool = TRUE);
+      void trimStructure(int, const xvector<double>&,
+          const xvector<double>&, const xvector<double>&,
+          bool = true);
+      bool projectToPrimitive();  // ME20200117
+      void projectToOriginal();  // ME20200117
+      xvector<int> getSupercellDimensionsShell(uint, bool);
+      void setupShellRestrictions(int);
+      //ME20190715 BEGIN - added const to getter functions so they can be used with const Supercell &
+      bool isShellRestricted() const;
+      int getMaxShellID() const;
+      uint getNumberOfAtoms() const;
+      uint getNumberOfUniqueAtoms() const;
+      uint getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
+      int getUniqueAtomID(int) const;
+      int getUniqueAtomID(int, int) const;
+      const _atom& getUniqueAtom(int) const;
+      string getUniqueAtomSymbol(int) const;
+      double getUniqueAtomMass(int) const;
+      double getAtomMass(int) const;
+      int getAtomNumber(int) const;
+      //ME20190715 END
+      const xstructure& getSupercellStructure() const;
+      const xstructure& getSupercellStructureLight() const;
+      const xstructure& getPrimitiveStructure() const;
+      const xstructure& getInputStructure() const;
+      const xstructure& getInputStructureLight() const;
+      const xstructure& getOriginalStructure() const;  // ME20200117
+      int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO20190218
+      int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO20190218
+      const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
+      void calculatePhaseVectors();  // ME20200117
+      bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
+      bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
+          int&, xvector<xcomplex<double> >&, bool);  //ME20180828
+      int pc2scMap(int) const;
+      int sc2pcMap(int) const;
+      void center(int);
+      //CO START
+      void center_original(void);
+      //corey
+      void getFullBasisAGROUP();  //ME20191218
+      bool fullBasisCalculatedAGROUP();  //ME20191218
+      const vector<vector<_sym_op> >& getAGROUP(void) const;
+      const vector<_sym_op>& getFGROUP(void) const;
+      const vector<_sym_op>& getAGROUP(int) const;
+      bool isDerivativeStructure() const;
+      double getEPS(void) const;
+      //ME20190715 END
+      //CO END
+      // **** BEGIN JJPR *****
+      xvector<int> scell;
+      vector<int> _pc2scMap;
+      vector<int> _sc2pcMap;
+      // **** END  JJPR *****
+      string _directory;  // for the logger
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  struct _qpoint {
+    xvector<double> cpos;  // Cartesian position of the q-point
+    xvector<double> fpos;  // Fractional coordinates of the q-point
+    int irredQpt;  // The irreducible q-point this q-point belongs to
+    int ibzqpt;  // The index of the irreducible q-point in the _ibzqpt vector
+    int symop;  // Symmetry operation to transform the irreducible q-point into this q-point
+  };
+
+  struct _kcell {
+    xmatrix<double> lattice;  // The reciprocal lattice vectors
+    xmatrix<double> rlattice;  // The real space lattice
+    xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
+    xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
+    bool skewed;  // Is the lattice skewed?
+    vector<_sym_op> pgroup;  // The point group operations of the reciprocal cell
+  };
+
+  class QMesh : public xStream {
+    public:
+      QMesh(ostream& oss=std::cout);
+      QMesh(ofstream&, ostream& os=std::cout);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
+      QMesh(const QMesh&);
+      QMesh& operator=(const QMesh&);
+      ~QMesh();
+
+      void clear();
+      void clear_tetrahedra();
+
+      void initialize(const vector<int>&, const xstructure& xs, ofstream&, bool=true, bool=true, ostream& oss=std::cout);
+      void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
+      void initialize(const xvector<int>&, const xstructure& xs, ofstream&, bool=true, bool=true, ostream& oss=std::cout);
+      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
+
+      void makeIrreducible();
+      void calculateLittleGroups();  // ME20200109
+      void writeQpoints(string, bool=true);
+      void writeIrredQpoints(string, bool=true);
+
+      string _directory;
+
+      int getnIQPs() const;
+      int getnQPs() const;
+      int getGrid(int) const;
+      const xvector<int>& getGrid() const;
+      const _qpoint& getIrredQPoint(int) const;
+      const _qpoint& getIrredQPoint(int, int, int) const;
+      vector<xvector<double> > getIrredQPointsCPOS() const;
+      vector<xvector<double> > getIrredQPointsFPOS() const;
+      int getIrredQPointIndex(int) const;
+      int getIrredQPointIndex(int, int, int) const;
+      const _qpoint& getQPoint(int) const;
+      const _qpoint& getQPoint(int, int, int) const;
+      const _qpoint& getQPoint(const xvector<double>&) const;  //ME20190813
+      int getQPointIndex(xvector<double>) const;  //ME20190813
+      int getQPointIndex(int, int, int) const;
+      vector<xvector<double> > getQPointsCPOS() const;
+      vector<xvector<double> > getQPointsFPOS() const;
+      int getIbzqpt(int) const;
+      int getIbzqpt(int, int, int) const;
+      const vector<int>& getIbzqpts() const;
+      const vector<_qpoint>& getPoints() const;
+      const _kcell& getReciprocalCell() const;
+      bool isShifted() const;  //ME20190813
+      const xvector<double>& getShift() const;
+      const vector<int>& getWeights() const;
+      bool initialized() const;
+      bool isReduced() const;
+      bool isGammaCentered() const;
+      bool littleGroupsCalculated() const;  // ME20200109
+      const vector<int>& getLittleGroup(int) const;  // ME20200109
+
+      // Tetrahedron method
+      void generateTetrahedra();
+      void makeIrreducibleTetrahedra();
+
+      const vector<vector<int> >& getTetrahedra() const;
+      const vector<int>& getTetrahedron(int) const;
+      const vector<int>& getIrredTetrahedron(int) const;
+      int getTetrahedronCorner(int, int) const;
+      vector<vector<int> > getIrreducibleTetrahedra() const;
+      vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;
+      int getnTetrahedra() const;
+      int getnIrredTetrahedra() const;
+      double getVolumePerTetrahedron() const;
+      const vector<int>& getWeightsTetrahedra() const;
+      int getWeightTetrahedron(int) const;
+      bool isReducedTetrahedra() const;
+
+    private:
+      void free();
+      void copy(const QMesh&);
+
+      vector<int> _ibzqpts;  // The indices of the irreducible q-points
+      bool _initialized;  // Indicates whether the QMesh object has been intialized
+      bool _isGammaCentered;  // Indicates whether the includes the Gamma point
+      vector<vector<int> > _littleGroups;  // The little groups of the irreducible q-points
+      bool _littleGroupsCalculated;  // Indicates whether the little groups have been calculated
+      int _nIQPs;  // The number of irreducible q-points
+      int _nQPs;  // The number of q-points
+      xvector<int> _qptGrid;  // The dimensions of the q-point mesh
+      vector<vector<vector<int> > > _qptMap;  // Maps a q-point triplet to a q-point index
+      vector<_qpoint> _qpoints;  // The q-points of the mesh
+      _kcell _recCell;  // The reciprocal cell
+      bool _reduced;  // Indicates whether the q-point mesh has been reduced
+      bool _shifted;  // Indicates whether the q-point mesh has been shifted
+      xvector<double> _shift;  // The shift vector of the mesh
+      vector<int> _weights;  // The weights of each irreducible q-point
+
+      void setGrid(const xvector<int>&);
+      void setupReciprocalCell(xstructure, bool);
+      void generateGridPoints(bool);
+      void shiftMesh(const xvector<double>&);
+      void moveToBZ(xvector<double>&) const;
+
+      // Tetrahedron method
+      vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra
+      vector<int> _irredTetrahedra;  // List of irreducible tetrahedra
+      bool _reducedTetrahedra; // Indicates whether the tetrahedra are reduced
+      int _nTetra;  // The number of tetrahedra
+      int _nIrredTetra;  // The number of irreducible tetrahedra - ME20190625
+      double _volumePerTetrahedron;  // The relative volume of each tetrahedron
+      vector<int> _weightsTetrahedra;  // The weights of each irreducible tetrahedron
+
+      vector<vector<xvector<int> > > initializeTetrahedra();
+      void findMostCompactTetrahedra(vector<vector<xvector<int> > >&);
+      void generateAllTetrahedra(const vector<vector<xvector<int> > >&);
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+// END: Supplemental classes for APL, AAPL, and QHA
+// ***************************************************************************
+
+// ***************************************************************************
+// BEGIN: Automatic Phonon Library (APL)
+// ***************************************************************************
+
+// ***************************************************************************
+
+#define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME20190108
+#define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME20190108
+//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME20190108  // OBSOLETE ME20200213 - the calculation does not use force fields
+//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME20190108  // OBSOLETE ME20200213
+#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME20200213
+#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME20200213
+
+namespace apl {
+
+  class ForceConstantCalculator : public xStream {
+    protected:
+      Supercell* _supercell;
+    private:
+      bool _sc_set;
+      bool _initialized;
+
+      vector<_xinput> xInputs;
+      string _method;
+
+      // Calculate forces at no distortion - since for some structure
+      // (not well relaxed, or with other problems) these forces have to be
+      // known and substracted from the calculated forces with distortion
+      bool _calculateZeroStateForces;
+
+      // For each atom of supercell, there is a full force field
+      vector<vector<xmatrix<double> > > _forceConstantMatrices;
+      // Stuff for polar materials
+      bool _isPolarMaterial;
+      // For each atom there is a matrix 3x3 of Born effective charge
+      vector<xmatrix<double> > _bornEffectiveChargeTensor;
+      // Dielectric tensor
+      xmatrix<double> _dielectricTensor;
+
+      void free();
+      void copy(const ForceConstantCalculator&);
+
+      // Force constants
+      bool runVASPCalculationsDM(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+      bool runVASPCalculationsLR(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+      bool calculateForceConstants(); // ME20200211
+      bool calculateForceConstantsDM();
+      bool readForceConstantsFromVasprun(_xinput&);
+      void symmetrizeForceConstantMatrices();
+      void correctSumRules();
+
+      //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
+      //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
+
+      // Direct method
+      bool AUTO_GENERATE_PLUS_MINUS;
+      bool USER_GENERATE_PLUS_MINUS;
+      bool GENERATE_ONLY_XYZ;
+      bool DISTORTION_SYMMETRIZE; //CO20190108
+      double DISTORTION_MAGNITUDE;
+      bool DISTORTION_INEQUIVONLY; //CO20190108
+      // For each inequivalent atom, there is a set of unique distortions
+      vector<vector<xvector<double> > > _uniqueDistortions;
+      // For each inequivalent atom and unique distortion, there is a field
+      // of forces (for each atom of the supercell)
+      vector<vector<vector<xvector<double> > > > _uniqueForces;
+      vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
+
+      void estimateUniqueDistortions(const xstructure&,
+          vector<vector<xvector<double> > >&);
+      void testDistortion(const xvector<double>&, const vector<_sym_op>&,
+          vector<xvector<double> >&,
+          vector<xvector<double> >&,
+          bool integrate_equivalent_distortions=true);  //CO20190114
+      bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
+      bool calculateForceFields();  // ME20190412  //ME20191029
+      void completeForceFields();
+      void projectToCartesianDirections();
+      void buildForceConstantMatrices();
+
+      // Born charges + dielectric tensor
+      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
+      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
+      void readBornEffectiveChargesFromAIMSOUT(void);
+      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
+      void symmetrizeBornEffectiveChargeTensors(void);
+      void readDielectricTensorFromAIMSOUT(void);
+      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
+
+    public:
+      ForceConstantCalculator(ostream& oss=std::cout);
+      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(Supercell&, const aurostd::xoption&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(const ForceConstantCalculator&);
+      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
+      ~ForceConstantCalculator();
+      void clear(Supercell&);
+      void initialize(const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
+      void initialize(const aurostd::xoption&);
+
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
+
+      bool run();  // ME20191029
+      void hibernate();
+
+      const vector<vector<xmatrix<double> > >& getForceConstants() const;
+      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
+      const xmatrix<double>& getDielectricTensor() const;
+      bool isPolarMaterial() const;
+
+      string _directory;
+
+      void writeHarmonicIFCs(const string&);
+      void writeBornChargesDielectricTensor(const string&);
+      void writeDYNMAT(const string&);
+      void saveState(const string&);  // ME20200112
+      void readFromStateFile(const string&);  // ME20200112
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  enum IPCFreqFlags {
+    NONE = 0L,
+    ALLOW_NEGATIVE = 1L << 1,
+    OMEGA = 1L << 2,
+    RAW = 1L << 3,  // eV/A/A/atomic_mass_unit
+    HERTZ = 1L << 4,
+    THZ = 1L << 5,
+    RECIPROCAL_CM = 1L << 6,
+    MEV = 1L << 7
+  };
+  inline IPCFreqFlags operator&(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
+    return IPCFreqFlags(static_cast<int>(__a) & static_cast<int>(__b));
+  }
+  inline IPCFreqFlags operator|(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
+    return IPCFreqFlags(static_cast<int>(__a) | static_cast<int>(__b));
+  }
+  inline IPCFreqFlags operator|=(IPCFreqFlags& __a, const IPCFreqFlags& __b) {
+    return (__a = (__a | __b));
+  }
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class AnharmonicIFCs;  // Forward declaration
+  class PhononCalculator : public xStream {
+    private:
+      // USER PARAMETERS
+      string _directory;  // for loggers
+      int _ncpus;
+
+      QMesh _qm;
+      Supercell _supercell;
+
+      // harmonic IFCs
+      vector<vector<xmatrix<double> > > _forceConstantMatrices;
+
+      // Stuff for polar materials
+      bool _isPolarMaterial;
+      // For each atom there is a matrix 3x3 of Born effective charge
+      vector<xmatrix<double> > _bornEffectiveChargeTensor;
+      // Dielectric tensor
+      xmatrix<double> _dielectricTensor;
+      // Precomputed values used in non-analytical term (Gonze)
+      xmatrix<double> _inverseDielectricTensor;
+      double _recsqrtDielectricTensorDeterminant;
+      // Precomputed Ewald sum at Gamma point
+      bool _isGammaEwaldPrecomputed;
+      vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
+      // Anharmonic IFCs
+      vector<vector<vector<double> > > anharmonicIFCs;
+      vector<vector<vector<int> > > clusters;
+
+      void copy(const PhononCalculator&);  // ME20191228
+      void free();
+
+      void readHarmonicIFCs(const string&);
+      void readBornChargesDielectricTensor(const string&);
+
+      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
+      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180829
+      xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
+      xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
+
+      void calculateGroupVelocitiesThread(int, int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&);
+
+    public:
+      PhononCalculator(ostream& oss=std::cout);
+      PhononCalculator(ofstream&, ostream& oss=std::cout);
+      PhononCalculator(const PhononCalculator&);
+      PhononCalculator& operator=(const PhononCalculator&);
+      ~PhononCalculator();
+      void clear();
+
+      string _system;  // ME20190614 - for VASP-style output files
+
+      // Getter functions
+      Supercell& getSupercell();
+      QMesh& getQMesh();
+      const xstructure& getInputCellStructure() const;
+      const xstructure& getSuperCellStructure() const;
+      uint getNumberOfBranches() const;
+      string getDirectory() const;
+      int getNCPUs() const;
+      bool isPolarMaterial() const;  // ME20200206
+      const vector<vector<xmatrix<double> > >& getHarmonicForceConstants() const;
+      const vector<vector<double> >& getAnharmonicForceConstants(int) const;
+      const vector<vector<int> >& getClusters(int) const;
+
+      // Set functions
+      void setDirectory(const string&);
+      void setNCPUs(const _kflags&);
+      void setPolarMaterial(bool);
+
+      // Initializers
+      void initialize_qmesh(const vector<int>&, bool=true, bool=true);
+      void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
+      void initialize_supercell(const xstructure&);
+      void initialize_supercell(const string&);
+
+      // IFCs
+      void setHarmonicForceConstants(const ForceConstantCalculator&);
+      void awake();
+      void setAnharmonicForceConstants(const AnharmonicIFCs&);
+      void readAnharmonicIFCs(string);
+
+      // Dynamical Matrix/Frequencies
+      xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
+          xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  // ME20200206
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME20180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME20200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME20190624
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME20200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xvector<double> >&, bool=true);  // ME20180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xvector<double> >&, bool=true);  // ME20200206
+      double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
+
+      // Group velocities
+      vector<vector<xvector<double> > > calculateGroupVelocitiesOnMesh();
+      vector<vector<xvector<double> > > calculateGroupVelocitiesOnMesh(vector<vector<double> >&);
+      vector<vector<xvector<double> > > calculateGroupVelocitiesOnMesh(vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&);
+      void writeGroupVelocitiesToFile(const string&, const vector<vector<xvector<double> > >&);
+      void writeGroupVelocitiesToFile(const string&, const vector<vector<xvector<double> > >&, const vector<vector<double> >&, const string& unit="THz");
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class PathBuilder {
+    public:
+      enum StoreEnumType { RECIPROCAL_LATTICE,
+        CARTESIAN_LATTICE };
+      enum ModeEnumType { SINGLE_POINT_MODE,
+        COUPLE_POINT_MODE };
+
+    private:
+      std::vector<aurostd::xvector<double> > _path;
+      std::vector<aurostd::xvector<double> > _points;
+      std::vector<std::string> _labels;
+      aurostd::xmatrix<double> reciprocalLattice;
+      aurostd::xmatrix<double> cartesianLattice;
+      int _pointsVectorDimension;
+      int _pointsVectorStartingIndex;
+      uint _nPointsPerSubPath;
+      ModeEnumType _mode;
+      StoreEnumType _store;
+
+    private:
+      void buildPath();
+      void free();
+      void copy(const PathBuilder&);
+
+    public:
+      PathBuilder();
+      PathBuilder(ModeEnumType);
+      PathBuilder(const PathBuilder&);
+      PathBuilder& operator=(const PathBuilder&);
+      ~PathBuilder();
+      void clear();
+      void addPoint(const std::string& l, int dim, ...);
+      void addPoint(const std::string&, const aurostd::xvector<double>&);
+      void transform(const aurostd::xmatrix<double>&);
+      void pointsAreDefinedFor(const xstructure&, StoreEnumType);
+      void transformPointsFor(const xstructure&, StoreEnumType);
+      void defineCustomPoints(const string&,const string&,const Supercell&,bool CARESTIAN_COORDS=false);
+      void takeAflowElectronicPath(const string&,const Supercell&);//, const xstructure&, const xstructure&);
+      void setMode(ModeEnumType);
+      void setStore(StoreEnumType);
+      const StoreEnumType& getStore() const;  //ME20190614
+      void setDensity(int);
+      int getDensity();
+      uint getPathSize();
+      uint getPointSize();
+      aurostd::xvector<double> getPoint(uint);
+      uint getPointIndexOnPath(uint);
+      std::string getPointLabel(uint);
+      std::vector<aurostd::xvector<double> > getPath();
+      std::vector<aurostd::xvector<double> > getPath(ModeEnumType, const string&);
+      double getPathLength();
+      double getPathLength(uint);
+      xKPOINTS createKPOINTS(const Supercell&);  //ME20190614
+  };
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class PhononDispersionCalculator {
+    private:
+      PhononCalculator* _pc;
+      bool _pc_set;
+      PathBuilder _pb;
+      void copy(const PhononDispersionCalculator&);
+      void free();
+      std::vector<xvector<double> > _qpoints;
+      std::vector<xvector<double> > _freqs;
+      IPCFreqFlags _frequencyFormat;
+      double _temperature;  // ME20190614
+      //[OBSOLETE PN20180705]vector<double> path;       //[PINKU]
+      //[OBSOLETE PN20180705]vector<int> path_segment;  //[PINKU]
+      void calculateInOneThread(int, int);
+      bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
+      string _system;
+
+    public:
+      PhononDispersionCalculator();
+      PhononDispersionCalculator(PhononCalculator&);
+      PhononDispersionCalculator(const PhononDispersionCalculator&);
+      PhononDispersionCalculator& operator=(const PhononDispersionCalculator&);
+      ~PhononDispersionCalculator();
+      void clear(PhononCalculator&);
+      void initPathCoords(const string&,const string&,int,bool=false);  //CO20180406
+      void initPathLattice(const string&, int);
+      void setPath(const string&);
+      void calc(const IPCFreqFlags);
+      void writePDIS(const string&);
+      std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PN]
+      //ME20190614 START
+      xEIGENVAL createEIGENVAL();
+      void writePHEIGENVAL(const string&);
+      void writePHKPOINTS(const string&);
+      //ME20190614 STOP
+      //[OBSOLETE PN20180705]std::vector<double> get_path() { return path; }                   //[PN]
+      //[OBSOLETE PN20180705]std::vector<int> get_path_segment() { return path_segment; }      //[PN]
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class DOSCalculator {
+    protected:
+      PhononCalculator* _pc;
+      bool _pc_set;
+      string _bzmethod;  //ME20190423
+      std::vector<aurostd::xvector<double> > _qpoints;
+      //std::vector<int> _qweights;  OBSOLETE ME20190423
+      std::vector<aurostd::xvector<double> > _freqs;
+      double _minFreq;
+      double _maxFreq;
+      double _stepDOS;
+      double _halfStepDOS;
+      std::vector<double> _bins;
+      std::vector<double> _dos;
+      std::vector<double> _idos;  //ME20190614
+      std::vector<xmatrix<xcomplex<double> > > _eigen;  //ME20190624 - eigenvectors for projected DOS
+      std::vector<vector<vector<double> > > _projectedDOS; //ME20190614 - projectedDOS.at(atom).at(direction).at(frequency)
+      std::vector<xvector<double> > _projections;  //ME20190626 - the projection directions for the DOS in Cartesian coordinates
+      double _temperature;  //ME20190614
+      //CO START
+      //private:
+      void copy(const DOSCalculator&);
+      void calculateInOneThread(int, int);
+      //CO END
+      void calculateFrequencies();
+      void smearWithGaussian(vector<double>&, vector<double>&, double, double);  //ME20190614
+      void calcDosRS();
+      void calcDosLT();
+
+    public:
+      DOSCalculator();
+      DOSCalculator(PhononCalculator&, const string&, const vector<xvector<double> >&);
+      DOSCalculator(const DOSCalculator&);
+      DOSCalculator& operator=(const DOSCalculator&);
+      ~DOSCalculator();
+      void clear(PhononCalculator&);
+      void initialize(const vector<xvector<double> >&, const string&);
+      void calc(int);
+      void calc(int, double);
+      void calc(int, double, double, double);  //ME20200203
+      void writePDOS(const string&);
+      void writePDOS(string, string);  //[PN]
+      xDOSCAR createDOSCAR();  //ME20190614
+      void writePHDOSCAR(const string&);  //ME20190614
+      // Interface IDOSCalculator
+      const std::vector<double>& getBins() const;  //ME20200108 - added const
+      const std::vector<double>& getDOS() const;   //ME20200108 - added const
+      const std::vector<double>& getIDOS() const;  //ME20200210
+      const std::vector<xvector<double> >& getFreqs() const;  //AS20200312
+      bool hasNegativeFrequencies() const;  //ME20200108 - added const
+      string _system;
+    private:
+      void free();
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  enum ThermalPropertiesUnits { eV,
+    meV,
+    ueV,
+    eVK,
+    meVK,
+    ueVK,
+    kB };
+
+  class ThermalPropertiesCalculator : public xStream {
+    private:
+      std::vector<double> _freqs_0K;
+      std::vector<double> _dos_0K;
+      string system;
+
+      void free();
+      void copy(const ThermalPropertiesCalculator&);
+ 
+      double getStepDOS(const vector<double>&);
+      double getScalingFactor(const ThermalPropertiesUnits&);
+
+    public:
+      ThermalPropertiesCalculator(ostream& oss=std::cout);
+      ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
+      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string directory="./", ostream& os=std::cout);
+      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string directory="./", ostream& os=std::cout);
+      ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
+      ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
+      ~ThermalPropertiesCalculator();
+      void clear();
+
+      vector<double> temperatures;
+      vector<double> Cv;
+      vector<double> Fvib;
+      vector<double> Svib;
+      vector<double> U;
+      double U0;
+      string _directory;
+
+      void initialize(const vector<double>&, const vector<double>&, ofstream&, const string& system="", ostream& oss=std::cout);
+      void initialize(const vector<double>&, const vector<double>&, const string& system="");
+      void calculateThermalProperties(double, double, double);
+      void addPoint(double, const xDOSCAR&);
+      void addPoint(double, const vector<double>&, const vector<double>&);
+
+      double getZeroPointEnergy();
+      double getInternalEnergy(double, ThermalPropertiesUnits=apl::meV);
+      double getInternalEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalFreeEnergy(double, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalFreeEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalEntropy(double, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalEntropy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
+      double getVibrationalEntropy(double, double, double, ThermalPropertiesUnits=apl::kB);
+      double getIsochoricSpecificHeat(double, ThermalPropertiesUnits=apl::kB);
+      double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
+   
+      void writePropertiesToFile(string);
+  };
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class AtomicDisplacements {
+    protected:
+      PhononCalculator* _pc;
+      bool _pc_set;
+
+    private:
+      void free();
+      void copy(const AtomicDisplacements&);
+
+      vector<vector<vector<xvector<xcomplex<double> > > > > _eigenvectors;
+      vector<vector<double> > _frequencies;
+      vector<vector<xmatrix<xcomplex<double> > > > _displacement_matrices;
+      vector<vector<vector<xvector<xcomplex<double> > > > > _displacement_modes;
+      vector<_qpoint> _qpoints;
+      vector<double> _temperatures;
+
+      void calculateEigenvectors();
+      void calculateEigenvectorsInThread(int, int);
+      void calculateMeanSquareDisplacementMatrices();
+      void calculateModeDisplacements();
+      double getOccupationNumber(double, double);
+
+    public:
+      AtomicDisplacements();
+      AtomicDisplacements(PhononCalculator&);
+      AtomicDisplacements(const AtomicDisplacements&);
+      AtomicDisplacements& operator=(const AtomicDisplacements&);
+      ~AtomicDisplacements();
+      void clear(PhononCalculator&);
+
+      void calculateMeanSquareDisplacements(double, double, double);
+      void calculateModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
+
+      const vector<double>& getTemperatures() const;
+      const vector<vector<xmatrix<xcomplex<double> > > >& getDisplacementMatrices() const;
+      vector<vector<xvector<double> > > getDisplacementVectors() const;
+      const vector<vector<vector<xvector<xcomplex<double> > > > >& getModeDisplacements() const;
+
+      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, int, int, int);
+      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&, double);
+
+      void writeMeanSquareDisplacementsToFile(string);
+      void writeSceneFileXcrysden(string, const xstructure&, const vector<vector<vector<double> > >&, int);
+      void writeSceneFileVsim(string, const xstructure&, const vector<vector<vector<xvector<xcomplex<double> > > > >&);
+  };
+
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss=std::cout);
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
+}
+
+// ***************************************************************************
+// END: Automatic Phonon Library (APL)
+// ***************************************************************************
+
+// ***************************************************************************
+// BEGIN ME: Automatic Anharmonic Phonon Library (AAPL)
+// ***************************************************************************
+
+namespace apl {
+
+  // _cluster holds a single cluster
+  struct _cluster {
+    vector<int> atoms;  // List of atoms inside the cluster
+    int fgroup;  // Index pointing to the factor group that transforms the cluster into another cluster
+    int permutation;  // Index pointing to the permutation that transforms the cluster into another cluster
+  };
+
+  // _ineq_distortions contains a list of inequivalent distortion and its equivalent
+  // distortions for a given set of atoms
+  struct _ineq_distortions {
+    vector<int> atoms;  // A list of atoms involved in the distortions
+    vector<int> clusters;  // A list of cluster sets that use these distortions for their force constant calculations
+    vector<vector<vector<int> > > distortions; // Map of distortions. The distortions vectors need to be defined elsewhere. 
+    vector<vector<int> > rotations;  // The factor group that holds the rotation to transform the distortions
+    vector<vector<vector<int> > > transformation_maps;  // A map containing the transformation of the atoms for each distortion
+  };
+
+  // _linearCombinations is a structure to store linear combinations.
+  struct _linearCombinations {
+    vector<vector<int> > indices;  // Cartesian indices of each linear combination
+    vector<vector<double> > coefficients;  // Coefficients of each linear combination
+    vector<int> independent;  // The linearly independent values
+    vector<int> dependent;  // The linearly dependent values
+    // indep2depMap maps the independent coefficients to the coefficients that
+    // depend on them. This is used for the IFC correction method.
+    vector<vector<int> > indep2depMap;
+  };
+
+  class ClusterSet : public xStream {
+    // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
+    public:
+      ClusterSet(ostream& oss=std::cout);
+      ClusterSet(ofstream&, ostream& oss=std::cout);
+      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
+      ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
+      ~ClusterSet();  // Destructor
+      const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
+      void clear();
+      void initialize(const Supercell&, int, int, double, ofstream&, ostream& oss=std::cout);
+      void initialize(const Supercell&, int, int, double);
+      void readClusterSetFromFile(const string&);
+
+      vector<_cluster> clusters;
+      vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
+      double cutoff;  // Cutoff radius in Angstroms
+      string directory;  // Directory for logging
+      vector<xvector<double> > distortion_vectors;  // List of distortion vectors
+      vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
+      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
+      vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
+      vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
+      int nifcs;  // Number of force constants for each set of atoms.
+      int order;  // Order of the cluster, i.e. the order of the force constant to be calculated.
+      xstructure pcell;  // Structure of the primitive cell.
+      vector<int> pc2scMap;  // Atom map from the primitive cell to the supercell.
+      vector<vector<int> > permutations;  // List of possible permutations for the cluster
+      xstructure scell;  // Structure of the supercell.
+      vector<int> sc2pcMap;  // Atom map from the supercell to the primitive cell.
+      xvector<int> sc_dim;  // Dimensions of the supercell.
+      vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
+
+      const _cluster& getCluster(const int& i) const;  //ME20190520
+      void build();
+      void buildDistortions();
+      void writeClusterSetToFile(const string&);
+
+    private:
+      void free();
+      void copy(const ClusterSet&);
+
+      double getMaxRad(const xstructure&, int);
+      void buildShells();
+      vector<_cluster> buildClusters();
+      vector<vector<int> > getSymmetryMap();
+      vector<vector<int> > getPermutations(int);
+
+      // Clusters
+      void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
+      int getNumUniqueAtoms(const vector<int>&);
+      vector<int> getComposition(const vector<int>&);
+      bool sameComposition(const vector<int>&, const vector<int>&);
+      int equivalenceCluster(const vector<int>&, const vector<int>&,
+          const vector<vector<int> >&, const vector<vector<int> >&);
+      vector<int> translateToPcell(const vector<int>&, int);
+      int comparePermutations(const vector<int>&, const vector<int>&);
+      bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
+      void getSymOp(_cluster&, const vector<int>&);
+
+      // Distortions
+      vector<xvector<double> > getCartesianDistortionVectors();
+      vector<_ineq_distortions> initializeIneqDists();
+      int sameDistortions(const _cluster&, const vector<_ineq_distortions>&);
+      vector<vector<int> > getTestDistortions(const vector<int>&);
+      void getInequivalentDistortions(const vector<vector<int> >&, _ineq_distortions&);
+      void appendDistortion(_ineq_distortions&, vector<int>,
+          const int& eq=-1, const int& fg=-1);
+      bool allZeroDistortions(const vector<int>&, const vector<int>&);
+      bool allAtomsMatch(const int&, const vector<int>&);
+      int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
+          const vector<vector<vector<int> > >&, const vector<int>&);
+      vector<int> getTransformationMap(const int&, const int&);
+      vector<_ineq_distortions> getHigherOrderDistortions();
+
+      // Linear Combinations
+      vector<_linearCombinations> getLinearCombinations();
+      vector<vector<int> > getInvariantSymOps(const _cluster&);
+      vector<vector<double> > buildCoefficientMatrix(const vector<vector<int> >&);
+      vector<vector<double> > getRREF(vector<vector<double> >);
+
+      // File I/O
+      string writeParameters();
+      string writeInequivalentClusters();
+      string writeClusters(const vector<_cluster>&);
+      string writeLinearCombinations(const _linearCombinations&);
+      string writeInequivalentDistortions();
+      string writeIneqDist(const _ineq_distortions&);
+      string writeHigherOrderDistortions();
+
+      bool checkCompatibility(uint&, const vector<string>&);
+      void readInequivalentClusters(uint&, const vector<string>&);
+      vector<_cluster> readClusters(uint&, const vector<string>&);
+      _linearCombinations readLinearCombinations(uint&, const vector<string>&);
+      void readInequivalentDistortions(uint&, const vector<string>&);
+      _ineq_distortions readIneqDist(uint&, const vector<string>&);
+      void readHigherOrderDistortions(uint&, const vector<string>&);
+  };
+}  // namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class AnharmonicIFCs : public xStream {
+    // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
+    public:
+      AnharmonicIFCs(ostream& oss=std::cout);
+      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
+      AnharmonicIFCs(const AnharmonicIFCs&);
+      const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
+      ~AnharmonicIFCs();
+      void clear();
+      void initialize(const Supercell&, int, const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
+      void initialize(const Supercell&, int, const aurostd::xoption&);
+
+      void setOptions(double, int, double, double, bool);
+      const string& getDirectory() const;
+      void setDirectory(const string&);
+      int getOrder() const;
+
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
+      bool calculateForceConstants();
+      const vector<vector<double> >& getForceConstants() const;
+      vector<vector<int> > getClusters() const;
+      void writeIFCsToFile(const string&);
+
+    private:
+      ClusterSet clst;
+
+      vector<_xinput> xInputs;
+      bool _useZeroStateForces;
+      bool initialized;
+      string directory;
+      vector<vector<int> > cart_indices;  // A list of all Cartesian indices
+      double distortion_magnitude;  // The magnitude of the distortions in Angstroms
+      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
+      int max_iter;  // Number of iterations for the sum rules
+      double mixing_coefficient;  // The mixing coefficient for the SCF procedure
+      int order;  // The order of the IFCs
+      double sumrule_threshold;  // Convergence threshold for the sum rules
+
+      void free();
+      void copy(const AnharmonicIFCs&);
+
+      string buildRunName(const vector<int>&, const vector<int>&, int, int);
+      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
+
+      vector<vector<int> > getCartesianIndices();
+
+      vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
+      vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
+      int getTransformedAtom(const vector<int>&, const int&);
+      void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
+      vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
+          const vector<vector<vector<xvector<double> > > >&);
+      double finiteDifference(const vector<vector<xvector<double> > >&, int,
+          const vector<int>&, const vector<int>&);
+
+      // Symmetrization Functions
+      vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
+      typedef vector<std::pair<vector<int>, vector<double> > > tform;
+      typedef vector<vector<vector<vector<int> > > > v4int;
+      void getTensorTransformations(v4int&, vector<vector<tform> >&);
+      vector<vector<int> > getReducedClusters();
+      void applyLinCombs(vector<vector<double> >&);
+      void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
+      void applyPermutations(vector<int>, vector<vector<double> >&);
+      void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
+          vector<vector<double> >&, vector<vector<double> >&);
+      void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
+          const vector<vector<double> >&,
+          const vector<vector<int> >&, const v4int&);
+      vector<double> getCorrectionTerms(const int&,
+          const vector<vector<int> >&,
+          const vector<vector<double> >&,
+          const vector<vector<double> >&,
+          const vector<vector<double> >&);
+      uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
+
+      // File I/O
+      string writeParameters();
+      string writeIFCs();
+      bool checkCompatibility(uint&, const vector<string>&);
+      vector<vector<double> > readIFCs(uint&, const vector<string>&);
+  };
+
+}  //namespace apl
+
+// ***************************************************************************
+
+namespace apl {
+
+  class TCONDCalculator {
+    // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
+    public:
+      TCONDCalculator();
+      TCONDCalculator(PhononCalculator&, const aurostd::xoption&);
+      TCONDCalculator(const TCONDCalculator&);
+      TCONDCalculator& operator=(const TCONDCalculator&);
+      ~TCONDCalculator();
+      void clear(PhononCalculator&);
+      void initialize(const aurostd::xoption&);
+
+      double boundary_grain_size;
+      bool calc_boundary;
+      bool calc_cumulative;
+      bool calc_isotope;
+      bool calc_rta_only;
+      vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
+      vector<vector<double> > freq;  // The frequencies at each q-point
+      vector<vector<xvector<double> > > gvel;  // The group velocities
+      int nBranches;  // The number of branches in the phonon spectrum
+      int nIQPs;  // The total number of irreducible q-points in the grid
+      int nQPs;  // The total number of q-points in the grid
+      vector<vector<vector<int> > > processes;  // The sign, q-point and branch indices of the scattering processes
+      vector<vector<double> > intr_trans_probs;  // The intrinsic transition probabilities
+      vector<vector<vector<int> > > processes_iso;  // The q-point and branch indices of the isotope scattering processes
+      vector<vector<double> > intr_trans_probs_iso;  // The intrinsic transition probabilities for isotope processes
+      // Scattering rates
+      vector<vector<vector<double> > > scattering_rates_total;  // total
+      vector<vector<vector<double> > > scattering_rates_anharm;  // anharmonic scattering
+      vector<vector<double> > scattering_rates_boundary;  // boundary scattering
+      vector<vector<double> > scattering_rates_isotope;  // isotope scattering
+
+      vector<vector<vector<vector<double> > > > phase_space;  // Scattering phase space
+
+      vector<vector<double> > grueneisen_mode;  // Mode Grueneisen parameter
+      vector<double>  grueneisen_avg;  // Averaged Grueneisen parameter for each temperature
+
+      vector<double> temperatures;  // The temperatures for the thermal conductivity calculations
+      vector<xmatrix<double> > thermal_conductivity;  // The thermal conductivity values
+
+      void calculateThermalConductivity();
+      void calculateGrueneisenParameters();
+      void writeOutputFiles(const string&);
+
+    private:
+      PhononCalculator* _pc;  // Reference to the phonon calculator
+      QMesh* _qm;
+      bool _pc_set;
+      bool _initialized;
+
+      void free();
+      void copy(const TCONDCalculator&);
+
+      vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
+      double calculateAverageGrueneisen(double T, const vector<vector<double> >&);
+
+      void getWeightsLT(double, const vector<double>&, vector<double>&);
+      void calculateTransitionProbabilities();
+      vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
+      void calculateTransitionProbabilitiesPhonon(int, int,
+          vector<vector<vector<vector<double> > > >&,
+          const vector<vector<vector<xcomplex<double> > > >&);
+      void calculateTransitionProbabilitiesIsotope(int, int);
+      vector<vector<double> > calculateTransitionProbabilitiesBoundary();
+      void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
+      xmatrix<double> calculateThermalConductivityTensor(double, vector<vector<double> >&, vector<vector<double> >&);
+      vector<vector<double> > getOccupationNumbers(double);
+      vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
+      vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<double> >&);
+      double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
+      void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
+      vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
+      xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
+          const vector<vector<xvector<double> > >&);
+      void getMeanFreeDispFull(const vector<vector<double> >&,
+          const vector<vector<double> >&, vector<vector<xvector<double> > >&);
+      void calculateDelta(int, int, const vector<vector<double> >&,
+          const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+      void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+
+      void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
+      void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
+      void writeDataBlock(stringstream&, const vector<vector<double> >&);
+      void writePhaseSpace(const string&);
+      void writeGrueneisen(const string&);
+      void writeThermalConductivity(const string&);
+  };
+
+}  // namespace apl
+
+// ***************************************************************************
+// END ME: Automatic Anharmonic Phonon Library (AAPL)
+// ***************************************************************************
+
+// ***************************************************************************
+// BEGIN AS: Quasi-Harmonic Approximation (QHA)
+// ***************************************************************************
+
+//AS20200513 BEGIN
+#define QHA_ARUN_MODE "QHA" // used in filename
+
+namespace apl
+{
+  /// Fit to a nonlinear model using the Levenberg-Marquardt algorithm.
+  ///
+  /// The implementation here is based on the ideas from Numerical Recipes and
+  /// K. Madsen et al. Methods For Non-linear Least Squares Problems
+  /// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
+  ///
+  /// Caution: the default value for the parameter tau (a scaling factor for the initial step size)
+  /// was picked to yield a correct fit to the Murnaghan equation of state. 
+  /// If you observe that this is not a good choice for your function,
+  /// try 1e-6 if the initial guess is believed to be a good approximation to the true
+  /// parameters. Otherwise 1e-3 or even 1 might be a better choice.
+  class NonlinearFit{
+    public:
+      NonlinearFit();
+      NonlinearFit(const NonlinearFit &nlf);
+      NonlinearFit(xvector<double> &x, xvector<double> &y, xvector<double> &guess,
+          double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
+          double tol=1e-6, double tau=1e-12, int max_iter=1000);
+      ~NonlinearFit();
+      const NonlinearFit& operator=(const NonlinearFit &qha);
+      int Npoints, Nparams;
+      double tol; /// convergence tolerance criterion
+      double tau; /// scaling parameter for initial step size
+      int max_iter; /// maximum number of allowed iterations
+      xvector<double> x,y;   // data points
+      xvector<double> residuals; // residuals of a given model function
+      xvector<double> guess; // initial guess for fit parameters
+      xvector<double> p;     // parameters obtained by fit
+      xvector<double> dydp;  // derivative of a given function w.r.t parameters
+      xmatrix<double> A;     // J^T.J matrix
+      xmatrix<double> J;     // Jacobian of a model function w.r.t parameters
+      double (*f)(const double x, const xvector<double> &p, xvector<double> &dydp);
+      bool fitLevenbergMarquardt();
+      void Jacobian(const xvector<double> &guess);
+      void calculateResiduals(const xvector<double> &params);
+      double calculateResidualSquareSum(const xvector<double> &params);
+      void clear();
+
+    private:
+      void free();
+      void copy(const NonlinearFit &nlf);
+  };
+}
+
+namespace apl
+{
+  enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
+  enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC};
+
+  /// Calculates QHA-related properties
+  ///
+  /// This class will substitute old QHA class.
+  /// The old QHA class will be kept until the new one is finished.
+  ///
+  class QHAN : public xStream {
+    public:
+      QHAN(ostream& oss=std::cout);
+      QHAN(const QHAN& qha);
+      QHAN(string &tpt,_xinput &xinput, _kflags &kflags, xoption &supercellopts,
+          ofstream &messageFile, ostream &oss=std::cout);
+      void initialize(string &tpt,_xinput &xinput, _kflags &kflags,
+          xoption &supercellopts, ofstream &messageFile, ostream &oss);
+      ~QHAN();
+      const QHAN& operator=(const QHAN &qha);
+      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
+      void clear();
+      double calcGrueneisen(double V, xvector<double> &xomega, double &w);
+      double calcGrueneisenFD(const xvector<double> &xomega);
+      void   calcCVandGP(double T, double &CV, double &GP);
+      void   calcCVandGPfit(double T, double V, double &CV, double &GP);
+      double FreeEnergy(double T, int id);
+      double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double electronicFreeEnergy(double T, int id);
+      xvector<double> electronicFreeEnergySommerfeld(double T);
+      xvector<double> DOSatEf();
+      double InternalEnergyFit(double T, double V);
+      xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
+      double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
+      double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
+      double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
+          QHAmethod qha_method);
+      // QHA3P and SCQHA
+      double extrapolateFrequency(double V, const xvector<double> &xomega);
+      double extrapolateGamma(double V, const xvector<double> &xomega);
+      // QHA3P
+      double FreeEnergyTaylorExpansion(double T, int Vid);
+      double InternalEnergyTaylorExpansion(double T, double V);
+      // SCQHA
+      double VPgamma(double T, double V);
+      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
+      // output
+      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
+      void   writeFVT();
+      void   writeGPpath(double V, const string &directory=".");
+      void   writeAverageGPfiniteDifferences();
+      void   writeGPmeshFD();
+      void   writeFrequencies();
+      // members
+      xoption apl_options;
+      string system_title;
+      double EOS_volume_at_equilibrium;
+      double EOS_energy_at_equilibrium;
+      double EOS_bulk_modulus_at_equilibrium;
+      double EOS_Bprime_at_equilibrium;
+    private:
+      //xoption supercellopts;  // OBSOLETE ME20200518
+      bool isEOS;
+      bool isGP_FD;
+      bool ignore_imaginary;
+      bool runQHA, runQHA3P, runSCQHA;
+      bool isInitialized;
+      bool includeElectronicContribution;
+      int Ntemperatures;
+      int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
+      int N_EOSvolumes;  ///< number of volumes/calculations for EOS calc
+      int Nbranches;       ///< number of phonon dispersion branches
+      int NatomsOrigCell;  ///< number of atoms in original cell
+      //int NatomsSupercell; ///< number of atoms in supercell
+      xstructure origStructure;
+      vector<double> Temperatures;
+      vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
+      vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
+      vector<double> coefGPVolumes; ///< multiplication coefficient w.r.t initial volume
+      vector<double> coefEOSVolumes;
+      xvector<double> DOS_Ef;
+      // data necessary to calculate thermodynamic properties
+      vector<double> Efermi_V; ///< Fermi energy vs V
+      vector<double> E0_V;     ///< total energy vs V
+      vector<xEIGENVAL> static_eigvals;
+      vector<xIBZKPT>   static_ibzkpts;
+      vector<vector<double> > energies_V; ///< electronic energy bins vs V
+      vector<vector<double> > edos_V; ///< electronic DOS
+      vector<vector<double> > frequencies_V; ///< phonon frequency bins vs V
+      vector<vector<double> > pdos_V; ///< phonon DOS
+      vector<int> qpWeights;
+      vector<xvector<double> > qPoints;
+      // data needed for Grueneisen parameter calculation
+      xmatrix<double> gp_fit_matrix;
+      vector<vector<vector<double> > > omegaV_mesh;
+      vector<vector<vector<double> > > omegaV_mesh_EOS;
+      vector<xEIGENVAL> gp_ph_dispersions;
+      vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
+      //
+      vector<string> subdirectories_apl_eos;
+      vector<string> subdirectories_apl_gp;
+      vector<string> subdirectories_static;
+      vector<string> arun_runnames_static;
+      _xinput xinput;
+      string currentDirectory;
+      // methods
+      int  checkStaticCalculations();
+      void read();
+      bool runAPLcalculations(const vector<string> &subdirectories,
+          const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
+          _kflags &kflags, string &aflowin, bool gp=true);
+      void readStaticCalculationsData();
+      void calculate();
+      void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
+          const _kflags &kflags);
+      void free();
+      void copy(const QHAN &qha);
+  };
+}
+//AS20200513 END
+
+// ***************************************************************************
+// END AS: Quasi-Harmonic Approximation (QHA)
+// ***************************************************************************
+
+// ***************************************************************************
+// THE CLASSES BELOW WILL BE OBSOLETE AS SOON AS QHAN REPLACES QHA
+// ***************************************************************************
+
 namespace apl {
   class Logger;
   // Templates used for the definition of the one parameter manipulation
@@ -157,269 +1443,15 @@ namespace apl {
   LMANIP<const char*> sf(const char*);
 }  // namespace APL
 
-// ***************************************************************************
-// "hroutines.h"
-// in aurostd.h // [OBSOLETE]
-#include <typeinfo>
-
-namespace apl {
-  template <typename T>
-    inline std::string stringify(const T& x) {
-      std::ostringstream o;
-      if (!(o << x)) {
-        //ME20191031 - use xerror
-        //throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
-      }
-      return o.str();
-    }
-  //ME20190219 BEGIN
-  //[OBSOLETE] vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20180801
-  void tokenize(const string& strin, vector<string>& tokens, const string& del);
-  //[OBSOLETE] string getVASPVersionString(const string&);
-  //[OBSOLETE] unsigned int getFileCheckSum(const string&);
-  //[OBSOLETE] void printXVector(const xvector<double>&, bool = true);
-  //[OBSOLETE] void printXVector(const xvector<xcomplex<double> >&);
-  //[OBSOLETE] void printXMatrix(const xmatrix<double>&);
-  //[OBSOLETE] void printXMatrix(const xmatrix<xcomplex<double> >&);
-  //[OBSOLETE] void printXMatrix2(const xmatrix<xcomplex<double> >&);
-  //ME20190219 END
-}  // namespace apl
-
-// ***************************************************************************
-// ***************************************************************************
-// BEGIN ME: Anharmonic Force Constants (AAPL)
-// ***************************************************************************
-
-namespace apl {
-  // Options for anharmonic IFC calculations
-  // OBSOLETE ME20190501 - Replaced with xoption
-  //struct _anharmonicIFCOptions {
-  //  int max_iter;
-  //  double sumrule_threshold;
-  //  double mixing_coefficient;
-  //};
-
-  // _cluster holds a single cluster
-  struct _cluster {
-    vector<int> atoms;  // List of atoms inside the cluster
-    int fgroup;  // Index pointing to the factor group that transforms the cluster into another cluster
-    int permutation;  // Index pointing to the permutation that transforms the cluster into another cluster
-  };
-
-  // _ineq_distortions contains a list of inequivalent distortion and its equivalent
-  // distortions for a given set of atoms
-  struct _ineq_distortions {
-    vector<int> atoms;  // A list of atoms involved in the distortions
-    vector<int> clusters;  // A list of cluster sets that use these distortions for their force constant calculations
-    vector<vector<vector<int> > > distortions; // Map of distortions. The distortions vectors need to be defined elsewhere. 
-    vector<vector<int> > rotations;  // The factor group that holds the rotation to transform the distortions
-    vector<vector<vector<int> > > transformation_maps;  // A map containing the transformation of the atoms for each distortion
-  };
-
-  // _linearCombinations is a structure to store linear combinations.
-  struct _linearCombinations {
-    vector<vector<int> > indices;  // Cartesian indices of each linear combination
-    vector<vector<double> > coefficients;  // Coefficients of each linear combination
-    vector<int> independent;  // The linearly independent values
-    vector<int> dependent;  // The linearly dependent values
-    // indep2depMap maps the independent coefficients to the coefficients that
-    // depend on them. This is used for the IFC correction method.
-    vector<vector<int> > indep2depMap;
-  };
-
-  class Supercell;  // Forward declaration
-  class ClusterSet : public xStream {
-    // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
-    public:
-      ClusterSet(ostream& oss=std::cout);
-      ClusterSet(ofstream&, ostream& oss=std::cout);
-      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
-      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
-      ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-      ~ClusterSet();  // Destructor
-      const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear();
-      void initialize(const Supercell&, int, int, double);
-      void readClusterSetFromFile(const string&);
-
-      vector<_cluster> clusters;
-      vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
-      double cutoff;  // Cutoff radius in Angstroms
-      string directory;  // Directory for logging
-      vector<xvector<double> > distortion_vectors;  // List of distortion vectors
-      vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
-      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
-      vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
-      vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
-      int nifcs;  // Number of force constants for each set of atoms.
-      int order;  // Order of the cluster, i.e. the order of the force constant to be calculated.
-      xstructure pcell;  // Structure of the primitive cell.
-      vector<int> pc2scMap;  // Atom map from the primitive cell to the supercell.
-      vector<vector<int> > permutations;  // List of possible permutations for the cluster
-      xstructure scell;  // Structure of the supercell.
-      vector<int> sc2pcMap;  // Atom map from the supercell to the primitive cell.
-      xvector<int> sc_dim;  // Dimensions of the supercell.
-      vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
-
-      const _cluster& getCluster(const int& i) const;  //ME20190520
-      const string& getDirectory() const;
-      void setDirectory(const string&);
-      void build();
-      void buildDistortions();
-      void writeClusterSetToFile(const string&);
-
-    private:
-      void free();
-      void copy(const ClusterSet&);
-
-      double getMaxRad(const xstructure&, int);
-      void buildShells();
-      vector<_cluster> buildClusters();
-      vector<vector<int> > getSymmetryMap();
-      vector<vector<int> > getPermutations(int);
-
-      // Clusters
-      void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
-      int getNumUniqueAtoms(const vector<int>&);
-      vector<int> getComposition(const vector<int>&);
-      bool sameComposition(const vector<int>&, const vector<int>&);
-      int equivalenceCluster(const vector<int>&, const vector<int>&,
-          const vector<vector<int> >&, const vector<vector<int> >&);
-      vector<int> translateToPcell(const vector<int>&, int);
-      int comparePermutations(const vector<int>&, const vector<int>&);
-      bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
-      void getSymOp(_cluster&, const vector<int>&);
-
-      // Distortions
-      vector<xvector<double> > getCartesianDistortionVectors();
-      vector<_ineq_distortions> initializeIneqDists();
-      int sameDistortions(const _cluster&, const vector<_ineq_distortions>&);
-      vector<vector<int> > getTestDistortions(const vector<int>&);
-      void getInequivalentDistortions(const vector<vector<int> >&, _ineq_distortions&);
-      void appendDistortion(_ineq_distortions&, vector<int>,
-          const int& eq=-1, const int& fg=-1);
-      bool allZeroDistortions(const vector<int>&, const vector<int>&);
-      bool allAtomsMatch(const int&, const vector<int>&);
-      int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
-          const vector<vector<vector<int> > >&, const vector<int>&);
-      vector<int> getTransformationMap(const int&, const int&);
-      vector<_ineq_distortions> getHigherOrderDistortions();
-
-      // Linear Combinations
-      vector<_linearCombinations> getLinearCombinations();
-      vector<vector<int> > getInvariantSymOps(const _cluster&);
-      vector<vector<double> > buildCoefficientMatrix(const vector<vector<int> >&);
-      vector<vector<double> > getRREF(vector<vector<double> >);
-
-      // File I/O
-      string writeParameters();
-      string writeInequivalentClusters();
-      string writeClusters(const vector<_cluster>&);
-      string writeLinearCombinations(const _linearCombinations&);
-      string writeInequivalentDistortions();
-      string writeIneqDist(const _ineq_distortions&);
-      string writeHigherOrderDistortions();
-
-      bool checkCompatibility(uint&, const vector<string>&);
-      void readInequivalentClusters(uint&, const vector<string>&);
-      vector<_cluster> readClusters(uint&, const vector<string>&);
-      _linearCombinations readLinearCombinations(uint&, const vector<string>&);
-      void readInequivalentDistortions(uint&, const vector<string>&);
-      _ineq_distortions readIneqDist(uint&, const vector<string>&);
-      void readHigherOrderDistortions(uint&, const vector<string>&);
-  };
-
-  class AnharmonicIFCs : public xStream {
-    // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
-    public:
-      AnharmonicIFCs(ostream& oss=std::cout);
-      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
-      AnharmonicIFCs(const AnharmonicIFCs&);
-      const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
-      ~AnharmonicIFCs();
-      void clear();
-      void initialize(const Supercell&, int, int, double);
-
-      void setOptions(double, int, double, double, bool);
-      const string& getDirectory() const;
-      void setDirectory(const string&);
-      int getOrder() const;
-
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
-      bool calculateForceConstants();
-      const vector<vector<double> >& getForceConstants() const;
-      vector<vector<int> > getClusters() const;
-      void writeIFCsToFile(const string&);
-
-    private:
-      ClusterSet clst;
-
-      vector<_xinput> xInputs;
-      bool _useZeroStateForces;
-      bool initialized;
-      string directory;
-      vector<vector<int> > cart_indices;  // A list of all Cartesian indices
-      double distortion_magnitude;  // The magnitude of the distortions in Angstroms
-      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
-      int max_iter;  // Number of iterations for the sum rules
-      double mixing_coefficient;  // The mixing coefficient for the SCF procedure
-      int order;  // The order of the IFCs
-      double sumrule_threshold;  // Convergence threshold for the sum rules
-
-      void free();
-      void copy(const AnharmonicIFCs&);
-
-      string buildRunName(const vector<int>&, const vector<int>&, int, int);
-      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
-
-      vector<vector<int> > getCartesianIndices();
-
-      vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
-      vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
-      int getTransformedAtom(const vector<int>&, const int&);
-      void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
-      vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
-          const vector<vector<vector<xvector<double> > > >&);
-      double finiteDifference(const vector<vector<xvector<double> > >&, int,
-          const vector<int>&, const vector<int>&);
-
-      // Symmetrization Functions
-      vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
-      typedef vector<std::pair<vector<int>, vector<double> > > tform;
-      typedef vector<vector<vector<vector<int> > > > v4int;
-      void getTensorTransformations(v4int&, vector<vector<tform> >&);
-      vector<vector<int> > getReducedClusters();
-      void applyLinCombs(vector<vector<double> >&);
-      void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
-      void applyPermutations(vector<int>, vector<vector<double> >&);
-      void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
-          vector<vector<double> >&, vector<vector<double> >&);
-      void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
-          const vector<vector<double> >&,
-          const vector<vector<int> >&, const v4int&);
-      vector<double> getCorrectionTerms(const int&,
-          const vector<vector<int> >&,
-          const vector<vector<double> >&,
-          const vector<vector<double> >&,
-          const vector<vector<double> >&);
-      uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
-
-      // File I/O
-      string writeParameters();
-      string writeIFCs();
-      bool checkCompatibility(uint&, const vector<string>&);
-      vector<vector<double> > readIFCs(uint&, const vector<string>&);
-  };
-
-}  //namespace apl
-// ***************************************************************************
-// END ME: Anharmonic Force Constants (AAPL)
-// ***************************************************************************
 
 // ***************************************************************************
 // Linear and nonlinear fitting functions, this functions compute fitting parameters correctly
 //although chi-square matrix is not computing correctly [PN]
+//The functions in the header file "aflow_qha_operations.h" include various vector and matrix operations.//
+//These functions are used to calculate eigenvalues and eigenvectors of complex symmetric Hermitian matrices and .//
+//Also perform other operations involved in calculating quasiharmonic properties.//
+//These functions have been built based on vectorview concepts//
+#include "aflow_qha_operations.h"
 #define FIT_LIMIT 0.001
 namespace apl {
   class aflowFITTING {
@@ -576,320 +1608,6 @@ namespace apl {
 #endif
 }
 // ***************************************************************************
-// ***************************************************************************
-// Engine core for phonon calculation
-// ***************************************************************************
-// "supercell.h"
-namespace apl {
-  class Supercell : public xStream {
-    private:
-      string _directory;  // for the logger
-      xstructure _inStructure;
-      xstructure _inStructure_original;  //CO
-      xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
-      //deque<_atom> _inStructure_atoms_original; //CO
-      xstructure _pcStructure;           //CO20180406 - for the path
-      xstructure _scStructure;
-      xstructure _scStructure_original;  //CO
-      xstructure _scStructure_light;     //CO, does not include HEAVY symmetry stuff
-      //deque<_atom> _scStructure_atoms_original; //CO
-      //CO START
-      bool _skew;                  //SYM::isLatticeSkewed(), same for pc and sc
-      bool _derivative_structure;  //vs. simple expanded_lattice, derivative structure's lattice has LESS symmetry, so be careful ApplyAtom()'ing
-      double _sym_eps;             //same for pc and sc
-      //CO END
-      bool _isShellRestricted;
-      int _maxShellID;
-      vector<double> _maxShellRadius;
-      bool _isConstructed;
-      vector<vector<vector<xvector<double> > > > phase_vectors;  //ME20200116
-
-    private:
-      void calculateWholeSymmetry(xstructure&, bool=true);
-      xstructure calculatePrimitiveStructure() const;
-      bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  //ME20200117
-      void free();
-      void copy(const Supercell&);
-
-    public:
-      Supercell(ostream& oss=std::cout);
-      Supercell(ofstream&, ostream& os=std::cout);
-      Supercell(const xstructure&, ofstream&, const string& directory="./", ostream& oss=std::cout); //CO20181226
-      Supercell(const string&, ofstream&, const string& directory="./", ostream& os=std::cout);  //ME20200112
-      Supercell(const Supercell&);
-      Supercell& operator=(const Supercell&);
-      ~Supercell();
-      void clear();
-      void setDirectory(const string&);
-      string getDirectory() const;
-      void readFromStateFile(const string&);  //ME20200212
-      void initialize(const xstructure&, bool=true);  //ME20191225
-      void clearSupercell();
-      //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
-      bool isConstructed();
-      void reset();
-      xvector<int> determineSupercellDimensions(const aurostd::xoption&);  //ME20191225
-      void build(aurostd::xoption&, bool = true);  //ME20191225
-      void build(const xvector<int>&, bool = true);  //ME20191225
-      void build(int, int, int, bool = TRUE);
-      void trimStructure(int, const xvector<double>&,
-          const xvector<double>&, const xvector<double>&,
-          bool = true);
-      bool projectToPrimitive();  //ME20200117
-      void projectToOriginal();  //ME20200117
-      xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  //ME20200102
-      void setupShellRestrictions(int);
-      //ME20190715 BEGIN - added const to getter functions so they can be used with const Supercell &
-      bool isShellRestricted() const;
-      int getMaxShellID() const;
-      uint getNumberOfAtoms() const;
-      uint getNumberOfUniqueAtoms() const;
-      uint getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
-      int getUniqueAtomID(int) const;
-      int getUniqueAtomID(int, int) const;
-      const _atom& getUniqueAtom(int) const;
-      string getUniqueAtomSymbol(int) const;
-      double getUniqueAtomMass(int) const;
-      double getAtomMass(int) const;
-      int getAtomNumber(int) const;
-      //ME20190715 END
-      const xstructure& getSupercellStructure() const;
-      const xstructure& getSupercellStructureLight() const;
-      const xstructure& getPrimitiveStructure() const;
-      const xstructure& getInputStructure() const;
-      const xstructure& getInputStructureLight() const;
-      const xstructure& getOriginalStructure() const;  //ME20200117
-      int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO20190218
-      int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO20190218
-      const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
-      xvector<double> getFPositionItsNearestImage(const xvector<double>&,
-          const xvector<double>&,
-          const xmatrix<double>&);
-      xvector<double> getFPositionItsNearestImage(int, int);
-      xvector<double> getCPositionItsNearestImage(int, int);
-      bool compareFPositions(xvector<double>&, xvector<double>&);          //CO
-      bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
-      void calculatePhaseVectors();  //ME20200117
-      bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
-      bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
-          int&, xvector<xcomplex<double> >&, bool);  //ME20180828
-      int pc2scMap(int) const;
-      int sc2pcMap(int) const;
-      void center(int);
-      //CO START
-      void center_original(void);
-      //CO
-      void getFullBasisAGROUP();  //ME20191218
-      bool fullBasisCalculatedAGROUP();  //ME20191218
-      const vector<vector<_sym_op> >& getAGROUP(void) const;
-      const vector<_sym_op>& getFGROUP(void) const;
-      const vector<_sym_op>& getAGROUP(int) const;
-      bool isDerivativeStructure() const;
-      double getEPS(void) const;
-      //ME20190715 END
-      //CO END
-      // **** BEGIN JJPR *****
-      xvector<int> scell;
-      vector<int> _pc2scMap;
-      vector<int> _sc2pcMap;
-      // **** END  JJPR *****
-  };
-}  // namespace apl
-
-// ***************************************************************************
-// "ipc.h"
-
-namespace apl {
-  enum IPCFreqFlags {
-    NONE = 0L,
-    ALLOW_NEGATIVE = 1L << 1,
-    OMEGA = 1L << 2,
-    RAW = 1L << 3,  // eV/A/A/atomic_mass_unit
-    HERTZ = 1L << 4,
-    THZ = 1L << 5,
-    RECIPROCAL_CM = 1L << 6,
-    MEV = 1L << 7
-  };
-  inline IPCFreqFlags operator&(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
-    return IPCFreqFlags(static_cast<int>(__a) & static_cast<int>(__b));
-  }
-  inline IPCFreqFlags operator|(const IPCFreqFlags& __a, const IPCFreqFlags& __b) {
-    return IPCFreqFlags(static_cast<int>(__a) | static_cast<int>(__b));
-  }
-  inline IPCFreqFlags operator|=(IPCFreqFlags& __a, const IPCFreqFlags& __b) {
-    return (__a = (__a | __b));
-  }
-  // //////////////////////////////////////////////////////////////////////////
-
-}  // namespace apl
-
-// ***************************************************************************
-// "phoncalc.h"
-#define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  //ME20190108
-#define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) //ME20190108
-//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  //ME20190108  // OBSOLETE ME20200213 - the calculation does not use force fields
-//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) //ME20190108  // OBSOLETE ME20200213
-#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  //ME20200213
-#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) //ME20200213
-
-// Interface
-namespace apl {
-
-  bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); //ME20190108
-  void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
-  bool filesExistPhonons(_xinput&);
-  bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, ostream&, bool=false);  //ME20191029
-  bool readForcesFromDirectory(_xinput&);  //ME20200219
-  void subtractZeroStateForces(vector<_xinput>&, bool);
-  void subtractZeroStateForces(vector<_xinput>&, _xinput&);  //ME20190114
-
-}
-
-namespace apl {
-  class ForceConstantCalculator : public xStream {
-    protected:
-      // Aflow's stuff required for running some routines
-      Supercell* _supercell;
-      bool _sc_set;
-
-      vector<_xinput> xInputs;
-
-      // Calculate forces at no distortion - since for some structure
-      // (not well relaxed, or with other problems) these forces have to be
-      // known and substracted from the calculated forces with distortion
-      bool _calculateZeroStateForces;
-
-      // For each atom of supercell, there is a full force field
-      vector<vector<xmatrix<double> > > _forceConstantMatrices;
-      // Stuff for polar materials
-      bool _isPolarMaterial;
-      // For each atom there is a matrix 3x3 of Born effective charge
-      vector<xmatrix<double> > _bornEffectiveChargeTensor;
-      // Dielectric tensor
-      xmatrix<double> _dielectricTensor;
-      string _directory;
-
-      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
-      bool calculateBornChargesDielectricTensor(const _xinput&);  //ME20191029
-
-    private:
-      void free();
-      void copy(const ForceConstantCalculator&);
-
-      virtual bool calculateForceConstants() {return false;} //ME20200211
-
-      void symmetrizeForceConstantMatrices();
-      void correctSumRules();
-
-      void writeHarmonicIFCs(const string&);
-      void writeBornChargesDielectricTensor(const string&);
-
-      // Born charges + dielectric tensor
-      void readBornEffectiveChargesFromAIMSOUT(void);
-      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
-      void symmetrizeBornEffectiveChargeTensors(void);
-      void readDielectricTensorFromAIMSOUT(void);
-      void readDielectricTensorFromOUTCAR(const _xinput&);  //ME20190113
-
-      //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
-      //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
-
-    public:
-      ForceConstantCalculator(ostream& oss=std::cout);
-      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
-      ForceConstantCalculator(const ForceConstantCalculator&);
-      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
-      virtual ~ForceConstantCalculator() {};
-      void clear(Supercell&);
-
-      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&) {return false;};  //ME20191029
-      void setPolarMaterial(bool b) { _isPolarMaterial = b; }  //ME20200218
-
-      bool run();  //ME20191029
-      void hibernate();
-
-      const vector<vector<xmatrix<double> > >& getForceConstants() const;
-      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
-      const xmatrix<double>& getDielectricTensor() const;
-      bool isPolarMaterial() const;
-      const string& getDirectory() const;
-      void setDirectory(const string&);
-
-      virtual void saveState(const string&) {}  //ME20200112
-      virtual void readFromStateFile(const string&) {};  //ME20200112
-  };
-}
-
-// ***************************************************************************
-// "dirphoncalc.h"
-namespace apl {
-  class DirectMethodPC : public ForceConstantCalculator {
-    private:
-      //bool GENERATE_PLUS_MINUS;  //JAHNATEK ORIGINAL
-      //CO START
-      bool AUTO_GENERATE_PLUS_MINUS;
-      bool USER_GENERATE_PLUS_MINUS;
-      //CO END
-      bool GENERATE_ONLY_XYZ;
-      bool DISTORTION_SYMMETRIZE; //CO20190108
-      double DISTORTION_MAGNITUDE;
-      bool DISTORTION_INEQUIVONLY; //CO20190108
-      string zerostate_dir;  //ME20191030
-      // For each inequivalent atom, there is a set of unique distortions
-      vector<vector<xvector<double> > > _uniqueDistortions;
-      // For each inequivalent atom and unique distortion, there is a field
-      // of forces (for each atom of the supercell)
-      vector<vector<vector<xvector<double> > > > _uniqueForces;
-
-      void estimateUniqueDistortions(const xstructure&,
-          vector<vector<xvector<double> > >&);
-      void testDistortion(const xvector<double>&, const vector<_sym_op>&,
-          vector<xvector<double> >&,
-          vector<xvector<double> >&,
-          bool integrate_equivalent_distortions=true);  //CO20190114
-      bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
-
-    public:
-      DirectMethodPC(ostream& oss=std::cout);
-      DirectMethodPC(Supercell&, ofstream&, ostream& os=std::cout);
-      DirectMethodPC(const DirectMethodPC&);
-      DirectMethodPC& operator=(const DirectMethodPC&);
-      ~DirectMethodPC();
-      void clear(Supercell&);
-
-      // Easy access to global parameters
-      //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
-      void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
-      void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO20190108
-      void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
-      void setGeneratePlusMinus(bool _auto_, bool _user_) {
-        AUTO_GENERATE_PLUS_MINUS = _auto_;
-        USER_GENERATE_PLUS_MINUS = _user_;
-      }  //CO
-      void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
-      void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
-
-      //void writeFORCES();  // OBSOLETE ME20200504 - not used
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-      //void writeXCrysDenForces();  // OBSOLETE ME20200504 - not used
-      void saveState(const string&);  //ME20200212
-      void readFromStateFile(const string&);  //ME20200212
-
-    private:
-      void copy(const DirectMethodPC&);
-      void free();
-      vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
-      bool calculateForceConstants();  //ME20200211
-      bool calculateForceFields();  //ME20190412  //ME20191029
-      void completeForceFields();
-      void projectToCartesianDirections();
-      void buildForceConstantMatrices();
-
-      void writeDYNMAT();
-  };
-}  // namespace apl
-
 //PN START
 // ***************************************************************************
 //QHA-APL MACROS START PN
@@ -938,7 +1656,7 @@ namespace apl {
       string _EOS_KSCHEME;
       string _EOS_STATIC_KSCHEME;
       int _EOS_STATIC_KPPRA;
-      string _PSTRESS;  //ME20200220
+      string _PSTRESS;  // ME20200220
 
     public:
       QHA_AFLOWIN_CREATOR(Supercell& sc, ofstream& mf, ostream& os=std::cout);
@@ -1003,400 +1721,6 @@ namespace apl {
       string get_static_runname(const double i);
   };
 }
-// ***************************************************************************
-
-// ***************************************************************************
-// "lrphoncalc.h"
-namespace apl {
-  class LinearResponsePC : public ForceConstantCalculator {
-    private:
-      void free();
-      void copy(const LinearResponsePC&);
-      bool runVASPCalculationsDFPT(_xinput&, _aflags&, _kflags&, _xflags&, string&);  //ME20190113  //ME20200213 - changed name
-      bool readForceConstantsFromVasprun(_xinput&);  //ME20200211
-      bool calculateForceConstants();  //ME20200211
-
-    public:
-      LinearResponsePC(ostream& oss=std::cout);
-      LinearResponsePC(Supercell&, ofstream&, ostream& os=std::cout);
-      LinearResponsePC(const LinearResponsePC&);
-      LinearResponsePC& operator=(const LinearResponsePC&);
-      ~LinearResponsePC();
-      void clear(Supercell&);
-
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
-      void saveState(const string&);  //ME20200212
-      void readFromStateFile(const string&); //ME20200212
-  };
-}  // namespace apl
-
-// ***************************************************************************
-// "gsa.h"
-
-//CO generally redirects to DM, the distinction between DM and GSA is obsolete
-namespace apl {
-  class GeneralizedSupercellApproach : public DirectMethodPC {
-    public:
-      GeneralizedSupercellApproach(Supercell&, ofstream&, ostream& os=std::cout);
-      ~GeneralizedSupercellApproach();
-      void clear();
-  };
-}  // namespace apl
-
-// QMesh definition has to come before PhononCalculator
-namespace apl {
-
-  struct _qpoint {
-    xvector<double> cpos;  // Cartesian position of the q-point
-    xvector<double> fpos;  // Fractional coordinates of the q-point
-    int irredQpt;  // The irreducible q-point this q-point belongs to
-    int ibzqpt;  // The index of the irreducible q-point in the _ibzqpt vector
-    int symop;  // Symmetry operation to transform the irreducible q-point into this q-point
-  };
-
-  struct _kcell {
-    xmatrix<double> lattice;  // The reciprocal lattice vectors
-    xmatrix<double> rlattice;  // The real space lattice
-    xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
-    xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
-    bool skewed;  // Is the lattice skewed?
-    vector<_sym_op> pgroup;  // The point group operations of the reciprocal cell
-  };
-
-  class QMesh : public xStream {
-    public:
-      QMesh(ostream& oss=std::cout);
-      QMesh(ofstream&, ostream& os=std::cout);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
-      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
-      QMesh(const QMesh&);
-      QMesh& operator=(const QMesh&);
-      ~QMesh();
-
-      void clear();
-      void clear_tetrahedra();
-
-      void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
-      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
-
-      void setDirectory(const string& dir);
-      void setModule(const string&);
-      const string& getDirectory() const;
-      const string& getModule() const;
-
-      void makeIrreducible();
-      void calculateLittleGroups();  //ME20200109
-      void writeQpoints(string, bool=true);
-      void writeIrredQpoints(string, bool=true);
-
-      int getnIQPs() const;
-      int getnQPs() const;
-      int getGrid(int) const;
-      const xvector<int>& getGrid() const;
-      const _qpoint& getIrredQPoint(int) const;
-      const _qpoint& getIrredQPoint(int, int, int) const;
-      vector<xvector<double> > getIrredQPointsCPOS() const;
-      vector<xvector<double> > getIrredQPointsFPOS() const;
-      int getIrredQPointIndex(int) const;
-      int getIrredQPointIndex(int, int, int) const;
-      const _qpoint& getQPoint(int) const;
-      const _qpoint& getQPoint(int, int, int) const;
-      const _qpoint& getQPoint(const xvector<double>&) const;  //ME20190813
-      int getQPointIndex(xvector<double>) const;  //ME20190813
-      int getQPointIndex(int, int, int) const;
-      vector<xvector<double> > getQPointsCPOS() const;
-      vector<xvector<double> > getQPointsFPOS() const;
-      int getIbzqpt(int) const;
-      int getIbzqpt(int, int, int) const;
-      const vector<int>& getIbzqpts() const;
-      const vector<_qpoint>& getPoints() const;
-      const _kcell& getReciprocalCell() const;
-      bool isShifted() const;  //ME20190813
-      const xvector<double>& getShift() const;
-      const vector<int>& getWeights() const;
-      bool initialized() const;
-      bool isReduced() const;
-      bool isGammaCentered() const;
-      bool littleGroupsCalculated() const;  //ME20200109
-      const vector<int>& getLittleGroup(int) const;  //ME20200109
-
-      // Tetrahedron method
-      void generateTetrahedra();
-      void makeIrreducibleTetrahedra();
-
-      const vector<vector<int> >& getTetrahedra() const;
-      const vector<int>& getTetrahedron(int) const;
-      const vector<int>& getIrredTetrahedron(int) const;
-      int getTetrahedronCorner(int, int) const;
-      vector<vector<int> > getIrreducibleTetrahedra() const;
-      vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;
-      int getnTetrahedra() const;
-      int getnIrredTetrahedra() const;
-      double getVolumePerTetrahedron() const;
-      const vector<int>& getWeightsTetrahedra() const;
-      int getWeightTetrahedron(int) const;
-      bool isReducedTetrahedra() const;
-
-    private:
-      void free();
-      void copy(const QMesh&);
-
-      string _directory;
-
-      vector<int> _ibzqpts;  // The indices of the irreducible q-points
-      bool _initialized;  // Indicates whether the QMesh object has been intialized
-      bool _isGammaCentered;  // Indicates whether the includes the Gamma point
-      vector<vector<int> > _littleGroups;  // The little groups of the irreducible q-points
-      bool _littleGroupsCalculated;  // Indicates whether the little groups have been calculated
-      int _nIQPs;  // The number of irreducible q-points
-      int _nQPs;  // The number of q-points
-      xvector<int> _qptGrid;  // The dimensions of the q-point mesh
-      vector<vector<vector<int> > > _qptMap;  // Maps a q-point triplet to a q-point index
-      vector<_qpoint> _qpoints;  // The q-points of the mesh
-      _kcell _recCell;  // The reciprocal cell
-      bool _reduced;  // Indicates whether the q-point mesh has been reduced
-      bool _shifted;  // Indicates whether the q-point mesh has been shifted
-      xvector<double> _shift;  // The shift vector of the mesh
-      vector<int> _weights;  // The weights of each irreducible q-point
-
-      void setGrid(const xvector<int>&);
-      void setupReciprocalCell(xstructure, bool);
-      void generateGridPoints(bool);
-      void shiftMesh(const xvector<double>&);
-      void moveToBZ(xvector<double>&) const;
-
-      // Tetrahedron method
-      vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra
-      vector<int> _irredTetrahedra;  // List of irreducible tetrahedra
-      bool _reducedTetrahedra; // Indicates whether the tetrahedra are reduced
-      int _nTetra;  // The number of tetrahedra
-      int _nIrredTetra;  // The number of irreducible tetrahedra - ME20190625
-      double _volumePerTetrahedron;  // The relative volume of each tetrahedron
-      vector<int> _weightsTetrahedra;  // The weights of each irreducible tetrahedron
-
-      vector<vector<xvector<int> > > initializeTetrahedra();
-      void findMostCompactTetrahedra(vector<vector<xvector<int> > >&);
-      void generateAllTetrahedra(const vector<vector<xvector<int> > >&);
-  };
-}  // namespace apl
-
-namespace apl {
-  class PhononCalculator : public xStream {
-    protected:
-      // USER PARAMETERS
-      string _system;  //ME20190614 - for VASP-style output files
-      string _directory;  // for loggers
-      int _ncpus;
-
-      QMesh _qm;
-      Supercell _supercell;
-
-      // harmonic IFCs
-      vector<vector<xmatrix<double> > > _forceConstantMatrices;
-
-      // Stuff for polar materials
-      bool _isPolarMaterial;
-      // For each atom there is a matrix 3x3 of Born effective charge
-      vector<xmatrix<double> > _bornEffectiveChargeTensor;
-      // Dielectric tensor
-      xmatrix<double> _dielectricTensor;
-      // Precomputed values used in non-analytical term (Gonze)
-      xmatrix<double> _inverseDielectricTensor;
-      double _recsqrtDielectricTensorDeterminant;
-      // Precomputed Ewald sum at Gamma point
-      bool _isGammaEwaldPrecomputed;
-      vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
-      // Anharmonic IFCs
-      vector<vector<vector<double> > > anharmonicIFCs;
-      vector<vector<vector<int> > > clusters;
-
-    private:
-      void copy(const PhononCalculator&);  //ME20191228
-      void free();
-
-      void readHarmonicIFCs(const string&);
-      void readBornChargesDielectricTensor(const string&);
-
-      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
-      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180829
-      xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
-      xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
-
-    public:
-      PhononCalculator(ostream& oss=std::cout);
-      PhononCalculator(ofstream&, ostream& oss=std::cout);
-      PhononCalculator(const PhononCalculator&);
-      PhononCalculator& operator=(const PhononCalculator&);
-      ~PhononCalculator();
-      void clear();
-      // Getter functions
-      Supercell& getSupercell();
-      QMesh& getQMesh();
-      const xstructure& getInputCellStructure() const;
-      const xstructure& getSuperCellStructure() const;
-      uint getNumberOfBranches() const;
-      string getSystemName() const;  //ME20190614
-      string getDirectory() const;
-      int getNCPUs() const;
-      bool isPolarMaterial() const;  //ME20200206
-      const vector<vector<xmatrix<double> > >& getHarmonicForceConstants() const;
-      const vector<vector<double> >& getAnharmonicForceConstants(int) const;
-      const vector<vector<int> >& getClusters(int) const;
-
-      // Set functions
-      void setSystem(const string&);
-      void setDirectory(const string&);
-      void setNCPUs(const _kflags&);
-      void setPolarMaterial(bool);
-
-      // Initializers
-      void initialize_qmesh(const vector<int>&, bool=true, bool=true);
-      void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
-      void initialize_supercell(const xstructure&);
-      void initialize_supercell(const string&);
-
-      // IFCs
-      void setHarmonicForceConstants(const ForceConstantCalculator&);
-      void awake();
-      void setAnharmonicForceConstants(const AnharmonicIFCs&);
-      void readAnharmonicIFCs(string);
-
-      // Dynamical Matrix/Frequencies
-      xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
-          xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  //ME20200206
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  //ME20180827
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  //ME20200206
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  //ME20190624
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  //ME20200206
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20200206
-      double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
-  };
-}  // namespace apl
-
-
-// ***************************************************************************
-
-//PN START
-// OBSOLETE, moved to .aflow.rc - ME20181024
-//#define AFLOW_APL_VASP_USE_LEPSILON
-//#undef AFLOW_APL_VASP_USE_LCALCEPS  // HAS some problem [PN]
-//PN END
-
-// ***************************************************************************
-// ***************************************************************************
-// ***************************************************************************
-// Supplementary classes for calculation of dispersion curves and density of states
-
-// ***************************************************************************
-// "pathbuilder.h"
-namespace apl {
-  class PathBuilder {
-    public:
-      enum StoreEnumType { RECIPROCAL_LATTICE,
-        CARTESIAN_LATTICE };
-      enum ModeEnumType { SINGLE_POINT_MODE,
-        COUPLE_POINT_MODE };
-
-    private:
-      std::vector<aurostd::xvector<double> > _path;
-      std::vector<aurostd::xvector<double> > _points;
-      std::vector<std::string> _labels;
-      aurostd::xmatrix<double> reciprocalLattice;
-      aurostd::xmatrix<double> cartesianLattice;
-      int _pointsVectorDimension;
-      int _pointsVectorStartingIndex;
-      uint _nPointsPerSubPath;
-      ModeEnumType _mode;
-      StoreEnumType _store;
-
-    private:
-      void buildPath();
-      void free();
-      void copy(const PathBuilder&);
-      // [OBSOLETE ME20190219] void tokenize(const string&, vector<string>&, string);
-
-    public:
-      PathBuilder();
-      PathBuilder(ModeEnumType);
-      PathBuilder(const PathBuilder&);
-      PathBuilder& operator=(const PathBuilder&);
-      ~PathBuilder();
-      void clear();
-      void addPoint(const std::string& l, int dim, ...);
-      void addPoint(const std::string&, const aurostd::xvector<double>&);
-      void transform(const aurostd::xmatrix<double>&);
-      void pointsAreDefinedFor(const xstructure&, StoreEnumType);
-      void transformPointsFor(const xstructure&, StoreEnumType);
-      void defineCustomPoints(const string&,const string&,const Supercell&,bool CARESTIAN_COORDS=false);
-      void takeAflowElectronicPath(const string&,const Supercell&);//, const xstructure&, const xstructure&);
-      void setMode(ModeEnumType);
-      void setStore(StoreEnumType);
-      const StoreEnumType& getStore() const;  //ME20190614
-      void setDensity(int);
-      int getDensity();
-      uint getPathSize();
-      uint getPointSize();
-      aurostd::xvector<double> getPoint(uint);
-      uint getPointIndexOnPath(uint);
-      std::string getPointLabel(uint);
-      std::vector<aurostd::xvector<double> > getPath();
-      std::vector<aurostd::xvector<double> > getPath(ModeEnumType, const string&);
-      double getPathLength();
-      double getPathLength(uint);
-      xKPOINTS createKPOINTS(const Supercell&);  //ME20190614
-  };
-}  // namespace apl
-
-// ***************************************************************************
-// "pdisc.h"
-namespace apl {
-  class PhononDispersionCalculator {
-    private:
-      PhononCalculator* _pc;
-      bool _pc_set;
-      PathBuilder _pb;
-      void copy(const PhononDispersionCalculator&);
-      void free();
-      std::vector<xvector<double> > _qpoints;
-      std::vector<xvector<double> > _freqs;
-      IPCFreqFlags _frequencyFormat;
-      double _temperature;  //ME20190614
-      //[OBSOLETE PN20180705]vector<double> path;       //[PN]
-      //[OBSOLETE PN20180705]vector<int> path_segment;  //[PN]
-      void calculateInOneThread(int, int);
-      bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
-      string _system;
-
-    public:
-      PhononDispersionCalculator();
-      PhononDispersionCalculator(PhononCalculator&);
-      PhononDispersionCalculator(const PhononDispersionCalculator&);
-      PhononDispersionCalculator& operator=(const PhononDispersionCalculator&);
-      ~PhononDispersionCalculator();
-      void clear(PhononCalculator&);
-      void initPathCoords(const string&,const string&,int,bool=false);  //CO20180406
-      void initPathLattice(const string&, int);
-      void setPath(const string&);
-      void calc(const IPCFreqFlags);
-      void writePDIS(const string&);
-      std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PN]
-      //ME20190614 START
-      xEIGENVAL createEIGENVAL();
-      void writePHEIGENVAL(const string&);
-      void writePHKPOINTS(const string&);
-      //ME20190614 STOP
-      //[OBSOLETE PN20180705]std::vector<double> get_path() { return path; }                   //[PN]
-      //[OBSOLETE PN20180705]std::vector<int> get_path_segment() { return path_segment; }      //[PN]
-  };
-}  // namespace apl
 
 // ***************************************************************************
 namespace apl { //PN20180705
@@ -1424,576 +1748,9 @@ namespace apl { //PN20180705
 } // namespace apl
 
 // ***************************************************************************
-//ME20190417 END
 // ***************************************************************************
-// ***************************************************************************
-// "doscalc.h"
-namespace apl {
-#define MIN_FREQ_TRESHOLD -0.1  //in AMU
 #define RAW2Hz 15.6333046177
-#define AMU2Kg 1.66053904
-#define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue treshold in AMU
-  class DOSCalculator  //ME20190424
-  { //CO20200106 - patching for auto-indenting
-    protected:
-      PhononCalculator* _pc;
-      bool _pc_set;
-      string _bzmethod;  //ME20190423
-      std::vector<aurostd::xvector<double> > _qpoints;
-      //std::vector<int> _qweights;  OBSOLETE ME20190423
-      std::vector<aurostd::xvector<double> > _freqs;
-      double _minFreq;
-      double _maxFreq;
-      double _stepDOS;
-      double _halfStepDOS;
-      std::vector<double> _bins;
-      std::vector<double> _dos;
-      std::vector<double> _idos;  //ME20190614
-      std::vector<xmatrix<xcomplex<double> > > _eigen;  //ME20190624 - eigenvectors for projected DOS
-      std::vector<vector<vector<double> > > _projectedDOS; //ME20190614 - projectedDOS.at(atom).at(direction).at(frequency)
-      std::vector<xvector<double> > _projections;  //ME20190626 - the projection directions for the DOS in Cartesian coordinates
-      double _temperature;  //ME20190614
-      //CO START
-      //private:
-      void copy(const DOSCalculator&);
-      void calculateInOneThread(int, int);
-      //CO END
-      void calculateFrequencies();
-      void smearWithGaussian(vector<double>&, vector<double>&, double, double);  //ME20190614
-      void calcDosRS();
-      void calcDosLT();
-
-    public:
-      DOSCalculator();
-      DOSCalculator(PhononCalculator&, const string&, const vector<xvector<double> >&);
-      DOSCalculator(const DOSCalculator&);
-      DOSCalculator& operator=(const DOSCalculator&);
-      ~DOSCalculator();
-      void clear(PhononCalculator&);
-      void initialize(const vector<xvector<double> >&, const string&);
-      void calc(int);
-      void calc(int, double);
-      void calc(int, double, double, double);  //ME20200203
-      void writePDOS(const string&);
-      void writePDOS(string, string);  //[PN]
-      xDOSCAR createDOSCAR();  //ME20190614
-      void writePHDOSCAR(const string&);  //ME20190614
-      // Interface IDOSCalculator
-      const std::vector<double>& getBins() const;  //ME20200108 - added const
-      const std::vector<double>& getDOS() const;   //ME20200108 - added const
-      const std::vector<double>& getIDOS() const;  //ME20200210
-      const std::vector<xvector<double> >& getFreqs() const;  //AS20200312
-      bool hasNegativeFrequencies() const;  //ME20200108 - added const
-      string _system;
-    private:
-      void free();
-  };
-}  // namespace apl
-
-// ***************************************************************************
-// OBSOLETE ME20190423 - RootSamplingMethod and LinearTetrahedronMethod have
-// been integrated into DOSCalculator
-// "rsmdos.h"
-//namespace apl {
-//class RootSamplingMethod : public DOSCalculator {
-// public:
-//  RootSamplingMethod(IPhononCalculator&, IReciprocalPointGrid&, Logger&);
-//  ~RootSamplingMethod();
-//  void rawCalc(int);
-//};
-//}  // namespace apl
-//
-//// ***************************************************************************
-//// "ltetdos.h"
-//namespace apl {
-//class LinearTetrahedronMethod : public DOSCalculator {
-// private:
-//  double _weightVolumeOfEachTetrahedron;
-//  std::vector<std::vector<int> > _irrTetrahedraList;
-//  std::vector<int> _irrTetrahedraWeightList;
-//
-// private:
-//  void generateTetrahedras();
-//
-// public:
-//  LinearTetrahedronMethod(IPhononCalculator&, IReciprocalPointGrid&, Logger&);
-//  ~LinearTetrahedronMethod();
-//  void clear();
-//  void rawCalc(int);
-//};
-//}  // end namespace apl
-
-// ***************************************************************************
-// thermalpc.h
-namespace apl {
-  enum ThermalPropertiesUnits { eV,
-    meV,
-    ueV,
-    eVK,
-    meVK,
-    ueVK,
-    kB };
-
-  class ThermalPropertiesCalculator : public xStream {
-    private:
-      string _directory;
-      std::vector<double> _freqs_0K;
-      std::vector<double> _dos_0K;
-      string system;
-
-      void free();
-      void copy(const ThermalPropertiesCalculator&);
-
-      double getStepDOS(const vector<double>&);
-      double getScalingFactor(const ThermalPropertiesUnits&);
-
-    public:
-      ThermalPropertiesCalculator(ostream& oss=std::cout);
-      ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
-      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string directory="./", ostream& os=std::cout);
-      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string directory="./", ostream& os=std::cout);
-      ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
-      ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
-      ~ThermalPropertiesCalculator();
-      void clear();
-
-      void setDirectory(const string&);
-      string getDirectory() const;
-
-      vector<double> temperatures;
-      vector<double> Cv;
-      vector<double> Fvib;
-      vector<double> Svib;
-      vector<double> U;
-      double U0;
-
-      void initialize(const vector<double>&, const vector<double>&, string="");
-      void calculateThermalProperties(double, double, double);
-      void addPoint(double, const xDOSCAR&);
-      void addPoint(double, const vector<double>&, const vector<double>&);
-
-      double getZeroPointEnergy();
-      double getInternalEnergy(double, ThermalPropertiesUnits=apl::meV);
-      double getInternalEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
-      double getVibrationalFreeEnergy(double, ThermalPropertiesUnits=apl::meV);
-      double getVibrationalFreeEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
-      double getVibrationalEntropy(double, ThermalPropertiesUnits=apl::meV);
-      double getVibrationalEntropy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
-      double getVibrationalEntropy(double, double, double, ThermalPropertiesUnits=apl::kB);
-      double getIsochoricSpecificHeat(double, ThermalPropertiesUnits=apl::kB);
-      double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
-
-      void writePropertiesToFile(string);
-  };
-}  // namespace apl
-
-// ***************************************************************************
-// BEGIN ME: Lattice Thermal Conductivity (AAPL)
-// ***************************************************************************
-
-namespace apl {
-  //[ME20190520 - MOVED UP]struct _qpoint {
-  //[ME20190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
-  //[ME20190520 - MOVED UP]  xvector<double> fpos;  // Fractional coordinates of the q-point
-  //[ME20190520 - MOVED UP]  xvector<int> indices;  // Indices of the q-point grid for this q-point
-  //[ME20190520 - MOVED UP]  int symop;  // Symmetry operation to transform into an irreducible q-point
-  //[ME20190520 - MOVED UP]};
-
-  //[ME20190520 - MOVED UP]struct _kcell {
-  //[ME20190520 - MOVED UP]  xmatrix<double> lattice;  // The reciprocal lattice vectors
-  //[ME20190520 - MOVED UP]  xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
-  //[ME20190520 - MOVED UP]  xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
-  //[ME20190520 - MOVED UP]  bool skewed;  // Is the lattice skewed?
-  //[ME20190520 - MOVED UP]};
-
-  class TCONDCalculator {
-    // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
-    public:
-      TCONDCalculator();
-      TCONDCalculator(PhononCalculator&, const _aflags&);
-      TCONDCalculator(const TCONDCalculator&);
-      TCONDCalculator& operator=(const TCONDCalculator&);
-      ~TCONDCalculator();
-      void clear(PhononCalculator&, const _aflags&);
-      void initialize();
-
-      aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
-      vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
-      vector<vector<double> > freq;  // The frequencies at each q-point
-      vector<vector<xvector<double> > > gvel;  // The group velocities
-      int nBranches;  // The number of branches in the phonon spectrum
-      int nIQPs;  // The total number of irreducible q-points in the grid
-      int nQPs;  // The total number of q-points in the grid
-      vector<vector<vector<int> > > processes;  // The sign, q-point and branch indices of the scattering processes
-      vector<vector<double> > intr_trans_probs;  // The intrinsic transition probabilities
-      vector<vector<vector<int> > > processes_iso;  // The q-point and branch indices of the isotope scattering processes
-      vector<vector<double> > intr_trans_probs_iso;  // The intrinsic transition probabilities for isotope processes
-      vector<vector<double> > rates_boundary;
-      vector<vector<double> > rates_isotope;
-      vector<double> temperatures;  // The mperatures for the thermal conductivity calculations
-      vector<xmatrix<double> > thermal_conductivity;  // The thermal conductivity values
-
-      void calculateThermalConductivity();
-
-    private:
-      PhononCalculator* _pc;  // Reference to the phonon calculator
-      QMesh* _qm;
-      Logger _logger;  // The APL logger
-      _aflags aflags;
-      bool _pc_set;
-
-      void free();
-      void copy(const TCONDCalculator&);
-
-      vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
-      double calculateAverageGrueneisen(double T, const vector<vector<double> >&);
-
-      void calculateFrequenciesGroupVelocities();
-      void calculateFreqGvel(int, int);
-      void getWeightsLT(double, const vector<double>&, vector<double>&);
-      void calculateTransitionProbabilities();
-      vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
-      void calculateTransitionProbabilitiesPhonon(int, int,
-          vector<vector<vector<vector<double> > > >&,
-          const vector<vector<vector<xcomplex<double> > > >&);
-      void calculateTransitionProbabilitiesIsotope(int, int);
-      vector<vector<double> > calculateTransitionProbabilitiesBoundary();
-      void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
-      xmatrix<double> calculateThermalConductivityTensor(double,
-          vector<vector<vector<double> > >&,
-          vector<vector<vector<double> > >&);
-      vector<vector<double> > getOccupationNumbers(double);
-      vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
-      vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<vector<double> > >&);
-      double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
-      void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
-      vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
-      xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
-          const vector<vector<xvector<double> > >&);
-      void getMeanFreeDispFull(const vector<vector<double> >&,
-          const vector<vector<double> >&, vector<vector<xvector<double> > >&);
-      void calculateDelta(int, int, const vector<vector<double> >&,
-          const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
-      void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
-
-      void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
-      void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
-      void writeDataBlock(stringstream&, const vector<vector<double> >&);
-      void writeGroupVelocities(const string&);
-      void writePhaseSpace(const string&, const vector<vector<vector<vector<double> > > >&);
-      void writeGrueneisen(const string&, const vector<double>&, const vector<vector<double> >&);
-      void writeThermalConductivity(const string&);
-  };
-
-}  // namespace apl
-
-// ***************************************************************************
-// END ME: Lattice Thermal Conductivity (AAPL)
-// ***************************************************************************
-
-// OBSOLETE - ME20190428 - all q-point grids are now described using the QMesh class
-//namespace apl
-//{
-//  class UniformMesh
-//  { //PN20180705
-//  private:
-//    Logger& _logger;
-//    vector<aurostd::xvector<double> > _kpoints;
-//    vector<double> _weights;
-//    vector<int> _sc_size;
-//    xmatrix<double> _rlattice;
-//    aurostd::xmatrix<double> _klattice;
-//    int _k_index;//k index at gamma ponit
-//    public:
-//     UniformMesh(Logger&);
-//    ~UniformMesh();
-//    void clear();
-//
-//    public:
-//        void create_uniform_mesh(int na, int nb, int nc, const xstructure& xs);
-//        vector<int> get_sc_size();
-//        vector<double> get_weights();
-//        vector<aurostd::xvector<double> > get_kpoints();
-//        xmatrix<double> get_rlattice();
-//        xmatrix<double> get_klattice();
-//        int get_k_index();
-//  };
-//}
-// ***************************************************************************
-//Functions in this class are used to calculate group velocities and related properties//
-namespace apl
-{
-  class GroupVelocity
-  { //PN20180705
-    private:
-      PhononCalculator& _pc;
-      //UniformMesh& _umesh;  OBSOLETE ME20190428
-      QMesh& _umesh;  //ME20190428
-      Logger& _logger;
-
-      std::vector< aurostd::xvector<double> > _freq_kp;
-      std::vector< aurostd::xvector<double> > _freq_km;
-      std::vector< aurostd::xvector<double> > _freq;
-      std::vector< aurostd::xmatrix<xcomplex<double> > > _eigenvectors;
-      vector<bool> _freq_test;
-
-      std::vector< aurostd::xmatrix<double> > _gv;//direction dependent group velocities
-      std::vector< aurostd::xvector<double> > _phvel;//group velocities average over directions
-
-      std::vector< aurostd::xvector<double> > _kpoints_kp;
-      std::vector< aurostd::xvector<double> > _kpoints_km;
-      vector<aurostd::xvector<double> > _kpoints;
-
-      //std::vector< double > _weights;  OBSOLETE ME20190428 - not used
-      uint  _nBranches;
-      double _sound_speed;
-      double _kshift;
-      void populate_variables();
-      void solve_eigenvalues_at_k(int startIndex, int endIndex, int cpuid, int ktype);
-      bool eigen_solver(int ktype);
-      bool eigen_solver();
-      void sound_speed();
-      int  indexofSmallestElement(const vector<double> &array);
-      void clear_auxiliary_variables();
-
-    public:
-      GroupVelocity(PhononCalculator&, QMesh&, Logger&);  //ME20190428
-      ~GroupVelocity();
-      void clear();
-
-    public:
-      bool check_negative_frequencies();
-      bool compute_group_velocities();
-      void write();
-      std::vector< aurostd::xvector<double> > get_freq(){return _freq;}
-      std::vector< aurostd::xmatrix<double> > get_gv(){return _gv;}
-      std::vector< aurostd::xvector<double> > get_phvel(){return _phvel;}
-  };
-}
-// ***************************************************************************
-namespace apl {
-
-  class AtomicDisplacements {
-    protected:
-      PhononCalculator* _pc;
-      bool _pc_set;
-
-    private:
-      void free();
-      void copy(const AtomicDisplacements&);
-
-      vector<vector<vector<xvector<xcomplex<double> > > > > _eigenvectors;
-      vector<vector<double> > _frequencies;
-      vector<vector<xmatrix<xcomplex<double> > > > _displacement_matrices;
-      vector<vector<vector<xvector<xcomplex<double> > > > > _displacement_modes;
-      vector<_qpoint> _qpoints;
-      vector<double> _temperatures;
-
-      void calculateEigenvectors();
-      void calculateEigenvectorsInThread(int, int);
-      void calculateMeanSquareDisplacementMatrices();
-      void calculateModeDisplacements();
-      double getOccupationNumber(double, double);
-
-    public:
-      AtomicDisplacements();
-      AtomicDisplacements(PhononCalculator&);
-      AtomicDisplacements(const AtomicDisplacements&);
-      AtomicDisplacements& operator=(const AtomicDisplacements&);
-      ~AtomicDisplacements();
-      void clear(PhononCalculator&);
-
-      void calculateMeanSquareDisplacements(double, double, double);
-      void calculateModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
-
-      const vector<double>& getTemperatures() const;
-      const vector<vector<xmatrix<xcomplex<double> > > >& getDisplacementMatrices() const;
-      vector<vector<xvector<double> > > getDisplacementVectors() const;
-      const vector<vector<vector<xvector<xcomplex<double> > > > >& getModeDisplacements() const;
-
-      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, int, int, int);
-      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&, double);
-
-      void writeMeanSquareDisplacementsToFile(string);
-      void writeSceneFileXcrysden(string, const xstructure&, const vector<vector<vector<double> > >&, int);
-      void writeSceneFileVsim(string, const xstructure&, const vector<vector<vector<xvector<xcomplex<double> > > > >&);
-  };
-
-  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss=std::cout);
-  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
-}
-// ***************************************************************************
-//AS20200513 BEGIN
-#define QHA_ARUN_MODE "QHA" // used in filename
-
-namespace apl
-{
-  /// Fit to a nonlinear model using Levenberg-Marquardt algorithm.
-  ///
-  /// The implementation here is based on the ideas from Numerical Recipes and
-  /// K. Madsen et al. Methods For Non-linear Least Squares Problems
-  /// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
-  ///
-  /// Caution: the default value for the parameter tau (a scaling factor for the initial step size)
-  /// was picked to yield a correct fit to the Murnaghan equation of state. 
-  /// If you observe that this is not a good choice for your function,
-  /// try 1e-6 if the initial guess is believed to be a good approximation to the true
-  /// parameters. Otherwise 1e-3 or even 1 might be a better choice.
-  class NonlinearFit{
-    public:
-      NonlinearFit();
-      NonlinearFit(const NonlinearFit &nlf);
-      NonlinearFit(xvector<double> &x, xvector<double> &y, xvector<double> &guess,
-          double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
-          double tol=1e-6, double tau=1e-12, int max_iter=1000);
-      ~NonlinearFit();
-      const NonlinearFit& operator=(const NonlinearFit &qha);
-      int Npoints, Nparams;
-      double tol; /// convergence tolerance criterion
-      double tau; /// scaling parameter for initial step size
-      int max_iter; /// maximum number of allowed iterations
-      xvector<double> x,y;   // data points
-      xvector<double> residuals; // residuals of a given model function
-      xvector<double> guess; // initial guess for fit parameters
-      xvector<double> p;     // parameters obtained by fit
-      xvector<double> dydp;  // derivative of a given function w.r.t parameters
-      xmatrix<double> A;     // J^T.J matrix
-      xmatrix<double> J;     // Jacobian of a model function w.r.t parameters
-      double (*f)(const double x, const xvector<double> &p, xvector<double> &dydp);
-      bool fitLevenbergMarquardt();
-      void Jacobian(const xvector<double> &guess);
-      void calculateResiduals(const xvector<double> &params);
-      double calculateResidualSquareSum(const xvector<double> &params);
-      void clear();
-    private:
-      void free();
-      void copy(const NonlinearFit &nlf);
-  };
-}
-
-namespace apl
-{
-  enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
-  enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC};
-
-  /// Calculates QHA-related properties
-  ///
-  /// This class will substitute old QHA class.
-  /// The old QHA class will be kept until the new one is finished.
-  ///
-  class QHAN : public xStream {
-    public:
-      QHAN(ostream& oss=std::cout);
-      QHAN(const QHAN& qha);
-      QHAN(string &tpt,_xinput &xinput, _kflags &kflags, xoption &supercellopts,
-          ofstream &messageFile, ostream &oss=std::cout);
-      void initialize(string &tpt,_xinput &xinput, _kflags &kflags,
-          xoption &supercellopts, ofstream &messageFile, ostream &oss);
-      ~QHAN();
-      const QHAN& operator=(const QHAN &qha);
-      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
-      void clear();
-      double calcGrueneisen(double V, xvector<double> &xomega, double &w);
-      double calcGrueneisenFD(const xvector<double> &xomega);
-      void   calcCVandGP(double T, double &CV, double &GP);
-      void   calcCVandGPfit(double T, double V, double &CV, double &GP);
-      double FreeEnergy(double T, int id);
-      double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
-      double electronicFreeEnergy(double T, int id);
-      xvector<double> electronicFreeEnergySommerfeld(double T);
-      xvector<double> DOSatEf();
-      double InternalEnergyFit(double T, double V);
-      xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
-      double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
-      double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
-      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
-      double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
-      double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
-          QHAmethod qha_method);
-      // QHA3P and SCQHA
-      double extrapolateFrequency(double V, const xvector<double> &xomega);
-      double extrapolateGamma(double V, const xvector<double> &xomega);
-      // QHA3P
-      double FreeEnergyTaylorExpansion(double T, int Vid);
-      double InternalEnergyTaylorExpansion(double T, double V);
-      // SCQHA
-      double VPgamma(double T, double V);
-      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
-      // output
-      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
-      void   writeFVT();
-      void   writeGPpath(double V, const string &directory=".");
-      void   writeAverageGPfiniteDifferences();
-      void   writeGPmeshFD();
-      void   writeFrequencies();
-      // members
-      xoption apl_options;
-      string system_title;
-      double EOS_volume_at_equilibrium;
-      double EOS_energy_at_equilibrium;
-      double EOS_bulk_modulus_at_equilibrium;
-      double EOS_Bprime_at_equilibrium;
-    private:
-      xoption supercellopts;
-      bool isEOS;
-      bool isGP_FD;
-      bool ignore_imaginary;
-      bool runQHA, runQHA3P, runSCQHA;
-      bool isInitialized;
-      bool includeElectronicContribution;
-      int Ntemperatures;
-      int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
-      int N_EOSvolumes;  ///< number of volumes/calculations for EOS calc
-      int Nbranches;       ///< number of phonon dispersion branches
-      int NatomsOrigCell;  ///< number of atoms in original cell
-      //int NatomsSupercell; ///< number of atoms in supercell
-      xstructure origStructure;
-      vector<double> Temperatures;
-      vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
-      vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
-      vector<double> coefGPVolumes; ///< multiplication coefficient w.r.t initial volume
-      vector<double> coefEOSVolumes;
-      xvector<double> DOS_Ef;
-      // data necessary to calculate thermodynamic properties
-      vector<double> Efermi_V; ///< Fermi energy vs V
-      vector<double> E0_V;     ///< total energy vs V
-      vector<xEIGENVAL> static_eigvals;
-      vector<xIBZKPT>   static_ibzkpts;
-      vector<vector<double> > energies_V; ///< electronic energy bins vs V
-      vector<vector<double> > edos_V; ///< electronic DOS
-      vector<vector<double> > frequencies_V; ///< phonon frequency bins vs V
-      vector<vector<double> > pdos_V; ///< phonon DOS
-      vector<int> qpWeights;
-      vector<xvector<double> > qPoints;
-      // data needed for Grueneisen parameter calculation
-      xmatrix<double> gp_fit_matrix;
-      vector<vector<vector<double> > > omegaV_mesh;
-      vector<vector<vector<double> > > omegaV_mesh_EOS;
-      vector<xEIGENVAL> gp_ph_dispersions;
-      vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
-      //
-      vector<string> subdirectories_apl_eos;
-      vector<string> subdirectories_apl_gp;
-      vector<string> subdirectories_static;
-      vector<string> arun_runnames_static;
-      _xinput xinput;
-      string currentDirectory;
-      // methods
-      int  checkStaticCalculations();
-      void read();
-      bool runAPLcalculations(const vector<string> &subdirectories,
-          const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
-          _kflags &kflags, string &aflowin, bool gp=true);
-      void readStaticCalculationsData();
-      void calculate();
-      void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
-          const _kflags &kflags);
-      void free();
-      void copy(const QHAN &qha);
-  };
-}
-//AS20200513 END
-// ***************************************************************************
+#define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue threshold in AMU
 namespace apl
 {
   class QHA:public MVops
@@ -2778,129 +2535,8 @@ namespace apl
         std::vector<T> split(const std::string& line);
   };
 }
-// ***************************************************************************
-// shellhandle.h
-
-namespace apl {
-
-  struct ShellData {
-    ShellData();
-    ShellData(const ShellData& b);
-
-    int occupation;
-    int occupationCapacity;
-    bool isFull;
-    double radius;
-    double stdevRadius;
-    vector<xvector<int> > index;
-    vector<deque<_atom> > atoms;
-    vector<deque<_atom> > ratoms;
-
-    ~ShellData();
-    ShellData& operator=(const ShellData&);
-
-    void free();
-    void copy(const ShellData& b);
-  };
-
-  class ShellHandle {
-    private:
-      int _idSafeGeneratedShell;
-      int _idSafeMappedShell;
-
-      int _centralAtomID;
-      double _indexReductionConstant;
-      xstructure _initStructure;
-      xstructure _initStructure_original;  //CO, does not include HEAVY symmetry stuff
-      //deque<_atom> _initStructure_atoms_original; //CO
-
-      xvector<int> _safeDimension;
-      vector<ShellData> _shells;
-
-    private:
-      xvector<double> getFPositionItsNearestImage(const xvector<double>&,
-          const xvector<double>&,
-          const xmatrix<double>&);
-
-    public:
-      ShellHandle();
-      ShellHandle(const xstructure&, int, int);
-      ~ShellHandle();
-
-      void clear();
-      void init(const xstructure&, int, int);
-
-      double getShellRadius(int);
-      int getShell(double);
-
-      double getSafeShellRadius();
-      void setSafeShell(int);
-      int getSafeShell();
-
-      void calcShells(const xstructure&, int, int);
-      void splitBySymmetry();
-      void removeSplitBySymmetry();
-      void addAtomToShell(int, const _atom&, bool = true);
-      void mapStructure(const xstructure&, int, bool = true);
-
-      int getLastOccupiedShell();
-      int getLastRegularShell();
-      int getLastFullShell();
-
-      int getNumberOfShells();
-      int getNumberOfSubshells(int);
-      std::deque<_atom> getAtomsAtSameShell(int, int = 0);
-      const std::deque<_atom>& getReferenceAtomsAtSameShell(int, int = 0);
-
-      double getIndexReductionConstant() { return _indexReductionConstant; }
-
-      void printReport(ostream&);
-
-      //CO added here
-      void center(int);
-      void center_original(void);
-      //CO added here
-  };
-
-}  // end namespace apl
 
 // ***************************************************************************
-// aplmath.h
-
-namespace aurostd {
-  // Calculate vector projection b on a
-  template <class utype>
-    xvector<utype> getVectorProjection(const xvector<utype>& b, const xvector<utype>& a) {
-      return (a * (utype)(scalar_product(a, b) / scalar_product(a, a)));
-    }
-  // Calculate vector projection c on a like b on a
-  template <class utype>
-    xvector<utype> getModeratedVectorProjection(const xvector<utype>& c, const xvector<utype>& b, const xvector<utype>& a) {
-      return (c * (utype)(scalar_product(a, b) / scalar_product(a, a)));
-    }
-  // Calculate vector convolution
-  template <class utype>
-    xvector<utype> getVectorConvolution(const xvector<utype>& a, const xvector<utype>& b) {
-      xvector<utype> v(a.rows);
-      for (int i = v.lrows; i <= v.urows; i++) {
-        v(i) = a(i) * b(i);
-      }
-      return (v);
-    }
-}
-
-
-//OBSOLETE - ME20190815 - moved to aurostd::xmatrix
-//[OBSOLETE] namespace apl {
-//[OBSOLETE]   //void tred2(xmatrix<xcomplex<double> >&);
-//[OBSOLETE]   void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
-//[OBSOLETE] #ifdef USE_MKL
-//[OBSOLETE]   void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
-//[OBSOLETE] #endif
-//[OBSOLETE] }
-
-// ***************************************************************************
-// cursor.h
 
 #define cursor_moveyx(y, x) printf("\033[%d;%dH", y, x) /*Move cursor to position y,x (rows, columns) with (1,1) as origin*/
 #define cursor_moveup(y) printf("\033[%dA", y)          /*Move cursor up y*/
@@ -2934,136 +2570,10 @@ namespace aurostd {
 #define cursor_attr_blink() printf("\033[5m")     /*Supposed to make text blink, usually bolds it instead*/
 #define cursor_attr_reverse() printf("\033[7m")   /*Swap background and foreground colors*/
 
-// OBSOLETE ME20191031 - not used
-// ***************************************************************************
-// xtensor.hpp
-//
-//namespace apl {
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//class xtensor {
-//  T* _data;
-//  int _lindex;
-//  int _hindex;
-//  unsigned int _indexSize;
-//  unsigned long long _arraySize;
-//  std::vector<unsigned long long> _precomputedOffsets;
-//
-// private:
-//  unsigned long long getOffset(const std::vector<unsigned int>&);
-//
-// public:
-//  xtensor(int, int);
-//  ~xtensor();
-//  void zero();
-//  void fill(const T&);
-//  T& operator()(int, ...);
-//};
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//xtensor<T, TENSOR_ORDER>::xtensor(int index1, int index2) {
-//  _hindex = index1 > index2 ? index1 : index2;
-//  _lindex = index1 < index2 ? index1 : index2;
-//
-//  _indexSize = _hindex - _lindex + 1;
-//
-//  // Allocate data
-//  unsigned long long arraySizeBefore;
-//  _arraySize = 1ULL;
-//  _precomputedOffsets.push_back(_arraySize);
-//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER; i++) {
-//    arraySizeBefore = _arraySize;
-//    _arraySize *= _indexSize;
-//    // Detect overflow
-//    if (arraySizeBefore > _arraySize)
-//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); The setting is producing an array which can not by handled by this implementation.");
-//    _precomputedOffsets.push_back(_arraySize);
-//  }
-//
-//  try {
-//    // FIX: Problem; new(std::size_t), where size_t is hardware/platform specific,
-//    // for 32 bit systems it is uint = 2^32, if our array is bigger than this,
-//    // there is a overflow -> use more pages of the same block _data[PAGE][2^32]???,
-//    // or go to the 64 bits systems -> 2^64 (unsigned long long)
-//    if (_arraySize > (1ULL << (8 * sizeof(std::size_t) - 1)))  // dont go overboard  SC (-1)
-//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); Problem to allocate a required array. Hardware specific problem.");
-//    _data = new T[(std::size_t)_arraySize];
-//  } catch (std::bad_alloc& e) {
-//    throw APLRuntimeError("apl::xtensor<T>::xtensor(); Bad allocation.");
-//  }
-//
-//  // Reverse precomputed for better manipulation and shift by 1
-//  std::vector<unsigned long long> temp(_precomputedOffsets.rbegin() + 1, _precomputedOffsets.rend());
-//  _precomputedOffsets = temp;
-//  temp.clear();
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//xtensor<T, TENSOR_ORDER>::~xtensor() {
-//  _precomputedOffsets.clear();
-//  delete[] _data;
-//  _data = NULL;
-//  _arraySize = 0ULL;
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//void xtensor<T, TENSOR_ORDER>::zero() {
-//  // Take care! The last argument is of std::size_t, hence platform specific
-//  memset(_data, 0, _arraySize * sizeof(T));
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//void xtensor<T, TENSOR_ORDER>::fill(const T& val) {
-//  for (unsigned long long i = 0ULL; i < _arraySize; i++)
-//    _data[i] = val;
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//unsigned long long xtensor<T, TENSOR_ORDER>::getOffset(const std::vector<unsigned int>& idxs) {
-//  unsigned long long offset = idxs.back();
-//  for (_AFLOW_APL_REGISTER_ int i = idxs.size() - 2; i >= 0; i--)
-//    offset += (unsigned long long)(idxs[i] * _precomputedOffsets[i]);
-//  return offset;
-//}
-//
-////////////////////////////////////////////////////////////////////////////////
-//template <typename T, unsigned int TENSOR_ORDER>
-//T& xtensor<T, TENSOR_ORDER>::operator()(int idx1, ...) {
-//  // Get indices and transform to form 0...max
-//  va_list arguments;
-//  std::vector<unsigned int> idxs;
-//
-//  // The 1st index
-//  idxs.push_back((unsigned int)(idx1 - _lindex));
-//  //    if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-//  if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-//
-//  // The rest of indices
-//  va_start(arguments, idx1);
-//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER - 1; i++) {
-//    idxs.push_back((unsigned int)(va_arg(arguments, int) - _lindex));
-//    //   if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-//    if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-//  }
-//  va_end(arguments);
-//
-//  // Calculate offset
-//  unsigned long long offset = getOffset(idxs);
-//  idxs.clear();
-//
-//  // Return value
-//  return _data[offset];
-//}
-////////////////////////////////////////////////////////////////////////////////
-//}
-// ***************************************************************************
-
 #endif  // _AFLOW_APL_H_
 
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
 // ***************************************************************************

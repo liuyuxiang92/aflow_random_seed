@@ -20,6 +20,7 @@
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX
+#define _ZERO_TOL_LOOSE_ 1e-6  //ME20200519 - tolerance for float precision
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
 #define _XPROTO_ZERO_VOL_ 1.0e-6  //CO20190218
 
@@ -659,14 +660,10 @@ class _aflags {
 
 //ME20181026 - Container for APL options
 struct _moduleOptions {
-  _moduleOptions() : minatoms_restricted(false) {;}  //CO20181226
   // APL
-  vector<bool> supercell_method;
-  bool minatoms_restricted; //CO20181226 = false;
   vector<aurostd::xoption> aplflags;
 
   // AAPL
-  vector<bool> cut_rad_shell;
   vector<aurostd::xoption> aaplflags;
 
   // QHA
@@ -4392,12 +4389,11 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  //ME20181107
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption&, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  //ME20181107
   bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
   void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
-  // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
@@ -4539,7 +4535,7 @@ namespace makefile {
 #include "aflowlib.h"
 
 // ----------------------------------------------------------------------------
-// aflowlib.h stuff
+// aflow_pflow.h stuff
 #include "aflow_pflow.h"
 
 // ----------------------------------------------------------------------------
