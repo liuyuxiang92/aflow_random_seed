@@ -1425,18 +1425,18 @@ namespace init {
     string out="";
     //ME20200707 - The LIBRARY_NOTHING check is important or this function
     //breaks when the LIB directory does not exist
-    if((XHOST_LIBRARY_AUID != LIBRARY_NOTHING) && (lib=="AUID" || lib=="auid")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
-    if((XHOST_LIBRARY_ICSD != LIBRARY_NOTHING) && (lib=="ICSD" || lib=="icsd")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
-    if((XHOST_LIBRARY_LIB0 != LIBRARY_NOTHING) && (lib=="LIB0" || lib=="lib0" ||  lib=="0")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0);
-    if((XHOST_LIBRARY_LIB1 != LIBRARY_NOTHING) && (lib=="LIB1" || lib=="lib1" ||  lib=="1")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1);
-    if((XHOST_LIBRARY_LIB2 != LIBRARY_NOTHING) && (lib=="LIB2" || lib=="lib2" ||  lib=="2")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2);
-    if((XHOST_LIBRARY_LIB3 != LIBRARY_NOTHING) && (lib=="LIB3" || lib=="lib3" ||  lib=="3")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3);
-    if((XHOST_LIBRARY_LIB4 != LIBRARY_NOTHING) && (lib=="LIB4" || lib=="lib4" ||  lib=="4")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4);
-    if((XHOST_LIBRARY_LIB5 != LIBRARY_NOTHING) && (lib=="LIB5" || lib=="lib5" ||  lib=="5")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5);
-    if((XHOST_LIBRARY_LIB6 != LIBRARY_NOTHING) && (lib=="LIB6" || lib=="lib6" ||  lib=="6")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6);
-    if((XHOST_LIBRARY_LIB7 != LIBRARY_NOTHING) && (lib=="LIB7" || lib=="lib7" ||  lib=="7")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7);
-    if((XHOST_LIBRARY_LIB8 != LIBRARY_NOTHING) && (lib=="LIB8" || lib=="lib8" ||  lib=="8")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
-    if((XHOST_LIBRARY_LIB9 != LIBRARY_NOTHING) && (lib=="LIB9" || lib=="lib9" ||  lib=="9")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);
+    if((XHOST_LIBRARY_AUID != LIBRARY_NOTHING) && (aurostd::toupper(lib)=="AUID")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
+    if((XHOST_LIBRARY_ICSD != LIBRARY_NOTHING) && (aurostd::toupper(lib)=="ICSD")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    if((XHOST_LIBRARY_LIB0 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB0") ||  lib=="0")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0);
+    if((XHOST_LIBRARY_LIB1 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB1") ||  lib=="1")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1);
+    if((XHOST_LIBRARY_LIB2 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB2") ||  lib=="2")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2);
+    if((XHOST_LIBRARY_LIB3 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB3") ||  lib=="3")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3);
+    if((XHOST_LIBRARY_LIB4 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB4") ||  lib=="4")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4);
+    if((XHOST_LIBRARY_LIB5 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB5") ||  lib=="5")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5);
+    if((XHOST_LIBRARY_LIB6 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB6") ||  lib=="6")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6);
+    if((XHOST_LIBRARY_LIB7 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB7") ||  lib=="7")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7);
+    if((XHOST_LIBRARY_LIB8 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB8") ||  lib=="8")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
+    if((XHOST_LIBRARY_LIB9 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB9") ||  lib=="9")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);
     return out;
 
     //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)" "init::AFLOW_Projects_Directories(\"AUID\")" *cpp

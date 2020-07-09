@@ -672,6 +672,7 @@ namespace aurostd {
   bool _ishex(const string& hexstr) {
     uint istart = 0;
     uint str_len = hexstr.size();
+    // Also process hexadecimal numbers with the '0x' prefix.
     if ((str_len > 2) && (hexstr[0] == '0') && hexstr[1] == 'x') istart = 2;
     for (uint i = istart; i < str_len; i++) {
       if ((hexstr[i] < 48) || ((hexstr[i] > 57) && (hexstr[i] < 97)) || (hexstr[i] > 102)) return false;
