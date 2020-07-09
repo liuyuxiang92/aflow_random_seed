@@ -1632,7 +1632,7 @@ namespace compare{
     }
 
     // ---------------------------------------------------------------------------
-    // generate all permutations structures
+    // generate all permutation structures
     vector<StructurePrototype> permutation_structures = compare::generatePermutationStructures(structure);
 
     //cerr << "store naming" << endl;
