@@ -1054,7 +1054,7 @@ namespace apl
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
 
-      // save the corresponing structure into PHPOSCAR
+      // save the corresponding structure into PHPOSCAR
       string phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
       if (!aurostd::EFileExist(phposcarfile)){
         xinput.xvasp.str.is_vasp5_poscar_format = true;
@@ -1322,7 +1322,7 @@ namespace apl
   ///
   double QHAN::calcFrequencyFit(double V, xvector<double> &xomega)
   {
-    string function = "calcFrequencyFit():";
+    string function = "QHAN::calcFrequencyFit():";
     // set all weight in fit to 1
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
     xvector<double> Vpoly(4); for (int i=1; i<=4; i++) Vpoly[i] = pow(V,i-1);
@@ -1857,7 +1857,7 @@ namespace apl
   {
     // step taken to determine the bracketing interval
     static const double dE = max(0.01, KBOLTZEV*T);
-    static const string function = "ChemicalPotential():";
+    static const string function = "QHAN::ChemicalPotential():";
 
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
     if (LDEBUG) cerr << function << "begin" << std::endl;
@@ -2223,7 +2223,7 @@ namespace apl
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
   double QHAN::SCQHAgetEquilibriumVolume(double T)
   {
-    string function = "SCQHAgetEquilibriumVolume():";
+    string function = "QHAN::SCQHAgetEquilibriumVolume():";
     const static int max_scqha_iteration = 10000;
     const static double Vtol = 1e-5;
     const static double dV = 1e-3;
