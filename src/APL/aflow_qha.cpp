@@ -1847,12 +1847,12 @@ namespace apl
     return res;
   }
 
-  /// Returns the chemical potential at a given temperature for a given volume id.
+  /// Returns the chemical potential at a given temperature for a given volume Vid.
   ///
-  /// Chemical potential is found as a solution of the equation IDOS(T)-Nelectrons = 0,
+  /// The chemical potential is found as a solution of the equation IDOS(T)-Nelectrons = 0,
   /// where IDOS(T) = integral over the energy region of DOS(E)*FermiDirac(E, mu, T),
   /// where mu is a chemical potential.
-  /// Equation is solved using the bisection method and bracketing interval is
+  /// The equation is solved using the bisection method and the bracketing interval is
   /// automatically determined starting with the Fermi energy at the one end of the
   /// interval.
   double QHA::ChemicalPotential(double T, int Vid)
@@ -1873,9 +1873,9 @@ namespace apl
     double f_at_left_end = 0.0, f_at_middle = 0.0, f_at_right_end = 0.0;
 
     // The value of the initial guess is used to bracket the root.
-    // Since IDOS is monotonically increasing function another end of the bracketing 
-    // interval is found by stepping in the direction of increase, if IDOS value at
-    // "guess" energy is lower than the number of electrons, or in the direction of
+    // Since IDOS is a monotonically increasing function another end of the bracketing 
+    // interval is found by stepping in the direction of increase, if the IDOS value at
+    // the "guess" energy is lower than the number of electrons, or in the direction of
     // decrease in the opposite case until the bracketing interval is found (opposite
     // signs of IDOS-number_of_electrons at bracketing interval ends).
     left_end = right_end = guess;
@@ -1908,8 +1908,8 @@ namespace apl
 
   // Iterate until the convergence criterion is reached:
   // f(middle) is sufficiently close to zero or the bracketing interval is sufficiently
-  // small. The latter is used to avoid the infinite loop.
-  // For T->0 it is likely that IDOS is not smooth but is step-like due to numerical
+  // small. The latter is used to avoid an infinite loop.
+  // For T->0 it is likely that the IDOS is not smooth but step-like due to numerical
   // discretization.
   // Meanwhile, do a sanity check that the function has opposite signs at the interval 
   // ends.
@@ -1943,13 +1943,13 @@ namespace apl
 
   /// Calculates the electronic free energy at a given temperature for a given volume id.
   ///
-  /// Electronic free energy is calculated as a weighted sum over energy eigenvalues
+  /// The electronic free energy is calculated as a weighted sum over energy eigenvalues
   /// with occupancies as defined by Fermi-Dirac statistics.
   ///
-  /// Notice: there might be a problem for non-magnetic system when magnetic calculation
-  /// is turned on. Although, eigenvalues for spin up and spin down should be the same,
+  /// Notice: there might be a problem for non-magnetic systems when magnetic calculation
+  /// is turned on. Even though eigenvalues for spin up and spin down should be the same,
   /// I encountered a situation when the small differences in the values of eigenvalues
-  /// for spin up and down down lead to wrong electronic free energy for spin down,
+  /// for spin up and down down lead to wrong electronic free energies for spin down
   /// while the calculation was correct for spin up.
   double QHA::electronicFreeEnergy(double T, int Vid)
   {
@@ -2220,7 +2220,7 @@ namespace apl
     return VPgamma;
   }
 
-  /// Calculates equilibrium volume for a given temperatures using SCQHA self-consistent
+  /// Calculates the equilibrium volume for a given temperatures using SCQHA self-consistent
   /// loop procedure.
   /// Check for details:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
@@ -2278,7 +2278,7 @@ namespace apl
     if (all_iterations_self_consistent)
       msg += "with all temperature steps computed self-consistenly.";
     else
-      msg += "with temperature steps computed using V *= (1 + beta*dT) approximation.";
+      msg += "with temperature steps computed using the V *= (1 + beta*dT) approximation.";
 
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
@@ -2944,7 +2944,7 @@ namespace apl
       }
 
       msg = "Writing phonon dispersions corresponding to a ";
-      msg += aurostd::utype2string<double>(T) + " (K) temperature.";
+      msg += "temperature of " + aurostd::utype2string<double>(T) + " K.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
           _LOGGER_MESSAGE_);
 
