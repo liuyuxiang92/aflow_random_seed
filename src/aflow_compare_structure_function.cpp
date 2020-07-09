@@ -1542,7 +1542,7 @@ namespace compare{
           else{ break; }  
         }
       }
-      int num=1e9;
+      int num=AUROSTD_MAX_INT;
       if(num_string.size()!=0){
         if(aurostd::substring2bool(num_string,".")){
           vector<string> sub_tokens;
