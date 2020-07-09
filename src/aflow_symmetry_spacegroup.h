@@ -12,7 +12,6 @@
 #include <cstring>
 #include <map>
 #include "aflow.h"
-//#include "aflow_anrl.h" //DX20200624
 const double Pi_r = 3.141592653589793;
 
 namespace SYM{

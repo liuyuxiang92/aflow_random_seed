@@ -16,7 +16,6 @@
 #include "aflow_pflow.h"
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
-//#include "aflow_anrl.h" //DX20200624
 
 #undef AFLOW_COMPARE_MULTITHREADS_ENABLE
 

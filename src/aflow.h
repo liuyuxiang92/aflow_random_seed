@@ -2589,7 +2589,8 @@ extern string PrototypeBinaryGUS_Cache_Library[];
 #define DOI_POCC " [POCC doi: 10.1021/acs.chemmater.6b01449]"
 
 namespace anrl {
-  xstructure PrototypeANRL(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option);
+  // ---------------------------------------------------------------------------
+  // get existing prototype information
   uint PrototypeANRL_LoadList(vector<string>& vproto,
       vector<string>& vproto_label,
       vector<uint>& vproto_nspecies,
@@ -2602,7 +2603,10 @@ namespace anrl {
       vector<string>& vproto_Strukturbericht,
       vector<string>& vproto_prototype,
       vector<string>& vproto_dialect);
-  vector<string> getANRLParameters(string anrl_label, string library="", int choice=-1, bool keep_original_lattice_parameter=false); //DX20181009 //DX20190227 - added keep_original_lattice_parameter
+  vector<string> getANRLParameters(string anrl_label,
+      string library="",
+      int choice=-1,
+      bool keep_original_lattice_parameter=false); //DX20181009 //DX20190227 - added keep_original_lattice_parameter
   bool vproto2tokens(string proto,
       string& label,
       uint& nspecies,
@@ -2615,24 +2619,43 @@ namespace anrl {
       string& Strukturbericht,
       string& prototype,
       string& dialect);
+  // ---------------------------------------------------------------------------
+  // functions to determine atomic positions from Wyckoff and parameters
   vector<uint> extractStoichiometry(string& anrl_label);
+  // ---------------------------------------------------------------------------
+  // checking functions
   bool PrototypeANRL_Consistency(uint vparameters_size,uint proto_nparameters,string proto_prototype,
       string proto_label,string proto_Strukturbericht,string proto_Pearson_symbol,
       uint proto_spacegroup, string proto_params, uint print_mode); //DX20180710 - added print_mode //DX20200207 - oss no longer needed
+  // ---------------------------------------------------------------------------
+  // helper functions to determine label and internal degrees of freedom 
   string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize);
   vector<string> getANRLLatticeParameterString(char& lattice_type);
   vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting); //DX20191031
   vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting); //DX20191031
   vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting); //DX20191031
   uint getANRLSettingChoice(int spacegroup); //DX20191031 - removed reference
+  // ---------------------------------------------------------------------------
+  // map structure to label and internal degrees of freedom 
   string structure2anrl(istream& input, aurostd::xoption& vpflow);           // xoption
   string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX20191031 - added recalculate_symmetry
   string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO20190520 - removed pointers for bools and doubles, added const where possible
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
   string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
-  xstructure rhl2hex(xstructure& str, double& a, double& c); 
+  // ---------------------------------------------------------------------------
+  // generic prototype generator (main function)
   xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout, bool silence_logger=true); //DX20200528 - command line = no logger
   xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ofstream& FileMESSAGE, ostream& logstream=cout, bool silence_logger=false); //DX20200528 - internal = logger
+  // ---------------------------------------------------------------------------
+  // [OLD] hard-coded generator (requires ANRL/ subdirectory)
+  xstructure PrototypeANRL(ostream &oss,
+      string label,
+      string parameters,
+      deque<string> &vatomX,
+      deque<double> &vvolumeX,
+      double volume_in,
+      int mode,
+      bool flip_option);
 }
 
 // ----------------------------------------------------------------------------
