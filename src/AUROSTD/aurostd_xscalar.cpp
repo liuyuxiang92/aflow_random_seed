@@ -675,6 +675,7 @@ namespace aurostd {
     // Also process hexadecimal numbers with the '0x' prefix.
     if ((str_len > 2) && (hexstr[0] == '0') && hexstr[1] == 'x') istart = 2;
     for (uint i = istart; i < str_len; i++) {
+      // Return false if chars aren't '0-9' or 'a-f' - https://www.asciitable.com/
       if ((hexstr[i] < 48) || ((hexstr[i] > 57) && (hexstr[i] < 97)) || (hexstr[i] > 102)) return false;
     }
     return true;
