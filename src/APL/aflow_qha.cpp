@@ -2439,6 +2439,21 @@ namespace apl
             CV += Cvi;
             Feq  += fi;
           }
+          else if (T<_ZERO_TOL_){
+            ui  *= qpWeights[q];
+            fi *= qpWeights[q];
+
+            d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
+              pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
+            d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
+
+            Bgamma  += ui*pow(gamma, 2);
+            Bdgamma -= ui*((1+gamma)*gamma - pow(V,2)/w*d2wdV2);
+
+            GP += extrapolateGrueneisen(V, xomega, SCQHA_CALC) * Cvi;
+
+            Feq  += fi;
+          }
         }
         NQpoints += qpWeights[q];
       }
