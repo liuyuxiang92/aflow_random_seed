@@ -255,7 +255,7 @@ namespace aflowlib {
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
-      string directory2MetadataAUIDjsonfile(const string& directory);                                 //CO20200624 - get contents of auid_metadata.json 
+      string directory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
       bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
       void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
       void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
@@ -270,6 +270,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
+  string VASPdirectory2auid(const string& directory,const string& aurl);   //CO20200624 - moving from inside _aflowlib_entry
   uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
   string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
 }

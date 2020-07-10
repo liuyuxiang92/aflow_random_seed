@@ -37,6 +37,8 @@
         -- return early for --pocc_count_total command to avoid giving user too much verbosity (CO)
         -- added MessageOption() (vs. ErrorOption()) that does NOT throw error (CO)
         -- patching flow of POccCalculator() to read/load from aflow.in ALWAYS and overwrite with inputs (CO)
+        -- created scheme for POCC auids, see directory2MetadataAUIDjsonfile (CO)
+        -- prepared LIB2RAW for POCC (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

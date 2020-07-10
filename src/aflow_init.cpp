@@ -1873,8 +1873,7 @@ namespace init {
     vector<string> tokens_options;
     aurostd::string2tokens(options,tokens_options,",");
 
-    message << "Routine " << routine << ": Wrong number/type of input parameters (" << tokens_options.size();
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_ERROR_);
+    message << "Routine " << routine << ": Wrong number/type of input parameters (" << tokens_options.size();pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_ERROR_);
     //[CO20200624 - OBSOLETE]oss << "ERROR: " << routine << ":" << endl;
     //[CO20200624 - OBSOLETE]oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
     

@@ -1753,6 +1753,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo
   // copy the file but does not check if the directory can be made or not...
+  // CO20200624 - it cannot check because we might pass in *
   bool CopyFile(string from,string to) { // "" compliant April/2019 SC
     stringstream command;
     command << "cp -f \"" << CleanFileName(from) << "\" \"" << CleanFileName(to) << "\" " << endl;
@@ -1766,6 +1767,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo
   // copy the file but does not check if the directory can be made or not...
+  // CO20200624 - it cannot check because we might pass in *
   bool LinkFile(string from,string to) { // "" compliant April/2019 SC
     stringstream command;
     command << "ln -sf \"" << CleanFileName(from) << "\" \"" << CleanFileName(to) << "\" " << endl;

@@ -987,13 +987,15 @@ namespace aflowlib {
     long double seconds_begin=aurostd::get_seconds();
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
+    
     // Call to LIB2LIB function to run postprocessing - added by CT20181212
-    bool run_lib2lib=true; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
-    if(run_lib2lib &&!LIB2LIB(options, flag_FORCE, LOCAL)) {
+    bool perform_LIB2LIB=false; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
+    if(perform_LIB2LIB && !LIB2LIB(options, flag_FORCE, LOCAL)) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aflowlib::LIB2LIB() failed",_RUNTIME_ERROR_);
       //[CO20200624 - OBSOLETE]cerr << soliloquy << " LIB2LIB failed" << endl;
       //[CO20200624 - OBSOLETE]exit(0);
     }
+    
     vector<string> tokens;
     if(!aurostd::substring2bool(options,"POCC")) {
       aurostd::string2tokens(options,tokens,","); // QUICK FIX
@@ -1005,7 +1007,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
       init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
-      exit(0);
+      return false;  //CO20200624
     }
 
     if(tokens.size()>=1) {
@@ -1017,7 +1019,7 @@ namespace aflowlib {
       }
     }
 
-    string directory_LIB,directory_RAW,directory_WEB;
+    string directory_LIB="",directory_RAW="",directory_WEB="";
     bool flag_WEB=FALSE;
     bool flag_files_LIB=FALSE,flag_files_RAW=FALSE,flag_files_WEB=FALSE;
     string PROJECT_LIBRARY;
@@ -1091,10 +1093,10 @@ namespace aflowlib {
             }
           }
         if(directory_LIB.length()==0) {
-          cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
-          cout << soliloquy << " you must specify the directory including the whole lattice type" << endl;
-          cout << " such as  aflow --lib2raw=FCC/La1Se1_ICSD_27104  " << endl;
-          exit(0);
+          cerr << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
+          cerr << soliloquy << " you must specify the directory including the whole lattice type" << endl;
+          cerr << " such as  aflow --lib2raw=FCC/La1Se1_ICSD_27104  " << endl;
+          return false;  //CO20200624
         }
       }
 
@@ -1130,6 +1132,8 @@ namespace aflowlib {
     cout << soliloquy << " directory_RAW=" << directory_RAW << endl;
     cout << soliloquy << " directory_WEB=" << directory_WEB << endl;
 
+    if(!directory_LIB.empty()) {XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_LIB);} //CO20200624 - fix error messages to point to directory_LIB
+
     bool perform_LOCK=FALSE;  //CO20200624 - turning off in general, check below
     bool perform_BANDS=FALSE,perform_BADER=FALSE,perform_MAGNETIC=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
@@ -1151,7 +1155,6 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext))) perform_AEL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+XHOST.vext.at(iext))) perform_POCC=TRUE; //CO20200624
     }
-
     if((perform_THERMODYNAMICS || perform_BANDS || perform_MAGNETIC)){perform_PATCH=true;} //CO20200624
 
     // override for the web
@@ -1241,15 +1244,20 @@ namespace aflowlib {
       if(i<vspecies.size()-1)  aflowlib_data.species+=",";
     }    // plug vspecies into aflowlib_data
 
+    string system_name=KBIN::ExtractSystemName(directory_LIB);
+    
     if(LDEBUG) cerr << soliloquy << " [3]" << endl;
-
-    if(perform_POCC){aflowlib_data.directory2MetadataAUIDjsonfile(directory_LIB);}
 
     if(LOCAL) {
       aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
     } else {
       // build aflowlib_data.aurl
       aflowlib_data.aurl="aflowlib.duke.edu:"+directory_LIB;
+      
+      //CO REMOVE ME - DEBUGGING ONLY!!!!!!
+      aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO REMOVE ME - DEBUGGING ONLY!!!!!!
+      //CO REMOVE ME - DEBUGGING ONLY!!!!!!
+
       if(aurostd::substring2bool(aflowlib_data.aurl,"LIBRARYX")) { aurostd::StringSubst(aflowlib_data.aurl,"common/GNDSTATE/LIBRARYX/LIB","AFLOWDATA/LIB2_RAW");aflowlib_data.catalog="LIBRARYX"; } // [HISTORIC]
       if(aurostd::substring2bool(aflowlib_data.aurl,"ICSD")) { aurostd::StringSubst(aflowlib_data.aurl,"common/ICSD/LIB","AFLOWDATA/ICSD_WEB");aflowlib_data.catalog="ICSD"; }
       if(aurostd::substring2bool(aflowlib_data.aurl,"LIB0")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB0/LIB","AFLOWDATA/LIB0_RAW");aflowlib_data.catalog="LIB0"; }
@@ -1264,18 +1272,28 @@ namespace aflowlib {
       if(aurostd::substring2bool(aflowlib_data.aurl,"LIB9")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB9/LIB","AFLOWDATA/LIB9_RAW");aflowlib_data.catalog="LIB9"; }
       if(aurostd::substring2bool(aflowlib_data.aurl,"AURO")) { aurostd::StringSubst(aflowlib_data.aurl,"common/AURO/LIB","AFLOWDATA/AURO_RAW");aflowlib_data.catalog="AURO"; }
       aurostd::StringSubst(aflowlib_data.aurl,":/AFLOWDATA",":AFLOWDATA");
+      
       // cout << soliloquy << " AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
+
+      if(LDEBUG){cerr << soliloquy << " aurl=" << aflowlib_data.aurl << endl;}
+
       // build aflowlib_data.auid
+      
       if(LDEBUG) cerr << soliloquy << " [AUID=0] directory_LIB=" << directory_LIB << endl;
-      // aflowlib::directory2auid(directory_LIB,aflowlib_data.aurl,aflowlib_data.auid,aflowlib_data.vauid); // OLD STYLE
-      aflowlib_data.directory2auid(directory_LIB); // NEW STLYE
+      if(perform_POCC){ //CO20200624
+        string metadata_auid_json=aflowlib_data.directory2MetadataAUIDjsonfile(directory_LIB);
+        aurostd::string2file(metadata_auid_json,aurostd::CleanFileName(directory_RAW+"/"+"metadata_auid.json"));
+      }else{
+        // aflowlib::directory2auid(directory_LIB,aflowlib_data.aurl,aflowlib_data.auid,aflowlib_data.vauid); // OLD STYLE
+        aflowlib_data.directory2auid(directory_LIB); // NEW STLYE
+      }
       //  if(AFLOWLIB_VERBOSE)
       if(LDEBUG) cerr << soliloquy << " [AUID=0b] directory_LIB=" << directory_LIB << endl;
       cout << soliloquy << " AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl; 
       cout << soliloquy << " AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
       cout << soliloquy << " VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
       //ME20200207 - the system name is the canonical title
-      aflowlib_data.title = KBIN::ExtractSystemName(directory_LIB);  //ME20200207
+      aflowlib_data.title = system_name;  //ME20200207  //CO20200624
 
       //[OBSOLETE] //ME20190125 BEGIN - Build the title of the calculation
       //[OBSOLETE] vector<string> tokens;
@@ -1371,366 +1389,364 @@ namespace aflowlib {
       cout << soliloquy << " LOCK LOOP ---------------------------------------------------------------------------------" << endl;
       aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (LOCK):"); 
     }
-    if((perform_THERMODYNAMICS || perform_BANDS ||  perform_MAGNETIC)) {
-      // ---------------------------------------------------------------------------------------------------------------------------------
-      // do the PATCH
-      if(perform_PATCH) {
-        cout << soliloquy << " PATCH LOOP --------------------------------------------------------------------------------" << endl;
-        aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (PATCH):"); 
-      }
-      // ---------------------------------------------------------------------------------------------------------------------------------
-      // write DOS + BANDS JSON //CO20171025
-      string system_name=KBIN::ExtractSystemName(directory_LIB);
-      if((aurostd::FileExist(directory_LIB+"/DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/DOSCAR.static")) &&
-          (aurostd::FileExist(directory_LIB+"/POSCAR.static") || aurostd::EFileExist(directory_LIB+"/POSCAR.static"))) {
-        cout << soliloquy << " DOS + BANDS JSON  ---------------------------------------------------------------------------------" << endl;
-        stringstream _json_file,json_file;
-        aurostd::xoption vpflow;  //dummy
-        if(estructure::DOSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
-          json_file << _json_file.str() << endl; _json_file.str("");
-          cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_dosdata.json") << endl; cout.flush();
-          aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_dosdata.json");
-          json_file.str("");
-          if(aurostd::EFileExist(directory_LIB+"/EIGENVAL.bands") && aurostd::EFileExist(directory_LIB+"/KPOINTS.bands")) {
-            if(estructure::BANDSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
-              json_file << _json_file.str() << endl; _json_file.str("");
-              cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_bandsdata.json") << endl; cout.flush();
-              aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_bandsdata.json");
-              json_file.str("");
-            }
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // do the PATCH
+    if(perform_PATCH) {
+      cout << soliloquy << " PATCH LOOP --------------------------------------------------------------------------------" << endl;
+      aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (PATCH):"); 
+    }
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // write DOS + BANDS JSON //CO20171025
+    if((aurostd::FileExist(directory_LIB+"/DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/DOSCAR.static")) &&
+        (aurostd::FileExist(directory_LIB+"/POSCAR.static") || aurostd::EFileExist(directory_LIB+"/POSCAR.static"))) {
+      cout << soliloquy << " DOS + BANDS JSON  ---------------------------------------------------------------------------------" << endl;
+      stringstream _json_file,json_file;
+      aurostd::xoption vpflow;  //dummy
+      if(estructure::DOSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
+        json_file << _json_file.str() << endl; _json_file.str("");
+        cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_dosdata.json") << endl; cout.flush();
+        aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_dosdata.json");
+        json_file.str("");
+        if(aurostd::EFileExist(directory_LIB+"/EIGENVAL.bands") && aurostd::EFileExist(directory_LIB+"/KPOINTS.bands")) {
+          if(estructure::BANDSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
+            json_file << _json_file.str() << endl; _json_file.str("");
+            cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_bandsdata.json") << endl; cout.flush();
+            aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_bandsdata.json");
+            json_file.str("");
           }
         }
-      }
-
-      // ---------------------------------------------------------------------------------------------------------------------------------
-      // DO THE COMPRESSING
-      //      cout << "COMPRESSING" << endl;
-      cout << soliloquy << " COMPRESSING REMOVING LINKING --------------------------------------------------------------" << endl;
-
-      // generic for compressing and linking
-      deque<string> vtype; aurostd::string2tokens(".orig,.relax,.relax1,.relax2,.relax3,.relax4,.static,.bands",vtype,",");
-      deque<string> vout; aurostd::string2tokens(".out,.json",vout,",");
-
-      for(uint iext=1;iext<XHOST.vext.size();iext++) {
-        aurostd::RemoveFile(directory_RAW+"/*.eps"+XHOST.vext.at(iext));
-      }
-
-      // [OBSOLETE] for(uint iext=0;iext<XHOST.vext.size();iext++) {  //[CO20200106 - close bracket for indenting]}
-      // [OBSOLETE] 	//  aurostd::RemoveFile(directory_RAW+"/core*");
-      // [OBSOLETE] 	  for(uint ifile=0;ifile<vfile.size();ifile++) {
-      // [OBSOLETE] 	  cout << vfile.at(ifile) << endl;
-      // [OBSOLETE]    if(!aurostd::substring2bool(vfile.at(ifile),XHOST.vext.at(iext)) && aurostd::FileExist(directory_RAW+"/"+vfile.at(ifile))) {
-      // [OBSOLETE] 	    if(LOCAL) { //CO20171025
-      // [OBSOLETE] 	      if(aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); } //it's all sitting in the directory above, wasteful
-      // [OBSOLETE] 	      if(vfile.at(ifile)=="KPOINTS.relax") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
-      // [OBSOLETE] 	      if(vfile.at(ifile)=="EIGENVAL.bands.old") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
-      // [OBSOLETE] 	      if(vfile.at(ifile)=="OUTCAR.relax") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
-      // [OBSOLETE] 	    } 
-      // [OBSOLETE] 	} // vfile
-      // [OBSOLETE]  } // iext
-
-      // FILES to remove
-      deque<string> vfile2remove; aurostd::string2tokens("KPOINTS.bands.old,EIGENVAL.bands.old,OUTCAR.relax1",vfile2remove,","); //CO20200404 - removed OUTCAR.bands from this list, we need for Egap. EIGENVAL.bands does not have occupancies
-      vfile2remove.push_back("aflow.pgroupk_xtal.out"); // comes from nowhere DX
-      for(uint iremove=0;iremove<vfile2remove.size();iremove++) {
-        if(aurostd::FileExist(directory_RAW+"/"+vfile2remove.at(iremove))) { // need to be present
-          //if(LDEBUG)
-          cout << soliloquy << " removing file: " << string(directory_RAW+"/"+vfile2remove.at(iremove)) << endl;
-          aurostd::RemoveFile(directory_RAW+"/"+vfile2remove.at(iremove));
-        } // FileExist
-      } // iremove
-      // FILES to compress if not compressed already (linked), in such case they will be deleted.
-      deque<string> vfile2compress0; aurostd::string2tokens("OUTCAR.relax",vfile2compress0,",");
-      for(uint icompress=0;icompress<vfile2compress0.size();icompress++) {
-        if(aurostd::FileExist(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN)) { // test if there is one already compressed (possibly linked)
-          if(1||LDEBUG) { cout << soliloquy << " found compressed file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN) << endl;  cout.flush(); }
-          if(1||LDEBUG) { cout << soliloquy << " removing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
-          aurostd::RemoveFile(directory_RAW+"/"+vfile2compress0.at(icompress));
-        }
-        if(aurostd::FileExist(directory_RAW+"/"+vfile2compress0.at(icompress))) { // need to be present
-          if(1||LDEBUG) { cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
-          aurostd::CompressFile(directory_RAW+"/"+vfile2compress0.at(icompress),DEFAULT_KZIP_BIN);
-        } // FILES to compress
-      } // icompress
-      // [OBSOLETE] no compress jvxl     if(perform_BADER) {
-      // [OBSOLETE] no compress jvxl   if(LDEBUG) { cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+"*.jvxl") << endl;  cout.flush(); }
-      // [OBSOLETE] no compress jvxl   aurostd::CompressFile(directory_RAW+"/"+"*.jvxl",DEFAULT_KZIP_BIN);
-      // [OBSOLETE] no compress jvxl     }
-      // FILES to compress
-      deque<string> vfile2compress1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.pgroupk_Patterson,aflow.fgroup,aflow.iatoms,aflow.agroup",vfile2compress1,","); //DX20200520 - added Patterson
-      for(uint ilink=0;ilink<vfile2compress1.size();ilink++) {
-        for(uint iout=0;iout<vout.size();iout++) {
-          for(uint itype=0;itype<vtype.size();itype++) {   
-            if(aurostd::FileExist(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout))) {
-              if(1||LDEBUG) { cout << soliloquy << " compressing file (" << ilink << "," << iout << "," << itype << "): " << string(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::CompressFile(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout),DEFAULT_KZIP_BIN);
-            } // FileExist
-          } // itype
-        } // iout
-      } // ilink
-
-      // FILES to link LIB to RAW
-      for(uint ifile=0;ifile<vfile.size();ifile++) {
-        if(aurostd::FileExist(directory_RAW+"/"+vfile.at(ifile))) { // need to be present
-          deque<string> vfile2link0; aurostd::string2tokens("DOSCAR.static,OUTCAR.static,CHGCAR.static,AECCAR0.static,AECCAR2.static,EIGENVAL.bands,OSZICAR.bands",vfile2link0,",");
-          for(uint ilink=0;ilink<vfile2link0.size();ilink++) {
-            if(vfile.at(ifile)==vfile2link0.at(ilink)) {
-              // cout << soliloquy << " linking file RAW->LIB: " << vfile2link0.at(ilink) << endl;       
-              if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)) || aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { // need to be present in LIB also  
-                aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); // remove RAW original
-                if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile))) { 
-                  cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)) << endl; cout.flush();   
-                  aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile),directory_RAW); // link LIB to RAW (save space)
-                }
-                for(uint iext=0;iext<XHOST.vext.size();iext++) {
-                  if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext))) {
-                    cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext)) << endl;  cout.flush();          
-                    aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext),directory_RAW); // link LIB to RAW (save space)
-                  }
-                }
-              }
-            }
-          } // files to link LIB to RAW
-        } // File Exist
-      } // ifile
-
-      // FILES to leave as is
-      for(uint ifile=0;ifile<vfile.size();ifile++) {
-        if(aurostd::FileExist(directory_RAW+"/"+vfile.at(ifile))) { // need to be present
-          // [NO COMPRESS] if(vfile.at(ifile)=="KPOINTS.relax") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
-          // [NO COMPRESS] if(vfile.at(ifile)=="KPOINTS.static") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
-          // [NO COMPRESS] if(vfile.at(ifile)=="KPOINTS.bands") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
-          // [NO COMPRESS] if(vfile.at(ifile)=="INCAR.relax") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
-          // [NO COMPRESS] if(vfile.at(ifile)=="INCAR.static") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
-          // [NO COMPRESS] if(vfile.at(ifile)=="INCAR.bands") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
-          // [NO COMPRESS] if(vfile.at(ifile)=="OUTCAR.relax") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\"");  // seems to work, although I do not like if(SC-0512)
-        } // File Exist
-      } // ifile
-
-      // DO THE FINISH LINK/COPY FOR WEB
-
-      if(perform_BANDS || 1 || TRUE) { // ALWAYS
-        cout << soliloquy << " linking stuff flag_WEB=" << flag_WEB << endl;
-        // MOVE/LINK PICS data
-
-        if(flag_WEB) {
-          string system_name=KBIN::ExtractSystemName(directory_LIB);
-          cout << soliloquy << " linking SYSTEM=" << system_name << endl;
-          if(aurostd::FileExist(directory_RAW+"/"+system_name+".png")
-              || aurostd::FileExist(directory_RAW + "/" + system_name + "_banddos.png"))  //ME20190621 - new file name convention
-            aurostd::LinkFile(directory_RAW+"/*png",directory_WEB);            // LINK
-          if(aurostd::FileExist(directory_RAW+"/"+system_name+".cif"))
-            aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK
-
-          aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_RAW+"/index.php");                      // LINK
-          aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_WEB+"/index.php");                      // LINK
-          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_WEB);    // LINK
-          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_WEB);   // LINK
-          aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.auid+".out",directory_WEB);     // LINK for AUID
-          aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.auid+".json",directory_WEB);     // LINK for AUID
-
-          deque<string> vfile2link1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.fgroup,aflow.iatoms,aflow.agroup,edata,data",vfile2link1,",");
-          for(uint ilink=0;ilink<vfile2link1.size();ilink++) {
-            for(uint iout=0;iout<vout.size();iout++) {
-              for(uint itype=0;itype<vtype.size();itype++) {   
-                if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout))) { // no compression
-                  if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }              
-                  aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout),directory_WEB);
-                }  // FileExist
-                for(uint iext=0;iext<XHOST.vext.size();iext++) {
-                  if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext))) { // with compression
-                    if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-                    aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);
-                  } // FileExist
-                } // iext
-              } //itype
-            } // iout
-          } // ilink
-          // PREVIOUSLY IN NETFLIX // cheat for void string
-          for(uint iout=0;iout<vout.size();iout++) {
-            if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout))) {
-              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout),directory_WEB);  //CO20171024
-            }  // FileExist
-          } // iout
-          for(uint iout=0;iout<vout.size();iout++) {
-            if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout))) {
-              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  //CO20171024
-            } // FileExist
-          } // iout
-          for(uint iout=0;iout<vout.size();iout++) {
-            if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)))  {  // NO EXTENSION
-              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout),directory_WEB);       //CO20171024
-            }
-            for(uint iext=0;iext<XHOST.vext.size();iext++) {
-              if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)))  {
-                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-                aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       //CO20171024
-              } // FileExist
-            } // iext
-          } // iout
-          for(uint iout=0;iout<vout.size();iout++) {
-            if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout))) { // NO EXTENSION
-              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout),directory_WEB);     //CO20171024
-            } // FileExist
-            for(uint iext=0;iext<XHOST.vext.size();iext++) {
-              if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext))) {
-                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-                aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     //CO20171024
-              } // FileExist
-            } // iext
-          } // iout
-          deque<string> vfile2link2; aurostd::string2tokens("EIGENVAL.bands,DOSCAR.static,OUTCAR.static,CONTCAR.relax,CONTCAR.relax1,POSCAR.bands,CONTCAR.relax.vasp,CONTCAR.relax.qe,CONTCAR.relax.abinit,CONTCAR.relax.aims,KPOINTS.relax,KPOINTS.static,KPOINTS.bands,INCAR.bands,AECCAR0.static,AECCAR2.static,CHGCAR.static",vfile2link2,",");
-          for(uint ilink=0;ilink<vfile2link2.size();ilink++) {
-            if(aurostd::FileExist(directory_RAW+"/"+vfile2link2.at(ilink))) { // NO EXTENSION
-              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)) << endl; cout.flush(); }
-              aurostd::LinkFile(directory_RAW+"/"+vfile2link2.at(ilink),directory_WEB);         // LINK
-            }
-            for(uint iext=0;iext<XHOST.vext.size();iext++) {
-              if(aurostd::FileExist(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext))) {
-                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-                aurostd::LinkFile(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext),directory_WEB);         // LINK
-              }
-            } // iext
-          } // ilink
-
-          if(perform_BADER) {
-            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*jvxl") << endl; cout.flush(); }
-            aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
-            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*_abader.out") << endl; cout.flush(); }
-            aurostd::LinkFile(directory_RAW+"/"+"*_abader.out*",directory_WEB);         // LINK
-          }
-        } // flag_WEB
-      }
-      // DONE
-      // write files if necessary
-      vector<string> vdirectory;
-      // do the directories
-      if(flag_files_LIB) {
-        aurostd::DirectoryLS(directory_LIB,vdirectory);
-        for(uint i=0;i<vdirectory.size();i++)
-          aflowlib_data.vfiles.push_back(vdirectory.at(i));
-      }
-      if(flag_files_RAW) {
-        aurostd::DirectoryLS(directory_RAW,vdirectory);
-        for(uint i=0;i<vdirectory.size();i++)
-          aflowlib_data.vfiles.push_back(vdirectory.at(i));
-      }
-      if(flag_files_WEB) {
-        aurostd::DirectoryLS(directory_WEB,vdirectory);
-        for(uint i=0;i<vdirectory.size();i++)
-          aflowlib_data.vfiles.push_back(vdirectory.at(i));
-      }
-      // DO THE FINAL WRITING
-      
-      if(aflowlib_data.vaflowlib_date.size()!=1){ //CO20200624 - this means we didn't get the LOCK date, spit warning
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"LOCK date NOT found",_LOGGER_WARNING_);
-      }
-      aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime()+"_GMT-5"); //CO20200624 - adding LOCK date
-
-      //     cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
-      //      aurostd::LinkFile("../../"+_XENTRY_","directory_RAW+"/"+_XENTRY_);
-      if(!LOCAL) { //CO20171025
-        aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_RAW+"/"+_XENTRY_);
-      }
-
-      // write aflowlib.out
-      cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl; cout.flush(); 
-      cout << XPID << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"out");
-      cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".out") << endl; cout.flush(); 
-      aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_RAW+"/"+aflowlib_data.auid+".out");         // LINK
-      // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
-
-      // write aflowlib.json
-      cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << endl; cout.flush(); 
-      cout << XPID << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,"json");
-      cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".json") << endl; cout.flush(); 
-      aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_RAW+"/"+aflowlib_data.auid+".json");         // LINK
-      // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON);
-
-      if(flag_WEB) {
-        if(!LOCAL) { //CO20171025
-          aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_WEB+"/"+_XENTRY_);
-        }
-      }
-
-      // CHECK FOR AUID-WEB-LINKS
-      //      LDEBUG=TRUE;
-      if (!LOCAL) {
-        if(LDEBUG) cout << soliloquy << " flag_WEB=" << flag_WEB << endl;
-        if(LDEBUG) cout << soliloquy << " directory_LIB=" << directory_LIB << endl;
-        if(LDEBUG) cout << soliloquy << " directory_RAW=" << directory_RAW << endl;
-        if(LDEBUG) cout << soliloquy << " directory_WEB=" << directory_WEB << endl;
-        //if(LDEBUG)
-        cout << soliloquy << " aflowlib_data.auid=" << aflowlib_data.auid << endl;
-        // **----------------------------------------------------------------------------
-        // **----------------------------------------------------------------------------
-        // NEW BUT STILL DOING
-        string directory_AUID="";
-        string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
-        directory_AUID=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aflowlib_data.auid);
-        aurostd::DirectoryMake(directory_AUID);
-        directory_AUID_LIB=directory_AUID+"/LIB"; 
-        directory_AUID_RAW=directory_AUID+"/RAW";
-        directory_AUID_WEB=directory_AUID+"/WEB";
-        aurostd::RemoveFile(directory_AUID_LIB); // to avoid auto-linking SC20181205
-        aurostd::RemoveFile(directory_AUID_RAW); // to avoid auto-linking SC20181205
-        aurostd::RemoveFile(directory_AUID_WEB); // to avoid auto-linking SC20181205
-
-        // directory_AUID_LIB
-        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
-        cout << soliloquy << " (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
-        aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK
-        // directory_AUID_RAW
-        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
-        cout << soliloquy << " (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
-        aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK
-
-        if(flag_WEB) {
-          if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
-          cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
-          aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK
-        } else {
-          if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
-          cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
-          aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK
-        }
-
-        // ICSD2LINK
-        if(aflowlib_data.catalog=="ICSD") {
-          aurostd::string2tokens(directory_LIB,tokens,"_");
-          if(tokens.size()>2) {
-            if(tokens.at(tokens.size()-2)=="ICSD") {
-              string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
-              aurostd::DirectoryMake(directory_ICSD2LINK);	      
-              cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
-              // LIB
-              aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
-              aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK
-              cout << soliloquy << " (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
-              // RAW
-              aurostd::RemoveFile(directory_ICSD2LINK+"/RAW");  // to avoid auto-linking SC20190830
-              aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK
-              cout << soliloquy << " (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
-              // WEB
-              aurostd::RemoveFile(directory_ICSD2LINK+"/WEB");  // to avoid auto-linking SC20190830
-              aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK
-              cout << soliloquy << " (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
-            }
-          }
-        }
-
-
-        // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << soliloquy << " DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
-        // DONE
-        //      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
-        cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
-        if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
     }
+    
+
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // DO THE COMPRESSING OF VASP FILES
+    //      cout << "COMPRESSING" << endl;
+    cout << soliloquy << " COMPRESSING REMOVING LINKING --------------------------------------------------------------" << endl;
+
+    // generic for compressing and linking
+    deque<string> vtype; aurostd::string2tokens(".orig,.relax,.relax1,.relax2,.relax3,.relax4,.static,.bands",vtype,",");
+    deque<string> vout; aurostd::string2tokens(".out,.json",vout,",");
+
+    //CO20200624 - removed COMPRESSED eps
+    for(uint iext=1;iext<XHOST.vext.size();iext++) {
+      aurostd::RemoveFile(directory_RAW+"/*.eps"+XHOST.vext.at(iext));
+    }
+
+    // [OBSOLETE] for(uint iext=0;iext<XHOST.vext.size();iext++) {  //[CO20200106 - close bracket for indenting]}
+    // [OBSOLETE] 	//  aurostd::RemoveFile(directory_RAW+"/core*");
+    // [OBSOLETE] 	  for(uint ifile=0;ifile<vfile.size();ifile++) {
+    // [OBSOLETE] 	  cout << vfile.at(ifile) << endl;
+    // [OBSOLETE]    if(!aurostd::substring2bool(vfile.at(ifile),XHOST.vext.at(iext)) && aurostd::FileExist(directory_RAW+"/"+vfile.at(ifile))) {
+    // [OBSOLETE] 	    if(LOCAL) { //CO20171025
+    // [OBSOLETE] 	      if(aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); } //it's all sitting in the directory above, wasteful
+    // [OBSOLETE] 	      if(vfile.at(ifile)=="KPOINTS.relax") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
+    // [OBSOLETE] 	      if(vfile.at(ifile)=="EIGENVAL.bands.old") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
+    // [OBSOLETE] 	      if(vfile.at(ifile)=="OUTCAR.relax") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
+    // [OBSOLETE] 	    } 
+    // [OBSOLETE] 	} // vfile
+    // [OBSOLETE]  } // iext
+
+    // FILES to remove
+    deque<string> vfile2remove; aurostd::string2tokens("KPOINTS.bands.old,EIGENVAL.bands.old,OUTCAR.relax1",vfile2remove,","); //CO20200404 - removed OUTCAR.bands from this list, we need for Egap. EIGENVAL.bands does not have occupancies
+    vfile2remove.push_back("aflow.pgroupk_xtal.out"); // comes from nowhere DX - we have variants for each VASP run (relax, static, bands), so this is NOW redundant
+    for(uint iremove=0;iremove<vfile2remove.size();iremove++) {
+      if(aurostd::FileExist(directory_RAW+"/"+vfile2remove.at(iremove))) { // need to be present
+        //if(LDEBUG)
+        cout << soliloquy << " removing file: " << string(directory_RAW+"/"+vfile2remove.at(iremove)) << endl;
+        aurostd::RemoveFile(directory_RAW+"/"+vfile2remove.at(iremove));
+      } // FileExist
+    } // iremove
+    // FILES to compress if not compressed already (linked), in such case they will be deleted.
+    deque<string> vfile2compress0; aurostd::string2tokens("OUTCAR.relax",vfile2compress0,",");
+    for(uint icompress=0;icompress<vfile2compress0.size();icompress++) {
+      if(aurostd::FileExist(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN)) { // test if there is one already compressed (possibly linked)
+        if(1||LDEBUG) { cout << soliloquy << " found compressed file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)+"."+DEFAULT_KZIP_BIN) << endl;  cout.flush(); }
+        if(1||LDEBUG) { cout << soliloquy << " removing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
+        aurostd::RemoveFile(directory_RAW+"/"+vfile2compress0.at(icompress));
+      }
+      if(aurostd::FileExist(directory_RAW+"/"+vfile2compress0.at(icompress))) { // need to be present
+        if(1||LDEBUG) { cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+vfile2compress0.at(icompress)) << endl;  cout.flush(); }
+        aurostd::CompressFile(directory_RAW+"/"+vfile2compress0.at(icompress),DEFAULT_KZIP_BIN);
+      } // FILES to compress
+    } // icompress
+    // [OBSOLETE] no compress jvxl     if(perform_BADER) {
+    // [OBSOLETE] no compress jvxl   if(LDEBUG) { cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+"*.jvxl") << endl;  cout.flush(); }
+    // [OBSOLETE] no compress jvxl   aurostd::CompressFile(directory_RAW+"/"+"*.jvxl",DEFAULT_KZIP_BIN);
+    // [OBSOLETE] no compress jvxl     }
+    // FILES to compress
+    deque<string> vfile2compress1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.pgroupk_Patterson,aflow.fgroup,aflow.iatoms,aflow.agroup",vfile2compress1,","); //DX20200520 - added Patterson
+    for(uint ilink=0;ilink<vfile2compress1.size();ilink++) {
+      for(uint iout=0;iout<vout.size();iout++) {
+        for(uint itype=0;itype<vtype.size();itype++) {   
+          if(aurostd::FileExist(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout))) {
+            if(1||LDEBUG) { cout << soliloquy << " compressing file (" << ilink << "," << iout << "," << itype << "): " << string(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }
+            aurostd::CompressFile(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout),DEFAULT_KZIP_BIN);
+          } // FileExist
+        } // itype
+      } // iout
+    } // ilink
+
+    // FILES to link LIB to RAW
+    for(uint ifile=0;ifile<vfile.size();ifile++) {
+      if(aurostd::FileExist(directory_RAW+"/"+vfile.at(ifile))) { // need to be present
+        deque<string> vfile2link0; aurostd::string2tokens("DOSCAR.static,OUTCAR.static,CHGCAR.static,AECCAR0.static,AECCAR2.static,EIGENVAL.bands,OSZICAR.bands",vfile2link0,",");
+        for(uint ilink=0;ilink<vfile2link0.size();ilink++) {
+          if(vfile.at(ifile)==vfile2link0.at(ilink)) {
+            // cout << soliloquy << " linking file RAW->LIB: " << vfile2link0.at(ilink) << endl;       
+            if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)) || aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { // need to be present in LIB also  
+              aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); // remove RAW original
+              if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile))) { 
+                cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)) << endl; cout.flush();   
+                aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile),directory_RAW); // link LIB to RAW (save space)
+              }
+              for(uint iext=0;iext<XHOST.vext.size();iext++) {
+                if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext))) {
+                  cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext)) << endl;  cout.flush();          
+                  aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext),directory_RAW); // link LIB to RAW (save space)
+                }
+              }
+            }
+          }
+        } // files to link LIB to RAW
+      } // File Exist
+    } // ifile
+
+    //[CO20200624 - OBSOLETE]// FILES to leave as is
+    //[CO20200624 - OBSOLETE]for(uint ifile=0;ifile<vfile.size();ifile++) {
+    //[CO20200624 - OBSOLETE]  if(aurostd::FileExist(directory_RAW+"/"+vfile.at(ifile))) { // need to be present
+        // [NO COMPRESS] if(vfile.at(ifile)=="KPOINTS.relax") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
+        // [NO COMPRESS] if(vfile.at(ifile)=="KPOINTS.static") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
+        // [NO COMPRESS] if(vfile.at(ifile)=="KPOINTS.bands") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
+        // [NO COMPRESS] if(vfile.at(ifile)=="INCAR.relax") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
+        // [NO COMPRESS] if(vfile.at(ifile)=="INCAR.static") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
+        // [NO COMPRESS] if(vfile.at(ifile)=="INCAR.bands") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\""); // seems to work, although I do not like if(SC-0914)
+        // [NO COMPRESS] if(vfile.at(ifile)=="OUTCAR.relax") aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/"+vfile.at(ifile)+"\"");  // seems to work, although I do not like if(SC-0512)
+    //[CO20200624 - OBSOLETE]  } // File Exist
+    //[CO20200624 - OBSOLETE]} // ifile
+
+    // DO THE FINISH LINK/COPY FOR WEB
+    cout << soliloquy << " linking stuff flag_WEB=" << flag_WEB << endl;
+    // MOVE/LINK PICS data
+
+    if(flag_WEB) {
+      cout << soliloquy << " linking SYSTEM=" << system_name << endl;
+      if(aurostd::FileExist(directory_RAW+"/"+system_name+".png") ||
+          aurostd::FileExist(directory_RAW+"/"+system_name+"_banddos.png") ||  //ME20190621 - new file name convention
+          FALSE){
+        aurostd::LinkFile(directory_RAW+"/*png",directory_WEB);            // LINK
+      }
+      if(aurostd::FileExist(directory_RAW+"/"+system_name+".cif")) aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK
+
+      if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_RAW+"/index.php");                      // LINK
+      if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_WEB+"/index.php");                      // LINK
+      if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_WEB);    // LINK
+      if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_WEB);   // LINK
+      if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.auid+".out")) aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.auid+".out",directory_WEB);     // LINK for AUID
+      if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.auid+".json")) aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.auid+".json",directory_WEB);     // LINK for AUID
+
+      deque<string> vfile2link1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.fgroup,aflow.iatoms,aflow.agroup,edata,data",vfile2link1,",");
+      for(uint ilink=0;ilink<vfile2link1.size();ilink++) {
+        for(uint iout=0;iout<vout.size();iout++) {
+          for(uint itype=0;itype<vtype.size();itype++) {   
+            if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout))) { // no compression
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }              
+              aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout),directory_WEB);
+            }  // FileExist
+            for(uint iext=0;iext<XHOST.vext.size();iext++) {
+              if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext))) { // with compression
+                if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+                aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);
+              } // FileExist
+            } // iext
+          } //itype
+        } // iout
+      } // ilink
+      // PREVIOUSLY IN NETFLIX // cheat for void string
+      for(uint iout=0;iout<vout.size();iout++) {
+        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout))) {
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout),directory_WEB);  //CO20171024
+        }  // FileExist
+      } // iout
+      for(uint iout=0;iout<vout.size();iout++) {
+        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout))) {
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  //CO20171024
+        } // FileExist
+      } // iout
+      for(uint iout=0;iout<vout.size();iout++) {
+        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)))  {  // NO EXTENSION
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout),directory_WEB);       //CO20171024
+        }
+        for(uint iext=0;iext<XHOST.vext.size();iext++) {
+          if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)))  {
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+            aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       //CO20171024
+          } // FileExist
+        } // iext
+      } // iout
+      for(uint iout=0;iout<vout.size();iout++) {
+        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout))) { // NO EXTENSION
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout),directory_WEB);     //CO20171024
+        } // FileExist
+        for(uint iext=0;iext<XHOST.vext.size();iext++) {
+          if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext))) {
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+            aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     //CO20171024
+          } // FileExist
+        } // iext
+      } // iout
+      deque<string> vfile2link2; aurostd::string2tokens("EIGENVAL.bands,DOSCAR.static,OUTCAR.static,CONTCAR.relax,CONTCAR.relax1,POSCAR.bands,CONTCAR.relax.vasp,CONTCAR.relax.qe,CONTCAR.relax.abinit,CONTCAR.relax.aims,KPOINTS.relax,KPOINTS.static,KPOINTS.bands,INCAR.bands,AECCAR0.static,AECCAR2.static,CHGCAR.static",vfile2link2,",");
+      for(uint ilink=0;ilink<vfile2link2.size();ilink++) {
+        if(aurostd::FileExist(directory_RAW+"/"+vfile2link2.at(ilink))) { // NO EXTENSION
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+vfile2link2.at(ilink),directory_WEB);         // LINK
+        }
+        for(uint iext=0;iext<XHOST.vext.size();iext++) {
+          if(aurostd::FileExist(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext))) {
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+            aurostd::LinkFile(directory_RAW+"/"+vfile2link2.at(ilink)+XHOST.vext.at(iext),directory_WEB);         // LINK
+          }
+        } // iext
+      } // ilink
+
+      if(perform_BADER) {
+        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*jvxl") << endl; cout.flush(); }
+        aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
+        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*_abader.out") << endl; cout.flush(); }
+        aurostd::LinkFile(directory_RAW+"/"+"*_abader.out*",directory_WEB);         // LINK
+      }
+    } // flag_WEB
+    
+    // DONE
+    // write files if necessary
+    vector<string> vdirectory;
+    // do the directories
+    if(flag_files_LIB) {
+      aurostd::DirectoryLS(directory_LIB,vdirectory);
+      for(uint i=0;i<vdirectory.size();i++)
+        aflowlib_data.vfiles.push_back(vdirectory.at(i));
+    }
+    if(flag_files_RAW) {
+      aurostd::DirectoryLS(directory_RAW,vdirectory);
+      for(uint i=0;i<vdirectory.size();i++)
+        aflowlib_data.vfiles.push_back(vdirectory.at(i));
+    }
+    if(flag_files_WEB) {
+      aurostd::DirectoryLS(directory_WEB,vdirectory);
+      for(uint i=0;i<vdirectory.size();i++)
+        aflowlib_data.vfiles.push_back(vdirectory.at(i));
+    }
+    // DO THE FINAL WRITING
+    
+    if(aflowlib_data.vaflowlib_date.size()!=1){ //CO20200624 - this means we didn't get the LOCK date, spit warning
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"LOCK date NOT found",_LOGGER_WARNING_);
+    }
+    aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime()+"_GMT-5"); //CO20200624 - adding LOCK date
+
+    //     cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
+    //      aurostd::LinkFile("../../"+_XENTRY_","directory_RAW+"/"+_XENTRY_);
+    if(!LOCAL) { //CO20171025
+      if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_RAW+"/"+_XENTRY_);
+    }
+
+    // write aflowlib.out
+    cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl; cout.flush(); 
+    cout << XPID << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"out");
+    cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".out") << endl; cout.flush(); 
+    if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_RAW+"/"+aflowlib_data.auid+".out");         // LINK
+    // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
+
+    // write aflowlib.json
+    cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << endl; cout.flush(); 
+    cout << XPID << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,"json");
+    cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".json") << endl; cout.flush(); 
+    if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_RAW+"/"+aflowlib_data.auid+".json");         // LINK
+    // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON);
+
+    if(flag_WEB) {
+      if(!LOCAL) { //CO20171025
+        if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_WEB+"/"+_XENTRY_);
+      }
+    }
+
+    // CHECK FOR AUID-WEB-LINKS
+    //      LDEBUG=TRUE;
+    if (!LOCAL) {
+      if(LDEBUG) cout << soliloquy << " flag_WEB=" << flag_WEB << endl;
+      if(LDEBUG) cout << soliloquy << " directory_LIB=" << directory_LIB << endl;
+      if(LDEBUG) cout << soliloquy << " directory_RAW=" << directory_RAW << endl;
+      if(LDEBUG) cout << soliloquy << " directory_WEB=" << directory_WEB << endl;
+      //if(LDEBUG)
+      cout << soliloquy << " aflowlib_data.auid=" << aflowlib_data.auid << endl;
+      // **----------------------------------------------------------------------------
+      // **----------------------------------------------------------------------------
+      // NEW BUT STILL DOING
+      string directory_AUID="";
+      string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
+      directory_AUID=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aflowlib_data.auid);
+      aurostd::DirectoryMake(directory_AUID);
+      directory_AUID_LIB=directory_AUID+"/LIB"; 
+      directory_AUID_RAW=directory_AUID+"/RAW";
+      directory_AUID_WEB=directory_AUID+"/WEB";
+      aurostd::RemoveFile(directory_AUID_LIB); // to avoid auto-linking SC20181205
+      aurostd::RemoveFile(directory_AUID_RAW); // to avoid auto-linking SC20181205
+      aurostd::RemoveFile(directory_AUID_WEB); // to avoid auto-linking SC20181205
+
+      // directory_AUID_LIB
+      if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
+      cout << soliloquy << " (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
+      if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK
+      // directory_AUID_RAW
+      if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
+      cout << soliloquy << " (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
+      if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK
+
+      if(flag_WEB) {
+        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
+        cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
+        if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK
+      } else {
+        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
+        cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
+        if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK
+      }
+
+      // ICSD2LINK
+      if(aflowlib_data.catalog=="ICSD") {
+        aurostd::string2tokens(directory_LIB,tokens,"_");
+        if(tokens.size()>2) {
+          if(tokens.at(tokens.size()-2)=="ICSD") {
+            string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
+            aurostd::DirectoryMake(directory_ICSD2LINK);	      
+            cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
+            // LIB
+            aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
+            if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK
+            cout << soliloquy << " (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
+            // RAW
+            aurostd::RemoveFile(directory_ICSD2LINK+"/RAW");  // to avoid auto-linking SC20190830
+            if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK
+            cout << soliloquy << " (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
+            // WEB
+            aurostd::RemoveFile(directory_ICSD2LINK+"/WEB");  // to avoid auto-linking SC20190830
+            if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK
+            cout << soliloquy << " (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
+          }
+        }
+      }
+
+
+      // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << soliloquy << " DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
+      // DONE
+      //      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
+      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
+      if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
+    }
+    
     // COMPRESS
     /*
     //  aurostd::execute(DEFAULT_KZIP_BIN+" -9f \""+directory_RAW+"/POSCAR.bands\"");
@@ -1744,7 +1760,7 @@ namespace aflowlib {
     // then directories
     // FILES
 
-    LDEBUG=FALSE; //CO20180321
+    //[CO20200624 - leave as what it is]LDEBUG=FALSE; //CO20180321
     //CO20180216 - more robust for any type of directory/file setup
     vector<string> Chmod_Files;
     if(LDEBUG) { cerr << soliloquy << " pwd=" << aurostd::getPWD() << endl;}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
