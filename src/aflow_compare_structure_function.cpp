@@ -6133,8 +6133,8 @@ namespace compare{
     // C |      C1, C2     with A,B,C,D 
     // D |      D1, D2    
 
-    bool LDEBUG=true;//(FALSE || XHOST.DEBUG);
-    bool VERBOSE=true;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
 
     string function_name = XPID + "compare::findMatch():";
 
@@ -6147,9 +6147,6 @@ namespace compare{
     // DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING = 4.0 (default)
     // Increase scaling to have a more stringent cutoff (slower, but more robust)
     double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING; //DX20200623
-    cerr << "minimum_interatomic_distance: " << minimum_interatomic_distance << endl;
-    cerr << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING: " << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl;
-
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  // indices of atoms (index after sorting)
@@ -7498,7 +7495,7 @@ namespace compare{
 
     // Performs lattice and origin search
 
-    bool LDEBUG=true;//(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::latticeAndOriginSearch():";
 
     bool supercell_method = false; //DX20200330 - original method, but slow

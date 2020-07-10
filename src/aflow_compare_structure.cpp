@@ -2964,7 +2964,7 @@ namespace compare {
     // and determines their level of similarity based on the idea discussed 
     // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
 
-    bool LDEBUG=true;//(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     comparison_log << "==================================================================================" << endl;
 

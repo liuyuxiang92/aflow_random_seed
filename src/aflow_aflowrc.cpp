@@ -2018,7 +2018,7 @@ namespace aflowrc {
     //DX20200708 - START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS XTALFINDER" << endl;
-    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=\"" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << "\"" << "  // factor that divides minimum interatomic distance" << endl;
+    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl;
     //DX20200708 - END
 
     aflowrc << " " << endl;
