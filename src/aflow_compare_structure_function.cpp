@@ -6147,6 +6147,9 @@ namespace compare{
     // DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING = 4.0 (default)
     // Increase scaling to have a more stringent cutoff (slower, but more robust)
     double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING; //DX20200623
+    cerr << "minimum_interatomic_distance: " << minimum_interatomic_distance << endl;
+    cerr << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING: " << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl;
+
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  // indices of atoms (index after sorting)
