@@ -1225,6 +1225,11 @@ DEFAULT_APL_FILE_PREFIX
   type: string
   default: "aflow.apl."
 
+DEFAULT_APL_PDIS_FILE
+  description: Output file for the phonon dispersion curve.
+  type: string
+  default: "phonon_dispersion.out"
+
 DEFAULT_APL_PDOS_FILE
   description: Output file for the phonon DOS.
   type: string
@@ -1328,6 +1333,11 @@ DEFAULT_QHA_GP_DISTORTION
   description: Sets the value of volume change (dV) for the calculation of the Grueneisen parameter using the finite difference method.
   type: double
   default: 1.0
+
+DEFAULT_QHA_TAYLOR_EXPANSION_ORDER
+  description: Sets the order of Taylor expansion that is used by QHANP method.
+  type: int
+  default: 2
 
 DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   description: Defines if electronic contribution to the free energy is included.
