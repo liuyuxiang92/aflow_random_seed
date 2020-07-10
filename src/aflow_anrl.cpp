@@ -26,7 +26,7 @@ namespace anrl {
       string Pearson_symbol,uint spacegroup,string params,uint print_mode) { //DX20180710 - added print_mode info //DX20200207 - oss no longer needed
 
     if(vparameters_size!=nparameters && print_mode!=1) { //DX20180710 - if equations only (print_mode==1), we do not need the parameters
-      string function_name = "PrototypeANRL_Consistency():";
+      string function_name = XPID + "anrl::PrototypeANRL_Consistency():";
       stringstream message;
       message << "anrl::PrototypeANRL" << endl;
       message << " Prototype                   : " << prototype << endl;
@@ -1588,7 +1588,7 @@ namespace anrl {
       const string& variables, 
       bool& keep_anrl_lattice_parameter){ 
 
-    // bool must be reference: toggles automatic volume scaling later
+    // keep_anrl_lattice_parameter must be reference: toggles automatic volume scaling later
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::extractANRLPrototypeParameterValues():";
@@ -1647,7 +1647,7 @@ namespace anrl {
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::structureAndLabelConsistent():";
 
-    xstructure xstr = _xstr; //copy
+    xstructure xstr = _xstr; // copy
 
     // ---------------------------------------------------------------------------
     // determine label from structure (reverse process) 
@@ -1715,6 +1715,14 @@ namespace anrl {
 // *************************************************************************** 
 // anrl::PrototypeANRL_Generator()
 // *************************************************************************** 
+// Returns a ANRL prototype structure based on the label and internal 
+// degrees of freedom.
+// The function is generic and will build ANY prototype as long as: 
+//   1) the label and parameters are valid (the function has many checks) AND
+//   2) the structure is a crystal (i.e., built from Wyckoff positions)
+// A symbolic representations of the crystal can be returned in terms of: 
+// lattice variables: a, b, c, alpha, beta, gamma AND
+// Wyckoff variables: x, y, and z 
 namespace anrl {
   xstructure PrototypeANRL_Generator(string& label,
       string& parameters,
@@ -1722,6 +1730,8 @@ namespace anrl {
       deque<double> &vvolumeX,
       ostream& logstream,
       bool silence_logger){
+
+    // command line version (no need for FileMESSAGE or logger)
 
     ofstream FileMESSAGE;
     
@@ -1746,14 +1756,7 @@ namespace anrl {
       ostream& logstream,
       bool silence_logger){
 
-		// Returns a ANRL prototype structure based on the label and internal 
-    // degrees of freedom.
-    // The function is generic and will build ANY prototype as long as: 
-    // 1) the label and parameters are valid (the function has many checks) AND
-    // 2) the structure is a crystal (i.e., built from Wyckoff positions)
-    // A symbolic representations of the crystal can be returned in terms of: 
-    // lattice variables: a, b, c, alpha, beta, gamma AND
-    // Wyckoff variables: x, y, and z 
+    // main version
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::PrototypeANRL_Generator():";
@@ -2180,41 +2183,30 @@ namespace anrl {
       symbolic::Symbolic lattice_symbolic = SymbolicANRLPrimitiveLattices(lattice_and_centering_from_Pearson, space_group_letter);
 
       // ---------------------------------------------------------------------------
-      // re-sort to alphabetic/type ordering 
-      //vector<wyckoffsite_ITC> Wyckoff_sites_ordered_by_type = ordered_Wyckoff_sites_ITC;
-      //std::sort(Wyckoff_sites_ordered_by_type.begin(), Wyckoff_sites_ordered_by_type.end(), sortWyckoffByType); 
-
+      // convert Wyckoff site into symbolic notation
       vector<SymbolicWyckoffSite> Wyckoff_sites_symbolic;
-      //for(uint i=0;i<Wyckoff_sites_ordered_by_type.size();i++){
-        //Wyckoff_sites_symbolic.push_back(initializeSymbolicWyckoffSite(Wyckoff_sites_ordered_by_type[i]));
       for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
         Wyckoff_sites_symbolic.push_back(initializeSymbolicWyckoffSite(ordered_Wyckoff_sites_ITC[i]));
       }
 
       // ---------------------------------------------------------------------------
-      // convert to symbolic equations 
-      //vector<symbolic::Symbolic> all_symbolic_equations;
-      //for(uint i=0;i<Wyckoff_sites_ordered_by_type.size();i++){
-      //  vector<symbolic::Symbolic> symbolic_equation = equations2SymbolicEquations(Wyckoff_sites_ordered_by_type[i].equations);
-      //  all_symbolic_equations.insert(all_symbolic_equations.end(), symbolic_equation.begin(), symbolic_equation.end());
-      //}
-
-      // ---------------------------------------------------------------------------
       // transform to ANRL primitive cell 
-      //vector<symbolic::Symbolic> reduced_symbolic_equation = convertEquations2FractionalEquations(lattice_and_centering_from_Pearson, lattice_symbolic, all_symbolic_equations);
       for(uint i=0;i<Wyckoff_sites_symbolic.size();i++){
         Wyckoff_sites_symbolic[i].equations = convertEquations2FractionalEquations(lattice_and_centering_from_Pearson, lattice_symbolic, Wyckoff_sites_symbolic[i].equations);
       }
 
+      // ---------------------------------------------------------------------------
+      // convert generic variable to the parameter designation, e.g., x -> x2 
       substituteVariableWithParameterDesignation(Wyckoff_sites_symbolic); 
       vector<symbolic::Symbolic> symbolic_equations;
       for(uint i=0;i<Wyckoff_sites_symbolic.size();i++){
         symbolic_equations.insert(symbolic_equations.end(), Wyckoff_sites_symbolic[i].equations.begin(), Wyckoff_sites_symbolic[i].equations.end());
       }
 
+      // ---------------------------------------------------------------------------
+      // convert to vector<string> and add to _atom 
       str.symbolic_math_lattice = symbolic::matrix2VectorVectorString(lattice_symbolic);
       addSymbolicEquation2Atoms(symbolic_equations, str.atoms);
-      //addSymbolicEquation2Atoms(symbolic_equations, atoms_primitive_cell);
 #else
       // ---------------------------------------------------------------------------
       // if the SymbolicC++ code is not compiled
@@ -2255,6 +2247,7 @@ namespace anrl {
           //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
           str.AddAtom(atoms.at(i));
           // DX20181205 - Volume scaling by atomic species - START
+          // ---------------------------------------------------------------------------
           // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
           if(scale_volume_by_species==true){
             double volume=0.0;
@@ -2265,7 +2258,7 @@ namespace anrl {
               }
             }
             //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-            str.SetVolume(volume);  //CO20190205 - more robust
+            str.SetVolume(volume); //CO20190205 - more robust
             str.neg_scale=TRUE;
           }
           //DX20181205 - Volume scaling by atomic species - END
@@ -2359,6 +2352,9 @@ void substituteVariableWithParameterDesignation(vector<SymbolicWyckoffSite>& Wyc
 
 // SymbolicWyckoffSite
 void substituteVariableWithParameterDesignation(SymbolicWyckoffSite& Wyckoff_symbolic){
+    
+  // convert a generic variable to the parameter designation, e.g., x -> x2
+  
   for(uint i=0;i<Wyckoff_symbolic.equations.size();i++){
     Wyckoff_symbolic.equations[i]=Wyckoff_symbolic.equations[i].subst("x","x"+aurostd::utype2string<uint>(Wyckoff_symbolic.parameter_index));
     Wyckoff_symbolic.equations[i]=Wyckoff_symbolic.equations[i].subst("y","y"+aurostd::utype2string<uint>(Wyckoff_symbolic.parameter_index));
@@ -2375,9 +2371,9 @@ namespace symbolic {
     // Convert a string into symbolic math notation
     // The SYMBOLICC++ library cannot convert a string into a symbol so
     // we must do it ourselves
-    // NOTE: this is preliminary, if this is to be used beyond Wyckoff 
-    // positions, we need to add more operators/functions 
-    // (e.g., sin, cos, exponentials, etc.)
+    // NOTE: this function is rudimentary and NOT generalized, 
+    // if this is to be used beyond Wyckoff positions, we need to add more 
+    // operators/functions (e.g., sin, cos, exponentials, etc.)
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "symbolic::string2symbolic():";
@@ -2419,7 +2415,7 @@ namespace symbolic {
 namespace symbolic {
   bool isEqual(const Symbolic& a, const Symbolic& b){
     
-    // right now this relies on SymbolicC++'s implementation of "=="
+    // relies on SymbolicC++'s implementation of "=="
     // this is sufficient for now, e.g., (1e-9)*x+(1e-6)*y+0 = 0
 
     bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE A NESTED FUNCTION
@@ -2514,8 +2510,8 @@ namespace symbolic {
     // bring symbolic math inside the cell
     // it is impossible to know what the variable (x, y, or z) will be 
     // to truly bring the coordinate in the cell, but this function brings 
-    // the constant term in cell
-    // uses the Symbolic.coeff(<variable>,<order>) function, where
+    // any constant term(s) in cell
+    // here, we use the Symbolic.coeff(<variable>,<order>) function, where
     // <variable>: is the variable of interest
     // <order>: is the order/degree of the variable
     // TRICK: define a constant and provide order 1, i.e.,
