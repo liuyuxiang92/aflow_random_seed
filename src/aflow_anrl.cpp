@@ -2415,16 +2415,15 @@ namespace symbolic {
 namespace symbolic {
   bool isEqual(const Symbolic& a, const Symbolic& b){
     
-    // need to be able to handle (1e-9)*x+(1e-6)*y+0
-    // right now this relies on SymbolicC++'s implementation of ==
-    // this may not be robust enough 
+    // right now this relies on SymbolicC++'s implementation of "=="
+    // this is sufficient for now, e.g., (1e-9)*x+(1e-6)*y+0 = 0
 
     bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE A NESTED FUNCTION
 
     Symbolic diff = a - b;
 
     if(VERBOSE){ 
-      string function_name = XPID + "symbolic::isEqual():";
+      string function_name = XPID + "symbolic::isEqual():"; // definition in loop for efficiency
       cerr << function_name << " a-b=" << diff << endl;
     }
 
@@ -2438,12 +2437,25 @@ namespace symbolic {
 namespace symbolic {
   bool isEqualVector(const Symbolic& a_vec, const Symbolic& b_vec){
     
-    // perhaps check type (number, vector, matrix?) and have if statements?
+    // check if Symbolic vector inputs are equal
+    
+    // ---------------------------------------------------------------------------
+    // check that the inputs' types are SymbolicMatrix (vector)
+    if(typeid(*a_vec).name() != typeid(SymbolicMatrix).name() ||
+        typeid(*b_vec).name() != typeid(SymbolicMatrix).name()){
+      string function_name = XPID + "symbolic::isEqualVector():"; // definition in loop for efficiency
+      stringstream message;
+      message << "One or both of the inputs are not a SymbolicMatrix (i.e., typeids are different):"
+        << " a_vec (input) id: " << typeid(*a_vec).name()
+        << " b_vec (input) id: " << typeid(*b_vec).name()
+        << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    }
 
     bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE A NESTED FUNCTION
 
     if(VERBOSE){ 
-      string function_name = XPID + "symbolic::isEqualVector():";
+      string function_name = XPID + "symbolic::isEqualVector():"; // definition in loop for efficiency
       cerr << function_name << " a_vec-b_vec=" << (a_vec-b_vec) << endl;
     }
 
@@ -2463,6 +2475,16 @@ namespace symbolic {
 
     // convert symbolic matrix to vector<vector<string> >
     // perhaps check if type is matrix?
+
+    // ---------------------------------------------------------------------------
+    // check that input type is a SymbolicMatrix 
+    if(typeid(*lattice).name() != typeid(SymbolicMatrix).name()){
+      string function_name = XPID + "symbolic::matrix2VectorVectorString():";
+      stringstream message;
+      message << "The input is not a SymbolicMatrix (i.e., typeids are different): lattice (input) id: "
+        << typeid(*lattice).name() << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    }
 
     vector<vector<string> > vvstring;
 
