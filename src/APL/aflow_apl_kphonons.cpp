@@ -1479,7 +1479,7 @@ namespace apl {
     int TAYLOR_EXPANSION_ORDER = aurostd::string2utype<int>(qhaopts.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
     if (TAYLOR_EXPANSION_ORDER <= 0){
       string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
-      msg += " List of temperatures is not given.";
+      msg += " Taylor expansion order parameter should be a non-negative integer.";
       msg += " Specify as " + option + "=";
       msg += aurostd::utype2string<int>(AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
