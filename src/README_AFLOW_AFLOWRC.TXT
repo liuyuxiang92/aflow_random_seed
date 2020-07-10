@@ -1340,7 +1340,7 @@ DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   default: 0
 
 DEFAULT_QHA_SOMMERFELD_EXPANSION
-  description: Defines if electronic contribution to the free energy is calculated using Sommerfeld expansion.
+  description: Defines if electronic contribution to the free energy is calculated using the Sommerfeld expansion.
   type: bool
   default: 0
 
