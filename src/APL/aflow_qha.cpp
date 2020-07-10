@@ -34,6 +34,10 @@
 
 enum DATA_FILE {DF_DIRECTORY, DF_OUTCAR, DF_EIGENVAL, DF_IBZKPT};
 
+#define EOS_METHOD_FILE_POLYNOMIAL "polynomial."
+#define EOS_METHOD_FILE_BIRCH_MURNAGHAN "birch-murnaghan."
+#define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
+
 //=============================================================================
 //              Definitions of the NonlinearFit class members
 
@@ -196,7 +200,7 @@ namespace apl
       chi_sqr = calculateResidualSquareSum(p);
       new_chi_sqr = calculateResidualSquareSum(pnew);
 
-      if (abs(new_chi_sqr - chi_sqr) < tol){
+      if (std::abs(new_chi_sqr - chi_sqr) < tol){
         p = pnew;
         break;
       }
@@ -357,7 +361,7 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
   // Iterate until the convergence criterion is reached:
   // f(middle) is sufficiently close to zero.
   // Meanwhile, do a sanity check that the function has opposite signs at the interval ends.
-  while ((sign(f_at_left_end) != sign(f_at_right_end)) && (abs(f_at_middle)>tol)){
+  while ((sign(f_at_left_end) != sign(f_at_right_end)) && (std::abs(f_at_middle)>tol)){
     if (sign(f_at_left_end) == sign(f_at_middle)){
       std::swap(left_end, middle);
       std::swap(f_at_left_end, f_at_middle);
@@ -381,7 +385,7 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
   }
 
   // double-check that the convergence criterion was reached
-  if (abs(f_at_middle) > tol) return -1;
+  if (std::abs(f_at_middle) > tol) return -1;
 
   if (LDEBUG) cerr << function << "end" << std::endl;
   return middle;
@@ -621,6 +625,7 @@ namespace apl
         TaylorExpansionOrder = option->content_int;
         if (TaylorExpansionOrder <= 0){
           string message = "Wrong setting in [AFLOW_QHA]TAYLOR_EXPANSION_ORDER.";
+          message += " Specify as TAYLOR_EXPANSION_ORDER=2";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_ILLEGAL_);
         }
@@ -662,7 +667,7 @@ namespace apl
               _INPUT_NUMBER_);
         }
         for (uint i=0; i<tokens.size(); i++){
-          ph_disp_temperatures.push_back(aurostd::string2utype<double>(tokens[i]));
+          ph_disp_temperatures.push_back(aurostd::string2utype<int>(tokens[i]));
         }
       }
     }
@@ -784,6 +789,9 @@ namespace apl
   /// QHA3P and SCQHA calculations require 3 phonon calculations and N_EOSvolumes static
   /// calculations.
   /// 
+  /// QHANP calculation requires 2*TaylorExpansionOrder+1 phonon calculations and 
+  /// N_EOSvolumes static calculations.
+  ///
   void QHA::run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin)
   {
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
@@ -816,10 +824,19 @@ namespace apl
             vector<bool>(4));
 
         uint n_static_calcs = checkStaticCalculations(file_is_present);
+        // read data from a set of static DFT calculations only when all required
+        // output files are present.
+        // Post-processing that requires a set of static DFT calculations (QHA+EOS,
+        // QHA3P, QHANP and SCQHA) will happen only when all required data from this
+        // set was read successfully.
         if (n_static_calcs == subdirectories_static.size()){
           eos_static_data_available = readStaticCalculationsData();
         }
         else{
+          // if there exists data for at least one completed static DFT calculation,
+          // print an error listing missing files/directories.
+          // Thus, errors are not printed if it is a first QHA run or QHA was run by
+          // mistake after the first run before the static DFT calculations were executed
           if (n_static_calcs > 0) printMissingStaticFiles(file_is_present, 
               subdirectories_static);
 
@@ -916,12 +933,15 @@ namespace apl
     // create aflow.in if there are no outputs with results in the directory:
     // OUTCAR, EIGENVAL and IBZKPT. The last two are only required when electronic
     // contribution is included
+    // The existing aflow.in file will not be overwritten.
     for (uint i=0; i<subdirectories_static.size(); i++){
       if (includeElectronicContribution){
         if (file_is_present[i][DF_EIGENVAL] && file_is_present[i][DF_IBZKPT] &&
             file_is_present[i][DF_OUTCAR]) continue;
       }
       else if (file_is_present[i][DF_OUTCAR]) continue;
+
+      if (aurostd::FileExist(subdirectories_static[i]+'/'+_AFLOWIN_)) continue;
 
       msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -1001,30 +1021,27 @@ namespace apl
     string msg = "";
     for (uint i=0; i<subdirectories.size(); i++){
       if (!list[i][DF_DIRECTORY]){
-        msg = "Directory " + subdirectories[i] + " is missing.";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-          *p_oss, _LOGGER_ERROR_);
+        msg += "Directory " + subdirectories[i] + " is missing.\n";
       }
       else{
         if (!list[i][DF_OUTCAR]){
-          msg = "File " + subdirectories[i] + "/OUTCAR.static is missing.";
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_ERROR_);
+          msg += "File " + subdirectories[i] + "/OUTCAR.static is missing.\n";
         }
         if (includeElectronicContribution){
           if(!list[i][DF_EIGENVAL]){
-            msg = "File " + subdirectories[i] + "/EIGENVAL.static is missing.";
-            pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_ERROR_);
+            msg += "File " + subdirectories[i] + "/EIGENVAL.static is missing.\n";
           }
 
           if(!list[i][DF_IBZKPT]){
-            msg = "File " + subdirectories[i] + "/IBZKPT.static is missing.";
-            pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_ERROR_);
+            msg += "File " + subdirectories[i] + "/IBZKPT.static is missing.\n";
           }
         }
       }
+    }
+
+    if (!msg.empty()){
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
     }
   }
 
@@ -1382,7 +1399,7 @@ namespace apl
 
       // check the fit error
       for (int Vid=0; Vid<N_EOSvolumes; Vid++){
-        err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
+        err = std::abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
             -xomega[Vid+1])/xomega[Vid+1];
         err *= 100.0;
         if (err>=10.0){
@@ -1867,7 +1884,7 @@ namespace apl
     // Fermi energy is used as a starting guess for the value of chemical potential
     double guess = Efermi_V[Vid];
     double f = IDOS(guess, T, static_eigvals[Vid]) - Nelectrons;
-    if (abs(f) < AUROSTD_ROUNDOFF_TOL) return guess;
+    if (std::abs(f) < AUROSTD_ROUNDOFF_TOL) return guess;
 
     double left_end = 0.0, middle = 0.0, right_end = 0.0;
     double f_at_left_end = 0.0, f_at_middle = 0.0, f_at_right_end = 0.0;
@@ -1914,7 +1931,7 @@ namespace apl
   // Meanwhile, do a sanity check that the function has opposite signs at the interval 
   // ends.
     while ((sign(f_at_left_end) != sign(f_at_right_end)) && 
-        (abs(f_at_middle)>_ZERO_TOL_) && (abs(left_end-right_end) > _ZERO_TOL_)){
+        (std::abs(f_at_middle)>_ZERO_TOL_) && (std::abs(left_end-right_end) > _ZERO_TOL_)){
       if (sign(f_at_left_end) == sign(f_at_middle)){
         std::swap(left_end, middle);
         std::swap(f_at_left_end, f_at_middle);
@@ -1941,16 +1958,16 @@ namespace apl
     return middle;
   }
 
-  /// Calculates the electronic free energy at a given temperature for a given volume id.
+  /// Calculates the electronic free energy at a given temperature for a given volume Vid.
   ///
   /// The electronic free energy is calculated as a weighted sum over energy eigenvalues
   /// with occupancies as defined by Fermi-Dirac statistics.
   ///
   /// Notice: there might be a problem for non-magnetic systems when magnetic calculation
   /// is turned on. Even though eigenvalues for spin up and spin down should be the same,
-  /// I encountered a situation when the small differences in the values of eigenvalues
-  /// for spin up and down down lead to wrong electronic free energies for spin down
-  /// while the calculation was correct for spin up.
+  /// A.S. encountered a situation when the small differences in the values of
+  /// eigenvalues for spin up and down down lead to wrong electronic free energies for 
+  /// spin down while the calculation was correct for spin up.
   double QHA::electronicFreeEnergy(double T, int Vid)
   {
      static const double Tmin = 0.1;
@@ -1996,7 +2013,7 @@ namespace apl
   double QHA::extrapolateFrequency(double V, const xvector<double> &xomega,
       QHAmethod qha_method)
   {
-    string function = XPID + "QHA::extrapolateFrequency(): ";
+    string function = XPID + "QHA::extrapolateFrequency(): ", msg = "";
     double result = 0.0;
     switch(qha_method){
       // here QHA3P and SCQHA share the same code
@@ -2042,10 +2059,10 @@ namespace apl
           result += xomega[TaylorExpansionOrder+1];
         }
         break;
-      default:
-        string message = "QHA::extrapolateFrequency() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
-        message += " However, another method was requested.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
+      case (QHA_CALC):
+        msg = "QHA::extrapolateFrequency() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
+        msg += " However, QHA method was requested.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
               _INPUT_ILLEGAL_);
         break;
     }
@@ -2245,7 +2262,7 @@ namespace apl
       Pe   = dEOSpoly(V, fit_params);
       VPg  = VPgamma(T, V);
       Vnew = VPg/Pe;
-      if (abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
+      if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
     }
 
     if (iter == max_scqha_iteration){
@@ -2298,7 +2315,7 @@ namespace apl
       Pe   = dEOSpoly(V0K, fit_params);
       VPg  = VPgamma(0.0,V0K);
       Vnew = VPg/Pe;
-      if (abs(V0K - Vnew)/V0K > Vtol) V0K += (Vnew - V0K) * dV; else break;
+      if (std::abs(V0K - Vnew)/V0K > Vtol) V0K += (Vnew - V0K) * dV; else break;
     }
 
     // the name of the output file depends on the EOS fit method
@@ -2307,13 +2324,13 @@ namespace apl
     string sc = all_iterations_self_consistent ? "sc." : "";
     switch(method){
       case(EOS_POLYNOMIAL):
-        filename += sc+"polynomial.";
+        filename += sc+EOS_METHOD_FILE_POLYNOMIAL;
         break;
       case(EOS_BIRCH_MURNAGHAN):
-        filename += sc+"birch-murnaghan.";
+        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN;
         break;
       case(EOS_MURNAGHAN):
-        filename += sc+"murnaghan.";
+        filename += sc+EOS_METHOD_FILE_MURNAGHAN;
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
@@ -2350,7 +2367,7 @@ namespace apl
       Pe   = dEOSpoly(V, fit_params);
       VPg  = VPgamma(T, V);
       Vnew = VPg/Pe;
-      if (abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
+      if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
       iter++;
     }
     if (iter == max_scqha_iteration){
@@ -2393,13 +2410,13 @@ namespace apl
 
       // calculate the next equilibrium volume using a self-consistent loop if beta=0 or
       // if the user wants so
-      if (all_iterations_self_consistent || !(abs(beta)>0)){
+      if (all_iterations_self_consistent || !(std::abs(beta)>0)){
         iter=1;
         while (iter <= max_scqha_iteration){
           Pe   = dEOSpoly(V, fit_params);
           VPg  = VPgamma(T, V);
           Vnew = VPg/Pe;
-          if (abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
+          if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
           iter++;
         }
         if (iter == max_scqha_iteration){
@@ -2540,13 +2557,13 @@ namespace apl
     // QHA calculation
     switch(eos_method){
       case(EOS_POLYNOMIAL):
-        filename += "polynomial.";
+        filename += EOS_METHOD_FILE_POLYNOMIAL;
         break;
       case(EOS_BIRCH_MURNAGHAN):
-        filename += "birch-murnaghan.";
+        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN;
         break;
       case(EOS_MURNAGHAN):
-        filename += "murnaghan.";
+        filename += EOS_METHOD_FILE_MURNAGHAN;
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
@@ -2919,8 +2936,11 @@ namespace apl
   void QHA::writeTphononDispersions(QHAmethod qha_method)
   {
     string function = XPID + "QHA::writeTphononDispersions():", msg = "";
-    double T = 0.0, V = 0.0;
+    double V = 0.0; int T = 0;
     xvector<double> xomega;
+
+    int ndigits = aurostd::getZeroPadding(max(ph_disp_temperatures));
+
     for (uint i=0; i<ph_disp_temperatures.size(); i++){
       T = ph_disp_temperatures[i];
       switch(qha_method){
@@ -3018,7 +3038,7 @@ namespace apl
            // not supported, this case is handled in an earlier switch statement
           break;
       }
-      filename += aurostd::utype2string<double>(T)+DEFAULT_QHA_TPHDISP_FILE;
+      filename += aurostd::PaddedNumString(T, ndigits)+'.'+DEFAULT_APL_PDOS_FILE;
       aurostd::stringstream2file(eig_stream, filename);
       if (!aurostd::FileExist(filename)){
         msg = "Cannot open "+filename+" file.";

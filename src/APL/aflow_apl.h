@@ -1306,7 +1306,7 @@ namespace apl
       //int NatomsSupercell; ///< number of atoms in supercell
       xstructure origStructure;
       vector<double> Temperatures;
-      vector<double> ph_disp_temperatures;///< temperatures for T-dependent phonon dispersions
+      vector<int> ph_disp_temperatures;///< temperatures for T-dependent phonon dispersions
       vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
       vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
       vector<double> QHANPvolumes; ///< a set of volumes for QHANP calculation

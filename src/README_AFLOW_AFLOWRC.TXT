@@ -1225,11 +1225,6 @@ DEFAULT_APL_FILE_PREFIX
   type: string
   default: "aflow.apl."
 
-DEFAULT_APL_PDIS_FILE
-  description: Output file for the phonon dispersion curve.
-  type: string
-  default: "phonon_dispersion.out"
-
 DEFAULT_APL_PDOS_FILE
   description: Output file for the phonon DOS.
   type: string
