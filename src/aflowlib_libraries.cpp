@@ -1614,10 +1614,15 @@ namespace aflowlib {
       } // ilink
 
       if(perform_BADER) {
+        //CO20200624 - we don't need to worry about zipped variants, this analysis is done in RAW only (no LIB compression)
+        //H15Th4_ICSD_638495_Bader_50_H.jvxl - 50 will always exist
         if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*jvxl") << endl; cout.flush(); }
-        aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
-        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*_abader.out") << endl; cout.flush(); }
-        aurostd::LinkFile(directory_RAW+"/"+"*_abader.out*",directory_WEB);         // LINK
+        if(vspecies.size()>0 && aurostd::FileExist(directory_RAW+"/"+system_name+"_Bader_50_"+vspecies[0]+".jvxl")){
+          aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
+        }
+        //H15Th4_ICSD_638495_abader.out
+        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_abader.out") << endl; cout.flush(); }  //CO20200624
+        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_abader.out")) aurostd::LinkFile(directory_RAW+"/"+system_name+"_abader.out",directory_WEB); // LINK //CO20200624
       }
     } // flag_WEB
     

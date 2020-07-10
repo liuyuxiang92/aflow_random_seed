@@ -39,6 +39,7 @@
         -- patching flow of POccCalculator() to read/load from aflow.in ALWAYS and overwrite with inputs (CO)
         -- created scheme for POCC auids, see directory2MetadataAUIDjsonfile (CO)
         -- prepared LIB2RAW for POCC (CO)
+        -- added aurostd::FileExist() to all linking in LIB2RAW (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
