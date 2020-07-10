@@ -1,5 +1,8 @@
 3.2.5 - 2020/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- Made search --aflowlib more inclusive. (ME)
+        -- Fixed out of bounds error in init::AFLOW_Projects_Directories for missing LIB directories. (ME)
+        -- Added aurostd::_ishex. (ME)
         -- Moved POCC progress bar into pflow. (ME)
         -- Added "Notice" from apl::Logger into pflow::logger. (ME)
         -- Modularized APL option parsing. (ME)
