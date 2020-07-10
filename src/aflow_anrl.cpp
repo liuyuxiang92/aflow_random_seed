@@ -585,9 +585,9 @@ namespace anrl {
       bool contains_x=false; bool contains_y=false; bool contains_z=false;
       if(ordered_Wyckoff_sites_ITC[i].equations.size()>0){
         for(uint j=0;j<ordered_Wyckoff_sites_ITC[i].equations[0].size();j++){ //DX20190311 - used ordered Wyckoff variable
-          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"x")){ contains_x=true; } //DX20190311 - used ordered Wyckoff variable
-          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"y")){ contains_y=true; } //DX20190311 - used ordered Wyckoff variable
-          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"z")){ contains_z=true; } //DX20190311 - used ordered Wyckoff variable
+          if(ordered_Wyckoff_sites_ITC[i].equations[0][j].find("x") != std::string::npos){ contains_x=true; } //DX20190311 - used ordered Wyckoff variable
+          if(ordered_Wyckoff_sites_ITC[i].equations[0][j].find("y") != std::string::npos){ contains_y=true; } //DX20190311 - used ordered Wyckoff variable
+          if(ordered_Wyckoff_sites_ITC[i].equations[0][j].find("z") != std::string::npos){ contains_z=true; } //DX20190311 - used ordered Wyckoff variable
         }
         // store 
         string variable_designation="";
@@ -1304,9 +1304,9 @@ namespace anrl {
         // look at the representative Wyckoff position (index 0) and see if it 
         // x, y, and/or z
         for(uint j=0;j<Wyckoff_positions[i].equations[0].size();j++){
-          if(aurostd::substring2bool(Wyckoff_positions[i].equations[0][j],"x")){ contains_x=true; }
-          if(aurostd::substring2bool(Wyckoff_positions[i].equations[0][j],"y")){ contains_y=true; }
-          if(aurostd::substring2bool(Wyckoff_positions[i].equations[0][j],"z")){ contains_z=true; }
+          if(Wyckoff_positions[i].equations[0][j].find("x") != std::string::npos){ contains_x=true; }
+          if(Wyckoff_positions[i].equations[0][j].find("y") != std::string::npos){ contains_y=true; }
+          if(Wyckoff_positions[i].equations[0][j].find("z") != std::string::npos){ contains_z=true; }
         }
         
         // ---------------------------------------------------------------------------
@@ -1407,9 +1407,9 @@ namespace anrl {
         // look at the representative Wyckoff position (index 0) and see if it 
         // x, y, and/or z
         for(uint j=0;j<Wyckoff_positions[i].equations[0].size();j++){
-          if(aurostd::substring2bool(Wyckoff_positions[i].equations[0][j],"x")){ contains_x=true; }
-          if(aurostd::substring2bool(Wyckoff_positions[i].equations[0][j],"y")){ contains_y=true; }
-          if(aurostd::substring2bool(Wyckoff_positions[i].equations[0][j],"z")){ contains_z=true; }
+          if(Wyckoff_positions[i].equations[0][j].find("x") != std::string::npos){ contains_x=true; }
+          if(Wyckoff_positions[i].equations[0][j].find("y") != std::string::npos){ contains_y=true; }
+          if(Wyckoff_positions[i].equations[0][j].find("z") != std::string::npos){ contains_z=true; }
         }
         
         // ---------------------------------------------------------------------------
@@ -1478,9 +1478,13 @@ namespace anrl {
           // ---------------------------------------------------------------------------
           // case 1: no variables in representative Wyckoff positions (first equation)
           // means we should only have one instance of this Wyckoff position
-          if(!aurostd::substring2bool(ordered_Wyckoff_sites[i].equations[0],"x") &&
-              !aurostd::substring2bool(ordered_Wyckoff_sites[i].equations[0],"y") &&
-              !aurostd::substring2bool(ordered_Wyckoff_sites[i].equations[0],"z")){
+          bool contains_variable = false;
+          for(uint k=0;k<ordered_Wyckoff_sites[i].equations[0].size();k++){
+            if(ordered_Wyckoff_sites[i].equations[0][k].find("x") != std::string::npos){ contains_variable=true; break; }
+            if(ordered_Wyckoff_sites[i].equations[0][k].find("y") != std::string::npos){ contains_variable=true; break; }
+            if(ordered_Wyckoff_sites[i].equations[0][k].find("z") != std::string::npos){ contains_variable=true; break; }
+          }
+          if(!contains_variable){
             message << "Contains multiple static (i.e., no variable) Wyckoff positions: " << ordered_Wyckoff_sites[i].letter;
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
             return true;
@@ -1804,7 +1808,7 @@ namespace anrl {
 
     // ---------------------------------------------------------------------------
     // check if preset suffix is included with label, e.g., A_hR2_166_c-001 
-    if(aurostd::substring2bool(label_anrl,"-")){
+    if(label_anrl.find("-") != std::string::npos){
       tokens.clear();
       aurostd::string2tokens(label_anrl,tokens,"-");
       if(tokens.size()==2){
@@ -3787,7 +3791,7 @@ namespace anrl {
     if(tokens.size()==2) { label_anrl=tokens.at(0); label_permutations=tokens.at(1); }
 
     //DX20181207 - add predefined protos - START
-    if(aurostd::substring2bool(label,"-")){
+    if(label.find("-") != std::string::npos){
       vector<string> tokens;
       aurostd::string2tokens(label,tokens,"-");
       if(tokens.size()==2){
