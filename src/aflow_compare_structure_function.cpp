@@ -6133,8 +6133,8 @@ namespace compare{
     // C |      C1, C2     with A,B,C,D 
     // D |      D1, D2    
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    bool VERBOSE=false;
+    bool LDEBUG=true;//(FALSE || XHOST.DEBUG);
+    bool VERBOSE=true;
 
     string function_name = XPID + "compare::findMatch():";
 
@@ -7495,7 +7495,7 @@ namespace compare{
 
     // Performs lattice and origin search
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=true;//(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::latticeAndOriginSearch():";
 
     bool supercell_method = false; //DX20200330 - original method, but slow
