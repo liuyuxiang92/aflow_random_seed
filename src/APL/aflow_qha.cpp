@@ -548,16 +548,16 @@ namespace apl
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  QHA::QHA(_xinput &xinput, _kflags &kflags, xoption &apl_options,
+  QHA::QHA(_xinput &xinput, xoption &qha_options, xoption &apl_options,
       ofstream &FileMESSAGE, ostream &oss)
   {
-    initialize(xinput, kflags, apl_options, FileMESSAGE, oss);
+    initialize(xinput, qha_options, apl_options, FileMESSAGE, oss);
   }
 
   /// Initializes the QHA class with all the necessary data.
   ///
-  void QHA::initialize(_xinput &xinput, _kflags &kflags,
-      xoption &apl_options, ofstream &FileMESSAGE, ostream &oss)
+  void QHA::initialize(_xinput &xinput, xoption &qha_options, xoption &apl_options,
+      ofstream &FileMESSAGE, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
     static const int precision_format = 3;
@@ -586,91 +586,53 @@ namespace apl
     double Volume = origStructure.GetVolume();
 
     // parse QHA-related aflow.in options
-    string dirname = "";
-    gp_distortion = 0.0;
+    isEOS = qha_options.flag("EOS");
     vector<double> eosrange(3);
-    vector<string> tokens;
-    vector<xoption>::iterator option;
-    for (option  = kflags.KBIN_MODULE_OPTIONS.qhaflags.begin();
-        option != kflags.KBIN_MODULE_OPTIONS.qhaflags.end(); ++option){
-      if (option->keyword=="EOS") isEOS = option->option;
-      if (option->keyword=="INCLUDE_ELEC_CONTRIB")
-        includeElectronicContribution = option->option;
-      if (option->keyword=="SOMMERFELD_EXPANSION") doSommerfeldExpansion=option->option;
-      if (option->keyword=="GP_FINITE_DIFF") isGP_FD = option->option;
-      if (option->keyword=="IGNORE_IMAGINARY") ignore_imaginary = option->option;
+    aurostd::string2tokens(qha_options.getattachedscheme("EOS_DISTORTION_RANGE"),
+        eosrange, " :");
+    gp_distortion = aurostd::string2utype<double>(qha_options.getattachedscheme("GP_DISTORTION"));
+    gp_distortion /= 100.0;
+    isGP_FD = qha_options.flag("GP_FINITE_DIFF");
+    ignore_imaginary = qha_options.flag("IGNORE_IMAGINARY");
+    includeElectronicContribution = qha_options.flag("INCLUDE_ELEC_CONTRIB");
+    runQHA = qha_options.flag("MODE:QHA");
+    runQHA3P = qha_options.flag("MODE:QHA3P");
+    runQHANP = qha_options.flag("MODE:QHANP");
+    runSCQHA = qha_options.flag("MODE:SCQHA");
+    aurostd::string2tokens(qha_options.getattachedscheme("PDIS_T"), ph_disp_temperatures, ",");
+    doSommerfeldExpansion = qha_options.flag("SOMMERFELD_EXPANSION");
+    TaylorExpansionOrder = aurostd::string2utype<int>(qha_options.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
 
-      if (option->keyword=="EOS_DISTORTION_RANGE"){
-        aurostd::string2tokens(option->content_string, tokens, string(" :"));
+    // output with what parameters QHA will be run
+    stringstream message;
+    message << "QHA will run with the following parameters:" << std::endl;
+    message << "Methods:" << (runQHA ? " QHA" : "") << (runQHA3P ? " QHA3P" : "");
+    message << (runQHANP ? " QHANP" : "") << (runSCQHA ? " SCQHA" : "") << "." << std::endl;
 
-        if (tokens.size() != 3) {
-          string message = "Wrong setting in the ";
-          message += "[AFLOW_QHA]EOS_DISTORTION_RANGE.";
-          message += "Specify as EOS_DISTORTION_RANGE=";
-          message += AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
-              _INPUT_NUMBER_);
-        }
+    message << "Finite differences calculation of Grueneisen parameters will ";
+    message << (isGP_FD ? "" : "NOT ") << "be run." << std::endl;
 
-        for (uint j=0; j<3; j++){
-          eosrange[j] = aurostd::string2utype<double>(tokens[j]);
-        }
-      } // eos_distortion_range
+    message << "Equation of state will " << (isEOS ? "" : "NOT ") << "be calculated ";
+    message << "when QHA method is used." << std::endl;
+    message << "EOS range of volumes and volume increment is ";
+    message << qha_options.getattachedscheme("EOS_DISTORTION_RANGE") << "." << std::endl;
 
-      if (option->keyword=="GP_DISTORTION"){
-        gp_distortion = option->content_double/100.0;
-      }
+    message << "Electronic contribution to the free energy will ";
+    message << (includeElectronicContribution ? "" : "NOT ") << "be included." << std::endl;
+    message << "Sommerfeld expansion will " << (doSommerfeldExpansion ? "" : "NOT ");
+    message << "be employed." << std::endl;
 
-      if (option->keyword=="TAYLOR_EXPANSION_ORDER"){
-        TaylorExpansionOrder = option->content_int;
-        if (TaylorExpansionOrder <= 0){
-          string message = "Wrong setting in [AFLOW_QHA]TAYLOR_EXPANSION_ORDER.";
-          message += " Specify as TAYLOR_EXPANSION_ORDER=2";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
-              _INPUT_ILLEGAL_);
-        }
-      }
+    message << "GP_DISTORTION = " << gp_distortion << "." << std::endl;
+    message << "TAYLOR_EXPANSION_ORDER = " << TaylorExpansionOrder << "." << std::endl;
+    message << "Temperature-dependent phonon dispersions will be calculated for the";
+    message << " following list of temperatures: ";
+    message << qha_options.getattachedscheme("PDIS_T") << "." << std::endl;
 
-      // note: QHA, QHA3P and SCQHA could run "simultaneously"
-      if (option->keyword=="MODE"){
-        tokens.clear();
-        aurostd::string2tokens(option->content_string, tokens, ",");
+    message << "If there are unstable phonon modes, they will ";
+    message << (ignore_imaginary ? "" : "NOT ") << "be ignored.";
 
-        if ((tokens.size()<1) || (tokens.size() > 4)){
-          string message = "Wrong setting in ";
-          message += "[AFLOW_QHA]MODE. ";
-          message += "Specify as MODE=QHA,QHA3P,SCQHA,QHANP";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
-              _INPUT_NUMBER_);
-        }
-
-        for (uint i=0; i<tokens.size(); i++){
-          if (tokens[i].length()==3){
-            if (tokens[i].find("QHA")!=std::string::npos) runQHA = true;
-          }
-          else if (tokens[i].length()==5){
-            if (tokens[i].find("QHA3P")!=std::string::npos) runQHA3P = true;
-            if (tokens[i].find("SCQHA")!=std::string::npos) runSCQHA = true;
-            if (tokens[i].find("QHANP")!=std::string::npos) runQHANP = true;
-          }
-        }
-      }
-
-      // list of temperatures for temperature-dependent phonon dispersions
-      if (option->keyword=="PDIS_T"){
-        tokens.clear();
-        aurostd::string2tokens(option->content_string, tokens, ",");
-        if (!tokens.size()){
-          string message = "Wrong setting in [AFLOW_QHA]PDIS_T: list of ";
-          message += "temperatures is not given.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
-              _INPUT_NUMBER_);
-        }
-        for (uint i=0; i<tokens.size(); i++){
-          ph_disp_temperatures.push_back(aurostd::string2utype<int>(tokens[i]));
-        }
-      }
-    }
+    pflow::logger(QHA_ARUN_MODE, function, message, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_MESSAGE_);
 
     // determine the names for the directories for the calculation of the Grueneisen parameter
     // (calculated using finite differences method)
@@ -684,7 +646,6 @@ namespace apl
       coefGPVolumes.push_back(gprange[j]);
       GPvolumes.push_back(gprange[j]*Volume/NatomsOrigCell);
     }
-
 
     // determine the names for the directories used for the EOS calculation
     if (isEOS || runQHA3P || runSCQHA || runQHANP){
@@ -709,6 +670,7 @@ namespace apl
       }
 
       // get a set of volumes that would be used for the QHA-EOS calculation
+      string dirname = "";
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
         subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
             "_PHONON_" + aurostd::utype2string(i, precision_format));
@@ -740,7 +702,8 @@ namespace apl
       }
     }
 
-    tokens.clear();
+
+    vector<double> tokens;
     aurostd::string2tokens(apl_options.getattachedscheme("TPT"), tokens, string (" :"));
     if (tokens.size() != 3){
       stringstream msg;
@@ -751,9 +714,9 @@ namespace apl
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
           _INPUT_NUMBER_);
     }
-    double tp_start = aurostd::string2utype<double>(tokens[0]);
-    double tp_end   = aurostd::string2utype<double>(tokens[1]);
-    double tp_step  = aurostd::string2utype<double>(tokens[2]);
+    double tp_start = tokens[0];
+    double tp_end   = tokens[1];
+    double tp_step  = tokens[2];
 
 
     // define a set of temperatures for thermodynamic calculations
@@ -3038,7 +3001,7 @@ namespace apl
            // not supported, this case is handled in an earlier switch statement
           break;
       }
-      filename += aurostd::PaddedNumString(T, ndigits)+'.'+DEFAULT_APL_PDOS_FILE;
+      filename += aurostd::PaddedNumString(T, ndigits)+'.'+DEFAULT_APL_PDIS_FILE;
       aurostd::stringstream2file(eig_stream, filename);
       if (!aurostd::FileExist(filename)){
         msg = "Cannot open "+filename+" file.";

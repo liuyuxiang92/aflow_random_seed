@@ -29,6 +29,7 @@ namespace apl {
   void validateParametersDispersionsAPL(xoption&);
   void validateParametersDosAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
   void validateParametersAAPL(xoption&, const _aflags&, ofstream&, ostream& oss=std::cout);
+  void validateParametersQHA(xoption& aaplopts, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss); //AS20200709
   bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
   bool filesExistPhonons(_xinput&);
@@ -1233,9 +1234,9 @@ namespace apl
     public:
       QHA(ostream& oss=std::cout);
       QHA(const QHA& qha);
-      QHA(_xinput &xinput, _kflags &kflags, xoption &aplopts, ofstream &FileMESSAGE,
+      QHA(_xinput &xinput, xoption &qhaopts, xoption &aplopts, ofstream &FileMESSAGE,
           ostream &oss=std::cout);
-      void initialize(_xinput &xinput, _kflags &kflags, xoption &aplopts,
+      void initialize(_xinput &xinput, xoption &qhaopts, xoption &aplopts,
           ofstream &FileMESSAGE, ostream &oss);
       ~QHA();
       const QHA& operator=(const QHA &qha);

@@ -774,9 +774,25 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    //AS20200709 BEGIN
+    // convert an array of xoptions to a single xoption using defaults for missing
+    // properties
+    aurostd::xoption qhaopts;
+    for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
+      const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
+      message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
+      << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+      qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
+      qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
+    }
+
+    apl::validateParametersQHA(qhaopts, aflags, FileMESSAGE, oss);
+    //AS20200709 END
+
     //AS20200513 BEGIN
     if (kflags.KBIN_PHONONS_CALCULATION_QHA){
-      apl::QHA qha(xinput, kflags, aplopts, FileMESSAGE, oss);
+      apl::QHA qha(xinput, qhaopts, aplopts, FileMESSAGE, oss);
 
       qha.system_title = phcalc._system;
       qha.run(xflags, aflags, kflags, AflowIn);
@@ -1377,6 +1393,99 @@ namespace apl {
       pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
     }
   }
+
+  //AS20200709 BEGIN
+  /// Checks that the QHA parameters are valid and recasts them to be usable.
+  void validateParametersQHA(xoption& qhaopts, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss)
+  {
+    string function = XPID + "apl::validateParametersQHA()";
+    vector<string> tokens;
+    vector<double> dtokens;
+    string option = "";
+
+    pflow::logger(_AFLOW_FILE_NAME_, function, "Validating QHA paramters.", aflags,
+          FileMESSAGE, oss, _LOGGER_MESSAGE_);
+
+    // EOS_DISTORTION_RANGE
+    option = "EOS_DISTORTION_RANGE";
+    aurostd::string2tokens(qhaopts.getattachedscheme(option), dtokens, " :");
+    if (dtokens.size() != 3) {
+      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      msg += " The number of parameters is wrong.";
+      msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    if (dtokens[1] < dtokens[0]){
+      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      msg += " The end of the range of given volumes is smaller than the beginning.";
+      msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    // GP_DISTORTION
+    double gp_distortion = aurostd::string2utype<double>(qhaopts.getattachedscheme("GP_DISTORTION"));
+    if (gp_distortion < _ZERO_TOL_){
+      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      msg += option + " should be a positive real number. ";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
+    }
+
+    // MODE
+    option = "MODE";
+    string MODE = aurostd::toupper(qhaopts.getattachedscheme(option));
+    aurostd::string2tokens(MODE, tokens, ",");
+    if ((tokens.size()<1) || (tokens.size() > 4)){
+      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      msg += " Either no method was given or number of given methods is too big.";
+      msg += " Specify as "+option+"=QHA,QHA3P,SCQHA,QHANP using each method once.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    string token = "";
+    // note: QHA, QHA3P and SCQHA could run "simultaneously"
+    for (uint i=0; i<tokens.size(); i++){
+      token = aurostd::toupper(tokens[i]);
+      if (token.length()==3){
+        if (token.find("QHA")!=std::string::npos) qhaopts.flag("MODE:QHA", true);
+      }
+      else if (token.length()==5){
+        if (token.find("QHA3P")!=std::string::npos) qhaopts.flag("MODE:QHA3P", true);
+        if (token.find("SCQHA")!=std::string::npos) qhaopts.flag("MODE:SCQHA", true);
+        if (token.find("QHANP")!=std::string::npos) qhaopts.flag("MODE:QHANP", true);
+      }
+    }
+
+    // PDIS_T
+    vector<int> itokens;
+    option = "PDIS_T";
+    aurostd::string2tokens(qhaopts.getattachedscheme(option), itokens, ",");
+    if (!itokens.size()){
+      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      msg += " List of temperatures is not given.";
+      msg += " Specify as " + option + AFLOWRC_DEFAULT_QHA_PDIS_T;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    for (uint i=0; i<itokens.size(); i++){
+      if (itokens[i] < 0){
+        string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+        msg += " Negative temperature was given.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
+      }
+    }
+
+    // TAYLOR_EXPANSION_ORDER
+    int TAYLOR_EXPANSION_ORDER = aurostd::string2utype<int>(qhaopts.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
+    if (TAYLOR_EXPANSION_ORDER <= 0){
+      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      msg += " List of temperatures is not given.";
+      msg += " Specify as " + option + "=";
+      msg += aurostd::utype2string<int>(AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
+    }
+  }
+  //AS20200709 END
 }
 
 //////////////////////////////////////////////////////////////////////////////
