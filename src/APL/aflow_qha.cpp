@@ -1010,9 +1010,9 @@ namespace apl
 
     // No exception is thrown since QHA is handling the problem of missing files
     // in a way that a method that depends on missing data will not be evaluated.
-    // Since user might request a number of methods to be run in one aflow execution,
-    // we want to allow the ones that does not depend on the missing data to finish
-    // successfully. For example, finite difference calculation of Grueneisen
+    // Since the user might request a number of methods to be run in one aflow run,
+    // we want to allow the ones that do not depend on the missing data to finish
+    // successfully. For example, a finite difference calculation of Grueneisen
     // parameters does not depend on any data from any static DFT calculation.
     if (!msg.empty()){
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
