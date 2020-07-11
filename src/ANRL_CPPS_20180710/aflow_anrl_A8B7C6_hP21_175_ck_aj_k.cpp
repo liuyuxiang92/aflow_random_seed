@@ -76,7 +76,7 @@ namespace anrl {
     double y5=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A8B7C6_hP21_175_ck_aj_k: y5=" << y5 << endl;}
 
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
     str.scale=1.0;
 
     a1=(1.0/2.0)*a*xn-(sqrt(3.0)/2.0)*a*yn;

@@ -1,5 +1,8 @@
 3.2.5 - 2020/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- Made search --aflowlib more inclusive. (ME)
+        -- Fixed out of bounds error in init::AFLOW_Projects_Directories for missing LIB directories. (ME)
+        -- Added aurostd::_ishex. (ME)
         -- Moved POCC progress bar into pflow. (ME)
         -- Added "Notice" from apl::Logger into pflow::logger. (ME)
         -- Modularized APL option parsing. (ME)
@@ -10,6 +13,11 @@
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
         -- Removed old QHA code, related infrastructure and dependencies. (AS)
+        -- Added 49 new ANRL prototype files for the nitrides and oxides (DX+RF)
+        -- Added 14 new parameter enumerations to existing ANRL labels for nitrides and oxides (DX+RF)
+        -- Updated README_PROTO.TXT with new nitrides and oxides (DX+RF)
+        -- Bug fixes in XtalFinder: precondition structures with BringInCell() for local geometry comparisons (DX)
+        -- Bug fixes in XtalFinder: use more robust matching protocol; accounts for undecorated prototypes (i.e., small volumes) (DX)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

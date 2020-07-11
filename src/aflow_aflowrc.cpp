@@ -783,6 +783,12 @@
 #define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedscheme("DEFAULT_CCE_OX_METHOD")
 //RF20200413 END
 
+//DX20200709 - START
+// DEFAULT XTALFINDER
+#define AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    4.0 // factor that divides minimum interatomic distance
+#define         DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING")
+//DX20200709 - END
+
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
 #define         AFLOW_CORE_TEMPERATURE_BEEP                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_BEEP") 
@@ -1489,6 +1495,11 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_CCE_OX_METHOD",AFLOWRC_DEFAULT_CCE_OX_METHOD);
     //RF20200413 END
 
+    //DX20200709 - START
+    // DEFAULT XTALFINDER
+    aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING);
+    //DX20200709 - END
+
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_HALT",AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT);
@@ -2034,6 +2045,12 @@ namespace aflowrc {
     aflowrc << "DEFAULT_CCE_OX_METHOD=\"" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "\"" << "  // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
     //RF20200413 END
 
+    //DX20200708 - START
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS XTALFINDER" << endl;
+    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl;
+    //DX20200708 - END
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
@@ -2548,6 +2565,11 @@ namespace aflowrc {
     if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
     //RF20200413 END
+
+    //DX20200708 - START
+    if(LDEBUG) oss << "// DEFAULTS XTALFINDER" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=\"" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << "\"" << endl;
+    //DX20200708 - END
 
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
