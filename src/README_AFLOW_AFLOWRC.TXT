@@ -1518,6 +1518,14 @@ DEFAULT_AAPL_TCOND_PLOT_FILE
   default: "thermal_conductivity.plt"
 
 ####################################################################################################
+DEFAULTS XTALFINDER
+
+DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING
+  description: Scaling factor that divides the minimum interatomic distance, establishing when mapped atoms are sufficiently close and other mappings do not need to be explored.
+  type: double
+  default: 4.0
+
+####################################################################################################
 DEFAULTS CORE
 
 AFLOW_CORE_TEMPERATURE_BEEP
