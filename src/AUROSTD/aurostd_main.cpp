@@ -4589,7 +4589,7 @@ namespace aurostd {
   string utype2string(double from,bool roff,double tol) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,tol,DEFAULT_STREAM);}
   string utype2string(double from,int precision,bool roff,double tol) {return utype2string(from,precision,roff,tol,DEFAULT_STREAM);}
   string utype2string(double from,bool roff,char FORMAT) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,FORMAT);}
-  string utype2string(double from,int precision,char FORMAT) {return utype2string(from,precision,false,FORMAT);}  //CO20200624
+  string utype2string(double from,int precision,char FORMAT,bool roff) {return utype2string(from,precision,roff,FORMAT);}  //CO20200624
   string utype2string(double from,int precision,bool roff,char FORMAT) {return utype2string(from,precision,roff,AUROSTD_ROUNDOFF_TOL,FORMAT);}
   string utype2string(double from,bool roff,double tol,char FORMAT) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,tol,FORMAT);}
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT) {

@@ -10431,43 +10431,43 @@ namespace pflow {
   void logger(const string& filename, const string& function_name, stringstream& message, const char& type, ostream& oss, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, directory, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, aflags, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, const string& _message, const char& type, ostream& oss, bool silent, const string& message_metadata) {  // overload

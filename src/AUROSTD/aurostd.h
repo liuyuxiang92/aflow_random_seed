@@ -730,7 +730,7 @@ namespace aurostd {
   string utype2string(double from,bool roff,double tol);
   string utype2string(double from,int precision,bool roff,double tol);
   string utype2string(double from,bool roff,char FORMAT);
-  string utype2string(double from,int precision,char FORMAT); //CO20200624
+  string utype2string(double from,int precision,char FORMAT,bool roff=false); //CO20200624
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
