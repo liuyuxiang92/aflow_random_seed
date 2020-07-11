@@ -4294,7 +4294,8 @@ namespace chull {
               message << " (auid=" << m_points[i_point_real].m_entry.auid << ")";
               message << ": abs(" << m_points[i_point_real].getLastCoord() << ")>=" << ENERGY_TOL << " [eV]";
               message << " (please report on AFLOW Forum: aflow.org/forum)";
-              if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+              if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
+              else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
               else {
                 message << ". Override with --force (results may not be reliable).";
                 throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
@@ -4323,7 +4324,8 @@ namespace chull {
             if(m_velements.size()){hull << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " ";}
             hull << "[i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
             message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
-            if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+            if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
+            else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
             else {
               message << ". Override with --force (results may not be reliable).";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
@@ -6225,7 +6227,8 @@ namespace chull {
     //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON",true);       //structure comparison is not needed for 1 hull point distance calculation
     //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true); //this would be circular
     //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS",true); //this would be circular
-    cflags.flag("FORCE",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
+    cflags.flag("FAKE_HULL",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
+    cflags.flag("FORCE",true); //need to avoid outlier issues, we're removing points, so these may (and likely will) come up
     //let's skip all this extra output
     bool see_sub_output=false;//true;
     ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
