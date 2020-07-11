@@ -16,7 +16,13 @@ namespace aurostd {
   // ***************************************************************************
 
   // constructure
-  xoption::xoption() {
+  xoption::xoption() {free();}  //CO20200624 - moved to free()
+
+  // destructor
+  xoption::~xoption() {free();} //CO20200624 - moved to free()
+
+  // free
+  void xoption::free() {
     keyword=""; //DX20180824 - missing from constructor
     isentry=FALSE; 
     content_string="";
@@ -30,15 +36,6 @@ namespace aurostd {
     vxsghost.clear();
     preserved=FALSE;
     LDEBUG=FALSE;
-  }
-
-  // destructor
-  xoption::~xoption() {
-    free();
-  }
-
-  // free
-  void xoption::free() {
   }
 
   // copy fuction
@@ -80,8 +77,9 @@ namespace aurostd {
   }
 
   void xoption::clear() {
-    xoption aflow_option_temp;
-    copy(aflow_option_temp);
+    //[CO20200624 - creating objects is SLOW]xoption aflow_option_temp;
+    //[CO20200624 - creating objects is SLOWcopy(aflow_option_temp);
+    free();
   }
 
   // **************************************************************************

@@ -2433,6 +2433,14 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
+  void PrintANSIEscapeSequence(const aurostd::xoption& color){
+    if(color.option==FALSE){return;}
+    if(color.flag("COLOR==GREEN")){cursor_fore_green();return;}
+    if(color.flag("COLOR==CYAN")){cursor_fore_cyan();return;}
+    if(color.flag("COLOR==YELLOW")){cursor_fore_yellow();return;}
+    if(color.flag("COLOR==RED")){cursor_fore_red();return;}
+  }
+
   void PrintMessageStream(ostringstream &stream,bool quiet,std::ostream& oss) {ofstream FileMESSAGE;return PrintMessageStream(FileMESSAGE,stream,quiet,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {
@@ -2453,43 +2461,54 @@ namespace aurostd {
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
 
+    //COLOR CANNOT BE A STRING, this construction will cause errors for the compiler
+    //string color="\033[32m";
+    //printf(color.c_str());
+    //the compiler needs to verify that you are not printf'ing junk
+    //so it needs to be a direct injection of code that the compiler can check
+    //reference aurostd.h: CO20200624 START - adding from Jahnatek
     for(uint i=0;i<message_parts.size();i++){FileMESSAGE << message_parts[i] << endl;}  //flush included in endl
     if(verbose){
       string::size_type loc;
       string str2search="";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
-      string color="";
+      aurostd::xoption color;color.clear(); //use xoption: .option is global color flag (do we have color?), and .vxscheme tells me which color
       if(fancy_print){
         string message=stream.str();
-        if(color.empty()){
-          //COMPLETE - START
+        //COMPLETE - START
+        if(color.option==FALSE){
           str2search="  COMPLETE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
-          if(message.find(str2search)!=string::npos){color="\033[32m";} //green
-          //COMPLETE - END
-          //NOTICE - START
-          str2search="  NOTICE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
-          if(message.find(str2search)!=string::npos){color="\033[36m";} //blue
-          //NOTICE - END
+          if(message.find(str2search)!=string::npos){color.option=TRUE;color.flag("COLOR==GREEN",TRUE);} //green
         }
+        //COMPLETE - END
+        //NOTICE - START
+        if(color.option==FALSE){
+          str2search="  NOTICE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
+          if(message.find(str2search)!=string::npos){color.option=TRUE;color.flag("COLOR==CYAN",TRUE);} //cyan
+        }
+        //NOTICE - END
       }
-      if(color.empty()){fancy_print=false;}  //add others as needed
-      if(fancy_print) printf(color.c_str());  // color
+
+      //cursor_fore_green()
+      //cursor_fore_cyan()
+
+      if(color.option==FALSE){fancy_print=false;}  //add others as needed
+      if(fancy_print) PrintANSIEscapeSequence(color);
       for(uint i=0;i<message_parts.size();i++){
         loc=(!str2search.empty()?message_parts[i].find(str2search):string::npos);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
           //colors see here: https://en.m.wikipedia.org/wiki/ANSI_escape_code
-          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
-          if(fancy_print) printf(color.c_str());  // color
-          if(fancy_print) printf("\033[5m");      // bold/blink
-
+          if(fancy_print) cursor_attr_none();             // turn off all cursor attributes
+          if(fancy_print) PrintANSIEscapeSequence(color); // color
+          if(fancy_print) cursor_attr_blink();cursor_attr_bold(); // bold+blink
           oss << str2search;
-          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
-          if(fancy_print) printf(color.c_str());  // color
+          if(fancy_print) cursor_attr_none();             // turn off all cursor attributes
+          if(fancy_print) PrintANSIEscapeSequence(color); // color
           oss << message_parts[i].substr(loc+str2search.size(),string::npos);
         }
         oss << endl;  //flush included in endl
       }
-      if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+      if(fancy_print) cursor_attr_none();  // turn off all cursor attributes
     }
     aurostd::StringstreamClean(stream);
   }
@@ -2545,26 +2564,25 @@ namespace aurostd {
     if(verbose){
       string::size_type loc;
       string str2search="  ERROR ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
-      string color="\033[31m";  // red
-      if(fancy_print) printf(color.c_str());  // color
+      if(fancy_print) cursor_fore_red();  // red
       std::ostream& oss=std::cerr;
       oss << ErrorBarString << endl;  //flush included in endl
       for(uint i=0;i<message_parts.size();i++){
         loc=message_parts[i].find(str2search);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
-          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
-          if(fancy_print) printf(color.c_str());  // color
-          if(fancy_print) printf("\033[5m");      // bold/blink
+          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_red();      // red
+          if(fancy_print) cursor_attr_blink();cursor_attr_bold(); // bold+blink
           oss << str2search;
-          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
-          if(fancy_print) printf(color.c_str());  // color
+          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_red();      // red
           oss << message_parts[i].substr(loc+str2search.size(),string::npos);
         }
         oss << endl;  //flush included in endl
       }
       oss << ErrorBarString << endl;  //flush included in endl
-      if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+      if(fancy_print) cursor_attr_none();  // turn off all cursor attributes
     }
     aurostd::StringstreamClean(stream);
   }
@@ -2620,28 +2638,25 @@ namespace aurostd {
     if(verbose){
       string::size_type loc;
       string str2search="  WARNING ";  //replicate old behavior, look for WARNING coming from logger() which has two pre spaces
-      string color="\033[33m\033[1m";  // yellow
-      //string color="\033[35m";  // magenta
-      if(fancy_print) printf(color.c_str());   // color
+      if(fancy_print) cursor_fore_yellow();   // yellow
       std::ostream& oss=std::cerr;
       oss << WarningBarString << endl;  //flush included in endl
       for(uint i=0;i<message_parts.size();i++){
         loc=message_parts[i].find(str2search);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
-          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
-          if(fancy_print) printf(color.c_str());  // color
-          if(fancy_print) printf("\033[5m");      // bold/blink
+          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_yellow();   // yellow
+          if(fancy_print) cursor_attr_blink();cursor_attr_bold(); // bold+blink
           oss << str2search;
-          if(fancy_print) printf("\033[0m");      // turn off all cursor attributes
-          if(fancy_print) printf(color.c_str());  // color
-
+          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_yellow();   // yellow
           oss << message_parts[i].substr(loc+str2search.size(),string::npos);
         }
         oss << endl;  //flush included in endl
       }
       oss << WarningBarString << endl;  //flush included in endl
-      if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+      if(fancy_print) cursor_attr_none();  // turn off all cursor attributes
     }
     aurostd::StringstreamClean(stream);
   }
