@@ -1417,7 +1417,7 @@ namespace apl {
     }
 
     if (dtokens[1] < dtokens[0]){
-      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " The end of the range of given volumes is smaller than the beginning.";
       msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
@@ -1426,7 +1426,7 @@ namespace apl {
     // GP_DISTORTION
     double gp_distortion = aurostd::string2utype<double>(qhaopts.getattachedscheme("GP_DISTORTION"));
     if (gp_distortion < _ZERO_TOL_){
-      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += option + " should be a positive real number. ";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
     }
@@ -1457,7 +1457,7 @@ namespace apl {
     option = "PDIS_T";
     aurostd::string2tokens(qhaopts.getattachedscheme(option), itokens, ",");
     if (!itokens.size()){
-      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " List of temperatures is not given.";
       msg += " Specify as " + option + AFLOWRC_DEFAULT_QHA_PDIS_T;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
@@ -1465,7 +1465,7 @@ namespace apl {
 
     for (uint i=0; i<itokens.size(); i++){
       if (itokens[i] < 0){
-        string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
+        string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
         msg += " Negative temperature was given.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
       }
