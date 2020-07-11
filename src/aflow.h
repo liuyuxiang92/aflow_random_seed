@@ -2929,8 +2929,8 @@ namespace KBIN {
   double XVASP_Afix_GENERIC(string mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double=0.0,int=0);
 
   string ExtractSystemName(const string& directory);  //ME20200217
-  string ExtractSystemNameFromAFLOWIN(string directory);  //ME20200217
-  string ExtractSystemNameFromVASP(string directory);  //ME20200217
+  string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
+  string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);

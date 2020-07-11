@@ -5843,7 +5843,8 @@ namespace KBIN {
     return system_name;
   }
 
-  string ExtractSystemNameFromAFLOWIN(string directory) {
+  string ExtractSystemNameFromAFLOWIN(const string& _directory) {
+    string directory=_directory;  //CO20200624
     if (directory.empty()) directory = ".";
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
@@ -5872,9 +5873,9 @@ namespace KBIN {
     return system_name;
   }
 
-  string ExtractSystemNameFromVASP(string _directory) {
+  string ExtractSystemNameFromVASP(const string& _directory) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string directory, SystemName, stmp, DOSCARfile;
+    string directory="", SystemName="", stmp="", DOSCARfile="";
     stringstream strline;
 
     directory=_directory; //Get directory

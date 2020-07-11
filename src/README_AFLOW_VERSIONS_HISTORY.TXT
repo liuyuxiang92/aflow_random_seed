@@ -38,8 +38,9 @@
         -- added MessageOption() (vs. ErrorOption()) that does NOT throw error (CO)
         -- patching flow of POccCalculator() to read/load from aflow.in ALWAYS and overwrite with inputs (CO)
         -- created scheme for POCC auids, see directory2MetadataAUIDjsonfile (CO)
-        -- prepared LIB2RAW for POCC (CO)
+        -- prepared LIB2RAW for POCC, including adding perform_POCC and aflowlib::LIB2RAW_Loop_POCC() (CO)
         -- added aurostd::FileExist() to all linking in LIB2RAW (CO)
+        -- lots of cleaning of LIB2RAW, including adding CleanDirectoryLIB(), removing obsolete VOLDISTPARAMS and VOLDISTEVOLUTION functionality, and cleaning vspecies (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

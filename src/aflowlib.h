@@ -372,24 +372,26 @@ namespace aflowlib {
 namespace aflowlib {
   void XFIX_LIBRARY_ALL(string LIBRARY_IN,vector<string>);
   // void LIB2RAW_LIBRARY_ALL(string LIBRARY_IN);
-  string LIB2RAW_CheckProjectFromDirectory(string directory);
+  string LIB2RAW_CheckProjectFromDirectory(const string& directory);
   bool LIB2RAW_ALL(string options,bool overwrite);
-  bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,string MESSAGE);
+  bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,const string& MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
+  void CleanDirectoryLIB(string& directory);  //CO20200624
   bool LIB2RAW(const string& options,bool overwrite,bool LOCAL=false);
   bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
   bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
   bool XPLUG(const vector<string>& argv);  //CO20200501
   bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
-  bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
-  // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2RAW_Loop_Bands(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_Magnetic(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_Bader(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_AGL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_LOCK(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
+  bool LIB2RAW_Loop_Thermodynamics(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE,bool LOCAL=false);
+  // [OBSOLETE]  bool LIB2RAW_Loop_DATA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2RAW_Loop_Bands(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_Magnetic(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_Bader(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_AGL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_LOCK(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //CO20200624
+  bool LIB2RAW_Loop_PATCH(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
   bool LIB2LIB(const string& options,bool overwrite,bool LOCAL=false); //CT20181212
 }
 
