@@ -1394,17 +1394,17 @@ namespace aflowlib {
       cout << soliloquy << " AGL LOOP ---------------------------------------------------------------------------------" << endl;
       aflowlib::LIB2RAW_Loop_AGL(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (agl):");
       if(flag_WEB) {
-        aurostd::LinkFile(directory_RAW+"/aflow.agl.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AGL.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AGL_energies_temperature.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AGL_thermal_properties_temperature.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AGL_edos_gap_pressure.out",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AGL_edos_gap_pressure.json",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AGL_energy.json",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AGL_energy_structures.json",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AGL_energy_volume.out",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AGL_gibbs_energy_pT.out",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AGL_Hugoniot.out",directory_WEB);    // LINK //CT20181212
+        if(aurostd::FileExist(directory_RAW+"/aflow.agl.out")) aurostd::LinkFile(directory_RAW+"/aflow.agl.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL.out")) aurostd::LinkFile(directory_RAW+"/AGL.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_energies_temperature.out")) aurostd::LinkFile(directory_RAW+"/AGL_energies_temperature.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_thermal_properties_temperature.out")) aurostd::LinkFile(directory_RAW+"/AGL_thermal_properties_temperature.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_edos_gap_pressure.out")) aurostd::LinkFile(directory_RAW+"/AGL_edos_gap_pressure.out",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_edos_gap_pressure.json")) aurostd::LinkFile(directory_RAW+"/AGL_edos_gap_pressure.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_energy.json")) aurostd::LinkFile(directory_RAW+"/AGL_energy.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_energy_structures.json")) aurostd::LinkFile(directory_RAW+"/AGL_energy_structures.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_energy_volume.out")) aurostd::LinkFile(directory_RAW+"/AGL_energy_volume.out",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_gibbs_energy_pT.out")) aurostd::LinkFile(directory_RAW+"/AGL_gibbs_energy_pT.out",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AGL_Hugoniot.out")) aurostd::LinkFile(directory_RAW+"/AGL_Hugoniot.out",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
       }
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -1413,11 +1413,11 @@ namespace aflowlib {
       cout << soliloquy << " AEL LOOP ---------------------------------------------------------------------------------" << endl;
       aflowlib::LIB2RAW_Loop_AEL(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (ael):");
       if(flag_WEB) {
-        aurostd::LinkFile(directory_RAW+"/aflow.ael.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AEL_Elastic_constants.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AEL_Compliance_tensor.out",directory_WEB);    // LINK
-        aurostd::LinkFile(directory_RAW+"/AEL_elastic_tensor.json",directory_WEB);    // LINK //CT20181212
-        aurostd::LinkFile(directory_RAW+"/AEL_energy_structures.json",directory_WEB);    // LINK //CT20181212
+        if(aurostd::FileExist(directory_RAW+"/aflow.ael.out")) aurostd::LinkFile(directory_RAW+"/aflow.ael.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AEL_Elastic_constants.out")) aurostd::LinkFile(directory_RAW+"/AEL_Elastic_constants.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AEL_Compliance_tensor.out")) aurostd::LinkFile(directory_RAW+"/AEL_Compliance_tensor.out",directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AEL_elastic_tensor.json")) aurostd::LinkFile(directory_RAW+"/AEL_elastic_tensor.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(directory_RAW+"/AEL_energy_structures.json")) aurostd::LinkFile(directory_RAW+"/AEL_energy_structures.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
       }
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
