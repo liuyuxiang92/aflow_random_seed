@@ -981,27 +981,39 @@ namespace apl
     const vector<string> &subdirectories)
   {
     string function = XPID + "QHA::printMissingStaticFiles():";
-    string msg = "";
+    string msg = "", missing_files = "";
     for (uint i=0; i<subdirectories.size(); i++){
       if (!list[i][DF_DIRECTORY]){
         msg += "Directory " + subdirectories[i] + " is missing.\n";
       }
       else{
+        missing_files = "";
         if (!list[i][DF_OUTCAR]){
-          msg += "File " + subdirectories[i] + "/OUTCAR.static is missing.\n";
+          missing_files = "OUTCAR.static";
         }
         if (includeElectronicContribution){
           if(!list[i][DF_EIGENVAL]){
-            msg += "File " + subdirectories[i] + "/EIGENVAL.static is missing.\n";
+            if (!missing_files.empty()) missing_files += ",";
+            missing_files += "EIGENVAL.static";
           }
 
           if(!list[i][DF_IBZKPT]){
-            msg += "File " + subdirectories[i] + "/IBZKPT.static is missing.\n";
+            if (!missing_files.empty()) missing_files += ",";
+            missing_files += "IBZKPT.static";
           }
+        }
+        if (!missing_files.empty()){
+          msg += "File(s)   "+subdirectories[i]+"/"+missing_files+" is (are) missing.\n";
         }
       }
     }
 
+    // No exception is thrown since QHA is handling the problem of missing files
+    // in a way that a method that depends on missing data will not be evaluated.
+    // Since user might request a number of methods to be run in one aflow execution,
+    // we want to allow the ones that does not depend on the missing data to finish
+    // successfully. For example, finite difference calculation of Grueneisen
+    // parameters does not depend on any data from any static DFT calculation.
     if (!msg.empty()){
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
