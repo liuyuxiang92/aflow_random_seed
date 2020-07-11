@@ -1437,7 +1437,7 @@ namespace apl {
     aurostd::string2tokens(MODE, tokens, ",");
     if ((tokens.size()<1) || (tokens.size() > 4)){
       string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
-      msg += " Either no method was given or number of given methods is too big.";
+      msg += " Either no method was given or the number of given methods is too big.";
       msg += " Specify as "+option+"=QHA,QHA3P,SCQHA,QHANP using each method once.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
     }
@@ -1479,7 +1479,7 @@ namespace apl {
     int TAYLOR_EXPANSION_ORDER = aurostd::string2utype<int>(qhaopts.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
     if (TAYLOR_EXPANSION_ORDER <= 0){
       string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
-      msg += " Taylor expansion order parameter should be a non-negative integer.";
+      msg += " Taylor expansion order parameter should be a positive integer.";
       msg += " Specify as " + option + "=";
       msg += aurostd::utype2string<int>(AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
