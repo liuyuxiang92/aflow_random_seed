@@ -2082,7 +2082,7 @@ namespace apl
           break;
       default:
         string message = "QHA::extrapolateGrueneisen() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
-        message += " However, another method was requested.";
+        message += " However, QHA method was requested.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_ILLEGAL_);
            break;

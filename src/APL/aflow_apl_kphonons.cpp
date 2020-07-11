@@ -1410,14 +1410,14 @@ namespace apl {
     option = "EOS_DISTORTION_RANGE";
     aurostd::string2tokens(qhaopts.getattachedscheme(option), dtokens, " :");
     if (dtokens.size() != 3) {
-      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
       msg += " The number of parameters is wrong.";
       msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
     }
 
     if (dtokens[1] < dtokens[0]){
-      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
       msg += " The end of the range of given volumes is smaller than the beginning.";
       msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
@@ -1426,7 +1426,7 @@ namespace apl {
     // GP_DISTORTION
     double gp_distortion = aurostd::string2utype<double>(qhaopts.getattachedscheme("GP_DISTORTION"));
     if (gp_distortion < _ZERO_TOL_){
-      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
       msg += option + " should be a positive real number. ";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
     }
@@ -1436,7 +1436,7 @@ namespace apl {
     string MODE = aurostd::toupper(qhaopts.getattachedscheme(option));
     aurostd::string2tokens(MODE, tokens, ",");
     if ((tokens.size()<1) || (tokens.size() > 4)){
-      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " Either no method was given or the number of given methods is too big.";
       msg += " Specify as "+option+"=QHA,QHA3P,SCQHA,QHANP using each method once.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
@@ -1446,14 +1446,10 @@ namespace apl {
     // note: QHA, QHA3P and SCQHA could run "simultaneously"
     for (uint i=0; i<tokens.size(); i++){
       token = aurostd::toupper(tokens[i]);
-      if (token.length()==3){
-        if (token.find("QHA")!=std::string::npos) qhaopts.flag("MODE:QHA", true);
-      }
-      else if (token.length()==5){
-        if (token.find("QHA3P")!=std::string::npos) qhaopts.flag("MODE:QHA3P", true);
-        if (token.find("SCQHA")!=std::string::npos) qhaopts.flag("MODE:SCQHA", true);
-        if (token.find("QHANP")!=std::string::npos) qhaopts.flag("MODE:QHANP", true);
-      }
+      if (token == "QHA")   qhaopts.flag("MODE:QHA",   true);
+      if (token == "QHA3P") qhaopts.flag("MODE:QHA3P", true);
+      if (token == "SCQHA") qhaopts.flag("MODE:SCQHA", true);
+      if (token == "QHANP") qhaopts.flag("MODE:QHANP", true);
     }
 
     // PDIS_T
@@ -1461,7 +1457,7 @@ namespace apl {
     option = "PDIS_T";
     aurostd::string2tokens(qhaopts.getattachedscheme(option), itokens, ",");
     if (!itokens.size()){
-      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
       msg += " List of temperatures is not given.";
       msg += " Specify as " + option + AFLOWRC_DEFAULT_QHA_PDIS_T;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
@@ -1469,7 +1465,7 @@ namespace apl {
 
     for (uint i=0; i<itokens.size(); i++){
       if (itokens[i] < 0){
-        string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+        string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
         msg += " Negative temperature was given.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
       }
@@ -1478,7 +1474,7 @@ namespace apl {
     // TAYLOR_EXPANSION_ORDER
     int TAYLOR_EXPANSION_ORDER = aurostd::string2utype<int>(qhaopts.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
     if (TAYLOR_EXPANSION_ORDER <= 0){
-      string msg = "Wrong setting in the " + _ASTROPT_QHA_ + option + ".";
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " Taylor expansion order parameter should be a positive integer.";
       msg += " Specify as " + option + "=";
       msg += aurostd::utype2string<int>(AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);
