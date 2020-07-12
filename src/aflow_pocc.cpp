@@ -2371,7 +2371,7 @@ namespace pocc {
   void POccCalculator::setPOccFlags(const aurostd::xoption& pocc_flags) {m_p_flags=pocc_flags;}
 
   void POccCalculator::loadFromAFlags() { //grabs from m_aflags
-    bool LDEBUG=(TRUE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
     string soliloquy = XPID + "POccCalculator::loadFromAFlags():";
     string AflowIn_file="",AflowIn="";
     KBIN::getAflowInFromAFlags(m_aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
