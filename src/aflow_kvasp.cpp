@@ -296,103 +296,7 @@ namespace KBIN {
     // parameters for QHA - CO20170601
     // to make backwards compatible, we need to not only look for substring, but need to see if "[AFLOW_QHA]CALC"
     if(!kflags.KBIN_PHONONS_CALCULATION_AAPL){  //mutually exclusive
-
-      kflags.KBIN_PHONONS_CALCULATION_QHA=false;
-      kflags.KBIN_PHONONS_CALCULATION_QHA_A=false;
-      kflags.KBIN_PHONONS_CALCULATION_QHA_B=false;
-      kflags.KBIN_PHONONS_CALCULATION_QHA_C=false;
-
-      kflags.KBIN_PHONONS_CALCULATION_QHA3P=false;
-      kflags.KBIN_PHONONS_CALCULATION_QHA3P_A=false;
-      kflags.KBIN_PHONONS_CALCULATION_QHA3P_B=false;
-      kflags.KBIN_PHONONS_CALCULATION_QHA3P_C=false;
-
-      kflags.KBIN_PHONONS_CALCULATION_SCQHA=false;
-      kflags.KBIN_PHONONS_CALCULATION_SCQHA_A=false;
-      kflags.KBIN_PHONONS_CALCULATION_SCQHA_B=false;
-      kflags.KBIN_PHONONS_CALCULATION_SCQHA_C=false;
-
-
       kflags.KBIN_PHONONS_CALCULATION_QHA  = aurostd::substring2bool(AflowIn,"[AFLOW_QHA]CALC",TRUE) || aurostd::substring2bool(AflowIn,"VASP_QHA]CALC",TRUE);
-      if(kflags.KBIN_PHONONS_CALCULATION_QHA)
-      { //PN20180719
-        vector<string> tokens;
-        aurostd::xoption USER_QHA_OPTION; USER_QHA_OPTION.xscheme = "QHA,QHA3P,SCQHA"; 
-        USER_QHA_OPTION.options2entry(AflowIn, string("[AFLOW_QHA]MODE="), USER_QHA_OPTION.option, USER_QHA_OPTION.xscheme);
-        tokens.clear();
-        if(USER_QHA_OPTION.option)
-        {
-          aurostd::string2tokens(USER_QHA_OPTION.content_string,tokens,",");
-          if(tokens.size()>0){
-            kflags.KBIN_PHONONS_CALCULATION_QHA=false;
-          }
-          for(uint i=0; i<tokens.size(); i++){
-            if(tokens[i].length()==3){
-              if (tokens[i].find("QHA")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA=true;
-              }
-            } else if(tokens[i].length()==5){
-              if (tokens[i].find("QHA_A")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA_A=true;
-              } else if (tokens[i].find("QHA_B")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA_B=true;
-              } else if (tokens[i].find("QHA_C")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA_C=true;
-              }
-            }
-
-            if(tokens[i].length()==5){
-              if (tokens[i].find("SCQHA")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_SCQHA=true;
-              }
-            } else if(tokens[i].length()==7){
-              if (tokens[i].find("SCQHA_A")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_SCQHA_A=true;
-              } else if (tokens[i].find("SCQHA_B")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_SCQHA_B=true;
-              }if (tokens[i].find("SCQHA_C")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_SCQHA_C=true;
-              }
-            }
-
-            if(tokens[i].length()==5){
-              if (tokens[i].find("QHA3P")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA3P=true;
-              }
-            } else if(tokens[i].length()==7){
-              if (tokens[i].find("QHA3P_A")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA3P_A=true;
-              } else if (tokens[i].find("QHA3P_B")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA3P_B=true;
-              } else if (tokens[i].find("QHA3P_C")!=std::string::npos){
-                kflags.KBIN_PHONONS_CALCULATION_QHA3P_C=true;
-              }
-            }
-          }
-        }
-        //making some QHA options mutually exclusive //PN20180705
-        if(kflags.KBIN_PHONONS_CALCULATION_QHA){ //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_QHA_A  = false; //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_QHA_B  = false; //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN20180705
-        } else if(kflags.KBIN_PHONONS_CALCULATION_QHA_A){ //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_QHA_B  = false; //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN20180705
-        } else if(kflags.KBIN_PHONONS_CALCULATION_QHA_B){ //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN20180705
-        }
-        //making some SC-QHA options mutually exclusive //PN20180705
-        if(kflags.KBIN_PHONONS_CALCULATION_SCQHA){ //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA_A  = false; //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA_B  = false; //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN20180705
-        } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA_A){ //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA_B  = false; //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN20180705
-        } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA_B){ //PN20180705
-          kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN20180705
-        }
-      }
       /////////////////////////////
       //aurostd::xoption KBIN_PHONONS_CALCULATION_QHA; //PN20180705
       //KBIN_PHONONS_CALCULATION_QHA.option=false; //PN20180705
@@ -435,7 +339,7 @@ namespace KBIN {
     }
     // ---------------------------------------------------------
     // Warn user if both APL/AAPL and AEL/AGL flags are set, since they are mutually exclusive
-    if ((kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA) && (kflags.KBIN_PHONONS_CALCULATION_AGL || kflags.KBIN_PHONONS_CALCULATION_AEL)) {
+    if ((kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA) && (kflags.KBIN_PHONONS_CALCULATION_AGL || kflags.KBIN_PHONONS_CALCULATION_AEL)) {
       aus << "WWWWW  WARNING: APL/AAPL/QHA and AEL/AGL flags both set" << endl;
       aus << "WWWWW  WARNING: These runs are mutually exclusive" << endl;
       aus << "WWWWW  WARNING: APL/AAPL/QHA runs will take priority" << endl;

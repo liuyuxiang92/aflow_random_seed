@@ -1334,12 +1334,22 @@ DEFAULT_QHA_GP_DISTORTION
   type: double
   default: 1.0
 
+DEFAULT_QHA_TAYLOR_EXPANSION_ORDER
+  description: Sets the order of Taylor expansion that is used by QHANP method.
+  type: int
+  default: 2
+
 DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   description: Defines if electronic contribution to the free energy is included.
   type: bool
   default: 0
 
-DEFAULT_QHA_SCQHA_PDIS_T
+DEFAULT_QHA_SOMMERFELD_EXPANSION
+  description: Defines if electronic contribution to the free energy is calculated using the Sommerfeld expansion.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_PDIS_T
   description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
   type: string
   default: "50,100,600"
@@ -1358,6 +1368,21 @@ DEFAULT_QHA_FILE_PREFIX
   description: QHA file prefix. All QHA output files start with this prefix.
   type: string
   default: "aflow.qha."
+
+DEFAULT_QHA3P_FILE_PREFIX
+  description: QHA3P file prefix. All QHA3P output files start with this prefix.
+  type: string
+  default: "aflow.qha3p."
+
+DEFAULT_QHANP_FILE_PREFIX
+  description: QHANP file prefix. All QHANP output files start with this prefix.
+  type: string
+  default: "aflow.qhanp."
+
+DEFAULT_SCQHA_FILE_PREFIX
+  description: SCQHA file prefix. All SCQHA output files start with this prefix.
+  type: string
+  default: "aflow.scqha."
 
 DEFAULT_QHA_GP_PATH_FILE
   description: Output file for mode-resolved Grueneisen parameter dispersion curve.
