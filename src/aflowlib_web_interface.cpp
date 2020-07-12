@@ -3282,6 +3282,20 @@ namespace aflowlib {
   }
 }
 
+//CO20200624 - CCE corrections
+namespace aflowlib {
+  double _aflowlib_entry::enthalpyFormationCell(int T) const { //CO20200624
+    if(T==300 && enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_300K_cell;
+    if(T==0 && enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_0K_cell;
+    return enthalpy_formation_cell;
+  }
+  double _aflowlib_entry::enthalpyFormationAtom(int T) const { //CO20200624
+    if(T==300 && enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_300K_atom;
+    if(T==0 && enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_0K_atom;
+    return enthalpy_formation_atom;
+  }
+}
+
 //CO20171202 - apennsy fixes!
 namespace aflowlib {
   void _aflowlib_entry::correctBadDatabase(bool verbose,ostream& oss){

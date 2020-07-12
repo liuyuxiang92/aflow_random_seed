@@ -16,6 +16,7 @@
         -- Consolidated APL classes: ShellHandle and ShellData integrated into Supercell, group velocities moved into PhononCalculator, and harmonic force constant calculations are now handled by a single class. (ME)
         -- APL code clean-up: removed obsolete code and moved functions into AUROSTD where appropriate. (ME)
         -- adding enthlapy_formation_cce_300K_cell, enthlapy_formation_cce_300K_atom, enthlapy_formation_cce_0K_cell, and enthlapy_formation_cce_0K_cell to database (CO+RF)
+        -- incorporating CCE into CHULL (CO)
         -- changed XHOST.vschema for aflowlib_date (CO+ME)
         -- changing NOTICE color blue to cyan (CO+ME)
         -- patching lib2raw index issues: LIB7/LIB did not exist (CO)

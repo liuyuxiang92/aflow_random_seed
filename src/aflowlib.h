@@ -259,6 +259,8 @@ namespace aflowlib {
       string aflowlib2file(string file,string="out");            //
       string directory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
       bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
+      double enthalpyFormationCell(int T=300) const;                                        //CO20200624 - CCE correction added
+      double enthalpyFormationAtom(int T=300) const;                                        //CO20200624 - CCE correction added
       void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
       void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
       bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes

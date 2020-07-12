@@ -1130,7 +1130,7 @@ namespace chull {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No formation energy available for ChullPoint",_INPUT_ILLEGAL_);
     return AUROSTD_NAN;
   }
-  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpy_formation_atom,units);}
+  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpyFormationAtom(),units);}  //entry.enthalpy_formation_atom - ADDING CCE
   double T_S(const ChullPoint& point){
     if(point.m_has_entry){return T_S(point.m_entry);}
     return AUROSTD_NAN;
@@ -1533,7 +1533,7 @@ namespace chull {
         }
       }
     }
-    if(formation_energy_coord){coord[coord.urows]=entry.enthalpy_formation_atom;}
+    if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
     else {coord[coord.urows]=entry.entropic_temperature;}  //entropic temperature is positive for stable compounds (we want upper half convex-hull)
     setGenCoords(coord,formation_energy_coord);
   }
@@ -3381,7 +3381,7 @@ namespace chull {
       reason="calculated with manual NUPDOWN, thus E-fermi is NOT adjusted for spin-up"; //as explained in ovasp
       return false;
     }
-    if(entry.enthalpy_formation_atom==AUROSTD_NAN || entry.entropic_temperature==AUROSTD_NAN){
+    if(H_f_atom(entry)==AUROSTD_NAN || entry.entropic_temperature==AUROSTD_NAN){  //entry.enthalpy_formation_atom
       reason="enthalpy_formation_atom/entropic_temperature not calculated";
       return false;
     }
@@ -6259,8 +6259,8 @@ namespace chull {
     if(point.m_i_nary==0){return AUROSTD_MAX_DOUBLE;} //N+1(unary)=formation_enthalpy (distance from 0 point) - TECHNICALLY TRUE (allowed in polytope theory), but our definition for N+1 enthalpy gain really starts for binaries (Delta H[{N|1,...,N-1}]), can NOT have 1|0
     bool force_calc_binaries=false; //set TRUE for debugging
     if(point.m_i_nary==0 || (point.m_i_nary==1 && force_calc_binaries==false) ){ //N+1(unary)=formation_enthalpy (distance from 0 point), N+1(binary)=formation_enthalpy (distance from 0 tieline)
-      if(LDEBUG){cerr << soliloquy << " found " << (point.m_i_nary==0 ? "unary" : "binary") << ", returning abs(enthalpy_formation_atom)" << endl;}
-      if(point.m_has_entry&&point.m_entry.enthalpy_formation_atom!=AUROSTD_NAN){return abs(point.m_entry.enthalpy_formation_atom);}
+      if(LDEBUG){cerr << soliloquy << " found " << (point.m_i_nary==0 ? "unary" : "binary") << ", returning abs(H_f_atom)" << endl;} //enthalpy_formation_atom
+      if(point.m_has_entry&&H_f_atom(point.m_entry)!=AUROSTD_NAN){return abs(H_f_atom(point.m_entry));} //point.m_entry.enthalpy_formation_atom
       return AUROSTD_MAX_DOUBLE; //0; //return null
     }
 
@@ -6414,9 +6414,9 @@ namespace chull {
       //[MATHEMATICALLY ALLOWED but our definition of N+1 energy does not allow for unaries, so don't check]if(m_points[i_point].m_i_nary==0 || m_points[i_point].m_i_nary==1)
       if(m_points[i_point].m_i_nary==1)
       {
-        if(m_points[i_point].m_has_entry&&m_points[i_point].m_entry.enthalpy_formation_atom!=AUROSTD_NAN){
-          if(!aurostd::identical(abs(np1egain),abs(m_points[i_point].m_entry.enthalpy_formation_atom),ZERO_MEV_TOL)){
-            message << "abs(np1egain) != abs(m_points[i_point].m_entry.enthalpy_formation_atom) [ " << abs(np1egain) << " != " << abs(m_points[i_point].m_entry.enthalpy_formation_atom) << " ], please check";
+        if(m_points[i_point].m_has_entry&&H_f_atom(m_points[i_point].m_entry)!=AUROSTD_NAN){  //m_points[i_point].m_entry.enthalpy_formation_atom
+          if(!aurostd::identical(abs(np1egain),abs(H_f_atom(m_points[i_point].m_entry)),ZERO_MEV_TOL)){ //m_points[i_point].m_entry.enthalpy_formation_atom
+            message << "abs(np1egain) != abs(H_f_atom(m_points[i_point].m_entry)) [ " << abs(np1egain) << " != " << abs(H_f_atom(m_points[i_point].m_entry)) << " ], please check"; //m_points[i_point].m_entry.enthalpy_formation_atom
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_); //throw an error because we are not in debug mode (see force_calc_binaries)
             //pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           }
