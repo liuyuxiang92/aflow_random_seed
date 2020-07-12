@@ -18,7 +18,7 @@ namespace cce {
   //get_corrections_line////////////////////////////////////////////////////////
   // function to get corrections
   string get_corrections_line(const string& cor_identifier) {
-    //CCE corrections per bond for DFT formation energies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U_ICSD) 
+    //CCE corrections per bond for DFT formation energies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U:ICSD) 
     //with PAW data sets for VASP 5.4.4 and measured experimental values according to the CCE paper 
     //Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019). 
     //The extensions after the binary formula indicate the source from which the experimental value was taken: 

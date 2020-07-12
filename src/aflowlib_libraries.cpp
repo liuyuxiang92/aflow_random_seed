@@ -3121,6 +3121,7 @@ namespace aflowlib {
     bool FORMATION_CALC=TRUE;    
     bool isLDAUcalc=FALSE;
     if(str_relax.species_pp_vLDAU.at(0).size()>0) isLDAUcalc=TRUE;
+    if(LDEBUG){cerr << soliloquy << " isLDAUcalc=" << isLDAUcalc << endl;}
     
     //CO20200624 START - CCE
     string functional="";
@@ -3144,7 +3145,7 @@ namespace aflowlib {
           functional="";
         }
       }
-      if(data.catalog=="ICSD" && isLDAUcalc==TRUE && functional=="PBE"){functional=="PBE+U_ICSD";}
+      if(data.catalog=="ICSD" && isLDAUcalc==TRUE && functional=="PBE"){functional="PBE+U:ICSD";}
     }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FUNCTIONAL=" << functional << endl;
     //CO20200624 STOP - CCE

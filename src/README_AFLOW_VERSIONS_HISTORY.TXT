@@ -91,7 +91,7 @@
         -- added CCE function to determine oxidation numbers from Allen electronegativities (RF)
         -- added CCE function to get number of neighbors for all atoms (RF)
         -- added CCE function to get number of neighbors of a certain type for all atoms (RF)
-        -- extended CCE scheme to PBE+U_ICSD functional and approach based on experimental formation enthalpies per bond (RF)
+        -- extended CCE scheme to PBE+U:ICSD functional and approach based on experimental formation enthalpies per bond (RF)
         -- extended CCE to work for general anion systems (RF)
         -- extended CCE to multi-anion sytems (RF)
         -- CCE corrections added for nitrides (RF)
