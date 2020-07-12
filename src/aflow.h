@@ -793,17 +793,6 @@ class _kflags {
     // phonons operation lists
     bool   KBIN_PHONONS_CALCULATION_APL;
     bool   KBIN_PHONONS_CALCULATION_QHA;  //CO20170601
-    bool   KBIN_PHONONS_CALCULATION_QHA_A;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA_B;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA_C;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_A;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_B;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_C;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_A;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_B;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_C;  //PN20180705
     bool   KBIN_PHONONS_CALCULATION_AAPL; //CO20170601
     bool   KBIN_PHONONS_CALCULATION_AGL;
     bool   KBIN_PHONONS_CALCULATION_AEL;
@@ -3011,6 +3000,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;
+    int nelectrons; //AS20200528
     double natoms;                                                // for aflowlib_libraries.cpp
     double energy_cell,energy_atom;                               // for aflowlib_libraries.cpp
     double enthalpy_cell,enthalpy_atom;                           // for aflowlib_libraries.cpp
