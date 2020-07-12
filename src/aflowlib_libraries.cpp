@@ -1739,7 +1739,7 @@ namespace aflowlib {
       //if(LDEBUG)
       cout << soliloquy << " aflowlib_data.auid=" << aflowlib_data.auid << endl;
       // **----------------------------------------------------------------------------
-      if(XHOST.hostname=="nietzsche.mems.duke.edu" && (XHOST.user=="auro"||XHOST.user=="common")){  //CO20200624 - cannot create these links otherwise
+      if(XHOST.hostname=="nietzsche.mems.duke.edu" && (XHOST.user=="auro"||XHOST.user=="common"||XHOST.user=="stefano")){  //CO20200624 - cannot create these links otherwise
         // **----------------------------------------------------------------------------
         // NEW BUT STILL DOING
         string directory_AUID="";
