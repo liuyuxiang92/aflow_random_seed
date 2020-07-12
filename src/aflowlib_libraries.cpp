@@ -12,6 +12,7 @@
 #include "aflowlib.h"
 #include "aflow_pflow.h"
 #include "aflow_bader.h"
+#include "aflow_cce.h" //CO20200624
 #include "aflow_pocc.h" //CO20200624
 #include "aflow_matlab_funcs.cpp" //CO20200508
 #include "aflow_gnuplot_funcs.cpp" //CO20200508
@@ -1738,58 +1739,60 @@ namespace aflowlib {
       //if(LDEBUG)
       cout << soliloquy << " aflowlib_data.auid=" << aflowlib_data.auid << endl;
       // **----------------------------------------------------------------------------
-      // **----------------------------------------------------------------------------
-      // NEW BUT STILL DOING
-      string directory_AUID="";
-      string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
-      directory_AUID=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aflowlib_data.auid);
-      aurostd::DirectoryMake(directory_AUID);
-      directory_AUID_LIB=directory_AUID+"/LIB"; 
-      directory_AUID_RAW=directory_AUID+"/RAW";
-      directory_AUID_WEB=directory_AUID+"/WEB";
-      aurostd::RemoveFile(directory_AUID_LIB); // to avoid auto-linking SC20181205
-      aurostd::RemoveFile(directory_AUID_RAW); // to avoid auto-linking SC20181205
-      aurostd::RemoveFile(directory_AUID_WEB); // to avoid auto-linking SC20181205
+      if(XHOST.hostname=="nietzsche.mems.duke.edu" && (XHOST.user=="auro"||XHOST.user=="common")){  //CO20200624 - cannot create these links otherwise
+        // **----------------------------------------------------------------------------
+        // NEW BUT STILL DOING
+        string directory_AUID="";
+        string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
+        directory_AUID=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aflowlib_data.auid);
+        aurostd::DirectoryMake(directory_AUID);
+        directory_AUID_LIB=directory_AUID+"/LIB"; 
+        directory_AUID_RAW=directory_AUID+"/RAW";
+        directory_AUID_WEB=directory_AUID+"/WEB";
+        aurostd::RemoveFile(directory_AUID_LIB); // to avoid auto-linking SC20181205
+        aurostd::RemoveFile(directory_AUID_RAW); // to avoid auto-linking SC20181205
+        aurostd::RemoveFile(directory_AUID_WEB); // to avoid auto-linking SC20181205
 
-      // directory_AUID_LIB
-      if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
-      cout << soliloquy << " (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
-      if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK  //CO20200624 - adding FileExist() check
-      // directory_AUID_RAW
-      if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
-      cout << soliloquy << " (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
-      if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK  //CO20200624 - adding FileExist() check
+        // directory_AUID_LIB
+        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
+        cout << soliloquy << " (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
+        if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK  //CO20200624 - adding FileExist() check
+        // directory_AUID_RAW
+        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
+        cout << soliloquy << " (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
+        if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK  //CO20200624 - adding FileExist() check
 
-      if(flag_WEB) {
-        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
-        cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
-        if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK  //CO20200624 - adding FileExist() check
-      } else {
-        if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
-        cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
-        if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK  //CO20200624 - adding FileExist() check
-      }
+        if(flag_WEB) {
+          if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
+          cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
+          if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK  //CO20200624 - adding FileExist() check
+        } else {
+          if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
+          cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
+          if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK  //CO20200624 - adding FileExist() check
+        }
 
-      // ICSD2LINK
-      if(aflowlib_data.catalog=="ICSD") {
-        aurostd::string2tokens(directory_LIB,tokens,"_");
-        if(tokens.size()>2) {
-          if(tokens.at(tokens.size()-2)=="ICSD") {
-            string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
-            aurostd::DirectoryMake(directory_ICSD2LINK);	      
-            cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
-            // LIB
-            aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
-            if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK  //CO20200624 - adding FileExist() check
-            cout << soliloquy << " (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
-            // RAW
-            aurostd::RemoveFile(directory_ICSD2LINK+"/RAW");  // to avoid auto-linking SC20190830
-            if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK  //CO20200624 - adding FileExist() check
-            cout << soliloquy << " (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
-            // WEB
-            aurostd::RemoveFile(directory_ICSD2LINK+"/WEB");  // to avoid auto-linking SC20190830
-            if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK  //CO20200624 - adding FileExist() check
-            cout << soliloquy << " (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
+        // ICSD2LINK
+        if(aflowlib_data.catalog=="ICSD") {
+          aurostd::string2tokens(directory_LIB,tokens,"_");
+          if(tokens.size()>2) {
+            if(tokens.at(tokens.size()-2)=="ICSD") {
+              string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
+              aurostd::DirectoryMake(directory_ICSD2LINK);	      
+              cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
+              // LIB
+              aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
+              if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK  //CO20200624 - adding FileExist() check
+              cout << soliloquy << " (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
+              // RAW
+              aurostd::RemoveFile(directory_ICSD2LINK+"/RAW");  // to avoid auto-linking SC20190830
+              if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK  //CO20200624 - adding FileExist() check
+              cout << soliloquy << " (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
+              // WEB
+              aurostd::RemoveFile(directory_ICSD2LINK+"/WEB");  // to avoid auto-linking SC20190830
+              if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK  //CO20200624 - adding FileExist() check
+              cout << soliloquy << " (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
+            }
           }
         }
       }
@@ -3118,10 +3121,38 @@ namespace aflowlib {
     bool FORMATION_CALC=TRUE;    
     bool isLDAUcalc=FALSE;
     if(str_relax.species_pp_vLDAU.at(0).size()>0) isLDAUcalc=TRUE;
+    
+    //CO20200624 START - CCE
+    string functional="";
+    if(str_relax.species_pp_version.size()>0){
+      //CO20200624 - don't use else if's, we might prefer that which comes later
+      if(str_relax.species_pp_version[0].find("PBE")!=string::npos){functional="PBE";}
+      if(str_relax.species_pp_version[0].find("LDA")!=string::npos){functional="LDA";}
+      if(str_relax.species_pp_version[0].find("SCAN")!=string::npos){functional="SCAN";}
+      //double check all of the pp match
+      for(uint i=0;i<str_relax.species_pp_version.size()&&!functional.empty();i++){
+        if(functional=="PBE" && str_relax.species_pp_version[i].find("PBE")==string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional="";
+        }
+        if(functional=="LDA" && str_relax.species_pp_version[i].find("LDA")!=string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional="";
+        }
+        if(functional=="SCAN" && str_relax.species_pp_version[i].find("SCAN")!=string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional="";
+        }
+      }
+      if(data.catalog=="ICSD" && isLDAUcalc==TRUE && functional=="PBE"){functional=="PBE+U_ICSD";}
+    }
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FUNCTIONAL=" << functional << endl;
+    //CO20200624 STOP - CCE
 
     // LDAU ?
-    if(FORMATION_CALC) {
-      if(isLDAUcalc) FORMATION_CALC=FALSE; // no formation for LDAU
+    if(FORMATION_CALC) { //CO20200624 - we can correct PBE now with CCE
+      //[CO20200624 - we can correct PBE now with CCE]if(isLDAUcalc) FORMATION_CALC=FALSE; // no formation for LDAU
+      if(functional.empty()) FORMATION_CALC=FALSE;  //CO20200624
     }
 
     // PP AVAILABLE ?
@@ -3165,6 +3196,30 @@ namespace aflowlib {
       for(uint i=0;i<(uint) data.nspecies;i++) data.enthalpy_formation_cell=data.enthalpy_formation_cell-(double(venthalpy_atom_ref.at(i)*str_relax.num_each_type.at(i)));
       //   for(uint i=0;i<(uint) data.nspecies;i++) data.enthalpy_formation_atom=data.enthalpy_formation_atom-venthalpy_atom_ref.at(i)*double(str_relax.num_each_type.at(i))/double(str_relax.atoms.size());
       data.enthalpy_formation_atom=data.enthalpy_formation_cell/double(str_relax.atoms.size());
+      
+      //CO20200624 START - adding cce variants
+      if(!functional.empty()){
+        bool found_correctable=false;
+        if(aurostd::WithinList(data.vspecies,"O")) found_correctable=true;
+        //[CO20200624 - not yet]if(aurostd::WithinList(data.vspecies,"N")) found_correctable=true;
+        if(found_correctable){
+          data.enthalpy_formation_cce_300K_cell=data.enthalpy_formation_cce_0K_cell=data.enthalpy_formation_cell;
+          vector<double> enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(str_relax,functional);
+          if(enthalpy_formation_cell_corrections_cce.size()==2){  //the first is at 300K, the second at 0K
+            data.enthalpy_formation_cce_300K_cell-=enthalpy_formation_cell_corrections_cce[0];
+            data.enthalpy_formation_cce_0K_cell-=enthalpy_formation_cell_corrections_cce[1];
+            data.enthalpy_formation_cce_300K_atom=data.enthalpy_formation_cce_300K_cell/double(str_relax.atoms.size());
+            data.enthalpy_formation_cce_0K_atom=data.enthalpy_formation_cce_0K_cell/double(str_relax.atoms.size());
+          }
+        }
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " data.enthalpy_formation_cce_300K_cell=" << data.enthalpy_formation_cce_300K_cell << endl;
+        cerr << soliloquy << " data.enthalpy_formation_cce_0K_cell=" << data.enthalpy_formation_cce_0K_cell << endl;
+        cerr << soliloquy << " data.enthalpy_formation_cce_300K_atom=" << data.enthalpy_formation_cce_300K_atom << endl;
+        cerr << soliloquy << " data.enthalpy_formation_cce_0K_atom=" << data.enthalpy_formation_cce_0K_atom << endl;
+      }
+      //CO20200624 STOP - adding cce variants
 
       if(LDEBUG) cerr << soliloquy << " [FCALC=3]" << endl;
 
@@ -3188,6 +3243,12 @@ namespace aflowlib {
     if(FORMATION_CALC==TRUE) {
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION total E0 (eV) = " << data.enthalpy_formation_cell << endl;
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION per atom E0/N (eV) = " << data.enthalpy_formation_atom << "   " << directory_LIB << endl;
+      //CO20200624 START - CCE
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE total E(300K) (eV) = " << data.enthalpy_formation_cce_300K_cell << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE per atom E(300K)/N (eV) = " << data.enthalpy_formation_cce_300K_atom << "   " << directory_LIB << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE total E(0K) (eV) = " << data.enthalpy_formation_cce_0K_cell << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE per atom E(0K)/N (eV) = " << data.enthalpy_formation_cce_0K_atom << "   " << directory_LIB << endl;
+      //CO20200624 END - CCE
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTROPIC_TEMPERATURE (eV) = " << data.entropic_temperature*KBOLTZEV << endl;
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTROPIC_TEMPERATURE (K) = " << data.entropic_temperature << "   " << directory_LIB << endl;
     }
