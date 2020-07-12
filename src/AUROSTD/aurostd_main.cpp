@@ -2419,15 +2419,15 @@ namespace aurostd {
 #define WarningBarString "WWWWW  ---------------------------------------------------------------------------------------------------------------------------- "
 
   //[CO20200624 - OBSOLETE]// with ostringstream
-  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream &FileERROR,ostringstream &stream,bool quiet) {
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream &FileERROR,ostringstream &stream,bool quiet) {
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream &FileMESSAGE,ostringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
@@ -2519,29 +2519,29 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream &FileERROR,ostringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream &FileMESSAGE,ostringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
   //CO20200624 - no std::ostream& oss input: THIS MUST GO TO CERR
-  void PrintErrorStream(ostringstream &stream,bool quiet) {ofstream FileERROR;return PrintErrorStream(FileERROR,stream,quiet);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileERROR,stream,quiet,osswrite);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,ostringstream &stream,bool quiet,bool osswrite) {
+  void PrintErrorStream(ostringstream &stream,bool quiet) {ofstream FileMESSAGE;return PrintErrorStream(FileMESSAGE,stream,quiet);} //CO20200624
+  void PrintErrorStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //CO20200624
+  void PrintErrorStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet,bool osswrite) {
     //[CO20200624 - OBSOLETE]if(quiet) {;} // phony just to keep quiet busy
     //[CO20200624 - OBSOLETE]if(osswrite) {;} // phony just to keep quiet busy
-    //[CO20200624 - OBSOLETE]FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
+    //[CO20200624 - OBSOLETE]FileMESSAGE << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileMESSAGE.flush();
     //[CO20200624 - OBSOLETE]oss << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
     //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
     
@@ -2558,9 +2558,9 @@ namespace aurostd {
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
     bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
 
-    FileERROR << ErrorBarString << endl;
-    for(uint i=0;i<message_parts.size();i++){FileERROR << message_parts[i] << endl;}  //flush included in endl
-    FileERROR << ErrorBarString << endl;
+    FileMESSAGE << ErrorBarString << endl;
+    for(uint i=0;i<message_parts.size();i++){FileMESSAGE << message_parts[i] << endl;}  //flush included in endl
+    FileMESSAGE << ErrorBarString << endl;
     if(verbose){
       string::size_type loc;
       string str2search="  ERROR ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
@@ -2594,28 +2594,28 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream &FileERROR,ostringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << stream.str().c_str();cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream &FileERROR,ostringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream &FileMESSAGE,ostringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << stream.str().c_str();cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
   //CO20200624 - no std::ostream& oss input: THIS MUST GO TO CERR
-  void PrintWarningStream(ostringstream &stream,bool quiet) {ofstream FileWARNING;return PrintWarningStream(FileWARNING,stream,quiet);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,ostringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileWARNING,stream,quiet,osswrite);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,ostringstream &stream,bool quiet,bool osswrite) {
+  void PrintWarningStream(ostringstream &stream,bool quiet) {ofstream FileMESSAGE;return PrintWarningStream(FileMESSAGE,stream,quiet);} //CO20200624
+  void PrintWarningStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);} //CO20200624
+  void PrintWarningStream(ofstream &FileMESSAGE,ostringstream &stream,bool quiet,bool osswrite) {
     //[CO20200624 - OBSOLETE]if(quiet) {;} // phony just to keep quiet busy
-    //[CO20200624 - OBSOLETE]FileWARNING << stream.str().c_str(); FileWARNING.flush();
+    //[CO20200624 - OBSOLETE]FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
     //[CO20200624 - OBSOLETE]if(osswrite) {oss << stream.str().c_str();oss.flush();}
     //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
     
@@ -2632,9 +2632,9 @@ namespace aurostd {
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
     bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
 
-    FileWARNING << WarningBarString << endl;
-    for(uint i=0;i<message_parts.size();i++){FileWARNING << message_parts[i] << endl;}  //flush included in endl
-    FileWARNING << WarningBarString << endl;
+    FileMESSAGE << WarningBarString << endl;
+    for(uint i=0;i<message_parts.size();i++){FileMESSAGE << message_parts[i] << endl;}  //flush included in endl
+    FileMESSAGE << WarningBarString << endl;
     if(verbose){
       string::size_type loc;
       string str2search="  WARNING ";  //replicate old behavior, look for WARNING coming from logger() which has two pre spaces
@@ -2669,15 +2669,15 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]}
 
   //[CO20200624 - OBSOLETE]// with stringstream
-  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream &FileERROR,stringstream &stream,bool quiet) {
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream &FileERROR,stringstream &stream,bool quiet) {
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream &FileMESSAGE,stringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
@@ -2685,7 +2685,7 @@ namespace aurostd {
 
   void PrintMessageStream(stringstream &stream,bool quiet,std::ostream& oss) {ofstream FileMESSAGE;return PrintMessageStream(FileMESSAGE,stream,quiet,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {ostringstream omess;omess << stream.str();return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);}
+  void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {ostringstream omess;omess << stream.str();return PrintMessageStream(FileMESSAGE,omess,quiet,osswrite,oss);}
 
   //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
@@ -2693,25 +2693,25 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream &FileERROR,stringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream &FileMESSAGE,stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintErrorStream(stringstream &stream,bool quiet) {ofstream FileERROR;return PrintErrorStream(FileERROR,stream,quiet);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileERROR,stream,quiet,osswrite);} //CO20200624
-  void PrintErrorStream(ofstream &FileERROR,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintErrorStream(FileERROR,stream,quiet,osswrite);}
+  void PrintErrorStream(stringstream &stream,bool quiet) {ofstream FileMESSAGE;return PrintErrorStream(FileMESSAGE,stream,quiet);} //CO20200624
+  void PrintErrorStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //CO20200624
+  void PrintErrorStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintErrorStream(FileMESSAGE,omess,quiet,osswrite);}
 
   //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
@@ -2720,25 +2720,25 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream &FileERROR,stringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << stream.str().c_str();cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream &FileERROR,stringstream &stream,bool quiet) {
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream &FileMESSAGE,stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
-  //[CO20200624 - OBSOLETE]  FileERROR << stream.str().c_str(); FileERROR.flush();
+  //[CO20200624 - OBSOLETE]  FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
   //[CO20200624 - OBSOLETE]  cout << stream.str().c_str();cout.flush();
   //[CO20200624 - OBSOLETE]  // cerr << stream.str().c_str(); cerr.flush();
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintWarningStream(stringstream &stream,bool quiet) {ofstream FileWARNING;return PrintWarningStream(FileWARNING,stream,quiet);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,stringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileWARNING,stream,quiet,osswrite);} //CO20200624
-  void PrintWarningStream(ofstream &FileWARNING,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintWarningStream(FileWARNING,stream,quiet,osswrite);}
+  void PrintWarningStream(stringstream &stream,bool quiet) {ofstream FileMESSAGE;return PrintWarningStream(FileMESSAGE,stream,quiet);} //CO20200624
+  void PrintWarningStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);} //CO20200624
+  void PrintWarningStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintWarningStream(FileMESSAGE,omess,quiet,osswrite);}
 
   //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
