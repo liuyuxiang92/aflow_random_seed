@@ -1,5 +1,6 @@
 3.2.5 - 2020/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- patched convert issue: security policy 'PDF' blocking conversion (SC)
         -- adding --lib2lib patches for AEL/AGL (CT)
         -- Added 49 new ANRL prototype files for the nitrides and oxides (DX+RF)
         -- Added 14 new parameter enumerations to existing ANRL labels for nitrides and oxides (DX+RF)
