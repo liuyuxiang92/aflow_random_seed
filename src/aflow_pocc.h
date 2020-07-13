@@ -521,8 +521,8 @@ namespace pocc {
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;
-      vector<double> m_Egap;
-      double m_Egap_net;
+      vector<double> m_Egap_DOS,m_Egap;
+      double m_Egap_DOS_net,m_Egap_net;
 
       //initializers
       bool initialize(ostream& oss);

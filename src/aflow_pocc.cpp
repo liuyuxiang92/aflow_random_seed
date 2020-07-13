@@ -955,7 +955,7 @@ namespace pocc {
     xDOSCAR xdoscar;
     string DOSCAR_file="";
     unsigned long long int isupercell=0;
-    m_Egap_net=0.0;
+    m_Egap_DOS_net=0.0;
     bool metal_found=false,insulator_found=false;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
@@ -965,7 +965,7 @@ namespace pocc {
       message << "xDOSCAR read";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       xdoscar.GetBandGap();
       for(uint ispin=0;ispin<xdoscar.Egap.size();ispin++){
-        message << "ISPIN=" << ispin << ", Egap=" << xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        message << "ISPIN=" << ispin << ", Egap_DOS=" << xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       }
       if(isupercell==0){ //set all to 0
         m_xdoscar=xdoscar;  //import all properties
@@ -982,7 +982,7 @@ namespace pocc {
           }
         }
         m_xdoscar.Efermi=0.0;
-        m_Egap.assign(xdoscar.Egap.size(),0.0);
+        m_Egap_DOS.assign(xdoscar.Egap.size(),0.0);
       }else{ //check that all dimensions match
         //these are VERY important checks, make sure venergyEf can be ensemble averaged
         //otherwise none of the properties can be averaged (comparing values at two different energies)
@@ -996,7 +996,7 @@ namespace pocc {
           message << "Mismatch SPIN-ON/SPIN-OFF settings, attempting to rectify";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
           if(m_xdoscar.viDOS.size()==1){ //make duplicate for spin-off
             m_xdoscar.convertSpinOFF2ON();
-            m_Egap.push_back(m_Egap.back());  //need to extend m_Egap too
+            m_Egap_DOS.push_back(m_Egap_DOS.back());  //need to extend m_Egap_DOS too
           }
           else if(xdoscar.viDOS.size()==1){xdoscar.convertSpinOFF2ON();}
           if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
@@ -1016,7 +1016,7 @@ namespace pocc {
             }
           }
         }
-        if(m_Egap.size()!=xdoscar.Egap.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_Egap.size()!=xdoscar.Egap.size()",_INDEX_MISMATCH_);}
+        if(m_Egap_DOS.size()!=xdoscar.Egap.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_Egap_DOS.size()!=xdoscar.Egap.size()",_INDEX_MISMATCH_);}
       }
 
       //these are all VECTORS and not xvectors, if we change in the future, this can be reduced by ienergy for loop
@@ -1055,23 +1055,23 @@ namespace pocc {
 
       m_xdoscar.Efermi+=( (*it).m_probability*xdoscar.Efermi ); //venergyEf ensemble average should give the SAME energies as subtracting averaged Ef from venergy
 
-      for(uint ispin=0;ispin<m_Egap.size();ispin++){
+      for(uint ispin=0;ispin<m_Egap_DOS.size();ispin++){
         //might consider adding vbm/cbm later
         if(xdoscar.Egap[ispin]==_METALGAP_){metal_found=true;} //just be safe, check spin-polarized
         else{insulator_found=true;}
         if(LDEBUG){cerr << soliloquy << " xdoscar.Egap[ispin=" << ispin << "]=" << xdoscar.Egap[ispin] << endl;}
-        m_Egap[ispin]+=( (*it).m_probability*xdoscar.Egap[ispin]);
+        m_Egap_DOS[ispin]+=( (*it).m_probability*xdoscar.Egap[ispin]);
       }
       if(xdoscar.Egap_net==_METALGAP_){metal_found=true;}  //just be safe, check _net
       else{insulator_found=true;}
-      m_Egap_net+=( (*it).m_probability*xdoscar.Egap_net);
+      m_Egap_DOS_net+=( (*it).m_probability*xdoscar.Egap_net);
     }
     if(metal_found && insulator_found){
       message << "Mixed metal and insulator states found, averaging to a metallic gap";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
     }
     if(metal_found){
-      for(uint ispin=0;ispin<m_Egap.size();ispin++){m_Egap[ispin]=_METALGAP_;}
-      m_Egap_net=_METALGAP_;
+      for(uint ispin=0;ispin<m_Egap_DOS.size();ispin++){m_Egap_DOS[ispin]=_METALGAP_;}
+      m_Egap_DOS_net=_METALGAP_;
     }
 
     //set some attributes
@@ -1083,16 +1083,16 @@ namespace pocc {
     //from m_xdoscar
     message << "Egap of average DOS (OBSOLETE)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     for(uint ispin=0;ispin<m_xdoscar.Egap.size();ispin++){
-      message << "ISPIN=" << ispin << ", Egap=" << m_xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "ISPIN=" << ispin << ", Egap_DOS=" << m_xdoscar.Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
-    message << "Egap_net=" << xdoscar.Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Egap_DOS_net=" << xdoscar.Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //from POccCalculator
-    message << "Average of Egaps";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Average of Egap_DOSs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     for(uint ispin=0;ispin<xdoscar.Egap.size();ispin++){
-      message << "ISPIN=" << ispin << ", Egap=" << m_Egap[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      message << "ISPIN=" << ispin << ", Egap_DOS=" << m_Egap_DOS[ispin];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
-    message << "Egap_net=" << m_Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Egap_DOS_net=" << m_Egap_DOS_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
@@ -1812,7 +1812,9 @@ namespace pocc {
     m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
     m_ARUN_directory_ground=AUROSTD_MAX_UINT;
     m_xdoscar.clear();
+    m_Egap_DOS.clear();
     m_Egap.clear();
+    m_Egap_DOS_net=AUROSTD_MAX_DOUBLE;
     m_Egap_net=AUROSTD_MAX_DOUBLE;
     enumerator_mode.clear();
 
@@ -1850,7 +1852,9 @@ namespace pocc {
     m_ARUN_directory_ground=b.m_ARUN_directory_ground;
     m_ARUN_directories.clear();for(uint i=0;i<b.m_ARUN_directories.size();i++){m_ARUN_directories.push_back(b.m_ARUN_directories[i]);}
     m_xdoscar=b.m_xdoscar;
+    m_Egap_DOS.clear();for(uint ispin=0;ispin<b.m_Egap_DOS.size();ispin++){m_Egap_DOS.push_back(b.m_Egap_DOS[ispin]);}
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}
+    m_Egap_DOS_net=b.m_Egap_DOS_net;
     m_Egap_net=b.m_Egap_net;
     enumerator_mode=b.enumerator_mode;
   }
