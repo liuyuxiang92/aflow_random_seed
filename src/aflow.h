@@ -79,7 +79,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 "";
 
 //MESSAGE defaults - CO20200502
-#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -1048,10 +1048,10 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
 
-string Message(string="");
-string Message(string str1,string list2print);
-string Message(const _aflags& aflags,string="",string="");
-bool AFLOW_BlackList(string h);
+string Message(const string& list2print="");  //CO20200713
+string Message(const string& list2print,const string& filename);  //CO20200713
+string Message(const _aflags& aflags,const string& list2print="",const string& filename="");  //CO20200713
+bool AFLOW_BlackList(const string& h);  //CO20200713
 namespace init {
   bool MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
   bool MessageOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
@@ -2637,7 +2637,7 @@ string MessageHostTime(const _aflags& aflags);
 string MessageDir(const _aflags& aflags);
 string MessageDirTime(const _aflags& aflags);
 string MessageDirHostTime(const _aflags& aflags);
-bool AFLOW_BlackList(string hostname);
+//[CO20200624 - REDUNDANT]bool AFLOW_BlackList(string hostname);
 
 // ----------------------------------------------------------------------------
 // aflow_pthreads.cpp
