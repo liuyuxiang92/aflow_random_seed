@@ -212,19 +212,19 @@ namespace KBIN {
             //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
             return TRUE;	
           } else { // must be unlocked
-            if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+            if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
             return FALSE;
           }
         } else { // must contain _AFLOWIN_
-          if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+          if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
           return FALSE;
         }
       } else { // empty
-        if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+        if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
         return FALSE;
       }
     } else { // unexisting
-      // if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      // if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
     return FALSE;

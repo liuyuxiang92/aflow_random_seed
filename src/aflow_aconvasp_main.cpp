@@ -1756,7 +1756,7 @@ namespace pflow {
       // G
       if(vpflow.flag("GETTEMP")) {
         AFLOW_getTEMP(argv); _PROGRAMRUN=true; 
-        //cout << "TEMPERATURE " << Message("host",_AFLOW_FILE_NAME_) << endl;exit(0); _PROGRAMRUN=true;
+        //cout << "TEMPERATURE " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;exit(0); _PROGRAMRUN=true;
       } //CO20200106 - patching for auto-indenting
       if(vpflow.flag("GEOMETRY")) {cout << pflow::GEOMETRY(cin) << endl; _PROGRAMRUN=true;}  //CO20191110
       if(vpflow.flag("GULP")) {pflow::GULP(cin); _PROGRAMRUN=true;}

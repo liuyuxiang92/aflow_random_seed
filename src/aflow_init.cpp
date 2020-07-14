@@ -1578,7 +1578,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
     double Tzero=30.0;
-    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message("host",_AFLOW_FILE_NAME_) << endl; exit(1);
+    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; exit(1);
     if(RUNSTAT || (!RUNSTAT && !RUNBAR)) {
       string soss="- [temp(C)=";
       for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {soss+=aurostd::utype2string(XHOST.vTemperatureCore.at(i),3)+(i<XHOST.vTemperatureCore.size()-1?",":"]");}
