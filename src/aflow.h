@@ -310,7 +310,8 @@ class _XHOST {
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
-    bool POSTPROCESS; //CT20181212
+    bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
+    bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too
     bool AVOID_RUNNING_VASP; //CO20200624
     bool PSEUDOPOTENTIAL_GENERATOR; //SC20200327
     // HARDWARE/SOFTWARE

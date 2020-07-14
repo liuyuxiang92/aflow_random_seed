@@ -619,7 +619,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xOUTCAR::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   clear(); // so it does not mess up vector/deque
@@ -2519,7 +2519,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xOUTCAR::GetBandGap():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   if((content == "") || (vcontent.size() == 0)) {
     //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xOUTCAR needs to be loaded before. \n"
@@ -4177,7 +4177,7 @@ bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VER
 bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xDOSCAR::GetProperties():";
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   stringstream message;
 
   bool ERROR_flag=FALSE;
@@ -4585,7 +4585,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::GetBandGap():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   if((content == "") || (vcontent.size() == 0)) {
     //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xDOSCAR needs to be loaded before. \n"
@@ -5066,7 +5066,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xEIGENVAL::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
@@ -7604,7 +7604,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xPOTCAR::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   // XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
@@ -8005,7 +8005,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xVASPRUNXML::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
   if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
@@ -8201,7 +8201,7 @@ bool xVASPRUNXML::GetForces(stringstream& stringstreamIN, bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xVASPRUNXML::GetForces():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -8335,7 +8335,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xIBZKPT::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
 
   long double seconds=aurostd::get_seconds();
@@ -8547,7 +8547,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xKPOINTS::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   clear(); // so it does not mess up vector/deque
@@ -8860,7 +8860,7 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xCHGCAR::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
@@ -9045,7 +9045,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   bool LDBEUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xQMVASP::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();

@@ -327,7 +327,7 @@ namespace AEL_functions {
     // SOME WARNINGS: check existence of LOCK and OUTCAR.relax2 files
     // [OBSOLETE] if( !aurostd::FileExist( vaspRun.Directory + string("/LOCK") ) &&
     if( !(aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) ||
-          ((XHOST.POSTPROCESS || AEL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/ael.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) &&
+          ((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/ael.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) &&
         ( vfileexist ) ) {
       //[OBSOLETE]	aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.relax2") ) )
       aurostd::StringstreamClean(aus);
@@ -339,7 +339,7 @@ namespace AEL_functions {
 
     // [OBSOLETE] if( aurostd::FileExist( vaspRun.Directory + string("/LOCK") ) &&
     if( (aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) ||
-          ((XHOST.POSTPROCESS || AEL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/ael.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) && !(vfileexist) ) {
+          ((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/ael.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) && !(vfileexist) ) {
       //[OBSOLETE]	!aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.relax2") ) )
       aurostd::StringstreamClean(aus);
       // [OBSOLETE] aus << _AELSTR_WARNING_ + "found LOCK but no OUTCAR.static in " <<  vaspRun.Directory << endl;
@@ -806,7 +806,7 @@ namespace AEL_functions {
         aus <<  _AELSTR_MESSAGE_ + "LOCK file path = " << dirrunname.at(idVaspRun) + "/" + _AFLOWLOCK_ << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) &&
-            !(((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+            !(((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
                 ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) || (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
                  (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
                  (aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/ael.LOCK")))))) {
@@ -987,7 +987,7 @@ namespace AEL_functions {
         // Do not accept it and wait for the new run
         // [OBSOLETE] if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) )
         if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ )  && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) &&
-            !(((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+            !(((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
                 ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) || (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
                  (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
                  (aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/ael.LOCK")))))) {
@@ -1130,7 +1130,7 @@ namespace AEL_functions {
       // If the LOCK file is missing, then it is probably a corrupted run
       // Do not accept it and wait for the new run
       if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ )  &&
-          !(((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+          !(((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
               ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) || (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
                (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
                (aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/ael.LOCK")))))) {

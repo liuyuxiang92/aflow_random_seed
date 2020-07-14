@@ -29,7 +29,7 @@
         -- patching --run vs --run=1 bug in AEL/AGL (CO)
         -- cleaning up PrintMessageStream()/PrintWarningStream()/PrintErrorStream() (CO)
         -- creating VASP_Get_Kflags_from_AflowIN() and separating from KBIN::RUN_Directory() (CO)
-        -- adding XHOST.POSTPROCESS hard stop for VASP_Run() function (--postprocess) (CO)
+        -- adding XHOST.ARUN_POSTPROCESS hard stop for VASP_Run() function (--postprocess) (CO)
         -- adding POCC postprocessing to LIB2LIB (CO)
         -- reading kflags and vflags options from aflow.in before processing POCC (CO)
         -- changing LIB2LIB() to run RUN_Directory() instead of individual post-processing functions (CO)
@@ -54,6 +54,7 @@
         -- added aurostd::FileExist() to all linking in LIB2RAW (CO)
         -- lots of cleaning of LIB2RAW, including adding CleanDirectoryLIB(), removing obsolete VOLDISTPARAMS and VOLDISTEVOLUTION functionality, and cleaning vspecies (CO)
         -- differentiating Egap_DOS and Egap in POCC (CO)
+        -- removing exits from xOUTCAR which kills VASP auto-fix (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

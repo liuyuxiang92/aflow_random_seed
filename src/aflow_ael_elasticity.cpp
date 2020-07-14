@@ -1936,7 +1936,7 @@ namespace AEL_functions {
               aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
               aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
               aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
-              ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+              ((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
                ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
                 (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) ||
                 (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
@@ -1950,7 +1950,7 @@ namespace AEL_functions {
               aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
               aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ||
               aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ||
-              ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+              ((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
                ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
                 (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) ||
                 (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
@@ -1975,7 +1975,7 @@ namespace AEL_functions {
         }
 
         // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-        if (!(XHOST.POSTPROCESS || AEL_data.postprocess)) {
+        if (!(XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) {
           // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
           // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), AEL_data, FileMESSAGE);
           // [OBSOLETE] if(aelerror != 0) {
@@ -2025,7 +2025,7 @@ namespace AEL_functions {
                   aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/" + _AFLOWLOCK_ ) ||
                   aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) ||
                   aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) ||
-                  ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+                  ((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
                    ((aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/agl.LOCK")) ||
                     (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/ael.LOCK")) ||
                     (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/LOCK")) ||
@@ -2039,7 +2039,7 @@ namespace AEL_functions {
                   aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/" + _AFLOWLOCK_ ) ||
                   aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ||
                   aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ||
-                  ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+                  ((XHOST.ARUN_POSTPROCESS || AEL_data.postprocess) &&
                    ((aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/agl.LOCK")) ||
                     (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/ael.LOCK")) ||
                     (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/LOCK")) ||
@@ -2064,7 +2064,7 @@ namespace AEL_functions {
             }
 
             // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-            if (!(XHOST.POSTPROCESS || AEL_data.postprocess)) {	  
+            if (!(XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) {	  
               // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
               // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), _vaspFlags, _kbinFlags, runnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
               // [OBSOLETE] if(aelerror != 0) {
