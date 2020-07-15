@@ -91,6 +91,9 @@ namespace pocc {
   double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
   double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
   double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
+
+  void poccOld2New(ostream& oss=cout);
+  void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
 } // namespace pocc
 
 namespace pocc {
@@ -518,8 +521,8 @@ namespace pocc {
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;
-      vector<double> m_Egap;
-      double m_Egap_net;
+      vector<double> m_Egap_DOS,m_Egap;
+      double m_Egap_DOS_net,m_Egap_net;
 
       //initializers
       bool initialize(ostream& oss);
@@ -602,9 +605,10 @@ namespace pocc {
       bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
 
       //external methods
-      void setPOccFlags(const aurostd::xoption& pocc_flags);  //input flags, e.g., vpflow
-      void loadPOccStructureFromAFlags(const _aflags& aflags);
+      void setPOccFlags(const aurostd::xoption& pocc_flags);      //input flags, e.g., vpflow
+      void loadFromAFlags();                                      //grabs from m_aflags
       void setPOccStructure(const xstructure& xstr_pocc);
+      void setAFlags(const _aflags& Aflags);                      //standard _aflags
       void setKFlags(const _kflags& Kflags);                      //standard _kflags
       void setVFlags(const _vflags& Vflags);                      //standard _vflags
 
@@ -631,6 +635,7 @@ namespace pocc {
       void resetSiteConfigurations();
 
       void CleanPostProcessing();
+      void loadDataIntoCalculator();
       void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();

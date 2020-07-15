@@ -514,6 +514,9 @@ namespace aurostd {
   template<class utype> bool
     linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection); //CO20180520
 
+  template<class utype> xvector<utype> getVectorProjection(const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
+  template<class utype> xvector<utype> getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
+
   // SIMPLE SORT ROUTINES
   template<class utype> xvector<utype>  // WRAP TO SHELL SHORT
     sort(const xvector<utype>& a) __xprototype;

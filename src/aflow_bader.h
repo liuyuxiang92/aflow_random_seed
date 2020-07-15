@@ -20,13 +20,13 @@ using std::string;
 // perform Bader analysis using the program from Henkelman Group at UT, Austin
 namespace bader_functions {
 string BaderCalc(aurostd::xoption vpflow);
-bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, string& directory, ostream& oss);
+bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, const string& directory, ostream& oss);
 bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, const string& prototype,
                const vector<string>& vspecies, const deque<int>& num_each_species, const vector<double>& vZVAL,
-               const vector<double>& cutoffs, const vector<int>& downsample_ratios, string& directory, ostream& oss);
+               const vector<double>& cutoffs, const vector<int>& downsample_ratios, const string& directory, ostream& oss);
 bool BaderCalc(const string& bader_options, const string& prototype, const vector<string>& vspecies,
                const deque<int>& num_each_species, const vector<double>& vZVAL, const vector<double>& cutoffs,
-               const vector<int>& downsample_ratios, string& directory, ostream& oss);
+               const vector<int>& downsample_ratios, const string& directory, ostream& oss);
 void FixDirectory(string& directory);
 bool Flags2BaderCommands(aurostd::xoption& vpflow, string& bader_options, ostream& oss);
 bool getPushCommand(const string& misc_option, string& push_command, ostream& oss);
@@ -65,25 +65,6 @@ bool CHGCAR2JVXL(string chgcar_file, const double& cutoff, ostream& oss);
 string CHGCAR2JVXL_get_output_filename(string chgcar_file, const double& cutoff, const int& downsample_ratio);
 string CHGCAR2JVXL_get_output_filename(string chgcar_file, const double& cutoff);
 }
-
-// Phonon graphs
-namespace pflow {
-bool PLOT_PHDISP(vector<string>& argv);
-}
-// read phonon calculation output and produce graphs
-string gnuplotPhononHeader(string directory, string name, string unit, string plot_type, string title);
-// return header info for gnuplot .eps graph
-string gnuplotPhononDisp(string dis_path, string ylabel, double conversion, vector<string> specialLabels,
-                         vector<double> specialPositions, int nbranches, string rightmargin, string botmargin);
-// return info for making a plot of the phonon dispersion
-string gnuplotPhononDos(string pdos_path, string leftmargin, string botmargin);
-// return infor for making a plot of the phonon density of states
-string gnuplotPhononThermo(string thermo_path, string topmargin);
-// return info for making a plot of the thermodynamics properties F_vib, S_vib, C_v
-void callOutputConversion(bool PNG, bool PDF, bool JPG, bool GIF, string directory, string name, string unit, string plot);
-// executes `convert' to produce requested formats from .eps
-void cleanGnuplotScript(bool file1, bool file2, bool file3, string script);
-// removes the gnuplot scripts because they refer to temporary files
 
 #endif
 

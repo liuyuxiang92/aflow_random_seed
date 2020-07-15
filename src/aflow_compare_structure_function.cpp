@@ -1013,6 +1013,7 @@ namespace compare {
         }
         structure_tmp.structure_representative = xstr1;
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
+        structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = directory+"/"+vfiles[i];
         structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
         structure_tmp.elements = compare::getElements(xstr1);
@@ -1124,6 +1125,7 @@ namespace compare {
           catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX20190801
         }
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
+        structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = designation.str();
         structure_tmp.stoichiometry = compare::getStoichiometry(structure_tmp.structure_representative,same_species);
         structure_tmp.elements = compare::getElements(structure_tmp.structure_representative);
@@ -1204,6 +1206,7 @@ namespace compare {
       }
       structure_tmp.structure_representative = xstr;
       structure_tmp.structure_representative.ReScale(1.0); //DX20190715
+      structure_tmp.structure_representative.BringInCell(); //DX20200707
       structure_tmp.structure_representative_name = filenames[i];
       structure_tmp.stoichiometry = compare::getStoichiometry(xstr,same_species);
       structure_tmp.elements = compare::getElements(xstr);
@@ -1425,6 +1428,11 @@ namespace compare {
       return false;
     }
 
+    // ---------------------------------------------------------------------------
+    // pre-condition structures 
+    structure.ReScale(1.0); //DX20200707
+    structure.BringInCell(); //DX20200707
+
     return true;
   }
 }
@@ -1482,18 +1490,18 @@ namespace compare{
 
     string ICSD_substring = "";
     bool ICSD_substring_found = false;
-    if(aurostd::substring2bool(name,"/")){
+    if(name.find("/") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
       vector<string> tokens;
       aurostd::string2tokens(name,tokens,"/");
       for(uint i=0;i<tokens.size();i++){
-        if(aurostd::substring2bool(tokens[i],"_ICSD_")){
+        if(tokens[i].find("_ICSD_") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
           ICSD_substring = tokens[i];
           ICSD_substring_found = true;
         }
       }
     }
     else {
-      if(aurostd::substring2bool(name,"_ICSD_")){ 
+      if(name.find("_ICSD_") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
         ICSD_substring = name;
         ICSD_substring_found = true;
       }
@@ -1523,13 +1531,34 @@ namespace compare{
       if(ICSD_entries[i].empty()){ continue; } //DX20191108 - if not an ICSD, skip
       vector<string> tokens;
       aurostd::string2tokens(ICSD_entries[i],tokens,"_"); 
-      string num_string = tokens[tokens.size()-1];
-      for(uint j=0;j<num_string.size();j++){
-        if(isalpha(num_string[j])){
-          num_string.erase(num_string.begin()+j);
+      //DX20200706 [find ICSD number, more robust] - START
+      string num_string = "";
+      for(uint j=0;j<tokens.size();j++){
+        if(tokens[j].find("ICSD") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
+          if(j+1<tokens.size()){
+            num_string = tokens[j+1];
+            break;
+          }
+          else{ break; }  
         }
       }
-      int num = aurostd::string2utype<int>(tokens[tokens.size()-1]); // ICSD number is aways of the form (Ag1_ICSD_######)
+      int num=AUROSTD_MAX_INT;
+      if(!num_string.empty()){
+        if(num_string.find(".") != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
+          vector<string> sub_tokens;
+          aurostd::string2tokens(num_string,sub_tokens,"."); 
+          num_string = sub_tokens[0];
+        }
+        num = aurostd::string2utype<int>(num_string);
+      }
+      //DX20200706 [find ICSD number, more robust] - END
+      //DX20200706 [OBSOLETE - not robust] string num_string = tokens[tokens.size()-1];
+      //DX20200706 [OBSOLETE - not robust] for(uint j=0;j<num_string.size();j++){
+      //DX20200706 [OBSOLETE - not robust]   if(isalpha(num_string[j])){
+      //DX20200706 [OBSOLETE - not robust]     num_string.erase(num_string.begin()+j);
+      //DX20200706 [OBSOLETE - not robust]   }
+      //DX20200706 [OBSOLETE - not robust] }
+      //DX20200706 [OBSOLETE - not robust] int num = aurostd::string2utype<int>(tokens[tokens.size()-1]); // ICSD number is aways of the form (Ag1_ICSD_######)
       if(num < min_num){
         min_ICSD = ICSD_entries[i];
         min_num = num;
@@ -1603,7 +1632,7 @@ namespace compare{
     }
 
     // ---------------------------------------------------------------------------
-    // generate all permuations structures
+    // generate all permutation structures
     vector<StructurePrototype> permutation_structures = compare::generatePermutationStructures(structure);
 
     //cerr << "store naming" << endl;
@@ -1837,6 +1866,7 @@ namespace compare{
       StructurePrototype str_proto_tmp;
       str_proto_tmp.structure_representative = xstr_tmp;
       str_proto_tmp.structure_representative.ReScale(1.0); //DX20190715
+      str_proto_tmp.structure_representative.BringInCell(); //DX20200707
       str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
       str_proto_tmp.structure_representative_generated = true;
       //DX20190730 - ORIG - str_proto_tmp.structure_representative_source = "permutation";
@@ -2097,6 +2127,7 @@ namespace compare{
       StructurePrototype str_proto_tmp;
       str_proto_tmp.structure_representative = xstr_tmp;
       str_proto_tmp.structure_representative.ReScale(1.0); //DX20190715
+      str_proto_tmp.structure_representative.BringInCell(); //DX20200707
       str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
       str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
       str_proto_tmp.structure_representative_generated = true;
@@ -4219,9 +4250,9 @@ namespace compare{
           ICSD_entries.push_back(findICSDName(comparison_schemes[i].structures_duplicate_names[j]));
         }
         string min_ICSD_entry = findMinimumICSDEntry(ICSD_entries);
-        if(!aurostd::substring2bool(comparison_schemes[i].structure_representative_name,min_ICSD_entry) && !min_ICSD_entry.empty()){ //DX20191108 - add not empty case
+        if((comparison_schemes[i].structure_representative_name.find(min_ICSD_entry) == std::string::npos) && !min_ICSD_entry.empty()){ //DX20191108 - add not empty case //DX20200709 - aurostd::substring2bool to find
           for(uint j=0;j<comparison_schemes[i].structures_duplicate_names.size();j++){
-            if(aurostd::substring2bool(comparison_schemes[i].structures_duplicate_names[j],min_ICSD_entry)){
+            if(comparison_schemes[i].structures_duplicate_names[j].find(min_ICSD_entry) != std::string::npos){ //DX20200709 - aurostd::substring2bool to find
               string old_representative_ID = comparison_schemes[i].structure_representative_name;
               string old_representative_compound = comparison_schemes[i].structure_representative_compound;
               bool old_representative_generated = comparison_schemes[i].structure_representative_generated;
@@ -6087,6 +6118,7 @@ namespace compare{
 namespace compare{
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
+      double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
       const int& type_match) {
 
@@ -6105,6 +6137,16 @@ namespace compare{
     bool VERBOSE=false;
 
     string function_name = XPID + "compare::findMatch():";
+
+    // ---------------------------------------------------------------------------
+    // Determines cutoff distance in which atoms map onto one another and are
+    // unlikely to match with other atoms based on the resolution of atoms
+    // (i.e., minimum interatomic distance). If mapping distances are below this
+    // value, then we do not need to check other possible atom mappings (offering
+    // a speed increase).
+    // DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING = 4.0 (default)
+    // Increase scaling to have a more stringent cutoff (slower, but more robust)
+    double _SAFE_MATCH_CUTOFF_ = minimum_interatomic_distance/DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING; //DX20200623
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  // indices of atoms (index after sorting)
@@ -6181,7 +6223,7 @@ namespace compare{
         }
         // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
         //DX - running vector in each loop saves computations; fewer duplicate operations
-        if(incell_mod>0.25){
+        if(incell_mod>_SAFE_MATCH_CUTOFF_){
           for(uint m=0;m<l1.size();m++){
             a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
             for(uint n=0;n<l2.size();n++){
@@ -6197,11 +6239,11 @@ namespace compare{
                   dist = tmp;
                   min_xvec = tmp_xvec;
                 }
-                if(dist<0.25){ break; }
+                if(dist<_SAFE_MATCH_CUTOFF_){ break; }
               }
-              if(dist<0.25){ break; }
+              if(dist<_SAFE_MATCH_CUTOFF_){ break; }
             }
-            if(dist<0.25){ break; }
+            if(dist<_SAFE_MATCH_CUTOFF_){ break; }
           }
         }
         else{
@@ -6228,7 +6270,7 @@ namespace compare{
         vdiffs.push_back(dist);
         //DX20190701 - speed increase, not possible to match to anything else if less than quarter of an Angstrom
         // note this will truncate vdiffs, so if we need it, then do not use the break below
-        if(dist<0.25){
+        if(dist<_SAFE_MATCH_CUTOFF_){
           break;
         }
       }
@@ -8035,6 +8077,9 @@ namespace compare{
     bool supercell_method = false; //DX20200330
     double mis=AUROSTD_MAX_DOUBLE;
     double mag_dis=AUROSTD_MAX_DOUBLE; double mag_fail=AUROSTD_MAX_DOUBLE;
+
+    double minimum_interatomic_distance = aurostd::min(xstr1.dist_nn_min,xstr_supercell.dist_nn_min); //DX20200622
+
     xstructure proto;
     //xstructure xstr2_tmp = xstr2;
 
@@ -8162,7 +8207,7 @@ namespace compare{
             }
             vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,map_index_str1,map_index_str2,min_dists,type_match)){;
+            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
               if(VERBOSE){
                 for(uint m=0;m<map_index_str1.size();m++){
                   cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;

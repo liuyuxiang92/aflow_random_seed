@@ -232,6 +232,42 @@ typedef unsigned uint;
 #include "../aflow.h"     //needed for XHOST
 //#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
+//CO20200624 START - adding from Jahnatek
+//http://ascii-table.com/ansi-escape-sequences.php
+//http://ascii-table.com/ansi-escape-sequences-vt-100.php
+#define cursor_moveyx(y, x) printf("\033[%d;%dH", y, x) //Move cursor to position y,x (rows, columns) with (1,1) as origin    
+#define cursor_moveup(y) printf("\033[%dA", y)          //Move cursor up y    
+#define cursor_movedown(y) printf("\033[%dB", y)        //Move cursor down y    
+#define cursor_moveright(x) printf("\033[%dC", x)       //Move cursor right x    
+#define cursor_moveleft(x) printf("\033[%dD", x)        //Move cursor left x    
+#define cursor_store() printf("\033[s")                 //Store current cursor position and color    
+#define cursor_restore() printf("\033[u")               //Restore cursor position and color from cursor_store()    
+#define cursor_clear() printf("\033[2J")                //Clear screen and leave cursor where is    
+#define cursor_clearline() printf("\033[K")             //Clear to end of line and leave cursor where is    
+#define cursor_fore_black() printf("\033[30m")          //Change foreground color to black    
+#define cursor_fore_red() printf("\033[31m")            //Change foreground color to red    
+#define cursor_fore_green() printf("\033[32m")          //Change foreground color to green    
+#define cursor_fore_orange() printf("\033[33m")         //Change foreground color to orange    
+#define cursor_fore_blue() printf("\033[34m")           //Change foreground color to blue    
+#define cursor_fore_magenta() printf("\033[35m")        //Change foreground color to magenta    
+#define cursor_fore_cyan() printf("\033[36m")           //Change foreground color to cyan    
+#define cursor_fore_yellow() printf("\033[33m\033[1m")  //Change foreground color to yellow (add bold to help visibility) 
+#define cursor_fore_white() printf("\033[37m")          //Change foreground color to white    
+#define cursor_back_black() printf("\033[40m")          //Change background color to black    
+#define cursor_back_red() printf("\033[41m")            //Change background color to red    
+#define cursor_back_green() printf("\033[42m")          //Change background color to green    
+#define cursor_back_orange() printf("\033[43m")         //Change background color to orange    
+#define cursor_back_blue() printf("\033[44m")           //Change background color to blue    
+#define cursor_back_magenta() printf("\033[45m")        //Change background color to magenta    
+#define cursor_back_cyan() printf("\033[46m")           //Change background color to cyan    
+#define cursor_back_white() printf("\033[47m")          //Change background color to white    
+#define cursor_attr_none() printf("\033[0m")            //Turn off all cursor attributes    
+#define cursor_attr_bold() printf("\033[1m")            //Make test bold    
+#define cursor_attr_underline() printf("\033[4m")       //Underline text    
+#define cursor_attr_blink() printf("\033[5m")           //Supposed to make text blink, usually bolds it instead    
+#define cursor_attr_reverse() printf("\033[7m")         //Swap background and foreground colors
+//CO20200624 END - adding from Jahnatek
+
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
 template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<utype>&);// __xprototype;
 
@@ -239,12 +275,19 @@ template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<ut
 // TIME stuff
 namespace aurostd {
   int get_day(void);
+  int get_day(tm* tstruct); //CO20200624
   int get_month(void);
+  int get_month(tm* tsruct);  //CO20200624
   int get_year(void);
+  int get_year(tm* tstruct);  //CO20200624
   long int get_date(void);
+  long int get_date(tm* tstruct);  //CO20200624
   int get_hour(void);
+  int get_hour(tm* tstruct);  //CO20200624
   int get_min(void);
+  int get_min(tm* tstruct); //CO20200624
   int get_sec(void);
+  int get_sec(tm* tstruct); //CO20200624
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
@@ -255,8 +298,11 @@ namespace aurostd {
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
   string get_time(void);
+  string get_time(tm* tstruct); //CO20200624
   string get_datetime(void);
+  string get_datetime(tm* tstruct); //CO20200624
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
+  string get_datetime_formatted(tm* tstruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
   bool beep(uint=2000,uint=100); // standard values
 }
 // ----------------------------------------------------------------------------
@@ -429,21 +475,22 @@ namespace aurostd {
   // about printing
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintANSIEscapeSequence(const aurostd::xoption& color);
   void PrintMessageStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
   void PrintMessageStream(ofstream& FileMESSAGE,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
   void PrintMessageStream(ofstream& FileMESSAGE,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
-  void PrintErrorStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintErrorStream(ostringstream& stream,bool quiet); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
-  void PrintWarningStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintWarningStream(ostringstream& stream,bool quiet); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ostringstream& stream,bool quiet);
 
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,stringstream& stream,bool quiet);
@@ -454,15 +501,15 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
-  void PrintErrorStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintErrorStream(stringstream& stream,bool quiet);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,stringstream& stream,bool quiet);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
-  void PrintWarningStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
-  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  void PrintWarningStream(stringstream& stream,bool quiet);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,bool osswrite);
   //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream& stream,bool quiet);
 
   // about executing
@@ -683,6 +730,7 @@ namespace aurostd {
   string utype2string(double from,bool roff,double tol);
   string utype2string(double from,int precision,bool roff,double tol);
   string utype2string(double from,bool roff,char FORMAT);
+  string utype2string(double from,int precision,char FORMAT,bool roff=false); //CO20200624
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);

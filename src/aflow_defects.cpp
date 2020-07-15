@@ -952,9 +952,9 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   aflowin << "[AFLOW] CAGES IN AFLOW.IN FORMAT" << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl;
   for(uint ivstr=0;ivstr<vstr.size();ivstr++) {
-    aflowin << "[VASP_POSCAR_MODE_EXPLICIT]START." << vtitle.at(ivstr) << endl;
+    aflowin << _VASP_POSCAR_MODE_EXPLICIT_START_ << vtitle.at(ivstr) << endl;  //CO20200624
     aflowin << vstr.at(ivstr);
-    aflowin << "[VASP_POSCAR_MODE_EXPLICIT]STOP." << vtitle.at(ivstr) << endl;
+    aflowin << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << vtitle.at(ivstr) << endl; //CO20200624
     aflowin << AFLOWIN_SEPARATION_LINE << endl;
   }  
   aflowin << AFLOWIN_SEPARATION_LINE << endl;

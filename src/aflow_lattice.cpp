@@ -3546,19 +3546,19 @@ namespace LATTICE {
     if(LDEBUG) cerr << XPID << "LATTICE::BZPLOTDATA: mode=" << mode << endl;
 
     if(mode==0 && tokens.size()!=0) {
-      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
+      init::ErrorOption(options,"LATTICE::BZPLOTDATA","aflow --bzplotdata < POSCAR > plotbz.dat");
       exit(0);
     }
     if(mode==10 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotdatauseKPOINTS=KPOINTS < POSCAR > plotbz.dat");
+      init::ErrorOption(options,"LATTICE::BZPLOTDATA","aflow --bzplotdatauseKPOINTS=KPOINTS < POSCAR > plotbz.dat");
       exit(0);
     }
     if(mode==1 && tokens.size()!=0) {
-      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplot < POSCAR");
+      init::ErrorOption(options,"LATTICE::BZPLOTDATA","aflow --bzplot < POSCAR");
       exit(0);
     }
     if(mode==11 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"LATTICE::BZPLOTDATA","aflow --bzplotuseKPOINTS=KPOINTS < POSCAR");
+      init::ErrorOption(options,"LATTICE::BZPLOTDATA","aflow --bzplotuseKPOINTS=KPOINTS < POSCAR");
       exit(0);
     }
 

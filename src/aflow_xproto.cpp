@@ -2398,7 +2398,7 @@ namespace aflowlib {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>1) {
-      init::ErrorOption(cout,options,"aflowlib::CALCULATED","aflow --protos_icsd[=N]");
+      init::ErrorOption(options,"aflowlib::CALCULATED","aflow --protos_icsd[=N]");
       exit(0);
     }
 
@@ -2507,7 +2507,7 @@ namespace aflowlib {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>1) {
-      init::ErrorOption(cout,options,"aflowlib::CALCULATED","aflow --calculated[[=]all|icsd|lib0|lib1|lib2|lib3|lib4|lib5|lib6|lib7|lib8|lib9]");
+      init::ErrorOption(options,"aflowlib::CALCULATED","aflow --calculated[[=]all|icsd|lib0|lib1|lib2|lib3|lib4|lib5|lib6|lib7|lib8|lib9]");
       exit(0);
     }
 

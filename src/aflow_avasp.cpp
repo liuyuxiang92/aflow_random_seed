@@ -1924,7 +1924,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     string pocc_params_add_on=":POCC_"+xvasp.AVASP_pocc_parameters;
     system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     if(!xvasp.AVASP_pocc_tol.empty()){
-      string pocc_params_add_on=":TOL_"+xvasp.AVASP_pocc_tol;
+      string pocc_tol_str_tmp=xvasp.AVASP_pocc_tol;
+      aurostd::StringSubst(pocc_tol_str_tmp,":","_"); //TOL_0.001_0.001 - first is site tol, second is stoich tol
+      string pocc_params_add_on=":TOL_"+pocc_tol_str_tmp; //CO20200624 - xvasp.AVASP_pocc_tol;
       system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     }
   }
@@ -5644,7 +5646,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
       xvasp.AVASP_potential!=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN) {
     // bad potential
     aus << "EEEEE  PROTO_Generation_Binary_Aflowin potential is not VASP style: " << xvasp.AVASP_potential << endl;
-    aurostd::PrintErrorStream(aus,XHOST.QUIET,cerr);  //CO20200624
+    aurostd::PrintErrorStream(aus,XHOST.QUIET);  //CO20200624
     return FALSE;
   }
   // good potential

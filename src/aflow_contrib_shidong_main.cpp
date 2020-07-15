@@ -28,7 +28,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
-      init::ErrorOption(cout,options,"pflow::AClusterExpansionMethodMain",aurostd::liststring2string("aflow --cluster-expansion=... | --ce=structure_type,A,B,EA,EB"));
+      init::ErrorOption(options,"pflow::AClusterExpansionMethodMain",aurostd::liststring2string("aflow --cluster-expansion=... | --ce=structure_type,A,B,EA,EB"));
       exit(0);
     } 
 
@@ -548,7 +548,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=7 && tokens.size()!=3) {
-      init::ErrorOption(cout,options,"pflow::SQS",aurostd::liststring2string("aflow --sqs=structure_type,atom_num,neighbour_num,sl_num_min,sl_num_max,A,B | --special-quasirandom-structure=...","aflow --sqs=structure_type n1 n2 < POSCAR | --special-quasirandom-structure=..."));
+      init::ErrorOption(options,"pflow::SQS",aurostd::liststring2string("aflow --sqs=structure_type,atom_num,neighbour_num,sl_num_min,sl_num_max,A,B | --special-quasirandom-structure=...","aflow --sqs=structure_type n1 n2 < POSCAR | --special-quasirandom-structure=..."));
       exit(0);
     } 
 
@@ -681,7 +681,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=3 && tokens.size()!=4) {
-      init::ErrorOption(cout,options,"pflow::Superlattice",aurostd::liststring2string("aflow --superlattice=structure_type,n_min,n_max < POSCAR","--superlattice=VASP,structure_type,A,B < superlattice_name"));
+      init::ErrorOption(options,"pflow::Superlattice",aurostd::liststring2string("aflow --superlattice=structure_type,n_min,n_max < POSCAR","--superlattice=VASP,structure_type,A,B < superlattice_name"));
       exit(0);
     }      
 
@@ -795,7 +795,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
-      init::ErrorOption(cout,options,"pflow::Cluster","aflow --cluster=structure_type,n_min,n_max,m_min,m_max");
+      init::ErrorOption(options,"pflow::Cluster","aflow --cluster=structure_type,n_min,n_max,m_min,m_max");
       exit(0);
     } 
     // generate the clusters

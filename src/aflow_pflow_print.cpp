@@ -580,7 +580,7 @@ namespace pflow {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
     if(data.rows!=6) {
-      init::ErrorOption(cout,"","pflow::PrintClat",aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
+      init::ErrorOption("","pflow::PrintClat",aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
       exit(0);
     }
     oss.setf(std::ios::fixed,std::ios::floatfield);

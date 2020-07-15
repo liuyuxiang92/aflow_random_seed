@@ -1214,7 +1214,7 @@ namespace slab {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()<3 || tokens.size()>5) {
-      init::ErrorOption(cout,options,"slab::MAKE_SLAB","aflow --slab=h,k,l[,#filled_layers[,#vacuum layers]] < POSCAR");
+      init::ErrorOption(options,"slab::MAKE_SLAB","aflow --slab=h,k,l[,#filled_layers[,#vacuum layers]] < POSCAR");
       exit(0);
     }
     int i=0,j=0,k=0;

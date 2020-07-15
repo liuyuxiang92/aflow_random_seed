@@ -227,7 +227,7 @@ namespace estructure {
     stringstream straus, strline, dosfile, ss_outcar, ss_doscar; //, stringstreamtmp, strline;  
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_DOS","aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
+      init::ErrorOption(options,"estructure::PLOT_DOS","aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -393,7 +393,7 @@ namespace estructure {
     if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_DOSWEB","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
+      init::ErrorOption(options,"estructure::PLOT_DOSWEB","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -1395,7 +1395,7 @@ namespace estructure {
     stringstream ss_doscar, ss_poscar, ss_outcar; 
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_PEDOSALL_AFLOWLIB","aflow --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
+      init::ErrorOption(options,"estructure::PLOT_PEDOSALL_AFLOWLIB","aflow --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -1577,7 +1577,7 @@ namespace estructure {
     if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOSALL: tokens.at(i)=" << tokens.at(i) << endl;
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_PEDOSALL","aflow --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
+      init::ErrorOption(options,"estructure::PLOT_PEDOSALL","aflow --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -1642,7 +1642,7 @@ namespace estructure {
     if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOS: tokens.at(i)=" << tokens.at(i) << endl;
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_PEDOS","aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
+      init::ErrorOption(options,"estructure::PLOT_PEDOS","aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -1907,7 +1907,7 @@ namespace estructure {
     stringstream straus, stringstreamtmp, strline, dosfile, ss_outcar, ss_doscar, ss_engenval, ss_kpoints; 
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_BAND","aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
+      init::ErrorOption(options,"estructure::PLOT_BAND","aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -2440,7 +2440,7 @@ namespace estructure {
     stringstream straus, stringstreamtmp, strline, dosfile, ss_outcar, ss_doscar, ss_engenval, ss_kpoints; 
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_BAND2","aflow --plotband2[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
+      init::ErrorOption(options,"estructure::PLOT_BAND2","aflow --plotband2[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -2950,7 +2950,7 @@ namespace estructure {
     stringstream straus, stringstreamtmp, strline; //, dosfile; //, stringstreamtmp, strline;  
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_BAND_SPINSPLIT","aflow -plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
+      init::ErrorOption(options,"estructure::PLOT_BAND_SPINSPLIT","aflow -plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
       exit(0);
     }
     if(tokens.size()>=1) directory = tokens.at(0);
@@ -4533,7 +4533,7 @@ namespace estructure{
     if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
 
     //if(tokens.size()>0) {
-    //  init::ErrorOption(cout,options,"estructure::DOSDATA_JSON","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
+    //  init::ErrorOption(options,"estructure::DOSDATA_JSON","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     //  exit(0);
     //}
     //if(tokens.size()>=1) directory = tokens.at(0);

@@ -2413,7 +2413,7 @@ namespace AGL_functions {
             aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
             aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
             aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
-            ((XHOST.POSTPROCESS || AGL_data.postprocess) &&
+            ((XHOST.ARUN_POSTPROCESS || AGL_data.postprocess) &&
              ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
               (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
               (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
@@ -2437,7 +2437,7 @@ namespace AGL_functions {
         }
 
         // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-        if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {
+        if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
           // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
           // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
           // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
@@ -2491,7 +2491,7 @@ namespace AGL_functions {
       // If the data does not have a minimum, then this section of the code will add additional strained structures until a minimum is found
       // If the structure has been properly relaxed prior to running AFLOW AGL, then this problem should not occur
       // If this part of the code produces warnings, you should check the relaxation of the initial structure
-      if(USER_CHECK_EV_MIN.option && !(XHOST.POSTPROCESS || AGL_data.postprocess)) {
+      if(USER_CHECK_EV_MIN.option && !(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Checking location of energy minimum" << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2629,7 +2629,7 @@ namespace AGL_functions {
             continue;
           }
           // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-          if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {
+          if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
             // [OBSOLETE] if(aglerror != 0) {
@@ -2770,7 +2770,7 @@ namespace AGL_functions {
             continue;
           } 	  	  
           // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-          if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {	  
+          if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {	  
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
             // [OBSOLETE] if(aglerror != 0) {
@@ -2824,7 +2824,7 @@ namespace AGL_functions {
       // Problems with the concavity of the (E, V) data are usually caused by an insufficient basis set or k-point mesh
       // If the data is not concave, then this section of the code will increase the density of the k-point mesh and rerun the VASP calculations
       // If this part of the code produces warnings, you should check the k-point mesh and the basis set
-      if(USER_CHECK_EV_CONCAVITY.option && !(XHOST.POSTPROCESS || AGL_data.postprocess)) {	  
+      if(USER_CHECK_EV_CONCAVITY.option && !(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {	  
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Checking concavity of (E, V) data" << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

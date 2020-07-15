@@ -20,6 +20,7 @@
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX
+#define _ZERO_TOL_LOOSE_ 1e-6  //ME20200519 - tolerance for float precision
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
 #define _XPROTO_ZERO_VOL_ 1.0e-6  //CO20190218
 
@@ -78,7 +79,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 "";
 
 //MESSAGE defaults - CO20200502
-#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -178,6 +179,9 @@ extern string _AFLOWLOCK_;
 #define VASP_OPTIONS_MPI_DEFAULT         ""
 #define VASPLS_BIN_POSTFIX_DEFAULT       "LS"
 #define GRND_BIN_DEFAULT                 "./grnd_intel"
+
+#define _VASP_POSCAR_MODE_EXPLICIT_START_ "[VASP_POSCAR_MODE_EXPLICIT]START."  //CO20200624
+#define _VASP_POSCAR_MODE_EXPLICIT_STOP_ "[VASP_POSCAR_MODE_EXPLICIT]STOP."  //CO20200624
 
 // --------------------------------------------------------------------------
 // definitions for projects
@@ -306,7 +310,9 @@ class _XHOST {
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
-    bool POSTPROCESS; //CT20181212
+    bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
+    bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too
+    bool AVOID_RUNNING_VASP; //CO20200624
     bool PSEUDOPOTENTIAL_GENERATOR; //SC20200327
     // HARDWARE/SOFTWARE
     string hostname,machine_type,tmpfs,user,group,home,shell,progname;
@@ -659,14 +665,10 @@ class _aflags {
 
 //ME20181026 - Container for APL options
 struct _moduleOptions {
-  _moduleOptions() : minatoms_restricted(false) {;}  //CO20181226
   // APL
-  vector<bool> supercell_method;
-  bool minatoms_restricted; //CO20181226 = false;
   vector<aurostd::xoption> aplflags;
 
   // AAPL
-  vector<bool> cut_rad_shell;
   vector<aurostd::xoption> aaplflags;
 
   // QHA
@@ -796,17 +798,6 @@ class _kflags {
     // phonons operation lists
     bool   KBIN_PHONONS_CALCULATION_APL;
     bool   KBIN_PHONONS_CALCULATION_QHA;  //CO20170601
-    bool   KBIN_PHONONS_CALCULATION_QHA_A;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA_B;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA_C;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_A;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_B;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_C;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_A;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_B;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_C;  //PN20180705
     bool   KBIN_PHONONS_CALCULATION_AAPL; //CO20170601
     bool   KBIN_PHONONS_CALCULATION_AGL;
     bool   KBIN_PHONONS_CALCULATION_AEL;
@@ -1053,16 +1044,19 @@ double AFLOW_checkMEMORY(string="",double=102.0);
 bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
+string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
 
-string Message(string="");
-string Message(string str1,string list2print);
-string Message(const _aflags& aflags,string="",string="");
-bool AFLOW_BlackList(string h);
+string Message(const string& list2print="");  //CO20200713
+string Message(const string& list2print,const string& filename);  //CO20200713
+string Message(const _aflags& aflags,const string& list2print="",const string& filename="");  //CO20200713
+bool AFLOW_BlackList(const string& h);  //CO20200713
 namespace init {
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,vector<string> vusage);
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,string vusage);
+  bool MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
+  bool MessageOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
+  bool ErrorOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
+  bool ErrorOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
 }
 
 // --------------------------------------------------------------------------
@@ -2643,7 +2637,7 @@ string MessageHostTime(const _aflags& aflags);
 string MessageDir(const _aflags& aflags);
 string MessageDirTime(const _aflags& aflags);
 string MessageDirHostTime(const _aflags& aflags);
-bool AFLOW_BlackList(string hostname);
+//[CO20200624 - REDUNDANT]bool AFLOW_BlackList(string hostname);
 
 // ----------------------------------------------------------------------------
 // aflow_pthreads.cpp
@@ -2925,8 +2919,8 @@ namespace KBIN {
   double XVASP_Afix_GENERIC(string mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double=0.0,int=0);
 
   string ExtractSystemName(const string& directory);  //ME20200217
-  string ExtractSystemNameFromAFLOWIN(string directory);  //ME20200217
-  string ExtractSystemNameFromVASP(string directory);  //ME20200217
+  string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
+  string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);
@@ -3016,6 +3010,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;
+    int nelectrons; //AS20200528
     double natoms;                                                // for aflowlib_libraries.cpp
     double energy_cell,energy_atom;                               // for aflowlib_libraries.cpp
     double enthalpy_cell,enthalpy_atom;                           // for aflowlib_libraries.cpp
@@ -4396,12 +4391,11 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  //ME20181107
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption&, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  //ME20181107
   bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
   void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
-  // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
@@ -4545,7 +4539,7 @@ namespace makefile {
 #include "aflowlib.h"
 
 // ----------------------------------------------------------------------------
-// aflowlib.h stuff
+// aflow_pflow.h stuff
 #include "aflow_pflow.h"
 
 // ----------------------------------------------------------------------------

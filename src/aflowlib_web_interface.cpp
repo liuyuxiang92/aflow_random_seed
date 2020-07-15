@@ -11,6 +11,7 @@
 #ifndef _AFLOWLIB_WEB_INTERFACE_CPP_
 #define _AFLOWLIB_WEB_INTERFACE_CPP_
 #include "aflow.h"
+#include "aflow_pocc.h" //CO20200624
 #include "aflowlib_webapp_entry.cpp"  //CO20170622 - BH JMOL stuff
 #include "aflowlib_webapp_bands.cpp"  //CO20180305 - GG bands stuff
 
@@ -30,7 +31,7 @@ namespace aflowlib {
     vauid.clear();vauid.clear();
     aurl.clear();vaurl.clear();
     keywords.clear();vkeywords.clear();
-    aflowlib_date.clear();
+    aflowlib_date.clear();vaflowlib_date.clear(); //CO20200624 - adding LOCK date
     aflowlib_version.clear();
     aflowlib_entries.clear();vaflowlib_entries.clear();
     aflowlib_entries_number=0;
@@ -70,6 +71,8 @@ namespace aflowlib {
     kpoints_bands_path_grid=0;
     enthalpy_cell=AUROSTD_NAN;enthalpy_atom=AUROSTD_NAN;
     enthalpy_formation_cell=AUROSTD_NAN;enthalpy_formation_atom=AUROSTD_NAN;
+    enthalpy_formation_cce_300K_cell=AUROSTD_NAN;enthalpy_formation_cce_300K_atom=AUROSTD_NAN;  //CO20200624
+    enthalpy_formation_cce_0K_cell=AUROSTD_NAN;enthalpy_formation_cce_0K_atom=AUROSTD_NAN;  //CO20200624
     entropic_temperature=AUROSTD_NAN;
     files.clear();vfiles.clear();
     files_LIB.clear();vfiles_LIB.clear();
@@ -236,7 +239,7 @@ namespace aflowlib {
     vauid=b.vauid;vauid.clear();for(uint i=0;i<b.vauid.size();i++) vauid.push_back(b.vauid.at(i));
     aurl=b.aurl;vaurl.clear();for(uint i=0;i<b.vaurl.size();i++) vaurl.push_back(b.vaurl.at(i));
     vkeywords.clear();for(uint i=0;i<b.vkeywords.size();i++) vkeywords.push_back(b.vkeywords.at(i));
-    aflowlib_date=b.aflowlib_date;
+    aflowlib_date=b.aflowlib_date;vaflowlib_date.clear();for(uint i=0;i<b.vaflowlib_date.size();i++) vaflowlib_date.push_back(b.vaflowlib_date.at(i)); //CO20200624 - adding LOCK date
     aflowlib_version=b.aflowlib_version;
     aflowlib_entries=b.aflowlib_entries;
     vaflowlib_entries.clear();for(uint i=0;i<b.vaflowlib_entries.size();i++) vaflowlib_entries.push_back(b.vaflowlib_entries.at(i));
@@ -275,6 +278,8 @@ namespace aflowlib {
     kpoints_bands_path_grid=b.kpoints_bands_path_grid;
     enthalpy_cell=b.enthalpy_cell;enthalpy_atom=b.enthalpy_atom;
     enthalpy_formation_cell=b.enthalpy_formation_cell;enthalpy_formation_atom=b.enthalpy_formation_atom;
+    enthalpy_formation_cce_300K_cell=b.enthalpy_formation_cce_300K_cell;enthalpy_formation_cce_300K_atom=b.enthalpy_formation_cce_300K_atom;  //CO20200624
+    enthalpy_formation_cce_0K_cell=b.enthalpy_formation_cce_0K_cell;enthalpy_formation_cce_0K_atom=b.enthalpy_formation_cce_0K_atom;  //CO20200624
     entropic_temperature=b.entropic_temperature;
     files=b.files;vfiles.clear();for(uint i=0;i<b.vfiles.size();i++) vfiles.push_back(b.vfiles.at(i));
     files_LIB=b.files_LIB;vfiles_LIB.clear();for(uint i=0;i<b.vfiles_LIB.size();i++) vfiles_LIB.push_back(b.vfiles_LIB.at(i));
@@ -560,7 +565,7 @@ namespace aflowlib {
         else if(keyword=="aurl") {aurl=content;aurostd::string2tokens(content,stokens,":");for(uint j=0;j<stokens.size();j++) vaurl.push_back(stokens.at(j));}
         else if(keyword=="title") {title=content;}  //ME20190129
         else if(keyword=="keywords") {keywords=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vkeywords.push_back(stokens.at(j));}
-        else if(keyword=="aflowlib_date") {aflowlib_date=content;}
+        else if(keyword=="aflowlib_date") {aflowlib_date=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vaflowlib_date.push_back(stokens.at(j));} //CO20200624 - adding LOCK date
         else if(keyword=="aflowlib_version") {aflowlib_version=content;}
         else if(keyword=="aflowlib_entries") {aflowlib_entries=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vaflowlib_entries.push_back(stokens.at(j));}
         else if(keyword=="aflowlib_entries_number") {aflowlib_entries_number=aurostd::string2utype<int>(content);}
@@ -608,7 +613,11 @@ namespace aflowlib {
         else if(keyword=="enthalpy_cell") {enthalpy_cell=aurostd::string2utype<double>(content);}
         else if(keyword=="enthalpy_atom") {enthalpy_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="enthalpy_formation_cell") {enthalpy_formation_cell=aurostd::string2utype<double>(content);}
+        else if(keyword=="enthalpy_formation_cce_300K_cell") {enthalpy_formation_cce_300K_cell=aurostd::string2utype<double>(content);} //CO20200624
+        else if(keyword=="enthalpy_formation_cce_0K_cell") {enthalpy_formation_cce_0K_cell=aurostd::string2utype<double>(content);} //CO20200624
         else if(keyword=="enthalpy_formation_atom") {enthalpy_formation_atom=aurostd::string2utype<double>(content);}
+        else if(keyword=="enthalpy_formation_cce_300K_atom") {enthalpy_formation_cce_300K_atom=aurostd::string2utype<double>(content);} //CO20200624
+        else if(keyword=="enthalpy_formation_cce_0K_atom") {enthalpy_formation_cce_0K_atom=aurostd::string2utype<double>(content);} //CO20200624
         else if(keyword=="entropic_temperature") {entropic_temperature=aurostd::string2utype<double>(content);}
         else if(keyword=="files") {files=content;for(uint j=0;j<stokens.size();j++) vfiles.push_back(stokens.at(j));}
         else if(keyword=="files_LIB") {files_LIB=content;for(uint j=0;j<stokens.size();j++) vfiles_LIB.push_back(stokens.at(j));}
@@ -937,7 +946,11 @@ namespace aflowlib {
       oss << "enthalpy_cell=" << enthalpy_cell << (html?"<br>":"") << endl; 
       oss << "enthalpy_atom=" << enthalpy_atom << (html?"<br>":"") << endl; 
       oss << "enthalpy_formation_cell=" << enthalpy_formation_cell << (html?"<br>":"") << endl; 
+      oss << "enthalpy_formation_cce_300K_cell=" << enthalpy_formation_cce_300K_cell << (html?"<br>":"") << endl;   //CO20200624
+      oss << "enthalpy_formation_cce_0K_cell=" << enthalpy_formation_cce_0K_cell << (html?"<br>":"") << endl;   //CO20200624
       oss << "enthalpy_formation_atom=" << enthalpy_formation_atom << (html?"<br>":"") << endl; 
+      oss << "enthalpy_formation_cce_300K_atom=" << enthalpy_formation_cce_300K_atom << (html?"<br>":"") << endl;   //CO20200624
+      oss << "enthalpy_formation_cce_0K_atom=" << enthalpy_formation_cce_0K_atom << (html?"<br>":"") << endl;   //CO20200624
       oss << "entropic_temperature=" << entropic_temperature << (html?"<br>":"") << endl; 
       // oss << "files=" << files << "  vfiles= ";for(uint j=0;j<vfiles.size();j++) oss << vfiles.at(j) << " "; oss << (html?"<br>":"") << endl;
       // oss << "files_LIB=" << files_LIB << "  vfiles_LIB= ";for(uint j=0;j<vfiles_LIB.size();j++) oss << vfiles_LIB.at(j) << " "; oss << (html?"<br>":"") << endl;
@@ -1102,6 +1115,7 @@ namespace aflowlib {
 
   // aflowlib2string 
   string _aflowlib_entry::aflowlib2string(string mode) {
+    string soliloquy=XPID+"aflowlib::_aflowlib_entry::aflowlib2string():";
     stringstream sss("");
     //  string eendl="\n";
 
@@ -1188,7 +1202,11 @@ namespace aflowlib {
       if(eentropy_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "eentropy_cell=" << eentropy_cell << eendl;
       if(eentropy_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "eentropy_atom=" << eentropy_atom << eendl;
       if(enthalpy_formation_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cell=" << enthalpy_formation_cell << eendl;
+      if(enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_300K_cell=" << enthalpy_formation_cce_300K_cell << eendl; //CO20200624
+      if(enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_0K_cell=" << enthalpy_formation_cce_0K_cell << eendl; //CO20200624
       if(enthalpy_formation_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_atom=" << enthalpy_formation_atom << eendl;
+      if(enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_300K_atom=" << enthalpy_formation_cce_300K_atom << eendl; //CO20200624
+      if(enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_0K_atom=" << enthalpy_formation_cce_0K_atom << eendl; //CO20200624
       if(entropic_temperature!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "entropic_temperature=" << entropic_temperature << eendl;
       if(PV_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "PV_cell=" << PV_cell << eendl;
       if(PV_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "PV_atom=" << PV_atom << eendl;
@@ -1345,14 +1363,14 @@ namespace aflowlib {
       if(aflow_version.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_version=" << aflow_version << eendl;
       if(catalog.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "catalog=" << catalog << eendl;
       sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflowlib_version=" << string(AFLOW_VERSION) << eendl;
-      sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflowlib_date=" << aurostd::get_datetime() << "_GMT-5" << eendl;
+      sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflowlib_date=" << aurostd::joinWDelimiter(vaflowlib_date,",") << eendl;  //CO20200624 - adding LOCK date
       sss << endl;
 
     } // out
 
     // this is the aflowlib.json mode
     if(mode=="json" || mode=="JSON") {  //CO OPERATE HERE ALL THE STRINGS AS BEFORE
-      string eendl="";
+      string eendl=",";
       bool PRINT_NULL=FALSE;
       stringstream sscontent_json;
       vector<string> vcontent_json;
@@ -1364,253 +1382,253 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(auid.size()) {
-        sscontent_json << "\"aurl\":\"" << aurl << "\"" << eendl;
+        sscontent_json << "\"aurl\":\"" << aurl << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"aurl\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"aurl\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(auid.size()) {
-        sscontent_json << "\"auid\":\"" << auid << "\"" << eendl;
+        sscontent_json << "\"auid\":\"" << auid << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"auid\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"auid\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //ME20190125 BEGIN
       //////////////////////////////////////////////////////////////////////////
       if(!title.empty()) {
-        sscontent_json << "\"title\":\"" << title << "\"" << eendl;
+        sscontent_json << "\"title\":\"" << title << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"title\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"title\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //ME20190125 END
 
       //////////////////////////////////////////////////////////////////////////
       if(data_api.size()) {
-        sscontent_json << "\"data_api\":\"" << data_api << "\"" << eendl;
+        sscontent_json << "\"data_api\":\"" << data_api << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"data_api\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"data_api\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(data_source.size()) {
-        sscontent_json << "\"data_source\":\"" << data_source << "\"" << eendl;
+        sscontent_json << "\"data_source\":\"" << data_source << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"data_source\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"data_source\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(data_language.size()) {
-        sscontent_json << "\"data_language\":\"" << data_language << "\"" << eendl;
+        sscontent_json << "\"data_language\":\"" << data_language << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"data_language\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"data_language\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(error_status.size()) {
-        sscontent_json << "\"error_status\":\"" << error_status << "\"" << eendl;
+        sscontent_json << "\"error_status\":\"" << error_status << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"error_status\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"error_status\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       // LOOP
       //////////////////////////////////////////////////////////////////////////
       if(vloop.size()) {
         aurostd::sort(vloop);
-        sscontent_json << "\"loop\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vloop,"\""),",") << "]" << eendl;
+        sscontent_json << "\"loop\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vloop,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"loop\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"loop\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       // MATERIALS
       //////////////////////////////////////////////////////////////////////////
       if(code.size()) {
-        sscontent_json << "\"code\":\"" << code << "\"" << eendl;
+        sscontent_json << "\"code\":\"" << code << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"code\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"code\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(compound.size()) {
-        sscontent_json << "\"compound\":\"" << compound << "\"" << eendl;
+        sscontent_json << "\"compound\":\"" << compound << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"compound\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"compound\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(prototype.size()) {
-        sscontent_json << "\"prototype\":\"" << prototype << "\"" << eendl;
+        sscontent_json << "\"prototype\":\"" << prototype << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"prototype\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"prototype\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(nspecies!=AUROSTD_NAN) {
-        sscontent_json << "\"nspecies\":" << nspecies << eendl;
+        sscontent_json << "\"nspecies\":" << nspecies;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"nspecies\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"nspecies\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(natoms!=AUROSTD_NAN) {
-        sscontent_json << "\"natoms\":" << natoms << eendl;
+        sscontent_json << "\"natoms\":" << natoms;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"natoms\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"natoms\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //DX20190124 - add original crystal info - START
       //////////////////////////////////////////////////////////////////////////
       if(natoms_orig!=AUROSTD_NAN) {
-        sscontent_json << "\"natoms_orig\":" << natoms_orig << eendl;
+        sscontent_json << "\"natoms_orig\":" << natoms_orig;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"natoms_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"natoms_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //DX20190124 - add original crystal info - END
 
       //////////////////////////////////////////////////////////////////////////
       if(vcomposition.size()) {
         //aflowlib_libraries does not specify precision
-        sscontent_json << "\"composition\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vcomposition,9),",") << "]" << eendl;
+        sscontent_json << "\"composition\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vcomposition,9),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"composition\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"composition\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(density!=AUROSTD_NAN) {
-        sscontent_json << "\"density\":" << density << eendl;
+        sscontent_json << "\"density\":" << density;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"density\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"density\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //DX20190124 - add original crystal info - START
       //////////////////////////////////////////////////////////////////////////
       if(density_orig!=AUROSTD_NAN) {
-        sscontent_json << "\"density_orig\":" << density_orig << eendl;
+        sscontent_json << "\"density_orig\":" << density_orig;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"density_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"density_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //DX20190124 - add original crystal info - END
 
       //////////////////////////////////////////////////////////////////////////
       if(scintillation_attenuation_length!=AUROSTD_NAN) {
-        sscontent_json << "\"scintillation_attenuation_length\":" << scintillation_attenuation_length << eendl;
+        sscontent_json << "\"scintillation_attenuation_length\":" << scintillation_attenuation_length;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"scintillation_attenuation_length\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"scintillation_attenuation_length\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vstoichiometry.size()) {
         //aflowlib_libraries specifies precision of 9
-        sscontent_json << "\"stoichiometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vstoichiometry,9),",") << "]" << eendl;
+        sscontent_json << "\"stoichiometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vstoichiometry,9),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"stoichiometry\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"stoichiometry\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vspecies.size()) {
-        sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << "]" << eendl;
+        sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"species\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"species\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vspecies_pp.size()) {
-        sscontent_json << "\"species_pp\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp,"\""),",") << "]" << eendl;
+        sscontent_json << "\"species_pp\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"species_pp\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"species_pp\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(dft_type.size()) {
         //DX+CO START
-        //sscontent_json << "\"dft_type\":\"" << dft_type << "\"" << eendl; //CO, this is technically a vector (RESTAPI paper)
-        sscontent_json << "\"dft_type\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vdft_type,"\""),",") << "]" << eendl;
+        //sscontent_json << "\"dft_type\":\"" << dft_type << "\""; //CO, this is technically a vector (RESTAPI paper)
+        sscontent_json << "\"dft_type\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vdft_type,"\""),",") << "]";
         //DX+CO END
       } else {
-        if(PRINT_NULL) sscontent_json << "\"dft_type\":null" << dft_type << eendl;
+        if(PRINT_NULL) sscontent_json << "\"dft_type\":null" << dft_type;
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
-      // if(species_pp_type.size()) sscontent_json << "species_pp_type=" << species_pp_type << eendl;
+      // if(species_pp_type.size()) sscontent_json << "species_pp_type=" << species_pp_type;
 
       //////////////////////////////////////////////////////////////////////////
       if(vspecies_pp_version.size()) {
-        sscontent_json << "\"species_pp_version\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp_version,"\""),",") << "]" << eendl;
+        sscontent_json << "\"species_pp_version\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp_version,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"species_pp_version\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"species_pp_version\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vspecies_pp_ZVAL.size()) {
         //aflowlib_libraries does not specify precision
-        sscontent_json << "\"species_pp_ZVAL\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspecies_pp_ZVAL,9),",") << "]" << eendl;
+        sscontent_json << "\"species_pp_ZVAL\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspecies_pp_ZVAL,9),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"species_pp_ZVAL\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"species_pp_ZVAL\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vspecies_pp_AUID.size()) {
-        sscontent_json << "\"species_pp_AUID\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp_AUID,"\""),",") << "]" << eendl;
+        sscontent_json << "\"species_pp_AUID\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp_AUID,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"species_pp_AUID\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"species_pp_AUID\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(METAGGA.size()) {
-        sscontent_json << "\"metagga\":\"" << METAGGA << "\"" << eendl;
+        sscontent_json << "\"metagga\":\"" << METAGGA << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"metagga\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"metagga\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
@@ -1642,12 +1660,12 @@ namespace aflowlib {
           vs.push_back("["+aurostd::joinWDelimiter(L,",")+"]");
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(U,9),",")+"]");
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(J,9),",")+"]");
-          ss_helper << aurostd::joinWDelimiter(vs,",") << eendl;
+          ss_helper << aurostd::joinWDelimiter(vs,",");
           vector<string> ldau_keys;  //ME20190124
           aurostd::string2tokens("ldau_type,ldau_l,ldau_u,ldau_j", ldau_keys, ",");  //ME20190124
           for (uint i = 0; i < ldau_keys.size(); i++) {  //ME20190124
-            sscontent_json << "\"" << ldau_keys[i] << "\":" << vs[i] << eendl;  //ME20190124
-            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+            sscontent_json << "\"" << ldau_keys[i] << "\":" << vs[i];  //ME20190124
+            vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
           }
           vs.clear();
         }
@@ -1655,225 +1673,225 @@ namespace aflowlib {
         vs.clear();
       }
       if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
-        sscontent_json << "\"ldau_TLUJ\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
+        sscontent_json << "\"ldau_TLUJ\":[" << ss_helper.str() << "]"; ss_helper.str("");
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ldau_TLUJ\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ldau_TLUJ\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(valence_cell_iupac!=AUROSTD_NAN) {
-        sscontent_json << "\"valence_cell_iupac\":" << valence_cell_iupac << eendl;
+        sscontent_json << "\"valence_cell_iupac\":" << valence_cell_iupac;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"valence_cell_iupac\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"valence_cell_iupac\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(valence_cell_std!=AUROSTD_NAN) {
-        sscontent_json << "\"valence_cell_std\":" << valence_cell_std << eendl;
+        sscontent_json << "\"valence_cell_std\":" << valence_cell_std;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"valence_cell_std\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"valence_cell_std\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(volume_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"volume_cell\":" << volume_cell << eendl;
+        sscontent_json << "\"volume_cell\":" << volume_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"volume_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"volume_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(volume_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"volume_atom\":" << volume_atom << eendl;
+        sscontent_json << "\"volume_atom\":" << volume_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"volume_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"volume_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //DX20190124 - add original crystal info - START
       //////////////////////////////////////////////////////////////////////////
       if(volume_cell_orig!=AUROSTD_NAN) {
-        sscontent_json << "\"volume_cell_orig\":" << volume_cell_orig << eendl;
+        sscontent_json << "\"volume_cell_orig\":" << volume_cell_orig;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"volume_cell_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"volume_cell_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(volume_atom_orig!=AUROSTD_NAN) {
-        sscontent_json << "\"volume_atom_orig\":" << volume_atom_orig << eendl;
+        sscontent_json << "\"volume_atom_orig\":" << volume_atom_orig;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"volume_atom_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"volume_atom_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //DX20190124 - add original crystal info - END
 
       //////////////////////////////////////////////////////////////////////////
       if(pressure!=AUROSTD_NAN) {
-        sscontent_json << "\"pressure\":" << pressure << eendl;
+        sscontent_json << "\"pressure\":" << pressure;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"pressure\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"pressure\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vstress_tensor.size()) {
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"stress_tensor\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vstress_tensor,7),",") << "]" << eendl;
+        sscontent_json << "\"stress_tensor\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vstress_tensor,7),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"stress_tensor\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"stress_tensor\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(pressure_residual!=AUROSTD_NAN) {
-        sscontent_json << "\"pressure_residual\":" << pressure_residual << eendl;
+        sscontent_json << "\"pressure_residual\":" << pressure_residual;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"pressure_residual\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"pressure_residual\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Pulay_stress!=AUROSTD_NAN) {
-        sscontent_json << "\"Pulay_stress\":" << Pulay_stress << eendl;
+        sscontent_json << "\"Pulay_stress\":" << Pulay_stress;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Pulay_stress\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Pulay_stress\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vgeometry.size()) {
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"geometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vgeometry,7),",") << "]" << eendl;
+        sscontent_json << "\"geometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vgeometry,7),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"geometry\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"geometry\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //DX20190124 - add original crystal info - START
       //////////////////////////////////////////////////////////////////////////
       if(vgeometry_orig.size()) {
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"geometry_orig\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vgeometry_orig,7),",") << "]" << eendl;
+        sscontent_json << "\"geometry_orig\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vgeometry_orig,7),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"geometry_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"geometry_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //DX20190124 - add original crystal info - END
 
       //////////////////////////////////////////////////////////////////////////
       if(Egap!=AUROSTD_NAN) {
-        sscontent_json << "\"Egap\":" << Egap << eendl;
+        sscontent_json << "\"Egap\":" << Egap;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Egap\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Egap\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Egap_fit!=AUROSTD_NAN) {
-        sscontent_json << "\"Egap_fit\":" << Egap_fit << eendl;
+        sscontent_json << "\"Egap_fit\":" << Egap_fit;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Egap_fit\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Egap_fit\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Egap_type.size()) {
-        sscontent_json << "\"Egap_type\":\"" << Egap_type << "\"" << eendl;
+        sscontent_json << "\"Egap_type\":\"" << Egap_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Egap_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Egap_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(energy_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"energy_cell\":" << energy_cell << eendl;
+        sscontent_json << "\"energy_cell\":" << energy_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"energy_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"energy_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(energy_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"energy_atom\":" << energy_atom << eendl;
+        sscontent_json << "\"energy_atom\":" << energy_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"energy_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"energy_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(energy_cutoff!=AUROSTD_NAN) {
-        sscontent_json << "\"energy_cutoff\":" << energy_cutoff << eendl;
+        sscontent_json << "\"energy_cutoff\":" << energy_cutoff;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"energy_cutoff\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"energy_cutoff\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(delta_electronic_energy_convergence!=AUROSTD_NAN) {
-        sscontent_json << "\"delta_electronic_energy_convergence\":" << delta_electronic_energy_convergence << eendl;
+        sscontent_json << "\"delta_electronic_energy_convergence\":" << delta_electronic_energy_convergence;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"delta_electronic_energy_convergence\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"delta_electronic_energy_convergence\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(delta_electronic_energy_threshold!=AUROSTD_NAN) {
-        sscontent_json << "\"delta_electronic_energy_threshold\":" << delta_electronic_energy_threshold << eendl;
+        sscontent_json << "\"delta_electronic_energy_threshold\":" << delta_electronic_energy_threshold;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"delta_electronic_energy_threshold\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"delta_electronic_energy_threshold\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       // [NOT_PRINTED]     //////////////////////////////////////////////////////////////////////////
       // [NOT_PRINTED]     if(nkpoints!=0) {
-      // [NOT_PRINTED]       sscontent_json << "\"nkpoints\":" << nkpoints << eendl;
+      // [NOT_PRINTED]       sscontent_json << "\"nkpoints\":" << nkpoints;
       // [NOT_PRINTED]     } else {
-      // [NOT_PRINTED]       if(PRINT_NULL) sscontent_json << "\"nkpoints\":null" << eendl;
+      // [NOT_PRINTED]       if(PRINT_NULL) sscontent_json << "\"nkpoints\":null";
       // [NOT_PRINTED]     }
-      // [NOT_PRINTED]     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      // [NOT_PRINTED]     vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       // [NOT_PRINTED]     //////////////////////////////////////////////////////////////////////////
 
       // [NOT_PRINTED]     //////////////////////////////////////////////////////////////////////////
       // [NOT_PRINTED]     if(nkpoints_irreducible!=0) {
-      // [NOT_PRINTED]       sscontent_json << "\"nkpoints_irreducible\":" << nkpoints_irreducible << eendl;
+      // [NOT_PRINTED]       sscontent_json << "\"nkpoints_irreducible\":" << nkpoints_irreducible;
       // [NOT_PRINTED]     } else {
-      // [NOT_PRINTED]       if(PRINT_NULL) sscontent_json << "\"nkpoints_irreducible\":null" << eendl;
+      // [NOT_PRINTED]       if(PRINT_NULL) sscontent_json << "\"nkpoints_irreducible\":null";
       // [NOT_PRINTED]     }
-      // [NOT_PRINTED]     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      // [NOT_PRINTED]     vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       // [NOT_PRINTED]     //////////////////////////////////////////////////////////////////////////
 
       // [NOT_PRINTED]     //////////////////////////////////////////////////////////////////////////
       // [NOT_PRINTED]     if(kppra!=0) {
-      // [NOT_PRINTED]       sscontent_json << "\"kppra\":" << kppra << eendl;
+      // [NOT_PRINTED]       sscontent_json << "\"kppra\":" << kppra;
       // [NOT_PRINTED]     } else {
-      // [NOT_PRINTED]       if(PRINT_NULL) sscontent_json << "\"kppra\":null" << eendl;
+      // [NOT_PRINTED]       if(PRINT_NULL) sscontent_json << "\"kppra\":null";
       // [NOT_PRINTED]     }
-      // [NOT_PRINTED]     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      // [NOT_PRINTED]     vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       // [NOT_PRINTED]     //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
@@ -1884,18 +1902,18 @@ namespace aflowlib {
         //ME20190124 - Add the individual pieces of "kpoints" to the json file
         if ((kpoints_nnn_relax.rows==3) && (sum(kpoints_nnn_relax) > 0)) {  //ME20190128
           vs.push_back("["+aurostd::joinWDelimiter(kpoints_nnn_relax,",")+"]");
-          sscontent_json << "\"kpoints_relax\":" << vs.back() << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_relax\":" << vs.back();  //ME20190124
         } else if (PRINT_NULL) {  //ME20190124
-          sscontent_json << "\"kpoints_relax\":null" << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_relax\":null";  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+        vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
         if ((kpoints_nnn_static.rows==3) && (sum(kpoints_nnn_static) > 0)) {  //ME20190128
           vs.push_back("["+aurostd::joinWDelimiter(kpoints_nnn_static,",")+"]");
-          if (sum(kpoints_nnn_static) > 0) sscontent_json << "\"kpoints_static\":" << vs.back() << eendl;  //ME20190124
+          if (sum(kpoints_nnn_static) > 0) sscontent_json << "\"kpoints_static\":" << vs.back();  //ME20190124
         } else if (PRINT_NULL) {  //ME20190124
-          sscontent_json << "\"kpoints_static\":null" << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_static\":null";  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+        vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
         if(kpoints_pairs.size()){
           //first for escape characters in \Gamma or \Sigma
           vector<string> kpoints_pairs_new;
@@ -1906,245 +1924,281 @@ namespace aflowlib {
             kpoints_pairs_new.push_back(aurostd::StringSubst(kpoints_pairs.at(i),issue_ss.str(),fix_s));
           }
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(kpoints_pairs_new,"\""),",")+"]");
-          sscontent_json << "\"kpoints_bands_path\":" << vs.back() << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_bands_path\":" << vs.back();  //ME20190124
         } else if (PRINT_NULL) {  //ME20190124
-          sscontent_json << "\"kpoints_bands_path\":null" << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_bands_path\":null";  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+        vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
         ss_helper << aurostd::joinWDelimiter(vs, ",");  //ME20190128
         if(kpoints_bands_path_grid!=0){
           //ME20190128 - This causes kpoints to only be written when the band structure
           // was calculated. This is inconsistent with the aflowlib.out file
           // [OBSOLETE ME20190128] ss_helper << aurostd::joinWDelimiter(vs,",") << "," << aurostd::utype2string(kpoints_bands_path_grid);
           ss_helper << "," << aurostd::utype2string(kpoints_bands_path_grid);
-          sscontent_json << "\"kpoints_bands_nkpts\":" << ((int) kpoints_bands_path_grid) << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_bands_nkpts\":" << ((int) kpoints_bands_path_grid);  //ME20190124
         } else if (PRINT_NULL) {  //ME20190124
-          sscontent_json << "\"kpoints_bands_nkpts\":null" << eendl;  //ME20190124
+          sscontent_json << "\"kpoints_bands_nkpts\":null";  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+        vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
       }
       if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
-        sscontent_json << "\"kpoints\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
+        sscontent_json << "\"kpoints\":[" << ss_helper.str() << "]"; ss_helper.str("");
       } else {
-        if(PRINT_NULL) sscontent_json << "\"kpoints\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"kpoints\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"enthalpy_cell\":" << enthalpy_cell << eendl;
+        sscontent_json << "\"enthalpy_cell\":" << enthalpy_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"enthalpy_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"enthalpy_atom\":" << enthalpy_atom << eendl;
+        sscontent_json << "\"enthalpy_atom\":" << enthalpy_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"enthalpy_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(eentropy_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"eentropy_cell\":" << eentropy_cell << eendl;
+        sscontent_json << "\"eentropy_cell\":" << eentropy_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"eentropy_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"eentropy_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(eentropy_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"eentropy_atom\":" << eentropy_atom << eendl;
+        sscontent_json << "\"eentropy_atom\":" << eentropy_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"eentropy_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"eentropy_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"enthalpy_formation_cell\":" << enthalpy_formation_cell << eendl;
+        sscontent_json << "\"enthalpy_formation_cell\":" << enthalpy_formation_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+      
+      //////////////////////////////////////////////////////////////////////////
+      if(enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) {  //CO20200624
+        sscontent_json << "\"enthalpy_formation_cce_300K_cell\":" << enthalpy_formation_cce_300K_cell;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cce_300K_cell\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+      
+      //////////////////////////////////////////////////////////////////////////
+      if(enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) {  //CO20200624
+        sscontent_json << "\"enthalpy_formation_cce_0K_cell\":" << enthalpy_formation_cce_0K_cell;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cce_0K_cell\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"enthalpy_formation_atom\":" << enthalpy_formation_atom << eendl;
+        sscontent_json << "\"enthalpy_formation_atom\":" << enthalpy_formation_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+      
+      //////////////////////////////////////////////////////////////////////////
+      if(enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) {  //CO20200624
+        sscontent_json << "\"enthalpy_formation_cce_300K_atom\":" << enthalpy_formation_cce_300K_atom;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cce_300K_atom\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+      
+      //////////////////////////////////////////////////////////////////////////
+      if(enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) {  //CO20200624
+        sscontent_json << "\"enthalpy_formation_cce_0K_atom\":" << enthalpy_formation_cce_0K_atom;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cce_0K_atom\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(entropic_temperature!=AUROSTD_NAN) {
-        sscontent_json << "\"entropic_temperature\":" << entropic_temperature << eendl;
+        sscontent_json << "\"entropic_temperature\":" << entropic_temperature;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"entropic_temperature\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"entropic_temperature\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(PV_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"PV_cell\":" << PV_cell << eendl;
+        sscontent_json << "\"PV_cell\":" << PV_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"PV_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"PV_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(PV_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"PV_atom\":" << PV_atom << eendl;
+        sscontent_json << "\"PV_atom\":" << PV_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"PV_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"PV_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(spin_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"spin_cell\":" << spin_cell << eendl;
+        sscontent_json << "\"spin_cell\":" << spin_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spin_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spin_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(spin_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"spin_atom\":" << spin_atom << eendl;
+        sscontent_json << "\"spin_atom\":" << spin_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spin_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spin_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vspinD.size()) {
         //aflowlib_libraries specifies precision of 5
-        sscontent_json << "\"spinD\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspinD,5),",") << "]" << eendl;
+        sscontent_json << "\"spinD\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspinD,5),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spinD\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spinD\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vspinD_magmom_orig.size()) {
         //aflowlib_libraries specifies precision of 5
-        sscontent_json << "\"spinD_magmom_orig\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspinD_magmom_orig,5),",") << "]" << eendl;
+        sscontent_json << "\"spinD_magmom_orig\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspinD_magmom_orig,5),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spinD_magmom_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spinD_magmom_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(spinF!=AUROSTD_NAN) {
-        sscontent_json << "\"spinF\":" << spinF << eendl;
+        sscontent_json << "\"spinF\":" << spinF;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spinF\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spinF\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       // [OBSOLETE] 
       // [OBSOLETE] if(stoich.size()) {
       // [OBSOLETE]   //just use the string SC made
-      // [OBSOLETE]   sscontent_json << "\"stoich\":\"" << stoich << "\"" << eendl;
+      // [OBSOLETE]   sscontent_json << "\"stoich\":\"" << stoich << "\"";
       // [OBSOLETE]   ////aflowlib_libraries does not specify precision
-      // [OBSOLETE]   //sscontent_json << "\"stoich\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vstoich,9),",") << "]" << eendl;
+      // [OBSOLETE]   //sscontent_json << "\"stoich\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vstoich,9),",") << "]";
       // [OBSOLETE] } else {
-      // [OBSOLETE]   if(PRINT_NULL) sscontent_json << "\"stoich\":null" << eendl;
+      // [OBSOLETE]   if(PRINT_NULL) sscontent_json << "\"stoich\":null";
       // [OBSOLETE] }
-      // [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      // [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(calculation_time!=AUROSTD_NAN) {
-        sscontent_json << "\"calculation_time\":" << calculation_time << eendl;
+        sscontent_json << "\"calculation_time\":" << calculation_time;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"calculation_time\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"calculation_time\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(calculation_memory!=AUROSTD_NAN) {
-        sscontent_json << "\"calculation_memory\":" << calculation_memory << eendl;
+        sscontent_json << "\"calculation_memory\":" << calculation_memory;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"calculation_memory\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"calculation_memory\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(calculation_cores!=AUROSTD_NAN) {
-        sscontent_json << "\"calculation_cores\":" << calculation_cores << eendl;
+        sscontent_json << "\"calculation_cores\":" << calculation_cores;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"calculation_cores\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"calculation_cores\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vnbondxx.size()) {
         //aflowlib_libraries does not specify precision
-        sscontent_json << "\"nbondxx\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vnbondxx,9),",") << "]" << eendl;
+        sscontent_json << "\"nbondxx\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vnbondxx,9),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"nbondxx\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"nbondxx\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(sg.size()) {
         aurostd::string2tokens(sg,sg_tokens,",");
-        sscontent_json << "\"sg\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(sg_tokens,"\""),",") << "]" << eendl;
+        sscontent_json << "\"sg\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(sg_tokens,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"sg\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"sg\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(sg2.size()) {
         aurostd::string2tokens(sg2,sg_tokens,",");
-        sscontent_json << "\"sg2\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(sg_tokens,"\""),",") << "]" << eendl;
+        sscontent_json << "\"sg2\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(sg_tokens,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"sg2\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"sg2\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(spacegroup_orig.size()) {
-        sscontent_json << "\"spacegroup_orig\":" << spacegroup_orig << eendl;
+        sscontent_json << "\"spacegroup_orig\":" << spacegroup_orig;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spacegroup_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spacegroup_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(spacegroup_relax.size()) {
-        sscontent_json << "\"spacegroup_relax\":" << spacegroup_relax << eendl;
+        sscontent_json << "\"spacegroup_relax\":" << spacegroup_relax;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"spacegroup_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"spacegroup_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
@@ -2167,18 +2221,18 @@ namespace aflowlib {
             vs.push_back("["+aurostd::joinWDelimiter(vvs.at(i),",")+"]");
           }
           if(vs.size()){
-            ss_helper << aurostd::joinWDelimiter(vs,",") << eendl;
+            ss_helper << aurostd::joinWDelimiter(vs,",");
           }
         }
         vs.clear();
         vvs.clear();
       }
       if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
-        sscontent_json << "\"forces\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
+        sscontent_json << "\"forces\":[" << ss_helper.str() << "]"; ss_helper.str("");
       } else {
-        if(PRINT_NULL) sscontent_json << "\"forces\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"forces\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
@@ -2201,18 +2255,18 @@ namespace aflowlib {
             vs.push_back("["+aurostd::joinWDelimiter(vvs.at(i),",")+"]");
           }
           if(vs.size()){
-            ss_helper << aurostd::joinWDelimiter(vs,",") << eendl;
+            ss_helper << aurostd::joinWDelimiter(vs,",");
           }
         }
         vs.clear();
         vvs.clear();
       }
       if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
-        sscontent_json << "\"positions_cartesian\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
+        sscontent_json << "\"positions_cartesian\":[" << ss_helper.str() << "]"; ss_helper.str("");
       } else {
-        if(PRINT_NULL) sscontent_json << "\"positions_cartesian\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"positions_cartesian\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
@@ -2235,256 +2289,256 @@ namespace aflowlib {
             vs.push_back("["+aurostd::joinWDelimiter(vvs.at(i),",")+"]");
           }
           if(vs.size()){
-            ss_helper << aurostd::joinWDelimiter(vs,",") << eendl;
+            ss_helper << aurostd::joinWDelimiter(vs,",");
           }
         }
         vs.clear();
         vvs.clear();
       }
       if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
-        sscontent_json << "\"positions_fractional\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
+        sscontent_json << "\"positions_fractional\":[" << ss_helper.str() << "]"; ss_helper.str("");
       } else {
-        if(PRINT_NULL) sscontent_json << "\"positions_fractional\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"positions_fractional\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_orig.size()) {
-        sscontent_json << "\"Bravais_lattice_orig\":\"" << Bravais_lattice_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_orig\":\"" << Bravais_lattice_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(lattice_variation_orig.size()) {
-        sscontent_json << "\"lattice_variation_orig\":\"" << lattice_variation_orig << "\"" << eendl;
+        sscontent_json << "\"lattice_variation_orig\":\"" << lattice_variation_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"lattice_variation_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"lattice_variation_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(lattice_system_orig.size()) {
-        sscontent_json << "\"lattice_system_orig\":\"" << lattice_system_orig << "\"" << eendl;
+        sscontent_json << "\"lattice_system_orig\":\"" << lattice_system_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"lattice_system_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"lattice_system_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Pearson_symbol_orig.size()) {
-        sscontent_json << "\"Pearson_symbol_orig\":\"" << Pearson_symbol_orig << "\"" << eendl;
+        sscontent_json << "\"Pearson_symbol_orig\":\"" << Pearson_symbol_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_relax.size()) {
-        sscontent_json << "\"Bravais_lattice_relax\":\"" << Bravais_lattice_relax << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_relax\":\"" << Bravais_lattice_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(lattice_variation_relax.size()) {
-        sscontent_json << "\"lattice_variation_relax\":\"" << lattice_variation_relax << "\"" << eendl;
+        sscontent_json << "\"lattice_variation_relax\":\"" << lattice_variation_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"lattice_variation_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"lattice_variation_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(lattice_system_relax.size()) {
-        sscontent_json << "\"lattice_system_relax\":\"" << lattice_system_relax << "\"" << eendl;
+        sscontent_json << "\"lattice_system_relax\":\"" << lattice_system_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"lattice_system_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"lattice_system_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(Pearson_symbol_relax.size()) {
-        sscontent_json << "\"Pearson_symbol_relax\":\"" << Pearson_symbol_relax << "\"" << eendl;
+        sscontent_json << "\"Pearson_symbol_relax\":\"" << Pearson_symbol_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //DX20190124 - added original symmetry info - START
       // SYMMETRY
       //////////////////////////////////////////////////////////////////////////
       if(crystal_family_orig.size()){
-        sscontent_json << "\"crystal_family_orig\":\"" << crystal_family_orig << "\"" << eendl;
+        sscontent_json << "\"crystal_family_orig\":\"" << crystal_family_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"crystal_family_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"crystal_family_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(crystal_system_orig.size()){
-        sscontent_json << "\"crystal_system_orig\":\"" << crystal_system_orig << "\"" << eendl;
+        sscontent_json << "\"crystal_system_orig\":\"" << crystal_system_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"crystal_system_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"crystal_system_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(crystal_class_orig.size()){
-        sscontent_json << "\"crystal_class_orig\":\"" << crystal_class_orig << "\"" << eendl;
+        sscontent_json << "\"crystal_class_orig\":\"" << crystal_class_orig << "\"";
       } else {
-        if(PRINT_NULL){ sscontent_json << "\"crystal_class_orig\":null" << eendl;}
+        if(PRINT_NULL){ sscontent_json << "\"crystal_class_orig\":null";}
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_Hermann_Mauguin_orig.size()){
-        sscontent_json << "\"point_group_Hermann_Mauguin_orig\":\"" << point_group_Hermann_Mauguin_orig << "\"" << eendl;
+        sscontent_json << "\"point_group_Hermann_Mauguin_orig\":\"" << point_group_Hermann_Mauguin_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_Hermann_Mauguin_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_Hermann_Mauguin_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_Schoenflies_orig.size()){
-        sscontent_json << "\"point_group_Schoenflies_orig\":\"" << point_group_Schoenflies_orig << "\"" << eendl;
+        sscontent_json << "\"point_group_Schoenflies_orig\":\"" << point_group_Schoenflies_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_Schoenflies_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_Schoenflies_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_orbifold_orig.size()){
-        sscontent_json << "\"point_group_orbifold_orig\":\"" << point_group_orbifold_orig << "\"" << eendl;
+        sscontent_json << "\"point_group_orbifold_orig\":\"" << point_group_orbifold_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_orbifold_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_orbifold_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_type_orig.size()){
-        sscontent_json << "\"point_group_type_orig\":\"" << point_group_type_orig << "\"" << eendl;
+        sscontent_json << "\"point_group_type_orig\":\"" << point_group_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_order_orig!=AUROSTD_NAN){
-        sscontent_json << "\"point_group_order_orig\":" << point_group_order_orig << eendl; //DX20190124 - changed to number, not string 
+        sscontent_json << "\"point_group_order_orig\":" << point_group_order_orig; //DX20190124 - changed to number, not string 
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_order_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_order_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_structure_orig.size()){
-        sscontent_json << "\"point_group_structure_orig\":\"" << point_group_structure_orig << "\"" << eendl;
+        sscontent_json << "\"point_group_structure_orig\":\"" << point_group_structure_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_structure_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_structure_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_lattice_type_orig.size()){
-        sscontent_json << "\"Bravais_lattice_lattice_type_orig\":\"" << Bravais_lattice_lattice_type_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_lattice_type_orig\":\"" << Bravais_lattice_lattice_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_lattice_variation_type_orig.size()){
-        sscontent_json << "\"Bravais_lattice_lattice_variation_type_orig\":\"" << Bravais_lattice_lattice_variation_type_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_lattice_variation_type_orig\":\"" << Bravais_lattice_lattice_variation_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_variation_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_variation_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_lattice_system_orig.size()){
-        sscontent_json << "\"Bravais_lattice_lattice_system_orig\":\"" << Bravais_lattice_lattice_system_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_lattice_system_orig\":\"" << Bravais_lattice_lattice_system_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_system_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_system_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_superlattice_lattice_type_orig.size()){
-        sscontent_json << "\"Bravais_superlattice_lattice_type_orig\":\"" << Bravais_superlattice_lattice_type_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_superlattice_lattice_type_orig\":\"" << Bravais_superlattice_lattice_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_superlattice_lattice_variation_type_orig.size()){
-        sscontent_json << "\"Bravais_superlattice_lattice_variation_type_orig\":\"" << Bravais_superlattice_lattice_variation_type_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_superlattice_lattice_variation_type_orig\":\"" << Bravais_superlattice_lattice_variation_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_variation_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_variation_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_superlattice_lattice_system_orig.size()){
-        sscontent_json << "\"Bravais_superlattice_lattice_system_orig\":\"" << Bravais_superlattice_lattice_system_orig << "\"" << eendl;
+        sscontent_json << "\"Bravais_superlattice_lattice_system_orig\":\"" << Bravais_superlattice_lattice_system_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_system_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_system_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Pearson_symbol_superlattice_orig.size()){
-        sscontent_json << "\"Pearson_symbol_superlattice_orig\":\"" << Pearson_symbol_superlattice_orig << "\"" << eendl;
+        sscontent_json << "\"Pearson_symbol_superlattice_orig\":\"" << Pearson_symbol_superlattice_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_superlattice_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_superlattice_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(vreciprocal_geometry_orig.size()) {
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"reciprocal_geometry_orig\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry_orig,7),",") << "]" << eendl;
+        sscontent_json << "\"reciprocal_geometry_orig\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry_orig,7),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(reciprocal_volume_cell_orig!=AUROSTD_NAN) {
-        sscontent_json << "\"reciprocal_volume_cell_orig\":" << reciprocal_volume_cell_orig << eendl;
+        sscontent_json << "\"reciprocal_volume_cell_orig\":" << reciprocal_volume_cell_orig;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_volume_cell_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_volume_cell_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(reciprocal_lattice_type_orig.size()){
-        sscontent_json << "\"reciprocal_lattice_type_orig\":\"" << reciprocal_lattice_type_orig << "\"" << eendl;
+        sscontent_json << "\"reciprocal_lattice_type_orig\":\"" << reciprocal_lattice_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(reciprocal_lattice_variation_type_orig.size()){
-        sscontent_json << "\"reciprocal_lattice_variation_type_orig\":\"" << reciprocal_lattice_variation_type_orig << "\"" << eendl;
+        sscontent_json << "\"reciprocal_lattice_variation_type_orig\":\"" << reciprocal_lattice_variation_type_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_variation_type_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_variation_type_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_letters_orig.size()){
@@ -2496,12 +2550,12 @@ namespace aflowlib {
           aurostd::string2tokens(Wyckoff_letters_orig_set[w],Wyckoff_tokens,",");
           tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_letters_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]" << eendl;
-        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_letters_orig\":\"" << Wyckoff_letters_orig << "\"" << eendl;
+        sscontent_json << "\"Wyckoff_letters_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_letters_orig\":\"" << Wyckoff_letters_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Wyckoff_letters_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Wyckoff_letters_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_multiplicities_orig.size()){
@@ -2513,12 +2567,12 @@ namespace aflowlib {
           aurostd::string2tokens(Wyckoff_multiplicities_orig_set[w],Wyckoff_tokens,",");
           tmp_content.push_back("["+aurostd::joinWDelimiter(Wyckoff_tokens,",")+"]");
         }
-        sscontent_json << "\"Wyckoff_multiplicities_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]" << eendl;
-        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_multiplicities_orig\":\"" << Wyckoff_multiplicities_orig << "\"" << eendl;
+        sscontent_json << "\"Wyckoff_multiplicities_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_multiplicities_orig\":\"" << Wyckoff_multiplicities_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Wyckoff_multiplicities_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Wyckoff_multiplicities_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_site_symmetries_orig.size()){
@@ -2530,178 +2584,178 @@ namespace aflowlib {
           aurostd::string2tokens(Wyckoff_site_symmetries_orig_set[w],Wyckoff_tokens,",");
           tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_site_symmetries_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]" << eendl;
-        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_site_symmetries_orig\":\"" << Wyckoff_site_symmetries_orig << "\"" << eendl;
+        sscontent_json << "\"Wyckoff_site_symmetries_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_site_symmetries_orig\":\"" << Wyckoff_site_symmetries_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Wyckoff_site_symmetries_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Wyckoff_site_symmetries_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
 
       //DX20180823 - added more symmetry info - START
       // SYMMETRY
       //////////////////////////////////////////////////////////////////////////
       if(crystal_family.size()){
-        sscontent_json << "\"crystal_family\":\"" << crystal_family << "\"" << eendl;
+        sscontent_json << "\"crystal_family\":\"" << crystal_family << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"crystal_family\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"crystal_family\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(crystal_system.size()){
-        sscontent_json << "\"crystal_system\":\"" << crystal_system << "\"" << eendl;
+        sscontent_json << "\"crystal_system\":\"" << crystal_system << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"crystal_system\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"crystal_system\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(crystal_class.size()){
-        sscontent_json << "\"crystal_class\":\"" << crystal_class << "\"" << eendl;
+        sscontent_json << "\"crystal_class\":\"" << crystal_class << "\"";
       } else {
-        if(PRINT_NULL){ sscontent_json << "\"crystal_class\":null" << eendl;}
+        if(PRINT_NULL){ sscontent_json << "\"crystal_class\":null";}
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_Hermann_Mauguin.size()){
-        sscontent_json << "\"point_group_Hermann_Mauguin\":\"" << point_group_Hermann_Mauguin << "\"" << eendl;
+        sscontent_json << "\"point_group_Hermann_Mauguin\":\"" << point_group_Hermann_Mauguin << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_Hermann_Mauguin\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_Hermann_Mauguin\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_Schoenflies.size()){
-        sscontent_json << "\"point_group_Schoenflies\":\"" << point_group_Schoenflies << "\"" << eendl;
+        sscontent_json << "\"point_group_Schoenflies\":\"" << point_group_Schoenflies << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_Schoenflies\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_Schoenflies\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_orbifold.size()){
-        sscontent_json << "\"point_group_orbifold\":\"" << point_group_orbifold << "\"" << eendl;
+        sscontent_json << "\"point_group_orbifold\":\"" << point_group_orbifold << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_orbifold\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_orbifold\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_type.size()){
-        sscontent_json << "\"point_group_type\":\"" << point_group_type << "\"" << eendl;
+        sscontent_json << "\"point_group_type\":\"" << point_group_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_order!=AUROSTD_NAN){
-        sscontent_json << "\"point_group_order\":" << point_group_order << eendl; //DX20190124 - changed to number, not string 
+        sscontent_json << "\"point_group_order\":" << point_group_order; //DX20190124 - changed to number, not string 
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_order\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_order\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(point_group_structure.size()){
-        sscontent_json << "\"point_group_structure\":\"" << point_group_structure << "\"" << eendl;
+        sscontent_json << "\"point_group_structure\":\"" << point_group_structure << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"point_group_structure\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"point_group_structure\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_lattice_type.size()){
-        sscontent_json << "\"Bravais_lattice_lattice_type\":\"" << Bravais_lattice_lattice_type << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_lattice_type\":\"" << Bravais_lattice_lattice_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_lattice_variation_type.size()){
-        sscontent_json << "\"Bravais_lattice_lattice_variation_type\":\"" << Bravais_lattice_lattice_variation_type << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_lattice_variation_type\":\"" << Bravais_lattice_lattice_variation_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_variation_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_variation_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_lattice_lattice_system.size()){
-        sscontent_json << "\"Bravais_lattice_lattice_system\":\"" << Bravais_lattice_lattice_system << "\"" << eendl;
+        sscontent_json << "\"Bravais_lattice_lattice_system\":\"" << Bravais_lattice_lattice_system << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_system\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_lattice_lattice_system\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_superlattice_lattice_type.size()){
-        sscontent_json << "\"Bravais_superlattice_lattice_type\":\"" << Bravais_superlattice_lattice_type << "\"" << eendl;
+        sscontent_json << "\"Bravais_superlattice_lattice_type\":\"" << Bravais_superlattice_lattice_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_superlattice_lattice_variation_type.size()){
-        sscontent_json << "\"Bravais_superlattice_lattice_variation_type\":\"" << Bravais_superlattice_lattice_variation_type << "\"" << eendl;
+        sscontent_json << "\"Bravais_superlattice_lattice_variation_type\":\"" << Bravais_superlattice_lattice_variation_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_variation_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_variation_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Bravais_superlattice_lattice_system.size()){
-        sscontent_json << "\"Bravais_superlattice_lattice_system\":\"" << Bravais_superlattice_lattice_system << "\"" << eendl;
+        sscontent_json << "\"Bravais_superlattice_lattice_system\":\"" << Bravais_superlattice_lattice_system << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_system\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Bravais_superlattice_lattice_system\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Pearson_symbol_superlattice.size()){
-        sscontent_json << "\"Pearson_symbol_superlattice\":\"" << Pearson_symbol_superlattice << "\"" << eendl;
+        sscontent_json << "\"Pearson_symbol_superlattice\":\"" << Pearson_symbol_superlattice << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_superlattice\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Pearson_symbol_superlattice\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(vreciprocal_geometry.size()) {
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"reciprocal_geometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry,7),",") << "]" << eendl;
+        sscontent_json << "\"reciprocal_geometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry,7),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(reciprocal_volume_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"reciprocal_volume_cell\":" << reciprocal_volume_cell << eendl;
+        sscontent_json << "\"reciprocal_volume_cell\":" << reciprocal_volume_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_volume_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_volume_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(reciprocal_lattice_type.size()){
-        sscontent_json << "\"reciprocal_lattice_type\":\"" << reciprocal_lattice_type << "\"" << eendl;
+        sscontent_json << "\"reciprocal_lattice_type\":\"" << reciprocal_lattice_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(reciprocal_lattice_variation_type.size()){
-        sscontent_json << "\"reciprocal_lattice_variation_type\":\"" << reciprocal_lattice_variation_type << "\"" << eendl;
+        sscontent_json << "\"reciprocal_lattice_variation_type\":\"" << reciprocal_lattice_variation_type << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_variation_type\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_lattice_variation_type\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_letters.size()){
@@ -2713,12 +2767,12 @@ namespace aflowlib {
           aurostd::string2tokens(Wyckoff_letters_set[w],Wyckoff_tokens,",");
           tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_letters\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]" << eendl;
-        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_letters\":\"" << Wyckoff_letters << "\"" << eendl;
+        sscontent_json << "\"Wyckoff_letters\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_letters\":\"" << Wyckoff_letters << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Wyckoff_letters\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Wyckoff_letters\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_multiplicities.size()){
@@ -2730,12 +2784,12 @@ namespace aflowlib {
           aurostd::string2tokens(Wyckoff_multiplicities_set[w],Wyckoff_tokens,",");
           tmp_content.push_back("["+aurostd::joinWDelimiter(Wyckoff_tokens,",")+"]");
         }
-        sscontent_json << "\"Wyckoff_multiplicities\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]" << eendl;
-        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_multiplicities\":\"" << Wyckoff_multiplicities << "\"" << eendl;
+        sscontent_json << "\"Wyckoff_multiplicities\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_multiplicities\":\"" << Wyckoff_multiplicities << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Wyckoff_multiplicities\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Wyckoff_multiplicities\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_site_symmetries.size()){
@@ -2747,338 +2801,338 @@ namespace aflowlib {
           aurostd::string2tokens(Wyckoff_site_symmetries_set[w],Wyckoff_tokens,",");
           tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_site_symmetries\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]" << eendl;
-        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_site_symmetries\":\"" << Wyckoff_site_symmetries << "\"" << eendl;
+        sscontent_json << "\"Wyckoff_site_symmetries\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_site_symmetries\":\"" << Wyckoff_site_symmetries << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"Wyckoff_site_symmetries\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"Wyckoff_site_symmetries\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //DX20190208 - added anrl info - START
       // ANRL
       //////////////////////////////////////////////////////////////////////////
       if(anrl_label_orig.size()){
-        sscontent_json << "\"anrl_label_orig\":\"" << anrl_label_orig << "\"" << eendl;
+        sscontent_json << "\"anrl_label_orig\":\"" << anrl_label_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_label_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"anrl_label_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(anrl_parameter_list_orig.size()){
         vector<string> anrl_parameters_vector_orig; aurostd::string2tokens(anrl_parameter_list_orig,anrl_parameters_vector_orig,",");
-        sscontent_json << "\"anrl_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_orig,"\""),",") << "]" << eendl;
+        sscontent_json << "\"anrl_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_orig,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(anrl_parameter_values_orig.size()){
         vector<string> anrl_values_vector_orig; aurostd::string2tokens(anrl_parameter_values_orig,anrl_values_vector_orig,",");
-        sscontent_json << "\"anrl_parameter_values_orig\":[" << aurostd::joinWDelimiter(anrl_values_vector_orig,",") << "]" << eendl;
+        sscontent_json << "\"anrl_parameter_values_orig\":[" << aurostd::joinWDelimiter(anrl_values_vector_orig,",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_orig\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_orig\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(anrl_label_relax.size()){
-        sscontent_json << "\"anrl_label_relax\":\"" << anrl_label_relax << "\"" << eendl;
+        sscontent_json << "\"anrl_label_relax\":\"" << anrl_label_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_label_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"anrl_label_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(anrl_parameter_list_relax.size()){
         vector<string> anrl_parameters_vector_relax; aurostd::string2tokens(anrl_parameter_list_relax,anrl_parameters_vector_relax,",");
-        sscontent_json << "\"anrl_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_relax,"\""),",") << "]" << eendl;
+        sscontent_json << "\"anrl_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_relax,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
       if(anrl_parameter_values_relax.size()){
         vector<string> anrl_values_vector_relax; aurostd::string2tokens(anrl_parameter_values_relax,anrl_values_vector_relax,",");
-        sscontent_json << "\"anrl_parameter_values_relax\":[" << aurostd::joinWDelimiter(anrl_values_vector_relax,",") << "]" << eendl;
+        sscontent_json << "\"anrl_parameter_values_relax\":[" << aurostd::joinWDelimiter(anrl_values_vector_relax,",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_relax\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_relax\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //DX20190208 - added anrl info - END
 
       // AGL/AEL
       //////////////////////////////////////////////////////////////////////////
       if(agl_thermal_conductivity_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_thermal_conductivity_300K\":" << agl_thermal_conductivity_300K << eendl;
+        sscontent_json << "\"agl_thermal_conductivity_300K\":" << agl_thermal_conductivity_300K;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_thermal_conductivity_300K\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_thermal_conductivity_300K\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_debye!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_debye\":" << agl_debye << eendl;
+        sscontent_json << "\"agl_debye\":" << agl_debye;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_debye\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_debye\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_acoustic_debye!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_acoustic_debye\":" << agl_acoustic_debye << eendl;
+        sscontent_json << "\"agl_acoustic_debye\":" << agl_acoustic_debye;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_acoustic_debye\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_acoustic_debye\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_gruneisen!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_gruneisen\":" << agl_gruneisen << eendl;
+        sscontent_json << "\"agl_gruneisen\":" << agl_gruneisen;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_gruneisen\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_gruneisen\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_heat_capacity_Cv_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_heat_capacity_Cv_300K\":" << agl_heat_capacity_Cv_300K << eendl;
+        sscontent_json << "\"agl_heat_capacity_Cv_300K\":" << agl_heat_capacity_Cv_300K;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_heat_capacity_Cv_300K\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_heat_capacity_Cv_300K\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_heat_capacity_Cp_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_heat_capacity_Cp_300K\":" << agl_heat_capacity_Cp_300K << eendl;
+        sscontent_json << "\"agl_heat_capacity_Cp_300K\":" << agl_heat_capacity_Cp_300K;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_heat_capacity_Cp_300K\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_heat_capacity_Cp_300K\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_thermal_expansion_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_thermal_expansion_300K\":" << agl_thermal_expansion_300K << eendl;
+        sscontent_json << "\"agl_thermal_expansion_300K\":" << agl_thermal_expansion_300K;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_thermal_expansion_300K\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_thermal_expansion_300K\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_bulk_modulus_static_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_bulk_modulus_static_300K\":" << agl_bulk_modulus_static_300K << eendl;
+        sscontent_json << "\"agl_bulk_modulus_static_300K\":" << agl_bulk_modulus_static_300K;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_bulk_modulus_static_300K\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_bulk_modulus_static_300K\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(agl_bulk_modulus_isothermal_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_bulk_modulus_isothermal_300K\":" << agl_bulk_modulus_isothermal_300K << eendl;
+        sscontent_json << "\"agl_bulk_modulus_isothermal_300K\":" << agl_bulk_modulus_isothermal_300K;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_bulk_modulus_isothermal_300K\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_bulk_modulus_isothermal_300K\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(agl_poisson_ratio_source.size()) {
-        sscontent_json << "\"agl_poisson_ratio_source\":\"" << agl_poisson_ratio_source << "\"" << eendl;
+        sscontent_json << "\"agl_poisson_ratio_source\":\"" << agl_poisson_ratio_source << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_poisson_ratio_source\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_poisson_ratio_source\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(agl_vibrational_free_energy_300K_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_vibrational_free_energy_300K_cell\":" << agl_vibrational_free_energy_300K_cell << eendl;
+        sscontent_json << "\"agl_vibrational_free_energy_300K_cell\":" << agl_vibrational_free_energy_300K_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_free_energy_300K_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_free_energy_300K_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(agl_vibrational_free_energy_300K_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_vibrational_free_energy_300K_atom\":" << agl_vibrational_free_energy_300K_atom << eendl;
+        sscontent_json << "\"agl_vibrational_free_energy_300K_atom\":" << agl_vibrational_free_energy_300K_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_free_energy_300K_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_free_energy_300K_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(agl_vibrational_entropy_300K_cell!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_vibrational_entropy_300K_cell\":" << agl_vibrational_entropy_300K_cell << eendl;
+        sscontent_json << "\"agl_vibrational_entropy_300K_cell\":" << agl_vibrational_entropy_300K_cell;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_entropy_300K_cell\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_entropy_300K_cell\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(agl_vibrational_entropy_300K_atom!=AUROSTD_NAN) {
-        sscontent_json << "\"agl_vibrational_entropy_300K_atom\":" << agl_vibrational_entropy_300K_atom << eendl;
+        sscontent_json << "\"agl_vibrational_entropy_300K_atom\":" << agl_vibrational_entropy_300K_atom;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_entropy_300K_atom\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"agl_vibrational_entropy_300K_atom\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_poisson_ratio!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_poisson_ratio\":" << ael_poisson_ratio << eendl;
+        sscontent_json << "\"ael_poisson_ratio\":" << ael_poisson_ratio;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_poisson_ratio\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_poisson_ratio\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_bulk_modulus_voigt!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_bulk_modulus_voigt\":" << ael_bulk_modulus_voigt << eendl;
+        sscontent_json << "\"ael_bulk_modulus_voigt\":" << ael_bulk_modulus_voigt;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_bulk_modulus_voigt\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_bulk_modulus_voigt\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_bulk_modulus_reuss!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_bulk_modulus_reuss\":" << ael_bulk_modulus_reuss << eendl;
+        sscontent_json << "\"ael_bulk_modulus_reuss\":" << ael_bulk_modulus_reuss;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_bulk_modulus_reuss\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_bulk_modulus_reuss\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_shear_modulus_voigt!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_shear_modulus_voigt\":" << ael_shear_modulus_voigt << eendl;
+        sscontent_json << "\"ael_shear_modulus_voigt\":" << ael_shear_modulus_voigt;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_shear_modulus_voigt\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_shear_modulus_voigt\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_shear_modulus_reuss!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_shear_modulus_reuss\":" << ael_shear_modulus_reuss << eendl;
+        sscontent_json << "\"ael_shear_modulus_reuss\":" << ael_shear_modulus_reuss;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_shear_modulus_reuss\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_shear_modulus_reuss\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_bulk_modulus_vrh!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_bulk_modulus_vrh\":" << ael_bulk_modulus_vrh << eendl; //CT20190117
+        sscontent_json << "\"ael_bulk_modulus_vrh\":" << ael_bulk_modulus_vrh; //CT20190117
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_bulk_modulus_vrh\":null" << eendl; //CT20190117
+        if(PRINT_NULL) sscontent_json << "\"ael_bulk_modulus_vrh\":null"; //CT20190117
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_shear_modulus_vrh!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_shear_modulus_vrh\":" << ael_shear_modulus_vrh << eendl;
+        sscontent_json << "\"ael_shear_modulus_vrh\":" << ael_shear_modulus_vrh;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_shear_modulus_vrh\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_shear_modulus_vrh\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(ael_elastic_anisotropy!=AUROSTD_NAN) { //CO20181129
-        sscontent_json << "\"ael_elastic_anisotropy\":" << ael_elastic_anisotropy << eendl; //CO20181129
+        sscontent_json << "\"ael_elastic_anisotropy\":" << ael_elastic_anisotropy; //CO20181129
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_elastic_anisotropy\":null" << eendl; //CO20181129
+        if(PRINT_NULL) sscontent_json << "\"ael_elastic_anisotropy\":null"; //CO20181129
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_youngs_modulus_vrh!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_youngs_modulus_vrh\":" << ael_youngs_modulus_vrh << eendl;
+        sscontent_json << "\"ael_youngs_modulus_vrh\":" << ael_youngs_modulus_vrh;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_youngs_modulus_vrh\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_youngs_modulus_vrh\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_speed_sound_transverse!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_speed_sound_transverse\":" << ael_speed_sound_transverse << eendl;
+        sscontent_json << "\"ael_speed_sound_transverse\":" << ael_speed_sound_transverse;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_speed_sound_transverse\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_speed_sound_transverse\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_speed_sound_longitudinal!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_speed_sound_longitudinal\":" << ael_speed_sound_longitudinal << eendl;
+        sscontent_json << "\"ael_speed_sound_longitudinal\":" << ael_speed_sound_longitudinal;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_speed_sound_longitudinal\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_speed_sound_longitudinal\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       ////////////////////////////////////////////////////////////////////////// 
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_speed_sound_average!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_speed_sound_average\":" << ael_speed_sound_average << eendl;
+        sscontent_json << "\"ael_speed_sound_average\":" << ael_speed_sound_average;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_speed_sound_average\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_speed_sound_average\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_pughs_modulus_ratio!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_pughs_modulus_ratio\":" << ael_pughs_modulus_ratio << eendl;
+        sscontent_json << "\"ael_pughs_modulus_ratio\":" << ael_pughs_modulus_ratio;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_pughs_modulus_ratio\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_pughs_modulus_ratio\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_debye_temperature!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_debye_temperature\":" << ael_debye_temperature << eendl;
+        sscontent_json << "\"ael_debye_temperature\":" << ael_debye_temperature;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_debye_temperature\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_debye_temperature\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_applied_pressure!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_applied_pressure\":" << ael_applied_pressure << eendl;
+        sscontent_json << "\"ael_applied_pressure\":" << ael_applied_pressure;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_applied_pressure\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_applied_pressure\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////CT20181212
       if(ael_average_external_pressure!=AUROSTD_NAN) {
-        sscontent_json << "\"ael_average_external_pressure\":" << ael_average_external_pressure << eendl;
+        sscontent_json << "\"ael_average_external_pressure\":" << ael_average_external_pressure;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"ael_average_external_pressure\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"ael_average_external_pressure\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////ME20191105
@@ -3091,9 +3145,9 @@ namespace aflowlib {
         }
         sscontent_json << "]";
       } else {
-        if (PRINT_NULL) sscontent_json << "\"ael_stiffness_tensor\":null" << eendl;
+        if (PRINT_NULL) sscontent_json << "\"ael_stiffness_tensor\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////ME20191105
       if ((ael_compliance_tensor.rows == 6) && (ael_compliance_tensor.cols == 6)) {
@@ -3105,107 +3159,113 @@ namespace aflowlib {
         }
         sscontent_json << "]";
       } else {
-        if (PRINT_NULL) sscontent_json << "\"ael_compliance_tensor\":null" << eendl;
+        if (PRINT_NULL) sscontent_json << "\"ael_compliance_tensor\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       // BADER
       //////////////////////////////////////////////////////////////////////////
       if(vbader_net_charges.size()) {
-        sscontent_json << "\"bader_net_charges\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vbader_net_charges,6),",") << "]" << eendl;
+        sscontent_json << "\"bader_net_charges\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vbader_net_charges,6),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"bader_net_charges\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"bader_net_charges\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(vbader_atomic_volumes.size()) {
-        sscontent_json << "\"bader_atomic_volumes\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vbader_atomic_volumes,4),",") << "]" << eendl;
+        sscontent_json << "\"bader_atomic_volumes\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vbader_atomic_volumes,4),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"bader_atomic_volumes\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"bader_atomic_volumes\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       // FILES
       //////////////////////////////////////////////////////////////////////////
       if(vfiles.size()) {
         aurostd::sort(vfiles);
-        sscontent_json << "\"files\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vfiles,"\""),",") << "]" << eendl;
+        sscontent_json << "\"files\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vfiles,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"files\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"files\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       // CPUS
       //////////////////////////////////////////////////////////////////////////
       if(node_CPU_Model.size()) {
-        sscontent_json << "\"node_CPU_Model\":\"" << node_CPU_Model << "\"" << eendl;
+        sscontent_json << "\"node_CPU_Model\":\"" << node_CPU_Model << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"node_CPU_Model\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"node_CPU_Model\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(node_CPU_Cores!=AUROSTD_NAN) {
-        sscontent_json << "\"node_CPU_Cores\":" << node_CPU_Cores << eendl;
+        sscontent_json << "\"node_CPU_Cores\":" << node_CPU_Cores;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"node_CPU_Cores\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"node_CPU_Cores\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(node_CPU_MHz!=AUROSTD_NAN) {
-        sscontent_json << "\"node_CPU_MHz\":" << node_CPU_MHz << eendl;
+        sscontent_json << "\"node_CPU_MHz\":" << node_CPU_MHz;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"node_CPU_MHz\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"node_CPU_MHz\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
       if(node_RAM_GB!=INF) {
-        sscontent_json << "\"node_RAM_GB\":" << node_RAM_GB << eendl;
+        sscontent_json << "\"node_RAM_GB\":" << node_RAM_GB;
       } else {
-        if(PRINT_NULL) sscontent_json << "\"node_RAM_GB\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"node_RAM_GB\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       // VERSION/DATE
       //////////////////////////////////////////////////////////////////////////
       if(aflow_version.size()) {
-        sscontent_json << "\"aflow_version\":\"" << aflow_version << "\"" << eendl;
+        sscontent_json << "\"aflow_version\":\"" << aflow_version << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"aflow_version\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"aflow_version\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-
+      
       //////////////////////////////////////////////////////////////////////////
       if(catalog.size()) {
-        sscontent_json << "\"catalog\":\"" << catalog << "\"" << eendl;
+        sscontent_json << "\"catalog\":\"" << catalog << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"catalog\":null" << eendl;
+        if(PRINT_NULL) sscontent_json << "\"catalog\":null";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      sscontent_json << "\"aflowlib_version\":\"" << string(AFLOW_VERSION) << "\"" << eendl;  //CO20170613
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"aflowlib_version\":\"" << string(AFLOW_VERSION) << "\"";  //CO20170613
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      sscontent_json << "\"aflowlib_date\":\"" << aurostd::get_datetime() << "_GMT-5\"" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //[CO20200624 - OBSOLETE]sscontent_json << "\"aflowlib_date\":\"" << aurostd::get_datetime() << "_GMT-5\"";
+      //[CO20200624 - OBSOLETE]vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      if(vaflowlib_date.size()) {
+        sscontent_json << "\"aflowlib_date\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vaflowlib_date,"\""),",") << "]";
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"aflowlib_date\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
-      sss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
+      sss << "{" << aurostd::joinWDelimiter(vcontent_json,eendl)  << "}";
       vcontent_json.clear();
 
       sss << endl;
@@ -3219,6 +3279,20 @@ namespace aflowlib {
     string aflowlib_out=aflowlib2string(mode);
     aurostd::string2file(aflowlib_out,file);
     return aflowlib_out;
+  }
+}
+
+//CO20200624 - CCE corrections
+namespace aflowlib {
+  double _aflowlib_entry::enthalpyFormationCell(int T) const { //CO20200624
+    if(T==300 && enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_300K_cell;
+    if(T==0 && enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_0K_cell;
+    return enthalpy_formation_cell;
+  }
+  double _aflowlib_entry::enthalpyFormationAtom(int T) const { //CO20200624
+    if(T==300 && enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_300K_atom;
+    if(T==0 && enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_0K_atom;
+    return enthalpy_formation_atom;
   }
 }
 
@@ -3623,12 +3697,86 @@ namespace aflowlib {
 // auid2present
 // **************************************************************************
 namespace aflowlib {
-  bool _aflowlib_entry::directory2auid(string directory) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: BEGIN" << endl;
-    auid="";
-    vauid.clear();
+  string _aflowlib_entry::directory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
+    //CO20200624 - THIS IS HOW WE CREATE AUID FOR POCC STRUCTURES
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy=XPID+"_aflowlib_entry::directory2MetadataAUIDjsonfile():";
+    stringstream message;
+    
+    if(aurl.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AURL has not been calculated",_INPUT_MISSING_);}
 
+    string system_name=KBIN::ExtractSystemName(directory);
+    if(system_name.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name found",_FILE_CORRUPT_);}
+    if(LDEBUG){cerr << soliloquy << " system_name=" << system_name << endl;}
+    if(system_name.find(":TOL_")==string::npos){
+      int prec=3;
+      prec=(int)ceil(log10(1.0/DEFAULT_POCC_SITE_TOL));
+      system_name+=":TOL_"+aurostd::utype2string(DEFAULT_POCC_SITE_TOL,prec);
+      prec=(int)ceil(log10(1.0/DEFAULT_POCC_STOICH_TOL));
+      system_name+="_"+aurostd::utype2string(DEFAULT_POCC_STOICH_TOL,prec);
+    }
+    if(LDEBUG){cerr << soliloquy << " system_name(with TOL)=" << system_name << endl;}
+
+    _aflags aflags;aflags.Directory=directory;
+    pocc::POccCalculator pcalc(aflags);
+    pcalc.loadDataIntoCalculator();
+    if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+    vector<string> vauid_aruns;
+    string aurl_arun="";
+    for(uint i=0;i<pcalc.m_ARUN_directories.size();i++){
+      aurl_arun=aurl+"/"+pcalc.m_ARUN_directories[i];
+      if(LDEBUG){
+        cerr << soliloquy << " m_ARUN_directories[" << i << "]=" << pcalc.m_ARUN_directories[i] << endl;
+        cerr << soliloquy << " m_ARUN_directories[" << i << "].aurl=" << aurl_arun << endl;
+      }
+      vauid_aruns.push_back(VASPdirectory2auid(aurostd::CleanFileName(directory+"/"+pcalc.m_ARUN_directories[i]),aurl_arun));
+      if(LDEBUG){cerr << soliloquy << " m_ARUN_directories[" << i << "].auid=" << vauid_aruns.back() << endl;}
+    }
+
+    stringstream sscontent_json;
+    string eendl="";
+    vector<string> vcontent_json;
+    
+    sscontent_json << "\"salt\":" << aurostd::utype2string(salt);vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
+    sscontent_json << "\"aflow_type\":" << "\"aggregate\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
+    sscontent_json << "\"method\":" << "\"aflow_pocc\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
+    sscontent_json << "\"aggregate_parameters\":" << "\"" << system_name << "\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
+    sscontent_json << "\"aggregate_content\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vauid_aruns,"\""),",") << "]";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
+    
+    string metadata_auid_json="";
+    uint64_t crc=0;
+
+    metadata_auid_json="{"+aurostd::joinWDelimiter(vcontent_json,",")+"}";
+    if(LDEBUG){cerr << soliloquy << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
+    //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
+    crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
+    auid="aflow:"+aurostd::crc2string(crc);
+
+    //find conflicts
+    string aurl_found="";
+    if(aflowlib::auid2present(auid,aurl_found,1)){
+      if(LDEBUG) cerr << soliloquy << " conflict auid=" << auid << endl;	
+      message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
+      if(aurl_found!=aurl) { // avoid conflict with yourself
+        salt++;
+        metadata_auid_json=directory2MetadataAUIDjsonfile(directory,salt);
+        if(LDEBUG){cerr << soliloquy << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
+        //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
+        crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
+        auid="aflow:"+aurostd::crc2string(crc);
+      } else {
+        message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
+      }
+    }
+
+    return metadata_auid_json;
+  }
+  string VASPdirectory2auid(const string& directory,const string& aurl){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aflowlib::VASPdirectory2auid():";
+    stringstream message;
+
+    string auid="";
     bool conflict=TRUE; 
     while (conflict) {
       uint64_t crc=0;
@@ -3645,24 +3793,24 @@ namespace aflowlib {
         vfiles2.push_back("OUTCAR"+XHOST.vext.at(iext));
       }
 
-      if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: [0]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [0]" << endl;
 
       for(uint i=0;i<vfiles2.size();i++) 
         if(aurostd::FileExist(directory+"/"+vfiles2.at(i)))
           crc=aurostd::crc64(crc,aurostd::efile2string(directory+"/"+vfiles2.at(i))); // DONT TOUCH THIS
       auid="aflow:"+aurostd::crc2string(crc);
 
-      if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: [1]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [1]" << endl;
 
-      if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: auid=" << auid << endl;
+      if(LDEBUG) cerr << soliloquy << " auid=" << auid << endl;
       conflict=FALSE;
-      string aurl_found;
+      string aurl_found="";
       if(aflowlib::auid2present(auid,aurl_found,1)) {
-        if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: conflict auid=" << auid << endl;	
-        cerr << XPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl << endl;
+        if(LDEBUG) cerr << soliloquy << " conflict auid=" << auid << endl;	
+        message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_); //CO20200624
         if(aurl_found!=aurl) { // avoid conflict with yourself
           string salt="AUID_salt["+aurostd::utype2string<long double>(aurostd::get_useconds())+"]";
-          cerr << XPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRUE      " << auid << " " << aurl_found << " " << aurl << "  " << salt << endl;
+          message << "CONFLICT TRUE      " << auid << " " << aurl_found << " " << aurl << "  " << salt;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_WARNING_); //CO20200624
           string file=vfiles2.at(0);
           //
           for(uint iext=0;iext<XHOST.vext.size();iext++) { aurostd::StringSubst(file,XHOST.vext.at(iext),""); }
@@ -3672,12 +3820,16 @@ namespace aflowlib {
           //
           conflict=TRUE; // recheck
         } else {
-          cerr << XPID << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl << endl;
+          message << "CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_); //CO20200624
         }
       }
     }
-
-    // now it has auid   
+    return auid;
+  }
+  bool _aflowlib_entry::directory2auid(const string& directory) { //CO20200624
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << XPID << "_aflowlib_entry::directory2auid: BEGIN" << endl;
+    auid=VASPdirectory2auid(directory,aurl); // now it has auid   
     vauid.clear();
     aflowlib::auid2vauid(auid,vauid);
 
@@ -3797,7 +3949,7 @@ namespace aflowlib {
   string auid2directory(const string auid) {                                // gives AUID directory from existence of vauid
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "aflowlib::auid2directory: BEGIN" << endl;
-    string directory;
+    string directory="";  //CO20200624
     deque<string> vauid;
     aflowlib::auid2vauid(auid,vauid);
     if(vauid.size()>0) {
@@ -3986,10 +4138,10 @@ namespace aflowlib {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==0) {
-      if(mode=="AFLOWLIB_AUID2AURL") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2aurl=auid1,auid2....");
-      if(mode=="AFLOWLIB_AURL2AUID") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2auid=aurl1,aurl2....");
-      if(mode=="AFLOWLIB_AUID2LOOP") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2loop=auid1,auid2....");
-      if(mode=="AFLOWLIB_AURL2LOOP") init::ErrorOption(cout,options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2loop=aurl1,aurl2....");
+      if(mode=="AFLOWLIB_AUID2AURL") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2aurl=auid1,auid2....");
+      if(mode=="AFLOWLIB_AURL2AUID") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2auid=aurl1,aurl2....");
+      if(mode=="AFLOWLIB_AUID2LOOP") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_auid2loop=auid1,auid2....");
+      if(mode=="AFLOWLIB_AURL2LOOP") init::ErrorOption(options,"aflowlib::AflowlibLocator","aflow --aflowlib_aurl2loop=aurl1,aurl2....");
       exit(0);
     } 
     // move on
@@ -4099,9 +4251,11 @@ namespace aflowlib {
     string options="";
 
     if(vpflow.flag("AFLUX::USAGE")) {
-      stringstream ss_usage;
-      init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      init::ErrorOption(vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
+      return "";
     }
 
     string summons = "";
@@ -4208,7 +4362,7 @@ namespace aflowlib {
 //[SC20200327 - OBSOLETE]    vector<string> voptions;
 //[SC20200327 - OBSOLETE]    aurostd::string2tokens(options,voptions,",");
 //[SC20200327 - OBSOLETE]    if(voptions.size()==0) {
-//[SC20200327 - OBSOLETE]      init::ErrorOption(cout,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
+//[SC20200327 - OBSOLETE]      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
 //[SC20200327 - OBSOLETE]      exit(0);
 //[SC20200327 - OBSOLETE]    } 
 //[SC20200327 - OBSOLETE]
@@ -4830,8 +4984,8 @@ namespace aflowlib {
 //[SC20200327 - OBSOLETE]        //    oss << "<li><span class=\"description\">AFLOW KPPRA:</span>" << "unavailable" << "</li>" << endl; //JPO20180731
 //[SC20200327 - OBSOLETE]        if(!aentry.aflowlib_version.empty()) 
 //[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry version [<a href=\"" << url_WEB << "/?aflowlib_version\">aflowlib_version</a>]:</h5><span class=\"value\">" << (!aentry.aflowlib_version.empty()?aentry.aflowlib_version:"unavailable") << "</span></div></div>" << endl; //PC20180515 //JPO20180731
-//[SC20200327 - OBSOLETE]        if(!aentry.aflowlib_date.empty()) 
-//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry date [<a href=\"" << url_WEB << "/?aflowlib_date\">aflowlib_date</a>]:</h5><span class=\"value\">" << (!aentry.aflowlib_date.empty()?aentry.aflowlib_date:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
+//[SC20200327 - OBSOLETE]        if(!aentry.vaflowlib_date.empty()) 
+//[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOWLIB_entry date [<a href=\"" << url_WEB << "/?aflowlib_date\">aflowlib_date</a>]:</h5><span class=\"value\">" << (!aentry.vaflowlib_date.empty()?aurostd::joinWDelimiter(aentry.vaflowlib_date,","):"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731  //CO20200624 - adding LOCK date
 //[SC20200327 - OBSOLETE]        if(!aentry.author.empty()) 
 //[SC20200327 - OBSOLETE]          oss << "<div class=\"container__cell\"><div class=\"container__card\"><h5 class=\"value-name\">AFLOW Version [<a href=\"" << url_WEB << "/?author\">author</a>]:</h5><span class=\"value\">" << (!aentry.author.empty()?aentry.author:"unavailable") << "</span></div></div>" << endl;  //PC20180515 //JPO20180731
 //[SC20200327 - OBSOLETE]        if(!aentry.corresponding.empty()) 
@@ -5668,8 +5822,8 @@ namespace aflowlib {
     vector<string> voptions;
     aurostd::string2tokens(options,voptions,",");
     if(voptions.size()==0) {
-      init::ErrorOption(cout,options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");
-      exit(0);
+      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
+      return 0; //CO20200624 - 0 is error here
     } 
 
     // move on
@@ -5743,6 +5897,9 @@ namespace aflowlib {
       // **********************************************************************************************************
       // TRY AUID
       // **********************************************************************************************************
+      // ME20200707 - Also check for AUIDs without the aflow: prefix
+      string option_orig = option;
+      if ((option.size() == 16) && aurostd::_ishex(option)) option = "aflow:" + option;
       if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
         if(LDEBUG) cout << "WEB_Aflowlib_Entry: option=" << option << endl;
         string auid=aurostd::tolower(option);
@@ -5787,6 +5944,8 @@ namespace aflowlib {
           }
         }
       }
+      //ME20200707 - Restore
+      option = option_orig;
 
       // **********************************************************************************************************
       // TRY DIRECTORY
@@ -5860,6 +6019,9 @@ namespace aflowlib {
       // TRY ICSD LINK
       // **********************************************************************************************************
       if(!vflags.flag("FLAG::FOUND")) { // icsd link
+        //ME20200707 - Remove possible icsd: prefix
+        option_orig = option;
+        if (option.find("icsd") == 0) option = option.substr(5);
         string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+option;
         aurostd::StringSubst(directory_ICSD2LINK,"ICSD:","icsd:");
         aurostd::StringSubst(directory_ICSD2LINK,"icsd:icsd:","icsd:");    
@@ -5877,6 +6039,8 @@ namespace aflowlib {
           label=directory;
           //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
         }
+        //ME20200707 - Restore
+        option = option_orig;
       }
 
       // **********************************************************************************************************
@@ -6159,8 +6323,8 @@ namespace aflowlib {
       // additional web output
       aflowlib_json << "," << "\"aflow_version\":\"" << AFLOW_VERSION << "\"";
       aflowlib_out << "|" << "aflow_version=" << AFLOW_VERSION;
-      aflowlib_json << "," << "\"aflow_date\":\"" << TODAY << "\"";
-      aflowlib_out << "|" << "aflow_date=" << TODAY;
+      aflowlib_json << "," << "\"aflow_build_date\":\"" << TODAY << "\""; //CO20200624 - more semantic
+      aflowlib_out << "|" << "aflow_build_date=" << TODAY;  //CO20200624 - more semantic
       //ME20191217 STOP
 
       // XHOST.machine_type

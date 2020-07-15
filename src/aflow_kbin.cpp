@@ -212,19 +212,19 @@ namespace KBIN {
             //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
             return TRUE;	
           } else { // must be unlocked
-            if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+            if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
             return FALSE;
           }
         } else { // must contain _AFLOWIN_
-          if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+          if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
           return FALSE;
         }
       } else { // empty
-        if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+        if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
         return FALSE;
       }
     } else { // unexisting
-      // if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      // if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
     return FALSE;
@@ -239,11 +239,12 @@ namespace KBIN {
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO20191110
     string soliloquy = XPID + "KBIN::getAflowInFromAFlags():";
-    AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
+    AflowIn_file=aurostd::CleanFileName(aflags.Directory+"/"+_AFLOWIN_); //CO20200624
     if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::file2string(AflowIn_file,AflowIn);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"AflowIn.size()="+aurostd::utype2string(AflowIn.size()),FileMESSAGE,oss,_LOGGER_MESSAGE_); //CO20200624 - check size!=0
   }
 }
 
@@ -1493,7 +1494,7 @@ namespace KBIN {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=0) {
-      init::ErrorOption(cout,options,"KBIN::XClean","aflow --xclean");
+      init::ErrorOption(options,"KBIN::XClean","aflow --xclean");
       exit(0);
     }
 

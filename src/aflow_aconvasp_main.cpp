@@ -916,7 +916,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   } else {
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
   }
-  //[OBSOLETE] vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
   if (aurostd::args2flag(argv, cmds, "--plotphdos")) {
     vpflow.flag("PLOT_PHDOS", true);
     vpflow.addattachedscheme("PLOT_PHDOS", "./", true);
@@ -1757,7 +1756,7 @@ namespace pflow {
       // G
       if(vpflow.flag("GETTEMP")) {
         AFLOW_getTEMP(argv); _PROGRAMRUN=true; 
-        //cout << "TEMPERATURE " << Message("host",_AFLOW_FILE_NAME_) << endl;exit(0); _PROGRAMRUN=true;
+        //cout << "TEMPERATURE " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;exit(0); _PROGRAMRUN=true;
       } //CO20200106 - patching for auto-indenting
       if(vpflow.flag("GEOMETRY")) {cout << pflow::GEOMETRY(cin) << endl; _PROGRAMRUN=true;}  //CO20191110
       if(vpflow.flag("GULP")) {pflow::GULP(cin); _PROGRAMRUN=true;}
@@ -1871,7 +1870,6 @@ namespace pflow {
       if(vpflow.flag("PLOT_BANDDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_BANDDOS"); plotter::PLOT_BANDDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOS",true); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PDOSALL")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOSALL",false); pltopts.push_attached("DATASET", "-1"); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
-      if(vpflow.flag("PLOTPHDISP")) {pflow::PLOT_PHDISP(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDOS"); plotter::PLOT_PHDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISP")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISP"); plotter::PLOT_PHDISP(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_PHDISPDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISPDOS"); plotter::PLOT_PHDISPDOS(pltopts); _PROGRAMRUN=true;}
@@ -3085,7 +3083,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(cout,options,"pflow::SYMMETRY",
+        return init::ErrorOption(options,"pflow::SYMMETRY",
             aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] "+sym_specific_options+" < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
       }
     }
@@ -3345,7 +3343,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==0) {
-      init::ErrorOption(cout,options,"pflow::ALPHACompound","aflow --alpha_compound=string1,string2,....");
+      init::ErrorOption(options,"pflow::ALPHACompound","aflow --alpha_compound=string1,string2,....");
       exit(0);
     } 
     // move on
@@ -3371,7 +3369,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==0) {
-      init::ErrorOption(cout,options,"pflow::ALPHASpecies","aflow --alpha_species=string1,string2,....");
+      init::ErrorOption(options,"pflow::ALPHASpecies","aflow --alpha_species=string1,string2,....");
       exit(0);
     } 
     // move on
@@ -3397,7 +3395,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::ANGLES","aflow --angle=cutoff < POSCAR");
+      init::ErrorOption(options,"pflow::ANGLES","aflow --angle=cutoff < POSCAR");
       exit(0);
     } 
     // move on
@@ -3421,7 +3419,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::ATOMSMAX","aflow --maxatoms=N | --max_atoms=N | --atoms_max=N | --atomsmax=N < POSCAR");
+      init::ErrorOption(options,"pflow::ATOMSMAX","aflow --maxatoms=N | --max_atoms=N | --atoms_max=N | --atomsmax=N < POSCAR");
       exit(0);
     } 
     // move on
@@ -3451,7 +3449,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::BANDS","aflow --bands=PROOUT < POSCAR");
+      init::ErrorOption(options,"pflow::BANDS","aflow --bands=PROOUT < POSCAR");
       exit(0);
     } 
     // move on
@@ -3535,7 +3533,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::BZDIRECTIONSLATTICE","aflow --bzdirections= | --bzd=LATTICE");
+      init::ErrorOption(options,"pflow::BZDIRECTIONSLATTICE","aflow --bzdirections= | --bzd=LATTICE");
       exit(0);
     }  else {     // move on
       if(tokens.at(0)!="TRI1a" && tokens.at(0)!="TRI1b" && tokens.at(0)!="TRI2a" && tokens.at(0)!="TRI2b" &&
@@ -3552,7 +3550,7 @@ namespace pflow {
           tokens.at(0)!="CUB" &&
           tokens.at(0)!="FCC" &&
           tokens.at(0)!="BCC"	 ) {
-        init::ErrorOption(cout,options,"pflow::BZDIRECTIONSLATTICE","aflow --bzdirections= | --bzd=LATTICE");
+        init::ErrorOption(options,"pflow::BZDIRECTIONSLATTICE","aflow --bzdirections= | --bzd=LATTICE");
         cout << "LATTICES = (the ones with \"\") " << endl;
         cout << "1. TRI order: kalpha,kbeta,kgamma  > 90 (kgamma<kalpha, kgamma<kbeta) " << endl;
         cout << "   or kalpha,kbeta,kgamma  < 90 (kgamma>kalpha, kgamma>kbeta) " << endl;
@@ -3651,7 +3649,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=0 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::CAGES","aflow [--np=NP] --cages[=roughness] < POSCAR");
+      init::ErrorOption(options,"pflow::CAGES","aflow [--np=NP] --cages[=roughness] < POSCAR");
       exit(0);
     }
     double roughness=-1.0;
@@ -4769,7 +4767,7 @@ namespace pflow {
     // output usage
     if(LDEBUG) oss << soliloquy << "CHECK USAGE" << endl; 
     if(vpflow.flag("CHGDIFF::USAGE")) {
-      init::ErrorOption(cout,vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF()",aurostd::liststring2string(usage_usage,usage_options));
+      init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF()",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
     }
 
@@ -4781,7 +4779,7 @@ namespace pflow {
       oss << soliloquy << "ERROR: No input given." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(cout,vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
+      init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
     }
 
@@ -4795,7 +4793,7 @@ namespace pflow {
       oss << soliloquy << "ERROR: Incorrect input arguments. List two CHGCARs separated by commas." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(cout,vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
+      init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
     }
 
@@ -4970,7 +4968,7 @@ namespace pflow {
     // output usage
     if(LDEBUG) oss << soliloquy << "CHECK USAGE" << endl; 
     if(vpflow.flag("CHGSUM::USAGE")) {
-      init::ErrorOption(cout,vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
+      init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
     }
 
@@ -4982,7 +4980,7 @@ namespace pflow {
       oss << soliloquy << "ERROR: No input given." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(cout,vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
+      init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
       oss << endl;
       return oss.str();
     }
@@ -4997,7 +4995,7 @@ namespace pflow {
       oss << soliloquy << "ERROR: Incorrect input arguments. List at least two CHGCARs separated by commas." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(cout,vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
+      init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
     } else {
       // get inputs
@@ -5218,7 +5216,7 @@ namespace pflow {
 namespace pflow {
   void CIF(istream& input, aurostd::xoption& vpflow) {
     if(vpflow.flag("CIF::USAGE")) {
-      init::ErrorOption(cout,"--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance|=tight|=loose] [--setting=1|2] [--no_symmetry] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
+      init::ErrorOption("--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance|=tight|=loose] [--setting=1|2] [--no_symmetry] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
       return;
     }
     xstructure a(input,IOAFLOW_AUTO);
@@ -5276,7 +5274,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=6) {
-      init::ErrorOption(cout,options,"pflow::CLAT","aflow --clat=a,b,c,alpha,beta,gamma");
+      init::ErrorOption(options,"pflow::CLAT","aflow --clat=a,b,c,alpha,beta,gamma");
       exit(0);
     }
     xvector<double> data(6);
@@ -5332,7 +5330,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=12) {
-      init::ErrorOption(cout,options,"pflow::COMPARE","aflow --compare=a,b,c,d,e,f,g,h,k,j,i,l");
+      init::ErrorOption(options,"pflow::COMPARE","aflow --compare=a,b,c,d,e,f,g,h,k,j,i,l");
       exit(0);
     }
     xvector<double> aa(12);
@@ -5437,7 +5435,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(cout,options,"pflow::DATA",
+        return init::ErrorOption(options,"pflow::DATA",
             aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
       }
     }
@@ -5522,7 +5520,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::DATA1","aflow --data1=rcut < POSCAR");
+      init::ErrorOption(options,"pflow::DATA1","aflow --data1=rcut < POSCAR");
       exit(0);
     }
     double rcut=0.0;
@@ -5558,7 +5556,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::DISP","aflow --disp=cutoff < POSCAR");
+      init::ErrorOption(options,"pflow::DISP","aflow --disp=cutoff < POSCAR");
       exit(0);
     }
     double cutoff=0.0;
@@ -5580,7 +5578,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::DIST","aflow --dist=cutoff < POSCAR");
+      init::ErrorOption(options,"pflow::DIST","aflow --dist=cutoff < POSCAR");
       exit(0);
     }
     double cutoff=0.0;
@@ -5603,7 +5601,7 @@ namespace pflow {
 // 
 //     if(argv.size() != 3)
 //       {  // user control lines - aflow specific.
-//    init::ErrorOption(cout,"","pflow::DYNADIEL","aflow --dynadiel OUTCAR*");
+//    init::ErrorOption("","pflow::DYNADIEL","aflow --dynadiel OUTCAR*");
 // 	exit(0) ;
 //       }
 //     outcar = argv.at(2) ;
@@ -5826,7 +5824,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(cout,options,"pflow::EQUIVALENT",
+        init::ErrorOption(options,"pflow::EQUIVALENT",
             aurostd::liststring2string("aflow --equivalent|--equiv|--inequivalent|--inequiv|--iatoms|--eatoms[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0"));
         exit(0);
       }
@@ -5929,7 +5927,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>=2) {
-      init::ErrorOption(cout,options,"pflow::EWALD","aflow --ewald[=eta] < POSCAR");
+      init::ErrorOption(options,"pflow::EWALD","aflow --ewald[=eta] < POSCAR");
       exit(0);
     } 
     // move on
@@ -6012,7 +6010,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::EIGCURV","aflow --eigcurv=DIRECTORY(with bands)");
+      init::ErrorOption(options,"pflow::EIGCURV","aflow --eigcurv=DIRECTORY(with bands)");
       exit(0);
     }
     string filename="";
@@ -6539,7 +6537,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(cout,options,"pflow::CalculateFullSymmetry",
+        return init::ErrorOption(options,"pflow::CalculateFullSymmetry",
             aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
       }
     }
@@ -6900,7 +6898,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>=2) {
-      init::ErrorOption(cout,options,"pflow::FINDSYM","aflow --findsym[_print][=tolerance_relative] < POSCAR");
+      init::ErrorOption(options,"pflow::FINDSYM","aflow --findsym[_print][=tolerance_relative] < POSCAR");
       exit(0);
     } 
     // move on
@@ -7555,7 +7553,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=3 && tokens.size()!=4) {
-      init::ErrorOption(cout,options,"pflow::HKL","aflow --hkl=h,k,l[,bond] < POSCAR");
+      init::ErrorOption(options,"pflow::HKL","aflow --hkl=h,k,l[,bond] < POSCAR");
       exit(0);
     }
     xstructure a(input,IOAFLOW_AUTO);
@@ -7591,15 +7589,15 @@ namespace pflow {
     if(LDEBUG) cerr << XPID << "pflow::HKLSearch: options=" << options << endl;
 
     if(smode=="HKL_SEARCH_TRIVIAL" && tokens.size()>3) {
-      init::ErrorOption(cout,options,"pflow::HKLSearch: (mode=\"HKL_SEARCH_TRIVIAL\")","aflow --hkl_search[=khlmax[,bond[,step]]] < POSCAR");
+      init::ErrorOption(options,"pflow::HKLSearch: (mode=\"HKL_SEARCH_TRIVIAL\")","aflow --hkl_search[=khlmax[,bond[,step]]] < POSCAR");
       exit(0);
     }
     if(smode=="HKL_SEARCH_SIMPLE" && tokens.size()>4) {
-      init::ErrorOption(cout,options,"pflow::HKLSearch: (mode=\"HKL_SEARCH_SIMPLE\")","aflow --hkl_search_simple[=cutoff[,bond[,khlmax[,step]]]] < POSCAR");
+      init::ErrorOption(options,"pflow::HKLSearch: (mode=\"HKL_SEARCH_SIMPLE\")","aflow --hkl_search_simple[=cutoff[,bond[,khlmax[,step]]]] < POSCAR");
       exit(0);
     }
     if(smode=="HKL_SEARCH_COMPLETE" && tokens.size()>4) {
-      init::ErrorOption(cout,options,"pflow::HKLSearch: (mode=\"HKL_SEARCH_COMPLETE\")","aflow --hkl_search_complete[=cutoff[,bond[,khlmax[,step]]]] < POSCAR");
+      init::ErrorOption(options,"pflow::HKLSearch: (mode=\"HKL_SEARCH_COMPLETE\")","aflow --hkl_search_complete[=cutoff[,bond[,khlmax[,step]]]] < POSCAR");
       exit(0);
     }
     xstructure a(input,IOAFLOW_AUTO);
@@ -7693,6 +7691,7 @@ namespace pflow {
 namespace pflow {
   bool POCC_COMMAND_LINE(aurostd::xoption& vpflow,istream& input,ostream& oss) {  //CO20181226
     string soliloquy = XPID + "pflow::POCC_COMMAND_LINE():";
+    stringstream message;
     oss << aflow::Banner("BANNER_NORMAL");
     xstructure xstr(input,IOAFLOW_AUTO);
     if(vpflow.flag("POCC_TOL")){setPOCCTOL(xstr,vpflow.getattachedscheme("POCC_TOL"));}
@@ -7936,7 +7935,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=4) {
-      init::ErrorOption(cout,options,"pflow::INTPOL","aflow --intpol=file1,file2,nimages,nearest_image_flag");
+      init::ErrorOption(options,"pflow::INTPOL","aflow --intpol=file1,file2,nimages,nearest_image_flag");
       exit(0);
     }
     if(!aurostd::FileExist(tokens.at(0))) {
@@ -7987,7 +7986,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
 
     if(tokens.size()>5) {
-      init::ErrorOption(cout,options,"pflow::JMOL","aflow --jmol[=n1[,n2[,n3[,color[,true/false]]]]] < POSCAR");
+      init::ErrorOption(options,"pflow::JMOL","aflow --jmol[=n1[,n2[,n3[,color[,true/false]]]]] < POSCAR");
       exit(0);
     }
 
@@ -8208,7 +8207,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1 ) {
-      init::ErrorOption(cout,options,soliloquy,"aflow --kpoints=KDENS [or --kppra=KDENS,-k=KDENS] < POSCAR"); //CO20190520
+      init::ErrorOption(options,soliloquy,"aflow --kpoints=KDENS [or --kppra=KDENS,-k=KDENS] < POSCAR"); //CO20190520
       exit(0);
     }
     int NK=aurostd::string2utype<int>(tokens.at(0));
@@ -8253,7 +8252,7 @@ namespace pflow {
     //[OBSOLETE CO20171010]vector<string> tokens;
     //[OBSOLETE CO20171010]aurostd::string2tokens(options,tokens,",");
     //[OBSOLETE CO20171010]if(tokens.size()!=1 ) {
-    //[OBSOLETE CO20171010]  init::ErrorOption(cout,options,"pflow::KPOINTS_DELTA","aflow --delta_kpoints=number [or --dkpoints=number | -dkpoints=number | -dk=number] < POSCAR");
+    //[OBSOLETE CO20171010]  init::ErrorOption(options,"pflow::KPOINTS_DELTA","aflow --delta_kpoints=number [or --dkpoints=number | -dkpoints=number | -dk=number] < POSCAR");
     //[OBSOLETE CO20171010]  exit(0);
     //[OBSOLETE CO20171010]}
     double DK=aurostd::string2utype<double>(vpflow.getattachedscheme("FLAG::XVASP_KPOINTS_DELTA")); //tokens.at(0));  //CO20171010
@@ -10399,6 +10398,25 @@ namespace pflow {
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace pflow {
+
+  // ME20200512 - Created by CO for POCC.
+  const int BAR_WIDTH = 70;
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
+    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag
+    double progress = (double)current/(double)end;
+    int pos = BAR_WIDTH * progress;
+
+    oss << "[";
+    for (int i = 0; i < BAR_WIDTH; ++i) {
+      if (i < pos) oss << "=";
+      else if (i == pos) oss << ">";
+      else oss << " ";
+    }
+    oss << "] " << int(progress * 100.0) << " %\r";
+    oss.flush();
+    if(current==end){ oss << endl; }
+  }
+
   //***************************************************************************//
   // pflow::logger(const char& type,const string& function_name,string
   // _message,bool silent,ostream& oss,ofstream& FileMESSAGE)
@@ -10410,40 +10428,51 @@ namespace pflow {
   // message can be string or stringstream (if stringstream, it gets cleared out)
   // oss = cout, cerr (as you prefer)
   // FileMESSAGE - logfile
+  void logger(const string& filename, const string& function_name, stringstream& message, const char& type, ostream& oss, bool silent, const string& message_metadata) {  // overload
+    string _message = message.str();
+    logger(filename, function_name, _message, oss, type, silent, message_metadata);
+    aurostd::StringstreamClean(message);
+  }
+
   void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, directory, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, aflags, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
   }
 
   void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
     logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
-    message.str("");
+    aurostd::StringstreamClean(message);
+  }
+
+  void logger(const string& filename, const string& function_name, const string& _message, const char& type, ostream& oss, bool silent, const string& message_metadata) {  // overload
+    ofstream FileMESSAGE;
+    logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
   void logger(const string& filename, const string& function_name, const string& _message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
@@ -10479,10 +10508,7 @@ namespace pflow {
     // no need for function name for R, you can put ""
 
     string message = aurostd::RemoveWhiteSpacesFromTheBack(_message);
-    if(message.empty())  // && oss.str().empty())
-    { //CO20200106 - patching for auto-indenting
-      return;
-    }
+    if(message.empty()){return;}
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
     aurostd::string2vectorstring(message,_message_parts);
@@ -10493,314 +10519,51 @@ namespace pflow {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !silent);
-    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
-
-    string soliloquy = aurostd::RemoveWhiteSpaces(function_name);
-    string ErrorBarString =   "EEEEE  ---------------------------------------------------------------------------------------------------------------------------- ";
-    string WarningBarString = "WWWWW  ---------------------------------------------------------------------------------------------------------------------------- ";
-
+    string soliloquy=aurostd::RemoveWhiteSpaces(function_name);
+    string tag_code="00000";
+    string tag_message="MESSAGE";
     if (type == _LOGGER_ERROR_) {
-      ////////////////////////////////////////////////////////////////////////////
-      // START Error logger
-      ////////////////////////////////////////////////////////////////////////////
-
-      // write to screen if not quiet
-      if(verbose) {
-        // borrowed from APL/aflow_apl.h
-        if(fancy_print) printf("\033[31m");     // red
-        oss << ErrorBarString;  // make it clear in log file that an error
-        // occurred
-        oss << endl;
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
-          oss << XPID; //CO20200524
-          oss << "EEEEE";
-          oss << "  ";
-
-          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-          if(fancy_print) printf("\033[31m");  // red
-          if(fancy_print) printf("\033[5m");   // bold/blink
-          oss << "ERROR";
-          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-          if(fancy_print) printf("\033[31m");  // red
-
-          oss << " ";
-          oss << soliloquy;
-          oss << " ";
-          oss << message_parts[i]; //CO20181226 //message;
-          oss << Message(aflags,message_metadata,filename);
-          oss << endl;
-        }
-        oss << ErrorBarString;  // make it clear in log file that an error
-        // occurred
-        oss << endl;
-        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-        oss.flush();
-      }
-      // write to log
-      FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
-      FileMESSAGE << endl;
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
-        FileMESSAGE << XPID; //CO20200524
-        FileMESSAGE << "EEEEE";
-        FileMESSAGE << "  ";
-        FileMESSAGE << "ERROR";
-        FileMESSAGE << " ";
-        FileMESSAGE << soliloquy;
-        FileMESSAGE << " ";
-        FileMESSAGE << message_parts[i]; //CO20181226 //message;
-        FileMESSAGE << Message(aflags,message_metadata,filename);
-        FileMESSAGE << endl;
-      }
-      FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
-      FileMESSAGE << endl;
-      FileMESSAGE.flush();
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Error logger
-      ////////////////////////////////////////////////////////////////////////////
-
+      tag_code="EEEEE";
+      tag_message="ERROR";
     } else if (type == _LOGGER_WARNING_) {
-      ////////////////////////////////////////////////////////////////////////////
-      // START Warning logger
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(verbose) {
-        // borrowed from APL/aflow_apl.h
-        if(fancy_print) printf("\033[33m\033[1m");  // yellow
-        oss << WarningBarString;    // make it clear in log file that an warning
-        // occurred
-        oss << endl;
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
-          oss << XPID; //CO20200524
-          oss << "WWWWW";
-          oss << "  ";
-
-          if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
-          if(fancy_print) printf("\033[33m\033[1m");  // yellow
-          if(fancy_print) printf("\033[5m");          // bold/blink
-          oss << "WARNING";
-          if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
-          if(fancy_print) printf("\033[33m\033[1m");  // yellow
-
-          oss << " ";
-          oss << soliloquy;
-          oss << " ";
-          oss << message_parts[i]; //CO20181226 //message;
-          oss << Message(aflags,message_metadata,filename);
-          oss << endl;
-        }
-        oss << WarningBarString;  // make it clear in log file that an warning
-        // occurred
-        oss << endl;
-        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-        oss.flush();
-      }
-      // write to log
-      FileMESSAGE << WarningBarString;  // make it clear in log file that an
-      // warning occurred
-      FileMESSAGE << endl;
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
-        FileMESSAGE << XPID; //CO20200524
-        FileMESSAGE << "WWWWW";
-        FileMESSAGE << "  ";
-        FileMESSAGE << "WARNING";
-        FileMESSAGE << " ";
-        FileMESSAGE << soliloquy;
-        FileMESSAGE << " ";
-        FileMESSAGE << message_parts[i]; //CO20181226 //message;
-        FileMESSAGE << Message(aflags,message_metadata,filename);
-        FileMESSAGE << endl;
-      }
-      FileMESSAGE << WarningBarString;  // make it clear in log file that a
-      // warning occurred
-      FileMESSAGE << endl;
-      FileMESSAGE.flush();
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Warning logger
-      ////////////////////////////////////////////////////////////////////////////
-
+      tag_code="WWWWW";
+      tag_message="WARNING";
     } else if (type == _LOGGER_COMPLETE_) {
-      ////////////////////////////////////////////////////////////////////////////
-      // START Complete logger
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(verbose) {
-        // borrowed from APL/aflow_apl.h
-        if(fancy_print) printf("\033[32m");  // green
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
-          oss << XPID; //CO20200524
-          oss << "CCCCC";
-          oss << "  ";
-
-          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-          if(fancy_print) printf("\033[32m");  // green
-          if(fancy_print) printf("\033[5m");   // bold/blink
-          oss << "COMPLETE";
-          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-          if(fancy_print) printf("\033[32m");  // green
-
-          oss << " ";
-          oss << soliloquy;
-          oss << " ";
-          oss << message_parts[i]; //CO20181226 //message;
-          oss << Message(aflags,message_metadata,filename);
-          oss << endl;
-        }
-        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-        oss.flush();
-      }
-      // write to log
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
-        FileMESSAGE << XPID; //CO20200524
-        FileMESSAGE << "CCCCC";
-        FileMESSAGE << "  ";
-        FileMESSAGE << "COMPLETE";
-        FileMESSAGE << " ";
-        FileMESSAGE << soliloquy;
-        FileMESSAGE << " ";
-        FileMESSAGE << message_parts[i]; //CO20181226 //message;
-        FileMESSAGE << Message(aflags,message_metadata,filename);
-        FileMESSAGE << endl;
-      }
-      FileMESSAGE.flush();
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Complete logger
-      ////////////////////////////////////////////////////////////////////////////
-
+      tag_code="CCCCC";
+      tag_message="COMPLETE";
     } else if (type == _LOGGER_OPTION_) {
-      ////////////////////////////////////////////////////////////////////////////
-      // START Option logger
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(verbose) {
-        // borrowed from APL/aflow_apl.h
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
-          oss << XPID; //CO20200524
-          oss << "-OPT-";
-          oss << "  ";
-          oss << "MESSAGE-OPTION";
-          oss << " ";
-          oss << soliloquy;
-          oss << " ";
-          oss << message_parts[i]; //CO20181226 //message;
-          oss << Message(aflags,message_metadata,filename);
-          oss << endl;
-        }
-        oss.flush();
-      }
-      // write to log
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
-        FileMESSAGE << XPID; //CO20200524
-        FileMESSAGE << "-OPT-";
-        FileMESSAGE << "  ";
-        FileMESSAGE << "MESSAGE-OPTION";
-        FileMESSAGE << " ";
-        FileMESSAGE << soliloquy;
-        FileMESSAGE << " ";
-        FileMESSAGE << message_parts[i]; //CO20181226 //message;
-        FileMESSAGE << Message(aflags,message_metadata,filename);
-        FileMESSAGE << endl;
-      }
-      FileMESSAGE.flush();
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Option logger
-      ////////////////////////////////////////////////////////////////////////////
-
+      tag_code="-OPT-";
+      tag_message="MESSAGE-OPTION";
     } else if (type == _LOGGER_RAW_) {
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Option logger
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(verbose) {
-        // borrowed from APL/aflow_apl.h
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
-          oss << XPID; //CO20200524
-          oss << message_parts[i] << endl; //CO20181226 //message;
-        }
-        oss.flush();
-      }
-      // write to log
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
-        FileMESSAGE << XPID; //CO20200524
-        FileMESSAGE << message_parts[i] << endl; //CO20181226 //message;
-      }
-      FileMESSAGE.flush();
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Raw logger
-      ////////////////////////////////////////////////////////////////////////////
-
-    } else {
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Message logger
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(verbose) {
-        // borrowed from APL/aflow_apl.h
-        //[CO20181226 OBSOLETE]if(!message.empty())
-        for(uint i=0;i<message_parts.size();i++) //CO20181226
-        { //CO20200106 - patching for auto-indenting
-          oss << XPID; //CO20200524
-          oss << "00000";
-          oss << "  ";
-          oss << "MESSAGE";
-          oss << " ";
-          oss << soliloquy;
-          oss << " ";
-          oss << message_parts[i]; //CO20181226 //message;
-          oss << Message(aflags,message_metadata,filename);
-          oss << endl;
-        }
-        oss.flush();
-      }
-      // write to log
-      //[CO20181226 OBSOLETE]if(!message.empty())
-      for(uint i=0;i<message_parts.size();i++) //CO20181226
-      { //CO20200106 - patching for auto-indenting
-        FileMESSAGE << XPID; //CO20200524
-        FileMESSAGE << "00000";
-        FileMESSAGE << "  ";
-        FileMESSAGE << "MESSAGE";
-        FileMESSAGE << " ";
-        FileMESSAGE << soliloquy;
-        FileMESSAGE << " ";
-        FileMESSAGE << message_parts[i]; //CO20181226 //message;
-        FileMESSAGE << Message(aflags,message_metadata,filename);
-        FileMESSAGE << endl;
-      }
-      FileMESSAGE.flush();
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Message logger
-      ////////////////////////////////////////////////////////////////////////////
-
+      tag_code="";
+      tag_message="";
+    } else if (type == _LOGGER_NOTICE_) { // ME20200514
+      tag_code="00000";
+      tag_message="NOTICE";
     }
+      
+    ostringstream stream;
+    if(type == _LOGGER_RAW_) {
+      for(uint i=0;i<message_parts.size();i++){stream << message_parts[i] << endl;} //CO20181226 //message;
+    }else{
+      for(uint i=0;i<message_parts.size();i++){
+        stream << XPID; //CO20200524
+        stream << tag_code;
+        stream << "  ";
+        stream << tag_message;
+        stream << " ";
+        stream << soliloquy;
+        stream << " ";
+        stream << message_parts[i]; //CO20181226 //message;
+        stream << Message(aflags,message_metadata,filename);
+        stream << endl;
+      }
+    }
+
+    bool osswrite=!silent;
+    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);} //oss - DEFAULT TO cerr
+    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);}  //oss - DEFAULT TO cerr
+    else{aurostd::PrintMessageStream(FileMESSAGE,stream,XHOST.QUIET,osswrite,oss);}
   }
 } // namespace pflow
 
@@ -10817,7 +10580,7 @@ namespace pflow {
     xmatrix<double> mlt(3,3);
 
     if(tokens.size()!=9 && tokens.size()!=3 && tokens.size()!=1 && tokens.size()!=4) {
-      init::ErrorOption(cout,options,"pflow::LTCELL",
+      init::ErrorOption(options,"pflow::LTCELL",
           aurostd::liststring2string("aflow --ltcell=a11,a12,a13,a21,a22,a23,a31,a32,a33 < POSCAR",
             "aflow --ltcell=a11,a22,a33 < POSCAR",
             "aflow --ltcell=file < POSCAR",
@@ -10894,7 +10657,7 @@ namespace pflow {
 // [OBSOLETE]     aurostd::string2tokens(options,tokens,",");
 // [OBSOLETE]  
 // [OBSOLETE]    if(tokens.size()!=4) {
-// [OBSOLETE]       init::ErrorOption(cout,options,"pflow::LTCELLFV","aflow --ltcellfv=v1,v2,v3,phi < POSCAR");
+// [OBSOLETE]       init::ErrorOption(options,"pflow::LTCELLFV","aflow --ltcellfv=v1,v2,v3,phi < POSCAR");
 // [OBSOLETE]       exit(0);
 // [OBSOLETE]     }
 // [OBSOLETE] 
@@ -10990,7 +10753,7 @@ namespace pflow {
 // [OBSOLETE]     vector<string> tokens;
 // [OBSOLETE]     aurostd::string2tokens(options,tokens,",");
 // [OBSOLETE]     if(tokens.size()!=3 && tokens.size()!=4 && tokens.size()!=5) {
-// [OBSOLETE]       init::ErrorOption(cout,options,"pflow::MILLER","aflow -miller=h,k,l[,nlayer[,elayer] < POSCAR");
+// [OBSOLETE]       init::ErrorOption(options,"pflow::MILLER","aflow -miller=h,k,l[,nlayer[,elayer] < POSCAR");
 // [OBSOLETE]       exit(0);
 // [OBSOLETE]     }
 // [OBSOLETE] 
@@ -11486,7 +11249,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(cout,options,"pflow::PLATON",
+        init::ErrorOption(options,"pflow::PLATON",
             aurostd::liststring2string("aflow --platonSG[_label,_number][=EQUAL| EXACT][,ang,d1,d2,d3] < POSCAR  default:"+
               string("EQUAL=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EQUAL)+","+
               string("EXACT=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EXACT)+","+
@@ -12391,7 +12154,7 @@ namespace pflow {
     aurostd::string2tokens(vpflow.getattachedscheme("PROTO"),params,":");
 
     if(params.size()==0) {
-      init::ErrorOption(cout,vpflow.getattachedscheme("PROTO"),
+      init::ErrorOption(vpflow.getattachedscheme("PROTO"),
           "pflow::PROTO",
           aurostd::liststring2string("aflow [options] --proto=label*[:speciesA*[:speciesB*]..[:volumeA*[:volumeB*].. | :volume]] [--params=..... [--hex]]",
             "                --proto[_icsd]=ICSD_number.{ABC}[:speciesA*[:speciesB*]..[:volumeA*[:volumeB*].. | :volume]]",
@@ -12769,7 +12532,7 @@ namespace pflow {
     // check usage
     if(LDEBUG) cerr << soliloquy << " CHECK USAGE" << endl; 
     if(vpflow.flag("PROTO_AFLOW::USAGE") || PARAMS.ucell.size()==0) {
-      init::ErrorOption(cout,vpflow.getattachedscheme("PROTO_AFLOW"),"pflow::PROTO_AFLOW",
+      init::ErrorOption(vpflow.getattachedscheme("PROTO_AFLOW"),"pflow::PROTO_AFLOW",
           aurostd::liststring2string("aflow [options] --aflow_proto[|_icsd]=label*:speciesA*[:speciesB*][:volumeA*[:volumeB*]|:volume] [--params=... [--hex]]",
             "       options:",
             "                --usage",
@@ -13307,7 +13070,7 @@ namespace pflow {
     // check usage
     if(LDEBUG) cerr << soliloquy << " CHECK USAGE" << endl; 
     if(vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") || file=="") {
-      init::ErrorOption(cout,vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),"pflow::PSEUDOPOTENTIALS_CHECK",
+      init::ErrorOption(vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),"pflow::PSEUDOPOTENTIALS_CHECK",
           aurostd::liststring2string("aflow [options] --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=",
             "       options:",
             "                --usage"));
@@ -13354,7 +13117,7 @@ namespace pflow {
     string outcar ;
     xvector<double> real(3), imag(3) ;
     if(argv.size() != 3) { // user control lines - aflow specific.
-      init::ErrorOption(cout,"","pflow::STATDIEL","aflow --statdiel OUTCAR*");
+      init::ErrorOption("","pflow::STATDIEL","aflow --statdiel OUTCAR*");
       exit(0) ;
     }
     outcar = argv.at(2) ;
@@ -13550,7 +13313,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
 
     if(tokens.size()>3) {
-      init::ErrorOption(cout,options,"pflow::RASMOL","aflow --rasmol[=n1[,n2[,n3]]] < POSCAR");
+      init::ErrorOption(options,"pflow::RASMOL","aflow --rasmol[=n1[,n2[,n3]]] < POSCAR");
       exit(0);
     }
 
@@ -13684,7 +13447,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>3) {
-      init::ErrorOption(cout,options,"pflow::RDF","aflow --rdf[=rmax[,nbins[,sigma]]] < POSCAR");
+      init::ErrorOption(options,"pflow::RDF","aflow --rdf[=rmax[,nbins[,sigma]]] < POSCAR");
       exit(0);
     } 
 
@@ -13723,7 +13486,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=6) {
-      init::ErrorOption(cout,options,"pflow::RDFCMP","aflow --rdfcmp=rmax,nbins,sigma,nshmax,POSCAR1,POSCAR2");
+      init::ErrorOption(options,"pflow::RDFCMP","aflow --rdfcmp=rmax,nbins,sigma,nshmax,POSCAR1,POSCAR2");
       exit(0);
     } 
     double rmax=(double) aurostd::string2utype<double>(tokens.at(0));
@@ -13796,7 +13559,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::SCALE","aflow --scale=s < POSCAR");
+      init::ErrorOption(options,"pflow::SCALE","aflow --scale=s < POSCAR");
       exit(0);
     } 
     // move on
@@ -13823,7 +13586,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::INFLATE_LATTICE","aflow --inflate_lattice=coefficient | --ilattice=coefficient < POSCAR");
+      init::ErrorOption(options,"pflow::INFLATE_LATTICE","aflow --inflate_lattice=coefficient | --ilattice=coefficient < POSCAR");
       exit(0);
     } 
     // move on
@@ -13849,7 +13612,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::INFLATE_VOLUME","aflow --inflate_volume=coefficient | --ivolume=coefficient < POSCAR");
+      init::ErrorOption(options,"pflow::INFLATE_VOLUME","aflow --inflate_volume=coefficient | --ivolume=coefficient < POSCAR");
       exit(0);
     } 
     // move on
@@ -13964,7 +13727,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(cout,options,"pflow::SG",
+        init::ErrorOption(options,"pflow::SG",
             aurostd::liststring2string("aflow --aflowSG[=tolerance|=tight|=loose] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: (minimum_interatomic_distance)/100.0",
               "aflow --platonSG[_label,_number][=EQUAL| EXACT][,ang,d1,d2,d3] < POSCAR  default:"+
               string("EQUAL=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EQUAL)+","+
@@ -14126,7 +13889,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=5) {
-      init::ErrorOption(cout,options,"pflow::SHELL","aflow --shell=ns,r1,r2,name,dens < POSCAR");
+      init::ErrorOption(options,"pflow::SHELL","aflow --shell=ns,r1,r2,name,dens < POSCAR");
       exit(0);
     } 
 
@@ -14163,7 +13926,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=3 && tokens.size()!=4) {
-      init::ErrorOption(cout,options,"pflow::SHIFT","aflow --shift=Sx,Sy,Sz[,cCdD] < POSCAR");
+      init::ErrorOption(options,"pflow::SHIFT","aflow --shift=Sx,Sy,Sz[,cCdD] < POSCAR");
       exit(0);
     }      
     // cout << aflow::Banner("BANNER_TINY") << endl;
@@ -14232,7 +13995,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(cout,options,"pflow::SGDATA",
+        return init::ErrorOption(options,"pflow::SGDATA",
             aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic"));
       }
     }
@@ -14390,7 +14153,7 @@ namespace pflow {
     xmatrix<double> msc(3,3);
 
     if(tokens.size()!=9 && tokens.size()!=3 && tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::SUPERCELL",
+      init::ErrorOption(options,"pflow::SUPERCELL",
           aurostd::liststring2string("aflow --supercell=a11,a12,a13,a21,a22,a23,a31,a32,a33 < POSCAR",
             "aflow --supercell=a11,a22,a33 < POSCAR",
             "aflow --supercell=file < POSCAR"));
@@ -14452,7 +14215,7 @@ namespace pflow {
     string infile_name="";
 
     if(tokens.size()!=10 && tokens.size()!=4 && tokens.size()!=2) {
-      init::ErrorOption(cout,options,"pflow::SUPERCELLSTRLIST",
+      init::ErrorOption(options,"pflow::SUPERCELLSTRLIST",
           aurostd::liststring2string("aflow --supercell_strlist=a11,a12,a13,a21,a22,a23,a31,a32,a33,strlist",
             "aflow --supercell_strlist=a11,a22,a33,strlist",
             "aflow --supercell_strlist=file,strlist"));
@@ -14536,7 +14299,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=2) {
-      init::ErrorOption(cout,options,"pflow::VOLUME","aflow --volume[|*|+]=x < POSCAR");
+      init::ErrorOption(options,"pflow::VOLUME","aflow --volume[|*|+]=x < POSCAR");
       exit(0);
     }
     xstructure a(input,IOAFLOW_AUTO);
@@ -14562,9 +14325,9 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(vpflow.flag("WYCCAR::USAGE")) {
-      init::ErrorOption(oss,options,"WYCCAR",
+      init::ErrorOption(options,"WYCCAR",
           aurostd::liststring2string("aflow --wyccar[=tolerance|=tight|=loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
-      exit(0);
+      return "";  //CO20200624 - empty is error
     }
     //DX20190201 START
     bool letters_only = false;
@@ -14679,7 +14442,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(cout,options,"pflow::XRAY","aflow --xray=lambda < POSCAR");
+      init::ErrorOption(options,"pflow::XRAY","aflow --xray=lambda < POSCAR");
       exit(0);
     }
     double l=0.0;
@@ -15028,7 +14791,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
 
     if(tokens.size()>3) {
-      init::ErrorOption(cout,options,"pflow::XYZ","aflow --xyz[=n1[,n2[,n3]]] < POSCAR");
+      init::ErrorOption(options,"pflow::XYZ","aflow --xyz[=n1[,n2[,n3]]] < POSCAR");
       exit(0);
     }
 
@@ -15074,7 +14837,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==0 || tokens.size()>2) {
-      init::ErrorOption(cout,options,"pflow::ZVAL","aflow "+tokens.at(0)+"[=directory]");
+      init::ErrorOption(options,"pflow::ZVAL","aflow "+tokens.at(0)+"[=directory]");
       exit(0);
     }
     string Directory;
@@ -16079,7 +15842,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=3) {
-      init::ErrorOption(cout,options,"pflow::GetAtomicPlaneDist","aflow --xrd_dist=h,k,l < POSCAR");
+      init::ErrorOption(options,"pflow::GetAtomicPlaneDist","aflow --xrd_dist=h,k,l < POSCAR");
       exit(0);
     } 
     // move on

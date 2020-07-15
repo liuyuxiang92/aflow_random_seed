@@ -44,7 +44,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
     string input_file=kflags.KBIN_PHONONS_CALCULATION_FROZSL_poscars;
-    aurostd::substring2strings(input_file,vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING,"[VASP_POSCAR_MODE_EXPLICIT]START.");
+    aurostd::substring2strings(input_file,vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING,_VASP_POSCAR_MODE_EXPLICIT_START_);  //CO20200624
     if(LDEBUG) cerr << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
     // some verbose
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++)
@@ -53,8 +53,8 @@ namespace KBIN {
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++) {
       string START="[VASP_POSCAR_MODE_EXPLICIT]START";
       string STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP";
-      START="[VASP_POSCAR_MODE_EXPLICIT]START."+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i);
-      STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP."+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i);
+      START=_VASP_POSCAR_MODE_EXPLICIT_START_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
+      STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
       stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
       if(aurostd::substring2bool(input_file,START) && aurostd::substring2bool(input_file,STOP))
         aurostd::ExtractToStringstreamEXPLICIT(input_file,POSCAR,START,STOP);
@@ -292,7 +292,7 @@ namespace FROZSL {
 
       command="grep \"\\[VASP_POSCAR_MODE_EXPLICIT\\]START\\.\" "+aflags.Directory+"/"+_AFLOWIN_;
       aflow_frozsl_out=aurostd::execute2string(command);
-      aurostd::StringSubst(aflow_frozsl_out,"[VASP_POSCAR_MODE_EXPLICIT]START.","");
+      aurostd::StringSubst(aflow_frozsl_out,_VASP_POSCAR_MODE_EXPLICIT_START_,""); //CO20200624
       aurostd::string2vectorstring(aflow_frozsl_out,vdirectories);
 
       for(uint i=0;i<vdirectories.size();i++) {

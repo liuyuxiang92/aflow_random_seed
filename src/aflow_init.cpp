@@ -57,6 +57,7 @@ namespace init {
   bool InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& oss) {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG),found=FALSE;
+    string soliloquy=XPID+"init::InitMachine():";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
     int depth_short=20,depth_long=45;
     string position;
@@ -81,7 +82,13 @@ namespace init {
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
     if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
-    XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
+    XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--lib2raw|--lib2lib");  //CO20200624
+    XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
+    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp");  //CO20200624 - VERY important, prevents VASP from running
+    if(XHOST.POSTPROCESS || 
+        XHOST.ARUN_POSTPROCESS ||
+        FALSE) XHOST.AVOID_RUNNING_VASP=TRUE;  //CO20200624
+    if(LDEBUG){cerr << soliloquy << " XHOST.AVOID_RUNNING_VASP=" << XHOST.AVOID_RUNNING_VASP << endl;}
 
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
@@ -1426,18 +1433,20 @@ namespace init {
     bool LDEBUG=FALSE;
     if(LDEBUG) {;} //CO20190906 - keep LDEBUG busy
     string out="";
-    if(lib=="AUID" || lib=="auid") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
-    if(lib=="ICSD" || lib=="icsd") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
-    if(lib=="LIB0" || lib=="lib0" ||  lib=="0") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0);
-    if(lib=="LIB1" || lib=="lib1" ||  lib=="1") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1);
-    if(lib=="LIB2" || lib=="lib2" ||  lib=="2") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2);
-    if(lib=="LIB3" || lib=="lib3" ||  lib=="3") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3);
-    if(lib=="LIB4" || lib=="lib4" ||  lib=="4") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4);
-    if(lib=="LIB5" || lib=="lib5" ||  lib=="5") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5);
-    if(lib=="LIB6" || lib=="lib6" ||  lib=="6") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6);
-    if(lib=="LIB7" || lib=="lib7" ||  lib=="7") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7);
-    if(lib=="LIB8" || lib=="lib8" ||  lib=="8") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
-    if(lib=="LIB9" || lib=="lib9" ||  lib=="9") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);    
+    //ME20200707 - The LIBRARY_NOTHING check is important or this function
+    //breaks when the LIB directory does not exist
+    if((XHOST_LIBRARY_AUID != LIBRARY_NOTHING) && (aurostd::toupper(lib)=="AUID")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
+    if((XHOST_LIBRARY_ICSD != LIBRARY_NOTHING) && (aurostd::toupper(lib)=="ICSD")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    if((XHOST_LIBRARY_LIB0 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB0") ||  lib=="0")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0);
+    if((XHOST_LIBRARY_LIB1 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB1") ||  lib=="1")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1);
+    if((XHOST_LIBRARY_LIB2 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB2") ||  lib=="2")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2);
+    if((XHOST_LIBRARY_LIB3 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB3") ||  lib=="3")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3);
+    if((XHOST_LIBRARY_LIB4 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB4") ||  lib=="4")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4);
+    if((XHOST_LIBRARY_LIB5 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB5") ||  lib=="5")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5);
+    if((XHOST_LIBRARY_LIB6 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB6") ||  lib=="6")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6);
+    if((XHOST_LIBRARY_LIB7 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB7") ||  lib=="7")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7);
+    if((XHOST_LIBRARY_LIB8 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB8") ||  lib=="8")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
+    if((XHOST_LIBRARY_LIB9 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB9") ||  lib=="9")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);
     return out;
 
     //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)" "init::AFLOW_Projects_Directories(\"AUID\")" *cpp
@@ -1570,7 +1579,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
     double Tzero=30.0;
-    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message("host",_AFLOW_FILE_NAME_) << endl; exit(1);
+    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; exit(1);
     if(RUNSTAT || (!RUNSTAT && !RUNBAR)) {
       string soss="- [temp(C)=";
       for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {soss+=aurostd::utype2string(XHOST.vTemperatureCore.at(i),3)+(i<XHOST.vTemperatureCore.size()-1?",":"]");}
@@ -1666,19 +1675,23 @@ bool CheckMaterialServer(const string& message) { //CO20200624
 // aflow_get_time_string
 // ***************************************************************************
 string aflow_get_time_string(void) {
-#ifdef ALPHA
-  ostringstream aus;
-  string OUT;
-  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
-  system(aus.str().c_str());
-  ifstream FileAUS;
-  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
-  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
-  FileAUS >> OUT;
-  FileAUS.clear();FileAUS.close();
-  // return (char*) OUT.c_str();
-  return string("NotAvailable \n");
-#else
+  //OUTPUT: http://www.cplusplus.com/reference/ctime/ctime/
+  //Www Mmm dd hh:mm:ss yyyy
+  //Where Www is the weekday, Mmm the month (in letters), dd the day of the month, hh:mm:ss the time, and yyyy the year.
+  //The string is followed by a new-line character ('\n') and terminated with a null-character.
+//[CO20200624 - OBSOLETE]#ifdef ALPHA
+//[CO20200624 - OBSOLETE]  ostringstream aus;
+//[CO20200624 - OBSOLETE]  string OUT;
+//[CO20200624 - OBSOLETE]  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
+//[CO20200624 - OBSOLETE]  system(aus.str().c_str());
+//[CO20200624 - OBSOLETE]  ifstream FileAUS;
+//[CO20200624 - OBSOLETE]  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
+//[CO20200624 - OBSOLETE]  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
+//[CO20200624 - OBSOLETE]  FileAUS >> OUT;
+//[CO20200624 - OBSOLETE]  FileAUS.clear();FileAUS.close();
+//[CO20200624 - OBSOLETE]  // return (char*) OUT.c_str();
+//[CO20200624 - OBSOLETE]  return string("NotAvailable \n");
+//[CO20200624 - OBSOLETE]#else
   long ltime=time(NULL);
 
   string date=string(ctime(&ltime));
@@ -1686,7 +1699,29 @@ string aflow_get_time_string(void) {
     if(date.at(date.length()-1)=='\n')
       date.erase(date.length()-1);
   return date;
-#endif
+//[CO20200624 - OBSOLETE]#endif
+}
+string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
+  //refer to aflow_get_time_string()
+  //convert Www Mmm dd hh:mm:ss yyyy style to aurostd::get_datetime() one
+  string soliloquy=XPID+"aflow_convert_time_LOCK2aflowlib():";
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+  
+  vector<string> tokens;
+  aurostd::string2tokens(time_LOCK,tokens);
+  if(tokens.size()!=5){return "";}
+  
+  //https://en.cppreference.com/w/c/chrono/strftime
+  //'Www Mmm dd hh:mm:ss yyyy' === '%a %b %d %H:%M:%S %Y'
+  //https://stackoverflow.com/questions/19524720/using-strptime-converting-string-to-time-but-getting-garbage
+  struct tm tstruct;
+  if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
+
+  if(LDEBUG){cerr << soliloquy << " END" << endl;}
+  
+  return aurostd::get_datetime(&tstruct);
 }
 
 // ***************************************************************************
@@ -1763,51 +1798,56 @@ double AFLOW_checkMEMORY(string progname,double memory) {
 // Messages
 // ***************************************************************************
 pthread_mutex_t mutex_INIT_Message=PTHREAD_MUTEX_INITIALIZER;
-string Message(string list2print) {
+string Message(const string& list2print) {
   pthread_mutex_lock(&mutex_INIT_Message);
   // pthread_mutex_unlock(&mutex_INIT_Message);
-  stringstream oss("");
-  if(aurostd::substring2bool(list2print,"user") || aurostd::substring2bool(list2print,"USER")) oss << " - [user=" << XHOST.user << "]";
-  if(aurostd::substring2bool(list2print,"group") || aurostd::substring2bool(list2print,"GROUP")) oss << " - [group=" << XHOST.group << "]";
-  if(aurostd::substring2bool(list2print,"host") || aurostd::substring2bool(list2print,"HOST")) oss << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME")) oss << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"- [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
-  if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) oss << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"pid") || aurostd::substring2bool(list2print,"PID")) oss << " - [PID=" << XHOST.PID << "]";  //CO20200502
-  if(aurostd::substring2bool(list2print,"tid") || aurostd::substring2bool(list2print,"TID")) oss << " - [TID=" << XHOST.TID << "]";  //CO20200502
-  if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
-  if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
+  stringstream strout;
+  if(aurostd::substring2bool(list2print,"user") || aurostd::substring2bool(list2print,"USER")) strout << " - [user=" << XHOST.user << "]";
+  if(aurostd::substring2bool(list2print,"group") || aurostd::substring2bool(list2print,"GROUP")) strout << " - [group=" << XHOST.group << "]";
+  if(aurostd::substring2bool(list2print,"host") || aurostd::substring2bool(list2print,"HOST") || 
+      aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME") ||
+      FALSE) strout << " - [host=" << XHOST.hostname << "]";
+  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME")) strout << " - [host=" << XHOST.hostname << "]";
+  if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
+  if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) strout << " - [host=" << XHOST.hostname << "]";
+  if(aurostd::substring2bool(list2print,"pid") || aurostd::substring2bool(list2print,"PID")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
+  if(aurostd::substring2bool(list2print,"tid") || aurostd::substring2bool(list2print,"TID")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
+  if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME") || 
+      aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
+  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";
   //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
-  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
-  if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) oss << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
-  // oss << endl;
+  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) strout << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
+  if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) strout << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
+  // strout << endl;
   pthread_mutex_unlock(&mutex_INIT_Message);
   // do some killing
   //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  //CO20170628 - this is already run above, very slow
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("aflow",XHOST.maxmem);
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("clamd",XHOST.maxmem);
-  return oss.str();
+  return strout.str();
 }
 
-string Message(string str1,string list2print) {return string(" - "+str1+Message(list2print));}
-//string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
-string Message(const _aflags& aflags) {
-  string strout=" - [dir="+aflags.Directory+"]"+=Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
-  if(AFLOW_PTHREADS::FLAG) strout+=" - [thread="+aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER)+"/"+aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS)+"]";
-  return strout;
+//[CO20200713 - OBSOLETE]string Message(const string& str1,const string& list2print) {return string(" - "+str1+Message(list2print));}
+string Message(const string& list2print,const string& filename) { //CO20200713
+  stringstream strout;  //CO20200713
+  strout << Message(list2print);  //CO20200624 - do not check for empty - print ERROR_TEMPERATURE
+  if(!filename.empty()) strout << " - ["  <<  filename << "]";  //CO20200713
+  return strout.str();  //CO20200713
 }
-string Message(const _aflags& aflags,string list2print1,string list2print2) {
-  stringstream strout;
-  if(!list2print1.empty()) strout << " [dir=" << aflags.Directory << "]" << Message(list2print1);
-  if(AFLOW_PTHREADS::FLAG) strout << " - [thread=" << aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER) << "/" << aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS) << "]";
-  if(!list2print2.empty()) strout << " ["  <<  list2print2 << "]";
-  return strout.str();
+//string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
+string Message(const _aflags& aflags) {return Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);}
+string Message(const _aflags& aflags,const string& list2print,const string& filename) { //CO20200713
+  stringstream strout;  //CO20200713
+  if(!list2print.empty()) strout << " - [dir=" << aflags.Directory << "]";  //CO20200713
+  if(AFLOW_PTHREADS::FLAG) strout << " - [thread=" << aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER) << "/" << aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS) << "]"; //CO20200713
+  strout << Message(list2print,filename); //CO20200713
+  return strout.str();  //CO20200713
 }
 
 // ***************************************************************************
 // AFLOW_BlackList
 // ***************************************************************************
-bool AFLOW_BlackList(string h) {
+bool AFLOW_BlackList(const string& h) { //CO20200713
   // cerr << h << endl;
   // if(h=="nietzsche" || h=="nietzsche.mems.duke.edu" || h=="material.duke.edu") return TRUE;
   if(h=="blacklisted_hostname") return TRUE;
@@ -1820,24 +1860,38 @@ bool AFLOW_BlackList(string h) {
 // init::ErrorOptions
 // ***************************************************************************
 namespace init {
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,vector<string> vusage) {
-    vector<string> tokens_options;
-    aurostd::string2tokens(options,tokens_options,",");
-
-    oss << "ERROR: " << routine << ":" << endl;
-    oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
-    string usage="       Usage: ";
+  bool MessageOption(const string& options, const string& routine,vector<string> vusage) {  //CO20200624
+    ostream& oss=cerr;
+    string usage="      "+routine+" Usage: ";  //CO20200624
     for(uint i=0;i<vusage.size();i++) {
       if(aurostd::substring2bool(vusage.at(i),"options:")) usage="              ";
       if(vusage.at(i)!="") oss << usage << vusage.at(i) << endl;
     }
     oss << "       options=[" << options << "]" << endl;
-    return TRUE;
+    return true;
   }
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,string usage) {
+  bool MessageOption(const string& options, const string& routine,string usage) { //CO20200624
     vector<string> vusage;
     aurostd::string2vectorstring(usage,vusage);
-    return ErrorOption(oss,options,routine,vusage);
+    return MessageOption(options,routine,vusage);
+  }
+  bool ErrorOption(const string& options, const string& routine,vector<string> vusage) {
+    string soliloquy=XPID+"init::ErrorOption():";
+    stringstream message;
+
+    vector<string> tokens_options;
+    aurostd::string2tokens(options,tokens_options,",");
+
+    message << "Routine " << routine << ": Wrong number/type of input parameters (" << tokens_options.size();pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_ERROR_);
+    //[CO20200624 - OBSOLETE]oss << "ERROR: " << routine << ":" << endl;
+    //[CO20200624 - OBSOLETE]oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
+    
+    return MessageOption(options,routine,vusage);
+  }
+  bool ErrorOption(const string& options, const string& routine,string usage) {
+    vector<string> vusage;
+    aurostd::string2vectorstring(usage,vusage);
+    return ErrorOption(options,routine,vusage);
   }
 }
 
@@ -1944,7 +1998,7 @@ namespace init {
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AFLOWLIB_DATE","aflowlib_date");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOWLIB_DATE","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOWLIB_DATE","string");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOWLIB_DATE","strings");  //CO+ME20200624
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
