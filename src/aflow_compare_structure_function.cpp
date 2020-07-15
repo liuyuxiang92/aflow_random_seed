@@ -6063,6 +6063,7 @@ namespace compare{
     for(uint i=0;i<xstr.atoms.size();i++){
       coordinates.push_back(xstr.atoms[i].cpos); //or cpos
     }
+
     return centroid_with_PBC(coordinates,xstr.lattice);
   }
 }
@@ -6116,16 +6117,89 @@ namespace compare{
   } 
 }
 
+// ***************************************************************************
+// Find centroid for system (NO periodic boundary conditions)
+// ***************************************************************************
+namespace compare{
+  xvector<double> centroid(const xstructure& xstr){
+
+    // Calculate the centroid in a non-periodic system.
+    // Takes the cpos coordinates
+
+    vector<xvector<double> > coordinates;
+    for(uint i=0;i<xstr.atoms.size();i++){
+      coordinates.push_back(xstr.atoms[i].cpos); //or cpos
+    }
+
+    return centroid(coordinates);
+  }
+}
+
+// ***************************************************************************
+// Find centroid for system (NO periodic boundary conditions)
+// ***************************************************************************
+namespace compare{
+  xvector<double> centroid(const deque<_atom>& atoms){
+
+    // Calculate the centroid in a non-periodic system.
+    // Takes the cpos coordinates
+
+    vector<xvector<double> > coordinates;
+    for(uint i=0;i<atoms.size();i++){
+      coordinates.push_back(atoms[i].cpos); //or cpos
+    }
+
+    return centroid(coordinates);
+  }
+}
+
+// ***************************************************************************
+// Find centroid for system (NO periodic boundary conditions)
+// ***************************************************************************
+namespace compare{
+  xvector<double> centroid(const vector<xvector<double> >& coordinates){
+
+    // Calculate the centroid in a non-periodic system.
+    // Sets weights equal to one in this function.
+
+    vector<double> weights;
+    for(uint i=0;i<coordinates.size();i++){
+      weights.push_back(1.0);
+    }
+    return centroid(coordinates,weights);
+  }
+}
+
+// ***************************************************************************
+// Find centroid for system with periodic boundary conditions
+// ***************************************************************************
+namespace compare{
+  xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights){
+
+    // Calculate the centroid in a non-periodic system.
+
+    xvector<double> centroid;
+    for(uint i=0;i<coordinates.size();i++){
+      centroid += coordinates[i]*weights[i];
+    }
+    centroid /= coordinates.size();
+
+    return centroid;
+  } 
+}
 
 // ***************************************************************************
 // Find Matches
 // ***************************************************************************
 namespace compare{
-  bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
+  bool findMatch(const deque<_atom>& _xstr1_atoms,
+      const deque<_atom>& _PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
-      vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
-      const int& type_match) {
+      vector<uint>& mapping_index_str1,
+      vector<uint>& mapping_index_str2,
+      vector<double>& min_dists,
+      const int& type_match){
 
     // In order to find the best matchings the routine computes 
     // the difference between one atom and all the others, 
@@ -6142,6 +6216,22 @@ namespace compare{
     bool VERBOSE=false;
 
     string function_name = XPID + "compare::findMatch():";
+   
+    // ---------------------------------------------------------------------------
+    // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
+    deque<_atom> xstr1_atoms = _xstr1_atoms;
+    xvector<double> xstr1_centroid = centroid(xstr1_atoms);
+    deque<_atom> PROTO_atoms = _PROTO_atoms;
+    xvector<double> PROTO_centroid = centroid(PROTO_atoms);
+  
+    if(LDEBUG){
+      cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
+      cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
+    }
+
+    for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid; }
+    for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid; }
+
 
     // ---------------------------------------------------------------------------
     // Determines cutoff distance in which atoms map onto one another and are
@@ -6186,6 +6276,7 @@ namespace compare{
 
     //DX20190226 [BETA] xvector<double> best_centroid1 = centroid_with_PBC(xstr1); 
     //DX20190226 [BETA] xvector<double> best_centroid2 = centroid_with_PBC(PROTO); 
+
 
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
@@ -7034,6 +7125,9 @@ namespace compare{
     // Compute the coordinates deviation by looking at each pair of atoms from
     // the reference and mapped structure
 
+    string function_name = XPID + "compare::coordinateDeviation():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+
     uint j=0;
     double num=0, den=0, nfail=0;
     double dd=0.0, nn1=0.0, nn2=0.0; //dd=delta distance, nn=nearest neighbour
@@ -7045,7 +7139,14 @@ namespace compare{
       nn1 = all_nn1[indexMatch1[j]];
       nn2 = all_nn_proto[indexMatch2[j]];
       dd = min_dists[j];
-
+      
+      if(LDEBUG){
+        cerr << function_name << " indexMatch1[j]: " << indexMatch1[j] << endl;
+        cerr << function_name << " indexMatch2[j]: " << indexMatch2[j] << endl;
+        cerr << function_name << " nn1: " << nn1 << endl;
+        cerr << function_name << " nn2: " << nn2 << endl;
+        cerr << function_name << " dd: " << dd << endl;
+      }
       //DX [OBSOLETE] if(dd<=0.5*nn1) fail1=0;
       //DX [OBSOLETE] if(dd>0.5*nn1) fail1=1;
       //DX [OBSOLETE] if(dd<=0.5*nn2) fail2=0;
@@ -7066,7 +7167,12 @@ namespace compare{
       }   
       if(fail1==1) nfail++;
       if(fail2==1) nfail++;
-    }   
+    }  
+
+    if(LDEBUG){
+      cerr << function_name << " cumulative num: " << num << endl;
+      cerr << function_name << " cumulative den: " << den << endl;
+    }
 
     if(den==0) cd=1;
     else cd=num/den;
@@ -7505,6 +7611,7 @@ namespace compare{
 
     bool supercell_method = false; //DX20200330 - original method, but slow
     bool test_one_lfa_only = false; //DX20190318
+    bool test_one_origin_only = false; //DX20200715
     //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
 
     bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
@@ -7559,7 +7666,7 @@ namespace compare{
       // convert to clattice representation
       xstr1_tmp.lattice=GetClat(xstr1_tmp.a,xstr1_tmp.b,xstr1_tmp.c,xstr1_tmp.alpha,xstr1_tmp.beta,xstr1_tmp.gamma);
       for(uint iat=0; iat<xstr1_tmp.atoms.size(); iat++){
-        xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos);
+        xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.scale*xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos); //DX20200715 - add scale just in case
       }
       vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp); // nearest neighbor distances (invariant of origin shifts) 
 
@@ -7661,111 +7768,109 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // shift representative structure to LFA
           // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
+          // //DX20200715 - now explore all shifts, cannot just test one
           for(uint i=0;i<xstr1_tmp.atoms.size();i++){
             if(xstr1_tmp.atoms[i].name==lfa_str1){
               xstr1_tmp.ShiftOriginToAtom(i);
               xstr1_tmp.BringInCell(1e-10);
-              break;
-            }
-          }
 
-          // ---------------------------------------------------------------------------
-          // create vector of variables for each thread 
-          vector<xstructure> xstr1_for_thread;
-          vector<structure_misfit> possible_min_misfit_info; //DX20191218
-          vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
-          vector<vector<double> > possible_minimum_distances;
-          vector<vector<xstructure> > vvprotos;
-          for(uint n=0; n<num_proc; n++){
-            vector<xstructure> vprotos_tmp;
-            vvprotos.push_back(vprotos_tmp);
-            xstr1_for_thread.push_back(xstr1_tmp);
-            structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX20191218
-            possible_min_misfit_info.push_back(temp_misfit_info); //DX20191218
-            vector<uint> tmp_indices;
-            possible_matching_indices_1.push_back(tmp_indices);
-            possible_matching_indices_2.push_back(tmp_indices);
-            vector<double> tmp_distances;
-            possible_minimum_distances.push_back(tmp_distances);
-          }
+              // ---------------------------------------------------------------------------
+              // create vector of variables for each thread 
+              vector<xstructure> xstr1_for_thread;
+              vector<structure_misfit> possible_min_misfit_info; //DX20191218
+              vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
+              vector<vector<double> > possible_minimum_distances;
+              vector<vector<xstructure> > vvprotos;
+              for(uint n=0; n<num_proc; n++){
+                vector<xstructure> vprotos_tmp;
+                vvprotos.push_back(vprotos_tmp);
+                xstr1_for_thread.push_back(xstr1_tmp);
+                structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX20191218
+                possible_min_misfit_info.push_back(temp_misfit_info); //DX20191218
+                vector<uint> tmp_indices;
+                possible_matching_indices_1.push_back(tmp_indices);
+                possible_matching_indices_2.push_back(tmp_indices);
+                vector<double> tmp_distances;
+                possible_minimum_distances.push_back(tmp_distances);
+              }
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
-          // ---------------------------------------------------------------------------
-          // threaded (DX20191107 thread pointer) 
-          vector<std::thread*> threads;
-          if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
-          for(uint n=0; n<number_of_threads; n++){
-            threads.push_back(new std::thread(structureSearch,
-                  std::ref(xstr1_for_thread[n]),
-                  std::ref(xstr_supercell),
-                  std::ref(all_nn1),
-                  std::ref(lfa_str2),
-                  type_match,
-                  std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
-                  //DX20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
-                  thread_distribution[n][0], thread_distribution[n][1],
-                  std::ref(possible_min_misfit_info[n]), //DX20191218
-                  std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
-                  std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
-                  optimize_match));
-          }         
-          for(uint t=0;t<threads.size();t++){
-            threads[t]->join();
-            delete threads[t];
-          }
+              // ---------------------------------------------------------------------------
+              // threaded (DX20191107 thread pointer) 
+              vector<std::thread*> threads;
+              if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
+              for(uint n=0; n<number_of_threads; n++){
+                threads.push_back(new std::thread(structureSearch,
+                      std::ref(xstr1_for_thread[n]),
+                      std::ref(xstr_supercell),
+                      std::ref(all_nn1),
+                      std::ref(lfa_str2),
+                      type_match,
+                      std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
+                      //DX20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
+                      thread_distribution[n][0], thread_distribution[n][1],
+                      std::ref(possible_min_misfit_info[n]), //DX20191218
+                      std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
+                      std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
+                      optimize_match));
+              }         
+              for(uint t=0;t<threads.size();t++){
+                threads[t]->join();
+                delete threads[t];
+              }
 #else
-          // ---------------------------------------------------------------------------
-          // non-threaded 
-          uint n=0;
-          uint start_index=0;
-          uint end_index=lattices.size();  //DX20191107 switching end point convention
-          if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
-          //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
-          //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
-          structureSearch(
-              xstr1_for_thread[n],
-              xstr_supercell,
-              all_nn1,
-              lfa_str2,
-              type_match,
-              lattices,clattices,latt_devs,
-              start_index, end_index,
-              possible_min_misfit_info[n], //DX20191218
-              possible_matching_indices_1[n],possible_matching_indices_2[n],
-              possible_minimum_distances[n],vvprotos[n],
-              optimize_match);
+              // ---------------------------------------------------------------------------
+              // non-threaded 
+              uint n=0;
+              uint start_index=0;
+              uint end_index=lattices.size();  //DX20191107 switching end point convention
+              if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
+              //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
+              //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
+              structureSearch(
+                  xstr1_for_thread[n],
+                  xstr_supercell,
+                  all_nn1,
+                  lfa_str2,
+                  type_match,
+                  lattices,clattices,latt_devs,
+                  start_index, end_index,
+                  possible_min_misfit_info[n], //DX20191218
+                  possible_matching_indices_1[n],possible_matching_indices_2[n],
+                  possible_minimum_distances[n],vvprotos[n],
+                  optimize_match);
 #endif
 
-          // ---------------------------------------------------------------------------
-          // collect misfits and matching structure representations
-          for(uint p=0;p<possible_min_misfit_info.size();p++){
-            if(p==0 && y==0 && x==0){ //DX20170208 - need to add x==0 ortherwise matches can be overwritten
-              min_misfit_info=possible_min_misfit_info[p]; //DX20191218
-              matching_indices_1=possible_matching_indices_1[p];
-              matching_indices_2=possible_matching_indices_2[p];
-              minimum_distances=possible_minimum_distances[p];
-              xstr1=xstr1_for_thread[p];
-              vprotos=vvprotos[p];
-            }
-            else {
-              if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
-                min_misfit_info=possible_min_misfit_info[p]; //DX20191218
-                matching_indices_1=possible_matching_indices_1[p];
-                matching_indices_2=possible_matching_indices_2[p];
-                minimum_distances=possible_minimum_distances[p];
-                xstr1=xstr1_for_thread[p];
-                vprotos=vvprotos[p];
+              // ---------------------------------------------------------------------------
+              // collect misfits and matching structure representations
+              for(uint p=0;p<possible_min_misfit_info.size();p++){
+                if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
+                  min_misfit_info=possible_min_misfit_info[p]; //DX20191218
+                  matching_indices_1=possible_matching_indices_1[p];
+                  matching_indices_2=possible_matching_indices_2[p];
+                  minimum_distances=possible_minimum_distances[p];
+                  xstr1=xstr1_for_thread[p];
+                  vprotos=vvprotos[p];
+                }
+              }
+
+              // ---------------------------------------------------------------------------
+              // quick return if found a match
+              if(min_misfit_info.misfit<0.1 && !optimize_match){
+                if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
+                printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+                    matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
+                return;
+              }
+
+              // ---------------------------------------------------------------------------
+              // quick return if testing only one origin //DX20200715
+              if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE)){ test_one_origin_only=true;}
+              if(test_one_origin_only){
+                if(LDEBUG){cerr << function_name << " No mapping found. Searched only one origin. Terminating search early." << endl;}
+                return;
               }
             }
-          }
-
-          // ---------------------------------------------------------------------------
-          // quick return if found a match
-          if(min_misfit_info.misfit<0.1 && !optimize_match){
-            if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
-            printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
-                matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
-            return;
           }
 
           // ---------------------------------------------------------------------------
@@ -8090,10 +8195,12 @@ namespace compare{
 
     vector<string> species_str1=sortSpeciesByFrequency(xstr1);
     deque<_atom> xstr1_atoms;
+    vector<double> all_nn1_resorted;
     for(uint i=0;i<species_str1.size();i++){
       for(uint j=0;j<xstr1.atoms.size();j++){
         if(species_str1[i]==xstr1.atoms[j].name){
           xstr1_atoms.push_back(xstr1.atoms[j]);
+          all_nn1_resorted.push_back(all_nn1[j]); //DX20200713    
         }
       }
     }
@@ -8193,6 +8300,7 @@ namespace compare{
       if(sameSpecies(proto,xstr1,false)){
         vector<string> species_str2=sortSpeciesByFrequency(proto);
         vector<double> all_nn_proto;
+        vector<double> all_nn_proto_resorted; //DX20200713
         bool all_nn_calculated = false;
         for(uint iat=0; iat<proto.atoms.size();iat++){
           if(proto.atoms[iat].name==lfa){
@@ -8229,9 +8337,17 @@ namespace compare{
                     cerr << "compare::structureSearch: Nearest neighbor distance from " << a << " atom: " << all_nn_proto[a] << endl;
                   }
                 }
+                all_nn_proto_resorted.clear(); //DX20200715
+                for(uint i=0;i<species_str2.size();i++){
+                  for(uint j=0;j<proto.atoms.size();j++){
+                    if(species_str2[i]==proto.atoms[j].name){
+                      all_nn_proto_resorted.push_back(all_nn_proto[j]); //DX20200715
+                    }
+                  }
+                }
                 all_nn_calculated = true;
               }
-              coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,map_index_str1,map_index_str2,min_dists,cd,f);
+              coordinateDeviation(xstr1,proto,all_nn1_resorted,all_nn_proto_resorted,map_index_str1,map_index_str2,min_dists,cd,f); //DX20200713 - used resorted nn's
               if(_CALCULATE_MAGNETIC_MISFIT_&& 
                   ((xstr1.atoms[0].spin_is_given && proto.atoms[0].spin_is_given) || 
                    (xstr1.atoms[0].noncoll_spin_is_given && proto.atoms[0].noncoll_spin_is_given))){

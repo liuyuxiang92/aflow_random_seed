@@ -446,6 +446,10 @@ namespace compare{
   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
       const xmatrix<double>& lattice);
+  xvector<double> centroid(const xstructure& xstr); //DX20200715
+  xvector<double> centroid(const deque<_atom>& atoms); //DX20200715
+  xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
+  xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
   //bool findMatch(const xstructure& xstr1, const xstructure& PROTO,vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, const int& type_match);
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,

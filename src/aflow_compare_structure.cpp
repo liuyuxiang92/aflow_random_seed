@@ -3030,6 +3030,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
+    // //DX20200715 - may need to rescale this if the structures are being scaled later....
     if(xstr_base.dist_nn_min==AUROSTD_NAN){ xstr_base.dist_nn_min=SYM::minimumDistance(xstr_base); }
     if(xstr_test.dist_nn_min==AUROSTD_NAN){ xstr_test.dist_nn_min=SYM::minimumDistance(xstr_test); }
 
