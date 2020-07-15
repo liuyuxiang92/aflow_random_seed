@@ -22,7 +22,13 @@
 
 _XHOST::_XHOST() {  // constructor PUBLIC
   PID=0;
+  TID=0;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
+  sPID="";
+  sTID="";
+  showPID=FALSE;
+  showTID=FALSE;
   QUIET=FALSE;
   TEST=FALSE;
   DEBUG=FALSE;
@@ -118,7 +124,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   SKEW_TEST=FALSE; //DX20171019
   SKEW_TOL=AUROSTD_NAN; //DX20171019
   // WEB
-  WEB_MODE=FALSE; //CO20190402
+  //[CO20200404 - overload with --www]WEB_MODE=FALSE; //CO20190402
 };
 
 _XHOST::~_XHOST() { // destructor PUBLIC
@@ -127,7 +133,13 @@ _XHOST::~_XHOST() { // destructor PUBLIC
 
 void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   PID=b.PID;
+  TID=b.TID;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));ostrPID << b.ostrPID.str();
+  ostrTID.clear();ostrTID.str(string(""));ostrTID << b.ostrTID.str(); //CO20200502 - threadID
+  sPID=b.sPID;
+  sTID=b.sTID;
+  showPID=b.showPID;
+  showTID=b.showTID;
   QUIET=b.QUIET;
   TEST=b.TEST;
   DEBUG=b.DEBUG;
@@ -210,7 +222,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   SKEW_TEST=b.SKEW_TEST; //DX20171019
   SKEW_TOL=b.SKEW_TOL; //DX20171019
   // WEB
-  WEB_MODE=b.WEB_MODE;  //CO20190402
+  //[CO20200404 - overload with --www]WEB_MODE=b.WEB_MODE;  //CO20190402
 }
 
 const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
@@ -228,9 +240,10 @@ const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
 
 void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   vTemperatureCore.clear();
-  //  thread.clear();
-  //  iret.clear();
+  // thread.clear();
+  // iret.clear();
   // thread_busy.clear();
   vcmd.clear();
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
@@ -267,17 +280,15 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
-  string soliloquy="_XHOST::command():";  //CO20190629
+  string soliloquy = XPID + "_XHOST::command():";  //CO20190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
 #endif
-  // for(uint i=0;i<vcmd.size();i++) if(aurostd::substring2bool(vcmd.at(i),_command)) return vcmd.at(i); // found before..  [KY]
-  // for(uint i=0;i<vcmd.size();i++) if(vcmd.at(i)==command || aurostd::substring2bool(vcmd.at(i),command)) return vcmd.at(i); // found before..
   //first check for EXACT match in vcmds  //CO20180705
-  if(command=="aflow_data"&&aurostd::FileExist("./aflow_data")){return "./aflow_data";} //CO20180705 - hack for developers, prefer ./aflow_data over aflow_data in PATH, as it is probably newer (development)
-  for(uint i=0;i<vcmd.size();i++){
-    if(vcmd.at(i)==command){
+  if(command=="aflow_data"&&aurostd::FileExist("./aflow_data")) {return "./aflow_data";} //CO20180705 - hack for developers, prefer ./aflow_data over aflow_data in PATH, as it is probably newer (development)
+  for(uint i=0;i<vcmd.size();i++) {
+    if(vcmd.at(i)==command) {
       return vcmd.at(i);
     }// found before.. only == otherwise cat gets confused with bzcat
   }
@@ -293,11 +304,11 @@ std::string _XHOST::command(const string& command) {
   //we need to strip vcmd's to basename and check
   vector<string> path_parts;
   string basename;
-  for(uint i=0;i<vcmd.size();i++){
+  for(uint i=0;i<vcmd.size();i++) {
     aurostd::string2tokens(vcmd[i],path_parts,"/",true);  //consecutive
-    if(path_parts.size()){
+    if(path_parts.size()) {
       basename=path_parts[path_parts.size()-1];
-      if(basename==command){
+      if(basename==command) {
         return vcmd[i];
       }
     }
@@ -310,7 +321,7 @@ std::string _XHOST::command(const string& command) {
 
 bool _XHOST::is_command(const string& command) {
   try{string path=_XHOST::command(command);return !path.empty();}    //CO20190629 - using xerror now
-  catch(aurostd::xerror& excpt){return false;}  //CO20190629 - using xerror now
+  catch(aurostd::xerror& excpt) {return false;}  //CO20190629 - using xerror now
   //[CO20190629 - using xerror now]return !_XHOST::command(command).empty(); //CO20180705
   //[CO20180705 OBSOLETE]string _command=command;
   //[CO20180705 OBSOLETE]#ifdef _MACOSX_
@@ -552,21 +563,6 @@ _kflags::_kflags() {
   KBIN_PHONONS_CALCULATION_APL                     = FALSE;
   KBIN_PHONONS_CALCULATION_QHA                     = FALSE; //CO20170601
   KBIN_PHONONS_CALCULATION_AAPL                    = FALSE; //CO20170601
-  //ME20190208 START
-  // Flags must be initialized to false, or they may be initialized
-  // to random numbers
-  KBIN_PHONONS_CALCULATION_QHA_A                   = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA_B                   = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA_C                   = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA                   = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA_A                 = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA_B                 = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA_C                 = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P                   = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P_A                 = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P_B                 = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P_C                 = FALSE;
-  //ME20190208 END
   KBIN_PHONONS_CALCULATION_AGL                     = FALSE;
   KBIN_PHONONS_CALCULATION_AEL                     = FALSE;
   KBIN_PHONONS_CALCULATION_FROZSL                  = FALSE;
@@ -677,19 +673,6 @@ void _kflags::copy(const _kflags& b) {
   KBIN_PHONONS_CALCULATION_AAPL                    = b.KBIN_PHONONS_CALCULATION_AAPL; //CO20170601
   KBIN_PHONONS_CALCULATION_AGL                     = b.KBIN_PHONONS_CALCULATION_AGL;
   KBIN_PHONONS_CALCULATION_AEL                     = b.KBIN_PHONONS_CALCULATION_AEL;
-  //ME20190208 START
-  KBIN_PHONONS_CALCULATION_QHA_A                   = b.KBIN_PHONONS_CALCULATION_QHA_A;
-  KBIN_PHONONS_CALCULATION_QHA_B                   = b.KBIN_PHONONS_CALCULATION_QHA_B;
-  KBIN_PHONONS_CALCULATION_QHA_C                   = b.KBIN_PHONONS_CALCULATION_QHA_C;
-  KBIN_PHONONS_CALCULATION_SCQHA                   = b.KBIN_PHONONS_CALCULATION_SCQHA;
-  KBIN_PHONONS_CALCULATION_SCQHA_A                 = b.KBIN_PHONONS_CALCULATION_SCQHA_A;
-  KBIN_PHONONS_CALCULATION_SCQHA_B                 = b.KBIN_PHONONS_CALCULATION_SCQHA_B;
-  KBIN_PHONONS_CALCULATION_SCQHA_C                 = b.KBIN_PHONONS_CALCULATION_SCQHA_C;
-  KBIN_PHONONS_CALCULATION_QHA3P                   = b.KBIN_PHONONS_CALCULATION_QHA3P;
-  KBIN_PHONONS_CALCULATION_QHA3P_A                 = b.KBIN_PHONONS_CALCULATION_QHA3P_A;
-  KBIN_PHONONS_CALCULATION_QHA3P_B                 = b.KBIN_PHONONS_CALCULATION_QHA3P_B;
-  KBIN_PHONONS_CALCULATION_QHA3P_C                 = b.KBIN_PHONONS_CALCULATION_QHA3P_C;
-  //ME20190208 END
   KBIN_PHONONS_CALCULATION_FROZSL                  = b.KBIN_PHONONS_CALCULATION_FROZSL;
   KBIN_PHONONS_CALCULATION_FROZSL_output           = b.KBIN_PHONONS_CALCULATION_FROZSL_output;
   KBIN_PHONONS_CALCULATION_FROZSL_poscars          = b.KBIN_PHONONS_CALCULATION_FROZSL_poscars;
@@ -1043,8 +1026,8 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_KPOINTS_PHONONS_KPPRA                                = b.KBIN_VASP_KPOINTS_PHONONS_KPPRA;
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME                              = b.KBIN_VASP_KPOINTS_PHONONS_KSCHEME;
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY                  = b.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;
-  KBIN_VASP_KPOINTS_PHONONS_GRID                                 = b.KBIN_VASP_KPOINTS_PHONONS_GRID;  // ME20200427
-  KBIN_VASP_KPOINTS_PHONONS_SHIFT                                = b.KBIN_VASP_KPOINTS_PHONONS_SHIFT; // ME20200427
+  KBIN_VASP_KPOINTS_PHONONS_GRID                                 = b.KBIN_VASP_KPOINTS_PHONONS_GRID;  //ME20200427
+  KBIN_VASP_KPOINTS_PHONONS_SHIFT                                = b.KBIN_VASP_KPOINTS_PHONONS_SHIFT; //ME20200427
   // BANDS
   KBIN_VASP_KPOINTS_BANDS_LATTICE                                = b.KBIN_VASP_KPOINTS_BANDS_LATTICE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -1287,7 +1270,7 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::KPOINTS_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVECAR_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVEDER_PRESERVED",FALSE);           // DEFAULT VALUES
-  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES   //CO20170601
   aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",FALSE);        // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_APL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_QHA=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
@@ -1362,12 +1345,12 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] AFLOWIN_FLAG_AIMS                      = b.AFLOWIN_FLAG_AIMS;
   // AVASP
   AVASP_aflowin_only_if_missing            = b.AVASP_aflowin_only_if_missing;
-  AVASP_arun                               = b.AVASP_arun;            // ME20181019
-  AVASP_arun_mode                          = b.AVASP_arun_mode;       // ME20181019
-  AVASP_arun_runname                       = b.AVASP_arun_runname;    // ME20181019
-  aplopts                                  = b.aplopts;               // ME20181025
-  aaplopts                                 = b.aaplopts;              // ME20181025
-  qhaopts                                  = b.qhaopts;               // AS20200302
+  AVASP_arun                               = b.AVASP_arun;            //ME20181019
+  AVASP_arun_mode                          = b.AVASP_arun_mode;       //ME20181019
+  AVASP_arun_runname                       = b.AVASP_arun_runname;    //ME20181019
+  aplopts                                  = b.aplopts;               //ME20181025
+  aaplopts                                 = b.aaplopts;              //ME20181025
+  qhaopts                                  = b.qhaopts;               //AS20200302
   AVASP_dirbase                            = b.AVASP_dirbase;
   AVASP_libbase                            = b.AVASP_libbase;
   AVASP_label                              = b.AVASP_label;
@@ -1514,17 +1497,17 @@ _aimsflags::~_aimsflags() {
 
 void _aimsflags::free() {
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear();
-  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].clear();} //DX20191220 - uppercase to lowercase clear
+  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++) {KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].clear();} //DX20191220 - uppercase to lowercase clear
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear();
 }
 
-void _aimsflags::copy(const _aimsflags& b){
+void _aimsflags::copy(const _aimsflags& b) {
   KBIN_AIMS_FORCE_OPTION_NOTUNE=b.KBIN_AIMS_FORCE_OPTION_NOTUNE;
   KBIN_AIMS_RUN=b.KBIN_AIMS_RUN;
   KBIN_AIMS_GEOM_MODE=b.KBIN_AIMS_GEOM_MODE;
   KBIN_AIMS_GEOM_FILE=b.KBIN_AIMS_GEOM_FILE;
-  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING[i]);}
-  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i]);}
+  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++) {KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING[i]);}
+  KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear(); for(uint i=0;i<b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++) {KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(b.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i]);}
   KBIN_AIMS_GEOM_FILE_VOLUME=b.KBIN_AIMS_GEOM_FILE_VOLUME;
   KBIN_AIMS_FORCE_OPTION_VOLUME=b.KBIN_AIMS_FORCE_OPTION_VOLUME;
   KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL=b.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL;
@@ -1581,7 +1564,7 @@ void _xaims::free() {
   xqsub.clear();
 }
 
-void _xaims::copy(const _xaims& b){
+void _xaims::copy(const _xaims& b) {
   GEOM_index=b.GEOM_index;
   str=b.str;
   Directory=b.Directory;
@@ -1778,9 +1761,9 @@ _xflags::_xflags() {
   AFLOW_MODE_ALIEN=false;
   free();
 }
-_xflags::_xflags(_vflags& vflags){setVFlags(vflags);}
-_xflags::_xflags(_aimsflags& aimsflags){setAIMSFlags(aimsflags);}
-_xflags::_xflags(_alienflags& alienflags){setALIENFlags(alienflags);}
+_xflags::_xflags(_vflags& vflags) {setVFlags(vflags);}
+_xflags::_xflags(_aimsflags& aimsflags) {setAIMSFlags(aimsflags);}
+_xflags::_xflags(_alienflags& alienflags) {setALIENFlags(alienflags);}
 
 _xflags::~_xflags() {
   free();
@@ -1792,7 +1775,7 @@ void _xflags::free() {
   alienflags.clear();
 }
 
-void _xflags::copy(const _xflags& b){
+void _xflags::copy(const _xflags& b) {
   AFLOW_MODE_VASP=b.AFLOW_MODE_VASP;
   vflags=b.vflags;
   AFLOW_MODE_AIMS=b.AFLOW_MODE_AIMS;
@@ -1818,21 +1801,21 @@ void _xflags::clear() {
   copy(xflags_temp);
 }
 
-void _xflags::setVFlags(_vflags& in_vflags){
+void _xflags::setVFlags(_vflags& in_vflags) {
   vflags=in_vflags;
   AFLOW_MODE_VASP=true;
   AFLOW_MODE_AIMS=false;
   AFLOW_MODE_ALIEN=false;
 }
 
-void _xflags::setAIMSFlags(_aimsflags& in_aimsflags){
+void _xflags::setAIMSFlags(_aimsflags& in_aimsflags) {
   aimsflags=in_aimsflags;
   AFLOW_MODE_VASP=false;
   AFLOW_MODE_AIMS=true;
   AFLOW_MODE_ALIEN=false;
 }
 
-void _xflags::setALIENFlags(_alienflags& in_alienflags){
+void _xflags::setALIENFlags(_alienflags& in_alienflags) {
   alienflags=in_alienflags;
   AFLOW_MODE_VASP=false;
   AFLOW_MODE_AIMS=false;
@@ -1862,7 +1845,7 @@ void _xinput::free() {
   xalien.clear();
 }
 
-void _xinput::copy(const _xinput& b){
+void _xinput::copy(const _xinput& b) {
   AFLOW_MODE_VASP=b.AFLOW_MODE_VASP;
   xvasp=b.xvasp;
   AFLOW_MODE_AIMS=b.AFLOW_MODE_AIMS;
@@ -1910,43 +1893,43 @@ void _xinput::setXALIEN(_xalien& in_xalien) {
 }
 
 xstructure& _xinput::getXStr() {
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)){
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
     cerr << "_xinput::getXStr: no xstructure available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP){return xvasp.str;}
-  if(AFLOW_MODE_AIMS){return xaims.str;}
+  if(AFLOW_MODE_VASP) {return xvasp.str;}
+  if(AFLOW_MODE_AIMS) {return xaims.str;}
   return xvasp.str; //otherwise, return garbage
 }
 
 string& _xinput::getDirectory() {
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)){
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
     cerr << "_xinput::getDirectory: no Directory available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP){return xvasp.Directory;}
-  if(AFLOW_MODE_AIMS){return xaims.Directory;}
-  if(AFLOW_MODE_ALIEN){return xalien.Directory;}
+  if(AFLOW_MODE_VASP) {return xvasp.Directory;}
+  if(AFLOW_MODE_AIMS) {return xaims.Directory;}
+  if(AFLOW_MODE_ALIEN) {return xalien.Directory;}
   return xvasp.Directory; //otherwise, return garbage
 }
 
-void _xinput::setXStr(const xstructure& str,bool set_all){
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)){
+void _xinput::setXStr(const xstructure& str,bool set_all) {
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
     cerr << "_xinput::setStr: no xstructure available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP || set_all){xvasp.str=str;}
-  if(AFLOW_MODE_AIMS || set_all){xaims.str=str;}
+  if(AFLOW_MODE_VASP || set_all) {xvasp.str=str;}
+  if(AFLOW_MODE_AIMS || set_all) {xaims.str=str;}
 }
 
-void _xinput::setDirectory(string Directory,bool set_all){
-  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)){
+void _xinput::setDirectory(string Directory,bool set_all) {
+  if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
     cerr << "_xinput::setDirectory: no Directory available!" << endl;
     exit(1);
   }
-  if(AFLOW_MODE_VASP  || set_all){xvasp.Directory=  Directory;}
-  if(AFLOW_MODE_AIMS  || set_all){xaims.Directory=  Directory;}
-  if(AFLOW_MODE_ALIEN || set_all){xalien.Directory= Directory;}
+  if(AFLOW_MODE_VASP  || set_all) {xvasp.Directory=  Directory;}
+  if(AFLOW_MODE_AIMS  || set_all) {xaims.Directory=  Directory;}
+  if(AFLOW_MODE_ALIEN || set_all) {xalien.Directory= Directory;}
 }
 
 // **************************************************************************
@@ -2023,47 +2006,43 @@ const _xqsub& _xqsub::operator=(const _xqsub& b) {  // operator=
 // look into aflow.h for the definitions
 
 // constructors
-xStream::xStream() : p_FileMESSAGE(NULL),f_new_ofstream(false) {} //{free();}
-xStream::~xStream() {free();} //{freeAll();} //CO20190318
-//void xStream::free() {} //CO20190318 - not necessary
+xStream::xStream(ostream& oss) : p_FileMESSAGE(NULL),f_new_ofstream(false) {initialize(oss);} //{free();}
+xStream::xStream(ofstream& ofs,ostream& oss) : p_FileMESSAGE(NULL),f_new_ofstream(false) {initialize(ofs,oss);} //{free();}
+xStream::~xStream() {free();} //CO20190318
 void xStream::free() {
-  p_oss=NULL;
-  if(f_new_ofstream){delete p_FileMESSAGE;}  //first delete, then set to null
+  if(f_new_ofstream) {delete p_FileMESSAGE;}  //first delete, then set to null
   p_FileMESSAGE=NULL;
   f_new_ofstream=false;
+  p_oss=NULL;
 }
-//void xStream::freeAll(){free();free();}  //CO20190318 - not necessary
-void xStream::copy(const xStream& b){
+void xStream::copy(const xStream& b) {
   //must handle this very carefully
   //first, since we are interested in copying the stream from b, we must delete the new pointer of self (if it's new)
   //if b is new, don't copy b's pointer, as it doesn't belong to self (and should not be deleted by self)
   //simply create a new one, and declare it as such
   //p_FileMESSAGE=b.p_FileMESSAGE;
   free();
-  p_oss=b.p_oss;
-  if(b.f_new_ofstream){p_FileMESSAGE=(new ofstream());}
-  else {p_FileMESSAGE=b.p_FileMESSAGE;}
+  if(b.f_new_ofstream) {p_FileMESSAGE=(new ofstream());}
+  else {setOFStream(*b.p_FileMESSAGE);}  //p_FileMESSAGE=b.p_FileMESSAGE;
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
+  setOSS(*b.p_oss); //p_oss=b.p_oss;
 }
 ostream* xStream::getOSS() const {return p_oss;} //CO20191110
 ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
-void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
+void xStream::setOFStream(ofstream& FileMESSAGE) {p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
-
-// ME20200427 - Initializer functions
+//ME20200427 START - Initializer functions
 void xStream::initialize(ostream& oss) {
   free();
-  p_FileMESSAGE = new ofstream();
-  f_new_ofstream = true;
-  initialize(*p_FileMESSAGE, oss);
-  f_new_ofstream = true;  // override
+  p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*p_FileMESSAGE,oss);
+  f_new_ofstream=true;  // override
 }
-
-void xStream::initialize(ofstream& ofs, ostream& oss) {
-  setOFStream(ofs);
-  f_new_ofstream = false;
+void xStream::initialize(ofstream& ofs,ostream& oss) {
+  setOFStream(ofs);f_new_ofstream=false;
   setOSS(oss);
 }
+//ME20200427 STOP - Initializer functions
 
 #endif  // _AFLOW_CLASSES_CPP
 

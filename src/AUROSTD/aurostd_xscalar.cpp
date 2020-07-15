@@ -664,6 +664,25 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// Function ishex
+// ***************************************************************************
+// ME20200707
+// Quick check if the string is a hexadecimal string
+namespace aurostd {
+  bool _ishex(const string& hexstr) {
+    uint istart = 0;
+    uint str_len = hexstr.size();
+    // Also process hexadecimal numbers with the '0x' prefix.
+    if ((str_len > 2) && (hexstr[0] == '0') && hexstr[1] == 'x') istart = 2;
+    for (uint i = istart; i < str_len; i++) {
+      // Return false if chars aren't '0-9' or 'a-f' - https://www.asciitable.com/
+      if ((hexstr[i] < 48) || ((hexstr[i] > 57) && (hexstr[i] < 97)) || (hexstr[i] > 102)) return false;
+    }
+    return true;
+  }
+}
+
+// ***************************************************************************
 // Function isodd
 // ***************************************************************************
 namespace aurostd {
@@ -934,6 +953,27 @@ namespace aurostd { //CO20191201
   long long int powint(long long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO20191201
   unsigned long long int powint(unsigned long long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO20191201
 }
+
+//AS20200513 BEGIN
+namespace aurostd{
+  double FermiDirac(double E, double mu, double T){
+    if (T<0) return 0;
+
+    if (T>_ZERO_TOL_){
+      return 1/(1+std::exp((E-mu)/(KBOLTZEV*T)));
+    }
+    else
+      // At T=0 FD transforms to Heaviside step function
+      if (E<mu){
+        return 1;
+      }
+      else if (E>mu){
+        return 0;
+      }
+      else return 0.5;
+  }
+}
+//AS20200513 END
 
 #endif // _AUROSTD_XSCALAR_CPP_
 

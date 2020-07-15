@@ -28,154 +28,157 @@ using std::fixed;
 
 class AELStageBreak : public std::exception
 {
- public:
-  AELStageBreak() { }
+  public:
+    AELStageBreak() { }
 };
 
 // Class to hold input and output data for Elastic constants
 class _AEL_data {
- public:
-  // constructors/destructors
-  _AEL_data();
-  ~_AEL_data();
-  const _AEL_data& operator=(const _AEL_data &b);    
-  
-  // Input title and filename
-  string dirpathname;
-  string sysname;
+  public:
+    // constructors/destructors
+    _AEL_data();
+    ~_AEL_data();
+    const _AEL_data& operator=(const _AEL_data &b);    
 
-  // User input data
-  double symtolfrac;
+    // Input title and filename
+    string dirpathname;
+    string sysname;
 
-  // Variables to control what is calculated within AEL
-  bool calcstrainorigin;
-  bool fitstrainorigin;
-  bool fitrelaxedstruct;
-  bool negstrain;
-  bool gaussxm_debug;
+    // User input data
+    double symtolfrac;
 
-  // Variable to control where stress tensor is read from vasprun.xml file
-  bool vasprunxmlstress;
+    // Variables to control what is calculated within AEL
+    bool calcstrainorigin;
+    bool fitstrainorigin;
+    bool fitrelaxedstruct;
+    bool negstrain;
+    bool gaussxm_debug;
 
-  // Variable to control whether PREC and ALGO values are set to ACCURATE and NORMAL, or are left as defaults/read from aflow.in file
-  bool precaccalgonorm;
+    // Variable to control where stress tensor is read from vasprun.xml file
+    bool vasprunxmlstress;
 
-  // Variable to control what aflow run type is used (relax, static or relax_static)
-  bool relax_static;
-  bool static_only;
-  bool relax_only;
-  bool aflowin_overwrite;
+    // Variable to control whether PREC and ALGO values are set to ACCURATE and NORMAL, or are left as defaults/read from aflow.in file
+    bool precaccalgonorm;
 
-  // Variable to let other parts of AFLOW know where or not the material is mechanically stable
-  bool mechanically_stable;
+    // Variable to control what aflow run type is used (relax, static or relax_static)
+    bool relax_static;
+    bool static_only;
+    bool relax_only;
+    bool aflowin_overwrite;
 
-  // Variable to record applied and external pressure for AEL calculation
-  double applied_pressure;
-  double average_external_pressure;
+    // Variable to control if this is a postprocessing run (suppresses creation of new ARUN directories)
+    bool postprocess;
 
-  // Variables to control fitting order for polynomial for stress-strain points
-  int normalpolyfitorder;
-  int shearpolyfitorder;
+    // Variable to let other parts of AFLOW know where or not the material is mechanically stable
+    bool mechanically_stable;
 
-  // List of failed ARUN directories to be skipped by AEL fitting procedure
-  vector<string> failed_arun_list;
-  bool autoskipfailedaruns;
-  uint skiparunsmax;
+    // Variable to record applied and external pressure for AEL calculation
+    double applied_pressure;
+    double average_external_pressure;
 
-  // Variable to control whether elastic stiffness tensor is symmetrized
-  bool symmetrize_elastic_tensor;
+    // Variables to control fitting order for polynomial for stress-strain points
+    int normalpolyfitorder;
+    int shearpolyfitorder;
 
-  // Variable to switch off VASP symmetrization
-  bool vasp_symmetry;
+    // List of failed ARUN directories to be skipped by AEL fitting procedure
+    vector<string> failed_arun_list;
+    bool autoskipfailedaruns;
+    uint skiparunsmax;
 
-  // Variables for cell mass, volume and density used to calculate speed of sound
-  double cellmasskg;
-  double cellvolumem3;
-  double mass_density;
+    // Variable to control whether elastic stiffness tensor is symmetrized
+    bool symmetrize_elastic_tensor;
 
-  // Data calculated within AEL
-  double poisson_ratio;
-  double bulkmodulus_voigt;
-  double bulkmodulus_voigt_half;
-  double bulkmodulus_reuss;
-  double bulkmodulus_reuss_half;
-  double shearmodulus_voigt;
-  double shearmodulus_voigt_half;
-  double shearmodulus_reuss;
-  double shearmodulus_reuss_half;
-  double bulkmodulus_vrh;
-  double bulkmodulus_vrh_half;
-  double shearmodulus_vrh;
-  double shearmodulus_vrh_half;
-  double elastic_anisotropy;
-  // Elastic modulus or Young's modulus, using definition E = 9BG/(3B+G)
-  double youngsmodulus_vrh;
-  // Speed of sound: see J.-P. Poirer, Introduction to the Physics of the Earth's Interior
-  double speed_sound_transverse;
-  double speed_sound_longitudinal;
-  double speed_sound_average;
-  // Pugh's modulus = G/B: see Phil. Mag. S7, 45, 367; PRB 84, 121405 and Intermetallics 19, 1275
-  double pughs_modulus_ratio;
-  // Debye temperature at zero temperature from speed of sound: see J.-P. Poirer, Introduction to the Physics of the Earth's Interior
-  double debye_temperature;
-  double natomscell;
+    // Variable to switch off VASP symmetrization
+    bool vasp_symmetry;
 
-  // Elastic constants / compliance tensors
-  vector<vector<double> > elastic_tensor;
-  vector<vector<double> > elastic_tensor_half;
-  vector<vector<double> > compliance_tensor;
-  vector<vector<double> > compliance_tensor_half;
-  vector<double> elastic_eigenvalues;
-  vector<double> youngsmodulus_directional;
-  vector<double> shearmodulus_directional;
-  vector<double> poissonratio_directional;
-  // [OBSOLETE] aurostd::xmatrix<double> elastic_tensor;
-  // [OBSOLETE] aurostd::xmatrix<double> compliance_tensor;
-  // [OBSOLETE] aurostd::xmatrix<double> elastic_tensor(6, 6);
-  // [OBSOLETE] aurostd::xmatrix<double> compliance_tensor(6, 6);
-  // [OBSOLETE] xmatrix<double> elastic_tensor(6, 6);
-  // [OBSOLETE] xmatrix<double> compliance_tensor(6, 6);
+    // Variables for cell mass, volume and density used to calculate speed of sound
+    double cellmasskg;
+    double cellvolumem3;
+    double mass_density;
 
-  // Normal strain deformations
-  vector<double> normal_deformations;
+    // Data calculated within AEL
+    double poisson_ratio;
+    double bulkmodulus_voigt;
+    double bulkmodulus_voigt_half;
+    double bulkmodulus_reuss;
+    double bulkmodulus_reuss_half;
+    double shearmodulus_voigt;
+    double shearmodulus_voigt_half;
+    double shearmodulus_reuss;
+    double shearmodulus_reuss_half;
+    double bulkmodulus_vrh;
+    double bulkmodulus_vrh_half;
+    double shearmodulus_vrh;
+    double shearmodulus_vrh_half;
+    double elastic_anisotropy;
+    // Elastic modulus or Young's modulus, using definition E = 9BG/(3B+G)
+    double youngsmodulus_vrh;
+    // Speed of sound: see J.-P. Poirer, Introduction to the Physics of the Earth's Interior
+    double speed_sound_transverse;
+    double speed_sound_longitudinal;
+    double speed_sound_average;
+    // Pugh's modulus = G/B: see Phil. Mag. S7, 45, 367; PRB 84, 121405 and Intermetallics 19, 1275
+    double pughs_modulus_ratio;
+    // Debye temperature at zero temperature from speed of sound: see J.-P. Poirer, Introduction to the Physics of the Earth's Interior
+    double debye_temperature;
+    double natomscell;
 
-  // Shear strain deformations
-  vector<double> shear_deformations;
+    // Elastic constants / compliance tensors
+    vector<vector<double> > elastic_tensor;
+    vector<vector<double> > elastic_tensor_half;
+    vector<vector<double> > compliance_tensor;
+    vector<vector<double> > compliance_tensor_half;
+    vector<double> elastic_eigenvalues;
+    vector<double> youngsmodulus_directional;
+    vector<double> shearmodulus_directional;
+    vector<double> poissonratio_directional;
+    // [OBSOLETE] aurostd::xmatrix<double> elastic_tensor;
+    // [OBSOLETE] aurostd::xmatrix<double> compliance_tensor;
+    // [OBSOLETE] aurostd::xmatrix<double> elastic_tensor(6, 6);
+    // [OBSOLETE] aurostd::xmatrix<double> compliance_tensor(6, 6);
+    // [OBSOLETE] xmatrix<double> elastic_tensor(6, 6);
+    // [OBSOLETE] xmatrix<double> compliance_tensor(6, 6);
 
-  // Normal strain matrix
-  vector<vector<xmatrix<double> > > normal_strain;
+    // Normal strain deformations
+    vector<double> normal_deformations;
 
-  // Shear strain matrix
-  vector<vector<xmatrix<double> > > shear_strain;
+    // Shear strain deformations
+    vector<double> shear_deformations;
 
-  // Normal strain matrix
-  vector<vector<double> > normal_deformations_complete;
+    // Normal strain matrix
+    vector<vector<xmatrix<double> > > normal_strain;
 
-  // Shear strain matrix
-  vector<vector<double> > shear_deformations_complete;
+    // Shear strain matrix
+    vector<vector<xmatrix<double> > > shear_strain;
 
-  // Normal strain deformations: only smallest deformations (for linearity check)
-  vector<double> normal_deformations_half;
+    // Normal strain matrix
+    vector<vector<double> > normal_deformations_complete;
 
-  // Shear strain deformations: only smallest deformations (for linearity check)
-  vector<double> shear_deformations_half;
+    // Shear strain matrix
+    vector<vector<double> > shear_deformations_complete;
 
-  // Stress matrices
-  vector<vector<xmatrix<double> > > normal_stress;
-  vector<vector<xmatrix<double> > > shear_stress;
-  // vector<vector<xmatrix<double> > > normal_stress_complete;
-  // vector<vector<xmatrix<double> > > shear_stress_complete;
-  vector<xmatrix<double> > origin_stress;
+    // Normal strain deformations: only smallest deformations (for linearity check)
+    vector<double> normal_deformations_half;
 
-  // Save energies, pressures and stresses
-  vector<double> energycalculated; 
-  vector<double> pressurecalculated;
-  vector<xmatrix<double> > stresscalculated;
-  vector<int> structurecalculated;
-  vector<xmatrix<double> > strain_matrix_list;
+    // Shear strain deformations: only smallest deformations (for linearity check)
+    vector<double> shear_deformations_half;
 
- private:                                                //
-  void free();                                           // free space
+    // Stress matrices
+    vector<vector<xmatrix<double> > > normal_stress;
+    vector<vector<xmatrix<double> > > shear_stress;
+    // vector<vector<xmatrix<double> > > normal_stress_complete;
+    // vector<vector<xmatrix<double> > > shear_stress_complete;
+    vector<xmatrix<double> > origin_stress;
+
+    // Save energies, pressures and stresses
+    vector<double> energycalculated; 
+    vector<double> pressurecalculated;
+    vector<xmatrix<double> > stresscalculated;
+    vector<int> structurecalculated;
+    vector<xmatrix<double> > strain_matrix_list;
+
+  private:                                                //
+    void free();                                           // free space
 };
 
 // Declaration of functions in AEL
@@ -183,10 +186,12 @@ class _AEL_data {
 // Namespace for functions used by AEL method, to avoid potential naming conflicts with other parts of AFLOW
 namespace AEL_functions {
   // Functions to actually run AEL, either directly or from another part of AFLOW
-  uint RunElastic_AEL(_xvasp& xvasp, string AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
-  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, ofstream& FileMESSAGE);
-  uint Get_BulkModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE);
-  uint Get_ShearModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE);
+  uint RunElastic_AEL(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
+  uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, const string& AflowInName, const string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint Get_ElasticProperties_AEL_postprocess(const string& directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor);
+  uint Get_PoissonRatio(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool postprocess, ofstream& FileMESSAGE);
+  uint Get_BulkModulus(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE);
+  uint Get_ShearModulus(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE);
   // Functions for generating aflow.in input files for strained structures and extracting stress tensor data calculated with VASP
   uint aelvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AEL_data& AEL_data, ofstream& FileMESSAGE);
   // [OBSOLETE] uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& kbinFlags, _vflags& vaspFlags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
@@ -194,7 +199,7 @@ namespace AEL_functions {
   // Functions for implementing the elastic constants method 
   uint elasticityfit(_AEL_data& AEL_data, ofstream& FileMESSAGE);
   uint elasticitycheck(_AEL_data& AEL_data, _xvasp& xvasp, ofstream& FileMESSAGE);
-  uint cij_fit(vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, double& Cij, int& npolycoeffwork, bool& gxmdebug, ofstream& FileMESSAGE);
+  uint cij_fit(vector<double>& xdata_to_fit, vector<double>& ydata_to_fit, double& Cij, int& npolycoeffwork, bool gxmdebug, ofstream& FileMESSAGE);
   uint elasticmoduli(_AEL_data& AEL_data, ofstream& FileMESSAGE);
 } // end of namespace
 

@@ -94,18 +94,18 @@ namespace AGL_functions {
   // END CHANGES BY PA20170603
   //
   uint runHugoniot(const std::vector<double>& pressures_external,
-		   const std::vector<double>& temperatures_external,
-		   const std::vector<std::vector<double> >& mass_densities_gcm3,
-		   const std::vector<std::vector<double> >& energies_pT_kJg,
-		   std::vector<std::vector<double> >& hugoniotData, bool hugoniotextrapolate, ofstream& FileMESSAGE,
-		   double desired_initial_pressure_external,
-		   double desired_initial_temperature_external) {
+      const std::vector<double>& temperatures_external,
+      const std::vector<std::vector<double> >& mass_densities_gcm3,
+      const std::vector<std::vector<double> >& energies_pT_kJg,
+      std::vector<std::vector<double> >& hugoniotData, bool hugoniotextrapolate, ofstream& FileMESSAGE,
+      double desired_initial_pressure_external,
+      double desired_initial_temperature_external) {
     // bool LDEBUG=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     if(pressures_external.size() != energies_pT_kJg.size()) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_ERROR_ + " Error in " << __FUNCTION__ << ": pressures_external and "
-	  << "energies_pT_kJg should be the same size, but they are not!" <<  endl;
+        << "energies_pT_kJg should be the same size, but they are not!" <<  endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       // OBSOLETE std::cerr << "Error in " << __FUNCTION__ << ": pressures_external and "
       // OBSOLETE    << "energies_pT_kJg should be the same size, but they are "
@@ -115,7 +115,7 @@ namespace AGL_functions {
     if(temperatures_external.size() != mass_densities_gcm3.size()) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_ERROR_ + " Error in " << __FUNCTION__ << ": temperatures_external and "
-	  << "mass_densities_gcm3 should be the same size, but they are not!" <<  endl;
+        << "mass_densities_gcm3 should be the same size, but they are not!" <<  endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       // OBSOLETE std::cerr << "Error in " << __FUNCTION__ << ": temperatures_external and "
       // OBSOLETE           << "mass_densities_gcm3 should be the same size, but they are "
@@ -150,20 +150,20 @@ namespace AGL_functions {
       double hugoniot_density = 0.0, hugoniot_temperature = 0.0, hugoniot_energy = 0.0;
       // CHANGES BY PA20170603
       uint ret = calculateHugoniotDataPoint(initial_mass_density_gcm3,
-                                            initial_energyDFT_UIntVib_kJg,
-                                            initial_pressure_external,
-                                            // OBSOLETE mass_densities_gcm3,
-					    tmp_mass_densities_gcm3,
-                                            temperatures_external,
-                                            energiesDFT_UIntVib_kJg,
-                                            pressure_external,
-                                            hugoniot_density,
-                                            hugoniot_temperature,
-                                            hugoniot_energy, hugoniotextrapolate, FileMESSAGE);
+          initial_energyDFT_UIntVib_kJg,
+          initial_pressure_external,
+          // OBSOLETE mass_densities_gcm3,
+          tmp_mass_densities_gcm3,
+          temperatures_external,
+          energiesDFT_UIntVib_kJg,
+          pressure_external,
+          hugoniot_density,
+          hugoniot_temperature,
+          hugoniot_energy, hugoniotextrapolate, FileMESSAGE);
       if(ret == 1) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + " calculateHugoniotDataPoint returned with an error!" <<  endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_ERROR_ + " calculateHugoniotDataPoint returned with an error!" <<  endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // OBSOLETE std::cerr << "Error in " << __FUNCTION__ << ": calculateHugoniotDataPoint "
         // OBSOLETE          << "returned with an error!\n";	
         return ret;
@@ -195,7 +195,7 @@ namespace AGL_functions {
   bool inVector(double item, const std::vector<double>& vec, double tol = 1.e-5) {
     for(size_t i = 0; i < vec.size(); ++i) {
       if(aurostd::abs(item - vec.at(i)) < tol)
-	return true;
+        return true;
     }
     return false;
   }
@@ -215,12 +215,12 @@ namespace AGL_functions {
   // found in aflow_agl_debye.h
   //
   uint runHugoniotAllTemperaturesAndPressures(
-					      const std::vector<AGL_pressure_temperature_energies>& AGL_pressure_temperature_energy_list,
-					      double cellmass_grams,
-					      std::vector<std::vector<double> >& hugoniotData, bool hugoniotextrapolate,
-					      ofstream& FileMESSAGE,
-					      double desired_initial_pressure_external,
-					      double desired_initial_temperature_external) {
+      const std::vector<AGL_pressure_temperature_energies>& AGL_pressure_temperature_energy_list,
+      double cellmass_grams,
+      std::vector<std::vector<double> >& hugoniotData, bool hugoniotextrapolate,
+      ofstream& FileMESSAGE,
+      double desired_initial_pressure_external,
+      double desired_initial_temperature_external) {
     ostringstream aus;
     // This tolerance will be used when comparing pressure values
     double pressureTol = 1.e-5;
@@ -254,19 +254,19 @@ namespace AGL_functions {
 
     // First, find the best initial conditions
     double initial_mass_density_gcm3 = 0.0,
-      initial_temperature_external = 0.0,
-      initial_energyDFT_UIntVib_kJg = 0.0,
-      initial_pressure_external = 0.0;
+           initial_temperature_external = 0.0,
+           initial_energyDFT_UIntVib_kJg = 0.0,
+           initial_pressure_external = 0.0;
 
     if(0 != findBestInitialConditionsAllTemperaturesAndPressures(
-								 AGL_pressure_temperature_energy_list,
-								 mass_densities_gcm3, energies_pT_kJg,
-								 desired_initial_pressure_external,
-								 desired_initial_temperature_external,
-								 initial_mass_density_gcm3,
-								 initial_temperature_external,
-								 initial_energyDFT_UIntVib_kJg,
-								 initial_pressure_external, FileMESSAGE))
+          AGL_pressure_temperature_energy_list,
+          mass_densities_gcm3, energies_pT_kJg,
+          desired_initial_pressure_external,
+          desired_initial_temperature_external,
+          initial_mass_density_gcm3,
+          initial_temperature_external,
+          initial_energyDFT_UIntVib_kJg,
+          initial_pressure_external, FileMESSAGE))
       return 1;
 
     // Clear the output if anything was written to it
@@ -291,26 +291,26 @@ namespace AGL_functions {
           temperatures_external.push_back(AGL_pressure_temperature_energy_list.at(j).temperature_external);
           energiesDFT_UIntVib_kJg.push_back(energies_pT_kJg.at(j));
           tmp_mass_densities_gcm3.push_back(mass_densities_gcm3.at(j));
-	}
+        }
       }
 
       // Now calculate the Hugoniot!
       double hugoniot_density = 0.0, hugoniot_temperature = 0.0, hugoniot_energy = 0.0;
       uint ret = calculateHugoniotDataPoint(initial_mass_density_gcm3,
-                                            initial_energyDFT_UIntVib_kJg,
-                                            initial_pressure_external,
-                                            tmp_mass_densities_gcm3,
-                                            temperatures_external,
-                                            energiesDFT_UIntVib_kJg,
-                                            currentPressure,
-                                            hugoniot_density,
-                                            hugoniot_temperature,
-                                            hugoniot_energy, hugoniotextrapolate, FileMESSAGE);
+          initial_energyDFT_UIntVib_kJg,
+          initial_pressure_external,
+          tmp_mass_densities_gcm3,
+          temperatures_external,
+          energiesDFT_UIntVib_kJg,
+          currentPressure,
+          hugoniot_density,
+          hugoniot_temperature,
+          hugoniot_energy, hugoniotextrapolate, FileMESSAGE);
       if(ret == 1) {
-	aurostd::StringstreamClean(aus);
+        aurostd::StringstreamClean(aus);
         aus << _AGLSTR_ERROR_ + "Error in " << __FUNCTION__
-            << ": calculateHugoniotDataPoint returned with an error!" << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          << ": calculateHugoniotDataPoint returned with an error!" << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         return ret;
       }
       else if(ret == 2) {
@@ -548,15 +548,15 @@ namespace AGL_functions {
   // END CHANGES BY PA20170603
   //
   uint calculateHugoniotDataPoint(double initial_mass_density_gcm3,
-				  double initial_energyDFT_UIntVib_kJg,
-				  double initial_pressure_external,
-				  const std::vector<double>& mass_densities_gcm3,
-				  const std::vector<double>& temperatures_external,
-				  const std::vector<double>& energiesDFT_UIntVib_kJg,
-				  double pressure_external,
-				  double& hugoniot_density,
-				  double& hugoniot_temperature,
-				  double& hugoniot_energy, bool hugoniotextrapolate, ofstream& FileMESSAGE) {
+      double initial_energyDFT_UIntVib_kJg,
+      double initial_pressure_external,
+      const std::vector<double>& mass_densities_gcm3,
+      const std::vector<double>& temperatures_external,
+      const std::vector<double>& energiesDFT_UIntVib_kJg,
+      double pressure_external,
+      double& hugoniot_density,
+      double& hugoniot_temperature,
+      double& hugoniot_energy, bool hugoniotextrapolate, ofstream& FileMESSAGE) {
     ostringstream aus;
     // We are finding E and P so that this will be equal to zero
     // E - E0 - 0.5 * (P + P0)(1.0/rho0 - 1.0/rho)
@@ -573,7 +573,7 @@ namespace AGL_functions {
 
     // All of the sizes of the input vectors must be equal
     if(mass_densities_gcm3.size() != temperatures_external.size() ||
-       mass_densities_gcm3.size() != energiesDFT_UIntVib_kJg.size()) {
+        mass_densities_gcm3.size() != energiesDFT_UIntVib_kJg.size()) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_ERROR_ + __FUNCTION__ << " was called, but the vectors do not have the same size!" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -592,23 +592,23 @@ namespace AGL_functions {
     double lastVal = 0.0;
     for(size_t i = 0; i < mass_densities_gcm3.size(); ++i) {
       if(i != 0 && temperatures_external.at(i) < temperatures_external.at(i - 1)) {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "Error in " << __FUNCTION__ << ": Temperatures are not sorted in "
-	    << "increasing order! They must be sorted in increasing order to call this function." << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	// OBSOLETE  std::cerr << "Error in " << __FUNCTION__ << ": Temperatures are not sorted in "
-	// OBSOLETE            << "increasing order! They must be sorted in increasing order "
-	// OBSOLETE            << "to call this function.\n";
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_ERROR_ + "Error in " << __FUNCTION__ << ": Temperatures are not sorted in "
+          << "increasing order! They must be sorted in increasing order to call this function." << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        // OBSOLETE  std::cerr << "Error in " << __FUNCTION__ << ": Temperatures are not sorted in "
+        // OBSOLETE            << "increasing order! They must be sorted in increasing order "
+        // OBSOLETE            << "to call this function.\n";
         return 1;
       }
       // We are trying to zero this expression.
       double val = energiesDFT_UIntVib_kJg.at(i) - initial_energyDFT_UIntVib_kJg - 0.5 *
-	(pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(i));
+        (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(i));
       //std::cout << "E is " << energiesDFT_UIntVib_kJg.at(i) << "; D is " << mass_densities_gcm3.at(i) << "\n";
       // Figure out when we switch signs. The solution is between these
       // two points.
       if((val == 0.0 || aurostd::abs(val + lastVal) < aurostd::abs(val) + aurostd::abs(lastVal)) &&
-	 i != 0) {
+          i != 0) {
         ind1 = i - 1;
         ind2 = i;
         break;
@@ -622,48 +622,48 @@ namespace AGL_functions {
     if(ind1 == 0 && ind2 == 0) {
       // Perform Hugoniot extrapolation if requested
       if (hugoniotextrapolate) {
-      size_t lastInd = mass_densities_gcm3.size() - 1;
-      // If the first point is closer to the solution, use the first two
-      // points. Otherwise, use the last two points.
-      if(aurostd::abs(energiesDFT_UIntVib_kJg.at(0) - initial_energyDFT_UIntVib_kJg -
-	      0.5 * (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(0))) <
-	 aurostd::abs(energiesDFT_UIntVib_kJg.at(lastInd) - initial_energyDFT_UIntVib_kJg - 0.5 *
-	      (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(lastInd)))) {
-        ind1 = 0;
-        ind2 = 1;
-      }
-      else {
-        ind1 = lastInd - 1;
-        ind2 = lastInd;
-      }
+        size_t lastInd = mass_densities_gcm3.size() - 1;
+        // If the first point is closer to the solution, use the first two
+        // points. Otherwise, use the last two points.
+        if(aurostd::abs(energiesDFT_UIntVib_kJg.at(0) - initial_energyDFT_UIntVib_kJg -
+              0.5 * (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(0))) <
+            aurostd::abs(energiesDFT_UIntVib_kJg.at(lastInd) - initial_energyDFT_UIntVib_kJg - 0.5 *
+              (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(lastInd)))) {
+          ind1 = 0;
+          ind2 = 1;
+        }
+        else {
+          ind1 = lastInd - 1;
+          ind2 = lastInd;
+        }
 
-      // Print a warning - the data may be bad.
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_WARNING_ + "WARNING: in " << __FUNCTION__ << ", the solution was found to be outside the temperature range." << endl;
-      aus << _AGLSTR_WARNING_ + "Data should be used cautiously. Extrapolation from the two nearest points was used." << endl;
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      // OBSOLETE  std::cerr << "WARNING: in " << __FUNCTION__ << ", the solution was found "
-      // OBSOLETE            << "to be outside the temperature range. Data should be used "
-      // OBSOLETE            << "cautiously. Extrapolation from the two nearest points "
-      // OBSOLETE            << "was used.\n";
+        // Print a warning - the data may be bad.
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_WARNING_ + "WARNING: in " << __FUNCTION__ << ", the solution was found to be outside the temperature range." << endl;
+        aus << _AGLSTR_WARNING_ + "Data should be used cautiously. Extrapolation from the two nearest points was used." << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        // OBSOLETE  std::cerr << "WARNING: in " << __FUNCTION__ << ", the solution was found "
+        // OBSOLETE            << "to be outside the temperature range. Data should be used "
+        // OBSOLETE            << "cautiously. Extrapolation from the two nearest points "
+        // OBSOLETE            << "was used.\n";
       } else {
-	// Exit loop for this pressure 
-	return 2;
+        // Exit loop for this pressure 
+        return 2;
       }
     }
 
     // We may replace this function in the future if we decide it is necessary
     // to use a different function to perform better fitting.
     interpolateToFindHugoniotEnergyAndDensity(initial_mass_density_gcm3,
-                                              initial_energyDFT_UIntVib_kJg,
-                                              initial_pressure_external,
-                                              pressure_external,
-                                              energiesDFT_UIntVib_kJg.at(ind1),
-                                              energiesDFT_UIntVib_kJg.at(ind2),
-                                              mass_densities_gcm3.at(ind1),
-                                              mass_densities_gcm3.at(ind2),
-                                              hugoniot_energy,
-                                              hugoniot_density);
+        initial_energyDFT_UIntVib_kJg,
+        initial_pressure_external,
+        pressure_external,
+        energiesDFT_UIntVib_kJg.at(ind1),
+        energiesDFT_UIntVib_kJg.at(ind2),
+        mass_densities_gcm3.at(ind1),
+        mass_densities_gcm3.at(ind2),
+        hugoniot_energy,
+        hugoniot_density);
 
     // To find the temperature, first find what fraction of a distance we are
     // from the ind1 energy. This fraction should also correspond to the distance
@@ -712,15 +712,15 @@ namespace AGL_functions {
   //
   // CHANGES BY PA20171224  
   uint findBestInitialConditions(const std::vector<double>& pressures_external,
-				 const std::vector<double>& temperatures_external,
-				 const std::vector<std::vector<double> >& mass_densities_gcm3,
-				 const std::vector<std::vector<double> >& energies_pT_kJg,
-				 double desired_initial_pressure_external,
-				 double desired_initial_temperature_external,
-				 double& initial_mass_density_gcm3,
-				 double& initial_temperature_external,
-				 double& initial_energyDFT_UIntVib_kJg,
-				 double& initial_pressure_external, ofstream& FileMESSAGE) {
+      const std::vector<double>& temperatures_external,
+      const std::vector<std::vector<double> >& mass_densities_gcm3,
+      const std::vector<std::vector<double> >& energies_pT_kJg,
+      double desired_initial_pressure_external,
+      double desired_initial_temperature_external,
+      double& initial_mass_density_gcm3,
+      double& initial_temperature_external,
+      double& initial_energyDFT_UIntVib_kJg,
+      double& initial_pressure_external, ofstream& FileMESSAGE) {
     ostringstream aus;
     // OBSOLETE if(data.size() == 0) {
     // OBSOLETE   aurostd::StringstreamClean(aus);
@@ -733,7 +733,7 @@ namespace AGL_functions {
     int bestInitialPressureInd = -1, bestInitialTemperatureInd = -1;
     double bestInitialPressure = -1.0, bestInitialTemperature = -1.0;
     // OBSOLETE bestInitialEnergy = 0.0, bestInitialDensity = -1.0;
-    // OBSOLETE for(size_t i = 0; i < data.size(); ++i) {
+    // OBSOLETE for(size_t i = 0; i < data.size(); ++i)
     // Must not be empty. Skip over it if it is.
     // OBSOLETE if(data.at(i).size() == 0) {
     // OBSOLETE aurostd::StringstreamClean(aus);
@@ -785,7 +785,7 @@ namespace AGL_functions {
     if(aurostd::abs(bestInitialPressure - desired_initial_pressure_external) > 1.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest pressure to the desired initial pressure of "
-	  << desired_initial_pressure_external << " GPa was found to be " << bestInitialPressure << " GPa." << endl;
+        << desired_initial_pressure_external << " GPa was found to be " << bestInitialPressure << " GPa." << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);           
       // OBSOLETE std::cerr << "Warning in " << __FUNCTION__ << ": the closest pressure "
       // OBSOLETE          << "to the desired initial pressure of "
@@ -794,7 +794,7 @@ namespace AGL_functions {
     }
 
     // Now let's find a best temperature at this pressure.
-    // OBSOLETE for(size_t i = 0; i < data.at(bestInitialPressureInd).size(); ++i) {
+    // OBSOLETE for(size_t i = 0; i < data.at(bestInitialPressureInd).size(); ++i)
     // The inner vector must be of size 4 again. Return an error if it isn't.
     // OBSOLETE if(data.at(bestInitialPressureInd).at(i).size() != 4) {
     // OBSOLETE aurostd::StringstreamClean(aus);
@@ -819,8 +819,8 @@ namespace AGL_functions {
       double currentTemperature = temperatures_external.at(i);
       // END CHANGES BY PA20171224   
       if(bestInitialTemperatureInd == -1 ||
-	 aurostd::abs(currentTemperature - desired_initial_temperature_external) <
-	 aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
+          aurostd::abs(currentTemperature - desired_initial_temperature_external) <
+          aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
         bestInitialTemperatureInd = i;
         bestInitialTemperature = currentTemperature;
       }
@@ -841,7 +841,7 @@ namespace AGL_functions {
     if(aurostd::abs(bestInitialTemperature - desired_initial_temperature_external) > 10.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest temperature to the desired initial temperature of "
-	  << desired_initial_temperature_external << " K was found to be " << bestInitialTemperature << " K." << endl;
+        << desired_initial_temperature_external << " K was found to be " << bestInitialTemperature << " K." << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);       
       // OBSOLETE std::cerr << "Warning in " << __FUNCTION__ << ": the closest temperature "
       // OBSOLETE           << "to the desired initial temperature of "
@@ -872,22 +872,22 @@ namespace AGL_functions {
   // found in aflow_agl_debye.h
   //
   uint findBestInitialConditionsAllTemperaturesAndPressures(
-							    const std::vector<AGL_pressure_temperature_energies>& AGL_pressure_temperature_energy_list,
-							    const std::vector<double>& mass_densities_gcm3,
-							    const std::vector<double>& energies_pT_kJg,
-							    double desired_initial_pressure_external,
-							    double desired_initial_temperature_external,
-							    double& initial_mass_density_gcm3,
-							    double& initial_temperature_external,
-							    double& initial_energyDFT_UIntVib_kJg,
-							    double& initial_pressure_external, ofstream& FileMESSAGE) {
+      const std::vector<AGL_pressure_temperature_energies>& AGL_pressure_temperature_energy_list,
+      const std::vector<double>& mass_densities_gcm3,
+      const std::vector<double>& energies_pT_kJg,
+      double desired_initial_pressure_external,
+      double desired_initial_temperature_external,
+      double& initial_mass_density_gcm3,
+      double& initial_temperature_external,
+      double& initial_energyDFT_UIntVib_kJg,
+      double& initial_pressure_external, ofstream& FileMESSAGE) {
     ostringstream aus;
     // Find a matching pressure first. Then find a matching temperature that has that pressure.
     double bestInitialPressure = 1.e300;
     for(size_t i = 0; i < AGL_pressure_temperature_energy_list.size(); ++i) {
       const double& currentPressure = AGL_pressure_temperature_energy_list.at(i).pressure_external;
       if(aurostd::abs(currentPressure - desired_initial_pressure_external) <
-	 aurostd::abs(bestInitialPressure - desired_initial_pressure_external)) {
+          aurostd::abs(bestInitialPressure - desired_initial_pressure_external)) {
         bestInitialPressure = currentPressure;
       }
     }
@@ -909,7 +909,7 @@ namespace AGL_functions {
       if(aurostd::abs(currentPressure - bestInitialPressure) < pressureTol) {
         const double& currentTemperature = AGL_pressure_temperature_energy_list.at(i).temperature_external;
         if(aurostd::abs(currentTemperature - desired_initial_temperature_external) <
-	   aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
+            aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
           bestInitialTemperature = currentTemperature;
           bestConditionsInd = i;
         }
@@ -939,7 +939,7 @@ namespace AGL_functions {
     if(aurostd::abs(bestInitialPressure - desired_initial_pressure_external) > 1.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest pressure to the desired initial pressure of "
-	  << desired_initial_pressure_external << " GPa was found to be " << bestInitialPressure << " GPa" << endl;
+        << desired_initial_pressure_external << " GPa was found to be " << bestInitialPressure << " GPa" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);           
       // OBSOLETE std::cerr << "Warning in " << __FUNCTION__ << ": the closest pressure "
       // OBSOLETE           << "to the desired initial pressure of "
@@ -952,7 +952,7 @@ namespace AGL_functions {
     if(aurostd::abs(bestInitialTemperature - desired_initial_temperature_external) > 10.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest temperature at pressure " << bestInitialPressure << " GPa to the desired initial temperature of "
-	  << desired_initial_temperature_external << " K was found to be " << bestInitialTemperature << " K." << endl;
+        << desired_initial_temperature_external << " K was found to be " << bestInitialTemperature << " K." << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);                 
       // OBSOLETE std::cerr << "Warning in " << __FUNCTION__ << ": the closest temperature "
       // OBSOLETE          << "at pressure " << bestInitialPressure
@@ -992,15 +992,15 @@ namespace AGL_functions {
   // functions if we find that fitting in this way is unsatisfactory.
   //
   void interpolateToFindHugoniotEnergyAndDensity(double initial_mass_density_gcm3,
-                                                 double initial_energyDFT_UIntVib_kJg,
-                                                 double initial_pressure_external,
-                                                 double pressure_external,
-                                                 double energy1,
-                                                 double energy2,
-                                                 double density1,
-                                                 double density2,
-                                                 double& hugoniot_energy,
-                                                 double& hugoniot_density) {
+      double initial_energyDFT_UIntVib_kJg,
+      double initial_pressure_external,
+      double pressure_external,
+      double energy1,
+      double energy2,
+      double density1,
+      double density2,
+      double& hugoniot_energy,
+      double& hugoniot_density) {
     // Find the equation of the interpolation line: D vs. E.
     // This only uses two points...
     double slope = (density2 - density1) / (energy2 - energy1);
@@ -1012,10 +1012,10 @@ namespace AGL_functions {
     // The following equation is ugly, but it is an analytical solution that results from the
     // interpolation.
     hugoniot_energy = (sqrt(4.0 * pow(slope_intercept, 2.0) * pow(initial_mass_density_gcm3, 2.0) +
-                            4.0 * slope_intercept * slope * cached_expression * initial_mass_density_gcm3 +
-                            slope * (slope * pow(cached_expression, 2.0) -
-				     8.0 * (pressure_external + initial_pressure_external) * pow(initial_mass_density_gcm3, 2.0))) -
-                       2.0 * slope_intercept * initial_mass_density_gcm3 + slope * cached_expression) /
+          4.0 * slope_intercept * slope * cached_expression * initial_mass_density_gcm3 +
+          slope * (slope * pow(cached_expression, 2.0) -
+            8.0 * (pressure_external + initial_pressure_external) * pow(initial_mass_density_gcm3, 2.0))) -
+        2.0 * slope_intercept * initial_mass_density_gcm3 + slope * cached_expression) /
       (4.0 * slope * initial_mass_density_gcm3);
 
     // Plug this into our equation to find density

@@ -15,11 +15,12 @@
 // #define  _AFLOW_TEMP_PRESERVE_  // to preseve /tmp files for debug
 
 #define NNN   -123456
-#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+//[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX
+#define _ZERO_TOL_LOOSE_ 1e-6  //ME20200519 - tolerance for float precision
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
 #define _XPROTO_ZERO_VOL_ 1.0e-6  //CO20190218
 
@@ -76,6 +77,9 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 ",_NC2"   //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
 ",_200eV"
 "";
+
+//MESSAGE defaults - CO20200502
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -143,7 +147,7 @@ extern string _AFLOWLOCK_;
 #define AFLOW_WEB_SERVER_DEFAULT              string("nietzsche.mems.duke.edu")
 #define AFLOWLIB_SERVER_DEFAULT               string("aflowlib.duke.edu")
 #define AFLOWLIB_MATERIALS_SERVER             string("aflow.org")
-#define AFLOWLIB_CONSORTIUM_STRING            string("AFLOW - www.aflow.org consortium")
+#define AFLOWLIB_CONSORTIUM_STRING            string("aflow.org")
 #define _XENTRY_ string("index.php")
 
 // [OBSOLETE] #define DEFAULT_KZIP_BIN              string("bzip2")           // moved to aflow_aflowrc.cpp in V3.1.194
@@ -296,8 +300,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID;  // aflow.cpp
-    ostringstream ostrPID; // aflow.cpp
+    int PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508
+    ostringstream ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508
+    string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -381,12 +387,15 @@ class _XHOST {
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
     // WEB MODE
-    bool WEB_MODE;  //CO20190401
+    //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //
     void free();                                           // free space
     void copy(const _XHOST& b);                            //
     void clear();                                          // free space
 };
+
+#define XPID XHOST.sPID
+#define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256
 #define XHOST_Library_HTQC                             XHOST.vGlobal_string.at(0)
@@ -651,14 +660,10 @@ class _aflags {
 
 //ME20181026 - Container for APL options
 struct _moduleOptions {
-  _moduleOptions() : minatoms_restricted(false) {;}  //CO20181226
   // APL
-  vector<bool> supercell_method;
-  bool minatoms_restricted; //CO20181226 = false;
   vector<aurostd::xoption> aplflags;
 
   // AAPL
-  vector<bool> cut_rad_shell;
   vector<aurostd::xoption> aaplflags;
 
   // QHA
@@ -751,8 +756,8 @@ class _kflags {
     bool  KBIN_SYMMETRY_PGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_WRITE;     // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
-    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;//DX20171205 - Added pgroupk_xtal
-    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;//DX20200129 - taken TRUE by default
+    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE; //DX20171205 - Added pgroupk_xtal
+    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;  //DX20200129 - taken TRUE by default
     bool  KBIN_SYMMETRY_FGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_SGROUP_WRITE;
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default
@@ -788,17 +793,6 @@ class _kflags {
     // phonons operation lists
     bool   KBIN_PHONONS_CALCULATION_APL;
     bool   KBIN_PHONONS_CALCULATION_QHA;  //CO20170601
-    bool   KBIN_PHONONS_CALCULATION_QHA_A;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA_B;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA_C;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_A;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_B;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_QHA3P_C;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA;    //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_A;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_B;  //PN20180705
-    bool   KBIN_PHONONS_CALCULATION_SCQHA_C;  //PN20180705
     bool   KBIN_PHONONS_CALCULATION_AAPL; //CO20170601
     bool   KBIN_PHONONS_CALCULATION_AGL;
     bool   KBIN_PHONONS_CALCULATION_AEL;
@@ -902,8 +896,8 @@ class _vflags {
     xoption KBIN_VASP_KPOINTS_PHONONS_KPPRA;      // isentry and content_int
     xoption KBIN_VASP_KPOINTS_PHONONS_KSCHEME;    // isentry and content_string
     xoption KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;  // EVEN ODD
-    xoption KBIN_VASP_KPOINTS_PHONONS_GRID;       // ME20200427
-    xoption KBIN_VASP_KPOINTS_PHONONS_SHIFT;      // ME20200427
+    xoption KBIN_VASP_KPOINTS_PHONONS_GRID;       //ME20200427
+    xoption KBIN_VASP_KPOINTS_PHONONS_SHIFT;      //ME20200427
     // BANDS
     xoption KBIN_VASP_KPOINTS_BANDS_LATTICE;
     //  bool KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -1034,7 +1028,8 @@ namespace init {
   string InitLibraryObject(string string2load,bool=FALSE);
   string AFLOW_Projects_Directories(string string2load);
   long GetRAM(void);
-  uint GetTEMPs(void);
+  uint GetTEMP(void);
+  double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
 } // namespace init
 
@@ -1045,7 +1040,7 @@ bool CheckMaterialServer(string message);
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
 string aflow_get_time_string_short(void);
-string strPID(void);
+// [OBSOLETE] string strPID(void);
 
 string Message(string="");
 string Message(string str1,string list2print);
@@ -1497,6 +1492,7 @@ class xstructure {
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
+    void UpdateCartesianCoordinates();                            //AS20200514
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice
@@ -1528,10 +1524,10 @@ class xstructure {
     void CalculateSymmetryPointGroupCrystal(void);                // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(bool);               // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(void);               // Calculate the symmetry
-    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME20200114
-    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME20200114
-    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  // ME20200129
-    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  // ME20200129
+    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  //ME20200114
+    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  //ME20200114
+    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  //ME20200129
+    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  //ME20200129
     int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
     int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
     int  GenerateGridAtoms(int);                                  // generate grid of atoms
@@ -1824,7 +1820,7 @@ class xstructure {
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
-void LightCopy(const xstructure&, xstructure&);  // ME20200220
+void LightCopy(const xstructure&, xstructure&);  //ME20200220
 
 //CO20180420
 //for stream management with objects
@@ -1832,7 +1828,8 @@ class xStream {
   public:
     //NECESSARY PUBLIC CLASS METHODS - START
     //constructors - START
-    xStream();
+    xStream(ostream& oss=cout);
+    xStream(ofstream& ofs,ostream& oss=cout);
     //constructors - STOP
     ~xStream();
     //NECESSARY PUBLIC CLASS METHODS - END
@@ -1842,12 +1839,10 @@ class xStream {
     ofstream* getOFStream() const; //CO20191110
   protected:
     //NECESSARY private CLASS METHODS - START
-    //void free();  //CO20190318 - not necessary
     void free();
-    //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
-    void initialize(ostream&);  // ME20200427
-    void initialize(ofstream&, ostream&);  // ME20200427
+    void initialize(ostream& oss=cout);  //ME20200427
+    void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
@@ -2380,14 +2375,14 @@ void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream
 void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss);
 void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose);
 void CalculateSymmetryPointGroupKLattice(xstructure& str);
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME20200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME20200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME20200114
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  // ME20200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  // ME20200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str);  // ME20200129
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  //ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  //ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  //ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str);  //ME20200114
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  //ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  //ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  //ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str);  //ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
@@ -2612,9 +2607,10 @@ namespace anrl {
 // uint argsprint(vector<string> argv);
 // ----------------------------------------------------------------------------
 // aflow.cpp
-string aflow_get_time_string(void);
-string aflow_get_time_string_short(void);
-string strPID(void);
+//[CO20200502 - DUPLICATE?]string aflow_get_time_string(void);
+//[CO20200502 - DUPLICATE?]string aflow_get_time_string_short(void);
+//[CO20200502 - DUPLICATE?]string strPID(void);
+//[CO20200502 - DUPLICATE?]string strTID(void);  //CO20200502 - threadID
 int AFLOW_main(vector<string> &argv);
 namespace aflow {
   string License_Preamble_aflow(void);
@@ -2696,8 +2692,8 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir);
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
-  int get_NCPUS();  // ME20200219
-  int get_NCPUS(const _kflags&);  // ME20200219
+  int get_NCPUS();  //ME20200219
+  int get_NCPUS(const _kflags&);  //ME20200219
 }
 
 // ----------------------------------------------------------------------------
@@ -2711,8 +2707,8 @@ namespace KBIN {
   vector<aurostd::xoption> loadDefaultsAPL();
   bool writeFlagAPL(const string& key,const xoption& xopt); //CO20181226  //ME20190113
   void readParametersAPL(const string&, _moduleOptions&, _xinput&);
-  vector<aurostd::xoption> loadDefaultsQHA();  // AS20200302
-  void readParametersQHA(const string&, _moduleOptions&, _xinput&); // AS20200302
+  vector<aurostd::xoption> loadDefaultsQHA();  //AS20200302
+  void readParametersQHA(const string&, _moduleOptions&, _xinput&); //AS20200302
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO20181226  //ME20190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
@@ -2818,6 +2814,8 @@ namespace KBIN {
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   string getVASPVersionString(const string&);  //ME20190219
+  string getVASPVersionNumber(const string&);  //CO20200610
+  double getVASPVersion(const string&);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -2985,8 +2983,10 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     xOUTCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN, bool=TRUE);  //ME20200427
-    
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
     ~xOUTCAR();                                                   // kill everything
     const xOUTCAR& operator=(const xOUTCAR &b);                   // copy
@@ -3000,6 +3000,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;
+    int nelectrons; //AS20200528
     double natoms;                                                // for aflowlib_libraries.cpp
     double energy_cell,energy_atom;                               // for aflowlib_libraries.cpp
     double enthalpy_cell,enthalpy_atom;                           // for aflowlib_libraries.cpp
@@ -3129,7 +3130,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
     //int spin;  //CO20171006 - camilo garbage
     friend ostream& operator<<(ostream&, const xOUTCAR&);  //ME20190623
- private:                       //
+  private:                       //
     void free();                 // free space
     void copy(const xOUTCAR& b); //
 };
@@ -3145,13 +3146,15 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     xDOSCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xDOSCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
 
     xDOSCAR(const xDOSCAR& b);                                    // constructor copy
     ~xDOSCAR();                                                   // kill everything
     const xDOSCAR& operator=(const xDOSCAR &b);                   // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3217,13 +3220,15 @@ class xEIGENVAL : public xStream { //CO20200404 - xStream integration for loggin
     xEIGENVAL(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
-    
+
     xEIGENVAL(const xEIGENVAL& b);                                // constructor copy
     ~xEIGENVAL();                                                 // kill everything
     const xEIGENVAL& operator=(const xEIGENVAL &b);               // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3258,15 +3263,17 @@ class xPOTCAR : public xStream { //CO20200404 - xStream integration for logging
     xPOTCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
-    
+
     ~xPOTCAR();                                                   // kill everything
     xPOTCAR(const xPOTCAR& b);                                    // constructor copy
     const xPOTCAR& operator=(const xPOTCAR &b);                   // copy
     void clear(void);                                             // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
-    
+
     // CONTENT
     string content;vector<string> vcontent;                       // the content and the lines
     string filename;                                              // the filename - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
@@ -3323,14 +3330,23 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA=""); // returns i
 bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& gs,double& enthalpy_atom,double& volume_atom,double& spin_atom);
 
 // -------------------------------------------------------------------------------------------------
-class xVASPRUNXML {
+class xVASPRUNXML : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xVASPRUNXML();                                                // default, just allocate
-    ~xVASPRUNXML();                                               // kill everything
-    xVASPRUNXML(const string& fileIN,bool=TRUE);                  // constructor from filename QUIET
+    xVASPRUNXML(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xVASPRUNXML(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xVASPRUNXML(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xVASPRUNXML(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xVASPRUNXML(const xVASPRUNXML& b);                            // constructor copy
+    ~xVASPRUNXML();                                               // kill everything
     const xVASPRUNXML& operator=(const xVASPRUNXML &b);           // copy
     void clear(void);                                             // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     double natoms;                                                // for aflowlib_libraries.cpp
@@ -3350,14 +3366,23 @@ class xVASPRUNXML {
     void copy(const xVASPRUNXML& b); //
 };
 // -------------------------------------------------------------------------------------------------
-class xIBZKPT {
+class xIBZKPT : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xIBZKPT();                                                    // default, just allocate
-    ~xIBZKPT();                                                   // kill everything
-    xIBZKPT(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
+    xIBZKPT(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xIBZKPT(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xIBZKPT(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xIBZKPT(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xIBZKPT(const xIBZKPT& b);                                    // constructor copy
+    ~xIBZKPT();                                                   // kill everything
     const xIBZKPT& operator=(const xIBZKPT &b);                   // copy
     void clear(void);                                             // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     uint nweights;                                                // for aflowlib_libraries.cpp
@@ -3376,14 +3401,23 @@ class xIBZKPT {
     void copy(const xIBZKPT& b); //
 };
 // -------------------------------------------------------------------------------------------------
-class xKPOINTS {
+class xKPOINTS : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xKPOINTS();                                                    // default, just allocate
-    ~xKPOINTS();                                                    // kill everything
-    xKPOINTS(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
+    xKPOINTS(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xKPOINTS(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xKPOINTS(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xKPOINTS(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xKPOINTS(const xKPOINTS& b);                                   // constructor copy
+    ~xKPOINTS();                                                    // kill everything
     const xKPOINTS& operator=(const xKPOINTS &b);                  // copy
     void clear(void);                                              // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     string title;                                                  // first line
@@ -3406,14 +3440,23 @@ class xKPOINTS {
     void copy(const xKPOINTS& b); //
 };
 // -------------------------------------------------------------------------------------------------
-class xCHGCAR {
+class xCHGCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xCHGCAR();                                                     // default, just allocate
-    ~xCHGCAR();                                                    // kill everything
-    xCHGCAR(const string& fileIN,bool=TRUE);                       // constructor from filename QUIET
+    xCHGCAR(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xCHGCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xCHGCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xCHGCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,bool=TRUE);  //ME20200427  //CO20200508
+
     xCHGCAR(const xCHGCAR& b);                                     // constructor copy
+    ~xCHGCAR();                                                    // kill everything
     const xCHGCAR& operator=(const xCHGCAR &b);                    // copy
     void clear(void);                                              // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     xvector<int>     grid; // N*N*N                                // triplet of grid
@@ -3436,13 +3479,15 @@ class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integratio
     xQMVASP(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
     bool initialize(const string& fileIN, bool=TRUE); //ME20200427
-    
+
     ~xQMVASP();                                                    // kill everything
     xQMVASP(const xQMVASP& b);                                     // constructor copy
     const xQMVASP& operator=(const xQMVASP &b);                    // copy
     void clear(void);                                              // clear
-    
+
     bool m_initialized;  //CO20200404 - xStream integration for logging
 
     // CONTENT
@@ -3591,7 +3636,7 @@ namespace plotter {
   void PLOT_DOS(aurostd::xoption&,stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ostream& oss=cout);  //CO20191110  //CO20200404
   void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110  //CO20200404
-  
+
   void PLOT_PDOS(aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void PLOT_PDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
   void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&,ostream& oss=cout); //CO20191110 //CO20200404
@@ -3600,7 +3645,7 @@ namespace plotter {
   void PLOT_PDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ostream& oss=cout);  //CO20191110 //CO20200404
   void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110 //CO20200404
-  
+
   void PLOT_BAND(aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void PLOT_BAND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
   void PLOT_BAND(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
@@ -4334,17 +4379,18 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  // ME20181107
-  bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME20200427
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption&, const aurostd::xvector<int>&, bool, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  //ME20181107
+  bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
   void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
-  // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
+  uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AGL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   // ----------------------------------------------------------------------------
   // aflow_ael_elasticity.cpp
+  uint relaxStructureAEL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AEL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
 }
 
@@ -4448,6 +4494,24 @@ void wa(_atom& a,xstructure &str);
 xstructure WyckoffPOSITIONS(uint spacegroup, xstructure strin);
 xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 
+
+// ----------------------------------------------------------------------------
+// aflow_makefile.cpp
+
+namespace makefile {
+  void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles);
+  void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles,bool& mt_required);
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<string>& vdefinitions);
+  //[CO20200508 - OBSOLETE]void replaceMakefileDefinitions(const vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const string& definitions,vector<string>& vdefinitions);
+  //[CO20200508 - OBSOLETE]void splitMakefileDefinitions(const vector<string>& vdefinitions,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const string& directory,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  //[CO20200508 - OBSOLETE]void readMakefileVariables(const vector<string>& vlines,vector<string>& vvariables,vector<vector<string> >& vvdefinitions);
+  void updateDependenciesAUROSTD(vector<string>& vdependencies);
+  void updateDependenciesVariable(const vector<string>& vdeps_var,const string& var,vector<string>& vdeps_replace);
+  void createMakefileAFLOW(const string& directory=".");
+}
+
 // ----------------------------------------------------------------------------
 // aflow_apennsy stuff
 #include "aflow_apennsy.h"
@@ -4461,7 +4525,7 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 #include "aflowlib.h"
 
 // ----------------------------------------------------------------------------
-// aflowlib.h stuff
+// aflow_pflow.h stuff
 #include "aflow_pflow.h"
 
 // ----------------------------------------------------------------------------

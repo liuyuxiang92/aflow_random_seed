@@ -439,7 +439,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20200327
+//ME20200327
 namespace aurostd {
   template<class utype> xmatrix<utype>
     outer_product(const xvector<utype>& a, const xvector<utype>& b) {
@@ -2185,6 +2185,23 @@ namespace aurostd {
       }
       return true;
     }
+}
+
+//ME20200511 - vector projections (taken from old APL/aflow_apl.h)
+namespace aurostd {
+
+  // Calculate the vector projection of b on a
+  template<class utype> xvector<utype>
+    getVectorProjection(const xvector<utype>& b, const xvector<utype>& a) {
+      return (a * (utype)(scalar_product(a, b)/scalar_product(a, a)));
+    }
+
+  // Project vector c using the projection of b on a
+  template<class utype> xvector<utype>
+    getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a) {
+      return (c * (utype) (scalar_product(a, b)/scalar_product(a, a)));
+    }
+
 }
 
 // ----------------------------------------------------------------------------

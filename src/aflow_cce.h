@@ -78,8 +78,8 @@ namespace cce {
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   string get_functional_from_aflow_in_outcar(const xstructure& structure, string& aflowin_file, string& outcar_file);
   // initialise flags and variables
-  aurostd::xoption init_flags(); // ME20200213
-  CCE_Variables init_variables(const xstructure&); // ME20200213
+  aurostd::xoption init_flags(); //ME20200213
+  CCE_Variables init_variables(const xstructure&); //ME20200213
   // structural analysis
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
   vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_);
@@ -125,9 +125,9 @@ namespace cce {
   void check_get_per_super_ox_corrections(CCE_Variables& cce_vars);
   // apply corrections and get corrected formation enthalpies
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
-  //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
+  //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); //ME20200213
   // print output and citation
-  string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
+  string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
   string print_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string print_citation();

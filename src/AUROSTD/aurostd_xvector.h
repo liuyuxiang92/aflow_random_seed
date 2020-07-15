@@ -175,7 +175,7 @@ namespace aurostd {
   template<class utype> xvector<utype>                
     vector_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
-  // ME20200327
+  //ME20200327
   template<class utype> xmatrix<utype>
     outer_product(const xvector<utype>&, const xvector<utype>&) __xprototype;
 
@@ -513,6 +513,9 @@ namespace aurostd {
 
   template<class utype> bool
     linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection); //CO20180520
+
+  template<class utype> xvector<utype> getVectorProjection(const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
+  template<class utype> xvector<utype> getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
 
   // SIMPLE SORT ROUTINES
   template<class utype> xvector<utype>  // WRAP TO SHELL SHORT

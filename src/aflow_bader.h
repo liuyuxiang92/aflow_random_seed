@@ -66,25 +66,6 @@ string CHGCAR2JVXL_get_output_filename(string chgcar_file, const double& cutoff,
 string CHGCAR2JVXL_get_output_filename(string chgcar_file, const double& cutoff);
 }
 
-// Phonon graphs
-namespace pflow {
-bool PLOT_PHDISP(vector<string>& argv);
-}
-// read phonon calculation output and produce graphs
-string gnuplotPhononHeader(string directory, string name, string unit, string plot_type, string title);
-// return header info for gnuplot .eps graph
-string gnuplotPhononDisp(string dis_path, string ylabel, double conversion, vector<string> specialLabels,
-                         vector<double> specialPositions, int nbranches, string rightmargin, string botmargin);
-// return info for making a plot of the phonon dispersion
-string gnuplotPhononDos(string pdos_path, string leftmargin, string botmargin);
-// return infor for making a plot of the phonon density of states
-string gnuplotPhononThermo(string thermo_path, string topmargin);
-// return info for making a plot of the thermodynamics properties F_vib, S_vib, C_v
-void callOutputConversion(bool PNG, bool PDF, bool JPG, bool GIF, string directory, string name, string unit, string plot);
-// executes `convert' to produce requested formats from .eps
-void cleanGnuplotScript(bool file1, bool file2, bool file3, string script);
-// removes the gnuplot scripts because they refer to temporary files
-
 #endif
 
 // ***************************************************************************

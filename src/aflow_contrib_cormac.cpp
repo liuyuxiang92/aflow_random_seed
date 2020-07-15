@@ -26,7 +26,7 @@ namespace pflow {
     //
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::DEBYE: BEGIN" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::DEBYE: BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
@@ -36,40 +36,40 @@ namespace pflow {
     string thermofilename="";
     if(tokens.size()>=1) thermofilename=tokens.at(0);
 
-    string cvfilename, debyefilename, firstline, flword, line, sysname;
+    string cvfilename = "", debyefilename = "", firstline = "", flword = "", line = "", sysname = "";
     ifstream infilethermo;
     ofstream ofilecv, ofiledebye;
-    int cvcolumn, tcolumn, ncolumn, itmin, itmax, id, jstart;
+    int cvcolumn = 0, tcolumn = 0, ncolumn = 0, itmin = 0, itmax = 0, id = 0, jstart = 0;
     int initcol = 0, npoints = 0;
     stringstream thermofile;
-    double rowvar, cvt, nkb, natoms, tol, tol2, tinit, y, Deb, fy, ya, fya, yb, fyb;
-    double tdmin, tdmax, rmsmin, tdtrial, smsq, rms, tdbest, DEB_min, DEB_max, Tmin, Tmax;
+    double rowvar = 0.0, cvt = 0.0, nkb = 0.0, natoms = 0.0, tol = 0.0, tol2 = 0.0, tinit = 0.0, y = 0.0, Deb = 0.0, fy = 0.0, ya = 0.0, fya = 0.0, yb = 0.0, fyb = 0.0;
+    double tdmin = 0.0, tdmax = 0.0, rmsmin = 0.0, tdtrial = 0.0, smsq = 0.0, rms = 0.0, tdbest = 0.0, DEB_min = 0.0, DEB_max = 0.0, Tmin = 0.0, Tmax = 0.0;
     bool natomcalcd = false;
 
     nkb = 1.0;
     tol = 0.00001;
     tinit = 100.0;
     tol2 = 1E-8;
-   
+
     // Open THERMO file (APL output) to determine number of temperature points
     if(aurostd::FileExist(thermofilename)) {
       if(thermofilename == "THERMO") {
-	infilethermo.open("THERMO");
+        infilethermo.open("THERMO");
       } else if(thermofilename == "THERMO.bz2") {
-	aurostd::execute("bzip2 -dqf " + thermofilename);
-	infilethermo.open("THERMO");
+        aurostd::execute("bzip2 -dqf " + thermofilename);
+        infilethermo.open("THERMO");
       } else if(thermofilename == "THERMO.gz") {
-	aurostd::execute("gzip -dqf " + thermofilename);
-	infilethermo.open("THERMO");
+        aurostd::execute("gzip -dqf " + thermofilename);
+        infilethermo.open("THERMO");
       } else if(thermofilename == "THERMO.xz") {
-	aurostd::execute("xz -dqf " + thermofilename);
-	infilethermo.open("THERMO");
+        aurostd::execute("xz -dqf " + thermofilename);
+        infilethermo.open("THERMO");
       } 
-      
+
       getline(infilethermo, firstline);
       while(infilethermo.peek() != EOF) {
-	getline(infilethermo, line);
-	npoints++;
+        getline(infilethermo, line);
+        npoints++;
       }   
       infilethermo.close();
     }
@@ -78,8 +78,8 @@ namespace pflow {
       infilethermo.open("THERMO");
       getline(infilethermo, firstline);
       while(infilethermo.peek() != EOF) {
-	getline(infilethermo, line);
-	npoints++;
+        getline(infilethermo, line);
+        npoints++;
       }    
       infilethermo.close();
     }
@@ -88,8 +88,8 @@ namespace pflow {
       infilethermo.open("THERMO");
       getline(infilethermo, firstline);
       while(infilethermo.peek() != EOF) {
-	getline(infilethermo, line);
-	npoints++;
+        getline(infilethermo, line);
+        npoints++;
       }    
       infilethermo.close();
     }
@@ -98,8 +98,8 @@ namespace pflow {
       infilethermo.open("THERMO");
       getline(infilethermo, firstline);
       while(infilethermo.peek() != EOF) {
-	getline(infilethermo, line);
-	npoints++;
+        getline(infilethermo, line);
+        npoints++;
       }    
       infilethermo.close();
     }
@@ -107,8 +107,8 @@ namespace pflow {
       infilethermo.open("THERMO");
       getline(infilethermo, firstline);
       while(infilethermo.peek() != EOF) {
-	getline(infilethermo, line);
-	npoints++;
+        getline(infilethermo, line);
+        npoints++;
       }    
       infilethermo.close();
     }
@@ -122,13 +122,13 @@ namespace pflow {
     for (int i = 0; i < aurostd::CountWordsinString(firstline); i++) {
       infilethermo >> flword;
       if(flword == "#") {
-	initcol = -1;
+        initcol = -1;
       }
       if(flword == "T(K)") {
-	tcolumn = i + initcol;
+        tcolumn = i + initcol;
       }
       if(flword == "Cv(kB/cell)") {
-	cvcolumn = i + initcol;
+        cvcolumn = i + initcol;
       }
     }
 
@@ -138,7 +138,7 @@ namespace pflow {
     aurostd::file2stringstream("THERMO", thermofile);
 
     ncolumn = aurostd::CountWordsinString(firstline) + initcol;
-  
+
     vector<double> Temp(npoints);
     vector<double> Cv(npoints);
     vector<double> ThetaD(npoints);
@@ -147,13 +147,13 @@ namespace pflow {
     // Read in temperature and heat capacity data from THERMO file
     for (int i = 0; i < npoints; i++) {
       for (int j = 0; j < ncolumn; j++) {
-	thermofile >> rowvar;
-	if(j == tcolumn) {
-	  Temp[i] = rowvar;
-	}
-	if(j == cvcolumn) {
-	  Cv[i] = rowvar;
-	}
+        thermofile >> rowvar;
+        if(j == tcolumn) {
+          Temp[i] = rowvar;
+        }
+        if(j == cvcolumn) {
+          Cv[i] = rowvar;
+        }
       }
     }
     // Determines number of atoms in unit cell by reading POSCAR part of _AFLOWIN_ file if it exists
@@ -164,17 +164,17 @@ namespace pflow {
       iafile.clear(); iafile.str(std::string());
       aurostd::file2stringstream(_AFLOWIN_, iafile);    
       if(aurostd::substring2bool(iafile.str(),START) && aurostd::substring2bool(iafile.str(),STOP)) {
-	stringstream POSCAR;
-	POSCAR.clear();   POSCAR.str(std::string());
-	aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,START,STOP);
-	xstructure xstr = xstructure(POSCAR, IOVASP_AUTO);
-	int ntypes = xstr.num_each_type.size();
-	natoms = 0;
-	for(int i=0; i<ntypes; i++) {
-	  natoms = natoms + xstr.num_each_type.at(i);
-	}
-	natomcalcd = true;
-	sysname = xstr.title;
+        stringstream POSCAR;
+        POSCAR.clear();   POSCAR.str(std::string());
+        aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,START,STOP);
+        xstructure xstr = xstructure(POSCAR, IOVASP_AUTO);
+        int ntypes = xstr.num_each_type.size();
+        natoms = 0;
+        for(int i=0; i<ntypes; i++) {
+          natoms = natoms + xstr.num_each_type.at(i);
+        }
+        natomcalcd = true;
+        sysname = xstr.title;
       }
     }
     // If POSCAR part of _AFLOWIN_ file does not exist, 
@@ -198,75 +198,75 @@ namespace pflow {
     for (int j = jstart; j < npoints; j++) {
       cvt = Cv[j] / nkb;
       if(j == 1) {	 
-	ThetaD[j] = Temp[j] * tinit;
+        ThetaD[j] = Temp[j] * tinit;
       }
       else {
-	ThetaD[j] = ThetaD[j-1];
+        ThetaD[j] = ThetaD[j-1];
       }
       y = ThetaD[j] / Temp[j];
       debint(y, Deb);
       fy = 9.0 * Deb - cvt;
 
       if(aurostd::abs(fy) < tol) {
-	//	  Initial trial theta is correct - do nothing
+        //	  Initial trial theta is correct - do nothing
       }
       else if(fy > 0.0) {
-	fya = fy;
-	ya = y;
-	y = y * 2.0;
-	debint(y, Deb);
-	fy = 9.0 * Deb - cvt;
-	if(fy < fya) {
-	  while (fy > 0.0) {
-	    y = y * 2.0;
-	    debint(y, Deb);
-	    fy = 9.0 * Deb - cvt;
-	  }
-	  yb = y;
-	}
-	else if(fy > fya) {
-	  while (fy > 0.0) {
-	    y = y / 2.0;
-	    debint(y, Deb);
-	    fy = 9.0 * Deb - cvt;
-	  }
-	  yb = y;
-	}  
+        fya = fy;
+        ya = y;
+        y = y * 2.0;
+        debint(y, Deb);
+        fy = 9.0 * Deb - cvt;
+        if(fy < fya) {
+          while (fy > 0.0) {
+            y = y * 2.0;
+            debint(y, Deb);
+            fy = 9.0 * Deb - cvt;
+          }
+          yb = y;
+        }
+        else if(fy > fya) {
+          while (fy > 0.0) {
+            y = y / 2.0;
+            debint(y, Deb);
+            fy = 9.0 * Deb - cvt;
+          }
+          yb = y;
+        }  
       }
       else if(fy < 0.0) {
-	fyb = fy;
-	yb = y;
-	y = y / 2.0;
-	debint(y, Deb);
-	fy = 9.0 * Deb - cvt;
-	if(fy > fyb) {
-	  while (fy < 0.0) {
-	    y = y / 2.0;
-	    debint(y, Deb);
-	    fy = 9.0 * Deb - cvt;
-	  }
-	  ya = y;
-	}
-	else if(fy < fyb) {
-	  while (fy < 0.0) {
-	    y = y * 2.0;
-	    debint(y, Deb);
-	    fy = 9.0 * Deb - cvt;
-	  }
-	  yb = y;
-	}
+        fyb = fy;
+        yb = y;
+        y = y / 2.0;
+        debint(y, Deb);
+        fy = 9.0 * Deb - cvt;
+        if(fy > fyb) {
+          while (fy < 0.0) {
+            y = y / 2.0;
+            debint(y, Deb);
+            fy = 9.0 * Deb - cvt;
+          }
+          ya = y;
+        }
+        else if(fy < fyb) {
+          while (fy < 0.0) {
+            y = y * 2.0;
+            debint(y, Deb);
+            fy = 9.0 * Deb - cvt;
+          }
+          yb = y;
+        }
       }
-      
+
       while (aurostd::abs(fy) > tol) {
-	y = (ya + yb) / 2.0;
-	debint(y, Deb);
-	fy = 9.0 * Deb - cvt;
-	if(fy > 0.0) {
-	  ya = y;
-	}
-	else if(fy < 0.0) {
-	  yb = y;
-	}
+        y = (ya + yb) / 2.0;
+        debint(y, Deb);
+        fy = 9.0 * Deb - cvt;
+        if(fy > 0.0) {
+          ya = y;
+        }
+        else if(fy < 0.0) {
+          yb = y;
+        }
       }
       ThetaD[j] = y * Temp[j];
 
@@ -283,11 +283,11 @@ namespace pflow {
 
     for (int j = 1; j < npoints; j++) {
       if(ThetaD[j] > tdmax) {
-	tdmax = ThetaD[j];
+        tdmax = ThetaD[j];
       }
 
       if(ThetaD[j] < tdmin) {
-	tdmin = ThetaD[j];
+        tdmin = ThetaD[j];
       }
     }
     DEB_min = tdmin - fmod(tdmin,100.0);
@@ -302,22 +302,22 @@ namespace pflow {
     rmsmin = 1e30;
     // Determines which Debye temperature gives best fit to all heat capacity data in given range
     for (int i = itmin; i <= itmax; i++)
-      {
-	id = i;
-	tdtrial = id;
-	smsq = 0.0;
-	for (int j = 1; j < npoints; j++) {
-	  y = tdtrial / Temp[j];
-	  debint(y, Deb);
-	  cvt = 9.0 * nkb * Deb;
-	  smsq = smsq + pow((cvt - Cv[j]), 2);
-	}
-	rms = sqrt(smsq);
-	if(rms < rmsmin) {
-	  rmsmin = rms;
-	  tdbest = tdtrial;
-	}
+    {
+      id = i;
+      tdtrial = id;
+      smsq = 0.0;
+      for (int j = 1; j < npoints; j++) {
+        y = tdtrial / Temp[j];
+        debint(y, Deb);
+        cvt = 9.0 * nkb * Deb;
+        smsq = smsq + pow((cvt - Cv[j]), 2);
       }
+      rms = sqrt(smsq);
+      if(rms < rmsmin) {
+        rmsmin = rms;
+        tdbest = tdtrial;
+      }
+    }
 
     ofiledebye.open("debye_temperature.dat");  
     if(ofiledebye.is_open()) {
@@ -325,7 +325,7 @@ namespace pflow {
       ofiledebye << "# Debye temperature giving best fit to Cv data = " << tdbest << "K " << endl;
       ofiledebye << "# T(K) " << "\t" << "Debye temperature (K) " << endl; 
       for (int i = jstart; i < npoints; i++) {
-	ofiledebye << Temp[i] << "\t" << ThetaD[i] << endl;
+        ofiledebye << Temp[i] << "\t" << ThetaD[i] << endl;
       }
     }
     else {
@@ -339,14 +339,14 @@ namespace pflow {
     fdebin.open(debyedatafile.c_str());  
     if(fdebin.is_open()) {
       if(aurostd::abs(Temp[0]) < tol2) {
-	for (int i = 1; i < npoints; i++) {
-	  fdebin << Temp[i] << "\t" << ThetaD[i] << endl;
-	}
+        for (int i = 1; i < npoints; i++) {
+          fdebin << Temp[i] << "\t" << ThetaD[i] << endl;
+        }
       }
       else {
-	for (int i = 0; i < npoints; i++) {
-	  fdebin << Temp[i] << "\t" << ThetaD[i] << endl;
-	}		  
+        for (int i = 0; i < npoints; i++) {
+          fdebin << Temp[i] << "\t" << ThetaD[i] << endl;
+        }		  
       }
     }
     else {
@@ -399,12 +399,12 @@ namespace pflow {
     }
 
     aurostd::execute("rm -f debye_temperature.eps");
-    
+
     if(thermofilename == "THERMO.bz2") { aurostd::execute("bzip2 -9fq THERMO"); }
     if(thermofilename == "THERMO.gz") { aurostd::execute("gzip -9fq THERMO"); }
     if(thermofilename == "THERMO.xz") { aurostd::execute("xz -9fq THERMO"); }
     // END
-    if(LDEBUG) cerr << "pflow::DEBYE: END" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::DEBYE: END" << endl;
   }
 }
 
@@ -432,9 +432,9 @@ void gauleg(double& x1,double& x2,double x[],double w[], int& n) {
       //.........Loop up the recurrence relation to get the Legendre polynomial 
       //         evaluated at z.
       for ( j = 1; j <= n; j++) {
-	p3=p2;
-	p2=p1;
-	p1=((2.0*j-1.0)*z*p2-(j-1.0)*p3)/j;
+        p3=p2;
+        p2=p1;
+        p1=((2.0*j-1.0)*z*p2-(j-1.0)*p3)/j;
       }
       //.........p1 is now the desired Legendre polynomial. We next compute pp,
       //         derivative , by a standard relation involving p2, the polyn-
@@ -444,10 +444,10 @@ void gauleg(double& x1,double& x2,double x[],double w[], int& n) {
       //.........Newton's method.
       z=z1-p1/pp;
       if(aurostd::abs(z-z1) > eps) {
-	converged = false;
+        converged = false;
       }
       else {
-	converged = true;
+        converged = true;
       }
     }
     //.......Scale the root to the desired interval.
@@ -483,15 +483,15 @@ void debint (double& y, double& Deb) {
       gauleg (cero,y,x,w,nl);
       sum=0.0;
       for (i = 0; i < nl; i++) {
-	sum=sum+w[i]*fdebye(x[i]);
+        sum=sum+w[i]*fdebye(x[i]);
       }
       debye=sum/y/y/y;
       xabs=aurostd::abs(debye-debye0);
       if(xabs < eps) {
-	break;
+        break;
       }
       else {
-	debye0=debye;
+        debye0=debye;
       }
     }
   }

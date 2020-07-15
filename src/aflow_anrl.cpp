@@ -675,6 +675,68 @@ namespace anrl { // put them in order
   uint PrototypeANRL_AB3C4_hR8_166_a_bc_2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-62
   uint PrototypeANRL_ABC2_hR8_166_c_c_abc(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-63
   uint PrototypeANRL_AB3C4_cP8_221_a_c_bd(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-64
+  // -------------------------------------------------------------------------
+  // oxide prototypes (from R. Friedrich)
+  // -------------------------------------------------------------------------
+  // binaries
+  uint PrototypeANRL_AB_mC20_12_b2i_c2i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-1
+  uint PrototypeANRL_A2B3_mC20_12_2i_3i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-2 
+  uint PrototypeANRL_A5B3_mC32_12_5i_3i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-3 
+  uint PrototypeANRL_A3B_mP16_14_3e_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-4
+  uint PrototypeANRL_A2B3_mP20_14_2e_3e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-5 
+  uint PrototypeANRL_AB_mC8_15_a_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-6
+  uint PrototypeANRL_A4B_mC20_15_2f_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-7 
+  uint PrototypeANRL_A2B5_oP28_19_2a_5a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-8
+  uint PrototypeANRL_A2B_oP24_33_4a_2a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-9
+  uint PrototypeANRL_AB3_oC32_40_c_3c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-10
+  uint PrototypeANRL_A5B2_oP14_59_a2e_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-11
+  uint PrototypeANRL_AB_oC16_64_e_f(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-12
+  uint PrototypeANRL_A4B3_tP28_135_gh_dh(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-13
+  uint PrototypeANRL_A2B3_hP15_144_2a_3a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-14 
+  uint PrototypeANRL_A2B_hR3_166_c_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-15
+  uint PrototypeANRL_AB2_hR6_166_c_2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-16
+  uint PrototypeANRL_AB_hP12_189_fg_eh(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-17
+  uint PrototypeANRL_AB_hP8_194_ac_f(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-18
+  uint PrototypeANRL_A2B3_cI80_199_a2b_2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-19
+  uint PrototypeANRL_A3B2_cF80_227_f_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-20
+  // -------------------------------------------------------------------------
+  // ternaries
+  uint PrototypeANRL_A4B4C_aP18_2_4i_4i_i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-21
+  uint PrototypeANRL_A2B7C2_aP22_2_2i_7i_2i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-22
+  uint PrototypeANRL_AB3C_aP30_2_3i_9i_3i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-23
+  uint PrototypeANRL_A2B5C_aP32_2_4i_10i_2i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-24
+  uint PrototypeANRL_A2B4C_mP28_4_4a_8a_2a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-25
+  uint PrototypeANRL_A3BC_mC60_5_ab8c_ab2c_3c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-26
+  uint PrototypeANRL_A3B5C_mC54_8_3a3b_9a3b_3a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-27
+  uint PrototypeANRL_A2B7C3_mP24_11_2e_7e_3e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-28
+  uint PrototypeANRL_AB6C2_mC18_12_a_3i_i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-29
+  uint PrototypeANRL_ABC4_mC48_12_gi_hi_2i3j(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-30
+  uint PrototypeANRL_AB4C_mP12_13_f_2g_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-31
+  uint PrototypeANRL_AB3C_mP40_14_2e_6e_2e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-32
+  uint PrototypeANRL_A2B3C_mC24_15_2e_af_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-33
+  uint PrototypeANRL_AB3C_mC40_15_2e_3f_f(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-34
+  uint PrototypeANRL_A2B3C_mC48_15_aef_3f_2e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-35
+  uint PrototypeANRL_A4BC7_mC48_15_2f_e_e3f(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-36
+  uint PrototypeANRL_AB3C_mC60_15_cf_e4f_ef(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-37
+  uint PrototypeANRL_ABC2_oP16_33_a_a_2a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-38
+  uint PrototypeANRL_A2B3C_oC24_36_b_ab_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-39
+  uint PrototypeANRL_A2B5C_oP32_58_eg_3gh_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-40
+  uint PrototypeANRL_AB2C4_oC28_63_c_ac_fg(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-41
+  uint PrototypeANRL_AB5C2_oC32_63_c_c2f_f(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-42
+  uint PrototypeANRL_ABC4_tI24_88_a_b_f(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-43
+  uint PrototypeANRL_A4BC2_tP28_91_2d_b_ac(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-44
+  uint PrototypeANRL_A2BC4_hP56_173_2b2c_ac_b5c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-45
+  uint PrototypeANRL_AB2C4_cF56_227_b_c_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-oxide-46
+  // -------------------------------------------------------------------------
+  // nitride prototypes (from R. Friedrich)
+  // -------------------------------------------------------------------------
+  // binaries
+  uint PrototypeANRL_A2B3_cI80_206_ad_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-nitride-1 (nitride)
+  // -------------------------------------------------------------------------
+  // ternaries
+  uint PrototypeANRL_ABC_oP12_62_c_c_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-nitride-2
+  uint PrototypeANRL_A2B2C_tI10_139_e_e_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-nitride-3
+  
 }
 
 // *************************************************************************** 
@@ -769,7 +831,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // not found
     if(!found) {
-      
+
       cerr << "ERROR - anrl::PrototypeANRL: prototype not found [label=" << label << "]" << endl;
       exit(0);
     }
@@ -3809,6 +3871,216 @@ namespace anrl {
     if(found && vlabel.at(ifound)=="AB3C4_cP8_221_a_c_bd")
       PrototypeANRL_AB3C4_cP8_221_a_c_bd(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // oxide prototypes (from R. Friedrich)
+    // -------------------------------------------------------------------------
+    // binaries
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-1 // ./aflow --proto=AB_mC20_12_b2i_c2i --params=9.7915972616,0.443468950753,0.626873661672,72.47,0.825,0.343,0.821,0.833,0.66,0.17,0.658,0.669
+    if(found && vlabel.at(ifound)=="AB_mC20_12_b2i_c2i")
+      PrototypeANRL_AB_mC20_12_b2i_c2i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-2 // ./aflow --proto=A2B3_mC20_12_2i_3i --params=12.8749583858,0.24865727853,0.999198732944,152.527888576,0.7041,0.7946,0.65536,0.31402,0.9453,0.1098,0.3899,0.5632,0.7607,0.2566
+    if(found && vlabel.at(ifound)=="A2B3_mC20_12_2i_3i")
+      PrototypeANRL_A2B3_mC20_12_2i_3i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-3 // ./aflow --proto=A5B3_mC32_12_5i_3i --params=9.7349670426,0.385643337648,1.40884015867,133.94703436,0.0136,0.2506,0.8276,0.8736,0.5586,0.6116,0.6158,0.9368,0.267,0.574,0.442,0.2461,0.9228,0.0529,0.2983,0.4337
+    if(found && vlabel.at(ifound)=="A5B3_mC32_12_5i_3i")
+      PrototypeANRL_A5B3_mC32_12_5i_3i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-4 // ./aflow --proto=A3B_mP16_14_3e_e --params=8.3369865333,0.56178500085,0.838076298071,144.831245943,0.958,0.961,0.756,0.442,0.046,0.243,0.255,0.673,0.243,0.2563,0.7319,0.9681
+    if(found && vlabel.at(ifound)=="A3B_mP16_14_3e_e")
+      PrototypeANRL_A3B_mP16_14_3e_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-5 // ./aflow --proto=A2B3_mP20_14_2e_3e --params=7.592734201,1.09598618914,0.998035732622,133.736291174,0.524,0.816,0.158,0.04,0.959,0.263,0.778,0.702,0.071,0.235,0.948,0.11,0.27,0.969,0.758
+    if(found && vlabel.at(ifound)=="A2B3_mP20_14_2e_3e")
+      PrototypeANRL_A2B3_mP20_14_2e_3e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-6 // ./aflow --proto=AB_mC8_15_a_e --params=4.6509294963,0.729773531807,1.35357481762,127.166266704,0.333
+    if(found && vlabel.at(ifound)=="AB_mC8_15_a_e")
+      PrototypeANRL_AB_mC8_15_a_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-7 // ./aflow --proto=A4B_mC20_15_2f_e --params=7.7087709852,0.481394604967,0.920353982304,63.4,0.7399,0.379,0.462,0.19,0.885,0.524,0.425
+    if(found && vlabel.at(ifound)=="A4B_mC20_15_2f_e")
+      PrototypeANRL_A4B_mC20_15_2f_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-8 // ./aflow --proto=A2B5_oP28_19_2a_5a --params=4.4859196717,1.82663207955,1.86900129701,0.3784,0.3475,0.4015,0.384,0.9674,0.7836,0.0951,0.3166,0.5403,0.8671,0.6061,0.7453,0.3371,0.4845,0.8324,0.7112,0.2743,0.749,0.55,0.4939,0.5257
+    if(found && vlabel.at(ifound)=="A2B5_oP28_19_2a_5a")
+      PrototypeANRL_A2B5_oP28_19_2a_5a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-9 // ./aflow --proto=A2B_oP24_33_4a_2a --params=5.6320569384,0.884841795441,2.16335540838,0.6753,0.1608,0.593,0.6454,0.8379,0.906,0.834,0.699,0.6957,0.9256,0.188,0.8093,0.9786,0.9654,0.0,0.6272,0.9994,0.7473
+    if(found && vlabel.at(ifound)=="A2B_oP24_33_4a_2a")
+      PrototypeANRL_A2B_oP24_33_4a_2a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-10 // ./aflow --proto=AB3_oC32_40_c_3c --params=5.0629282861,1.7868030904,1.19920651493,0.0,0.09676,0.75,0.8841,0.0,0.5,0.8755,0.7677,0.25,0.3284,0.1078,0.75
+    if(found && vlabel.at(ifound)=="AB3_oC32_40_c_3c")
+      PrototypeANRL_AB3_oC32_40_c_3c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-11 // ./aflow --proto=A5B2_oP14_59_a2e_e --params=3.2076870978,3.23007856337,1.22558922558,0.999,0.1457,0.469,0.3189,0.997,0.14882,0.1083
+    if(found && vlabel.at(ifound)=="A5B2_oP14_59_a2e_e")
+      PrototypeANRL_A5B2_oP14_59_a2e_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-12 // ./aflow --proto=AB_oC16_64_e_f --params=8.7597573116,1.03356994972,0.940698018333,0.6554,0.9104,0.0725
+    if(found && vlabel.at(ifound)=="AB_oC16_64_e_f")
+      PrototypeANRL_AB_oC16_64_e_f(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-13 // ./aflow --proto=A4B3_tP28_135_gh_dh --params=8.7553254034,0.751693002255,0.33,0.4,0.1,0.14,0.165
+    if(found && vlabel.at(ifound)=="A4B3_tP28_135_gh_dh")
+      PrototypeANRL_A4B3_tP28_135_gh_dh(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-14 // ./aflow --proto=A2B3_hP15_144_2a_3a --params=3.9844538913,1.92300578035,0.15,0.61,0.02,0.77,0.18,0.26,0.15,0.95,0.0,0.79,0.33,0.07,0.23,0.72,0.56
+    if(found && vlabel.at(ifound)=="A2B3_hP15_144_2a_3a")
+      PrototypeANRL_A2B3_hP15_144_2a_3a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-15 // ./aflow --proto=A2B_hR3_166_c_a --params5.73015,4.46193,0.744
+    if(found && vlabel.at(ifound)=="A2B_hR3_166_c_a")
+      PrototypeANRL_A2B_hR3_166_c_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-16 // ./aflow --proto=AB2_hR6_166_c_2c --params=3.5572963728,10.7622298067,0.083,0.377,0.21
+    if(found && vlabel.at(ifound)=="AB2_hR6_166_c_2c")
+      PrototypeANRL_AB2_hR6_166_c_2c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-17 // ./aflow --proto=AB_hP12_189_fg_eh --params=7.5487706231,0.71987757732,0.668,0.295,0.632,0.168
+    if(found && vlabel.at(ifound)=="AB_hP12_189_fg_eh")
+      PrototypeANRL_AB_hP12_189_fg_eh(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-18 // ./aflow --proto=AB_hP8_194_ac_f --params=3.7639841644,2.4272070374,0.6497
+    if(found && vlabel.at(ifound)=="AB_hP8_194_ac_f")
+      PrototypeANRL_AB_hP8_194_ac_f(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-19 // ./aflow --proto=A2B3_cI80_199_a2b_2c --params=10.7844999416,0.5,0.229,0.708,0.625,0.125,0.875,0.625,0.875,0.875
+    if(found && vlabel.at(ifound)=="A2B3_cI80_199_a2b_2c")
+      PrototypeANRL_A2B3_cI80_199_a2b_2c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-21 // ./aflow --proto=A3B2_cF80_227_f_e --params=10.7531348348,0.865,0.73
+    if(found && vlabel.at(ifound)=="A3B2_cF80_227_f_e")
+      PrototypeANRL_A3B2_cF80_227_f_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // -------------------------------------------------------------------------
+    // ternaries
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-21 // ./aflow --proto=A4B4C_aP18_2_4i_4i_i --params=6.63976352,1.00001361035,1.50518591105,71.844867398,80.9249357443,67.4411683666,0.7435,0.7649,0.0197,0.2323,0.4828,0.5617,0.2681,0.0455,0.3887,0.236,0.5962,0.1682,0.9572,0.3436,0.1926,0.9557,0.8502,0.3514,0.6442,0.1527,0.0884,0.5375,0.2907,0.3741,0.7148,0.2162,0.2479
+    if(found && vlabel.at(ifound)=="A4B4C_aP18_2_4i_4i_i")
+      PrototypeANRL_A4B4C_aP18_2_4i_4i_i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-22 // ./aflow --proto=A2B7C2_aP22_2_2i_7i_2i --params=7.3384982604,0.986316404633,0.950710549193,96.331,116.158,86.387,0.82535,0.34153,0.25581,0.23479,0.93732,0.27034,0.5623,0.6988,0.9539,0.6304,0.3997,0.4639,0.6025,0.9461,0.341,0.9238,0.6849,0.3595,0.8578,0.0087,0.1317,0.173,0.2822,0.2504,0.232,0.6233,0.107,0.34536,0.44585,0.27538,0.73214,0.83509,0.19625
+    if(found && vlabel.at(ifound)=="A2B7C2_aP22_2_2i_7i_2i")
+      PrototypeANRL_A2B7C2_aP22_2_2i_7i_2i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-23 // ./aflow --proto=AB3C_aP30_2_3i_9i_3i --params=8.440104917,0.923591309392,0.891430518055,90.055,95.217,103.426,0.19831,0.42266,0.7606,0.20241,0.92919,0.76401,0.50333,0.7504,0.52691,0.3034,0.4616,0.4628,0.3014,0.9385,0.4641,0.5705,0.7688,0.1988,0.9832,0.3739,0.2655,0.9819,0.8677,0.2648,0.4018,0.7266,0.8296,0.2183,0.1785,0.2254,0.2713,0.8704,0.0938,0.2735,0.5126,0.0931,0.1851,0.3875,0.2684,0.1849,0.9542,0.2691,0.3973,0.7236,0.0561
+    if(found && vlabel.at(ifound)=="AB3C_aP30_2_3i_9i_3i")
+      PrototypeANRL_AB3C_aP30_2_3i_9i_3i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-24 // ./aflow --proto=A2B5C_aP32_2_4i_10i_2i --params=7.3087649311,1.14261433201,0.821778898093,90.89,101.58,105.99,0.3463,0.7028,0.4634,0.2875,0.6959,0.9481,0.0961,0.3757,0.6278,0.1278,0.9318,0.1815,0.1019,0.1479,0.1134,0.1351,0.6991,0.197,0.2641,0.4568,0.9447,0.2832,0.9314,0.9431,0.1337,0.6232,0.6318,0.2765,0.4421,0.4144,0.2948,0.9435,0.4818,0.4953,0.2777,0.2314,0.1057,0.1465,0.6744,0.5003,0.2278,0.7656,0.2959,0.0562,0.72,0.2808,0.3359,0.1702
+    if(found && vlabel.at(ifound)=="A2B5C_aP32_2_4i_10i_2i")
+      PrototypeANRL_A2B5C_aP32_2_4i_10i_2i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-25 // ./aflow --proto=A2B4C_mP28_4_4a_8a_2a --params=9.0939150001,1.04504737499,0.608139562228,92.875,0.807,0.829,0.272,0.204,0.832,0.263,0.302,0.661,0.774,0.321,0.171,0.214,0.7387,0.1707,0.568,0.2717,0.3202,0.4218,0.6785,0.4914,0.642,0.7422,0.9861,0.0989,0.8129,0.3034,0.0693,0.7893,0.6712,0.078,0.5051,0.2076,0.129,0.0106,0.8783,0.3432,0.5032,-0.0,0.747,0.975,0.9939,0.7889
+    if(found && vlabel.at(ifound)=="A2B4C_mP28_4_4a_8a_2a")
+      PrototypeANRL_A2B4C_mP28_4_4a_8a_2a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-26 // ./aflow --proto=A3BC_mC60_5_ab8c_ab2c_3c --params=13.2962734468,0.579323216751,0.88233384728,68.42,0.126,0.583,0.395,0.925,0.458,0.177,0.139,0.393,0.968,0.991,0.37,0.658,0.858,0.777,0.165,0.139,0.451,0.315,0.635,0.89,0.089,0.511,0.381,0.841,0.35,0.287,0.857,0.63,0.384,0.71,0.999,0.37,0.798,0.498,0.9127,0.0,0.2494,0.2545,0.022,0.2458,0.5872,0.0207,0.2516
+    if(found && vlabel.at(ifound)=="A3BC_mC60_5_ab8c_ab2c_3c")
+      PrototypeANRL_A3BC_mC60_5_ab8c_ab2c_3c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-27 // ./aflow --proto=A3B5C_mC54_8_3a3b_9a3b_3a --params=13.993228409,0.578095627303,0.95071704775,134.2304365,0.0445,0.3334,0.9668,0.6832,0.5007,0.0005,0.2994,0.4493,0.9984,0.4969,0.6404,0.2828,0.8665,0.803,0.7033,0.5434,0.7612,0.1446,0.2517,0.8741,0.3501,0.7145,0.9192,0.057,0.0021,0.9993,0.5651,0.3477,0.4285,0.6427,0.1992,0.2336,0.6793,0.3112,0.2665,0.3313,0.7507,0.2478,0.0016,0.4657,0.8234,0.2857,0.5968,0.6856,0.0533,0.035,0.3071,0.7119
+    if(found && vlabel.at(ifound)=="A3B5C_mC54_8_3a3b_9a3b_3a")
+      PrototypeANRL_A3B5C_mC54_8_3a3b_9a3b_3a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-28 // ./aflow --proto=A2B7C3_mP24_11_2e_7e_3e --params=9.7906148128,0.416420361249,0.938259441704,101.57,0.595,0.682,0.154,0.508,0.195,0.221,0.473,0.14,0.645,0.438,0.885,0.314,0.745,0.997,0.313,0.791,0.031,0.905,0.2806,0.0278,0.673,0.2467,0.9811,0.142
+    if(found && vlabel.at(ifound)=="A2B7C3_mP24_11_2e_7e_3e")
+      PrototypeANRL_A2B7C3_mP24_11_2e_7e_3e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-29 // ./aflow --proto=AB6C2_mC18_12_a_3i_i --params=9.7742615012,0.36510934394,0.69960238568,75.2,0.6434,0.8818,0.7535,0.3934,0.9126,0.7219,0.7658,0.6691
+    if(found && vlabel.at(ifound)=="AB6C2_mC18_12_a_3i_i")
+      PrototypeANRL_AB6C2_mC18_12_a_3i_i(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-30 // ./aflow --proto=ABC4_mC48_12_gi_hi_2i3j --params=9.7995229272,0.904117589797,0.6838314027,73.04,0.3216,0.249,0.2996,0.3569,0.2291,0.9043,0.3587,0.0391,0.2983,0.6449,0.5415,0.8467,0.696,0.3587,0.6439,0.6088,0.6337,0.6552,0.9717
+    if(found && vlabel.at(ifound)=="ABC4_mC48_12_gi_hi_2i3j")
+      PrototypeANRL_ABC4_mC48_12_gi_hi_2i3j(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-31 // ./aflow --proto=AB4C_mP12_13_f_2g_e --params=6.912898268,0.837946008451,0.729410860817,136.193216009,0.1825,0.327,0.22,0.894,0.281,0.256,0.622,0.855
+    if(found && vlabel.at(ifound)=="AB4C_mP12_13_f_2g_e")
+      PrototypeANRL_AB4C_mP12_13_f_2g_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-32 // ./aflow --proto=AB3C_mP40_14_2e_6e_2e --params=9.8340572172,0.944454808597,0.553242905653,103.024236752,0.2509,0.3482,0.0296,0.2556,0.9865,0.037,0.8687,0.659,0.6887,0.1227,0.5,0.7987,0.1052,0.724,0.4962,0.3748,0.159,0.2478,0.6341,0.016,0.2471,0.6018,0.303,0.1428,0.0441,0.6597,0.7519,0.5525,0.1628,0.3184
+    if(found && vlabel.at(ifound)=="AB3C_mP40_14_2e_6e_2e")
+      PrototypeANRL_AB3C_mP40_14_2e_6e_2e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-33 // ./aflow --proto=A2B3C_mC24_15_2e_af_e --params=6.0875108932,1.66963707964,1.11173475337,123.707427092,0.1695,0.483,0.8419,0.0299,0.6684,0.5221
+    if(found && vlabel.at(ifound)=="A2B3C_mC24_15_2e_af_e")
+      PrototypeANRL_A2B3C_mC24_15_2e_af_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-34 // ./aflow --proto=AB3C_mC40_15_2e_3f_f --params=10.7421147996,0.897270659587,0.978465510971,147.31111283,0.45571,0.83777,0.78937,0.64875,0.16687,0.71802,0.50232,0.32358,0.43573,0.74259,0.03818,0.719,0.66021,0.26127
+    if(found && vlabel.at(ifound)=="AB3C_mC40_15_2e_3f_f")
+      PrototypeANRL_AB3C_mC40_15_2e_3f_f(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-35 // ./aflow --proto=A2B3C_mC48_15_aef_3f_2e --params=5.8157729384,1.73589080063,2.00719678852,109.149281309,0.8352,0.16749,0.49971,0.9884,0.6705,0.0001,0.75396,0.48644,0.8628,0.21836,0.66556,0.86281,0.25504,0.34412,0.86546
+    if(found && vlabel.at(ifound)=="A2B3C_mC48_15_aef_3f_2e")
+      PrototypeANRL_A2B3C_mC48_15_aef_3f_2e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-36 // ./aflow --proto=A4BC7_mC48_15_2f_e_e3f --params=13.2432547747,0.690228819766,0.966427058766,155.232510527,0.9409,0.2269,0.8889,0.6633,0.303,0.3712,0.8094,0.241,0.2004,0.6988,0.5659,0.2806,0.9947,0.1491,0.6373,0.8064,0.5797
+    if(found && vlabel.at(ifound)=="A4BC7_mC48_15_2f_e_e3f")
+      PrototypeANRL_A4BC7_mC48_15_2f_e_e3f(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-37 // ./aflow --proto=AB3C_mC60_15_cf_e4f_ef --params=12.5843824384,0.579976673828,0.889919034503,68.755,0.6408,0.16,0.587,0.2597,0.0011,0.6275,0.0955,0.4035,0.729,0.1009,0.1137,0.6109,0.8071,0.2522,0.5497,0.5564,0.1061,0.6278,0.047,0.2555
+    if(found && vlabel.at(ifound)=="AB3C_mC60_15_cf_e4f_ef")
+      PrototypeANRL_AB3C_mC60_15_cf_e4f_ef(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-38 // ./aflow --proto=ABC2_oP16_33_a_a_2a --params=5.9547396971,1.2544327646,0.947018118432,0.93178,0.87342,-0.0,0.5759,0.8771,0.503,0.9576,0.9125,0.656,0.6123,0.839,0.9169
+    if(found && vlabel.at(ifound)=="ABC2_oP16_33_a_a_2a")
+      PrototypeANRL_ABC2_oP16_33_a_a_2a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-39 // ./aflow --proto=A2B3C_oC24_36_b_ab_a --params=10.2764819278,0.576935497153,0.499471075467,0.108,0.155,0.167,0.504,0.33,0.83,0.0,0.353,0.81,0.594
+    if(found && vlabel.at(ifound)=="A2B3C_oC24_36_b_ab_a")
+      PrototypeANRL_A2B3C_oC24_36_b_ab_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-40 // ./aflow --proto=A2B5C_oP32_58_eg_3gh_g --params=7.7975902487,1.01536533044,0.715127549044,0.2419,0.8702,0.3614,0.922,0.1368,0.574,0.6392,0.8969,0.6001,0.754,0.7495,0.7697,0.8676,0.2387
+    if(found && vlabel.at(ifound)=="A2B5C_oP32_58_eg_3gh_g")
+      PrototypeANRL_A2B5C_oP32_58_eg_3gh_g(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-41 // ./aflow --proto=AB2C4_oC28_63_c_ac_fg --params=6.2543235982,1.56175972927,1.21827411167,0.3472,0.7,0.75,0.5694,0.7778,0.45
+    if(found && vlabel.at(ifound)=="AB2C4_oC28_63_c_ac_fg")
+      PrototypeANRL_AB2C4_oC28_63_c_ac_fg(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-42 // ./aflow --proto=AB5C2_oC32_63_c_c2f_f --params=3.8117041359,2.59759679576,2.66755674233,0.1943,0.7775,0.9542,0.886,0.687,0.9362,0.8659,0.4343
+    if(found && vlabel.at(ifound)=="AB5C2_oC32_63_c_c2f_f")
+      PrototypeANRL_AB5C2_oC32_63_c_c2f_f(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-43 // ./aflow --proto=ABC4_tI24_88_a_b_f --params=5.7543123731,2.29690513528,0.8831,0.7638,0.4223
+    if(found && vlabel.at(ifound)=="ABC4_tI24_88_a_b_f")
+      PrototypeANRL_ABC4_tI24_88_a_b_f(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-44 // ./aflow --proto=A4BC2_tP28_91_2d_b_ac --params=6.0709632596,1.40149875103,0.233,0.246,0.246,0.975,0.73,0.25,0.513,0.264,0.231
+    if(found && vlabel.at(ifound)=="A4BC2_tP28_91_2d_b_ac")
+      PrototypeANRL_A4BC2_tP28_91_2d_b_ac(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-45 // ./aflow --proto=A2BC4_hP56_173_2b2c_ac_b5c --params=11.1609261164,0.841147428044,0.25,0.95,0.56,0.74,0.163,0.341,0.056,0.152,0.325,0.45,0.507,0.009,0.253,0.181,0.0,0.978,0.69,0.005,0.058,0.498,0.181,0.004,0.175,0.498,0.993,0.1161,0.32,0.255
+    if(found && vlabel.at(ifound)=="A2BC4_hP56_173_2b2c_ac_b5c")
+      PrototypeANRL_A2BC4_hP56_173_2b2c_ac_b5c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-oxide-46 // ./aflow --proto=AB2C4_cF56_227_b_c_e --params=9.8805440428,0.2617
+    if(found && vlabel.at(ifound)=="AB2C4_cF56_227_b_c_e")
+      PrototypeANRL_AB2C4_cF56_227_b_c_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // -------------------------------------------------------------------------
+    // nitride prototypes (from R. Friedrich)
+    // -------------------------------------------------------------------------
+    // binaries
+    // ---------------------------------------------------------------------------
+    // Friedrich-nitride-1 // ./aflow --proto=A2B3_cI80_206_ad_e --params=9.8892799651,0.7716,0.1259,0.6002,0.6475
+    if(found && vlabel.at(ifound)=="A2B3_cI80_206_ad_e")
+      PrototypeANRL_A2B3_cI80_206_ad_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // -------------------------------------------------------------------------
+    // ternaries
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // Friedrich-nitride-2 // ./aflow --proto=ABC_oP12_62_c_c_c --params=9.95851159,0.433951127369,0.653641836852,0.15617,0.97349,0.04761,0.42551,0.40749,0.75982
+    if(found && vlabel.at(ifound)=="ABC_oP12_62_c_c_c")
+      PrototypeANRL_ABC_oP12_62_c_c_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ---------------------------------------------------------------------------
+    // Friedrich-nitride-3 // ./aflow --proto=A2B2C_tI10_139_e_e_a --params=4.0191421247,3.53238454024,0.664,0.8545
+    if(found && vlabel.at(ifound)=="A2B2C_tI10_139_e_e_a")
+      PrototypeANRL_A2B2C_tI10_139_e_e_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
 
 
     //DX PUT THEM HERE WITH THE ORDER OF THE PAPER
@@ -4162,7 +4434,7 @@ namespace anrl {
   vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting ){
     // get lattice parameter values from the XSTRUCTURE
 
-    string function_name = "anrl::getANRLLatticeParameterValuesFromABCAngles()";
+    string function_name = XPID + "anrl::getANRLLatticeParameterValuesFromABCAngles()";
 
     // extract lattice parameters from xstructure
     vector<double> all_lattice_parameters;
@@ -4263,7 +4535,7 @@ namespace anrl {
   string structure2anrl(istream& input, aurostd::xoption& vpflow) { 
     // determine anrl label, parameters, and parameter values of the input structure
 
-    string function_name = "anrl::structure2anrl()";
+    string function_name = XPID + "anrl::structure2anrl()";
 
     string directory="";
     bool recalculate_symmetry = true; //DX20191030
@@ -4285,6 +4557,7 @@ namespace anrl {
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       format = "json";
     }
+    //DX20191217 END
 
     //DX20191030 - add force Wyckoff choice option - START
     // check if forcing certain Wyckoff convention 
@@ -4374,7 +4647,7 @@ namespace anrl {
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
 
-    string function_name = "anrl::structure2anrl()";
+    string function_name = XPID + "anrl::structure2anrl()";
     ostringstream oss;
     stringstream message;
     ofstream FileMESSAGE;

@@ -1255,6 +1255,16 @@ DEFAULT_APL_HSKPTS_FILE
   type: string
   default: "hskpoints.out"
 
+DEFAULT_APL_MSQRDISP_FILE
+  description: Output file for the mean square displacements.
+  type: string
+  default: "displacements.out"
+
+DEFAULT_APL_GVEL_FILE
+  description: Output file for the group velocities.
+  type: string
+  default: "group_velocities.out"
+
 DEFAULT_APL_PHDOSCAR_FILE
   description: Output file for the phonon DOS in VASP DOSCAR format.
   type: string
@@ -1324,15 +1334,85 @@ DEFAULT_QHA_GP_DISTORTION
   type: double
   default: 1.0
 
+DEFAULT_QHA_TAYLOR_EXPANSION_ORDER
+  description: Sets the order of Taylor expansion that is used by QHANP method.
+  type: int
+  default: 2
+
 DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   description: Defines if electronic contribution to the free energy is included.
   type: bool
   default: 0
 
-DEFAULT_QHA_SCQHA_PDIS_T
+DEFAULT_QHA_SOMMERFELD_EXPANSION
+  description: Defines if electronic contribution to the free energy is calculated using the Sommerfeld expansion.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_PDIS_T
   description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
   type: string
   default: "50,100,600"
+
+DEFAULT_QHA_GP_FINITE_DIFF
+  description: Defines if Grueneisen parameter is calculated using finite difference method.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_IGNORE_IMAGINARY
+  description: Defines if imaginary frequencies in phonon calculations are ignored.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_FILE_PREFIX
+  description: QHA file prefix. All QHA output files start with this prefix.
+  type: string
+  default: "aflow.qha."
+
+DEFAULT_QHA3P_FILE_PREFIX
+  description: QHA3P file prefix. All QHA3P output files start with this prefix.
+  type: string
+  default: "aflow.qha3p."
+
+DEFAULT_QHANP_FILE_PREFIX
+  description: QHANP file prefix. All QHANP output files start with this prefix.
+  type: string
+  default: "aflow.qhanp."
+
+DEFAULT_SCQHA_FILE_PREFIX
+  description: SCQHA file prefix. All SCQHA output files start with this prefix.
+  type: string
+  default: "aflow.scqha."
+
+DEFAULT_QHA_GP_PATH_FILE
+  description: Output file for mode-resolved Grueneisen parameter dispersion curve.
+  type: string
+  default: "gp.disp.out"
+
+DEFAULT_QHA_GP_MESH_FILE
+  description: Output file for mode-resolved Grueneisen parameter calculated on q-points mesh.
+  type: string
+  default: "gp.mesh.out"
+
+DEFAULT_QHA_GP_AVG_FILE
+  description: Output file for temperature-dependent average Grueneisen parameter calculated using finite differences.
+  type: string
+  default: "gp.avg.out"
+
+DEFAULT_QHA_THERMO_FILE
+  description: Output file for thermal properties (equilibrium volume, free energy, bulk modulus, isobaric and isochoric specific heat, average Grueneisen parameter).
+  type: string
+  default: "gp.thermo.out"
+
+DEFAULT_QHA_FREQS_FILE
+  description: Output file for volume-dependent phonon frequencies.
+  type: string
+  default: "frequencies.out"
+
+DEFAULT_QHA_FVT_FILE
+  description: Output file for temperature- and volume-dependent free energy.
+  type:
+  default: "FVT.out"
 
 ####################################################################################################
 DEFAULTS AAPL
@@ -1407,23 +1487,13 @@ DEFAULT_AAPL_FILE_PREFIX
   type: string
   default: "aflow.aapl."
 
-DEFAULT_AAPL_QPOINTS_FILE
-  description: Output file for the q-points used for thermal conductivity calculations.
-  type: string
-  default: "qpoints.out"
-
 DEFAULT_AAPL_IRRQPTS_FILE
   description: Output file for the irreducible q-points used for thermal conductivity calculations.
   type: string
   default: "irred_qpoints.out"
 
-DEFAULT_AAPL_FREQ_FILE
-  description: Output file for the harmonic frequencies of the phonon modes used for thermal conductivity calculations.
-  type: string
-  default: "frequencies.out"
-
 DEFAULT_AAPL_GVEL_FILE
-  description: Output file for the group velocities of the phonon modes used for thermal conductivity calculations.
+  description: Output file for the group velocities of the phonon modes and frequencies used for thermal conductivity calculations.
   type: string
   default: "group_velocities.out"
 
@@ -1471,6 +1541,14 @@ DEFAULT_AAPL_TCOND_PLOT_FILE
   description: Gnuplot file for the thermal conductivity plot.
   type: string
   default: "thermal_conductivity.plt"
+
+####################################################################################################
+DEFAULTS XTALFINDER
+
+DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING
+  description: Scaling factor that divides the minimum interatomic distance, establishing when mapped atoms are sufficiently close and other mappings do not need to be explored.
+  type: double
+  default: 4.0
 
 ####################################################################################################
 DEFAULTS CORE

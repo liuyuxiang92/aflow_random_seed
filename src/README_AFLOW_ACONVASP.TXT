@@ -893,7 +893,7 @@ LATTICES = (the ones with "")
         [--match_to_aflow_prototypes!] : Identifies matching AFLOW prototypes to the representative structure.
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
           signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
-          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+          AFLOW-XtalFinder supports three input formats for the magnetic moment:
               1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
               2) read from a VASP INCAR, or
               3) read from a VASP OUTCAR.
@@ -905,7 +905,7 @@ LATTICES = (the ones with "")
         [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
           and the transformed structures in the closest matching representation.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
@@ -927,14 +927,14 @@ LATTICES = (the ones with "")
         [--keep_unmatched!] : Retains misfit information of unmatched structures (i.e., misfit>0.1).
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
           signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
-          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+          AFLOW-XtalFinder supports three input formats for the magnetic moment:
               1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
               2) read from a VASP INCAR, or
               3) read from a VASP OUTCAR.
             Additional magnetic moment readers for other ab initio codes will be available in future versions.
         [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
@@ -961,7 +961,7 @@ LATTICES = (the ones with "")
         [--match_to_aflow_prototypes!] : Identifies matching AFLOW prototypes to the representative structure.
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
           signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
-          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+          AFLOW-XtalFinder supports three input formats for the magnetic moment:
               1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
               2) read from a VASP INCAR, or
               3) read from a VASP OUTCAR.
@@ -971,7 +971,7 @@ LATTICES = (the ones with "")
         [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
           and the transformed structures in the closest matching representation.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
@@ -1002,7 +1002,7 @@ LATTICES = (the ones with "")
         [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
           and the transformed structures in the closest matching representation.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
@@ -1818,7 +1818,7 @@ LATTICES = (the ones with "")
         [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
         [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
@@ -2723,13 +2723,17 @@ LATTICES = (the ones with "")
       AIMS output                                                                     
         If you specify --aims, aflow will add AIMS code to aflow.in (experimental).  
 
-      ANRL: AFLOW NAVAL RESEARCH LAB PROTOTYPE LIBRARY
-        With respect to the article:
-        Mehl et al., "The AFLOW Library of Crystallographic Prototype", https://arxiv.org/abs/1607.02532
-        the code gives the possibility to define the parameters of the cell --params=...
-        Some rhombohedral cells can be generated in hexagonal configurations (see the article).
-        The choice is performed with the flag --hex.
-        Check aflow --readme=anrl 
+      AFLOW-ANRL: AFLOW NAVAL RESEARCH LAB PROTOTYPE LIBRARY
+        The AFLOW-ANRL Library consists of 590 (part 1: 288, part 2: 302) crystallographic prototypes
+        from the following articles:
+          - M. J. Mehl, D. Hicks, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, and S. Curtarolo,
+            The AFLOW Library of Crystallographic Prototypes: Part 1, Comp. Mat. Sci. 136, S1–S828 (2017).
+          - D. Hicks, M. J. Mehl, E. Gossett, C. Toher, O. Levy, R. M. Hanson, G. L. W. Hart, and S. Curtarolo,
+            The AFLOW Library of Crystallographic Prototypes: Part 2, Comp. Mat. Sci. 161 Supplement, S1-S1011 (2019).
+        These prototypes must be accompanied by the --params=... flag or label suffix (e.g., <label>-001) specifying
+        the internal degrees of freedom for the prototype.
+        Rhombohedral systems can be generated in the hexagonal setting with the flag --hex.
+        Check aflow --readme=anrl for more information.
    
 
   aflow --prototype [--setting=1|2|anrl] < file             

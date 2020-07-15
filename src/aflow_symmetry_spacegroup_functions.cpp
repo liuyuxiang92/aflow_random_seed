@@ -2037,7 +2037,7 @@ namespace SYM {
 namespace SYM {
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = "SYM::get_wyckoff_pos()";
+    string function_name = XPID + "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
     //if(!invec<int>(mult_vec,mult)){cerr << "ERROR: no wyckoff position with multiplicity "<<mult << "."<<endl;exit(1);}
@@ -2244,7 +2244,7 @@ namespace SYM {
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = "SYM::getWyckoffInformation()";
+    string function_name = XPID + "SYM::getWyckoffInformation()";
     bool reduce = true; // DEBUGGING variable: simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
     vector<string> split_Wyckoff_strings, Wyckoff_tokens, positions;
 
@@ -2731,13 +2731,13 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190723
 
-    string soliloquy = "SYM::formatWyckoffPosition()";
+    string soliloquy = XPID + "SYM::formatWyckoffPosition()";
 
     stringstream ss_eqn;
     string coordinate = "";
     vector<string> vec_coord;
     double running_double = 0.0;
-    bool double_only = false;
+    bool double_only = true; //DX20200609 - set default to true and toggle for any variable in j
 
     for(uint j=0;j<sd_coordinate.size();j++){
       sdouble sd_num = sd_coordinate[j];
@@ -2746,24 +2746,27 @@ namespace SYM {
       if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
         ss_eqn << sd_num.chr;
         vec_coord.push_back(ss_eqn.str());
+        double_only = false; //DX20200609
       }
       // ---------------------------------------------------------------------------
       // if a variable with negative unit factor (-1x -> -x)
       else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
         ss_eqn << "-" << sd_num.chr;
         vec_coord.push_back(ss_eqn.str());
+        double_only = false; //DX20200609
       }
       // ---------------------------------------------------------------------------
       // if a number (no variable)
       else if(sd_num.chr == '\0'){
         running_double+=sd_num.dbl;
-        double_only = true;
+        //DX20200609 [OBSOLETE - doesn't account for other j's] double_only = true;
       }
       // ---------------------------------------------------------------------------
       // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
       else {
         ss_eqn << sd_num.dbl << sd_num.chr;
         vec_coord.push_back(ss_eqn.str());
+        double_only = false; //DX20200609
       }
       ss_eqn.str("");
     }
@@ -2815,7 +2818,7 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190708
 
-    string soliloquy = "SYM::reorderWyckoffPosition()";
+    string soliloquy = XPID + "SYM::reorderWyckoffPosition()";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -5319,8 +5322,8 @@ namespace SYM {
     //  for(int j=0;j<tmpvvvsd[s][k].size();j++){
     //    xb();
     //    for(int i=0;i<tmpvvvsd[s][k][j].size();i++){
-    //	cerr <<  tmpvvvsd[s][k][j][i].dbl;
-    //	cerr <<  tmpvvvsd[s][k][j][i].chr << " ";
+    //	cerr << tmpvvvsd[s][k][j][i].dbl;
+    //	cerr << tmpvvvsd[s][k][j][i].chr << " ";
     //    }
     //  }
     //}

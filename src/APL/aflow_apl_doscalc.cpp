@@ -1,7 +1,8 @@
-// [OBSOLETE] #include <iostream>
-// [OBSOLETE] #include <sstream>
-// [OBSOLETE] #include <string>
-// [OBSOLETE] #include <limits>
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -17,9 +18,7 @@
 #endif
 //CO END
 
-#define MIN_FREQ_TRESHOLD -0.1
-
-using namespace std;
+static const double MIN_FREQ_THRESHOLD = -0.1;
 
 namespace apl {
 
@@ -36,19 +35,18 @@ namespace apl {
   }
 
   DOSCalculator::DOSCalculator(const DOSCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   DOSCalculator& DOSCalculator::operator=(const DOSCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void DOSCalculator::copy(const DOSCalculator& that) {
+    if (this == &that) return;
     _pc = that._pc;
     _pc_set = that._pc_set;
     _bzmethod = that._bzmethod;
@@ -83,7 +81,7 @@ namespace apl {
     _projectedDOS.clear(); //ME20190614
     _projections.clear();  //ME20190624
     _bzmethod = "";
-    _temperature = 0.0;  // ME20190614
+    _temperature = 0.0;  //ME20190614
     _minFreq = AUROSTD_NAN;
     _maxFreq = AUROSTD_NAN;
     _stepDOS = 0.0;
@@ -100,9 +98,9 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
-    string function = "apl::DOSCalculator::initialize()";
+    string function = "apl::DOSCalculator::initialize():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
@@ -110,7 +108,7 @@ namespace apl {
     }
     _bzmethod = method;
     _projections = projections;
-    _system = _pc->getSystemName();
+    _system = _pc->_system;
 
     if (!_pc->getSupercell().isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
@@ -203,10 +201,10 @@ namespace apl {
 #endif
     //CO END
 
-    //if freq > MIN_FREQ_TRESHOLD considerd as +ve freq [PN]
+    //if freq > MIN_FREQ_THRESHOLD considerd as +ve freq [PN]
     for (uint i = 0; i < _freqs.size(); i++) {
       for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
-        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_TRESHOLD)) _freqs[i][j] = 0.00;
+        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_THRESHOLD)) _freqs[i][j] = 0.00;
       }
     }
     //PN END
@@ -221,7 +219,7 @@ namespace apl {
       }
     }
     _maxFreq += 1.0;
-    if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    if (_minFreq < MIN_FREQ_THRESHOLD) _minFreq -= 1.0;
     else _minFreq = 0.0;
   }
 
@@ -278,7 +276,7 @@ namespace apl {
     gauss.clear();
   }
 
-  // ME20200203 - DOS can now be calculated within any frequency range
+  //ME20200203 - DOS can now be calculated within any frequency range
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS) {
@@ -294,15 +292,15 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
       double fmin, double fmax) {
+    string function = "DOSCalculator::calc():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::calc()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Check parameters
-    if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
-      string function = "apl::DOSCalculator::calc()";
-      string message = "Frequency range of phonon DOS is nearly zero.";
+    if (aurostd::isequal(fmax, fmin, _ZERO_TOL_LOOSE_)) {
+      message = "Frequency range of phonon DOS is nearly zero.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {
       double tmp = fmax;
@@ -334,11 +332,11 @@ namespace apl {
     //ME20200321 - Added logger output
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
     if (_bzmethod == "LT") {
-      string message = "Calculating phonon DOS using the linear tetrahedron method.";
+      message = "Calculating phonon DOS using the linear tetrahedron method.";
       pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       calcDosLT();
     } else if (_bzmethod == "RS") {
-      string message = "Calculating phonon DOS using the root sampling method.";
+      message = "Calculating phonon DOS using the root sampling method.";
       pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       calcDosRS();
     }
@@ -471,7 +469,7 @@ namespace apl {
         double fbin, dos, part;
         int br = ibranch - _freqs[0].lrows;
         for (int k = kstart; k <= kstop; k++) {
-          // ME20200203 - Use bins to accommodate different frequency range
+          //ME20200203 - Use bins to accommodate different frequency range
           fbin = _bins[k]; // _minFreq + k * _stepDOS + _halfStepDOS;
           dos = 0.0;
           if ((f[0] <= fbin) && (fbin <= f[1])) {
@@ -493,7 +491,7 @@ namespace apl {
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
               part = 0.0;
-              // ME20200320 - due to the big nesting level, loop unrolling
+              //ME20200320 - due to the big nesting level, loop unrolling
               // leads to a huge speed-up (x2 or more)
               //[OBSOLETE] for (int icorner = 0; icorner < 4; icorner++) {
               //[OBSOLETE]   part += parts[corners[icorner]][br][p][at];
@@ -515,9 +513,10 @@ namespace apl {
   //ME20190423 END
 
   void DOSCalculator::writePDOS(const string& directory) {
+    string function = "DOSCalculator::writePDOS():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::writePDOS()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Write PHDOS file
@@ -535,7 +534,7 @@ namespace apl {
     double factorRaw2rcm = _pc->getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
-    string message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME20181226
+    message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME20181226
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
@@ -551,7 +550,6 @@ namespace apl {
     //CO START
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
-      string function = "DOSCalculator::writePDOS()";
       message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
@@ -563,20 +561,20 @@ namespace apl {
 
   //ME20190614 - writes phonon DOS in DOSCAR format
   void DOSCalculator::writePHDOSCAR(const string& directory) {
+    string function = "DOSCalculator::writePHDOSCAR():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::writePHDOSCAR()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
-    string message = "Writing phonon density of states into file " + filename + ".";
+    message = "Writing phonon density of states into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     stringstream doscar;
     xDOSCAR xdos = createDOSCAR();
     doscar << xdos;
     aurostd::stringstream2file(doscar, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "DOSCalculator::writePHDOSCAR()";
       message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -622,14 +620,14 @@ namespace apl {
     double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
-    // ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
+    //ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
     // using different frequency ranges
     xdos.energy_max = _bins.back() * conv;
     xdos.energy_min = _bins[0] * conv;
     xdos.number_energies = _dos.size();
     xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
     xdos.venergy = aurostd::vector2deque(_bins);
-    xdos.venergyEf = xdos.venergy;  // ME20200324
+    xdos.venergyEf = xdos.venergy;  //ME20200324
     for (uint i = 0; i < xdos.number_energies; i++) xdos.venergy[i] *= conv;
     xdos.viDOS.resize(1);
     xdos.viDOS[0] = aurostd::vector2deque(_idos);
@@ -648,7 +646,7 @@ namespace apl {
       for (uint at = 0; at < xdos.number_atoms; at++) {
         for (uint p = 0; p < _projections.size(); p++) {
           vDOS[at + 1][p + 1][0] = aurostd::vector2deque(_projectedDOS[at][p]);
-          // ME20200321 - Add to totals for consistency
+          //ME20200321 - Add to totals for consistency
           for (uint e = 0; e < xdos.number_energies; e++) {
             vDOS[0][p + 1][0][e] += vDOS[at + 1][p + 1][0][e];
             vDOS[at + 1][0][0][e] += vDOS[at + 1][p + 1][0][e];
@@ -663,7 +661,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200108 - added const
+  //ME20200108 - added const
   const vector<double>& DOSCalculator::getBins() const {
     return _bins;
   }
@@ -672,22 +670,28 @@ namespace apl {
     return _dos;
   }
 
-  // ME20200210
+  //ME20200210
   const vector<double>& DOSCalculator::getIDOS() const {
     return _idos;
   }
 
+  //AS20200512
+  const vector<xvector<double> >& DOSCalculator::getFreqs() const {
+    return _freqs;
+  }
+
   bool DOSCalculator::hasNegativeFrequencies() const {
-    return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
+    return (_minFreq < MIN_FREQ_THRESHOLD ? true : false);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
   //PN START
   void DOSCalculator::writePDOS(string path, string ex)  //[PN]
   {
+    string function = "DOSCalculator::writePDOS():";
+    string message = "";
     if (!_pc_set) {
-      string function = "DOSCalculator::writePDOS()";
-      string message = "PhononCalculator pointer not set.";
+      message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     //CO START
@@ -700,7 +704,7 @@ namespace apl {
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
     string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; //ME20181226
-    string message = "Writing phonon density of states into file " + filename + "."; //ME20181226
+    message = "Writing phonon density of states into file " + filename + "."; //ME20181226
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
@@ -717,7 +721,6 @@ namespace apl {
     string file = path + "/" + filename + "." + ex; //ME20181226
     aurostd::stringstream2file(outfile, file);
     if (!aurostd::FileExist(file)) {
-      string function = "DOSCalculator::writePDOS()";
       message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -727,3 +730,9 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl
+
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************

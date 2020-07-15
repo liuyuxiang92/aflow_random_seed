@@ -42,7 +42,7 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
-    module_opts.qhaflags = loadDefaultsQHA(); // AS20200302
+    module_opts.qhaflags = loadDefaultsQHA(); //AS20200302
     // The readParameters functions are necessary to set xvasp
     string placeholder = "";  // acts as pseudo-aflow.in
     readParametersAPL(placeholder, module_opts, xinput);
@@ -80,11 +80,11 @@ namespace KBIN {
   // Sets all APL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAPL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAPL():";
+    string soliloquy = XPID + "loadDefaultsAPL():";
     vector<aurostd::xoption> aplflags;
     aurostd::xoption opt;
     opt.keyword="RELAX"; opt.option = DEFAULT_APL_RELAX; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
-    opt.keyword="RELAX_COMMENSURATE"; opt.option = DEFAULT_APL_RELAX_COMMENSURATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200427
+    opt.keyword="RELAX_COMMENSURATE"; opt.option = DEFAULT_APL_RELAX_COMMENSURATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  //ME20200427
     opt.keyword="HIBERNATE"; opt.option = DEFAULT_APL_HIBERNATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="ENGINE"; opt.xscheme = DEFAULT_APL_ENGINE; aplflags.push_back(opt); opt.clear();
     opt.keyword="SUPERCELL"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
@@ -102,8 +102,8 @@ namespace KBIN {
     opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 //ME20190112
     opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  //ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
     opt.keyword="KPOINTS"; aplflags.push_back(opt); opt.clear();
-    opt.keyword="KPOINTS_GRID"; aplflags.push_back(opt); opt.clear();  // ME20200427
-    opt.keyword="KPOINTS_SHIFT"; aplflags.push_back(opt); opt.clear();  // ME20200427
+    opt.keyword="KPOINTS_GRID"; aplflags.push_back(opt); opt.clear();  //ME20200427
+    opt.keyword="KPOINTS_SHIFT"; aplflags.push_back(opt); opt.clear();  //ME20200427
     opt.keyword="PREC"; opt.xscheme = DEFAULT_APL_PREC; aplflags.push_back(opt); opt.clear();
     opt.keyword="ZEROSTATE"; opt.option = DEFAULT_APL_ZEROSTATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="FREQFORMAT"; opt.xscheme = DEFAULT_APL_FREQFORMAT; aplflags.push_back(opt); opt.clear();
@@ -119,12 +119,13 @@ namespace KBIN {
     opt.keyword="DOSMESH"; opt.xscheme = DEFAULT_APL_DOSMESH; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSSMEAR"; opt.xscheme = utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPOINTS"; opt.xscheme = utype2string<int>(DEFAULT_APL_DOSPOINTS); aplflags.push_back(opt); opt.clear();
-    opt.keyword="DOS_PROJECT"; opt.option = DEFAULT_APL_DOS_PROJECT; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200213
+    opt.keyword="DOS_PROJECT"; opt.option = DEFAULT_APL_DOS_PROJECT; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  //ME20200213
     opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="DISPLACEMENTS"; opt.option = DEFAULT_APL_DISPLACEMENTS; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="TPT"; opt.xscheme = DEFAULT_APL_TPT; aplflags.push_back(opt); opt.clear();
+    opt.keyword="GROUP_VELOCITY"; opt.option = DEFAULT_APL_GVEL; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     //opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // OBSOLETE ME20200507
     if (LDEBUG) {
       for (uint i = 0; i < aplflags.size(); i++) {
@@ -173,9 +174,9 @@ namespace KBIN {
   void readParametersAPL(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="readParametersAPL():";
+    string soliloquy = XPID + "readParametersAPL():";
     string key, entry, xvaspflag;
-    module_opts.supercell_method.assign(4, false);
+    vector<bool> supercell_method(4, false);
     for (uint i = 0; i < module_opts.aplflags.size(); i++) {
       key = module_opts.aplflags[i].keyword;
       entry = _ASTROPT_APL_ + key + "=|" + _ASTROPT_APL_OLD_ + key + "="; //CO20181226
@@ -213,34 +214,30 @@ namespace KBIN {
 
       // Supercell options
       if ((key == "SUPERCELL") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[0] = true;
+        supercell_method[0] = true;
         continue;
       }
       if ((key == "MINATOMS") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[1] = true;
+        supercell_method[1] = true;
         continue;
       }
       if ((key == "MINATOMS_RESTRICTED") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[1] = true;
-        module_opts.minatoms_restricted = true;
+        supercell_method[2] = true;
         continue;
       }
       // MAXSHELL will be skipped because it's not documented at all
       if ((key == "MINSHELL") && (module_opts.aplflags[i].isentry)) {
-        module_opts.supercell_method[3] = true;
+        supercell_method[3] = true;
         continue;
       }
     }
 
     // Was a supercell entry found? If not, switch to MINATOMS
     bool supercell_found = false;
-    for (uint i = 0; i < module_opts.supercell_method.size(); i++) {
-      if (module_opts.supercell_method[i]) {
-        supercell_found = true;
-        break;
-      }
+    for (uint i = 0; i < supercell_method.size() && !supercell_found; i++) {
+      if (supercell_method[i]) supercell_found = true;
     }
-    if (!supercell_found) module_opts.supercell_method[1] = true;
+    if (!supercell_found) supercell_method[1] = true;
 
     // Unset contradicting/unnecessary xvasp flags
     if (xinput.AFLOW_MODE_VASP) {
@@ -260,10 +257,10 @@ namespace KBIN {
       }
 
       // Supercell
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_SUPERCELL", module_opts.supercell_method[0]);
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS", (module_opts.supercell_method[1] && !module_opts.minatoms_restricted));
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS_RESTRICTED", (module_opts.supercell_method[1] && module_opts.minatoms_restricted));
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINSHELL", module_opts.supercell_method[3]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_SUPERCELL", supercell_method[0]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS", supercell_method[1]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS_RESTRICTED", supercell_method[2]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINSHELL", supercell_method[3]);
 
       // Phonon dispersion
       if (xinput.xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_DCPATH") == "LATTICE") {
@@ -291,7 +288,7 @@ namespace KBIN {
   // Sets all AAPL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAAPL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAAPL():";
+    string soliloquy = XPID + "loadDefaultsAAPL():";
     vector<aurostd::xoption> aaplflags;
     aurostd::xoption opt;
     opt.keyword="BTE"; opt.xscheme = DEFAULT_AAPL_BTE; aaplflags.push_back(opt); opt.clear();
@@ -343,9 +340,8 @@ namespace KBIN {
   void readParametersAAPL(const string& AflowIn,
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="readParametersAAPL():";
+    string soliloquy = XPID + "readParametersAAPL():";
     string key, entry, xvaspflag;
-    module_opts.cut_rad_shell.assign(2, false);
     for (uint i = 0; i < module_opts.aaplflags.size(); i++) {
       key = module_opts.aaplflags[i].keyword;
       entry = _ASTROPT_AAPL_ + key + "=|" + _ASTROPT_APL_OLD_ + key + "=";  //CO20181226
@@ -359,14 +355,6 @@ namespace KBIN {
         xinput.xvasp.aaplopts.push_attached(xvaspflag, module_opts.aaplflags[i].xscheme); //this should become pop/push or changeattachedscheme (eventually)
       }
       // Special rules for certain keywords
-      if (key == "CUT_RAD") {
-        module_opts.cut_rad_shell[0] = module_opts.aaplflags[i].isentry;
-        continue;
-      }
-      if (key == "CUT_SHELL") {
-        module_opts.cut_rad_shell[1] = module_opts.aaplflags[i].isentry;
-        continue;
-      }
       //ME20190408 START
       // If KPPRA_AAPL is not set, use APL KPPRA
       if (key == "KPPRA_AAPL" && module_opts.aaplflags[i].content_int < 1) {
@@ -374,12 +362,6 @@ namespace KBIN {
         continue;
       }
       //ME20190408 END
-    }
-    if (module_opts.cut_rad_shell[0] != module_opts.cut_rad_shell[1]) {
-      if (xinput.AFLOW_MODE_VASP) {
-        xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_CUT_SHELL", module_opts.cut_rad_shell[0]);
-        xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_CUT_RAD", module_opts.cut_rad_shell[1]);
-      }
     }
     if (LDEBUG) {
       for (uint i = 0; i < module_opts.aaplflags.size(); i++) {
@@ -395,7 +377,7 @@ namespace KBIN {
   // Sets all AEL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAEL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAEL():";
+    string soliloquy = XPID + "loadDefaultsAEL():";
     vector<aurostd::xoption> aelflags;
     aurostd::xoption opt;
     opt.keyword="STRAIN_SYMMETRY"; opt.option = DEFAULT_AEL_STRAIN_SYMMETRY; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
@@ -457,7 +439,7 @@ namespace KBIN {
   // Sets all AGL flags to their default values.
   vector<aurostd::xoption> loadDefaultsAGL() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
-    string soliloquy="loadDefaultsAGL():";
+    string soliloquy = XPID + "loadDefaultsAGL():";
     vector<aurostd::xoption> aglflags;
     aurostd::xoption opt;
     opt.keyword="AEL_POISSON_RATIO"; opt.option = DEFAULT_AGL_AEL_POISSON_RATIO; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
@@ -521,7 +503,7 @@ namespace KBIN {
   }
 
   // QHA-related functions -----------------------------------------------------
-  // AS20200302
+  //AS20200302
   //loadDefaultsQHA/////////////////////////////////////////////////////////////
   // Sets all QHA flags to their default values.
   vector<aurostd::xoption> loadDefaultsQHA() {
@@ -533,8 +515,15 @@ namespace KBIN {
     opt.keyword="EOS"; opt.option = DEFAULT_QHA_EOS; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="EOS_DISTORTION_RANGE"; opt.xscheme = DEFAULT_QHA_EOS_DISTORTION_RANGE; qhaflags.push_back(opt); opt.clear();
     opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="TAYLOR_EXPANSION_ORDER"; opt.xscheme = utype2string<double>(DEFAULT_QHA_TAYLOR_EXPANSION_ORDER); qhaflags.push_back(opt); opt.clear();//AS20200602
     opt.keyword="INCLUDE_ELEC_CONTRIB"; opt.option = DEFAULT_QHA_INCLUDE_ELEC_CONTRIB; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
-    opt.keyword="SCQHA_PDIS_T"; opt.xscheme = DEFAULT_QHA_SCQHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
+    //AS20200528
+    opt.keyword="SOMMERFELD_EXPANSION"; opt.option = DEFAULT_QHA_SOMMERFELD_EXPANSION; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="PDIS_T"; opt.xscheme = DEFAULT_QHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
+    //AS20200508 BEGIN
+    opt.keyword="GP_FINITE_DIFF"; opt.option = DEFAULT_QHA_GP_FINITE_DIFF; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="IGNORE_IMAGINARY"; opt.option = DEFAULT_QHA_IGNORE_IMAGINARY; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    //AS20200508 END
 
     if (LDEBUG) {
       for (uint i = 0; i < qhaflags.size(); i++) {
@@ -552,8 +541,14 @@ namespace KBIN {
     if(key=="EOS"){return true;}
     if(key=="EOS_DISTORTION_RANGE"){return true;}
     if(key=="GP_DISTORTION"){return true;}
+    if(key=="TAYLOR_EXPANSION_ORDER"){return false;}//AS20200602
     if(key=="INCLUDE_ELEC_CONTRIB"){return true;}
-    if(key=="SCQHA_PDIS_T"){return false;}
+    if(key=="SOMMERFELD_EXPANSION"){return true;}//AS20200528
+    if(key=="PDIS_T"){return false;}
+    //AS20200508 BEGIN
+    if(key=="GP_FINITE_DIFF"){return true;}
+    if(key=="IGNORE_IMAGINARY"){return false;}
+    //AS20200508 END
 
     return true;
   }

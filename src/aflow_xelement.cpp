@@ -74,7 +74,7 @@ double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-
 double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
 double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
 
-// RF/SK20200410 START
+//RF+SK20200410 START
 // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
 // https://en.wikipedia.org/wiki/Oxidation_state#Determination
 // since there were no Allen electronegativities available for f-elements besides Lu but these elements are usually very similar,
@@ -84,7 +84,7 @@ double electronegativity_Allen;          // https://pubs.acs.org/doi/abs/10.1021
 // preferred and all oxidation states of the elements according to the periodic table of the elements from Wiley-VCH, 5th edition (2012) with some modifications (e. g. for Cr, Cu, Fe, Ti)
 vector<double> oxidation_states_preferred;
 vector<double> oxidation_states;
-// RF/SK20200410 END
+//RF+SK20200410 END
 
 double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
 double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
@@ -152,7 +152,7 @@ std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting
 namespace pflow {
   void XelementPrint(string options,ostream& oss) {
     bool LDEBUG=0;//(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::XelementPrint [BEGIN]" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [BEGIN]" << endl;
     if(LDEBUG) cerr << "options=" << options << endl;
     if(LDEBUG) cerr << "velement.size()=" << velement.size() << endl;
 
@@ -283,35 +283,31 @@ namespace pflow {
       }
     }
 
-    if(LDEBUG) cerr << "pflow::XelementPrint [END]" << endl;
+    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [END]" << endl;
   }
 }
 
-/*
-   std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
-   std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
-   std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
-   std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
-   std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-   std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
-   std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-   std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-   std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-   std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-// for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
-std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
-std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
-
-*/
+//   std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
+//   std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
+//   std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
+//   std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
+//   std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+//   std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+//   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+//   std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+//   // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
+//   std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
+//   std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
+//   std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
+//   std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
+//   std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
+//   std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+//   std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
 
 namespace xelement {
-
 
   // initialize them all
   void Initialize(void) { for(uint Z=0;Z<NUM_ELEMENTS;Z++) { velement.at(Z)=xelement(Z); } }
@@ -323,7 +319,15 @@ namespace xelement {
   int name2Z(const string& name) { return xelement(name).Z; }
 
   // constructors
-  xelement::xelement() {
+  xelement::xelement() {free();}  //CO20200520
+
+  // destructor
+  xelement::~xelement() {free();} //CO20200520
+
+  void xelement::free() { //CO20200520
+    // will populate
+    // [AFLOW]START=FREE
+    // [AFLOW]STOP=FREE
     // DEFAULT
     verbose=FALSE;
     // [AFLOW]START=CONSTRUCTOR
@@ -366,9 +370,9 @@ namespace xelement {
     hardness_Ghosh=NNN;            
     electronegativity_Pearson=NNN;           
     electronegativity_Ghosh=NNN;             
-    electronegativity_Allen=NNN;
-    oxidation_states.push_back(NNN);
-    oxidation_states_preferred.push_back(NNN);
+    electronegativity_Allen=NNN;  //RF+SK20200410
+    oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+    oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
     electron_affinity_PT=NNN;      
     Miedema_phi_star=NNN;         
     Miedema_nws=NNN;              
@@ -412,110 +416,100 @@ namespace xelement {
     // [AFLOW]STOP=CONSTRUCTOR
   }
 
-  // destructor
-  xelement::~xelement() {
-    free();
-  }
-
-  void xelement::free() {
-    // will populate
-    // [AFLOW]START=FREE
-    // [AFLOW]STOP=FREE
-  }
-
   const xelement& xelement::operator=(const xelement& b) {      // operator=
-    if(this != &b) {
-      free();
-      // will populate
-      verbose=b.verbose;
-      // [AFLOW]START=ASSIGNMENT
-      Z=b.Z;
-      symbol=b.symbol;
-      name=b.name;
-      Period=b.Period;
-      Group=b.Group; 
-      Series=b.Series;
-      Block=b.Block;      
-      //                                          
-      mass=b.mass;
-      MolarVolume=b.MolarVolume;  
-      volume=b.volume;      
-      Miedema_Vm=b.Miedema_Vm;      
-      //
-      valence_std=b.valence_std;  
-      valence_iupac=b.valence_iupac;
-      valence_PT=b.valence_PT;       
-      Density_PT=b.Density_PT;       
-      crystal=b.crystal;    
-      CrystalStr_PT=b.CrystalStr_PT;
-      space_group=b.space_group;
-      space_group_number=b.space_group_number;    
-      Pearson_coefficient=b.Pearson_coefficient;
-      lattice_constant=b.lattice_constant; 
-      lattice_angle=b.lattice_angle;   
-      phase=b.phase;
-      radius=b.radius;         
-      radius_PT=b.radius_PT;          
-      radius_covalent_PT=b.radius_covalent_PT;   
-      radius_covalent=b.radius_covalent;  
-      radius_VanDerWaals_PT=b.radius_VanDerWaals_PT;
-      radii_Ghosh08=b.radii_Ghosh08;         
-      radii_Slatter=b.radii_Slatter;         
-      radii_Pyykko=b.radii_Pyykko;          
-      //                                          
-      electrical_conductivity=b.electrical_conductivity;
-      electronegativity_vec=b.electronegativity_vec;    
-      hardness_Ghosh=b.hardness_Ghosh;            
-      electronegativity_Pearson=b.electronegativity_Pearson;           
-      electronegativity_Ghosh=b.electronegativity_Ghosh;             
-
-      electronegativity_Allen=b.electronegativity_Allen;
-      oxidation_states=b.oxidation_states;
-      oxidation_states_preferred=b.oxidation_states_preferred;
-
-      electron_affinity_PT=b.electron_affinity_PT;      
-      Miedema_phi_star=b.Miedema_phi_star;         
-      Miedema_nws=b.Miedema_nws;              
-      Miedema_gamma_s=b.Miedema_gamma_s;          
-      //
-      Pettifor_scale=b.Pettifor_scale;          
-      //
-      boiling_point=b.boiling_point;         
-      melting_point=b.melting_point;         
-      vaporization_heat_PT=b.vaporization_heat_PT;     
-      specific_heat_PT=b.specific_heat_PT;         
-      critical_Pressure=b.critical_Pressure;     
-      critical_Temperature_PT=b.critical_Temperature_PT;  
-      thermal_expansion=b.thermal_expansion;     
-      thermal_conductivity=b.thermal_conductivity;  
-      //                                         
-      Brinelll_hardness=b.Brinelll_hardness;
-      Mohs_hardness=b.Mohs_hardness;    
-      Vickers_hardness=b.Vickers_hardness; 
-      Hardness_Pearson=b.Hardness_Pearson;   
-      Hardness_Putz=b.Hardness_Putz;      
-      Hardness_RB=b.Hardness_RB;        
-      shear_modulus=b.shear_modulus;    
-      Young_modulus=b.Young_modulus;    
-      bulk_modulus=b.bulk_modulus;     
-      Poisson_ratio_PT=b.Poisson_ratio_PT;    
-      Miedema_BVm=b.Miedema_BVm;        
-      //
-      Magnetic_Type_PT=b.Magnetic_Type_PT;
-      Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
-      Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
-      Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
-      Curie_point=b.Curie_point;                  
-      //
-      refractive_index=b.refractive_index;             
-      color_PT=b.color_PT;         
-      //
-      HHIP=b.HHIP;                           
-      HHIR=b.HHIR;                           
-      xray_scatt=b.xray_scatt;    
-      // [AFLOW]STOP=ASSIGNMENT
-    }
+    if(this!=&b) {free();copy(b);}  //CO20200520
     return *this;
+  }
+
+  void xelement::copy(const xelement& b) {  //copy PRIVATE  //CO20200520
+    // will populate
+    verbose=b.verbose;
+    // [AFLOW]START=ASSIGNMENT
+    Z=b.Z;
+    symbol=b.symbol;
+    name=b.name;
+    Period=b.Period;
+    Group=b.Group; 
+    Series=b.Series;
+    Block=b.Block;      
+    //                                          
+    mass=b.mass;
+    MolarVolume=b.MolarVolume;  
+    volume=b.volume;      
+    Miedema_Vm=b.Miedema_Vm;      
+    //
+    valence_std=b.valence_std;  
+    valence_iupac=b.valence_iupac;
+    valence_PT=b.valence_PT;       
+    Density_PT=b.Density_PT;       
+    crystal=b.crystal;    
+    CrystalStr_PT=b.CrystalStr_PT;
+    space_group=b.space_group;
+    space_group_number=b.space_group_number;    
+    Pearson_coefficient=b.Pearson_coefficient;
+    lattice_constant=b.lattice_constant; 
+    lattice_angle=b.lattice_angle;   
+    phase=b.phase;
+    radius=b.radius;         
+    radius_PT=b.radius_PT;          
+    radius_covalent_PT=b.radius_covalent_PT;   
+    radius_covalent=b.radius_covalent;  
+    radius_VanDerWaals_PT=b.radius_VanDerWaals_PT;
+    radii_Ghosh08=b.radii_Ghosh08;         
+    radii_Slatter=b.radii_Slatter;         
+    radii_Pyykko=b.radii_Pyykko;          
+    //                                          
+    electrical_conductivity=b.electrical_conductivity;
+    electronegativity_vec=b.electronegativity_vec;    
+    hardness_Ghosh=b.hardness_Ghosh;            
+    electronegativity_Pearson=b.electronegativity_Pearson;           
+    electronegativity_Ghosh=b.electronegativity_Ghosh;             
+
+    electronegativity_Allen=b.electronegativity_Allen;  //RF+SK20200410
+    oxidation_states=b.oxidation_states;  //RF+SK20200410
+    oxidation_states_preferred=b.oxidation_states_preferred;  //RF+SK20200410
+
+    electron_affinity_PT=b.electron_affinity_PT;      
+    Miedema_phi_star=b.Miedema_phi_star;         
+    Miedema_nws=b.Miedema_nws;              
+    Miedema_gamma_s=b.Miedema_gamma_s;          
+    //
+    Pettifor_scale=b.Pettifor_scale;          
+    //
+    boiling_point=b.boiling_point;         
+    melting_point=b.melting_point;         
+    vaporization_heat_PT=b.vaporization_heat_PT;     
+    specific_heat_PT=b.specific_heat_PT;         
+    critical_Pressure=b.critical_Pressure;     
+    critical_Temperature_PT=b.critical_Temperature_PT;  
+    thermal_expansion=b.thermal_expansion;     
+    thermal_conductivity=b.thermal_conductivity;  
+    //                                         
+    Brinelll_hardness=b.Brinelll_hardness;
+    Mohs_hardness=b.Mohs_hardness;    
+    Vickers_hardness=b.Vickers_hardness; 
+    Hardness_Pearson=b.Hardness_Pearson;   
+    Hardness_Putz=b.Hardness_Putz;      
+    Hardness_RB=b.Hardness_RB;        
+    shear_modulus=b.shear_modulus;    
+    Young_modulus=b.Young_modulus;    
+    bulk_modulus=b.bulk_modulus;     
+    Poisson_ratio_PT=b.Poisson_ratio_PT;    
+    Miedema_BVm=b.Miedema_BVm;        
+    //
+    Magnetic_Type_PT=b.Magnetic_Type_PT;
+    Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
+    Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
+    Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
+    Curie_point=b.Curie_point;                  
+    //
+    refractive_index=b.refractive_index;             
+    color_PT=b.color_PT;         
+    //
+    HHIP=b.HHIP;                           
+    HHIR=b.HHIR;                           
+    xray_scatt=b.xray_scatt;    
+    // [AFLOW]STOP=ASSIGNMENT
   }
 
   void xelement::clear(){
@@ -531,10 +525,14 @@ namespace xelement {
     return oss;
   }
 
+  // ********************************************************************************************************************************************************
+
+  xelement::xelement(const string& element) {free();populate(element);}  //CO20200520
+  xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
 
   // ********************************************************************************************************************************************************
-  // constructor by name or symbol
-  xelement::xelement(string element) {
+  // populate by name or symbol
+  void xelement::populate(const string& element) {  //CO20200520
     free();
     // DEFAULT
     verbose=FALSE;
@@ -542,21 +540,22 @@ namespace xelement {
 
     // try with symbol
     if(Z==0) {
-      for(uint i=1;i<=103;i++)
+      for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
-      for(uint i=1;i<=103;i++)
+      for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
-    if(Z!=0) (*this)=xelement(Z);
+    if(Z!=0) {(*this)=xelement(Z);return;}  //CO20200520
 
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
   }
 
   // ********************************************************************************************************************************************************
-  // constructor by Z
-  xelement::xelement(uint ZZ) {
+  // populate by Z
+  void xelement::populate(uint ZZ) {  //CO20200520
     free();
     // DEFAULT
     verbose=FALSE;
@@ -568,6 +567,7 @@ namespace xelement {
       mass=0.0;// override
       valence_iupac=0;// override
       valence_std=0;// override
+      return; //CO20200520
     }
     // ROW 1
     // s-electron systems
@@ -575,7 +575,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Hydrogen
     // Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen
-    if(ZZ==1) { // Hydrogen
+    else if(ZZ==1) { // Hydrogen
       Z=ZZ;
       symbol="H";
       name="Hydrogen";
@@ -612,9 +612,9 @@ namespace xelement {
       hardness_Ghosh=6.4299;
       electronegativity_Pearson=7.18;
       electronegativity_Ghosh=7.178;
-      electronegativity_Allen=2.300;
-      oxidation_states.push_back(1); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=2.300;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1); oxidation_states.push_back(-1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=72.8;
       Miedema_phi_star=5.2;
       Miedema_nws=1.5;
@@ -650,6 +650,7 @@ namespace xelement {
       HHIR=NNN;
       xray_scatt=1.000;
       // H volume wrong *dimer* MIEDEMA =PAUL VAN DER PUT book
+      return; //CO20200520
     }
     // [AFLOW]STOP=Hydrogen
     // ********************************************************************************************************************************************************
@@ -657,7 +658,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Helium
     // Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium
-    if(ZZ==2) { // Helium
+    else if(ZZ==2) { // Helium
       Z=ZZ;
       symbol="He";
       name="Helium";
@@ -694,9 +695,9 @@ namespace xelement {
       hardness_Ghosh=12.5449;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=12.046;
-      electronegativity_Allen=4.160;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=4.160;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -732,6 +733,7 @@ namespace xelement {
       HHIR=3900;
       xray_scatt=2.000;
       // He
+      return; //CO20200520
     }
     // [AFLOW]STOP=Helium
     // ********************************************************************************************************************************************************
@@ -741,7 +743,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lithium
     // Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium
-    if(ZZ==3) { // Lithium
+    else if(ZZ==3) { // Lithium
       Z=ZZ;
       symbol="Li";
       name="Lithium";
@@ -778,9 +780,9 @@ namespace xelement {
       hardness_Ghosh=2.3746;
       electronegativity_Pearson=3.01;
       electronegativity_Ghosh=2.860;
-      electronegativity_Allen=0.912;
-      oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=0.912;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=59.6;
       Miedema_phi_star=2.85;
       Miedema_nws=0.98;
@@ -816,6 +818,7 @@ namespace xelement {
       HHIR=4200;
       xray_scatt=3.00145;
       // Li
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lithium
     // ********************************************************************************************************************************************************
@@ -823,7 +826,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Beryllium
     // Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium
-    if(ZZ==4) { // Beryllium
+    else if(ZZ==4) { // Beryllium
       Z=ZZ;
       symbol="Be";
       name="Beryllium";
@@ -860,9 +863,9 @@ namespace xelement {
       hardness_Ghosh=3.4968;
       electronegativity_Pearson=4.90;
       electronegativity_Ghosh=3.945;
-      electronegativity_Allen=1.576;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.576;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=4.20;
       Miedema_nws=1.60;
@@ -898,6 +901,7 @@ namespace xelement {
       HHIR=4000;
       /*xray_scatt=NNN;*/
       // Be
+      return; //CO20200520
     }
     // [AFLOW]STOP=Beryllium
     // ********************************************************************************************************************************************************
@@ -906,7 +910,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Boron
     // Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron
-    if(ZZ==5) { // Boron
+    else if(ZZ==5) { // Boron
       Z=ZZ;
       symbol="B";
       name="Boron";
@@ -943,9 +947,9 @@ namespace xelement {
       hardness_Ghosh=4.6190;
       electronegativity_Pearson=4.29;
       electronegativity_Ghosh=5.031;
-      electronegativity_Allen=2.051;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=2.051;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=26.7;
       Miedema_phi_star=4.75;
       Miedema_nws=1.55;
@@ -981,6 +985,7 @@ namespace xelement {
       HHIR=2000;
       /*xray_scatt=NNN;*/
       // B
+      return; //CO20200520
     }
     // [AFLOW]STOP=Boron
     // ********************************************************************************************************************************************************
@@ -988,7 +993,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Carbon
     // Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon
-    if(ZZ==6) { // Carbon
+    else if(ZZ==6) { // Carbon
       Z=ZZ;
       symbol="C";
       name="Carbon";
@@ -1025,9 +1030,9 @@ namespace xelement {
       hardness_Ghosh=5.7410;
       electronegativity_Pearson=6.27;
       electronegativity_Ghosh=6.116;
-      electronegativity_Allen=2.544;
-      oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-4);
-      oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(-4);
+      electronegativity_Allen=2.544;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-4); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(-4);  //RF+SK20200410
       electron_affinity_PT=153.9;
       Miedema_phi_star=6.20;
       Miedema_nws=1.90;
@@ -1063,6 +1068,7 @@ namespace xelement {
       HHIR=500;
       xray_scatt=6.019;
       // C//DX+CO20170904 radius_covalent uses sp3 hybridization (most common)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Carbon
     // ********************************************************************************************************************************************************
@@ -1070,7 +1076,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Nitrogen
     // Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen
-    if(ZZ==7) { // Nitrogen
+    else if(ZZ==7) { // Nitrogen
       Z=ZZ;
       symbol="N";
       name="Nitrogen";
@@ -1107,9 +1113,9 @@ namespace xelement {
       hardness_Ghosh=6.8625;
       electronegativity_Pearson=7.30;
       electronegativity_Ghosh=7.209;
-      electronegativity_Allen=3.066;
-      oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(-3);
-      oxidation_states_preferred.push_back(-3);
+      electronegativity_Allen=3.066;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-3); //RF+SK20200410
       electron_affinity_PT=7;
       Miedema_phi_star=7.00;
       Miedema_nws=1.60;
@@ -1145,6 +1151,7 @@ namespace xelement {
       HHIR=500;
       /*xray_scatt=NNN;*/
       //N JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Nitrogen
     // ********************************************************************************************************************************************************
@@ -1152,7 +1159,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Oxygen
     // Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen
-    if(ZZ==8) { // Oxygen
+    else if(ZZ==8) { // Oxygen
       Z=ZZ;
       symbol="O";
       name="Oxygen";
@@ -1189,9 +1196,9 @@ namespace xelement {
       hardness_Ghosh=7.9854;
       electronegativity_Pearson=7.54;
       electronegativity_Ghosh=8.287;
-      electronegativity_Allen=3.610;
-      oxidation_states.push_back(-0.5); oxidation_states.push_back(-1); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(-2);
+      electronegativity_Allen=3.610;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(-0.5); oxidation_states.push_back(-1); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-2); //RF+SK20200410
       electron_affinity_PT=141;
       Miedema_phi_star=6.97;
       Miedema_nws=1.70;
@@ -1227,6 +1234,7 @@ namespace xelement {
       HHIR=500;
       xray_scatt=8.052;
       // O Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Oxygen
     // ********************************************************************************************************************************************************
@@ -1234,7 +1242,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Fluorine
     // Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine
-    if(ZZ==9) { // Fluorine
+    else if(ZZ==9) { // Fluorine
       Z=ZZ;
       symbol="F";
       name="Fluorine";
@@ -1271,9 +1279,9 @@ namespace xelement {
       hardness_Ghosh=9.1065;
       electronegativity_Pearson=10.41;
       electronegativity_Ghosh=9.372;
-      electronegativity_Allen=4.193;
-      oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(-1);
+      electronegativity_Allen=4.193;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=328;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -1309,6 +1317,7 @@ namespace xelement {
       HHIR=1500;
       /*xray_scatt=NNN;*/
       //F
+      return; //CO20200520
     }
     // [AFLOW]STOP=Fluorine
     // ********************************************************************************************************************************************************
@@ -1316,7 +1325,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Neon
     // Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon
-    if(ZZ==10) { // Neon
+    else if(ZZ==10) { // Neon
       Z=ZZ;
       symbol="Ne";
       name="Neon";
@@ -1353,9 +1362,9 @@ namespace xelement {
       hardness_Ghosh=10.2303;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=10.459;
-      electronegativity_Allen=4.787;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=4.787;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -1391,6 +1400,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ne volume calculated with fcc-pawpbe
+      return; //CO20200520
     }
     // [AFLOW]STOP=Neon
     // ********************************************************************************************************************************************************
@@ -1400,7 +1410,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Sodium
     // Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium
-    if(ZZ==11) { // Sodium
+    else if(ZZ==11) { // Sodium
       Z=ZZ;
       symbol="Na";
       name="Sodium";
@@ -1437,9 +1447,9 @@ namespace xelement {
       hardness_Ghosh=2.4441;
       electronegativity_Pearson=2.85;
       electronegativity_Ghosh=2.536;
-      electronegativity_Allen=0.869;
-      oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=0.869;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=52.8;
       Miedema_phi_star=2.70;
       Miedema_nws=0.82;
@@ -1475,6 +1485,7 @@ namespace xelement {
       HHIR=500;
       /*xray_scatt=NNN;*/
       // Na
+      return; //CO20200520
     }
     // [AFLOW]STOP=Sodium
     // ********************************************************************************************************************************************************
@@ -1482,7 +1493,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Magnesium
     // Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium
-    if(ZZ==12) { // Magnesium
+    else if(ZZ==12) { // Magnesium
       Z=ZZ;
       symbol="Mg";
       name="Magnesium";
@@ -1519,9 +1530,9 @@ namespace xelement {
       hardness_Ghosh=3.0146;
       electronegativity_Pearson=3.75;
       electronegativity_Ghosh=3.310;
-      electronegativity_Allen=1.293;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.293;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=3.45;
       Miedema_nws=1.17;
@@ -1557,6 +1568,7 @@ namespace xelement {
       HHIR=500;
       /*xray_scatt=NNN;*/
       //Mg
+      return; //CO20200520
     }
     // [AFLOW]STOP=Magnesium
     // ********************************************************************************************************************************************************
@@ -1565,7 +1577,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Aluminium
     //Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium
-    if(ZZ==13) { // Aluminium
+    else if(ZZ==13) { // Aluminium
       Z=ZZ;
       symbol="Al";
       name="Aluminium";
@@ -1602,9 +1614,9 @@ namespace xelement {
       hardness_Ghosh=3.5849;
       electronegativity_Pearson=3.23;
       electronegativity_Ghosh=4.084;
-      electronegativity_Allen=1.613;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.613;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=42.5;
       Miedema_phi_star=4.20;
       Miedema_nws=1.39;
@@ -1640,6 +1652,7 @@ namespace xelement {
       HHIR=1000;
       /*xray_scatt=NNN;*/
       //Al
+      return; //CO20200520
     }
     // [AFLOW]STOP=Aluminium
     // ********************************************************************************************************************************************************
@@ -1647,7 +1660,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Silicon
     // Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon
-    if(ZZ==14) { // Silicon
+    else if(ZZ==14) { // Silicon
       Z=ZZ;
       symbol="Si";
       name="Silicon";
@@ -1684,9 +1697,9 @@ namespace xelement {
       hardness_Ghosh=4.1551;
       electronegativity_Pearson=4.77;
       electronegativity_Ghosh=4.857;
-      electronegativity_Allen=1.916;
-      oxidation_states.push_back(4); oxidation_states.push_back(-4);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=1.916;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(-4);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=133.6;
       Miedema_phi_star=4.70;
       Miedema_nws=1.50;
@@ -1722,6 +1735,7 @@ namespace xelement {
       HHIR=1000;
       xray_scatt=14.43;
       //Si ???
+      return; //CO20200520
     }
     // [AFLOW]STOP=Silicon
     // ********************************************************************************************************************************************************
@@ -1729,7 +1743,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Phosphorus
     // Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus
-    if(ZZ==15) { // Phosphorus
+    else if(ZZ==15) { // Phosphorus
       Z=ZZ;
       symbol="P";
       name="Phosphorus";
@@ -1766,9 +1780,9 @@ namespace xelement {
       hardness_Ghosh=4.7258;
       electronegativity_Pearson=5.62;
       electronegativity_Ghosh=5.631;
-      electronegativity_Allen=2.253;
-      oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3);
-      oxidation_states_preferred.push_back(5);
+      electronegativity_Allen=2.253;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=71;
       Miedema_phi_star=5.5;
       Miedema_nws=1.65;
@@ -1804,6 +1818,7 @@ namespace xelement {
       HHIR=5100;
       xray_scatt=15.3133;
       //P MIEDEMA =PAUL VAN DER PUT book
+      return; //CO20200520
     }
     // [AFLOW]STOP=Phosphorus
     // ********************************************************************************************************************************************************
@@ -1811,7 +1826,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Sulphur
     // Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur
-    if(ZZ==16) { // Sulphur
+    else if(ZZ==16) { // Sulphur
       Z=ZZ;
       symbol="S";
       name="Sulphur";
@@ -1848,9 +1863,9 @@ namespace xelement {
       hardness_Ghosh=5.2960;
       electronegativity_Pearson=6.22;
       electronegativity_Ghosh=6.420;
-      electronegativity_Allen=2.589;
-      oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(6);
+      electronegativity_Allen=2.589;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=200;
       Miedema_phi_star=5.6;
       Miedema_nws=1.46;
@@ -1886,6 +1901,7 @@ namespace xelement {
       HHIR=1000;
       /*xray_scatt=NNN;*/
       //S Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Sulphur
     // ********************************************************************************************************************************************************
@@ -1893,7 +1909,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Chlorine
     // Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine
-    if(ZZ==17) { // Chlorine
+    else if(ZZ==17) { // Chlorine
       Z=ZZ;
       symbol="Cl";
       name="Chlorine";
@@ -1930,9 +1946,9 @@ namespace xelement {
       hardness_Ghosh=5.8662;
       electronegativity_Pearson=8.30;
       electronegativity_Ghosh=7.178;
-      electronegativity_Allen=2.869;
-      oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(-1);
+      electronegativity_Allen=2.869;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=349;
       Miedema_phi_star=5.32;
       Miedema_nws=0.34;
@@ -1968,6 +1984,7 @@ namespace xelement {
       HHIR=1500;
       /*xray_scatt=NNN;*/
       //Cl interpolation phi_star, nws, Vm, gamma JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Chlorine
     // ********************************************************************************************************************************************************
@@ -1975,7 +1992,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Argon
     //Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon
-    if(ZZ==18) { // Argon
+    else if(ZZ==18) { // Argon
       Z=ZZ;
       symbol="Ar";
       name="Argon";
@@ -2012,9 +2029,9 @@ namespace xelement {
       hardness_Ghosh=6.4366;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=7.951;
-      electronegativity_Allen=3.242;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=3.242;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -2050,6 +2067,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ar guessed volume, must double check from results JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Argon
     // ********************************************************************************************************************************************************
@@ -2059,7 +2077,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Potassium
     // Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium
-    if(ZZ==19) { // Potassium
+    else if(ZZ==19) { // Potassium
       Z=ZZ;
       symbol="K";
       name="Potassium";
@@ -2096,9 +2114,9 @@ namespace xelement {
       hardness_Ghosh=2.3273;
       electronegativity_Pearson=2.42;
       electronegativity_Ghosh=2.672;
-      electronegativity_Allen=0.734;
-      oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=0.734;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=48.4;
       Miedema_phi_star=2.25;
       Miedema_nws=0.65;
@@ -2134,6 +2152,7 @@ namespace xelement {
       HHIR=7200;
       /*xray_scatt=NNN;*/
       //K
+      return; //CO20200520
     }
     // [AFLOW]STOP=Potassium
     // ********************************************************************************************************************************************************
@@ -2141,7 +2160,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Calcium
     // Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium
-    if(ZZ==20) { // Calcium
+    else if(ZZ==20) { // Calcium
       Z=ZZ;
       symbol="Ca";
       name="Calcium";
@@ -2178,9 +2197,9 @@ namespace xelement {
       hardness_Ghosh=2.7587;
       electronegativity_Pearson=2.2;
       electronegativity_Ghosh=3.140;
-      electronegativity_Allen=1.034;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.034;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=2.37;
       Miedema_phi_star=2.55;
       Miedema_nws=0.91;
@@ -2216,6 +2235,7 @@ namespace xelement {
       HHIR=1500;
       /*xray_scatt=NNN;*/
       //Ca
+      return; //CO20200520
     }
     // [AFLOW]STOP=Calcium
     // ********************************************************************************************************************************************************
@@ -2224,7 +2244,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Scandium
     // Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium
-    if(ZZ==21) { // Scandium
+    else if(ZZ==21) { // Scandium
       Z=ZZ;
       symbol="Sc";
       name="Scandium";
@@ -2261,9 +2281,9 @@ namespace xelement {
       hardness_Ghosh=2.8582;
       electronegativity_Pearson=3.34;
       electronegativity_Ghosh=3.248;
-      electronegativity_Allen=1.190;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.190;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=18.1;
       Miedema_phi_star=3.25;
       Miedema_nws=1.27;
@@ -2299,6 +2319,7 @@ namespace xelement {
       HHIR=4500;
       xray_scatt=21.34;
       //Sc
+      return; //CO20200520
     }
     // [AFLOW]STOP=Scandium
     // ********************************************************************************************************************************************************
@@ -2306,7 +2327,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Titanium
     // Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium
-    if(ZZ==22) { // Titanium
+    else if(ZZ==22) { // Titanium
       Z=ZZ;
       symbol="Ti";
       name="Titanium";
@@ -2343,9 +2364,9 @@ namespace xelement {
       hardness_Ghosh=2.9578;
       electronegativity_Pearson=3.45;
       electronegativity_Ghosh=3.357;
-      electronegativity_Allen=1.38;
-      oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=1.38; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=7.6;
       Miedema_phi_star=3.65;
       Miedema_nws=1.47;
@@ -2381,6 +2402,7 @@ namespace xelement {
       HHIR=1600;
       xray_scatt=22.24;
       //Ti
+      return; //CO20200520
     }
     // [AFLOW]STOP=Titanium
     // ********************************************************************************************************************************************************
@@ -2388,7 +2410,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Vanadium
     // Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium
-    if(ZZ==23) { // Vanadium
+    else if(ZZ==23) { // Vanadium
       Z=ZZ;
       symbol="V";
       name="Vanadium";
@@ -2425,9 +2447,9 @@ namespace xelement {
       hardness_Ghosh=3.0573;
       electronegativity_Pearson=3.6;
       electronegativity_Ghosh=3.465;
-      electronegativity_Allen=1.53;
-      oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(5);
+      electronegativity_Allen=1.53; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=50.6;
       Miedema_phi_star=4.25;
       Miedema_nws=1.64;
@@ -2463,6 +2485,7 @@ namespace xelement {
       HHIR=3400;
       /*xray_scatt=NNN;*/
       //V
+      return; //CO20200520
     }
     // [AFLOW]STOP=Vanadium
     // ********************************************************************************************************************************************************
@@ -2470,7 +2493,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Chromium
     // Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium
-    if(ZZ==24) { // Chromium
+    else if(ZZ==24) { // Chromium
       Z=ZZ;
       symbol="Cr";
       name="Chromium";
@@ -2507,9 +2530,9 @@ namespace xelement {
       hardness_Ghosh=3.1567;
       electronegativity_Pearson=3.72;
       electronegativity_Ghosh=3.573;
-      electronegativity_Allen=1.650;
-      oxidation_states.push_back(6); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(6); //Cr+3 most preferred oxidation number
+      electronegativity_Allen=1.650;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(6); //RF+SK20200410 //Cr+3 most preferred oxidation number
       electron_affinity_PT=64.3;
       Miedema_phi_star=4.65;
       Miedema_nws=1.74;
@@ -2545,6 +2568,7 @@ namespace xelement {
       HHIR=4100;
       xray_scatt=23.84;
       //Cr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Chromium
     // ********************************************************************************************************************************************************
@@ -2552,7 +2576,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Manganese
     // Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese
-    if(ZZ==25) { // Manganese
+    else if(ZZ==25) { // Manganese
       Z=ZZ;
       symbol="Mn";
       name="Manganese";
@@ -2589,9 +2613,9 @@ namespace xelement {
       hardness_Ghosh=3.2564;
       electronegativity_Pearson=3.72;
       electronegativity_Ghosh=3.681;
-      electronegativity_Allen=1.75;
-      oxidation_states.push_back(7); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.75; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=4.45;
       Miedema_nws=1.61;
@@ -2626,7 +2650,8 @@ namespace xelement {
       HHIP=1600;
       HHIR=1800;
       xray_scatt=24.46;
-      //xray_scatt=24.3589; Mn JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.3589; Mn JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Manganese
     // ********************************************************************************************************************************************************
@@ -2634,7 +2659,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Iron
     // Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron
-    if(ZZ==26) { // Iron
+    else if(ZZ==26) { // Iron
       Z=ZZ;
       symbol="Fe";
       name="Iron";
@@ -2671,9 +2696,9 @@ namespace xelement {
       hardness_Ghosh=3.3559;
       electronegativity_Pearson=4.06;
       electronegativity_Ghosh=3.789;
-      electronegativity_Allen=1.80;
-      oxidation_states.push_back(6); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(2); //Fe+3 most preferred oxidation number
+      electronegativity_Allen=1.80; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(2); //RF+SK20200410 //Fe+3 most preferred oxidation number
       electron_affinity_PT=15.7;
       Miedema_phi_star=4.93;
       Miedema_nws=1.77;
@@ -2708,7 +2733,8 @@ namespace xelement {
       HHIP=2400;
       HHIR=1400;
       xray_scatt=24.85;
-      //xray_scatt=24.6830; Fe JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.6830; Fe JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Iron
     // ********************************************************************************************************************************************************
@@ -2716,7 +2742,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cobalt
     // Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt
-    if(ZZ==27) { // Cobalt
+    else if(ZZ==27) { // Cobalt
       Z=ZZ;
       symbol="Co";
       name="Cobalt";
@@ -2753,9 +2779,9 @@ namespace xelement {
       hardness_Ghosh=3.4556;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=3.897;
-      electronegativity_Allen=1.84;
-      oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.84; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=63.7;
       Miedema_phi_star=5.10;
       Miedema_nws=1.75;
@@ -2790,7 +2816,8 @@ namespace xelement {
       HHIP=3100;
       HHIR=2700;
       xray_scatt=24.59;
-      //Co JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
+      //Co JX CHANGED VALENCE //DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cobalt
     // ********************************************************************************************************************************************************
@@ -2798,7 +2825,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Nickel
     // Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel
-    if(ZZ==28) { // Nickel
+    else if(ZZ==28) { // Nickel
       Z=ZZ;
       symbol="Ni";
       name="Nickel";
@@ -2835,9 +2862,9 @@ namespace xelement {
       hardness_Ghosh=3.5550;
       electronegativity_Pearson=4.40;
       electronegativity_Ghosh=4.005;
-      electronegativity_Allen=1.88;
-      oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.88; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=112;
       Miedema_phi_star=5.20;
       Miedema_nws=1.75;
@@ -2873,6 +2900,7 @@ namespace xelement {
       HHIR=1500;
       xray_scatt=25.02;
       //Ni
+      return; //CO20200520
     }
     // [AFLOW]STOP=Nickel
     // ********************************************************************************************************************************************************
@@ -2880,7 +2908,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Copper
     // Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper
-    if(ZZ==29) { // Copper
+    else if(ZZ==29) { // Copper
       Z=ZZ;
       symbol="Cu";
       name="Copper";
@@ -2917,9 +2945,9 @@ namespace xelement {
       hardness_Ghosh=3.6544;
       electronegativity_Pearson=4.48;
       electronegativity_Ghosh=4.113;
-      electronegativity_Allen=1.85;
-      oxidation_states.push_back(2); oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(2); oxidation_states_preferred.push_back(1); //Cu+2 most preferred oxidation number
+      electronegativity_Allen=1.85; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2); oxidation_states_preferred.push_back(1); //RF+SK20200410 //Cu+2 most preferred oxidation number
       electron_affinity_PT=118.4;
       Miedema_phi_star=4.55;
       Miedema_nws=1.47;
@@ -2955,6 +2983,7 @@ namespace xelement {
       HHIR=1500;
       xray_scatt=27.03;
       //Cu JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Copper
     // ********************************************************************************************************************************************************
@@ -2962,7 +2991,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Zinc
     // Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc
-    if(ZZ==30) { // Zinc
+    else if(ZZ==30) { // Zinc
       Z=ZZ;
       symbol="Zn";
       name="Zinc";
@@ -2999,9 +3028,9 @@ namespace xelement {
       hardness_Ghosh=3.7542;
       electronegativity_Pearson=4.45;
       electronegativity_Ghosh=4.222;
-      electronegativity_Allen=1.59;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.59; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=4.10;
       Miedema_nws=1.32;
@@ -3037,6 +3066,7 @@ namespace xelement {
       HHIR=1900;
       xray_scatt=28.44;
       //Zn
+      return; //CO20200520
     }
     // [AFLOW]STOP=Zinc
     // ********************************************************************************************************************************************************
@@ -3045,7 +3075,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Gallium
     // Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium
-    if(ZZ==31) { // Gallium
+    else if(ZZ==31) { // Gallium
       Z=ZZ;
       symbol="Ga";
       name="Gallium";
@@ -3082,9 +3112,9 @@ namespace xelement {
       hardness_Ghosh=4.1855;
       electronegativity_Pearson=3.2;
       electronegativity_Ghosh=4.690;
-      electronegativity_Allen=1.756;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.756;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=28.9;
       Miedema_phi_star=4.10;
       Miedema_nws=1.31;
@@ -3120,6 +3150,7 @@ namespace xelement {
       HHIR=1900;
       /*xray_scatt=NNN;*/
       //Ga
+      return; //CO20200520
     }
     // [AFLOW]STOP=Gallium
     // ********************************************************************************************************************************************************
@@ -3127,7 +3158,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Germanium
     // Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium
-    if(ZZ==32) { // Germanium
+    else if(ZZ==32) { // Germanium
       Z=ZZ;
       symbol="Ge";
       name="Germanium";
@@ -3164,9 +3195,9 @@ namespace xelement {
       hardness_Ghosh=4.6166;
       electronegativity_Pearson=4.6;
       electronegativity_Ghosh=5.159;
-      electronegativity_Allen=1.994;
-      oxidation_states.push_back(4);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=1.994;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=119;
       Miedema_phi_star=4.55;
       Miedema_nws=1.37;
@@ -3202,6 +3233,7 @@ namespace xelement {
       HHIR=1900;
       /*xray_scatt=NNN;*/
       //Ge
+      return; //CO20200520
     }
     // [AFLOW]STOP=Germanium
     // ********************************************************************************************************************************************************
@@ -3209,7 +3241,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Arsenic
     // Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic
-    if(ZZ==33) { // Arsenic
+    else if(ZZ==33) { // Arsenic
       Z=ZZ;
       symbol="As";
       name="Arsenic";
@@ -3246,9 +3278,9 @@ namespace xelement {
       hardness_Ghosh=5.0662;
       electronegativity_Pearson=5.3;
       electronegativity_Ghosh=5.628;
-      electronegativity_Allen=2.211;
-      oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=2.211;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=78;
       Miedema_phi_star=4.80;
       Miedema_nws=1.44;
@@ -3284,6 +3316,7 @@ namespace xelement {
       HHIR=4000;
       /*xray_scatt=NNN;*/
       //As
+      return; //CO20200520
     }
     // [AFLOW]STOP=Arsenic
     // ********************************************************************************************************************************************************
@@ -3291,7 +3324,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Selenium
     // Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium
-    if(ZZ==34) { // Selenium
+    else if(ZZ==34) { // Selenium
       Z=ZZ;
       symbol="Se";
       name="Selenium";
@@ -3328,9 +3361,9 @@ namespace xelement {
       hardness_Ghosh=5.4795;
       electronegativity_Pearson=5.89;
       electronegativity_Ghosh=6.096;
-      electronegativity_Allen=2.424;
-      oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=2.424;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=195;
       Miedema_phi_star=5.17;
       Miedema_nws=1.40;
@@ -3366,6 +3399,7 @@ namespace xelement {
       HHIR=1900;
       /*xray_scatt=NNN;*/
       //Se Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Selenium
     // ********************************************************************************************************************************************************
@@ -3373,7 +3407,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Bromine
     // Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine
-    if(ZZ==35) { // Bromine
+    else if(ZZ==35) { // Bromine
       Z=ZZ;
       symbol="Br";
       name="Bromine";
@@ -3410,9 +3444,9 @@ namespace xelement {
       hardness_Ghosh=5.9111;
       electronegativity_Pearson=7.59;
       electronegativity_Ghosh=6.565;
-      electronegativity_Allen=2.685;
-      oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(-1);
+      electronegativity_Allen=2.685;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=324.6;
       Miedema_phi_star=5.20;
       Miedema_nws=1.35;
@@ -3448,6 +3482,7 @@ namespace xelement {
       HHIR=6900;
       /* xray_scatt=NNN;*/
       //Br interpolation phi_star, nws, Vm, gamma, BVm JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Bromine
     // ********************************************************************************************************************************************************
@@ -3455,7 +3490,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Krypton
     // Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton
-    if(ZZ==36) { // Krypton
+    else if(ZZ==36) { // Krypton
       Z=ZZ;
       symbol="Kr";
       name="Krypton";
@@ -3492,9 +3527,9 @@ namespace xelement {
       hardness_Ghosh=6.3418;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=7.033;
-      electronegativity_Allen=2.966;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=2.966;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -3530,6 +3565,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Kr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Krypton
     // ********************************************************************************************************************************************************
@@ -3539,7 +3575,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Rubidium
     // Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium
-    if(ZZ==37) { // Rubidium
+    else if(ZZ==37) { // Rubidium
       Z=ZZ;
       symbol="Rb";
       name="Rubidium";
@@ -3576,9 +3612,9 @@ namespace xelement {
       hardness_Ghosh=2.1204;
       electronegativity_Pearson=2.34;
       electronegativity_Ghosh=2.849;
-      electronegativity_Allen=0.706;
-      oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=0.706;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=46.9;
       Miedema_phi_star=2.10;
       Miedema_nws=0.60;
@@ -3614,6 +3650,7 @@ namespace xelement {
       HHIR=6000;
       /*xray_scatt=NNN;*/
       //Rb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Rubidium
     // ********************************************************************************************************************************************************
@@ -3621,7 +3658,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Strontium
     // Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium
-    if(ZZ==38) { // Strontium
+    else if(ZZ==38) { // Strontium
       Z=ZZ;
       symbol="Sr";
       name="Strontium";
@@ -3658,9 +3695,9 @@ namespace xelement {
       hardness_Ghosh=2.5374;
       electronegativity_Pearson=2.0;
       electronegativity_Ghosh=3.225;
-      electronegativity_Allen=0.963;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=0.963;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=5.03;
       Miedema_phi_star=2.40;
       Miedema_nws=0.84;
@@ -3696,6 +3733,7 @@ namespace xelement {
       HHIR=3000;
       /*xray_scatt=NNN;*/
       //Sr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Strontium
     // ********************************************************************************************************************************************************
@@ -3704,7 +3742,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Yttrium
     // Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium
-    if(ZZ==39) { // Yttrium
+    else if(ZZ==39) { // Yttrium
       Z=ZZ;
       symbol="Y";
       name="Yttrium";
@@ -3741,9 +3779,9 @@ namespace xelement {
       hardness_Ghosh=2.6335;
       electronegativity_Pearson=3.19;
       electronegativity_Ghosh=3.311;
-      electronegativity_Allen=1.12;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.12; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=29.6;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -3779,6 +3817,7 @@ namespace xelement {
       HHIR=2600;
       /*xray_scatt=NNN;*/
       //Y
+      return; //CO20200520
     }
     // [AFLOW]STOP=Yttrium
     // ********************************************************************************************************************************************************
@@ -3786,7 +3825,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Zirconium
     // Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium
-    if(ZZ==40) { // Zirconium
+    else if(ZZ==40) { // Zirconium
       Z=ZZ;
       symbol="Zr";
       name="Zirconium";
@@ -3823,9 +3862,9 @@ namespace xelement {
       hardness_Ghosh=2.7298;
       electronegativity_Pearson=3.64;
       electronegativity_Ghosh=3.398;
-      electronegativity_Allen=1.32;
-      oxidation_states.push_back(4); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=1.32; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=41.1;
       Miedema_phi_star=3.40;
       Miedema_nws=1.39;
@@ -3861,6 +3900,7 @@ namespace xelement {
       HHIR=2600;
       /*xray_scatt=NNN;*/
       //Zr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Zirconium
     // ********************************************************************************************************************************************************
@@ -3868,7 +3908,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Niobium
     // Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium
-    if(ZZ==41) { // Niobium
+    else if(ZZ==41) { // Niobium
       Z=ZZ;
       symbol="Nb";
       name="Niobium";
@@ -3905,9 +3945,9 @@ namespace xelement {
       hardness_Ghosh=2.8260;
       electronegativity_Pearson=4.0;
       electronegativity_Ghosh=3.485;
-      electronegativity_Allen=1.41;
-      oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(5);
+      electronegativity_Allen=1.41; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=86.1;
       Miedema_phi_star=4.00;
       Miedema_nws=1.62;
@@ -3943,6 +3983,7 @@ namespace xelement {
       HHIR=8800;
       /*xray_scatt=NNN;*/
       //Nb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Niobium
     // ********************************************************************************************************************************************************
@@ -3950,7 +3991,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Molybdenum
     // Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum
-    if(ZZ==42) { // Molybdenum
+    else if(ZZ==42) { // Molybdenum
       Z=ZZ;
       symbol="Mo";
       name="Molybdenum";
@@ -3987,9 +4028,9 @@ namespace xelement {
       hardness_Ghosh=2.9221;
       electronegativity_Pearson=3.9;
       electronegativity_Ghosh=3.572;
-      electronegativity_Allen=1.47;
-      oxidation_states.push_back(6); oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(6);
+      electronegativity_Allen=1.47; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=71.9;
       Miedema_phi_star=4.65;
       Miedema_nws=1.77;
@@ -4025,6 +4066,7 @@ namespace xelement {
       HHIR=5300;
       /*xray_scatt=NNN;*/
       //Mo
+      return; //CO20200520
     }
     // [AFLOW]STOP=Molybdenum
     // ********************************************************************************************************************************************************
@@ -4032,7 +4074,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Technetium
     // Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium
-    if(ZZ==43) { // Technetium
+    else if(ZZ==43) { // Technetium
       Z=ZZ;
       symbol="Tc";
       name="Technetium";
@@ -4069,9 +4111,9 @@ namespace xelement {
       hardness_Ghosh=3.0184;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.659;
-      electronegativity_Allen=1.51;
-      oxidation_states.push_back(7);
-      oxidation_states_preferred.push_back(7);
+      electronegativity_Allen=1.51; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(7);  //RF+SK20200410
       electron_affinity_PT=53;
       Miedema_phi_star=5.30;
       Miedema_nws=1.81;
@@ -4107,6 +4149,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Tc JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Technetium
     // ********************************************************************************************************************************************************
@@ -4114,7 +4157,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Ruthenium
     // Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium
-    if(ZZ==44) { // Ruthenium
+    else if(ZZ==44) { // Ruthenium
       Z=ZZ;
       symbol="Ru";
       name="Ruthenium";
@@ -4151,9 +4194,9 @@ namespace xelement {
       hardness_Ghosh=3.1146;
       electronegativity_Pearson=4.5;
       electronegativity_Ghosh=3.745;
-      electronegativity_Allen=1.54;
-      oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.54; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(3); //RF+SK20200410
       electron_affinity_PT=101.3;
       Miedema_phi_star=5.40;
       Miedema_nws=1.83;
@@ -4189,6 +4232,7 @@ namespace xelement {
       HHIR=8000;
       /*xray_scatt=NNN;*/
       //Ru JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Ruthenium
     // ********************************************************************************************************************************************************
@@ -4196,7 +4240,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Rhodium
     // Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium
-    if(ZZ==45) { // Rhodium
+    else if(ZZ==45) { // Rhodium
       Z=ZZ;
       symbol="Rh";
       name="Rhodium";
@@ -4233,9 +4277,9 @@ namespace xelement {
       hardness_Ghosh=3.2108;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=3.832;
-      electronegativity_Allen=1.56;
-      oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(1); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=1.56; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(1); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(1); //RF+SK20200410
       electron_affinity_PT=109.7;
       Miedema_phi_star=5.40;
       Miedema_nws=1.76;
@@ -4271,6 +4315,7 @@ namespace xelement {
       HHIR=8000;
       /*xray_scatt=NNN;*/
       //Rh
+      return; //CO20200520
     }
     // [AFLOW]STOP=Rhodium
     // ********************************************************************************************************************************************************
@@ -4278,7 +4323,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Palladium
     // Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium
-    if(ZZ==46) { // Palladium
+    else if(ZZ==46) { // Palladium
       Z=ZZ;
       symbol="Pd";
       name="Palladium";
@@ -4315,9 +4360,9 @@ namespace xelement {
       hardness_Ghosh=3.3069;
       electronegativity_Pearson=4.45;
       electronegativity_Ghosh=3.919;
-      electronegativity_Allen=1.58;
-      oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.58; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=53.7;
       Miedema_phi_star=5.45;
       Miedema_nws=1.67;
@@ -4353,6 +4398,7 @@ namespace xelement {
       HHIR=8000;
       /*xray_scatt=NNN;*/
       //Pd
+      return; //CO20200520
     }
     // [AFLOW]STOP=Palladium
     // ********************************************************************************************************************************************************
@@ -4360,7 +4406,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Silver
     // Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver
-    if(ZZ==47) { // Silver
+    else if(ZZ==47) { // Silver
       Z=ZZ;
       symbol="Ag";
       name="Silver";
@@ -4397,9 +4443,9 @@ namespace xelement {
       hardness_Ghosh=3.4032;
       electronegativity_Pearson=4.44;
       electronegativity_Ghosh=4.006;
-      electronegativity_Allen=1.87;
-      oxidation_states.push_back(2); oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=1.87; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=125.6;
       Miedema_phi_star=4.45;
       Miedema_nws=1.39;
@@ -4435,6 +4481,7 @@ namespace xelement {
       HHIR=1400;
       xray_scatt=47.18;
       //Ag JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Silver
     // ********************************************************************************************************************************************************
@@ -4442,7 +4489,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cadmium
     // Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium
-    if(ZZ==48) { // Cadmium
+    else if(ZZ==48) { // Cadmium
       Z=ZZ;
       symbol="Cd";
       name="Cadmium";
@@ -4479,9 +4526,9 @@ namespace xelement {
       hardness_Ghosh=3.4994;
       electronegativity_Pearson=4.33;
       electronegativity_Ghosh=4.093;
-      electronegativity_Allen=1.52;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.52; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=4.05;
       Miedema_nws=1.24;
@@ -4517,6 +4564,7 @@ namespace xelement {
       HHIR=1300;
       /*xray_scatt=NNN;*/
       //Cd
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cadmium
     // ********************************************************************************************************************************************************
@@ -4525,7 +4573,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Indium
     // Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium
-    if(ZZ==49) { // Indium
+    else if(ZZ==49) { // Indium
       Z=ZZ;
       symbol="In";
       name="Indium";
@@ -4562,9 +4610,9 @@ namespace xelement {
       hardness_Ghosh=3.9164;
       electronegativity_Pearson=3.1;
       electronegativity_Ghosh=4.469;
-      electronegativity_Allen=1.656;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.656;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=28.9;
       Miedema_phi_star=3.90;
       Miedema_nws=1.17;
@@ -4600,6 +4648,7 @@ namespace xelement {
       HHIR=2000;
       /*xray_scatt=NNN;*/
       //In
+      return; //CO20200520
     }
     // [AFLOW]STOP=Indium
     // ********************************************************************************************************************************************************
@@ -4607,7 +4656,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tin
     // Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin
-    if(ZZ==50) { // Tin
+    else if(ZZ==50) { // Tin
       Z=ZZ;
       symbol="Sn";
       name="Tin";
@@ -4644,9 +4693,9 @@ namespace xelement {
       hardness_Ghosh=4.3332;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=4.845;
-      electronegativity_Allen=1.824;
-      oxidation_states.push_back(4); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.824;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2); //RF+SK20200410
       electron_affinity_PT=107.3;
       Miedema_phi_star=4.15;
       Miedema_nws=1.24;
@@ -4682,6 +4731,7 @@ namespace xelement {
       HHIR=1600;
       /*xray_scatt=NNN;*/
       //Sn
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tin
     // ********************************************************************************************************************************************************
@@ -4689,7 +4739,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Antimony
     // Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony
-    if(ZZ==51) { // Antimony
+    else if(ZZ==51) { // Antimony
       Z=ZZ;
       symbol="Sb";
       name="Antimony";
@@ -4726,9 +4776,9 @@ namespace xelement {
       hardness_Ghosh=4.7501;
       electronegativity_Pearson=4.85;
       electronegativity_Ghosh=5.221;
-      electronegativity_Allen=1.984;
-      oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.984;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=103.2;
       Miedema_phi_star=4.40;
       Miedema_nws=1.26;
@@ -4764,6 +4814,7 @@ namespace xelement {
       HHIR=3400;
       /*xray_scatt=NNN;*/
       //Sb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Antimony
     // ********************************************************************************************************************************************************
@@ -4771,7 +4822,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tellurium
     // Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium
-    if(ZZ==52) { // Tellurium
+    else if(ZZ==52) { // Tellurium
       Z=ZZ;
       symbol="Te";
       name="Tellurium";
@@ -4808,9 +4859,9 @@ namespace xelement {
       hardness_Ghosh=5.1670;
       electronegativity_Pearson=5.49;
       electronegativity_Ghosh=5.597;
-      electronegativity_Allen=2.158;
-      oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=2.158;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=190.2;
       Miedema_phi_star=4.72;
       Miedema_nws=1.31;
@@ -4846,6 +4897,7 @@ namespace xelement {
       HHIR=4900;
       /*xray_scatt=NNN;*/
       //Te Table 27 of JX
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tellurium
     // ********************************************************************************************************************************************************
@@ -4853,7 +4905,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Iodine
     // Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine
-    if(ZZ==53) { // Iodine
+    else if(ZZ==53) { // Iodine
       Z=ZZ;
       symbol="I";
       name="Iodine";
@@ -4890,9 +4942,9 @@ namespace xelement {
       hardness_Ghosh=5.5839;
       electronegativity_Pearson=6.76;
       electronegativity_Ghosh=5.973;
-      electronegativity_Allen=2.359;
-      oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(1); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(-1);
+      electronegativity_Allen=2.359;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(1); oxidation_states.push_back(-1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=295.2;
       Miedema_phi_star=5.33;
       Miedema_nws=0.17;
@@ -4928,6 +4980,7 @@ namespace xelement {
       HHIR=4800;
       /*xray_scatt=NNN;*/
       //I interpolation phi_star, nws, Vm,
+      return; //CO20200520
     }
     // [AFLOW]STOP=Iodine
     // ********************************************************************************************************************************************************
@@ -4935,7 +4988,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Xenon
     // Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon
-    if(ZZ==54) { // Xenon
+    else if(ZZ==54) { // Xenon
       Z=ZZ;
       symbol="Xe";
       name="Xenon";
@@ -4972,9 +5025,9 @@ namespace xelement {
       hardness_Ghosh=6.0009;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.349;
-      electronegativity_Allen=2.582;
-      oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=2.582;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -5010,6 +5063,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Xe JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Xenon
     // ********************************************************************************************************************************************************
@@ -5019,7 +5073,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cesium
     // Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium
-    if(ZZ==55) { // Cesium
+    else if(ZZ==55) { // Cesium
       Z=ZZ;
       symbol="Cs";
       name="Cesium";
@@ -5056,9 +5110,9 @@ namespace xelement {
       hardness_Ghosh=0.6829;
       electronegativity_Pearson=2.18;
       electronegativity_Ghosh=4.196;
-      electronegativity_Allen=0.659;
-      oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=0.659;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=45.5;
       Miedema_phi_star=1.95;
       Miedema_nws=0.55;
@@ -5094,6 +5148,7 @@ namespace xelement {
       HHIR=6000;
       /*xray_scatt=NNN;*/
       //Cs
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cesium
     // ********************************************************************************************************************************************************
@@ -5101,7 +5156,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Barium
     // Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium
-    if(ZZ==56) { // Barium
+    else if(ZZ==56) { // Barium
       Z=ZZ;
       symbol="Ba";
       name="Barium";
@@ -5138,9 +5193,9 @@ namespace xelement {
       hardness_Ghosh=0.9201;
       electronegativity_Pearson=2.4;
       electronegativity_Ghosh=4.318;
-      electronegativity_Allen=0.881;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=0.881;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=13.95;
       Miedema_phi_star=2.32;
       Miedema_nws=0.81;
@@ -5176,6 +5231,7 @@ namespace xelement {
       HHIR=2300;
       /*xray_scatt=NNN;*/
       //Ba
+      return; //CO20200520
     }
     // [AFLOW]STOP=Barium
     // ********************************************************************************************************************************************************
@@ -5184,7 +5240,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lanthanium
     // Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium
-    if(ZZ==57) { // Lanthanium
+    else if(ZZ==57) { // Lanthanium
       Z=ZZ;
       symbol="La";
       name="Lanthanium";
@@ -5221,7 +5277,7 @@ namespace xelement {
       hardness_Ghosh=1.1571;
       electronegativity_Pearson=3.1;
       electronegativity_Ghosh=4.439;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=48;
@@ -5259,6 +5315,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //La
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lanthanium
     // ********************************************************************************************************************************************************
@@ -5267,7 +5324,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cerium
     // Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium
-    if(ZZ==58) { // Cerium
+    else if(ZZ==58) { // Cerium
       Z=ZZ;
       symbol="Ce";
       name="Cerium";
@@ -5304,7 +5361,7 @@ namespace xelement {
       hardness_Ghosh=1.3943;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.561;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(4); oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5342,6 +5399,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Ce Pettifor linear interpolation// Miedema from Alonso-March.
+      return; //CO20200520
     }
     // [AFLOW]STOP=Cerium
     // ********************************************************************************************************************************************************
@@ -5349,7 +5407,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Praseodymium
     // Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium
-    if(ZZ==59) { // Praseodymium
+    else if(ZZ==59) { // Praseodymium
       Z=ZZ;
       symbol="Pr";
       name="Praseodymium";
@@ -5386,7 +5444,7 @@ namespace xelement {
       hardness_Ghosh=1.6315;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.682;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(4); oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5424,6 +5482,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Pr Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Praseodymium
     // ********************************************************************************************************************************************************
@@ -5431,7 +5490,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Neodymium
     // Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium
-    if(ZZ==60) { // Neodymium
+    else if(ZZ==60) { // Neodymium
       Z=ZZ;
       symbol="Nd";
       name="Neodymium";
@@ -5468,7 +5527,7 @@ namespace xelement {
       hardness_Ghosh=1.8684;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.804;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5506,6 +5565,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Nd Pettifor linear interpolation JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Neodymium
     // ********************************************************************************************************************************************************
@@ -5513,7 +5573,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Promethium
     // Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium
-    if(ZZ==61) { // Promethium
+    else if(ZZ==61) { // Promethium
       Z=ZZ;
       symbol="Pm";
       name="Promethium";
@@ -5550,7 +5610,7 @@ namespace xelement {
       hardness_Ghosh=2.1056;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.925;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5588,6 +5648,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       // Pm Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Promethium
     // ********************************************************************************************************************************************************
@@ -5595,7 +5656,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Samarium
     // Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium
-    if(ZZ==62) { // Samarium
+    else if(ZZ==62) { // Samarium
       Z=ZZ;
       symbol="Sm";
       name="Samarium";
@@ -5632,7 +5693,7 @@ namespace xelement {
       hardness_Ghosh=2.3427;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.047;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3); oxidation_states.push_back(2);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5670,6 +5731,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Sm Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Samarium
     // ********************************************************************************************************************************************************
@@ -5677,7 +5739,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Europium
     // Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium
-    if(ZZ==63) { // Europium
+    else if(ZZ==63) { // Europium
       Z=ZZ;
       symbol="Eu";
       name="Europium";
@@ -5714,7 +5776,7 @@ namespace xelement {
       hardness_Ghosh=2.5798;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.168;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3); oxidation_states.push_back(2);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5752,6 +5814,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Eu Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Europium
     // ********************************************************************************************************************************************************
@@ -5759,7 +5822,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Gadolinium
     // Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium
-    if(ZZ==64) { // Gadolinium
+    else if(ZZ==64) { // Gadolinium
       Z=ZZ;
       symbol="Gd";
       name="Gadolinium";
@@ -5796,7 +5859,7 @@ namespace xelement {
       hardness_Ghosh=2.8170;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.290;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5834,6 +5897,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       // Gd Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Gadolinium
     // ********************************************************************************************************************************************************
@@ -5841,7 +5905,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Terbium
     // Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium
-    if(ZZ==65) { // Terbium
+    else if(ZZ==65) { // Terbium
       Z=ZZ;
       symbol="Tb";
       name="Terbium";
@@ -5878,7 +5942,7 @@ namespace xelement {
       hardness_Ghosh=3.0540;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.411;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(4); oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5916,6 +5980,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       // Tb Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Terbium
     // ********************************************************************************************************************************************************
@@ -5923,7 +5988,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Dysprosium
     // Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium
-    if(ZZ==66) { // Dysprosium
+    else if(ZZ==66) { // Dysprosium
       Z=ZZ;
       symbol="Dy";
       name="Dysprosium";
@@ -5960,7 +6025,7 @@ namespace xelement {
       hardness_Ghosh=3.2912;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.533;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -5998,6 +6063,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Dy Pettifor linear interpolation JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Dysprosium
     // ********************************************************************************************************************************************************
@@ -6005,7 +6071,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Holmium
     // Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium
-    if(ZZ==67) { // Holmium
+    else if(ZZ==67) { // Holmium
       Z=ZZ;
       symbol="Ho";
       name="Holmium";
@@ -6042,7 +6108,7 @@ namespace xelement {
       hardness_Ghosh=3.5283;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.654;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -6080,6 +6146,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Ho Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Holmium
     // ********************************************************************************************************************************************************
@@ -6087,7 +6154,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Erbium
     // Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium
-    if(ZZ==68) { // Erbium
+    else if(ZZ==68) { // Erbium
       Z=ZZ;
       symbol="Er";
       name="Erbium";
@@ -6124,7 +6191,7 @@ namespace xelement {
       hardness_Ghosh=3.7655;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.776;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -6162,6 +6229,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Er Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Erbium
     // ********************************************************************************************************************************************************
@@ -6169,7 +6237,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Thulium
     // Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium
-    if(ZZ==69) { // Thulium
+    else if(ZZ==69) { // Thulium
       Z=ZZ;
       symbol="Tm";
       name="Thulium";
@@ -6206,7 +6274,7 @@ namespace xelement {
       hardness_Ghosh=4.0026;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.897;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3); oxidation_states.push_back(2);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -6244,6 +6312,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Tm Pettifor linear interpolation JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Thulium
     // ********************************************************************************************************************************************************
@@ -6251,7 +6320,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Ytterbium
     // Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium
-    if(ZZ==70) { // Ytterbium
+    else if(ZZ==70) { // Ytterbium
       Z=ZZ;
       symbol="Yb";
       name="Ytterbium";
@@ -6288,7 +6357,7 @@ namespace xelement {
       hardness_Ghosh=4.2395;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.019;
-      electronegativity_Allen=1.09; // use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
       oxidation_states.push_back(3); oxidation_states.push_back(2);
       oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
@@ -6326,6 +6395,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Yb Pettifor linear interpolation
+      return; //CO20200520
     }
     // [AFLOW]STOP=Ytterbium
     // ********************************************************************************************************************************************************
@@ -6333,7 +6403,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lutetium
     // Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium
-    if(ZZ==71) { // Lutetium
+    else if(ZZ==71) { // Lutetium
       Z=ZZ;
       symbol="Lu";
       name="Lutetium";
@@ -6370,9 +6440,9 @@ namespace xelement {
       hardness_Ghosh=4.4766;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.140;
-      electronegativity_Allen=1.09;
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.09; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.24;
@@ -6408,6 +6478,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Lu
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lutetium
     // ********************************************************************************************************************************************************
@@ -6416,7 +6487,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Hafnium
     // Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium
-    if(ZZ==72) { // Hafnium
+    else if(ZZ==72) { // Hafnium
       Z=ZZ;
       symbol="Hf";
       name="Hafnium";
@@ -6453,9 +6524,9 @@ namespace xelement {
       hardness_Ghosh=4.7065;
       electronegativity_Pearson=3.8;
       electronegativity_Ghosh=6.258;
-      electronegativity_Allen=1.16;
-      oxidation_states.push_back(4); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=1.16; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=3.55;
       Miedema_nws=1.43;
@@ -6491,6 +6562,7 @@ namespace xelement {
       HHIR=2600;
       /*xray_scatt=NNN;*/
       //Hf
+      return; //CO20200520
     }
     // [AFLOW]STOP=Hafnium
     // ********************************************************************************************************************************************************
@@ -6498,7 +6570,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tantalum
     // Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum
-    if(ZZ==73) { // Tantalum
+    else if(ZZ==73) { // Tantalum
       Z=ZZ;
       symbol="Ta";
       name="Tantalum";
@@ -6535,9 +6607,9 @@ namespace xelement {
       hardness_Ghosh=4.9508;
       electronegativity_Pearson=4.11;
       electronegativity_Ghosh=6.383;
-      electronegativity_Allen=1.34;
-      oxidation_states.push_back(5); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(5);
+      electronegativity_Allen=1.34; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=31;
       Miedema_phi_star=4.05;
       Miedema_nws=1.63;
@@ -6573,6 +6645,7 @@ namespace xelement {
       HHIR=4800;
       /*xray_scatt=NNN;*/
       //Ta
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tantalum
     // ********************************************************************************************************************************************************
@@ -6580,7 +6653,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tungsten
     // Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten
-    if(ZZ==74) { // Tungsten
+    else if(ZZ==74) { // Tungsten
       Z=ZZ;
       symbol="W";
       name="Tungsten";
@@ -6617,9 +6690,9 @@ namespace xelement {
       hardness_Ghosh=5.1879;
       electronegativity_Pearson=4.40;
       electronegativity_Ghosh=6.505;
-      electronegativity_Allen=1.47;
-      oxidation_states.push_back(6); oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(6);
+      electronegativity_Allen=1.47; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=78.6;
       Miedema_phi_star=4.80;
       Miedema_nws=1.81;
@@ -6655,6 +6728,7 @@ namespace xelement {
       HHIR=4300;
       /*xray_scatt=NNN;*/
       //W
+      return; //CO20200520
     }
     // [AFLOW]STOP=Tungsten
     // ********************************************************************************************************************************************************
@@ -6662,7 +6736,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Rhenium
     // Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium
-    if(ZZ==75) { // Rhenium
+    else if(ZZ==75) { // Rhenium
       Z=ZZ;
       symbol="Re";
       name="Rhenium";
@@ -6699,9 +6773,9 @@ namespace xelement {
       hardness_Ghosh=5.4256;
       electronegativity_Pearson=4.02;
       electronegativity_Ghosh=6.626;
-      electronegativity_Allen=1.60;
-      oxidation_states.push_back(7); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(7);
+      electronegativity_Allen=1.60; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(7);  //RF+SK20200410
       electron_affinity_PT=14.5;
       Miedema_phi_star=5.40;
       Miedema_nws=1.86;
@@ -6737,6 +6811,7 @@ namespace xelement {
       HHIR=3300;
       /*xray_scatt=NNN;*/
       //Re
+      return; //CO20200520
     }
     // [AFLOW]STOP=Rhenium
     // ********************************************************************************************************************************************************
@@ -6744,7 +6819,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Osmium
     // Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium
-    if(ZZ==76) { // Osmium
+    else if(ZZ==76) { // Osmium
       Z=ZZ;
       symbol="Os";
       name="Osmium";
@@ -6781,9 +6856,9 @@ namespace xelement {
       hardness_Ghosh=5.6619;
       electronegativity_Pearson=4.9;
       electronegativity_Ghosh=6.748;
-      electronegativity_Allen=1.65;
-      oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=1.65; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=106.1;
       Miedema_phi_star=5.40;
       Miedema_nws=1.85;
@@ -6819,6 +6894,7 @@ namespace xelement {
       HHIR=9100;
       /*xray_scatt=NNN;*/
       //Os JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Osmium
     // ********************************************************************************************************************************************************
@@ -6826,7 +6902,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Iridium
     // Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium
-    if(ZZ==77) { // Iridium
+    else if(ZZ==77) { // Iridium
       Z=ZZ;
       symbol="Ir";
       name="Iridium";
@@ -6863,9 +6939,9 @@ namespace xelement {
       hardness_Ghosh=5.9000;
       electronegativity_Pearson=5.4;
       electronegativity_Ghosh=6.831;
-      electronegativity_Allen=1.68;
-      oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(1); oxidation_states.push_back(0); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=1.68; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(1); oxidation_states.push_back(0); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(1); //RF+SK20200410
       electron_affinity_PT=151;
       Miedema_phi_star=5.55;
       Miedema_nws=1.83;
@@ -6901,6 +6977,7 @@ namespace xelement {
       HHIR=9100;
       /*xray_scatt=NNN;*/
       //Ir JX CHANGED VALENCE
+      return; //CO20200520
     }
     // [AFLOW]STOP=Iridium
     // ********************************************************************************************************************************************************
@@ -6908,7 +6985,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Platinum
     // Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum
-    if(ZZ==78) { // Platinum
+    else if(ZZ==78) { // Platinum
       Z=ZZ;
       symbol="Pt";
       name="Platinum";
@@ -6945,9 +7022,9 @@ namespace xelement {
       hardness_Ghosh=6.1367;
       electronegativity_Pearson=5.6;
       electronegativity_Ghosh=6.991;
-      electronegativity_Allen=1.72;
-      oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(0);
-      oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.72; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2); //RF+SK20200410
       electron_affinity_PT=205.3;
       Miedema_phi_star=5.65;
       Miedema_nws=1.78;
@@ -6983,6 +7060,7 @@ namespace xelement {
       HHIR=9100;
       /*xray_scatt=NNN;*/
       //Pt
+      return; //CO20200520
     }
     // [AFLOW]STOP=Platinum
     // ********************************************************************************************************************************************************
@@ -6990,7 +7068,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Gold
     // Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold
-    if(ZZ==79) { // Gold
+    else if(ZZ==79) { // Gold
       Z=ZZ;
       symbol="Au";
       name="Gold";
@@ -7027,9 +7105,9 @@ namespace xelement {
       hardness_Ghosh=6.3741;
       electronegativity_Pearson=5.77;
       electronegativity_Ghosh=7.112;
-      electronegativity_Allen=1.92;
-      oxidation_states.push_back(3); oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=1.92; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=222.8;
       Miedema_phi_star=5.15;
       Miedema_nws=1.57;
@@ -7065,6 +7143,7 @@ namespace xelement {
       HHIR=1000;
       xray_scatt=74.99;
       //Au
+      return; //CO20200520
     }
     // [AFLOW]STOP=Gold
     // ********************************************************************************************************************************************************
@@ -7072,7 +7151,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Mercury
     // Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury
-    if(ZZ==80) { // Mercury
+    else if(ZZ==80) { // Mercury
       Z=ZZ;
       symbol="Hg";
       name="Mercury";
@@ -7109,9 +7188,9 @@ namespace xelement {
       hardness_Ghosh=6.6103;
       electronegativity_Pearson=4.91;
       electronegativity_Ghosh=7.233;
-      electronegativity_Allen=1.76;
-      oxidation_states.push_back(2); oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.76; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=4.20;
       Miedema_nws=1.24;
@@ -7147,6 +7226,7 @@ namespace xelement {
       HHIR=3100;
       /*xray_scatt=NNN;*/
       //Hg
+      return; //CO20200520
     }
     // [AFLOW]STOP=Mercury
     // ********************************************************************************************************************************************************
@@ -7155,7 +7235,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Thallium
     // Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium
-    if(ZZ==81) { // Thallium
+    else if(ZZ==81) { // Thallium
       Z=ZZ;
       symbol="Tl";
       name="Thallium";
@@ -7192,9 +7272,9 @@ namespace xelement {
       hardness_Ghosh=1.7043;
       electronegativity_Pearson=3.2;
       electronegativity_Ghosh=4.719;
-      electronegativity_Allen=1.789;
-      oxidation_states.push_back(3); oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=1.789;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=19.2;
       Miedema_phi_star=3.90;
       Miedema_nws=1.12;
@@ -7230,6 +7310,7 @@ namespace xelement {
       HHIR=6500;
       /*xray_scatt=NNN;*/
       //Tl
+      return; //CO20200520
     }
     // [AFLOW]STOP=Thallium
     // ********************************************************************************************************************************************************
@@ -7237,7 +7318,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lead
     // Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead
-    if(ZZ==82) { // Lead
+    else if(ZZ==82) { // Lead
       Z=ZZ;
       symbol="Pb";
       name="Lead";
@@ -7274,9 +7355,9 @@ namespace xelement {
       hardness_Ghosh=1.9414;
       electronegativity_Pearson=3.90;
       electronegativity_Ghosh=4.841;
-      electronegativity_Allen=1.854;
-      oxidation_states.push_back(4); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=1.854;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=35.1;
       Miedema_phi_star=4.10;
       Miedema_nws=1.15;
@@ -7312,6 +7393,7 @@ namespace xelement {
       HHIR=1800;
       /*xray_scatt=NNN;*/
       //Pb
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lead
     // ********************************************************************************************************************************************************
@@ -7319,7 +7401,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Bismuth
     // Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth
-    if(ZZ==83) { // Bismuth
+    else if(ZZ==83) { // Bismuth
       Z=ZZ;
       symbol="Bi";
       name="Bismuth";
@@ -7356,9 +7438,9 @@ namespace xelement {
       hardness_Ghosh=2.1785;
       electronegativity_Pearson=4.69;
       electronegativity_Ghosh=4.962;
-      electronegativity_Allen=2.01;
-      oxidation_states.push_back(5); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      electronegativity_Allen=2.01; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=91.2;
       Miedema_phi_star=4.15;
       Miedema_nws=1.16;
@@ -7394,6 +7476,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Bi
+      return; //CO20200520
     }
     // [AFLOW]STOP=Bismuth
     // ********************************************************************************************************************************************************
@@ -7401,7 +7484,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Polonium
     // Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium
-    if(ZZ==84) { // Polonium
+    else if(ZZ==84) { // Polonium
       Z=ZZ;
       symbol="Po";
       name="Polonium";
@@ -7438,9 +7521,9 @@ namespace xelement {
       hardness_Ghosh=2.4158;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.084;
-      electronegativity_Allen=2.19;
-      oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(4);
+      electronegativity_Allen=2.19; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=183.3;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -7476,6 +7559,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Po
+      return; //CO20200520
     }
     // [AFLOW]STOP=Polonium
     // ********************************************************************************************************************************************************
@@ -7483,7 +7567,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Astatine
     // Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine
-    if(ZZ==85) { // Astatine
+    else if(ZZ==85) { // Astatine
       Z=ZZ;
       symbol="At";
       name="Astatine";
@@ -7520,9 +7604,9 @@ namespace xelement {
       hardness_Ghosh=2.6528;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.206;
-      electronegativity_Allen=2.39;
-      oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1);
-      oxidation_states_preferred.push_back(-1);
+      electronegativity_Allen=2.39; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=270.1;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -7558,6 +7642,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //At
+      return; //CO20200520
     }
     // [AFLOW]STOP=Astatine
     // ********************************************************************************************************************************************************
@@ -7565,7 +7650,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Radon
     // Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon
-    if(ZZ==86) { // Radon
+    else if(ZZ==86) { // Radon
       Z=ZZ;
       symbol="Rn";
       name="Radon";
@@ -7602,9 +7687,9 @@ namespace xelement {
       hardness_Ghosh=2.8900;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.327;
-      electronegativity_Allen=2.60;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=2.60; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -7640,6 +7725,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Rn
+      return; //CO20200520
     }
     // [AFLOW]STOP=Radon
     // ********************************************************************************************************************************************************
@@ -7649,7 +7735,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Francium
     // Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium
-    if(ZZ==87) { // Francium
+    else if(ZZ==87) { // Francium
       Z=ZZ;
       symbol="Fr";
       name="Francium";
@@ -7686,9 +7772,9 @@ namespace xelement {
       hardness_Ghosh=0.9882;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.376;
-      electronegativity_Allen=0.67;
-      oxidation_states.push_back(1);
-      oxidation_states_preferred.push_back(1);
+      electronegativity_Allen=0.67; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -7724,6 +7810,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Fr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Francium
     // ********************************************************************************************************************************************************
@@ -7731,7 +7818,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Radium
     // Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium
-    if(ZZ==88) { // Radium
+    else if(ZZ==88) { // Radium
       Z=ZZ;
       symbol="Ra";
       name="Radium";
@@ -7768,9 +7855,9 @@ namespace xelement {
       hardness_Ghosh=1.2819;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.664;
-      electronegativity_Allen=0.89;
-      oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(2);
+      electronegativity_Allen=0.89; //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -7806,6 +7893,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ra
+      return; //CO20200520
     }
     // [AFLOW]STOP=Radium
     // ********************************************************************************************************************************************************
@@ -7814,7 +7902,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Actinium
     // Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium
-    if(ZZ==89) { // Actinium
+    else if(ZZ==89) { // Actinium
       Z=ZZ;
       symbol="Ac";
       name="Actinium";
@@ -7851,9 +7939,9 @@ namespace xelement {
       hardness_Ghosh=1.3497;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.730;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -7889,6 +7977,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Ac
+      return; //CO20200520
     }
     // [AFLOW]STOP=Actinium
     // ********************************************************************************************************************************************************
@@ -7897,7 +7986,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Thorium
     // Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium
-    if(ZZ==90) { // Thorium
+    else if(ZZ==90) { // Thorium
       Z=ZZ;
       symbol="Th";
       name="Thorium";
@@ -7934,9 +8023,9 @@ namespace xelement {
       hardness_Ghosh=1.4175;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.796;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=3.30;
       Miedema_nws=1.28;
@@ -7972,6 +8061,7 @@ namespace xelement {
       HHIR=NNN;
       xray_scatt=86.64;
       //Th
+      return; //CO20200520
     }
     // [AFLOW]STOP=Thorium
     // ********************************************************************************************************************************************************
@@ -7979,7 +8069,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Protoactinium
     // Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium
-    if(ZZ==91) { // Protoactinium
+    else if(ZZ==91) { // Protoactinium
       Z=ZZ;
       symbol="Pa";
       name="Protoactinium";
@@ -8016,9 +8106,9 @@ namespace xelement {
       hardness_Ghosh=1.9369;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.306;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8054,6 +8144,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Pa
+      return; //CO20200520
     }
     // [AFLOW]STOP=Protoactinium
     // ********************************************************************************************************************************************************
@@ -8061,7 +8152,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Uranium
     // Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium
-    if(ZZ==92) { // Uranium
+    else if(ZZ==92) { // Uranium
       Z=ZZ;
       symbol="U";
       name="Uranium";
@@ -8098,9 +8189,9 @@ namespace xelement {
       hardness_Ghosh=2.2306;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.594;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8136,6 +8227,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //U
+      return; //CO20200520
     }
     // [AFLOW]STOP=Uranium
     // ********************************************************************************************************************************************************
@@ -8143,7 +8235,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Neptunium
     // Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium
-    if(ZZ==93) { // Neptunium
+    else if(ZZ==93) { // Neptunium
       Z=ZZ;
       symbol="Np";
       name="Neptunium";
@@ -8180,9 +8272,9 @@ namespace xelement {
       hardness_Ghosh=2.5241;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.882;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8218,6 +8310,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Np
+      return; //CO20200520
     }
     // [AFLOW]STOP=Neptunium
     // ********************************************************************************************************************************************************
@@ -8225,7 +8318,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Plutonium
     // Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium
-    if(ZZ==94) { // Plutonium
+    else if(ZZ==94) { // Plutonium
       Z=ZZ;
       symbol="Pu";
       name="Plutonium";
@@ -8262,9 +8355,9 @@ namespace xelement {
       hardness_Ghosh=3.0436;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.391;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8300,6 +8393,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Pu
+      return; //CO20200520
     }
     // [AFLOW]STOP=Plutonium
     // ********************************************************************************************************************************************************
@@ -8307,7 +8401,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Americium
     // Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium
-    if(ZZ==95) { // Americium
+    else if(ZZ==95) { // Americium
       Z=ZZ;
       symbol="Am";
       name="Americium";
@@ -8344,9 +8438,9 @@ namespace xelement {
       hardness_Ghosh=3.4169;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.678;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8382,6 +8476,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Am
+      return; //CO20200520
     }
     // [AFLOW]STOP=Americium
     // ********************************************************************************************************************************************************
@@ -8389,7 +8484,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Curium
     // Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium
-    if(ZZ==96) { // Curium
+    else if(ZZ==96) { // Curium
       Z=ZZ;
       symbol="Cm";
       name="Curium";
@@ -8426,9 +8521,9 @@ namespace xelement {
       hardness_Ghosh=3.4050;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.745;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8464,6 +8559,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Cm
+      return; //CO20200520
     }
     // [AFLOW]STOP=Curium
     // ********************************************************************************************************************************************************
@@ -8471,7 +8567,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Berkelium
     // Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium
-    if(ZZ==97) { // Berkelium
+    else if(ZZ==97) { // Berkelium
       Z=ZZ;
       symbol="Bk";
       name="Berkelium";
@@ -8508,9 +8604,9 @@ namespace xelement {
       hardness_Ghosh=3.9244;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.256;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8546,6 +8642,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Bk
+      return; //CO20200520
     }
     // [AFLOW]STOP=Berkelium
     // ********************************************************************************************************************************************************
@@ -8553,7 +8650,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Californium
     // Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium
-    if(ZZ==98) { // Californium
+    else if(ZZ==98) { // Californium
       Z=ZZ;
       symbol="Cf";
       name="Californium";
@@ -8590,9 +8687,9 @@ namespace xelement {
       hardness_Ghosh=4.2181;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.542;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8628,6 +8725,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Cf
+      return; //CO20200520
     }
     // [AFLOW]STOP=Californium
     // ********************************************************************************************************************************************************
@@ -8635,7 +8733,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Einsteinium
     // Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium
-    if(ZZ==99) { // Einsteinium
+    else if(ZZ==99) { // Einsteinium
       Z=ZZ;
       symbol="Es";
       name="Einsteinium";
@@ -8672,9 +8770,9 @@ namespace xelement {
       hardness_Ghosh=4.5116;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.830;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8710,6 +8808,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Es
+      return; //CO20200520
     }
     // [AFLOW]STOP=Einsteinium
     // ********************************************************************************************************************************************************
@@ -8717,7 +8816,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Fermium
     // Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium
-    if(ZZ==100) { // Fermium
+    else if(ZZ==100) { // Fermium
       Z=ZZ;
       symbol="Fm";
       name="Fermium";
@@ -8754,9 +8853,9 @@ namespace xelement {
       hardness_Ghosh=4.8051;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.118;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8792,6 +8891,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Fm
+      return; //CO20200520
     }
     // [AFLOW]STOP=Fermium
     // ********************************************************************************************************************************************************
@@ -8799,7 +8899,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Mendelevium
     // Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium
-    if(ZZ==101) { // Mendelevium
+    else if(ZZ==101) { // Mendelevium
       Z=ZZ;
       symbol="Md";
       name="Mendelevium";
@@ -8836,9 +8936,9 @@ namespace xelement {
       hardness_Ghosh=5.0990;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.406;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8874,6 +8974,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Md
+      return; //CO20200520
     }
     // [AFLOW]STOP=Mendelevium
     // ********************************************************************************************************************************************************
@@ -8881,7 +8982,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Nobelium
     // Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium
-    if(ZZ==102) { // Nobelium
+    else if(ZZ==102) { // Nobelium
       Z=ZZ;
       symbol="No";
       name="Nobelium";
@@ -8918,9 +9019,9 @@ namespace xelement {
       hardness_Ghosh=5.3926;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.694;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -8956,6 +9057,7 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //No
+      return; //CO20200520
     }
     // [AFLOW]STOP=Nobelium
     // ********************************************************************************************************************************************************
@@ -8963,7 +9065,7 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lawrencium
     // Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium
-    if(ZZ==103) { // Lawrencium
+    else if(ZZ==103) { // Lawrencium
       Z=ZZ;
       symbol="Lr";
       name="Lawrencium";
@@ -9000,9 +9102,9 @@ namespace xelement {
       hardness_Ghosh=5.4607;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.760;
-      electronegativity_Allen=NNN;
-      oxidation_states.push_back(NNN);
-      oxidation_states_preferred.push_back(NNN);
+      electronegativity_Allen=NNN;  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       Miedema_phi_star=NNN;
       Miedema_nws=NNN;
@@ -9038,9 +9140,12 @@ namespace xelement {
       HHIR=NNN;
       /*xray_scatt=NNN;*/
       //Lr
+      return; //CO20200520
     }
     // [AFLOW]STOP=Lawrencium
     // ********************************************************************************************************************************************************
+
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element number does not exist: "+aurostd::utype2string(ZZ),_FILE_NOT_FOUND_);  //CO20200520
   }
 } // namespace xelement
 

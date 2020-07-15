@@ -31,51 +31,46 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
-  ClusterSet::ClusterSet(ostream& oss) : xStream() {
+  ClusterSet::ClusterSet(ostream& oss) : xStream(oss) {
     free();
-    xStream::initialize(oss);
     directory = "./";
   }
 
-  ClusterSet::ClusterSet(ofstream& mf, ostream& oss) : xStream() {
+  ClusterSet::ClusterSet(ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     directory = "./";
   }
 
   ClusterSet::ClusterSet(const Supercell& supercell, int _order, int cut_shell,
-      double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream() {
+      double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();
-    xStream::initialize(mf, oss);
     directory = dir;
     initialize(supercell, _order, cut_shell, cut_rad);
   }
 
   //From file
   ClusterSet::ClusterSet(const string& filename, const Supercell& supercell, int _order,
-      int cut_shell, double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream() {
+      int cut_shell, double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream(mf,oss) {
     free();  // Clear old vectors
-    xStream::initialize(mf, oss);
     directory = dir;
     initialize(supercell, _order, cut_shell, cut_rad);
     readClusterSetFromFile(filename);
   }
 
   //Copy Constructors/////////////////////////////////////////////////////////
-  ClusterSet::ClusterSet(const ClusterSet& that) {
-    free();
+  ClusterSet::ClusterSet(const ClusterSet& that) : xStream(*that.getOFStream(),*that.getOSS()) {
+    if (this != &that) free();
     copy(that);
   }
 
   const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void ClusterSet::copy(const ClusterSet& that) {
+    if (this == &that) return;
     xStream::copy(that);
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;
@@ -135,13 +130,17 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initialize basic parameters.
+  void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad, ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(supercell, _order, cut_shell, cut_rad);
+  }
+
   void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad) {
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize():";
     stringstream message;
     if (_order > 1) {
       order = _order;
     } else {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize";
-      stringstream message;
       message << "Cluster order must be larger than 1 (is " << _order << ").";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
     }
@@ -184,15 +183,6 @@ namespace apl {
     return clusters[i];
   }
 
-  //Directory/////////////////////////////////////////////////////////////////
-  const string& ClusterSet::getDirectory() const {
-    return directory;
-  }
-
-  void ClusterSet::setDirectory(const string& dir) {
-    directory = dir;
-  }
-
 }
 
 /************************** INITIAL CALCULATIONS ****************************/
@@ -205,20 +195,21 @@ namespace apl {
   // have the same symmetry.
   vector<vector<int> > ClusterSet::getSymmetryMap() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap()";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap():";
+    string message = "";
     // Check if the symmetry of the supercell and the primitive cell are the
     // same by comparing the crystal point groups.
     if (!scell.pgroup_xtal_calculated) {
       scell.CalculateSymmetryPointGroupCrystal(false);
       if (!scell.pgroup_xtal_calculated) {
-        string message = "Could not calculate the point group of the supercell.";
+        message = "Could not calculate the point group of the supercell.";
         throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
     if (!pcell.pgroup_xtal_calculated) {
       pcell.CalculateSymmetryPointGroupCrystal(false);
       if (!pcell.pgroup_xtal_calculated) {
-        string message = "Could not calculate the point group of the primitive cell.";
+        message = "Could not calculate the point group of the primitive cell.";
         throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
@@ -228,7 +219,7 @@ namespace apl {
       if (!pcell.fgroup_calculated) {
         pcell.CalculateSymmetryFactorGroup(false);
         if (!pcell.fgroup_calculated) {
-          string message = "Could not calculate the factor group of the primitive cell.";
+          message = "Could not calculate the factor group of the primitive cell.";
           throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
         }
       }
@@ -259,7 +250,7 @@ namespace apl {
             }
           }
           if (!mapped) {
-            string message = "At least one atom of the supercell could not be mapped.";
+            message = "At least one atom of the supercell could not be mapped.";
             if (LDEBUG) {
               std::cerr << function << " Failed to map atom " << atsc << " using fgroup number " << fg << "." << std::endl;
             }
@@ -269,7 +260,7 @@ namespace apl {
       }
       return sym_map;
     } else {
-      string message = "The point group of supercell is different than the point of the supercell.";
+      message = "The point group of supercell is different than the point group of the input structure.";
       message += " This feature is not implemented yet.";
       if (LDEBUG) {
         std::cerr << "ClusterSet::getSymmetryMap: Point group mismatch. Primitive cell: ";
@@ -288,7 +279,6 @@ namespace apl {
       int countshell = 0;
       double shell_rad = 0.0;
       double max_rad = 0.0;
-      const double _DIST_TOL_ = 0.1;
       uint natoms = cell.atoms.size();
       xvector<double> distances(natoms - 1, 0);
       for (uint i = 0; i < cell.iatoms.size(); i++) {
@@ -304,11 +294,11 @@ namespace apl {
         }
         distances = aurostd::sort(distances);
         for (uint j = 1; j < natoms; j++) {
-          if (distances[j] > distances[j - 1] + _DIST_TOL_ ){
+          if (distances[j] > distances[j - 1] + _APL_SHELL_TOL_ ){
             countshell++;
           }
           if (countshell == cut_shell) {
-            shell_rad = distances[j] + _DIST_TOL_;
+            shell_rad = distances[j] + _APL_SHELL_TOL_;
             j = natoms;
             if (shell_rad > max_rad){
               max_rad = shell_rad;
@@ -1593,7 +1583,7 @@ namespace apl {
   // Reads a ClusterSet from an XML file.
   void ClusterSet::readClusterSetFromFile(const string& filename) {
     // Open file and handle exceptions
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusterSetFromFile";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusterSetFromFile():";
     stringstream message;
 
     if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
@@ -1643,7 +1633,7 @@ namespace apl {
   // cutoff) are the same. This prevents the ClusterSet from being
   // recalculated when only post-processing parameters are changed.
   bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlines) {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility():";
     string line = "";
     std::stringstream message;
     bool compatible = true;
@@ -1664,7 +1654,7 @@ namespace apl {
     }
 
     t = line.find_first_of(">") + 1;
-    tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+    aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
     if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
@@ -1679,7 +1669,7 @@ namespace apl {
         line = vlines[line_count++];
         if (line.find("order") != string::npos) {
           t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
           int ord = aurostd::string2utype<int>(tokens[0]);
           tokens.clear();
           if (ord != order) {
@@ -1699,7 +1689,7 @@ namespace apl {
         line = vlines[line_count++];
         if (line.find("cutoff") != string::npos) {
           t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
           double cut = aurostd::string2utype<double>(tokens[0]);
           tokens.clear();
           if (abs(cut - cutoff) > _ZERO_TOL_) {
@@ -1737,7 +1727,7 @@ namespace apl {
               message << "pcell lattice tag is corrupt. ";
             }
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (int j = 1; j < 3; j++) {
               latt(i, j) = aurostd::string2utype<double>(tokens[j - 1]);
             }
@@ -1777,12 +1767,12 @@ namespace apl {
             if (line.find("species=\"") != string::npos) {
               // Extract species
               t = line.find_first_of("\"") + 1;
-              tokenize(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
+              aurostd::string2tokens(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
               species.push_back(tokens[0]);
               tokens.clear();
               // Extract positions
               t = line.find_first_of(">") + 1;
-              tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+              aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
               xvector<double> fpos(3);
               for (int i = 1; i < 4; i++) {
                 fpos(i) = aurostd::string2utype<double>(tokens[i-1]);
@@ -1834,7 +1824,7 @@ namespace apl {
         if (line.find("varray name=\"supercell\"") != string::npos) {
           line = vlines[line_count++];
           t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
           xvector<int> sc(3);
           for (int i = 1; i < 4; i++) {
             sc(i) = aurostd::string2utype<double>(tokens[i-1]);
@@ -1866,7 +1856,7 @@ namespace apl {
   // Reads the inequivalent clusters.
   void ClusterSet::readInequivalentClusters(uint& line_count,
       const vector<string>& vlines) {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters():";
     string line = "", message = "";
     vector<string> tokens;
     int t = 0;
@@ -1916,7 +1906,7 @@ namespace apl {
   // Reads a set of _cluster objects for the inequivalent clusters.
   vector<_cluster> ClusterSet::readClusters(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readClusters";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readClusters():";
     string message = "", line = "";
     vector<_cluster> clusters;
     vector<string> tokens;
@@ -1940,19 +1930,19 @@ namespace apl {
           if (line.find("atoms") != string::npos) {
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint at = 0; at < tokens.size(); at++) {
               clst.atoms.push_back(aurostd::string2utype<int>(tokens[at]));
             }
           } else if (line.find("fgroup") != string::npos) {
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             clst.fgroup = aurostd::string2utype<int>(tokens[0]);
           } else if (line.find("permutation") != string::npos) {
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             clst.permutation = aurostd::string2utype<int>(tokens[0]);
           }
         }
@@ -1967,7 +1957,7 @@ namespace apl {
   // Reads a single _linearCombinations object.
   _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readLinearCombinations";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readLinearCombinations():";
     string message = "", line = "";
     _linearCombinations lcombs;
     vector<string> tokens;
@@ -1983,14 +1973,14 @@ namespace apl {
       if (line.find("independent") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           lcombs.independent.push_back(aurostd::string2utype<int>(tokens[i]));
         }
       } else if (line.find("dependent") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           lcombs.dependent.push_back(aurostd::string2utype<int>(tokens[i]));
         }
@@ -2007,7 +1997,7 @@ namespace apl {
             vector<int> indices;
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint i = 0; i < tokens.size(); i++) {
               indices.push_back(aurostd::string2utype<int>(tokens[i]));
             }
@@ -2027,7 +2017,7 @@ namespace apl {
             vector<double> coefficients;
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint i = 0; i < tokens.size(); i++) {
               coefficients.push_back(aurostd::string2utype<double>(tokens[i]));
             }
@@ -2047,7 +2037,7 @@ namespace apl {
             vector<int> indep2depMap;
             tokens.clear();
             t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+            aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
             for (uint i = 0; i < tokens.size(); i++) {
               indep2depMap.push_back(aurostd::string2utype<int>(tokens[i]));
             }
@@ -2064,7 +2054,7 @@ namespace apl {
   // Reads the inequivalent distortions.
   void ClusterSet::readInequivalentDistortions(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readInequivalentDistortions";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentDistortions():";
     string line = "", message = "";
     uint vsize = vlines.size();
 
@@ -2082,7 +2072,7 @@ namespace apl {
   }
 
   _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string>& vlines) {
-    string function = "readIneqDist";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readIneqDist():";
     string line = "", message = "";
     uint vsize = vlines.size();
     vector<string> tokens;
@@ -2098,14 +2088,14 @@ namespace apl {
       if (line.find("atoms") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           idist.atoms.push_back(aurostd::string2utype<int>(tokens[i]));
         }
       } else if (line.find("clusters") != string::npos) {
         tokens.clear();
         t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (uint i = 0; i < tokens.size(); i++) {
           idist.clusters.push_back(aurostd::string2utype<int>(tokens[i]));
         }
@@ -2130,7 +2120,7 @@ namespace apl {
                 vector<int> dist;
                 tokens.clear();
                 t = line.find_first_of(">") + 1;
-                tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+                aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
                 for (uint i = 0; i < tokens.size(); i++) {
                   dist.push_back(aurostd::string2utype<int>(tokens[i]));
                 }
@@ -2160,7 +2150,7 @@ namespace apl {
                 vector<int> rot;
                 tokens.clear();
                 t = line.find_first_of(">") + 1;
-                tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+                aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
                 for (uint i = 0; i < tokens.size(); i++) {
                   rot.push_back(aurostd::string2utype<int>(tokens[i]));
                 }
@@ -2190,7 +2180,7 @@ namespace apl {
                 vector<int> map;
                 tokens.clear();
                 t = line.find_first_of(">") + 1;
-                tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+                aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
                 for (uint i = 0; i < tokens.size(); i++) {
                   map.push_back(aurostd::string2utype<int>(tokens[i]));
                 }
@@ -2207,7 +2197,7 @@ namespace apl {
 
   void ClusterSet::readHigherOrderDistortions(uint& line_count,
       const vector<string>& vlines) {
-    string function = "readHigherOrderDistortions";
+    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readHigherOrderDistortions():";
     string line = "", message = "";
     uint vsize = vlines.size();
 
