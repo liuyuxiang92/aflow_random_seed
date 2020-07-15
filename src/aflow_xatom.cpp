@@ -15792,7 +15792,7 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
 // **************************************************************************
 // This function collects all the neighbor data out to some
 // cutoff and stores it for each atom in the structure.
-void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) {
+void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat)const { //RF+CO20200513
   deque<_atom> atom_vec;
   neigh_mat.clear();
   // Get data from str.

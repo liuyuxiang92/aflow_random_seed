@@ -998,9 +998,9 @@ DEFAULTS CCE
 
 DEFAULT_CCE_OX_METHOD
   description: Default method to determine oxidation numbers.
-  type: string
-  choices: "ELECTRONEGATIVITY_ALLEN", "BADER"
-  default: "ELECTRONEGATIVITY_ALLEN"
+  type: int
+  choices: 1 (ELECTRONEGATIVITY_ALLEN), 2 (BADER)
+  default: 1
 
 ####################################################################################################
 DEFAULTS GFA

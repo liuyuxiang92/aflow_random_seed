@@ -34,8 +34,10 @@ Details for the options available are explained in the following.
 (ii) AVAILABLE OPTIONS:
 --cce                         Prints user instructions.
 --cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure 
-                              format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... 
-                              For VASP, a VASP5 POSCAR is required.
+                              format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. 
+                              For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
+                              must be written on the right side next to the coordinates for each atom
+                              just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 --dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies, 
                               they are assumed to be: (i) negative for compounds lower in energy 
                               than the elements, (ii) in eV/cell. Currently, corrections are available 
@@ -52,7 +54,11 @@ Details for the options available are explained in the following.
                               provided structure file.
 --poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE. 
                               It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                              QE, aims, ... For VASP, a VASP5 POSCAR is required.
+                              QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                              is used the species must be written on the right side next to the coordinates for
+                              each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+--print=                      Obtain output in standard format (--print=out) or as json (--print=json).
+                              Default: out.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)

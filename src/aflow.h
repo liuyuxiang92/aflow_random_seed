@@ -1806,7 +1806,7 @@ class xstructure {
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
     // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
-    void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat);
+    void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat)const; //RF+CO20200513
     // ----------------------------------------------------------------------------------------
     // OUTPUT/ERROR FLAGS                                         // --------------------------------------
     bool Niggli_has_failed;                                       // Niggli has failed ?

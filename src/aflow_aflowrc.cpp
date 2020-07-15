@@ -746,8 +746,8 @@
 
 // RF20200413 - START
 // DEFAULT CCE
-#define AFLOWRC_DEFAULT_CCE_OX_METHOD                         string("ELECTRONEGATIVITY_ALLEN")
-#define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedscheme("DEFAULT_CCE_OX_METHOD")
+#define AFLOWRC_DEFAULT_CCE_OX_METHOD                         1
+#define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedutype<int>("DEFAULT_CCE_OX_METHOD")
 // RF20200413 - END
 
 // CORES // DONE
@@ -1951,7 +1951,7 @@ namespace aflowrc {
     // RF20200413 - START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CCE" << endl;
-    aflowrc << "DEFAULT_CCE_OX_METHOD=\"" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "\"" << "  // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    aflowrc << "DEFAULT_CCE_OX_METHOD=" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "" << "  // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER" << endl;
     // RF20200413 - END
 
     aflowrc << " " << endl;
@@ -2446,7 +2446,7 @@ namespace aflowrc {
 
     // RF20200413 - START
     if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER" << endl;
     // RF20200413 - END
 
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
