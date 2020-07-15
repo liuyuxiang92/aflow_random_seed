@@ -366,6 +366,7 @@ namespace init {
       if(XHOST.is_command("vasp52s")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"vasp52s\")=TRUE",depth_long) << "[" << XHOST.command("vasp52s") << "]" << endl;} else {oss << "XHOST.is_command(\"vasp52s\")=FALSE" << endl;}
       if(XHOST.is_command("vasp54s")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"vasp54s\")=TRUE",depth_long) << "[" << XHOST.command("vasp54s") << "]" << endl;} else {oss << "XHOST.is_command(\"vasp54s\")=FALSE" << endl;}
       if(XHOST.is_command("vasp54s")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"vasp54s\")=TRUE",depth_long) << "[" << XHOST.command("vasp54s") << "]" << endl;} else {oss << "XHOST.is_command(\"vasp54s\")=FALSE" << endl;}
+      if(XHOST.is_command("vasp_std")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"vasp_std\")=TRUE",depth_long) << "[" << XHOST.command("vasp_std") << "]" << endl;} else {oss << "XHOST.is_command(\"vasp_std\")=FALSE" << endl;} //CO20200624
       if(XHOST.is_command("wget")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"wget\")=TRUE",depth_long) << "[" << XHOST.command("wget") << "]" << endl;} else {oss << "XHOST.is_command(\"wget\")=FALSE" << endl;}
       if(XHOST.is_command("zip")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"zip\")=TRUE",depth_long) << "[" << XHOST.command("zip") << "]" << endl;} else {oss << "XHOST.is_command(\"zip\")=FALSE" << endl;}
       if(XHOST.is_command("xz")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"xz\")=TRUE",depth_long) << "[" << "xz" << "]" << endl;} else {oss << "XHOST.is_command(\"xz\")=FALSE" << endl;}
