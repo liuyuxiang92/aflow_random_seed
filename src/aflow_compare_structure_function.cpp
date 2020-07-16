@@ -6220,18 +6220,17 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
     deque<_atom> xstr1_atoms = _xstr1_atoms;
-    xvector<double> xstr1_centroid = centroid(xstr1_atoms);
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> xstr1_centroid = centroid(xstr1_atoms);
     deque<_atom> PROTO_atoms = _PROTO_atoms;
-    xvector<double> PROTO_centroid = centroid(PROTO_atoms);
-  
-    if(LDEBUG){
-      cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
-      cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
-    }
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> PROTO_centroid = centroid(PROTO_atoms);
 
-    for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid; }
-    for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid; }
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] if(LDEBUG){
+    //DX20200716 [BETA- NEEDS FUTHER TESTING]   cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
+    //DX20200716 [BETA- NEEDS FUTHER TESTING]   cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] }
 
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid; }
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid; }
 
     // ---------------------------------------------------------------------------
     // Determines cutoff distance in which atoms map onto one another and are
