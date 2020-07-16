@@ -1365,6 +1365,50 @@ namespace pocc {
     }
     //StructuresAllFile2SupercellSets();  //this also works, just slower
     //StructuresUniqueFile2SupercellSets();
+
+
+    //skip files if you need to
+    vector<string> v_aruns2skip;
+    if(!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()){aurostd::string2tokens(m_kflags.KBIN_POCC_ARUNS2SKIP_STRING,v_aruns2skip,",");}
+    if(XHOST.vflag_control.flag("ARUNS2SKIP")){aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("ARUNS2SKIP"),v_aruns2skip,",");}
+    if(v_aruns2skip.size()){
+      string index_str="";
+      uint index=0;
+      vector<uint> v_indices;
+      uint i=0;
+      for(i=0;i<v_aruns2skip.size();i++){
+        string index_str=v_aruns2skip[i];
+        if(!aurostd::isfloat(index_str)){  //input looks likes ARUN.POCC_..., convert to 1,2,3...
+          aurostd::StringSubst(index_str,"ARUN.POCC_","");
+          vector<string> tokens;
+          aurostd::string2tokens(index_str,tokens,"_");
+          index_str=tokens[0];
+          if(!aurostd::isfloat(index_str)){  //non-recognizable input
+            pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Unknown format for ARUN2SKIP[i="+aurostd::utype2string(i)+"]="+v_aruns2skip[i],m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
+            continue;
+          }
+        }
+        //now index_str should be good - assume index_str = index_str+1
+        index=aurostd::string2utype<uint>(index_str);
+        if((index-1)>=m_ARUN_directories.size()){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"ARUN2SKIP[i="+aurostd::utype2string(i)+"]="+v_aruns2skip[i]+" is out of range",m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
+          continue;
+        }
+        v_indices.push_back(index-1);
+      }
+      if(v_indices.size()){
+        std::sort(v_indices.rbegin(),v_indices.rend());  //sort backwards so we erase
+        std::list<POccSuperCellSet>::iterator it;
+        for(i=0;i<v_indices.size();i++){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Ignoring "+m_ARUN_directories[v_indices[i]],m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_); 
+          m_ARUN_directories.erase(m_ARUN_directories.begin()+v_indices[i]);
+
+          //erase
+          it=l_supercell_sets.begin();std::advance(it,v_indices[i]);
+          l_supercell_sets.erase(it);
+        }
+      }
+    }
   }
 
   //CT20200319 - added AEL/AGL option
