@@ -386,7 +386,7 @@ namespace anrl {
     bool recalculate_symmetry = true; //DX20191030
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
 
-    string usage="aflow --anrl|--convert2anrl|--structure2anrl|--struct2anrl < POSCAR";
+    string usage="aflow --prototype < POSCAR"; //DX20200721
     string options="";
 
     // load structure
