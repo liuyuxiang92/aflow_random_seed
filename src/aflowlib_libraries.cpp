@@ -5172,11 +5172,37 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " [1]" << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - begin " << directory_LIB << endl;
     data.vloop.push_back("pocc");
+    
+    if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE)) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_OUT_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_OUT_FILE,vfile,MESSAGE);  // aflow.pocc.out
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,vfile,MESSAGE);  // aflow.pocc.structures_unique.out
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,vfile,MESSAGE);  // aflow.pocc.hnf_matrices.out
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE,vfile,MESSAGE);  // aflow.pocc.site_configurations.out
+      //get DOSCAR.pocc + png's
+      vector<string> vfiles;
+      aurostd::DirectoryLS(directory_LIB,vfiles);
+      for(uint i=0;i<vfiles.size();i++){
+        if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // DOSCAR.pocc_
+        }
+        if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_orbitals_
+        }
+        if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_species_
+        }
+        if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_atoms_
+        }
+      }
+    }
+    if(aurostd::EFileExist(directory_LIB+"/"+"aflow.pocc_agl.out")) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.pocc_agl.out",directory_RAW,"aflow.pocc_agl.out",vfile,MESSAGE);  // aflow.pocc_agl.out
+    }
 
     if(data.vspecies.size()==0){
     int comp_prec=(int)ceil(log10(1.0/DEFAULT_POCC_STOICH_TOL));  //ceil ensures we round up above 1 //CO20181226
     }
-
 
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - end " << directory_LIB << endl;
     return true;
