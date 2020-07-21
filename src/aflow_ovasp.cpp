@@ -47,6 +47,7 @@ void xOUTCAR::free() {
   NIONS=0;                      // for aflowlib_libraries.cpp
   Efermi=0.0;                   // for aflowlib_libraries.cpp
   isLSCOUPLING=FALSE;           // for aflowlib_libraries.cpp
+  nelectrons = 0;               // AS20200528
   natoms=0.0;                   // for aflowlib_libraries.cpp
   energy_cell=0.0;              // for aflowlib_libraries.cpp
   energy_atom=0.0;              // for aflowlib_libraries.cpp
@@ -217,6 +218,7 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   NIONS=b.NIONS;
   Efermi=b.Efermi;
   isLSCOUPLING=b.isLSCOUPLING;
+  nelectrons=b.nelectrons; //AS20200528
   natoms=b.natoms;                              // for aflowlib_libraries.cpp
   energy_cell=b.energy_cell;                    // for aflowlib_libraries.cpp
   energy_atom=b.energy_atom;                    // for aflowlib_libraries.cpp
@@ -356,6 +358,7 @@ ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  //SC20200330
   oss << " NIONS=" << xOUT.NIONS << endl;
   oss << " Efermi=" << xOUT.Efermi << endl;
   oss << " isLSCOUPLING=" << xOUT.isLSCOUPLING << endl;
+  oss << " nelectrons=" << xOUT.nelectrons << endl; //AS20200528
   oss << " natoms=" << xOUT.natoms << endl;
   oss << " energy_cell=" << xOUT.energy_cell << endl;
   oss << " energy_atom=" << xOUT.energy_atom << endl;
@@ -1179,6 +1182,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"EAUG")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"RAUG") && aurostd::substring2bool(vcontentRED.at(iline),"sphere")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"RMAX") && aurostd::substring2bool(vcontentRED.at(iline),"radius")) vline.push_back(vcontentRED.at(iline));
+    //AS20200528
+    if(aurostd::substring2bool(vcontentRED.at(iline),"NELECT") && aurostd::substring2bool(vcontentRED.at(iline),"total number of electrons")) vline.push_back(vcontentRED.at(iline));
   }
   if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
   if(vline.size()==0) {
@@ -1204,6 +1209,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="EAUG" && k+1<tokens.size()) vEAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
       if(tokens.at(k)=="RAUG" && k+1<tokens.size()) vRAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
       if(tokens.at(k)=="RMAX" && k+1<tokens.size()) vRMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="NELECT" && k+1<tokens.size()) nelectrons=aurostd::string2utype<int>(tokens.at(k+1));//AS20200528
     }
   }
 
