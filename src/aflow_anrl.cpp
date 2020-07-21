@@ -672,7 +672,7 @@ namespace anrl {
       const char& space_group_letter, 
       const vector<double>& lattice_parameter_values, 
       uint mode){
-    
+
     // Returns the lattice in the ANRL convention and populates with the 
     // relevant lattice parameters.
     // space_group_letter : needed to differentiate between the A, and C
@@ -690,32 +690,32 @@ namespace anrl {
     if(lattice_and_centering == "aP"){
       return getTriclinicLattice(lattice_parameter_values, mode); // 0=primitive, 1=conventional
     }
-    
+
     // ---------------------------------------------------------------------------
     // monoclinic crystal system
     else if(lattice_and_centering == "mP" || lattice_and_centering == "mC"){
       return getMonoclinicLattice(lattice_and_centering, lattice_parameter_values, mode); // 0=primitive, 1=conventional
     }
-    
+
     // ---------------------------------------------------------------------------
     // orthorhombic crystal system
-		else if(lattice_and_centering == "oP" || lattice_and_centering == "oC" || 
-				lattice_and_centering == "oI" || lattice_and_centering == "oF"){
+    else if(lattice_and_centering == "oP" || lattice_and_centering == "oC" ||
+        lattice_and_centering == "oI" || lattice_and_centering == "oF"){
       return getOrthorhombicLattice(lattice_and_centering, space_group_letter, lattice_parameter_values, mode); // 0=primitive, 1=conventional
     }
-    
+
     // ---------------------------------------------------------------------------
     // tetragonal crystal system
     else if(lattice_and_centering == "tP" || lattice_and_centering == "tI"){
       return getTetragonalLattice(lattice_and_centering, lattice_parameter_values, mode); // 0=primitive, 1=conventional
     }
-    
+
     // ---------------------------------------------------------------------------
     // hexagonal crystal system (includes hex + rhl)
     else if(lattice_and_centering == "hP" || lattice_and_centering == "hR"){
       return getHexagonalLattice(lattice_and_centering, lattice_parameter_values, mode); // 0=primitive, 1=conventional
     }
-    
+
     // ---------------------------------------------------------------------------
     // cubic crystal system 
     else if(lattice_and_centering == "cP" || lattice_and_centering == "cF" || lattice_and_centering == "cI"){
@@ -735,7 +735,7 @@ namespace anrl {
 namespace anrl {
   xmatrix<double> getTriclinicLattice(const vector<double>& lattice_parameter_values, 
       uint mode){
-    
+
     // Returns the triclinic lattice in the ANRL convention and populates 
     // with the relevant lattice parameters.
     // lattice centering conventions
@@ -753,7 +753,7 @@ namespace anrl {
       message << "There needs to be 6 lattice parameters to build the triclinic lattice (input size=" << lattice_parameter_values.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // main variables 
     xmatrix<double> lattice;
@@ -761,7 +761,7 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-    
+
     uint i=0;
     double a=lattice_parameter_values[i++];                  if(LDEBUG) { cerr << function_name << " a=" << a << endl;}
     double bovera=lattice_parameter_values[i++],b=bovera*a;  if(LDEBUG) { cerr << function_name << " b=" << b << " (b/a=" << bovera << ")" << endl;}
@@ -773,7 +773,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // triclinic - tri (aP)
     if(mode ==0 || mode == 1){ // primitive and conventional cells are the same
-    
+
       double cx=c*cos(deg2rad*beta);
       double cy=c*(cos(deg2rad*alpha)-cos(deg2rad*beta)*cos(deg2rad*gamma))/sin(deg2rad*gamma);
       double cz=sqrt(pow(c,2.0)-pow(cx,2.0)-pow(cy,2.0));
@@ -787,7 +787,7 @@ namespace anrl {
       lattice(1,1)=a1(1);lattice(1,2)=a1(2);lattice(1,3)=a1(3);
       lattice(2,1)=a2(1);lattice(2,2)=a2(2);lattice(2,3)=a2(3);
       lattice(3,1)=a3(1);lattice(3,2)=a3(2);lattice(3,3)=a3(3);
-	 
+
     }
 
     if(LDEBUG){ cerr << function_name << " lattice = " << lattice << endl; }
@@ -803,23 +803,23 @@ namespace anrl {
   xmatrix<double> getMonoclinicLattice(const string& lattice_and_centering, 
       const vector<double>& lattice_parameter_values, 
       uint mode){
-    
+
     // Returns the monoclinic lattice in the ANRL convention and populates 
     // with the relevant lattice parameters.
     // lattice centering conventions
     // mode : specifies primitive(=0) or the conventional(=1) lattice
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::getMonoclinicLattice():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // check the number of inputs 
     if(lattice_parameter_values.size() != 4){
       message << "There needs to be 4 lattice parameters to build the monoclinic lattice (input size=" << lattice_parameter_values.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // main variables 
     xmatrix<double> lattice;
@@ -827,7 +827,7 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-    
+
     uint i=0;
     double a=lattice_parameter_values[i++];                  if(LDEBUG) { cerr << function_name << " a=" << a << endl;}
     double bovera=lattice_parameter_values[i++],b=bovera*a;  if(LDEBUG) { cerr << function_name << " b=" << b << " (b/a=" << bovera << ")" << endl;}
@@ -844,7 +844,7 @@ namespace anrl {
         a2=b*yn;
         a3=c*cos(deg2rad*beta)*xn+c*sin(deg2rad*beta)*zn;
       } 
-      
+
       // ---------------------------------------------------------------------------
       // base-centered monoclinic - mclc (mC)
       if(lattice_and_centering == "mC"){
@@ -867,7 +867,7 @@ namespace anrl {
     lattice(1,1)=a1(1);lattice(1,2)=a1(2);lattice(1,3)=a1(3);
     lattice(2,1)=a2(1);lattice(2,2)=a2(2);lattice(2,3)=a2(3);
     lattice(3,1)=a3(1);lattice(3,2)=a3(2);lattice(3,3)=a3(3);
-    
+
     if(LDEBUG){ cerr << function_name << " lattice = " << lattice << endl; }
 
     return lattice;
@@ -882,7 +882,7 @@ namespace anrl {
       const char& space_group_letter,
       const vector<double>& lattice_parameter_values,
       uint mode){
-    
+
     // Returns the orthorhombic lattice in the ANRL convention and populates 
     // with the relevant lattice parameters.
     // space_group_letter : needed to differentiate between the A, and C
@@ -899,7 +899,7 @@ namespace anrl {
       message << "There needs to be 3 lattice parameters to build the orthorhombic lattice (input size=" << lattice_parameter_values.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // main variables 
     xmatrix<double> lattice;
@@ -907,7 +907,7 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-    
+
     uint i=0;
     double a=lattice_parameter_values[i++];                  if(LDEBUG) { cerr << function_name << " a=" << a << endl;}
     double bovera=lattice_parameter_values[i++],b=bovera*a;  if(LDEBUG) { cerr << function_name << " b=" << b << " (b/a=" << bovera << ")" << endl;}
@@ -923,7 +923,7 @@ namespace anrl {
         a2=b*yn;
         a3=c*zn;  
       } 
-      
+
       // ---------------------------------------------------------------------------
       // base-centered orthorhombic - orcc (oC)
       if(lattice_and_centering == "oC"){
@@ -940,7 +940,7 @@ namespace anrl {
           a3=c*zn;
         }
       }
-      
+
       // ---------------------------------------------------------------------------
       // body-centered orthorhombic - orci (oI)
       if(lattice_and_centering == "oI"){
@@ -948,7 +948,7 @@ namespace anrl {
         a2=(1.0/2.0)*a*xn-(1.0/2.0)*b*yn+(1.0/2.0)*c*zn;
         a3=(1.0/2.0)*a*xn+(1.0/2.0)*b*yn-(1.0/2.0)*c*zn;
       } 
-      
+
       // ---------------------------------------------------------------------------
       // face-centered orthorhombic - orcf (oF)
       if(lattice_and_centering == "oF"){
@@ -971,7 +971,7 @@ namespace anrl {
     lattice(1,1)=a1(1);lattice(1,2)=a1(2);lattice(1,3)=a1(3);
     lattice(2,1)=a2(1);lattice(2,2)=a2(2);lattice(2,3)=a2(3);
     lattice(3,1)=a3(1);lattice(3,2)=a3(2);lattice(3,3)=a3(3);
-    
+
     if(LDEBUG){ cerr << function_name << " lattice = " << lattice << endl; }
 
     return lattice;
@@ -985,7 +985,7 @@ namespace anrl {
   xmatrix<double> getTetragonalLattice(const string& lattice_and_centering,
       const vector<double>& lattice_parameter_values,
       uint mode){
-    
+
     // Returns the tetragonal lattice in the ANRL convention and populates 
     // with the relevant lattice parameters.
     // lattice centering conventions
@@ -1001,7 +1001,7 @@ namespace anrl {
       message << "There needs to be 2 lattice parameters to build the tetragonal lattice (input size=" << lattice_parameter_values.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // main variables 
     xmatrix<double> lattice;
@@ -1009,7 +1009,7 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-    
+
     uint i=0;
     double a=lattice_parameter_values[i++];                  if(LDEBUG) { cerr << function_name << " a=" << a << endl;}
     double covera=lattice_parameter_values[i++],c=covera*a;  if(LDEBUG) { cerr << function_name << " c=" << c << " (c/a=" << covera << ")" << endl;}
@@ -1024,7 +1024,7 @@ namespace anrl {
         a2=a*yn;
         a3=c*zn;
       } 
-      
+
       // ---------------------------------------------------------------------------
       // body-centered tegtragonal - bct (tI)
       if(lattice_and_centering == "tI"){
@@ -1046,7 +1046,7 @@ namespace anrl {
     lattice(1,1)=a1(1);lattice(1,2)=a1(2);lattice(1,3)=a1(3);
     lattice(2,1)=a2(1);lattice(2,2)=a2(2);lattice(2,3)=a2(3);
     lattice(3,1)=a3(1);lattice(3,2)=a3(2);lattice(3,3)=a3(3);
-    
+
     if(LDEBUG){ cerr << function_name << " lattice = " << lattice << endl; }
 
     return lattice;
@@ -1060,7 +1060,7 @@ namespace anrl {
   xmatrix<double> getHexagonalLattice(const string& lattice_and_centering,
       const vector<double>& lattice_parameter_values,
       uint mode){
-    
+
     // Returns the hexagonal/rhombohedral lattice in the ANRL convention and 
     // populates with the relevant lattice parameters.
     // lattice centering conventions
@@ -1076,7 +1076,7 @@ namespace anrl {
       message << "There needs to be 2 lattice parameters to build the hexagonal/rhombohedral lattice (input size=" << lattice_parameter_values.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // main variables 
     xmatrix<double> lattice;
@@ -1084,7 +1084,7 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-    
+
     uint i=0;
     double a=lattice_parameter_values[i++];                  if(LDEBUG) { cerr << function_name << " a=" << a << endl;}
     double covera=lattice_parameter_values[i++],c=covera*a;  if(LDEBUG) { cerr << function_name << " c=" << c << " (c/a=" << covera << ")" << endl;}
@@ -1099,7 +1099,7 @@ namespace anrl {
         a2=(1.0/2.0)*a*xn+(sqrt(3.0)/2.0)*a*yn;
         a3=c*zn;
       } 
-      
+
       // ---------------------------------------------------------------------------
       // rhombohedral - rhl (hR)
       if(lattice_and_centering == "hR"){
@@ -1121,7 +1121,7 @@ namespace anrl {
     lattice(1,1)=a1(1);lattice(1,2)=a1(2);lattice(1,3)=a1(3);
     lattice(2,1)=a2(1);lattice(2,2)=a2(2);lattice(2,3)=a2(3);
     lattice(3,1)=a3(1);lattice(3,2)=a3(2);lattice(3,3)=a3(3);
-    
+
     if(LDEBUG){ cerr << function_name << " lattice = " << lattice << endl; }
 
     return lattice;
@@ -1135,7 +1135,7 @@ namespace anrl {
   xmatrix<double> getCubicLattice(const string& lattice_and_centering,
       const vector<double>& lattice_parameter_values,
       uint mode){
-    
+
     // Returns the cubic lattice in the ANRL convention and 
     // populates with the relevant lattice parameters.
     // lattice centering conventions
@@ -1151,7 +1151,7 @@ namespace anrl {
       message << "There needs to be 1 lattice parameters to build the cubic lattice (input size=" << lattice_parameter_values.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // main variables 
     xmatrix<double> lattice;
@@ -1159,7 +1159,7 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-    
+
     uint i=0;
     double a=lattice_parameter_values[i++];                  if(LDEBUG) { cerr << function_name << " a=" << a << endl;}
 
@@ -1173,7 +1173,7 @@ namespace anrl {
         a2=a*yn;
         a3=a*zn;
       } 
-      
+
       // ---------------------------------------------------------------------------
       // face-centered cubic - fcc (cF)
       if(lattice_and_centering == "cF"){
@@ -1181,7 +1181,7 @@ namespace anrl {
         a2=(1.0/2.0)*a*xn+(1.0/2.0)*a*zn;
         a3=(1.0/2.0)*a*xn+(1.0/2.0)*a*yn;
       } 
-      
+
       // ---------------------------------------------------------------------------
       // body-centered cubic - bcc (cI)
       if(lattice_and_centering == "cI"){
@@ -1190,7 +1190,7 @@ namespace anrl {
         a3=(1.0/2.0)*a*xn+(1.0/2.0)*a*yn-(1.0/2.0)*a*zn;
       } 
     }
-    
+
     // ---------------------------------------------------------------------------
     // conventional lattice
     else if(mode == 1){
@@ -1204,7 +1204,7 @@ namespace anrl {
     lattice(1,1)=a1(1);lattice(1,2)=a1(2);lattice(1,3)=a1(3);
     lattice(2,1)=a2(1);lattice(2,2)=a2(2);lattice(2,3)=a2(3);
     lattice(3,1)=a3(1);lattice(3,2)=a3(2);lattice(3,3)=a3(3);
-    
+
     if(LDEBUG){ cerr << function_name << " lattice = " << lattice << endl; }
 
     return lattice;
@@ -1217,7 +1217,7 @@ namespace anrl {
 namespace anrl {
   deque<_atom> getAtomsFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_positions,
       const xmatrix<double>& lattice_conventional){
-    
+
     // create atoms (deque<_atom>) from the Wyckoff positions by 
     // plugging in the parameter values into the Wyckoff equations 
 
@@ -1230,6 +1230,10 @@ namespace anrl {
     deque<_atom> atoms_conventional_cell;
     _atom atom_tmp;
     
+    // ---------------------------------------------------------------------------
+    // create f2c once (efficiency)
+    xmatrix<double> f2c = trasp(lattice_conventional);
+
     // ---------------------------------------------------------------------------
     // create an _atom for each Wyckoff position by plugging in the relevant parameters  
     for(uint i=0;i<Wyckoff_positions.size();i++){
@@ -1256,9 +1260,9 @@ namespace anrl {
           coordinate(k+1) = aurostd::string2utype<double>(component_string);
         }
         // store atom info
-        atom_tmp.fpos = coordinate;
-        atom_tmp.cpos = F2C(lattice_conventional,coordinate);
-        atom_tmp.type = Wyckoff_positions[i].index; 
+        atom_tmp.fpos = coordinate; // coordinate from ITC is fpos
+        atom_tmp.cpos = f2c*coordinate;
+        atom_tmp.type = Wyckoff_positions[i].index;
         atom_tmp.name = Wyckoff_positions[i].type;
         atoms_conventional_cell.push_back(atom_tmp);
       }
@@ -1277,8 +1281,8 @@ namespace anrl {
 // anrl::determineWyckoffVariables()
 // *************************************************************************** 
 namespace anrl {
-	vector<string> determineWyckoffVariables(
-			vector<wyckoffsite_ITC>& Wyckoff_positions){
+  vector<string> determineWyckoffVariables(
+      vector<wyckoffsite_ITC>& Wyckoff_positions){
 
     // Determines the variable coordinates in the Wyckoff positions and
     // returns a vector of Wyckoff variables (x, y, or z) that need to be 
@@ -1295,8 +1299,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // variables
     vector<string> Wyckoff_parameter_list;
-    //uint w=0; // Wyckoff counter
-    
+
     for(uint i=0;i<Wyckoff_positions.size();i++){
       bool contains_x=false; bool contains_y=false; bool contains_z=false;
       if(Wyckoff_positions[i].equations.size()>0){
@@ -1308,63 +1311,31 @@ namespace anrl {
           if(Wyckoff_positions[i].equations[0][j].find("y") != std::string::npos){ contains_y=true; }
           if(Wyckoff_positions[i].equations[0][j].find("z") != std::string::npos){ contains_z=true; }
         }
-        
+
         // ---------------------------------------------------------------------------
-        // check for x-coordinate 
-				if(contains_x){
-          string variable = "x"; 
-					string variable_name = variable+aurostd::utype2string<uint>(i+1);
-					Wyckoff_parameter_list.push_back(variable_name);
+        // check for x-coordinate
+        if(contains_x){
+          string variable = "x";
+          string variable_name = variable+aurostd::utype2string<uint>(i+1);
+          Wyckoff_parameter_list.push_back(variable_name);
           Wyckoff_positions[i].parameter_index=i+1;
-          //for(uint w=0;w<Wyckoff_positions[i].equations.size();w++){
-          //  for(uint e=0;e<Wyckoff_positions[i].equations[w].size();e++){
-          //    aurostd::StringSubst(Wyckoff_positions[i].equations[w][e],variable,variable_name);
-          //  }
-          //}
-					//if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(1) = Wyckoff_parameter_values[w++]; }
-          // store parameter value
-					//if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(1) = Wyckoff_parameter_values[w++]; }
-          //else{
-          //  message << "There are too few input parameters; could not populate the x-coordinate for Wyckoff position " << i;
-          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
-          //}
-				}
+        }
         // ---------------------------------------------------------------------------
-        // check for x-coordinate 
-				if(contains_y){ 
-          string variable = "y"; 
-					string variable_name = variable+aurostd::utype2string<uint>(i+1);
-					Wyckoff_parameter_list.push_back(variable_name);
+        // check for y-coordinate
+        if(contains_y){
+          string variable = "y";
+          string variable_name = variable+aurostd::utype2string<uint>(i+1);
+          Wyckoff_parameter_list.push_back(variable_name);
           Wyckoff_positions[i].parameter_index=i+1;
-          //for(uint w=0;w<Wyckoff_positions[i].equations.size();w++){
-          //  for(uint e=0;e<Wyckoff_positions[i].equations[w].size();e++){
-          //    aurostd::StringSubst(Wyckoff_positions[i].equations[w][e],variable,variable_name);
-          //  }
-          //}
-					//if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(2) = Wyckoff_parameter_values[w++]; }
-          //else{
-          //  message << "There are too few input parameters; could not populate the y-coordinate for Wyckoff position " << i;
-          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
-          //}
-				}
+        }
         // ---------------------------------------------------------------------------
-        // check for x-coordinate 
-				if(contains_z){ 
-          string variable = "z"; 
-					string variable_name = variable+aurostd::utype2string<uint>(i+1);
-					Wyckoff_parameter_list.push_back(variable_name);
+        // check for z-coordinate
+        if(contains_z){
+          string variable = "z";
+          string variable_name = variable+aurostd::utype2string<uint>(i+1);
+          Wyckoff_parameter_list.push_back(variable_name);
           Wyckoff_positions[i].parameter_index=i+1;
-          //for(uint w=0;w<Wyckoff_positions[i].equations.size();w++){
-          //  for(uint e=0;e<Wyckoff_positions[i].equations[w].size();e++){
-          //    aurostd::StringSubst(Wyckoff_positions[i].equations[w][e],variable,variable_name);
-          //  }
-          //}
-					//if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(3) = Wyckoff_parameter_values[w++]; }
-          //else{
-          //  message << "There are too few input parameters; could not populate the z-coordinate for Wyckoff position " << i;
-          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
-          //}
-				}
+        }
       }
       else{
         message << "The equations for site " << i << "are not provided. Check symmetry.";
@@ -1385,21 +1356,21 @@ namespace anrl {
   void applyWyckoffValues(
       const vector<double>& Wyckoff_parameter_values,
       vector<wyckoffsite_ITC>& Wyckoff_positions){
-    
+
     // Applies the Wyckoff parameter values to the Wyckoff object
     // i.e., the coord attribute, indicating the degree of freedom (x, y, or z) 
     // The Wyckoff positions should be ordered by Wyckoff letter
     // (alphabetic) in accordance with the ANRL convention.
     // The format is : x1, y1, z1, x2, y2, z2, x3, ...
-    
+
     string function_name = XPID + "anrl::applyWyckoffValues():";
     stringstream message;
-    
+
     // ---------------------------------------------------------------------------
     // variables
     vector<string> Wyckoff_parameter_list;
     uint w=0; // Wyckoff counter
-    
+
     for(uint i=0;i<Wyckoff_positions.size();i++){
       bool contains_x=false; bool contains_y=false; bool contains_z=false;
       if(Wyckoff_positions[i].equations.size()>0){
@@ -1411,37 +1382,37 @@ namespace anrl {
           if(Wyckoff_positions[i].equations[0][j].find("y") != std::string::npos){ contains_y=true; }
           if(Wyckoff_positions[i].equations[0][j].find("z") != std::string::npos){ contains_z=true; }
         }
-        
+
         // ---------------------------------------------------------------------------
-        // check for x-coordinate 
-				if(contains_x){ 
+        // check for x-coordinate
+        if(contains_x){
           // store parameter value
-					if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(1) = Wyckoff_parameter_values[w++]; }
+          if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(1) = Wyckoff_parameter_values[w++]; }
           else{
             message << "There are too few input parameters; could not populate the x-coordinate for Wyckoff position " << i;
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
           }
-				}
+        }
         // ---------------------------------------------------------------------------
-        // check for x-coordinate 
-				if(contains_y){ 
+        // check for y-coordinate
+        if(contains_y){
           // store parameter value
-					if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(2) = Wyckoff_parameter_values[w++]; }
+          if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(2) = Wyckoff_parameter_values[w++]; }
           else{
             message << "There are too few input parameters; could not populate the y-coordinate for Wyckoff position " << i;
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
           }
-				}
+        }
         // ---------------------------------------------------------------------------
-        // check for x-coordinate 
-				if(contains_z){ 
+        // check for z-coordinate
+        if(contains_z){
           // store parameter value
-					if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(3) = Wyckoff_parameter_values[w++]; }
+          if(w<Wyckoff_parameter_values.size()){ Wyckoff_positions[i].coord(3) = Wyckoff_parameter_values[w++]; }
           else{
             message << "There are too few input parameters; could not populate the z-coordinate for Wyckoff position " << i;
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
           }
-				}
+        }
       }
       else{
         message << "The equations for site " << i << "are not provided. Check symmetry.";
@@ -1467,8 +1438,9 @@ namespace anrl {
     stringstream message;
 
     // ---------------------------------------------------------------------------
-    double _WYCKOFF_FRACTIONAL_TOL_ = 1e-6;
-		
+    // tolerance indicating if Wyckoff coordinates are the same (heuristic)
+    double _WYCKOFF_FRACTIONAL_TOL_ = DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL; // default = 1e-6
+
     vector<wyckoffsite_ITC> ordered_Wyckoff_sites = wyckoff_sites_ITC;
     if(!already_ordered){ std::sort(ordered_Wyckoff_sites.begin(), ordered_Wyckoff_sites.end(), sortWyckoffByLetter); } 
 
@@ -1532,11 +1504,11 @@ namespace anrl {
     vector<wyckoffsite_ITC> wyckoff_sites_ITC;
     for(uint i=0;i<Wyckoff_tokens.size();i++){
 
-			if(LDEBUG){ cerr << function_name << " Wyckoff designation=" << Wyckoff_tokens[i] << endl; }
+      if(LDEBUG){ cerr << function_name << " Wyckoff designation=" << Wyckoff_tokens[i] << endl; }
 
       uint Wyckoff_multiplication_factor = 1;
       stringstream ss_Wyckoff_letter, ss_factor;
-        
+
       for(uint j=0;j<Wyckoff_tokens[i].size();j++){
         // ---------------------------------------------------------------------------
         // extract the prefactor (if it exists; prefactor=1 is not usually given)
@@ -1546,24 +1518,24 @@ namespace anrl {
         }
         // ---------------------------------------------------------------------------
         // extract the Wyckoff letter 
-        else{ 
-          ss_Wyckoff_letter << Wyckoff_tokens[i][j]; 
-          if(ss_factor.str().size()){ 
-						Wyckoff_multiplication_factor=aurostd::string2utype<uint>(ss_factor.str()); 
+        else{
+          ss_Wyckoff_letter << Wyckoff_tokens[i][j];
+          if(ss_factor.str().size()){
+            Wyckoff_multiplication_factor=aurostd::string2utype<uint>(ss_factor.str());
           }
         }
-				if(LDEBUG){ cerr << function_name << " " << Wyckoff_multiplication_factor << " Wyckoff position(s) with letter" << ss_Wyckoff_letter.str() << endl; }
-        
-				// ---------------------------------------------------------------------------
-        // populates Wyckoff with corresponding letter, multiplicity, equations, etc. 
-				wyckoffsite_ITC Wyckoff_tmp;
-        Wyckoff_tmp.getWyckoffFromLetter(space_group_number, ss_Wyckoff_letter.str(), setting);
-        Wyckoff_tmp.index = i; 
-        Wyckoff_tmp.type = species[i]; 
-				if(LDEBUG){ cerr << function_name << " extracted Wyckoff position:" << Wyckoff_tmp << endl; }
-			
+        if(LDEBUG){ cerr << function_name << " " << Wyckoff_multiplication_factor << " Wyckoff position(s) with letter" << ss_Wyckoff_letter.str() << endl; }
+
         // ---------------------------------------------------------------------------
-        // store the Wyckoff position as indicated by the prefactor, 
+        // populates Wyckoff with corresponding letter, multiplicity, equations, etc.
+        wyckoffsite_ITC Wyckoff_tmp;
+        Wyckoff_tmp.getWyckoffFromLetter(space_group_number, ss_Wyckoff_letter.str(), setting);
+        Wyckoff_tmp.index = i;
+        Wyckoff_tmp.type = species[i];
+        if(LDEBUG){ cerr << function_name << " extracted Wyckoff position:" << Wyckoff_tmp << endl; }
+
+        // ---------------------------------------------------------------------------
+        // store the Wyckoff position as indicated by the prefactor,
         // e.g., 4b-> four Wyckoff positions with letter b
         for(uint m=0;m<Wyckoff_multiplication_factor;m++){
           wyckoff_sites_ITC.push_back(Wyckoff_tmp);
@@ -1596,7 +1568,7 @@ namespace anrl {
 
     // index 
     int choice = -1;
-      
+
     // ---------------------------------------------------------------------------
     // only one degree of freedom
     if(variables == "a"){
@@ -1610,19 +1582,19 @@ namespace anrl {
     // if number ID is given, i.e., 001, 002, etc.
     else if(number_id.size()!=0){
       choice = aurostd::string2utype<uint>(number_id) - 1; //number to index
-			if(LDEBUG){ cerr << function_name << " id=" << number_id << " --> choice=" << choice << endl; }
+      if(LDEBUG){ cerr << function_name << " id=" << number_id << " --> choice=" << choice << endl; }
     }
 
     // ---------------------------------------------------------------------------
     // extract parameters for a given label 
     vector<string> all_possible_vparameters = getANRLParameters(label_anrl, "", choice, keep_anrl_lattice_parameter);
     string parameters=all_possible_vparameters[0];
-  
+
     // ---------------------------------------------------------------------------
     // extract parameters for a given label 
     vector<string> vparameters_library;
     aurostd::string2tokens(parameters,vparameters_library,",");
-    
+
     if(vparameters_library.size()==0){
       message << "No parameters provided; add parameter values with --params=... or use tabulated enumeration suffix (see aflow --protos)" << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
@@ -1636,13 +1608,13 @@ namespace anrl {
 // anrl::structureAndLabelConsistent()
 // *************************************************************************** 
 namespace anrl {
-	bool structureAndLabelConsistent(const xstructure& _xstr, 
-			const string& label_input, 
+  bool structureAndLabelConsistent(const xstructure& _xstr,
+      const string& label_input,
       string& label_and_params_calculated){
 
     // Checks if the created structure is consistent with the label;
     // it is possible that the provided parameters elevate the structure
-    // to a higher symmetry 
+    // to a higher symmetry
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
     string function_name = XPID + "anrl::structureAndLabelConsistent():";
@@ -1650,11 +1622,11 @@ namespace anrl {
     xstructure xstr = _xstr; // copy
 
     // ---------------------------------------------------------------------------
-    // determine label from structure (reverse process) 
+    // determine label from structure (reverse process)
     label_and_params_calculated = structure2anrl(xstr, true); // true=calculate sym
 
     // cannot do a strict string comparison of labels, symmetry analysis may
-    // change origin (i.e., Wyckoff letters); need to check if labels are  
+    // change origin (i.e., Wyckoff letters); need to check if labels are
     // isopointal (check SG and Wyckoff multiplicities and site symmetries)
 
     vector<string> label_fields;
@@ -1734,7 +1706,7 @@ namespace anrl {
     // command line version (no need for FileMESSAGE or logger)
 
     ofstream FileMESSAGE;
-    
+
     xstructure prototype = PrototypeANRL_Generator(label, 
         parameters, 
         vatomX, 
@@ -1781,7 +1753,7 @@ namespace anrl {
       message << "Printing geometry file only";
     }
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
-    
+
     // ---------------------------------------------------------------------------
     // declare variables
     vector<string> vproto,vlabel; 
@@ -1798,7 +1770,7 @@ namespace anrl {
     string label_anrl="";
     string number_id = ""; //for predefined anrls //DX20191207
     string label_permutations=""; deque<uint> vpermutation;
-    
+
     // ---------------------------------------------------------------------------
     // search for label_permutations
     aurostd::string2tokens(label,tokens,".");
@@ -1821,7 +1793,7 @@ namespace anrl {
     }
     message << "The input label is " << label_anrl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
-    
+
     if(number_id.size()){
       message << "The preset parameters " << number_id << " will be extracted (if they exist)"; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
@@ -1835,7 +1807,7 @@ namespace anrl {
       if(vlabel.at(i)==label_anrl) {  // FIX
         found=TRUE;
         ifound=i;
-        message << "This prototype label exists in the AFLOW library (part 1 or 2) label=" << label_anrl << "; index=" << ifound;
+        message << "This prototype label exists in the AFLOW library; label=" << label_anrl << "; index=" << ifound;
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
       }
     }
@@ -1847,7 +1819,7 @@ namespace anrl {
       message << " Consider adding it to the library.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     }
-    
+
     // -------------------------------------------------------------------------
     // check if using original anrl lattice parameter value when using the 
     // preset parameter functionality
@@ -1858,7 +1830,7 @@ namespace anrl {
       scale_volume_by_species = false;
       parameters=""; // clear the hack
     }
-  
+
     // -------------------------------------------------------------------------
     // if no parameters given 
     if(parameters.size()==0){
@@ -1873,11 +1845,11 @@ namespace anrl {
       message << "Extracted the following parameters (internal degrees of freedom) from the AFLOW parameters= " << parameters;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // split label into fields 
     aurostd::string2tokens(label_anrl,tokens,"_");
-      
+
     message << "The AFLOW label has been partitioned into " << tokens.size() << " fields : " << aurostd::joinWDelimiter(tokens, " ");
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, silence_logger, _LOGGER_MESSAGE_);
 
@@ -1885,7 +1857,7 @@ namespace anrl {
       message << "Number of fields in label is too small, should be 4 or more: label" << label_anrl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // check stoichometry
     string composition = tokens[0];
@@ -1895,7 +1867,7 @@ namespace anrl {
       message << "The input stoichiometry (first field in label=" << composition << ") is not reduced, it should be: " << aurostd::joinWDelimiter(reduced_stoich,":");
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // iniialize species variables
     vector<string> species;
@@ -1927,7 +1899,7 @@ namespace anrl {
       message << "The space group number is invalid; it must be between 1-230: spacegroup=" << space_group_number;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // check if Pearson symbol and space group match
     string lattice_and_centering_from_Pearson = Pearson_symbol.substr(0,2);
@@ -1938,7 +1910,7 @@ namespace anrl {
       message << "SG=" << space_group_number << "(centering=" << lattice_and_centering_from_sg << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // get space group information
     string space_group_symbol = GetSpaceGroupName(space_group_number);
@@ -1947,7 +1919,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // get Wyckoff positions (the remaining fields after the first three)
     vector<string> Wyckoff_tokens; Wyckoff_tokens.insert(Wyckoff_tokens.end(), tokens.begin()+3, tokens.end()); // get Wyckoff tokens
-    
+
     // ---------------------------------------------------------------------------
     // check if number of Wyckoff positions match the number of species
     if(Wyckoff_tokens.size() != species.size()){
@@ -1955,7 +1927,7 @@ namespace anrl {
       message << "# Wyckoff species=" << Wyckoff_tokens.size() << " (input label=" << label << ")" << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    
+
     if(LDEBUG){
       cerr << function_name << " the Wyckoff sequences associated with each species are:" << endl;
       for(uint i=0;i<species.size();i++){ cerr << species[i] << ": " << Wyckoff_tokens[i] << endl; }
@@ -1964,18 +1936,18 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // initialize ITC space group/Wyckoff position object
     uint setting=SG_SETTING_ANRL;
-    
+
     vector<wyckoffsite_ITC> wyckoff_sites_ITC = anrl::getWyckoffSitesFromANRL(Wyckoff_tokens, 
         species, 
         space_group_number,
         setting);
     vector<uint> number_of_each_type = SYM::numberEachTypeFromWyckoff(wyckoff_sites_ITC);
-    
+
     if(LDEBUG){
       cerr << function_name << " the Wyckoff positions are:" << endl;
       print(wyckoff_sites_ITC);
     }
-    
+
     // ---------------------------------------------------------------------------
     // check Wyckoff positions and stoichiometry
     //vector<uint> Wyckoff_reduced_stoich = compare::gcdStoich(number_of_each_type);
@@ -1985,7 +1957,7 @@ namespace anrl {
       message << ", Wyckoff=" << aurostd::joinWDelimiter(Wyckoff_reduced_stoich,":") << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // check Wyckoff multiplicity and number of atoms in the conventional cell
     // (should make this into a function)
@@ -2002,33 +1974,33 @@ namespace anrl {
     // determine parameters
     vector<string> parameter_list, lattice_parameter_list, Wyckoff_parameter_list;
     vector<double> parameter_values, lattice_parameter_values, Wyckoff_parameter_values;
-    
+
     // -------------------------------------------------------------------------
     // lattice parameters
     lattice_parameter_list = getANRLLatticeParameterString(lattice_type);
-    
+
     // ---------------------------------------------------------------------------
     // reorder Wyckoff positions alphabetically by Wyckoff letter, then by species
-		vector<wyckoffsite_ITC> ordered_Wyckoff_sites_ITC = wyckoff_sites_ITC;
+    vector<wyckoffsite_ITC> ordered_Wyckoff_sites_ITC = wyckoff_sites_ITC;
     std::sort(ordered_Wyckoff_sites_ITC.begin(), ordered_Wyckoff_sites_ITC.end(), sortWyckoffByLetter); 
-    
+
     if(LDEBUG){ 
       for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
         cerr << function_name << "::Ordered Wyckoff site: " << ordered_Wyckoff_sites_ITC[i] << endl;
       }
     }
-    
+
     // ---------------------------------------------------------------------------
     // determine degrees of freedom in Wyckoff positions 
     Wyckoff_parameter_list = determineWyckoffVariables(ordered_Wyckoff_sites_ITC); 
-    
-    
+
+
     // ---------------------------------------------------------------------------
     // combine parameter vectors
     parameter_list = lattice_parameter_list; 
     parameter_list.insert(parameter_list.end(), Wyckoff_parameter_list.begin(), Wyckoff_parameter_list.end());
     if(LDEBUG){ cerr << function_name << " parameters=" << aurostd::joinWDelimiter(parameter_list,",") << endl; }
-    
+
     // -------------------------------------------------------------------------
     // if no parameters provided and more than one is needed
     if(parameters.size()==0 && parameter_list.size()!=1){
@@ -2045,7 +2017,7 @@ namespace anrl {
     vector<string> vparameters_temp;
     aurostd::string2tokens(parameters,vparameters_temp,",");
     vector<double> vparameters = aurostd::vectorstring2vectordouble(vparameters_temp);
-    
+
     // ---------------------------------------------------------------------------
     // check for automatic volume scaling (i.e., first parameter is negative)
     if(vparameters[0]<=0.0){ //CO20181226 forget signbit, also include 0
@@ -2060,14 +2032,14 @@ namespace anrl {
       message << "parameter_list=" << aurostd::joinWDelimiter(parameter_list,",") << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // populate degree of freedom values 
     lattice_parameter_values.insert(lattice_parameter_values.end(), vparameters.begin(), vparameters.begin()+lattice_parameter_list.size());
     Wyckoff_parameter_values.insert(Wyckoff_parameter_values.end(), vparameters.begin()+lattice_parameter_list.size(), vparameters.end());
-    
+
     anrl::applyWyckoffValues(Wyckoff_parameter_values, ordered_Wyckoff_sites_ITC); 
-    
+
     // ---------------------------------------------------------------------------
     // check to ensure no duplicate 
     if(containsDuplicateWyckoffCoordinate(ordered_Wyckoff_sites_ITC,true)){
@@ -2078,7 +2050,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // generate lattice (in ANRL convention) based on symmetry and lattice
     // parameter values
-    
+
     // primitive (0)
     xmatrix<double> lattice_primitive = getLattice(
         lattice_and_centering_from_Pearson, 
@@ -2091,14 +2063,14 @@ namespace anrl {
         space_group_letter, 
         lattice_parameter_values, 
         1);
-   
+
     // ---------------------------------------------------------------------------
     // generate atoms based Wyckoff equations and Wyckoff parameter values
     deque<_atom> atoms_conventional_cell = getAtomsFromWyckoff(ordered_Wyckoff_sites_ITC,lattice_conventional);
 
     deque<_atom> atoms_primitive_cell;
     // special case: if using the rhombohedral setting, then the Wyckoff positions 
-    // are already wrt to the primitive cell; no need to perform conversion 
+    // are already given wrt to the primitive cell; no need to perform conversion
     if(setting==SG_SETTING_ANRL && lattice_centering=='R'){
       atoms_primitive_cell = atoms_conventional_cell;
     }
@@ -2118,7 +2090,7 @@ namespace anrl {
         cerr << atoms_primitive_cell[i] << " " << atoms_primitive_cell[i].name << endl;
       }
     }
-    
+
     // ---------------------------------------------------------------------------
     // check ratio between conventional and primitive atoms
     if(atoms_conventional_cell.size()%atoms_primitive_cell.size()!=0){
@@ -2150,7 +2122,7 @@ namespace anrl {
     str.prototype_parameter_list = parameter_list; 
     str.prototype_parameter_values = parameter_values;
     str.setting_ITC=setting;
-   
+
     // ---------------------------------------------------------------------------
     // convert RHL to HEX setting ([--hex] option)
     if(XHOST.vflag_pflow.flag("PROTO::HEX") && lattice_centering == 'R') {
@@ -2173,7 +2145,7 @@ namespace anrl {
       //     str.comp_each_type.at(str.atoms.at(iat).type)+=1.0; inside code
       str.species.at(str.atoms.at(iat).type)=str.atoms.at(iat).name;	
     }
-    
+
     // ---------------------------------------------------------------------------
     // symbolic representation of prototypes
     if(print_mode == _PROTO_GENERATOR_EQUATIONS_ONLY_ || print_mode == _PROTO_GENERATOR_GEOMETRY_FILE_AND_EQUATIONS_){ 
@@ -2214,7 +2186,7 @@ namespace anrl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
 #endif
     }
-    
+
     // ---------------------------------------------------------------------------
     // DONE
     if(print_mode!=_PROTO_GENERATOR_EQUATIONS_ONLY_){ //equations only //DX20180618
@@ -2267,17 +2239,17 @@ namespace anrl {
       str.SpeciesPutAlphabetic();
     }
 
-		// ---------------------------------------------------------------------------
-		// fix title of geometry file 
+    // ---------------------------------------------------------------------------
+    // fix title of geometry file
     aurostd::StringSubst(str.title,label,aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO20181216
     if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO20181216
-    
-		// ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
     // if this is a new prototype (i.e., not in library), we should check the 
     // symmetry; it is possible that the provided parameters elevate the structure
     // to a higher symmetry 
     if(!found){
-			string updated_label_and_params = "";
+      string updated_label_and_params = "";
       if(!structureAndLabelConsistent(str, label_anrl, updated_label_and_params)){ 
         // if changes symmetry, give the appropriate label
         message << "The structure has a higher symmetry than indicated by the label. ";
@@ -2452,7 +2424,7 @@ namespace symbolic {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
 
-    bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE A NESTED FUNCTION
+    bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE FUNCITON IS NESTED
 
     if(VERBOSE){ 
       string function_name = XPID + "symbolic::isEqualVector():"; // definition in loop for efficiency

@@ -378,18 +378,18 @@ Symbolic Product::subst(const Symbolic &x,const Symbolic &y,int &n) const
    Product resultl, resultr;
 
    // if the term did not play a role in the substitution just copy it
-   //DX 20190313 [OBSOLETE] for(j=v.begin();j!=insert;++j)
-   //DX 20190313 [OBSOLETE]  if(find(li->begin(),li->end(),j) == li->end())
-   //DX 20190313 [OBSOLETE]   if(j->commute(x)) resultr.factors.push_back(*j);
-   //DX 20190313 [OBSOLETE]  else              resultl.factors.push_back(*j);
-   //DX 20190313 - include braces - START
+   //DX20190313 [OBSOLETE] for(j=v.begin();j!=insert;++j)
+   //DX20190313 [OBSOLETE]  if(find(li->begin(),li->end(),j) == li->end())
+   //DX20190313 [OBSOLETE]   if(j->commute(x)) resultr.factors.push_back(*j);
+   //DX20190313 [OBSOLETE]  else              resultl.factors.push_back(*j);
+   //DX20190313 - include braces - START
    for(j=v.begin();j!=insert;++j){
     if(find(li->begin(),li->end(),j) == li->end()){
      if(j->commute(x)) { resultr.factors.push_back(*j); }
      else              { resultl.factors.push_back(*j); }
     }
    }
-   //DX 20190313 - include braces - END
+   //DX20190313 - include braces - END
 
    // perform the substitution
    resultl.factors.push_back(y);

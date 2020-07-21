@@ -425,8 +425,8 @@ Sum::match_parts(const Symbolic &s, const std::list<Symbolic> &p) const
  // remove empty sum
  for(j=matchpart.begin();j!=matchpart.end();++j)
   if(j->summands.size() == 0) break;
- //DX 20190313 [OBSOLETE] if(j != matchpart.end()); matchpart.erase(j);
- if(j != matchpart.end()) {} matchpart.erase(j); //DX 20190313 - above line is ambiguous, assuming brace placement. if(...){} should be equivalent to if(...);
+ //DX20190313 [OBSOLETE] if(j != matchpart.end()); matchpart.erase(j);
+ if(j != matchpart.end()) {} matchpart.erase(j); //DX20190313 - above line is ambiguous, assuming brace placement. if(...){} should be equivalent to if(...);
 
  for(j=matchpart.begin();j!=matchpart.end();++j)
  {

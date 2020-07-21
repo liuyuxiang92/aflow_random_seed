@@ -231,8 +231,8 @@ int Symbol::commute(const Symbolic &s) const
    if(!commute(*i)) return 0;
   return cp->commutes || commutes;
  }
- //DX 20190313 [OBSOLETE] catch(std::bad_cast) {}
- catch(std::bad_cast& bc) {} //DX 20190313 - need to pass by reference and then use it
+ //DX20190313 [OBSOLETE] catch(std::bad_cast) {}
+ catch(std::bad_cast& bc) {} //DX20190313 - need to pass by reference and then use it
  
  if(s.type() == typeid(SymbolicMatrix))
   return commutes;

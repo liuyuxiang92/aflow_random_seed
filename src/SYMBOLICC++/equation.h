@@ -121,25 +121,25 @@ Symbolic Equation::integrate(const Symbolic &s) const
 { return Equation(symbolic::integrate(lhs,s),symbolic::integrate(rhs,s)); } //DX20200625 - subst "::" with "symbolic::"
 
 Symbolic Equation::coeff(const Symbolic &s) const
-//DX 20190313 [OBSOLETE] { return 0; }
-//DX 20190313 - need to use argument somehow, simple fix - START 
+//DX20190313 [OBSOLETE] { return 0; }
+//DX20190313 - need to use argument somehow, simple fix - START
 { 
  if(s.type() == type()){ return 0; }
  return 0;
 }
-//DX 20190313 - need to use argument somehow, simple fix - END
+//DX20190313 - need to use argument somehow, simple fix - END
 
 Expanded Equation::expand() const
 { return Equation(lhs.expand(),rhs.expand()); }
 
 int Equation::commute(const Symbolic &s) const
-//DX 20190313 [OBSOLETE] { return 0; }
-//DX 20190313 - need to use argument somehow, simple fix - START 
+//DX20190313 [OBSOLETE] { return 0; }
+//DX20190313 - need to use argument somehow, simple fix - START
 { 
  if(s.type() == type()){ return 0; }
  return 0;
 }
-//DX 20190313 - need to use argument somehow, simple fix - END
+//DX20190313 - need to use argument somehow, simple fix - END
 
 PatternMatches
 Equation::match(const Symbolic &s, const std::list<Symbolic> &p) const

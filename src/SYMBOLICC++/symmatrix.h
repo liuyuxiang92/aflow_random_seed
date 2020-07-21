@@ -205,13 +205,13 @@ Symbolic SymbolicMatrix::integrate(const Symbolic &s) const
 }
 
 Symbolic SymbolicMatrix::coeff(const Symbolic &s) const
-//DX 20190313 [OBSOLETE] { return 0; }
-//DX 20190313 - need to use argument somehow, simple fix - START 
+//DX20190313 [OBSOLETE] { return 0; }
+//DX20190313 - need to use argument somehow, simple fix - START
 { 
  if(s.type() == type()){ return 0; }
  return 0;
 }
-//DX 20190313 - need to use argument somehow, simple fix - END
+//DX20190313 - need to use argument somehow, simple fix - END
 
 Expanded SymbolicMatrix::expand() const
 {

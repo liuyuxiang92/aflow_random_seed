@@ -329,13 +329,13 @@ int Numeric::compare(const Symbolic &s) const
 }
 
 Symbolic Numeric::df(const Symbolic &s) const
-//DX 20190313 [OBSOLETE] { return Number<int>(0); }
-//DX 20190313 - need to use argument somehow, simple fix - START 
+//DX20190313 [OBSOLETE] { return Number<int>(0); }
+//DX20190313 - need to use argument somehow, simple fix - START
 { 
  if(s.type() == type()){ return Number<int>(0); }
  return Number<int>(0);
 }
-//DX 20190313 - need to use argument somehow, simple fix - END
+//DX20190313 - need to use argument somehow, simple fix - END
 
 Symbolic Numeric::integrate(const Symbolic &s) const
 { return Symbolic(*this) * s; }
@@ -350,13 +350,13 @@ Expanded Numeric::expand() const
 { return *this; }
 
 int Numeric::commute(const Symbolic &s) const
-//DX 20190313 [OBSOLETE] { return 1; }
-//DX 20190313 - need to use argument somehow, simple fix - START 
+//DX20190313 [OBSOLETE] { return 1; }
+//DX20190313 - need to use argument somehow, simple fix - START
 { 
  if(s.type() == type()){ return 1; }
  return 1;
 }
-//DX 20190313 - need to use argument somehow, simple fix - END
+//DX20190313 - need to use argument somehow, simple fix - END
 
 PatternMatches
 Numeric::match(const Symbolic &s, const std::list<Symbolic> &p) const
@@ -364,9 +364,9 @@ Numeric::match(const Symbolic &s, const std::list<Symbolic> &p) const
  PatternMatches l;
  if(*this == s) pattern_match_TRUE(l);
  else pattern_match_FALSE(l);
- //DX 20190313 - need to use argument somehow, simple fix - START 
+ //DX20190313 - need to use argument somehow, simple fix - START
  if(p.size()){ return l; }
- //DX 20190313 - need to use argument somehow, simple fix - END
+ //DX20190313 - need to use argument somehow, simple fix - END
  return l;
 }
 

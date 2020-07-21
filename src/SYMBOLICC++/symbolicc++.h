@@ -403,8 +403,8 @@ Symbolic operator^(const Symbolic &s,int i)
 { return Power(s,Symbolic(i)); }
 
 Symbolic operator^(int i,const Symbolic &s)
-//DX 20190313 [OBSOLETE] { return Power(Symbolic(i),i); } //DX 20190314 - could this be a typo? should it be: Power(Symbolic(i),s);
-{ return Power(Symbolic(i),s); } //DX 20190314 - changed to include s : Power(Symbolic(i),s);
+//DX20190313 [OBSOLETE] { return Power(Symbolic(i),i); } //DX20190314 - could this be a typo? should it be: Power(Symbolic(i),s);
+{ return Power(Symbolic(i),s); } //DX20190314 - changed to include s : Power(Symbolic(i),s);
 
 Symbolic operator^(const Symbolic &s,double d)
 { return Power(s,Symbolic(d)); }

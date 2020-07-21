@@ -93,14 +93,14 @@ Symbolic integrate(const Symbolic &f,const Symbolic &x)
    {
     int n = CastPtr<const Number<int> >(bp)->n, sgn = 1;
     Symbolic integral, nf = 1;
-    //DX 20190313 [OBSOLETE] for(; n>=0; nf*=n+1, --n, sgn=-sgn) integral += sgn*nf*(x^n)*exp(x);
-    //DX 20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - START
+    //DX20190313 [OBSOLETE] for(; n>=0; nf*=n+1, --n, sgn=-sgn) integral += sgn*nf*(x^n)*exp(x);
+    //DX20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - START
     for(; n>=0; nf*=n+1){
       --n;
       sgn=-sgn;
       integral += sgn*nf*(x^n)*exp(x); 
     }
-    //DX 20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - END
+    //DX20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - END
     return integral;
    }
   } catch(const SymbolicError &se) {}
@@ -117,14 +117,14 @@ Symbolic integrate(const Symbolic &f,const Symbolic &x)
     {
      int n = CastPtr<const Number<int> >(bp)->n, sgn = 1;
      Symbolic integral, nf = 1/ap;
-     //DX 20190313 [OBSOLETE] for(; n>=0; nf*=(n+1)/ap, --n, sgn=-sgn)
-     //DX 20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - START
+     //DX20190313 [OBSOLETE] for(; n>=0; nf*=(n+1)/ap, --n, sgn=-sgn)
+     //DX20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - START
      for(; n>=0; nf*=(n+1)/ap){
       --n;
       sgn=-sgn;
       integral += sgn*nf*(x^n)*exp(ap*x);
      }
-     //DX 20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - END
+     //DX20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - END
      return integral;
     }
    }
@@ -142,14 +142,14 @@ Symbolic integrate(const Symbolic &f,const Symbolic &x)
     {
      int n = CastPtr<const Number<int> >(bp)->n, sgn = 1;
      Symbolic integral, nf = 1/ap;
-     //DX 20190313 [OBSOLETE] for(; n>=0; nf*=(n+1)/ap, --n, sgn=-sgn)
-     //DX 20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - START
+     //DX20190313 [OBSOLETE] for(; n>=0; nf*=(n+1)/ap, --n, sgn=-sgn)
+     //DX20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - START
      for(; n>=0; nf*=(n+1)/ap){
       --n;
       sgn=-sgn;
       integral += sgn*nf*(x^n)*exp(ap*x);
      }
-     //DX 20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - END
+     //DX20190313 - moved last two expressions into loop; otherwise we get a sequence-point warning - END
      return rhs(*i, c)*integral;
     }
    }

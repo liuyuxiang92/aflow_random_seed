@@ -248,8 +248,8 @@ SymbolicProxy::SymbolicProxy(const CloningSymbolicInterface &s)
  : CastPtr<CloningSymbolicInterface>(s) {}
 
 SymbolicProxy::SymbolicProxy(const SymbolicProxy &s)
- : SymbolicInterface(), CastPtr<CloningSymbolicInterface>(s) {} //DX 190402 - instantiate base class
-//DX 190402 - need to instantiate base class : CastPtr<CloningSymbolicInterface>(s) {}
+ : SymbolicInterface(), CastPtr<CloningSymbolicInterface>(s) {} //DX20190402 - instantiate base class
+//DX20190402 - need to instantiate base class : CastPtr<CloningSymbolicInterface>(s) {}
 
 SymbolicProxy::SymbolicProxy(const Number<void> &n)
  : CastPtr<CloningSymbolicInterface>(n) {}
