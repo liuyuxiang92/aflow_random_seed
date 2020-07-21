@@ -2896,44 +2896,6 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
     }
   }
 
-  /*
-  vector<vector<string> > non_shifted_Wyckoff_positions;
-  vector<string> tokens;
-  //format positions
-  for(uint i=0;i<all_positions.size();i++){
-    aurostd::string2tokens(all_positions[i],tokens,",");
-    vector<string> vec_pos;
-    for(uint t=0;t<tokens.size();t++){
-      string pos = aurostd::StringSubst(tokens[t],"(",""); pos = aurostd::StringSubst(pos,")","");
-      vec_pos.push_back(pos);
-    }
-    non_shifted_Wyckoff_positions.push_back(vec_pos);
-  }
-
-  vector<vector<string> > all_Wyckoff_positions;
-
-  stringstream tmp_Wyckoff_equation;
-  for(uint i=0;i<get_centering(spaceg).size();i++) {
-    for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
-      vector<string> vec_pos;
-      for(uint k=0;k<non_shifted_Wyckoff_positions[j].size();k++){
-        tmp_Wyckoff_equation << non_shifted_Wyckoff_positions[j][k];
-        tmp_Wyckoff_equation << "+" << get_centering(spaceg)[i][k];
-        vec_pos.push_back(tmp_Wyckoff_equation.str());
-        tmp_Wyckoff_equation.str(std::string());
-        tmp_Wyckoff_equation.clear();
-      }
-      all_Wyckoff_positions.push_back(vec_pos);
-    }
-  }
-
-  if(LDEBUG) {
-    vector<string> tmp;
-    for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
-    cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
-  }
-  return all_Wyckoff_positions;
-*/
 }
 
 // ******************************************************************************
@@ -3089,8 +3051,8 @@ namespace SYM {
         ss_eqn << running_double;
       }
       //DX20190419 - END
-      //string running_frac = aurostd::dbl2frac(running_double,false); //DX20190724 - now namespace aurostd
-      //ss_eqn << running_frac;
+      //DX20190419 [OBSOLETE] string running_frac = aurostd::dbl2frac(running_double,false); //DX20190724 - now namespace aurostd
+      //DX20190419 [OBSOLETE] ss_eqn << running_frac;
       vec_coord.push_back(ss_eqn.str());
       ss_eqn.str("");
     }
@@ -3404,7 +3366,7 @@ namespace SYM {
                   //cerr << endl;
                   first_wyckoff = false;
                   // ========== Store Wyckoff Position ========== //
-                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; //DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
                   tmp_Wyckoff_site.index = tmp_equivalent_atoms_shifted[ix].type; //DX20200427
                   tmp_Wyckoff_site.type = tmp_equivalent_atoms_shifted[ix].name;
                   //DX20191010 - update partial occupation value - START
