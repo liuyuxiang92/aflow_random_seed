@@ -1403,7 +1403,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // fix species (remove pseudopotentials, etc.) 
     string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX20200212 
-    vector<string> vspecies = pflow::stringElements2VectorElements(species_str); //DX20200212
+    vector<string> vspecies = aurostd::stringElements2VectorElements(species_str); //DX20200212
     xstr.species = aurostd::vector2deque(vspecies); //DX20200212 - needed to perform material comparisons with database entries
     xstr.SetSpecies(xstr.species);
 
@@ -1608,7 +1608,7 @@ namespace compare {
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::stringElements2VectorElements(compounds[i], vcomposition);
       if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
       vector<uint> tmp_stoich;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
@@ -1988,7 +1988,7 @@ namespace compare {
       // split by alloy species (no delimiter)
       else{
         //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(alloy_string, species);
-        species = pflow::stringElements2VectorElements(alloy_string); //DX20191106
+        species = aurostd::stringElements2VectorElements(alloy_string); //DX20191106
       }
     }
 
@@ -2259,7 +2259,7 @@ namespace compare {
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::stringElements2VectorElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
@@ -2361,7 +2361,7 @@ namespace compare {
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::stringElements2VectorElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
       for(uint j=0;j<vcomposition.size();j++){ //DX20191106

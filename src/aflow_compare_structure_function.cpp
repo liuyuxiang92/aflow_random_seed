@@ -620,7 +620,7 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
   structure_representative_name=b.structures_duplicate_names[index];
   // ntypes=b.structures_duplicate[index].num_each_type.size();
   structure_representative_compound=b.structures_duplicate_compounds[index]; //DX20190111 - added compound, e.g., Ag1Br2
-  elements = pflow::getElements(structure_representative_compound); //DX20191003 - add elements of this compound only!
+  elements = aurostd::getElements(structure_representative_compound); //DX20191003 - add elements of this compound only!
   structure_representative_generated=b.structures_duplicate_generated[index];
   structure_representative_source=b.structures_duplicate_source[index];
   structure_representative_relaxation_step=b.structures_duplicate_relaxation_step[index]; //DX20200429

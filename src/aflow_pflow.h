@@ -303,17 +303,6 @@ namespace pflow {
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false); //DX20200224
   ////////////////////////////////////////////////////////////////////////////////
-  vector<string> getElements(const string& _input); //CO20190712
-  void elementsFromCompositionString(const string& input);  //CO20190712
-  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition); //CO20190712
-  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO20190712
-  ////////////////////////////////////////////////////////////////////////////////
-  // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  //ME20190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  //ME20190628
-  ////////////////////////////////////////////////////////////////////////////////
   //[CO20190712 - OBSOLETE]// functions for making input alphabetic
   //[CO20190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters
   //[CO20190712 - OBSOLETE]string getAlphabeticString(const string& input, ostream& oss=cout);

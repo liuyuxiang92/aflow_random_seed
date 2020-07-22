@@ -108,6 +108,280 @@ namespace aurostd {
     }
   }
 
+  vector<string> getElements(const string& input){ //CO20190712 //borrowed from XATOM_SplitAlloySpecies() //slow since we create many strings, but definitely works
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::getElements():";
+    if(LDEBUG){cerr << soliloquy << " original input=\"" << input << "\"" << endl;}
+    string alloy=input;
+    //[CO20190712 - no need for multiple passes anymore]for(uint i=1;i<=2;i++){alloy=KBIN::VASP_PseudoPotential_CleanName(alloy);} //be certain you clean everything, especially _GW (worst offender)
+    aurostd::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
+    aurostd::RemoveNumbersInPlace(alloy);              // remove composition
+    if(LDEBUG){cerr << soliloquy << " cleaned input=\"" << alloy << "\"" << endl;}
+    vector<string> vspecies;
+    for(uint i=0;i<alloy.length();i++) {
+      if(alloy[i]>='A' && alloy[i]<='Z') vspecies.push_back("");
+      vspecies.back()+=alloy[i];
+    }
+    if(LDEBUG){cerr << soliloquy << " vspecies pre ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
+    for(uint i=0;i<vspecies.size();i++){aurostd::CleanStringASCII_InPlace(vspecies[i]);}
+    if(LDEBUG){cerr << soliloquy << " vspecies post ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
+    return vspecies;
+  }
+  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
+  //this assumes a very simple Mn2Pd5, non-stoich is ok (e.g., Mn2.5Pd5)
+  //no pseudo potential specification
+  //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
+  //this is FASTER than getElements(), but not as robust for general input (specialized)
+  void elementsFromCompositionString(const string& input,vector<string>& velements){vector<double> vcomposition;return elementsFromCompositionString(input,velements,vcomposition);}  //CO20190712
+  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition){ //CO20190712
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::getElementsFromCompositionString():";
+    velements.clear();
+    vcomposition.clear();  //ME20190628
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Checks for correct input by counting number of uppercase letters
+    //////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " original input=" << input << endl;}
+
+    //CO20180409 - running through input twice, no need, simply check at the end
+    //uint numberOfElements = 0;
+    //for (uint i = 0; i < input.size(); i++) {
+    //  if(isupper(input[i])) {
+    //    numberOfElements++;
+    //  }
+    //}
+    //if(numberOfElements == 0) {
+    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  return velements;
+    //}
+
+    //////////////////////////////////////////////////////////////////////////////
+    // END Checks for correct input by counting number of uppercase letters
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Parsing input
+    //////////////////////////////////////////////////////////////////////////////
+
+    //CO20180316 - fixed this function to be simpler, too complicated before
+    string auxstr;
+    for (uint i = 0; i < input.size(); i++) {
+      if(isupper(input[i])) {
+        auxstr.clear();
+        auxstr+=input[i++];
+        while (((i < input.size()) && (input[i]>='a' && input[i]<='z') )){auxstr+=input[i++];}
+        i--;  //very important since we increase at the top of the loop (equivalent to i+j-1)
+        //while (((i < input.size()) && isalpha(input[i]) && !isupper(input[i]))){auxstr+=input[i++];}
+        //while(!(clean && !isalpha(input[i]))) //(input[i]=='_' || input[i]==':' || input[i]=='.' || isdigit(input[i]))))
+        //isalpha() saves us from all issues with VASP_PseudoPotential_CleanName() except, e.g., potpaw_PBE/Na, we took care of that above
+        //if(clean)
+        //{ //CO20200106 - patching for auto-indenting
+        //  auxstr = KBIN::VASP_PseudoPotential_CleanName(auxstr);  //fix vasp pp
+        //  //CO20180409 - again, no need to run through essentially a third time, we already cut at these characters
+        //  //look for bad characters and cut the string
+        //  //for(uint j=1;j<auxstr.size();j++){
+        //  //  if(auxstr[j]=='_' || auxstr[j]==':' || isdigit(auxstr[j])){auxstr=auxstr.substr(0,j);break;}  //fix aflow stuff like ':'
+        //  //}
+        //}
+        if(LDEBUG) {cerr << soliloquy << " element found: " << auxstr << endl;}
+        velements.push_back(auxstr);
+        //ME20190628 - get composition, too
+      } else if ( (input[i]>='0' && input[i]<='9') || (input[i] == '.')) {  //CO20190712 - just in case we have H.25 (not good form but try to catch anyway, never produced by aflow automatically)
+        auxstr.clear();
+        auxstr += input[i++];
+        while ((i < input.size()) && ( (input[i]>='0' && input[i]<='9') || (input[i] == '.'))) {auxstr += input[i++];}
+        i--;
+        if (LDEBUG) {
+          std::cerr << soliloquy << " found element count: " << auxstr << " of element " << (velements.size() - 1) << ".";
+          if (vcomposition.size() != velements.size()) {
+            std::cerr << " Will add ones to elements " << vcomposition.size() << " to " << (velements.size() - 2) << ".";
+          }
+          std::cerr << std::endl;
+        }
+        // Add implicit ones
+        for (uint i = vcomposition.size(); i < velements.size() - 1; i++){vcomposition.push_back(1.0);}
+        vcomposition.push_back(aurostd::string2utype<double>(auxstr));
+      }
+    }
+    // Add implicit ones
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
+  }
+
+  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
+  //this assumes Mn_pvPt
+  //no composition information
+  //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
+  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp){ //CO20190712
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::getElementsFromPPString():";
+    velements=getElements(input);
+    if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+    if(keep_pp==false){return;}
+
+    //copy info into vspecies and clear velements
+    vector<string> vspecies;
+    for(uint i=0;i<velements.size();i++){vspecies.push_back(velements[i]);}
+    velements.clear();
+
+    //simply parse string around these elements
+    string::size_type loc1=0,loc2=string::npos;
+    vector<string> vCAPITAL_LETTERS_PP;
+    aurostd::string2tokens(CAPITAL_LETTERS_PP_LIST,vCAPITAL_LETTERS_PP,",");
+    bool found_CAPITAL_LETTERS_PP=false;
+    bool found_CAPITAL_LETTERS=false;
+    for(uint i=0;i<vspecies.size();i++){
+      if((i+1)>=vspecies.size()){loc2=string::npos;}
+      else{loc2=input.find(vspecies[i+1],loc1);}
+      while(loc2!=string::npos){
+        found_CAPITAL_LETTERS_PP=false;
+        for(uint j=0;j<vCAPITAL_LETTERS_PP.size()&&found_CAPITAL_LETTERS_PP==false;j++){
+          if((loc2-(vCAPITAL_LETTERS_PP[j].size()-1))<input.size()){continue;}
+          found_CAPITAL_LETTERS=true;
+          for(uint k=0;k<vCAPITAL_LETTERS_PP[j].size()&&found_CAPITAL_LETTERS==true;k++){
+            if(input[loc2-k]!=vCAPITAL_LETTERS_PP[j][vCAPITAL_LETTERS_PP[j].size()-k-1]){found_CAPITAL_LETTERS=false;}
+          }
+          if(found_CAPITAL_LETTERS){found_CAPITAL_LETTERS_PP=true;}
+        }
+        if(found_CAPITAL_LETTERS_PP==false){break;}
+        //[OBSOLETE] Do not pick W from _GW (tungsten)
+        //[OBSOLETE]if (!( (loc2-2)<input.size() && (input[loc2] == 'W') && (input[loc2-1] == 'G') && (input[loc2-2] == '_') )){break;} //(loc2-2)<input.size() because loc2 is utype, it's always >0, loc2-2 can wrap around to a big number though
+        loc2=input.find(vspecies[i],loc2+1);
+      }
+      if(LDEBUG){cerr << soliloquy << " loc1=" << loc1 << ", loc2=" << loc2 << endl;}
+      velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
+      loc1=loc2;
+    }
+
+    if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+
+  }
+
+  // ***************************************************************************
+  // pflow::stringElements2VectorElements(string input,ostream&
+  // oss,ofstream& FileMESSAGE)
+  // ***************************************************************************
+  // returns UNSORTED vector<string> from string
+  vector<string> stringElements2VectorElements(const string& input,bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
+    ofstream FileMESSAGE;
+    return stringElements2VectorElements(input, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
+  }
+
+  //ME20190628 - added variant that also determines the composition
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {
+    ofstream FileMESSAGE;
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
+  }
+
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
+    vector<double> vcomposition;
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
+  }
+
+  vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
+      ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) { // main function
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::stringElements2VectorElements():";
+    vector<string> velements;
+    vcomposition.clear();  //ME20190628
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Checks for correct input by counting number of uppercase letters
+    //////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " original input=" << _input << endl;}
+
+    if(_input.empty()) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Empty input", FileMESSAGE, oss, _LOGGER_ERROR_);
+      return velements;
+    }
+
+    string input=_input;
+
+    if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){aurostd::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
+
+    if(!isupper(input[0])) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
+      return velements;
+    }
+
+    //we have a LIB1 problem... grab first everything before :
+    //this is safe, as aflow generally introduces : in prototype, e.g., :LDAU2
+    //this is safe anyway because elements would be BEFORE :
+    if(clean){
+      //FAST
+      string::size_type loc;
+      //:
+      loc=input.find(':');input=input.substr(0,loc);
+      //_ICSD_
+      loc=input.find("_ICSD_");input=input.substr(0,loc);
+      //SLOW
+      //vector<string> tokens;
+      //aurostd::string2tokens(input,tokens,":");
+      //input=tokens[0];
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " checking input=" << input << endl;}
+
+    //CO20180409 - running through input twice, no need, simply check at the end
+    //uint numberOfElements = 0;
+    //for (uint i = 0; i < input.size(); i++) {
+    //  if(isupper(input[i])) {
+    //    numberOfElements++;
+    //  }
+    //}
+    //if(numberOfElements == 0) {
+    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  return velements;
+    //}
+
+    //////////////////////////////////////////////////////////////////////////////
+    // END Checks for correct input by counting number of uppercase letters
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Parsing input
+    //////////////////////////////////////////////////////////////////////////////
+
+    if(c_desig==composition_string){elementsFromCompositionString(input,velements,vcomposition);}
+    else if(c_desig==pp_string){elementsFromPPString(input,velements,keep_pp);}
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown compound designation",_INPUT_ILLEGAL_);
+    }
+
+    if(clean){
+      for(uint i=0;i<velements.size();i++){aurostd::CleanStringASCII_InPlace(velements[i]);}  //CO20190712 - extra cleaning from XATOM_SplitAlloySpecies
+    }
+
+    // Add implicit ones
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
+
+    //////////////////////////////////////////////////////////////////////////////
+    // END Parsing input
+    //////////////////////////////////////////////////////////////////////////////
+
+    if(velements.size()==0){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
+
+    if(sort_elements && velements.size()>1){
+      string etmp="";
+      double ctmp=0.0;
+      for(uint i=0;i<velements.size()-1;i++){
+        for(uint j=i+1;j<velements.size();j++){
+          if(velements[i]>velements[j]){
+            etmp=velements[j];  //fix old j
+            velements[j]=velements[i];  //swap
+            velements[i]=etmp;  //set i to old j
+            ctmp=vcomposition[j]; //fix old j
+            vcomposition[j]=vcomposition[i];  //swap
+            vcomposition[i]=ctmp; //set i to old j
+          }
+        }
+      }
+    }
+
+    return velements;
+  }
 } // namespace aurostd
 
 #endif // _AUROSTD_XPARSER_CPP_

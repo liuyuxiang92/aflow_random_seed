@@ -156,20 +156,20 @@ std::ostream& operator<< (std::ostream& buf,const std::deque<utype>& x) {
   return buf;
 }
 // ***************************************************************************
-ostream& operator<< (ostream& b,const vector<uint>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<uint>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const vector<char>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<char>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const vector<int>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<int>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const vector<long>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<long>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const vector<double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const vector<long double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<long double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const vector<string>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
-ostream& operator<< (ostream& b,const deque<string>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<uint>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<uint>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<char>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<char>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<int>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<int>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<long>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<long>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<long double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<long double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const vector<string>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+std::ostream& operator<< (std::ostream& b,const deque<string>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
 
 namespace aurostd {
   // ***************************************************************************

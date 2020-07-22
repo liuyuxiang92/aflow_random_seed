@@ -7335,7 +7335,7 @@ namespace pflow {
 
   string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO20190629
     vector<double> vcomposition;
-    vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
+    vector<string> vspecies =  aurostd::stringElements2VectorElements(compound, vcomposition);
     return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO20190629
   }
 
