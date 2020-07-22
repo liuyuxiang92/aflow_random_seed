@@ -640,8 +640,8 @@ namespace apl
     gprange[0] = 1.0-gp_distortion; gprange[1] = 1.0; gprange[2] = 1.0+gp_distortion;
     N_GPvolumes = 3;
     for (int j=0; j<N_GPvolumes; j++){
-      subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
-          "_PHONON_" + aurostd::utype2string<double>(gprange[j],precision_format));
+      subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + "_PHONON_"
+          + aurostd::utype2string(gprange[j],precision_format,false,FIXED_STREAM));
 
       coefGPVolumes.push_back(gprange[j]);
       GPvolumes.push_back(gprange[j]*Volume/NatomsOrigCell);
@@ -653,7 +653,7 @@ namespace apl
       eosrange[1] = 1.0 + eosrange[1]/100.0;
       eosrange[2] = eosrange[2]/100.0;
 
-      N_EOSvolumes = floor((eosrange[1]-eosrange[0])/eosrange[2])+1;
+      N_EOSvolumes = round((eosrange[1]-eosrange[0])/eosrange[2]+1);
       if (N_EOSvolumes < REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT){
         isEOS = false;
 
@@ -673,10 +673,10 @@ namespace apl
       string dirname = "";
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
         subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
-            "_PHONON_" + aurostd::utype2string(i, precision_format));
+            "_PHONON_" + aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
 
         arun_runnames_static.push_back("STATIC_" + 
-            aurostd::utype2string(i, precision_format));
+            aurostd::utype2string(i, precision_format, false, FIXED_STREAM));
         dirname = ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
           arun_runnames_static.back();
         subdirectories_static.push_back(dirname);
@@ -684,6 +684,7 @@ namespace apl
         coefEOSVolumes.push_back(i);
         EOSvolumes.push_back(i*Volume/NatomsOrigCell);
       }
+      N_EOSvolumes = EOSvolumes.size();
     }
 
     // determine the names for the directories used for the QHANP calculation
@@ -695,7 +696,7 @@ namespace apl
       for (int i=0; i<N_QHANPvolumes; i++){
         coef = 1.0 + (-TaylorExpansionOrder + i)*gp_distortion; //dV = 2*gp_distortion
         subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
-            "_PHONON_" + aurostd::utype2string(coef, precision_format));
+            "_PHONON_"+aurostd::utype2string(coef,precision_format,false,FIXED_STREAM));
 
         coefQHANPVolumes.push_back(coef);
         QHANPvolumes.push_back(coef*Volume/NatomsOrigCell);
@@ -917,10 +918,15 @@ namespace apl
       xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
       xinput.xvasp.AVASP_arun_runname = arun_runnames_static[i];
 
-      if (xinput.xvasp.AVASP_path_BANDS.empty()) xinput.xvasp.AVASP_path_BANDS = AFLOWRC_DEFAULT_BANDS_LATTICE;
+      AVASP_populateXVASP(aflags,kflags,xflags.vflags, xinput.xvasp);
+      if (xinput.xvasp.AVASP_path_BANDS.empty()){
+        if (xflags.vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string.empty())
+          xinput.xvasp.AVASP_path_BANDS = AFLOWRC_DEFAULT_BANDS_LATTICE;
+        else
+          xinput.xvasp.AVASP_path_BANDS = xflags.vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string;
+      }
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
-      AVASP_populateXVASP(aflags,kflags,xflags.vflags, xinput.xvasp);
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
     }
   }
