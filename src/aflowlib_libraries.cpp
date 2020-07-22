@@ -5201,14 +5201,13 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.pocc_agl.out",directory_RAW,"aflow.pocc_agl.out",vfile,MESSAGE);  // aflow.pocc_agl.out
     }
 
-    if(!data.vspecies.empty()){
-      string AflowIn_file="",AflowIn="";
-      KBIN::getAflowInFromDirectory(directory_LIB,AflowIn_file,AflowIn);
-      if(LDEBUG){cerr << soliloquy << " loaded aflow.in from dir=" << directory_LIB << endl;}
-      xstructure xstr_pocc=pocc::extractPARTCAR(AflowIn);
-      if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;cerr << xstr_pocc << endl;}
-      data.compound=getGenericTitleXStructure(xstr_pocc,false);
-    }
+    string AflowIn_file="",AflowIn="";
+    KBIN::getAflowInFromDirectory(directory_LIB,AflowIn_file,AflowIn);
+    if(LDEBUG){cerr << soliloquy << " loaded aflow.in from dir=" << directory_LIB << endl;}
+    xstructure xstr_pocc=pocc::extractPARTCAR(AflowIn);
+    if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;cerr << xstr_pocc << endl;}
+    data.compound=getGenericTitleXStructure(xstr_pocc,false);
+    
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - compound = " << data.compound << endl;
 
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - end " << directory_LIB << endl;
