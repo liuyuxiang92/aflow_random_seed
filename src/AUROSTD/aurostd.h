@@ -168,6 +168,7 @@ using std::vector;
 #include "aurostd_xrandom.h"
 #include "aurostd_xoption.h"
 #include "aurostd_argv.h"
+#include "aurostd_xparser.h" //CO20200624
 #include "aurostd_xcombos.h"
 #include "aurostd_xerror.h" //ME20180627
 
@@ -226,6 +227,28 @@ typedef unsigned uint;
 #define _AUROSTD_XLIBS_WARNING_  string("WARNING - AUROSTD_XLIBS++ [***]:")
 
 #define EMPTY_WORDING string("blablabla")
+
+//CO20200624 START - xparser stuff
+
+//compound specification is how a compound is specified
+//composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
+//for instance, H1.25 can be a pseudopotential and NOT a composition
+enum compound_designation {
+  composition_string,
+  pp_string,
+};
+
+//CO20190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
+const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+",_GW"    //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
+",_ZORA"  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
+",_LDApU" //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
+",_AE"    //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+",_NC2"   //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
+",_200eV"
+"";
+
+//CO20200624 END - xparser stuff
 
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;

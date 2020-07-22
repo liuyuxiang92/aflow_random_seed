@@ -9762,7 +9762,7 @@ namespace pflow {
       //compoundsBelong is only used for loadEntries() (as of 20190712)
       string input_new=input;
       //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO20190712
-      KBIN::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
+      aurostd::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
       input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, clean, sort_elements, composition_string, false, oss); //use composition_string (FASTER) //do not keep_pp
     }else{  //default
       input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, clean, sort_elements, c_desig, false, oss); //do not keep_pp
@@ -9987,7 +9987,7 @@ namespace pflow {
     if(LDEBUG){cerr << soliloquy << " original input=\"" << input << "\"" << endl;}
     string alloy=input;
     //[CO20190712 - no need for multiple passes anymore]for(uint i=1;i<=2;i++){alloy=KBIN::VASP_PseudoPotential_CleanName(alloy);} //be certain you clean everything, especially _GW (worst offender)
-    KBIN::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
+    aurostd::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
     aurostd::RemoveNumbersInPlace(alloy);              // remove composition
     if(LDEBUG){cerr << soliloquy << " cleaned input=\"" << alloy << "\"" << endl;}
     vector<string> vspecies;
@@ -10172,7 +10172,7 @@ namespace pflow {
 
     string input=_input;
 
-    if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){KBIN::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
+    if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){aurostd::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
 
     if(!isupper(input[0])) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);

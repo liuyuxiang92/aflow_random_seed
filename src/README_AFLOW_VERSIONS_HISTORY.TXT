@@ -18,6 +18,7 @@
         -- Updated README_PROTO.TXT with new nitrides and oxides (DX+RF)
         -- Bug fixes in XtalFinder: precondition structures with BringInCell() for local geometry comparisons (DX)
         -- Bug fixes in XtalFinder: use more robust matching protocol; accounts for undecorated prototypes (i.e., small volumes) (DX)
+        -- adding aurostd_xparser.cpp .h (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

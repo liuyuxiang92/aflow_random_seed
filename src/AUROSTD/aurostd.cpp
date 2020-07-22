@@ -17,6 +17,9 @@
 #ifndef _AUROSTD_ARGV_CPP_
 #include "aurostd_argv.cpp"
 #endif
+#ifndef _AUROSTD_XPARSER_CPP_  //CO20200624
+#include "aurostd_xparser.cpp" //CO20200624
+#endif                         //CO20200624
 #ifndef _AUROSTD_XOPTION_CPP_
 #include "aurostd_xoption.cpp"
 #endif
