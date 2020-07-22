@@ -473,7 +473,6 @@ namespace makefile {
             if(file.find("aflow_xpseudopotentials_data.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
             //[CO20200521 - OBSOLETE]if(file.find("aflow_aflowrc.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
             if(file.find("aflow_xproto_library_default.cpp")!=string::npos){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}
-            if(COMPILE_ANRL_SUBDIRECTORY&&file.find("aflow_anrl_list.cpp")!=string::npos&&!(file.find("ANRL/")!=string::npos)){if(LDEBUG){cerr << soliloquy << " SKIPPING " << file << endl;}skip_file=true;}//DX20200623 
             if(skip_file){
               vdep_aflow.push_back(file);  //add to aflow dependencies
               continue;

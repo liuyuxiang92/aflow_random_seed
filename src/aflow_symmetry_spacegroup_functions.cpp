@@ -225,12 +225,10 @@ namespace SYM {
 namespace SYM {
   string spacegroup2latticeAndCentering(uint sg_number){
 
-    string lattice_and_centering = "";
-
     // ---------------------------------------------------------------------------
     // triclinic
     if(sg_number >= 1 && sg_number <= 2){
-      lattice_and_centering = "aP";
+      return "aP";
     }
 
     // ---------------------------------------------------------------------------
@@ -239,11 +237,11 @@ namespace SYM {
       // simple monoclinic
       if(sg_number == 3 || sg_number == 4 || sg_number == 6 || sg_number == 7 ||
          sg_number == 10 || sg_number == 11 || sg_number == 13 || sg_number == 14){
-        lattice_and_centering = "mP";
+        return "mP";
       }
       // base-centered monoclinic
       else if(sg_number == 5 || sg_number == 8 || sg_number == 9 || sg_number == 12 || sg_number == 15){
-        lattice_and_centering = "mC";
+        return "mC";
       }
     }
 
@@ -252,19 +250,19 @@ namespace SYM {
     if(sg_number >= 16 && sg_number <= 74){
       // simple orthorhombic
       if ((sg_number >= 16 && sg_number <= 19) || (sg_number >= 25 && sg_number <= 34) || (sg_number >= 47 && sg_number <= 62)){
-        lattice_and_centering = "oP";
+        return "oP";
       }
       // base-centered orthorhombic
       else if((sg_number >= 20 && sg_number <= 21) || (sg_number >= 35 && sg_number <= 41) || (sg_number >= 63 && sg_number <= 68)){
-        lattice_and_centering = "oC";
+        return "oC";
       }
       // face-centered orthorhombic
       else if((sg_number == 22) || (sg_number >= 42 && sg_number <= 43) || (sg_number >= 69 && sg_number <= 70)){
-        lattice_and_centering = "oF";
+        return "oF";
       }
       // body-centered orthorhombic
       else if((sg_number >= 23 && sg_number <= 24) || (sg_number >= 44 && sg_number <= 46) || (sg_number >= 71 && sg_number <= 74)){
-        lattice_and_centering = "oI";
+        return "oI";
       }
     }
 
@@ -275,13 +273,13 @@ namespace SYM {
       if((sg_number >= 75 && sg_number <= 78) || (sg_number == 81) || (sg_number >= 83 && sg_number <= 86) ||
          (sg_number >= 89 && sg_number <= 96) || (sg_number >= 99 && sg_number <= 106) || (sg_number >= 111 && sg_number <= 118) ||
          (sg_number >= 123 && sg_number <= 138)){
-        lattice_and_centering = "tP";
+        return "tP";
       }
       // body-centered tetragonal
       else if((sg_number >= 79 && sg_number <= 80) || (sg_number == 82) || (sg_number >= 87 && sg_number <= 88) ||
               (sg_number >= 97 && sg_number <= 98) || (sg_number >= 107 && sg_number <= 110) || (sg_number >= 119 && sg_number <= 122) ||
               (sg_number >= 139 && sg_number <= 142)){
-        lattice_and_centering = "tI";
+        return "tI";
       }
     }
 
@@ -291,19 +289,19 @@ namespace SYM {
       // trigonal
       if((sg_number >= 143 && sg_number <= 145) || (sg_number == 147) || (sg_number >= 149 && sg_number <= 154) ||
          (sg_number >= 156 && sg_number <= 159) || (sg_number >= 162 && sg_number <= 165)){
-        lattice_and_centering = "hP";
+        return "hP";
       }
       // rhombohedral
       else if((sg_number == 146) || (sg_number == 148) || (sg_number == 155) ||
               (sg_number >= 160 && sg_number <= 161) || (sg_number >= 166 && sg_number <= 167)){
-        lattice_and_centering = "hR";
+        return "hR";
       }
     }
 
     // ---------------------------------------------------------------------------
     // hexagonal
     if(sg_number >= 168 && sg_number <= 194){
-      lattice_and_centering = "hP";
+      return "hP";
     }
 
     // ---------------------------------------------------------------------------
@@ -313,30 +311,26 @@ namespace SYM {
       if(sg_number == 195 || sg_number == 198 || sg_number == 200 || sg_number == 201 || sg_number == 205 || sg_number == 207 ||
          sg_number == 208 || sg_number == 212 || sg_number == 213 || sg_number == 215 || sg_number == 218 || sg_number == 221 ||
          sg_number == 222 || sg_number == 223 || sg_number == 224){
-        lattice_and_centering = "cP";
+        return "cP";
       }
       // face-centered cubic
       else if(sg_number == 196 || sg_number == 202 || sg_number == 203 || sg_number == 209 || sg_number == 210 || sg_number == 216 ||
               sg_number == 219 || sg_number == 225 || sg_number == 226 || sg_number == 227 || sg_number == 228){
-        lattice_and_centering = "cF";
+        return "cF";
       }
       // body-centered cubic
       else if(sg_number == 197 || sg_number == 199 || sg_number == 204 || sg_number == 206 || sg_number == 211 || sg_number == 214 ||
               sg_number == 217 || sg_number == 220 || sg_number == 229 || sg_number == 230){
-        lattice_and_centering = "cI";
+        return "cI";
       }
     }
 
     // ---------------------------------------------------------------------------
     // error
-    if(lattice_and_centering.size() == 0){
-      string function_name = XPID + "SYM::spacegroup2latticeAndCentering():";
-      stringstream message;
-      message << "Could not classify space group into a Bravais lattice (most likely ranges are incorrect).";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
-    }
-
-    return lattice_and_centering;
+    string function_name = XPID + "SYM::spacegroup2latticeAndCentering():";
+    stringstream message;
+    message << "Could not classify space group into a Bravais lattice (most likely ranges are incorrect).";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
 
   }
 }

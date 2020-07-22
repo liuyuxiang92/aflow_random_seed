@@ -45,7 +45,7 @@ namespace anrl{
   xmatrix<double> getTetragonalLattice(const string& lattice_and_centering, const vector<double>& lattice_parameter_values, uint mode=0);
   xmatrix<double> getHexagonalLattice(const string& lattice_and_centering, const vector<double>& lattice_parameter_values, uint mode=0);
   xmatrix<double> getCubicLattice(const string& lattice_and_centering, const vector<double>& lattice_parameter_values, uint mode=0);
-  xstructure rhl2hex(xstructure& str, double& a, double& c); 
+  xstructure rhl2hex(const xstructure& str, double& a, double& c); 
   
   // ---------------------------------------------------------------------------
   // functions to determine atomic positions from Wyckoff and parameters

@@ -23,7 +23,7 @@
 // 2) compile
 // 3) run aflow --makefile
 // 4) then uncomment the line below
-// #define USE_HARDCODED_PROTOTYPES
+//#define USE_HARDCODED_PROTOTYPES
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX
