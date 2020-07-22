@@ -32,15 +32,15 @@ namespace aurostd {
   void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO20190712
   ////////////////////////////////////////////////////////////////////////////////
   void elementsFromCompositionString(const string& input);  //CO20190712
-  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition); //CO20190712
+  template<class utype> void elementsFromCompositionString(const string& input,vector<string>& velements,vector<utype>& vcomposition); //CO20190712
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO20190712
   ////////////////////////////////////////////////////////////////////////////////
   // returns UNSORTED vector<string> from string
   vector<string> getElements(const string& input); //CO20190712
   vector<string> getElements(const string& input,elements_string_type e_str_type,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
-  vector<string> getElements(const string& input,vector<double>& vcomposition,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
+  template<class utype> vector<string> getElements(const string& input,vector<utype>& vcomposition,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
   vector<string> getElements(const string& input,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
-  vector<string> getElements(const string& _input,vector<double>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
+  template<class utype> vector<string> getElements(const string& _input,vector<utype>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
 } // namespace aurostd
 
 #endif // _AUROSTD_XPARSER_H_

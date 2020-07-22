@@ -114,7 +114,7 @@ namespace aurostd {
   //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
   //this is FASTER than getElements(), but not as robust for general input (specialized)
   void elementsFromCompositionString(const string& input,vector<string>& velements){vector<double> vcomposition;return elementsFromCompositionString(input,velements,vcomposition);}  //CO20190712
-  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition){ //CO20190712
+  template<class utype> void elementsFromCompositionString(const string& input,vector<string>& velements,vector<utype>& vcomposition){ //CO20190712
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::getElementsFromCompositionString():";
     velements.clear();
@@ -182,12 +182,12 @@ namespace aurostd {
           std::cerr << std::endl;
         }
         // Add implicit ones
-        for (uint i = vcomposition.size(); i < velements.size() - 1; i++){vcomposition.push_back(1.0);}
-        vcomposition.push_back(aurostd::string2utype<double>(auxstr));
+        for (uint i = vcomposition.size(); i < velements.size() - 1; i++){vcomposition.push_back((utype)1.0);}
+        vcomposition.push_back(aurostd::string2utype<utype>(auxstr));
       }
     }
     // Add implicit ones
-    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back((utype)1.0);
   }
 
   //use only as a supplement for getElements(), do NOT use outside
@@ -268,15 +268,16 @@ namespace aurostd {
     return getElements(input,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);
   }
   //ME20190628 - added variant that also determines the composition
-  vector<string> getElements(const string& input,vector<double>& vcomposition,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {
+  template<class utype> vector<string> getElements(const string& input,vector<utype>& vcomposition,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {
     ofstream FileMESSAGE;
     return getElements(input,vcomposition,composition_string,FileMESSAGE,clean,sort_elements,keep_pp,oss);  //this gets composition_string by default, pp_string has no composition
   }
+  //cannot deduce utype from this construction
   vector<string> getElements(const string& input,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {  // overload
     vector<double> vcomposition;
     return getElements(input,vcomposition,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);
   }
-  vector<string> getElements(const string& _input,vector<double>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) { // main function
+  template<class utype> vector<string> getElements(const string& _input,vector<utype>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) { // main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::getElements():";
     vector<string> velements;
@@ -351,7 +352,7 @@ namespace aurostd {
     }
 
     // Add implicit ones
-    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back((utype)1.0);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Parsing input
@@ -361,7 +362,7 @@ namespace aurostd {
 
     if(sort_elements && velements.size()>1){
       string etmp="";
-      double ctmp=0.0;
+      utype ctmp=(utype)0.0;
       for(uint i=0;i<velements.size()-1;i++){
         for(uint j=i+1;j<velements.size();j++){
           if(velements[i]>velements[j]){
