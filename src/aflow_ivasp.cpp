@@ -216,13 +216,13 @@ namespace KBIN {
       aurostd::RemoveSubStringInPlace(species,"1.66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
       aurostd::RemoveSubStringInPlace(species,"1.33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
       aurostd::RemoveSubStringInPlace(species,"1.25"); //CO20190712 - before all other decimal numbers
-      aurostd::RemoveSubStringInPlace(species,"1.5"); //CO20190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
+      aurostd::RemoveSubStringInPlace(species,"1.5");  //CO20190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
       aurostd::RemoveSubStringInPlace(species,".75");  //CO20190712 - before 0.5
       aurostd::RemoveSubStringInPlace(species,".25");  //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
-      aurostd::RemoveSubStringInPlace(species,".66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
-      aurostd::RemoveSubStringInPlace(species,".33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
-      aurostd::RemoveSubStringInPlace(species,".42"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
-      aurostd::RemoveSubStringInPlace(species,".58"); //CO20190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
+      aurostd::RemoveSubStringInPlace(species,".66");  //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
+      aurostd::RemoveSubStringInPlace(species,".33");  //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
+      aurostd::RemoveSubStringInPlace(species,".42");  //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
+      aurostd::RemoveSubStringInPlace(species,".58");  //CO20190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
       aurostd::RemoveSubStringInPlace(species,".5");
 
       aurostd::RemoveSubStringInPlace(species,"+1");

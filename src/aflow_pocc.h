@@ -605,12 +605,13 @@ namespace pocc {
       bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
 
       //external methods
-      void setPOccFlags(const aurostd::xoption& pocc_flags);      //input flags, e.g., vpflow
-      void loadFromAFlags();                                      //grabs from m_aflags
+      void setPOccFlags(const aurostd::xoption& pocc_flags);                    //input flags, e.g., vpflow
+      void loadFromAFlags();                                                    //grabs from m_aflags
+      void loadFromAFlags(const aurostd::xoption& loader);                      //grabs from m_aflags
       void setPOccStructure(const xstructure& xstr_pocc);
-      void setAFlags(const _aflags& Aflags);                      //standard _aflags
-      void setKFlags(const _kflags& Kflags);                      //standard _kflags
-      void setVFlags(const _vflags& Vflags);                      //standard _vflags
+      void setAFlags(const _aflags& Aflags);                                    //standard _aflags
+      void setKFlags(const _kflags& Kflags);                                    //standard _kflags
+      void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
       void writePARTCAR() const;
       void generateStructures(const _xvasp& xvasp);

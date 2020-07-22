@@ -2020,7 +2020,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2030,8 +2032,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setKFlags(kflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2041,8 +2045,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setVFlags(vflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2052,9 +2058,11 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setKFlags(kflags);
       setVFlags(vflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2074,8 +2082,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2087,6 +2097,8 @@ namespace pocc {
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setKFlags(kflags);
       setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2098,6 +2110,8 @@ namespace pocc {
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
       setVFlags(vflags);
       setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2122,6 +2136,8 @@ namespace pocc {
       setAFlags(aflags);
       setKFlags(kflags);
       setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2134,6 +2150,8 @@ namespace pocc {
       setAFlags(aflags);
       setVFlags(vflags);
       setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2147,6 +2165,8 @@ namespace pocc {
       setKFlags(kflags);
       setVFlags(vflags);
       setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2271,7 +2291,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       setPOccFlags(pocc_flags);
       m_initialized=true;
     }
@@ -2282,8 +2304,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setKFlags(kflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       setPOccFlags(pocc_flags);
       m_initialized=true;
     }
@@ -2294,8 +2318,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setVFlags(vflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       setPOccFlags(pocc_flags);
       m_initialized=true;
     }
@@ -2306,9 +2332,11 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setAFlags(aflags);  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
+      setAFlags(aflags);
       setKFlags(kflags);
       setVFlags(vflags);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",true);
+      loadFromAFlags(loader);
       setPOccFlags(pocc_flags);
       m_initialized=true;
     }
@@ -2330,9 +2358,11 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setPOccFlags(pocc_flags);
-      setPOccStructure(xstr_pocc);
       setAFlags(aflags);
+      setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
+      setPOccFlags(pocc_flags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2342,9 +2372,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
+      setKFlags(kflags);
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
-      setKFlags(kflags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2354,9 +2384,9 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
+      setVFlags(vflags);
       setPOccStructure(xstr_pocc);
       setPOccFlags(pocc_flags);
-      setVFlags(vflags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2366,10 +2396,10 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setPOccStructure(xstr_pocc);
-      setPOccFlags(pocc_flags);
       setKFlags(kflags);
       setVFlags(vflags);
+      setPOccStructure(xstr_pocc);
+      setPOccFlags(pocc_flags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2379,10 +2409,12 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setPOccStructure(xstr_pocc);
-      setPOccFlags(pocc_flags);
       setAFlags(aflags);
       setKFlags(kflags);
+      setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",true);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
+      setPOccFlags(pocc_flags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2392,10 +2424,12 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setPOccStructure(xstr_pocc);
-      setPOccFlags(pocc_flags);
       setAFlags(aflags);
       setVFlags(vflags);
+      setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",true);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
+      setPOccFlags(pocc_flags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2405,11 +2439,13 @@ namespace pocc {
     free();
     try{
       m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
-      setPOccStructure(xstr_pocc);
-      setPOccFlags(pocc_flags);
       setAFlags(aflags);
       setKFlags(kflags);
       setVFlags(vflags);
+      setPOccStructure(xstr_pocc);
+      aurostd::xoption loader;loader.flag("LOAD::KFLAGS",false);loader.flag("LOAD::VFLAGS",false);loader.flag("LOAD::PARTCAR",false);
+      loadFromAFlags(loader);
+      setPOccFlags(pocc_flags);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -2419,17 +2455,30 @@ namespace pocc {
   void POccCalculator::setPOccFlags(const aurostd::xoption& pocc_flags) {m_p_flags=pocc_flags;}
 
   void POccCalculator::loadFromAFlags() { //grabs from m_aflags
+    aurostd::xoption loader;
+    loader.flag("LOAD::KFLAGS",true);
+    loader.flag("LOAD::VFLAGS",true);
+    loader.flag("LOAD::PARTCAR",true);
+    return loadFromAFlags(loader);
+  }
+  void POccCalculator::loadFromAFlags(const aurostd::xoption& loader) { //grabs from m_aflags
     bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
     string soliloquy = XPID + "POccCalculator::loadFromAFlags():";
     string AflowIn_file="",AflowIn="";
     KBIN::getAflowInFromAFlags(m_aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
     if(LDEBUG){cerr << soliloquy << " loaded aflow.in" << endl;}
-    m_kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,*p_oss);  //set them here if we can, they will get overwritten with input kflags
-    if(LDEBUG){cerr << soliloquy << " loaded kflags" << endl;}
-    m_vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,m_kflags,*p_oss); //set them here if we can, they will get overwritten with input vflags
-    if(LDEBUG){cerr << soliloquy << " loaded vflags" << endl;}
-    setPOccStructure(pocc::extractPARTCAR(AflowIn));
-    if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;}
+    if(loader.flag("LOAD::KFLAGS")){
+      m_kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,*p_oss);  //set them here if we can, they will get overwritten with input kflags
+      if(LDEBUG){cerr << soliloquy << " loaded kflags" << endl;}
+    }
+    if(loader.flag("LOAD::VFLAGS")){
+      m_vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,m_kflags,*p_oss); //set them here if we can, they will get overwritten with input vflags
+      if(LDEBUG){cerr << soliloquy << " loaded vflags" << endl;}
+    }
+    if(loader.flag("LOAD::PARTCAR")){
+      setPOccStructure(pocc::extractPARTCAR(AflowIn));
+      if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;}
+    }
   }
 
   void POccCalculator::setPOccStructure(const xstructure& xstr_pocc) {
@@ -2453,7 +2502,6 @@ namespace pocc {
 
   void POccCalculator::setAFlags(const _aflags& aflags) {
     POccCalculatorTemplate::setAFlags(aflags);
-    loadFromAFlags();  //comes before setVflags(), setKflags(), setPOccStructure() so they can be reset
   }
   void POccCalculator::setKFlags(const _kflags& kflags) {m_kflags.clear();m_kflags=kflags;}
   void POccCalculator::setVFlags(const _vflags& vflags) {m_vflags.clear();m_vflags=vflags;}

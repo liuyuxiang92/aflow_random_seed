@@ -5167,7 +5167,7 @@ namespace aflowlib {
 // ***************************************************************************
 namespace aflowlib {
   bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy=XPID+"aflowlib::LIB2RAW_Loop_POCC():";
     if(LDEBUG) cerr << soliloquy << " [1]" << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - begin " << directory_LIB << endl;
@@ -5183,7 +5183,8 @@ namespace aflowlib {
       aurostd::DirectoryLS(directory_LIB,vfiles);
       for(uint i=0;i<vfiles.size();i++){
         if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
-          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // DOSCAR.pocc_
+          aurostd::LinkFile(directory_LIB+"/"+vfiles[i],directory_RAW);  //link the file, no need to de-compress
+          //aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // DOSCAR.pocc_
         }
         if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){
           aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_orbitals_
@@ -5200,9 +5201,15 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.pocc_agl.out",directory_RAW,"aflow.pocc_agl.out",vfile,MESSAGE);  // aflow.pocc_agl.out
     }
 
-    if(data.vspecies.size()==0){
-    int comp_prec=(int)ceil(log10(1.0/DEFAULT_POCC_STOICH_TOL));  //ceil ensures we round up above 1 //CO20181226
+    if(!data.vspecies.empty()){
+      string AflowIn_file="",AflowIn="";
+      KBIN::getAflowInFromDirectory(directory_LIB,AflowIn_file,AflowIn);
+      if(LDEBUG){cerr << soliloquy << " loaded aflow.in from dir=" << directory_LIB << endl;}
+      xstructure xstr_pocc=pocc::extractPARTCAR(AflowIn);
+      if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;cerr << xstr_pocc << endl;}
+      data.compound=getGenericTitleXStructure(xstr_pocc,false);
     }
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - compound = " << data.compound << endl;
 
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - end " << directory_LIB << endl;
     return true;

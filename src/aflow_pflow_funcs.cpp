@@ -39,18 +39,21 @@ double DebyeWallerFactor(double theta,
 // getGenericTitleXStructure()
 // ***************************************************************************
 string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO20190520
-  string title;
+  //CO20200624 - used to be num_each_type, now it's comp_each_type (works for both pocc and non-pocc)
+  //use pocc default for precision
+  string title="";
   uint iat=0;
-  //if any names missing from atoms, lets use generic names
+  int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
   bool atom_names=true;
-  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} //CO20180316 - use pp names
+  
+  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].cleanname.empty()){atom_names=false;}}
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
-    for(uint j=0;j<(uint)xstr.num_each_type.at(itype);j++) {
+    for(uint j=0;j<(uint)xstr.num_each_type[itype];j++) {
       if(j==0){
-        if(atom_names){title+=xstr.atoms.at(iat).name;} //CO20180316 - use pp names
+        if(atom_names){title+=xstr.atoms[iat].cleanname;} //CO20200624 - never use pp names, never mix pp with composition
         else {title+=char('A'+itype);}
-        if(latex){title+="$_{"+aurostd::utype2string(xstr.num_each_type.at(itype))+"}$";}
-        else {title+=aurostd::utype2string(xstr.num_each_type.at(itype));}
+        if(latex){title+="$_{"+aurostd::utype2string(xstr.comp_each_type[itype],comp_prec)+"}$";}
+        else {title+=aurostd::utype2string(xstr.comp_each_type[itype],comp_prec);}
       }
       iat++;
     }

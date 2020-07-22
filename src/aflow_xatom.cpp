@@ -223,18 +223,39 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
 
 
 void _atom::CleanName(void) {
-  // This function cleanup the name from VASP stuff
-  string name1,name2;
-  name1=name+" ";
-  name2=name+" ";
-  name1=name1.substr(0,1);
-  if(!((name1[0]>=65 && name1[0]<=90)||(name1[0]>=97 && name1[0]<=122))) name1="";
-  if((name1[0]>=97 && name1[0]<=122)) name1[0]-=-97+65;
-  name2=name2.substr(1,1);
-  if(!((name2[0]>=65 && name2[0]<=90)||(name2[0]>=97 && name2[0]<=122))) name2="";
-  if((name2[0]>=65 && name2[0]<=90)) name2[0]+=-97+65;
-  cleanname=name1+name2;
-  atomic_number=0;
+  //CO20200624 - cleaning up function
+  //the old function had a sign problem and was inefficient
+  cleanname=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(name);
+  KBIN::VASP_PseudoPotential_CleanName_InPlace(cleanname);
+  if(cleanname.size()>3){cleanname=cleanname.substr(0,3);}  //cannot be longer than 3 characters
+  for(uint i=cleanname.size()-1;i<cleanname.size();i--){  //go backwards and clean anything that isn't between A-Z and a-z 
+    //65-90 is A-Z
+    //97-122 is a-z
+    if(!((cleanname[i]>=65 && cleanname[i]<=90)||(cleanname[i]>=97 && cleanname[i]<=122))){
+      cleanname.erase(cleanname.begin()+i);
+    }
+  }
+  //the old function insists on correcting if we have aL instead of Al...
+  if(cleanname.size()>0 && cleanname[0]>=97 && cleanname[0]<=122){cleanname[0]-=('a'-'A');}
+  for(uint i=1;i<cleanname.size();i++){
+    if(cleanname[i]>=65 && cleanname[i]<=90){cleanname[i]+=('a'-'A');}
+  }
+
+  //[CO20200624 - OBSOLETE]// This function cleanup the name from VASP stuff
+  //[CO20200624 - OBSOLETE]string name1,name2;
+  //[CO20200624 - OBSOLETE]name1=name+" ";
+  //[CO20200624 - OBSOLETE]name2=name+" ";
+  //[CO20200624 - OBSOLETE]name1=name1.substr(0,1);  //grab first 2 characters
+  //[CO20200624 - OBSOLETE]//65-90 is A-Z
+  //[CO20200624 - OBSOLETE]//97-122 is a-z
+  //[CO20200624 - OBSOLETE]if(!((name1[0]>=65 && name1[0]<=90)||(name1[0]>=97 && name1[0]<=122))) name1="";
+  //[CO20200624 - OBSOLETE]if((name1[0]>=97 && name1[0]<=122)) name1[0]-=-97+65; //THE SIGN LOOKS WRONG!!! - if we have 97, then it would subtract -32: giving us 129
+  //[CO20200624 - OBSOLETE]name2=name2.substr(1,1);  //grab second and third character
+  //[CO20200624 - OBSOLETE]if(!((name2[0]>=65 && name2[0]<=90)||(name2[0]>=97 && name2[0]<=122))) name2="";
+  //[CO20200624 - OBSOLETE]if((name2[0]>=65 && name2[0]<=90)) name2[0]+=-97+65;  //THE SIGN LOOKS WRONG!!! - if we have 65, then it would add -32: giving us 33 
+  //[CO20200624 - OBSOLETE]cleanname=name1+name2;
+  //[CO20200624 - OBSOLETE]atomic_number=0;
+
   for(uint j=0;j< vatom_symbol.size();j++) if(cleanname==vatom_symbol.at(j)) atomic_number=j;
 }
 
@@ -6128,8 +6149,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.write_DEBUG_flag=TRUE;
 #endif
   //RF20200310 BEGIN
-  for(int i=0;i<(int)a.atoms.size();i++) {
-    if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).cleanname=(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name));
+  for(uint i=0;i<a.atoms.size();i++) {  //CO20200624
+    if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).CleanName(); //(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name)); //CO20200624 - fixed CleanName()
   }
   //RF20200310 END
   // CHECKS

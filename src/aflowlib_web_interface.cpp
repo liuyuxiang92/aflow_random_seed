@@ -1327,15 +1327,15 @@ namespace aflowlib {
       if(ael_applied_pressure!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_applied_pressure=" << ael_applied_pressure << eendl; //CT20181212
       if(ael_average_external_pressure!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_average_external_pressure=" << ael_average_external_pressure << eendl; //CT20181212
       //ME20191105 BEGIN
-      sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_stiffness_tensor=";
       if ((ael_stiffness_tensor.rows == 6) && (ael_stiffness_tensor.cols == 6)) {
+        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_stiffness_tensor="; //CO20200624 - a lot of empty ael_*_tensor appearing in aflowlib.out
         for (int i = 1; i <= 6; i++) {
           for (int j = 1; j <= 6; j++) sss << ael_stiffness_tensor[i][j] << ((j < 6)?",":"");
           sss << ((i < 6)?";":"") << eendl;
         }
       }
-      sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_compliance_tensor=";
       if ((ael_compliance_tensor.rows == 6) && (ael_compliance_tensor.cols == 6)) {
+        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_compliance_tensor=";  //CO20200624 - a lot of empty ael_*_tensor appearing in aflowlib.out
         for (int i = 1; i <= 6; i++) {
           for (int j = 1; j <= 6; j++) {
             sss << ael_compliance_tensor[i][j] << ((j < 6)?",":"");
