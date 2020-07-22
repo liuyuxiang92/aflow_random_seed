@@ -261,7 +261,7 @@ namespace chull {
       aurostd::xcombos xc(vsizes,'E');
       while(xc.increment()){
         velements=xc.applyCombo(vcomponents);
-        if(verbose_elimination){velements=aurostd::stringElements2VectorElements(aurostd::joinWDelimiter(velements,""),FileMESSAGE,true,true,pp_string,false,oss);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO20190712
+        if(verbose_elimination){velements=aurostd::getElements(aurostd::joinWDelimiter(velements,""),pp_string,FileMESSAGE,true,true,false,oss);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO20190712
         //[CO20190712 - OBSOLETE]if(verbose_elimination){velements=pflow::getAlphabeticVectorString(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
         std::sort(velements.begin(),velements.end());
         original_input=aurostd::joinWDelimiter(velements,"");
@@ -277,7 +277,7 @@ namespace chull {
     } else {  //simple list mode
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
-        velements=aurostd::stringElements2VectorElements(tokens_comma[i],FileMESSAGE,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp  //CO20190712
+        velements=aurostd::getElements(tokens_comma[i],pp_string,FileMESSAGE,true,true,false,oss);  //clean and sort, do not keep_pp  //CO20190712
         //[CO20190712 - OBSOLETE]velements=pflow::getAlphabeticVectorString(tokens_comma[i], FileMESSAGE,oss);
         nary=velements.size();
         original_input=aurostd::joinWDelimiter(velements,"");
@@ -322,7 +322,7 @@ namespace chull {
     for(uint i=0,fl_size_i=vinputs.size();i<fl_size_i;i++) {
       // go through each request
       // create log specific to that request
-      velements = aurostd::stringElements2VectorElements(vinputs[i],FileMESSAGE,true,true,pp_string,false,oss); //clean and sort, do not keep_pp  //CO20190712
+      velements = aurostd::getElements(vinputs[i],pp_string,FileMESSAGE,true,true,false,oss); //clean and sort, do not keep_pp  //CO20190712
       //[CO20190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
       if(!velements.size()){
         message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
@@ -3430,7 +3430,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy = XPID + "ConvexHull::loadPoints():";
     if(LDEBUG) {cerr << soliloquy << " initializing alloy, compound=" << alloy << endl;}
-    vector<string> velements = aurostd::stringElements2VectorElements(alloy, *p_FileMESSAGE, true, true, pp_string, false, *p_oss); //clean and sort, do not keep_pp  //CO20190712
+    vector<string> velements = aurostd::getElements(alloy, pp_string, *p_FileMESSAGE, true, true, false, *p_oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]vector<string> velements = pflow::getAlphabeticVectorString(alloy, *p_FileMESSAGE, *p_oss);
     return loadPoints(velements);
   }

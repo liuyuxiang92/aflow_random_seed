@@ -291,10 +291,10 @@ namespace pflow {
   vector<vector<string> > elementalCombinations(const vector<string>& velements, uint nary);
   ////////////////////////////////////////////////////////////////////////////////
   //easy way to think about it:  do compounds belong to the hull?
-  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
-  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
-  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
-  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string,bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string,bool shortcut_pp_string_AFLOW_database=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ostream& oss=cout, bool sort_elements=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ofstream& FileMESSAGE, ostream& oss=cout, bool sort_elements=false);
   ////////////////////////////////////////////////////////////////////////////////

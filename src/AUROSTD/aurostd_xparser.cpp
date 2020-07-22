@@ -108,26 +108,7 @@ namespace aurostd {
     }
   }
 
-  vector<string> getElements(const string& input){ //CO20190712 //borrowed from XATOM_SplitAlloySpecies() //slow since we create many strings, but definitely works
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::getElements():";
-    if(LDEBUG){cerr << soliloquy << " original input=\"" << input << "\"" << endl;}
-    string alloy=input;
-    //[CO20190712 - no need for multiple passes anymore]for(uint i=1;i<=2;i++){alloy=KBIN::VASP_PseudoPotential_CleanName(alloy);} //be certain you clean everything, especially _GW (worst offender)
-    aurostd::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
-    aurostd::RemoveNumbersInPlace(alloy);              // remove composition
-    if(LDEBUG){cerr << soliloquy << " cleaned input=\"" << alloy << "\"" << endl;}
-    vector<string> vspecies;
-    for(uint i=0;i<alloy.length();i++) {
-      if(alloy[i]>='A' && alloy[i]<='Z') vspecies.push_back("");
-      vspecies.back()+=alloy[i];
-    }
-    if(LDEBUG){cerr << soliloquy << " vspecies pre ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
-    for(uint i=0;i<vspecies.size();i++){aurostd::CleanStringASCII_InPlace(vspecies[i]);}
-    if(LDEBUG){cerr << soliloquy << " vspecies post ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
-    return vspecies;
-  }
-  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
+  //use only as a supplement for getElements(), do NOT use outside
   //this assumes a very simple Mn2Pd5, non-stoich is ok (e.g., Mn2.5Pd5)
   //no pseudo potential specification
   //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
@@ -135,7 +116,7 @@ namespace aurostd {
   void elementsFromCompositionString(const string& input,vector<string>& velements){vector<double> vcomposition;return elementsFromCompositionString(input,velements,vcomposition);}  //CO20190712
   void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition){ //CO20190712
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::getElementsFromCompositionString():";
+    string soliloquy = XPID + "aurostd::getElementsFromCompositionString():";
     velements.clear();
     vcomposition.clear();  //ME20190628
 
@@ -209,13 +190,13 @@ namespace aurostd {
     for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
   }
 
-  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
+  //use only as a supplement for getElements(), do NOT use outside
   //this assumes Mn_pvPt
   //no composition information
   //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp){ //CO20190712
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::getElementsFromPPString():";
+    string soliloquy = XPID + "aurostd::getElementsFromPPString():";
     velements=getElements(input);
     if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
     if(keep_pp==false){return;}
@@ -259,30 +240,45 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // pflow::stringElements2VectorElements(string input,ostream&
+  // aurostd::getElements(string input,ostream&
   // oss,ofstream& FileMESSAGE)
   // ***************************************************************************
   // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input,bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
-    ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
-  }
-
-  //ME20190628 - added variant that also determines the composition
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {
-    ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
-  }
-
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
-    vector<double> vcomposition;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
-  }
-
-  vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
-      ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) { // main function
+  vector<string> getElements(const string& input){ //CO20190712 //borrowed from XATOM_SplitAlloySpecies() //slow since we create many strings, but definitely works
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::stringElements2VectorElements():";
+    string soliloquy = XPID + "aurostd::getElements():";
+    if(LDEBUG){cerr << soliloquy << " original input=\"" << input << "\"" << endl;}
+    string alloy=input;
+    //[CO20190712 - no need for multiple passes anymore]for(uint i=1;i<=2;i++){alloy=KBIN::VASP_PseudoPotential_CleanName(alloy);} //be certain you clean everything, especially _GW (worst offender)
+    aurostd::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
+    aurostd::RemoveNumbersInPlace(alloy);              // remove composition
+    if(LDEBUG){cerr << soliloquy << " cleaned input=\"" << alloy << "\"" << endl;}
+    vector<string> vspecies;
+    for(uint i=0;i<alloy.length();i++) {
+      if(alloy[i]>='A' && alloy[i]<='Z') vspecies.push_back("");
+      vspecies.back()+=alloy[i];
+    }
+    if(LDEBUG){cerr << soliloquy << " vspecies pre ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
+    for(uint i=0;i<vspecies.size();i++){aurostd::CleanStringASCII_InPlace(vspecies[i]);}
+    if(LDEBUG){cerr << soliloquy << " vspecies post ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
+    return vspecies;
+  }
+  vector<string> getElements(const string& input,elements_string_type e_str_type,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {  // overload
+    ofstream FileMESSAGE;
+    return getElements(input,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);
+  }
+  //ME20190628 - added variant that also determines the composition
+  vector<string> getElements(const string& input,vector<double>& vcomposition,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {
+    ofstream FileMESSAGE;
+    return getElements(input,vcomposition,composition_string,FileMESSAGE,clean,sort_elements,keep_pp,oss);  //this gets composition_string by default, pp_string has no composition
+  }
+  vector<string> getElements(const string& input,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {  // overload
+    vector<double> vcomposition;
+    return getElements(input,vcomposition,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);
+  }
+  vector<string> getElements(const string& _input,vector<double>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) { // main function
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "aurostd::getElements():";
     vector<string> velements;
     vcomposition.clear();  //ME20190628
 
@@ -299,7 +295,7 @@ namespace aurostd {
 
     string input=_input;
 
-    if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){aurostd::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
+    if(clean && (e_str_type==composition_string || (e_str_type==pp_string && keep_pp==false))){aurostd::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
 
     if(!isupper(input[0])) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -344,8 +340,8 @@ namespace aurostd {
     // START Parsing input
     //////////////////////////////////////////////////////////////////////////////
 
-    if(c_desig==composition_string){elementsFromCompositionString(input,velements,vcomposition);}
-    else if(c_desig==pp_string){elementsFromPPString(input,velements,keep_pp);}
+    if(e_str_type==composition_string){elementsFromCompositionString(input,velements,vcomposition);}
+    else if(e_str_type==pp_string){elementsFromPPString(input,velements,keep_pp);}
     else{
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown compound designation",_INPUT_ILLEGAL_);
     }

@@ -9028,7 +9028,7 @@ namespace pflow {
 
     string soliloquy = XPID + "pflow::loadLIBX():";
     vector<string> velements =
-      aurostd::stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO20190712
+      aurostd::getElements(elements, composition_string, FileMESSAGE, true, true, false, oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9186,7 +9186,7 @@ namespace pflow {
 
     string soliloquy = XPID + "pflow::loadLIBX():";
     vector<string> velements =
-      aurostd::stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO20190712
+      aurostd::getElements(elements, composition_string, FileMESSAGE, true, true, false, oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9740,20 +9740,20 @@ namespace pflow {
   // sorting is generally NOT preferred as it would match unsorted compounds from database (NOT good)
 
   // vector
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database); }
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,e_str_type,shortcut_pp_string_AFLOW_database); }
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);}
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,e_str_type,shortcut_pp_string_AFLOW_database);}
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     vector<string> input_velements;
     vector<double> input_vcomposition;
-    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);}
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,e_str_type,shortcut_pp_string_AFLOW_database);}
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::compoundsBelong():";
-    if(c_desig==pp_string && shortcut_pp_string_AFLOW_database==true){
+    if(e_str_type==pp_string && shortcut_pp_string_AFLOW_database==true){
       //pp_string parsing is slow because of LONG list of strings to substitute in VASP_PseudoPotential_CleanName()
       //instead, we are safe with faster composition_string parsing IFF we only remove _GW, which will confuse elementsFromCompositionString()
       //all other characters are eliminated because we only look for A-Z a-z from substrings created from capital letters
@@ -9763,9 +9763,9 @@ namespace pflow {
       string input_new=input;
       //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO20190712
       aurostd::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
-      input_velements = aurostd::stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, clean, sort_elements, composition_string, false, oss); //use composition_string (FASTER) //do not keep_pp
+      input_velements = aurostd::getElements(input_new, input_vcomposition, composition_string, FileMESSAGE, clean, sort_elements, false, oss); //use composition_string (FASTER) //do not keep_pp
     }else{  //default
-      input_velements = aurostd::stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, clean, sort_elements, c_desig, false, oss); //do not keep_pp
+      input_velements = aurostd::getElements(input, input_vcomposition, e_str_type, FileMESSAGE, clean, sort_elements, false, oss); //do not keep_pp
     }
     if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(input_velements,"\""),",") << endl;}
     return compoundsBelong(velements2check, input_velements, FileMESSAGE, oss, false); //already sorted
@@ -9993,7 +9993,7 @@ namespace pflow {
 //[CO20190712 - OBSOLETE]  vector<string> getAlphabeticVectorString(const string& input,
 //[CO20190712 - OBSOLETE]				      ofstream& FileMESSAGE, ostream& oss) {  // main function
 //[CO20190712 - OBSOLETE]    string soliloquy = XPID + "pflow::getAlphabeticVectorString():";
-//[CO20190712 - OBSOLETE]    vector<string> velements = aurostd::stringElements2VectorElements(input, FileMESSAGE, oss);
+//[CO20190712 - OBSOLETE]    vector<string> velements = aurostd::getElements(input, FileMESSAGE, oss);
 //[CO20190712 - OBSOLETE]    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
 //[CO20190712 - OBSOLETE]    return velements;
 //[CO20190712 - OBSOLETE]  }
@@ -10010,7 +10010,7 @@ namespace pflow {
 //[CO20190712 - OBSOLETE]			      ofstream& FileMESSAGE, ostream& oss) {  // main function
 //[CO20190712 - OBSOLETE]    string soliloquy = XPID + "pflow::getAlphabeticString():";
 //[CO20190712 - OBSOLETE]    stringstream message;
-//[CO20190712 - OBSOLETE]    vector<string> velements = aurostd::stringElements2VectorElements(input, FileMESSAGE, oss);
+//[CO20190712 - OBSOLETE]    vector<string> velements = aurostd::getElements(input, FileMESSAGE, oss);
 //[CO20190712 - OBSOLETE]    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
 //[CO20190712 - OBSOLETE]    return auorstd::joinWDelimiter(velements,"");
 //[CO20190712 - OBSOLETE]  }
@@ -10069,7 +10069,7 @@ namespace pflow {
       if(input == "A") {
         //get appropriate size, slightly inefficient (as we got this before), but it's cheap
         //string system = vpflow.getattachedscheme("PFLOW::ALLOY");  //CO20170908 - don't want to have to set this everytime
-        //vector<string> velements = aurostd::stringElements2VectorElements(system, oss, FileMESSAGE);  //un-sorted, okay
+        //vector<string> velements = aurostd::getElements(system, oss, FileMESSAGE);  //un-sorted, okay
         string lib_count_string,load_lib_flag_name;
         //for (uint i = 0; i < velements.size() && i <= _AFLOW_LIB_MAX_; i++) //CO20170908 - simply load all, LoadEntries() limits appropriately by velements.size()
         for (uint lib = 1; lib <= _AFLOW_LIB_MAX_; lib++)
@@ -11823,7 +11823,7 @@ namespace pflow {
     uint site;
     POCCSiteSpecification pss;
     uint iatom;
-    vector<string> pocc_designations; //quick way to check if there are duplicate specifications
+    vector<string> poce_str_typenations; //quick way to check if there are duplicate specifications
     for(uint i=0;i<pocc_sites.size();i++){
       const string& ps=pocc_sites[i];
       if(ps.empty()){
@@ -11840,11 +11840,11 @@ namespace pflow {
         message << "No mode specified [designation=" << ps << "]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      if(aurostd::WithinList(pocc_designations,designation)){
+      if(aurostd::WithinList(poce_str_typenations,designation)){
         message << "Duplicate POCC designation: " << designation;
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      pocc_designations.push_back(designation);
+      poce_str_typenations.push_back(designation);
       mode=designation[0];
       _site=designation;_site.erase(_site.begin());
       if(!aurostd::isfloat(_site)){

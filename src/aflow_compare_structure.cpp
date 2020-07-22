@@ -1403,7 +1403,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // fix species (remove pseudopotentials, etc.) 
     string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX20200212 
-    vector<string> vspecies = aurostd::stringElements2VectorElements(species_str); //DX20200212
+    vector<string> vspecies = aurostd::getElements(species_str); //DX20200212
     xstr.species = aurostd::vector2deque(vspecies); //DX20200212 - needed to perform material comparisons with database entries
     xstr.SetSpecies(xstr.species);
 
@@ -1605,13 +1605,13 @@ namespace compare {
     // load and store entries from the database 
     for(uint i=0; i<auids.size(); i++){
       // first, get stoichiometry from entry
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX20191106 [OBSOLETE - switch to getElements] vector<string> species; vector<double> natoms;
+      //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = aurostd::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
       if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
       vector<uint> tmp_stoich;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
+      //DX20191106 [OBSOLETE - switch to getElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
       { //CO20200106 - patching for auto-indenting
         if(aurostd::isinteger(vcomposition[j])){
@@ -1987,8 +1987,8 @@ namespace compare {
       }
       // split by alloy species (no delimiter)
       else{
-        //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(alloy_string, species);
-        species = aurostd::stringElements2VectorElements(alloy_string); //DX20191106
+        //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(alloy_string, species);
+        species = aurostd::getElements(alloy_string); //DX20191106
       }
     }
 
@@ -2256,12 +2256,12 @@ namespace compare {
     for(uint i=0; i<auids.size(); i++){
       StructurePrototype str_proto_tmp;
       // first, get stoichiometry from entry
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX20191106 [OBSOLETE - switch to getElements] vector<string> species; vector<double> natoms;
+      //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = aurostd::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
+      //DX20191106 [OBSOLETE - switch to getElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
       { //CO20200106 - patching for auto-indenting
         if(aurostd::isinteger(vcomposition[j])){
@@ -2358,12 +2358,12 @@ namespace compare {
     vector<StructurePrototype> all_structures;
     for(uint i=0; i<auids.size(); i++){
       // first, get stoichiometry from entry
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX20191106 [OBSOLETE - switch to getElements] vector<string> species; vector<double> natoms;
+      //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = aurostd::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
+      //DX20191106 [OBSOLETE - switch to getElements] for(uint j=0;j<natoms.size();j++){
       for(uint j=0;j<vcomposition.size();j++){ //DX20191106
         if(aurostd::isinteger(vcomposition[j])){
           tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));

@@ -13,7 +13,7 @@
 //compound specification is how a compound is specified
 //composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
 //for instance, H1.25 can be a pseudopotential and NOT a composition
-enum compound_designation {
+enum elements_string_type {
   composition_string,
   pp_string,
 };
@@ -31,16 +31,16 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 namespace aurostd {
   void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO20190712
   ////////////////////////////////////////////////////////////////////////////////
-  vector<string> getElements(const string& _input); //CO20190712
   void elementsFromCompositionString(const string& input);  //CO20190712
   void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition); //CO20190712
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO20190712
   ////////////////////////////////////////////////////////////////////////////////
   // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  //ME20190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  //ME20190628
+  vector<string> getElements(const string& input); //CO20190712
+  vector<string> getElements(const string& input,elements_string_type e_str_type,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
+  vector<string> getElements(const string& input,vector<double>& vcomposition,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
+  vector<string> getElements(const string& input,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
+  vector<string> getElements(const string& _input,vector<double>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean=true,bool sort_elements=false,bool keep_pp=false,ostream& oss=cout);
 } // namespace aurostd
 
 #endif // _AUROSTD_XPARSER_H_

@@ -240,50 +240,50 @@ namespace KBIN {
 
     compound_to_test="W_sv_GWCs_sv_GWCr_sv_GWPt_ZORALi_AE_GW2";
     bool keep_pp=false;
-    velements=aurostd::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,false,true,pp_string,keep_pp,oss);
+    velements=aurostd::getElements(compound_to_test,vcomposition,pp_string,FileMESSAGE,false,true,keep_pp,oss);
     if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
     if(aurostd::joinWDelimiter(velements,"")!="CrCsLiPtW"){
-      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      message << "getElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
 
     compound_to_test="W_sv_GWCs_sv_GWCr_sv_GWPt_ZORALi_AE_GW2";
     keep_pp=true;
-    velements=aurostd::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,false,true,pp_string,keep_pp,oss);
+    velements=aurostd::getElements(compound_to_test,vcomposition,pp_string,FileMESSAGE,false,true,keep_pp,oss);
     if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
     if(aurostd::joinWDelimiter(velements,"")!="Cr_sv_GWCs_sv_GWLi_AE_GW2Pt_ZORAW_sv_GW"){
-      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      message << "getElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
 
     compound_to_test="H1.25";
     keep_pp=false;
-    velements=aurostd::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,false,true,pp_string,keep_pp,oss);
+    velements=aurostd::getElements(compound_to_test,vcomposition,pp_string,FileMESSAGE,false,true,keep_pp,oss);
     if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
     if(aurostd::joinWDelimiter(velements,"")!="H"){
-      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      message << "getElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
 
     compound_to_test="H1.25";
     keep_pp=true;
-    velements=aurostd::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,false,true,pp_string,keep_pp,oss);
+    velements=aurostd::getElements(compound_to_test,vcomposition,pp_string,FileMESSAGE,false,true,keep_pp,oss);
     if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
     if(aurostd::joinWDelimiter(velements,"")!="H1.25"){
-      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      message << "getElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
 
     compound_to_test="Mn.5W5H1.25";
     keep_pp=false;
-    velements=aurostd::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,false,true,composition_string,keep_pp,oss);
+    velements=aurostd::getElements(compound_to_test,vcomposition,composition_string,FileMESSAGE,false,true,keep_pp,oss);
     if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << ", vcomposition=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vcomposition,5),",") << endl;}
     if(!(aurostd::joinWDelimiter(velements,"")=="HMnW" && vcomposition.size()==3 && aurostd::isequal(vcomposition[0],1.25) && aurostd::isequal(vcomposition[1],0.5) && aurostd::isequal(vcomposition[2],5.0) )){
-      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      message << "getElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }

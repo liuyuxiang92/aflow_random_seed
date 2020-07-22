@@ -444,7 +444,7 @@ namespace plotter {
         aflowlib::GetAllPrototypeLabels(protos, "anrl");
         if (aurostd::WithinList(protos, proto)) {
           if (tokens.size() == 3) proto += "." + tokens[2];
-          vector<string> elements = aurostd::stringElements2VectorElements(tokens[0]);
+          vector<string> elements = aurostd::getElements(tokens[0]);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
           title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO20190629
@@ -456,7 +456,7 @@ namespace plotter {
           int index;
           if (aurostd::WithinList(protos, proto, index)) {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-            vector<string> elements = aurostd::stringElements2VectorElements(tokens[0]);
+            vector<string> elements = aurostd::getElements(tokens[0]);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
             title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO20190629
           } else {  // Title not in prototype format
@@ -519,7 +519,7 @@ namespace plotter {
 
     // Now determine the composition
     vector<double> comp;
-    aurostd::stringElements2VectorElements(compound, comp);
+    aurostd::getElements(compound, comp);
 
     // Finally, sort to match sequence
     vector<double> composition(comp.size());
@@ -578,7 +578,7 @@ namespace plotter {
         cerr << soliloquy << " proto=" << proto << endl;
       }
 
-      velements=aurostd::stringElements2VectorElements(pps,true,false,pp_string,true);  //clean, no sort_elements, pseudopotential string, keep_pp
+      velements=aurostd::getElements(pps,pp_string,true,false,true);  //clean, no sort_elements, pseudopotential string, keep_pp
       if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
       pocc_params=pocc_params_arun_str;
@@ -727,7 +727,7 @@ namespace plotter {
     el = proto.substr(0, t);
     proto = proto.substr(t + 1, string::npos);
     if (!generic) {
-      vector<string> elements = aurostd::stringElements2VectorElements(el);
+      vector<string> elements = aurostd::getElements(el);
       if (elements.size() != composition.size()) {
         generic = true;
         broken = true;
