@@ -982,28 +982,29 @@ double GetCompoundAttenuationLength(const deque<string>& _species,const deque<in
 // **************************************************************************
 // Function XATOM_AlphabetizationSpecies & XATOM_AlphabetizationCompound
 // **************************************************************************
-string XATOM_AlphabetizationSpecies(string speciesA,string speciesB) {
-  string system;
+string XATOM_AlphabetizationSpecies(const string& speciesA,const string& speciesB) {
+  string system="";
   if(speciesA<=speciesB) system=speciesA+speciesB; else system=speciesB+speciesA;
   return system;
 }
 
-string XATOM_AlphabetizationSpecies(vector<string> vspecies_in) {
-  stringstream system;
-  vector<string> vspecies(vspecies_in);
-  aurostd::sort(vspecies);
-  for(uint i=0;i<vspecies.size();i++)
-    system << vspecies.at(i);
-  return system.str();
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies_in) {
+  string system="";
+  vector<string> vspecies(vspecies_in);std::sort(vspecies.begin(),vspecies.end());
+  return aurostd::joinWDelimiter(vspecies,"");
+  //[CO20200624 - OBSOLETE]aurostd::sort(vspecies);
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<vspecies.size();i++)
+  //[CO20200624 - OBSOLETE]  system << vspecies.at(i);
+  //[CO20200624 - OBSOLETE]return system.str();
 }
 
-string XATOM_AlphabetizationSpecies(vector<string> vspecies_in,vector<double> vnumbers_in) {
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies_in,const vector<double>& vnumbers_in) {
   stringstream system;
   vector<string> vspecies(vspecies_in);
   vector<double> vnumbers(vnumbers_in);
   aurostd::sort(vspecies,vnumbers);
   for(uint i=0;i<vspecies.size();i++)
-    system << vspecies.at(i) << vnumbers.at(i);
+    system << vspecies[i] << vnumbers[i];
   return system.str();
 }
 
@@ -1047,86 +1048,86 @@ void XATOM_AlphabetizationCompound(string& system) {
 // **************************************************************************
 // Function XATOM_SplitAlloySpecies
 // **************************************************************************
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX) {
-  string alloy=alloy_in;
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  speciesX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
-    speciesX.at(speciesX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<speciesX.size();i++)
-    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX) {
+  speciesX=aurostd::getElements(alloy_in); //CO20200624
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in;
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]speciesX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
+  //[CO20200624 - OBSOLETE]  speciesX.at(speciesX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<speciesX.size();i++)
+  //[CO20200624 - OBSOLETE]  speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));
   return speciesX.size();
 }
 
+//[CO20200624 - OBSOLETE]uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
+//[CO20200624 - OBSOLETE]  string alloy=alloy_in,alloyn;
+//[CO20200624 - OBSOLETE]  string letters="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
+//[CO20200624 - OBSOLETE]  string numbers="0123456789";
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// exit(0);
+//[CO20200624 - OBSOLETE]
+//[CO20200624 - OBSOLETE]  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// exit(0);
+//[CO20200624 - OBSOLETE]  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// exit(0);
+//[CO20200624 - OBSOLETE]  alloy=aurostd::CleanStringASCII(alloy);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// exit(0);
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<alloy.length();i++)
+//[CO20200624 - OBSOLETE]    for(uint j=0;j<letters.length();j++)
+//[CO20200624 - OBSOLETE]      if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
+//[CO20200624 - OBSOLETE]
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl; exit(0); //CO20190629 - need to clean this exit(), but this function looks unused...
+//[CO20200624 - OBSOLETE]
+//[CO20200624 - OBSOLETE]  speciesX.clear();
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<alloy.length();i++) {
+//[CO20200624 - OBSOLETE]    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
+//[CO20200624 - OBSOLETE]    speciesX.at(speciesX.size()-1)+=alloy[i];
+//[CO20200624 - OBSOLETE]  }
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<speciesX.size();i++)
+//[CO20200624 - OBSOLETE]    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
+//[CO20200624 - OBSOLETE]  // now the atoms
+//[CO20200624 - OBSOLETE]  natomsX.clear();
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<speciesX.size();i++) {
+//[CO20200624 - OBSOLETE]    if(i<speciesX.size()-1)
+//[CO20200624 - OBSOLETE]      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
+//[CO20200624 - OBSOLETE]    else
+//[CO20200624 - OBSOLETE]      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
+//[CO20200624 - OBSOLETE]    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
+//[CO20200624 - OBSOLETE]  }
+//[CO20200624 - OBSOLETE]  //  for(uint i=0;i<natomsX.size();i++)
+//[CO20200624 - OBSOLETE]  //  cerr << natomsX.at(i) << endl;
+//[CO20200624 - OBSOLETE]  return speciesX.size();
+//[CO20200624 - OBSOLETE]}
 
-uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
-  string alloy=alloy_in,alloyn;
-  string letters="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
-  string numbers="0123456789";
-  cerr << alloy << endl;// exit(0);
-
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  cerr << alloy << endl;// exit(0);
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  cerr << alloy << endl;// exit(0);
-  alloy=aurostd::CleanStringASCII(alloy);
-  cerr << alloy << endl;// exit(0);
-  for(uint i=0;i<alloy.length();i++)
-    for(uint j=0;j<letters.length();j++)
-      if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
-
-  cerr << alloy << endl; exit(0); //CO20190629 - need to clean this exit(), but this function looks unused...
-
-  speciesX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
-    speciesX.at(speciesX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<speciesX.size();i++)
-    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
-  // now the atoms
-  natomsX.clear();
-  for(uint i=0;i<speciesX.size();i++) {
-    if(i<speciesX.size()-1)
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
-    else
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
-    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
-  }
-  //  for(uint i=0;i<natomsX.size();i++)
-  //  cerr << natomsX.at(i) << endl;
-  return speciesX.size();
-}
-
-
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
-  string alloy=alloy_in,alloyn;
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloyn=aurostd::CleanStringASCII(alloy);
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  speciesX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
-    speciesX.at(speciesX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<speciesX.size();i++)
-    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
-  // now the atoms
-  natomsX.clear();
-  for(uint i=0;i<speciesX.size();i++) {
-    if(i<speciesX.size()-1)
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
-    else
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
-    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
-  }
-  //  for(uint i=0;i<natomsX.size();i++)
-  //  cerr << natomsX.at(i) << endl;
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
+  speciesX=aurostd::getElements(alloy_in,natomsX);
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in,alloyn;
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloyn=aurostd::CleanStringASCII(alloy);
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]speciesX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
+  //[CO20200624 - OBSOLETE]  speciesX.at(speciesX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<speciesX.size();i++)
+  //[CO20200624 - OBSOLETE]  speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
+  //[CO20200624 - OBSOLETE]// now the atoms
+  //[CO20200624 - OBSOLETE]natomsX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<speciesX.size();i++) {
+  //[CO20200624 - OBSOLETE]  if(i<speciesX.size()-1)
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  else
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]//  for(uint i=0;i<natomsX.size();i++)
+  //[CO20200624 - OBSOLETE]//  cerr << natomsX.at(i) << endl;
   return speciesX.size();
 }
 
@@ -1134,41 +1135,43 @@ uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<d
 // **************************************************************************
 // Function XATOM_SplitAlloyPseudoPotentials
 // **************************************************************************
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX) {
-  string alloy=alloy_in;
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  species_ppX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
-    species_ppX.at(species_ppX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<species_ppX.size();i++)
-    species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX) {
+  species_ppX=aurostd::getElements(alloy_in,pp_string,false,false,true); //CO20200624 - no clean or sort, but do keep_pp
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in;
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]species_ppX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
+  //[CO20200624 - OBSOLETE]  species_ppX.at(species_ppX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<species_ppX.size();i++)
+  //[CO20200624 - OBSOLETE]  species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));
   return species_ppX.size();
 }
 
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX, vector<double> &natomsX) {
-  string alloy=alloy_in,alloyn;
-  alloyn=aurostd::CleanStringASCII(alloy);
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  species_ppX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
-    species_ppX.at(species_ppX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<species_ppX.size();i++)
-    species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));   // clean it up so it does not have problems inside only letters_numbers
-  // now the atoms
-  natomsX.clear();
-  for(uint i=0;i<species_ppX.size();i++) {
-    if(i<species_ppX.size()-1)
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length(),alloyn.find(species_ppX.at(i+1))-alloyn.find(species_ppX.at(i))-species_ppX.at(i).length())));
-    else
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length())));
-    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
-  }
-  //  for(uint i=0;i<natomsX.size();i++)
-  //  cerr << natomsX.at(i) << endl;
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX) {
+  species_ppX=aurostd::getElements(alloy_in,natomsX,pp_string,false,false,true); //CO20200624 - no clean or sort, but do keep_pp - will return natomX to be all 1's
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in,alloyn;
+  //[CO20200624 - OBSOLETE]alloyn=aurostd::CleanStringASCII(alloy);
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]species_ppX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
+  //[CO20200624 - OBSOLETE]  species_ppX.at(species_ppX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<species_ppX.size();i++)
+  //[CO20200624 - OBSOLETE]  species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));   // clean it up so it does not have problems inside only letters_numbers
+  //[CO20200624 - OBSOLETE]// now the atoms
+  //[CO20200624 - OBSOLETE]natomsX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<species_ppX.size();i++) {
+  //[CO20200624 - OBSOLETE]  if(i<species_ppX.size()-1)
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length(),alloyn.find(species_ppX.at(i+1))-alloyn.find(species_ppX.at(i))-species_ppX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  else
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]//  for(uint i=0;i<natomsX.size();i++)
+  //[CO20200624 - OBSOLETE]//  cerr << natomsX.at(i) << endl;
   return species_ppX.size();
 }
 

@@ -206,7 +206,7 @@ namespace aurostd {
     for(uint i=0;i<velements.size();i++){vspecies.push_back(velements[i]);}
     velements.clear();
 
-    //simply parse string around these elements
+    //parse string around these elements
     string::size_type loc1=0,loc2=string::npos;
     vector<string> vCAPITAL_LETTERS_PP;
     aurostd::string2tokens(CAPITAL_LETTERS_PP_LIST,vCAPITAL_LETTERS_PP,",");
@@ -276,6 +276,10 @@ namespace aurostd {
   vector<string> getElements(const string& input,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) {  // overload
     vector<double> vcomposition;
     return getElements(input,vcomposition,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);
+  }
+  template<class utype> vector<string> getElements(const string& input,vector<utype>& vcomposition,elements_string_type e_str_type,bool clean,bool sort_elements,bool keep_pp,ostream& oss) { // overload
+    ofstream FileMESSAGE;
+    return getElements(input,vcomposition,e_str_type,FileMESSAGE,clean,sort_elements,keep_pp,oss);  //this gets composition_string by default, pp_string has no composition
   }
   template<class utype> vector<string> getElements(const string& _input,vector<utype>& vcomposition,elements_string_type e_str_type,ofstream& FileMESSAGE,bool clean,bool sort_elements,bool keep_pp,ostream& oss) { // main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -361,6 +365,8 @@ namespace aurostd {
     if(velements.size()==0){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
 
     if(sort_elements && velements.size()>1){
+      //this is MORE efficient that std::swap which has a copy constructor inside
+      //http://www.cplusplus.com/reference/algorithm/swap/
       string etmp="";
       utype ctmp=(utype)0.0;
       for(uint i=0;i<velements.size()-1;i++){

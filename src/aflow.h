@@ -1216,18 +1216,18 @@ double GetCompoundAttenuationLength(const deque<string>& _species,const deque<in
 //DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  //RHT
 //DX+CO END
 // routines of general use
-string XATOM_AlphabetizationSpecies(string speciesA,string speciesB);
-string XATOM_AlphabetizationSpecies(vector<string> vspecies);
-string XATOM_AlphabetizationSpecies(vector<string> vspecies,vector<double> vnumbers);
+string XATOM_AlphabetizationSpecies(const string& speciesA,const string& speciesB);
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies);
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies,const vector<double>& vnumbers);
 void XATOM_AlphabetizationSpecies(string& system, vector<string>& vspecies,vector<double>& vnumbers);
 void XATOM_AlphabetizationCompound(string& system, vector<string>& vspecies,vector<double>& vnumbers);
 void XATOM_AlphabetizationSpecies(string& system, vector<string>& vspecies);
 void XATOM_AlphabetizationSpecies(string& system);
 void XATOM_AlphabetizationCompound(string& system);
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX);
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX);
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, vector<double> &natomsX);
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX);
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
 vector<uint> composition2stoichiometry(string& composition); //DX20181009
 // neighbour things
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
