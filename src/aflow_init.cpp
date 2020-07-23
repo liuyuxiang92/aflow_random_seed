@@ -84,11 +84,6 @@ namespace init {
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--lib2raw|--lib2lib");  //CO20200624
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
-    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp");  //CO20200624 - VERY important, prevents VASP from running
-    if(XHOST.POSTPROCESS || 
-        XHOST.ARUN_POSTPROCESS ||
-        FALSE) XHOST.AVOID_RUNNING_VASP=TRUE;  //CO20200624
-    if(LDEBUG){cerr << soliloquy << " XHOST.AVOID_RUNNING_VASP=" << XHOST.AVOID_RUNNING_VASP << endl;}
 
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
@@ -863,7 +858,14 @@ namespace init {
     if(XHOST.vflag_control.flag("AGL_SPRESSURE")) XHOST.vflag_control.push_attached("AGL_SPRESSURE",aurostd::args2attachedstring(argv,"--agl_spressure=","1.0")); //CT20200323
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_SPRESSURE") << endl;  //CT20200323
 
-
+    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp");  //CO20200624 - VERY important, prevents VASP from running
+    if( XHOST.GENERATE_AFLOWIN_ONLY ||
+        XHOST.POSTPROCESS || 
+        XHOST.ARUN_POSTPROCESS ||
+        XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING") || //CT20200722
+        XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING") || //CT20200722
+        FALSE) XHOST.AVOID_RUNNING_VASP=TRUE;  //CO20200624
+    if(LDEBUG){cerr << soliloquy << " XHOST.AVOID_RUNNING_VASP=" << XHOST.AVOID_RUNNING_VASP << endl;}
 
     XHOST.vflag_control.flag("XPLUG_DO_CLEAN",aurostd::args2flag(XHOST.argv,cmds,"--doclean"));
     XHOST.vflag_control.flag("XPLUG_DO_ADD",aurostd::args2flag(argv,"--add"));
