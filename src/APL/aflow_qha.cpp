@@ -2223,21 +2223,15 @@ namespace apl
   /// Check for details:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
-  double QHA::SCQHAgetEquilibriumVolume(double T)
+  double QHA::SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params)
   {
     string function = XPID + "QHA::SCQHAgetEquilibriumVolume():";
     const static int max_scqha_iteration = 10000;
     const static double Vtol = 1e-5;
     const static double dV = 1e-3;
-    xvector<double> E = aurostd::vector2xvector<double>(E0_V);
-    xvector<double> fit_params = fitToEOSmodel(E, EOS_POLYNOMIAL);
-    double V_static_eq = EOSpolyGetEqVolume(fit_params, min(EOSvolumes), max(EOSvolumes));
 
     double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
-    double Vnew = 0.0;
-    // to avoid division by zero in the self-consistent loop,
-    // the initial volume is taken to be 10% bigger
-    double V = 1.1 * V_static_eq;
+    double Vnew = 0.0, V = Vguess;
     int iter = 0;
     while (iter++ < max_scqha_iteration){
       Pe   = dEOSpoly(V, fit_params);
@@ -2256,6 +2250,15 @@ namespace apl
     return V;
   }
 
+  double QHA::SCQHAgetEquilibriumVolume(double T)
+  {
+    xvector<double> E = aurostd::vector2xvector<double>(E0_V);
+    xvector<double> fit_params = fitToEOSmodel(E, EOS_POLYNOMIAL);
+    double Vguess = 1.1*EOSpolyGetEqVolume(fit_params,min(EOSvolumes),max(EOSvolumes));
+
+    return SCQHAgetEquilibriumVolume(T, Vguess, fit_params);
+  }
+
   /// Performs SCQHA calculations.
   /// There are two implementations:
   /// 1) perform a self-consistent loop for the initial nonzero temperature and extrapolate
@@ -2268,10 +2271,6 @@ namespace apl
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
   void QHA::RunSCQHA(EOSmethod method, bool all_iterations_self_consistent)
   {
-    const int max_scqha_iteration = 10000;
-    const double dV = 1e-3;
-    const double Vtol = 1e-5;
-
     string function = XPID + "QHA::RunSCQHA():", msg = "Running SCQHA ";
     if (all_iterations_self_consistent)
       msg += "with all temperature steps computed self-consistenly.";
@@ -2285,19 +2284,11 @@ namespace apl
     // energies obtained from static DFT calculations
     xvector<double> E = aurostd::vector2xvector<double>(E0_V);
     xvector<double> fit_params = fitToEOSmodel(E, method);
-    double Pe = 0.0, VPg = 0.0; // electronic pressure and volume multiplied by phononic pressure
-    double Vnew = 0.0;
 
-    // self-consistent loop for 0 K
+    // self-consistent loop to determine equilibrium volume at T=0K
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V0K = 1.1*EOS_volume_at_equilibrium;
-    for (int i=0; i<max_scqha_iteration; i++){
-      Pe   = dEOSpoly(V0K, fit_params);
-      VPg  = VPgamma(0.0,V0K);
-      Vnew = VPg/Pe;
-      if (std::abs(V0K - Vnew)/V0K > Vtol) V0K += (Vnew - V0K) * dV; else break;
-    }
+    double V0K = SCQHAgetEquilibriumVolume(0,1.1*EOS_volume_at_equilibrium,fit_params);
 
     // the name of the output file depends on the EOS fit method
     stringstream file;
@@ -2340,23 +2331,7 @@ namespace apl
 
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V = 1.1*EOS_volume_at_equilibrium;
-
-    // self-consistent loop for the initial temperature (defined by user)
-    int iter=1;
-    while (iter <= max_scqha_iteration){
-      Pe   = dEOSpoly(V, fit_params);
-      VPg  = VPgamma(T, V);
-      Vnew = VPg/Pe;
-      if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
-      iter++;
-    }
-    if (iter == max_scqha_iteration){
-      msg="Maximum number of iterations in self consistent loop is reached";
-      msg += " at T="+aurostd::utype2string<double>(T)+"K.";
-      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
-          *p_oss, _LOGGER_MESSAGE_);
-    }
+    double V = SCQHAgetEquilibriumVolume(T, 1.1*EOS_volume_at_equilibrium, fit_params);
 
     double dT = (Temperatures[Ntemperatures-1]-Temperatures[0])/(Ntemperatures-1);
 
@@ -2367,11 +2342,9 @@ namespace apl
     double expx    = 0.0;  // temperature-dependent exponential factor
     double expx0   = 0.0;  // temperature-dependent exponential factor
     double ui      = 0.0;  // mode-dependent internal energy
-    double Bgamma  = 0.0;  // contribution to bulk modulus of 2nd order gamma component
-    double Bdgamma = 0.0;  // check https://doi.org/10.1016/j.commatsci.2016.04.012
     double Belec   = 0.0;  // "electronic" bulk modulus
+    double Bphononic = 0.0;// "phononic" bulk modulus
     double B       = 0.0;  // total bulk modulus
-    double Pgamma  = 0.0;  // "phononic" pressure
     double gamma   = 0.0;  // Grueneisen parameter
     double fi      = 0.0;  // mode-dependet free energy
     double Feq     = 0.0;  // total free energy for equilibrium volume at given T
@@ -2387,25 +2360,13 @@ namespace apl
 
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
-      betaT = 1.0/KBOLTZEV/T;
+      if (T > _ZERO_TOL_) betaT = 1.0/KBOLTZEV/T;
+      else betaT = 0.0;
 
       // calculate the next equilibrium volume using a self-consistent loop if beta=0 or
       // if the user wants so
       if (all_iterations_self_consistent || !(std::abs(beta)>0)){
-        iter=1;
-        while (iter <= max_scqha_iteration){
-          Pe   = dEOSpoly(V, fit_params);
-          VPg  = VPgamma(T, V);
-          Vnew = VPg/Pe;
-          if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
-          iter++;
-        }
-        if (iter == max_scqha_iteration){
-          string msg="Maximum number of iterations in self consistent loop is reached";
-          msg += " at T="+aurostd::utype2string<double>(T)+"K";
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
-              *p_oss, _LOGGER_MESSAGE_);
-        }
+        V = SCQHAgetEquilibriumVolume(T, V, fit_params);
       }
       else{
         V *= (1 + beta*dT);
@@ -2416,7 +2377,7 @@ namespace apl
       GP = 0.0; gamma = 0.0;
       w = 0.0; w0K = 0.0; expx = 0.0; expx0 = 0.0;
       ui = 0.0;
-      Bgamma = 0.0; Bdgamma = 0.0; Belec = 0.0; Pgamma = 0.0; B = 0.0;
+      Belec = 0.0; Bphononic = 0.0; B = 0.0;
       fi = 0.0; Feq = 0.0;
       NQpoints = 0;
 
@@ -2431,47 +2392,35 @@ namespace apl
 
           ui = 0.5*w;
           fi = 0.5*w;
-          if (w > AUROSTD_ROUNDOFF_TOL && T > _ZERO_TOL_){
-            expx = exp(w*betaT);
 
+          Cvi = 0.0;
+
+          if (T > _ZERO_TOL_){
+            expx = exp(w*betaT);
             // use volume at T=0K for calculation of isochoric specific heat
             expx0 = exp(w0K*betaT);
-            Cvi = pow(w0K,2)*expx0/pow(expx0-1.0,2) * qpWeights[q];
+            if (w0K > _ZERO_TOL_) Cvi = pow(w0K,2)*expx0/pow(expx0-1.0,2) * qpWeights[q];
 
-            ui  += w/(expx - 1.0);
-            ui  *= qpWeights[q];
-
-            fi += KBOLTZEV*T*log(1-exp(-w*betaT));
-            fi *= qpWeights[q];
-
-            d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
-              pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
-            d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
-
-            gamma = extrapolateGrueneisen(V, xomega, SCQHA_CALC);
-
-            Bgamma  += (ui - T*Cvi*pow(betaT,2)*KBOLTZEV)*pow(gamma, 2);
-            Bdgamma -= ui*((1+gamma)*gamma - pow(V,2)/w*d2wdV2);
-
-            GP += extrapolateGrueneisen(V, xomega, SCQHA_CALC) * Cvi;
-            CV += Cvi;
-            Feq  += fi;
+            if (w > _ZERO_TOL_){
+              ui += w/(expx - 1.0);
+              fi += KBOLTZEV*T*log(1-exp(-w*betaT));
+            }
           }
-          else if (T<_ZERO_TOL_){
-            ui  *= qpWeights[q];
-            fi *= qpWeights[q];
+          ui *= qpWeights[q];
+          fi *= qpWeights[q];
 
-            d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
-              pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
-            d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
+          d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
+            pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
+          d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
 
-            Bgamma  += ui*pow(gamma, 2);
-            Bdgamma -= ui*((1+gamma)*gamma - pow(V,2)/w*d2wdV2);
+          gamma = extrapolateGrueneisen(V, xomega, SCQHA_CALC);
 
-            GP += extrapolateGrueneisen(V, xomega, SCQHA_CALC) * Cvi;
+          if (w > _ZERO_TOL_) Bphononic += ui*pow(V,2)/w*d2wdV2;
+          Bphononic -= T*Cvi*pow(betaT,2)*KBOLTZEV*pow(gamma, 2);
 
-            Feq  += fi;
-          }
+          GP += extrapolateGrueneisen(V, xomega, SCQHA_CALC) * Cvi;
+          CV += Cvi;
+          Feq  += fi;
         }
         NQpoints += qpWeights[q];
       }
@@ -2480,22 +2429,20 @@ namespace apl
       Feq /= NatomsOrigCell;
       Feq += evalEOSmodel(V, fit_params, method);
 
-      Bgamma /= NQpoints; Bdgamma /= NQpoints;
-      Bgamma /= NatomsOrigCell; Bdgamma /= NatomsOrigCell;
-      Bgamma /= V; Bdgamma /= V;
-
       Belec  = BulkModulus(V, fit_params);
-      Pgamma = VPgamma(T, V)/V;
+      Bphononic *= eV2GPa/(NQpoints*NatomsOrigCell*V);
 
-      B = Belec + (Bgamma + Bdgamma + Pgamma)*eV2GPa;
+      B = Belec + Bphononic;
 
       GP /= CV;
       CV /= NQpoints; CV /= Nbranches;
       CV *= 3*pow(betaT,2); // [kB/atom]
 
-      beta = KBOLTZEV*CV*GP/V/(B/eV2GPa); // [K^-1]
+      if (T > _ZERO_TOL_){
+        beta = KBOLTZEV*CV*GP/V/(B/eV2GPa); // [K^-1]
+        CP = CV + V*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+      }
 
-      CP = CV + V*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
       file << setw(5)  << T                   << setw(SW) << ' ' <<
         setw(TW) << V                   << setw(SW) << ' ' <<
         setw(TW) << Feq                 << setw(SW) << ' ' <<

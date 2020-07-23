@@ -1271,6 +1271,7 @@ namespace apl
       // SCQHA
       double VPgamma(double T, double V);
       double SCQHAgetEquilibriumVolume(double T);
+      double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params);
       void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
       // output
       void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
