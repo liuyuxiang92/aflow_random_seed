@@ -19,7 +19,7 @@ void debint (double& y, double& Deb);
 // pflow::DEBYE
 // ***************************************************************************
 namespace pflow {
-  void DEBYE(string options) {
+  void DEBYE(const string& options) {
     // Fit Debye temperature to heat capacity calculated using APL
     // Heat capacity is in file "THERMO"
     // Usage: aflow --debye=THERMO 
