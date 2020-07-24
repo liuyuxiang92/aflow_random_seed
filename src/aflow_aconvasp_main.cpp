@@ -3083,8 +3083,8 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(options,"pflow::SYMMETRY",
-            aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] "+sym_specific_options+" < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
+        init::ErrorOption(options,"pflow::SYMMETRY",
+            aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] "+sym_specific_options+" < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
       }
     }
     //DX20170804 - need to rescale, so we make a fast copy and calculate
@@ -5435,8 +5435,8 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(options,"pflow::DATA",
-            aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
+        init::ErrorOption(options,"pflow::DATA",
+            aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
       }
     }
     xstructure _a(input,IOAFLOW_AUTO);
@@ -6537,8 +6537,8 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(options,"pflow::CalculateFullSymmetry",
-            aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
+        init::ErrorOption(options,"pflow::CalculateFullSymmetry",
+            aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
       }
     }
     //DX20170804 - need to rescale, so we make a fast copy and calculate
@@ -13995,8 +13995,8 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        return init::ErrorOption(options,"pflow::SGDATA",
-            aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic"));
+        init::ErrorOption(options,"pflow::SGDATA",
+            aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic")); //DX20200724 - removed return
       }
     }
     xstructure _a(input,IOAFLOW_AUTO);

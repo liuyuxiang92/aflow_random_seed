@@ -1054,10 +1054,10 @@ string Message(const string& list2print,const string& filename);  //CO20200713
 string Message(const _aflags& aflags,const string& list2print="",const string& filename="");  //CO20200713
 bool AFLOW_BlackList(const string& h);  //CO20200713
 namespace init {
-  bool MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
-  bool MessageOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
-  bool ErrorOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web
-  bool ErrorOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web
+  void MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
+  void MessageOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
+  void ErrorOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
+  void ErrorOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
 }
 
 // --------------------------------------------------------------------------

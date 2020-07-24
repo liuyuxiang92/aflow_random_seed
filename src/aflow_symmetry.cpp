@@ -69,8 +69,9 @@ namespace SYM {
   }
   double minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "SYM::minimumDistance()";
     double min_dist=AUROSTD_MAX_DOUBLE;
-    if(LDEBUG) cerr << "minimumDistance: INITIAL [0] " << min_dist << endl;
+    if(LDEBUG) cerr << function_name << " INITIAL [0] " << min_dist << endl;
 
     double radius=RadiusSphereLattice(lattice);
     xvector<int> dims(3);
@@ -81,10 +82,10 @@ namespace SYM {
     //for(int a=1;a<=dim;a++){
     for(int i=1;i<=3;i++){
       min_dist = aurostd::min(min_dist,aurostd::modulus(lattice(i))); // if loop is brought back, do a*lattice(i)
-      if(LDEBUG) {cerr << "minimumDistance: lattice_vector[" << i << "]: min_dist=" << min_dist << endl;}
+      if(LDEBUG) {cerr << function_name << " lattice_vector[" << i << "]: min_dist=" << min_dist << endl;}
     }
     //}
-    if(LDEBUG) cerr << "minimumDistance: LATTICE VECTORS [1] " << min_dist << endl;
+    if(LDEBUG) cerr << function_name << " LATTICE VECTORS [1] " << min_dist << endl;
 
     //DX20180508 - FASTER MIN CART DISTANCE CALCULATOR - START
     //DX20180508 - only calculate multiplication once (time-saver)
@@ -109,12 +110,12 @@ namespace SYM {
           for(uint b=0;b<lattice_lengths[j].size();b++){
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]+lattice_lengths[j][b]));
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]-lattice_lengths[j][b]));
-            if(LDEBUG) {cerr << "minimumDistance: lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << "; min_dist=" << min_dist << endl;}
+            if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << "; min_dist=" << min_dist << endl;}
           }
         }
       }
     }
-    if(LDEBUG) cerr << "minimumDistance: COMBOS OF 2 LATTICE VECTORS [2] " << min_dist << endl;
+    if(LDEBUG) cerr << function_name << " COMBOS OF 2 LATTICE VECTORS [2] " << min_dist << endl;
 
     ////combos of two lattice vectors
     //for(int a=1;a<=dim;a++){
@@ -123,12 +124,12 @@ namespace SYM {
     //      for(int j=i+1;j<=3;j++){
     //        min_dist = aurostd::min(min_dist,aurostd::modulus(a*lattice(i)+b*lattice(j)));
     //        min_dist = aurostd::min(min_dist,aurostd::modulus(a*lattice(i)-b*lattice(j)));
-    //        if(LDEBUG) {cerr << "minimumDistance: lattice_vectors: a=" << a << ",b=" << b << "; min_dist=" << min_dist << endl;}
+    //        if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << a << ",b=" << b << "; min_dist=" << min_dist << endl;}
     //      }
     //    }
     //  }
     //}
-    //if(LDEBUG) cerr << "minimumDistance: COMBOS OF 2 LATTICE VECTORS [2] " << min_dist << endl;
+    //if(LDEBUG) cerr << function_name << " COMBOS OF 2 LATTICE VECTORS [2] " << min_dist << endl;
 
     //combos of three lattice vectors 
     lattice_lengths.clear();
@@ -158,7 +159,7 @@ namespace SYM {
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(added-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted+lattice_lengths[k][c]));
-                if(LDEBUG) {cerr << "minimumDistance: lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << ",c=" << lattice_indices[k][c] << "; min_dist=" << min_dist << endl;}
+                if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << ",c=" << lattice_indices[k][c] << "; min_dist=" << min_dist << endl;}
               }
             }
           }  
@@ -177,7 +178,7 @@ namespace SYM {
     //            min_dist = aurostd::min(min_dist,aurostd::modulus(a*lattice(i)-b*lattice(j)-c*lattice(k)));
     //            min_dist = aurostd::min(min_dist,aurostd::modulus(a*lattice(i)+b*lattice(j)-c*lattice(k)));
     //            min_dist = aurostd::min(min_dist,aurostd::modulus(a*lattice(i)-b*lattice(j)+c*lattice(k)));
-    //            if(LDEBUG) {cerr << "minimumDistance: lattice_vectors: a=" << a << ",b=" << b << ",c=" << c << "; min_dist=" << min_dist << endl;}
+    //            if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << a << ",b=" << b << ",c=" << c << "; min_dist=" << min_dist << endl;}
     //            //min_dist = aurostd::min(min_dist,aurostd::modulus(-lattice(i)-lattice(j)-lattice(k)));  //same as -(+++)
     //            //min_dist = aurostd::min(min_dist,aurostd::modulus(-lattice(i)+lattice(j)+lattice(k)));  //same as -(+--)
     //            //min_dist = aurostd::min(min_dist,aurostd::modulus(-lattice(i)-lattice(j)+lattice(k)));  //same as -(++-)
@@ -188,7 +189,7 @@ namespace SYM {
     //    }
     //  }
     //}
-    if(LDEBUG) cerr << "minimumDistance: COMBOS OF 3 LATTICE VECTORS [3] " << min_dist << endl;
+    if(LDEBUG) cerr << function_name << " COMBOS OF 3 LATTICE VECTORS [3] " << min_dist << endl;
 
     //distance between each atom
     //DX20171023
@@ -228,7 +229,7 @@ namespace SYM {
             for(uint p=0;p<l3.size();p++){
               tmp = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
               min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
-              if(LDEBUG) {cerr << "minimumDistance: atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << endl;}
+              if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << endl;}
             }
           }
         }
@@ -247,21 +248,22 @@ namespace SYM {
     //      for(int b=-dims[2];b<=dims[2];b++){
     //        for(int c=-dims[3];c<=dims[3];c++){
     //          min_dist=aurostd::min(min_dist,aurostd::modulus(atoms.at(k).cpos-atoms.at(i).cpos+a*lattice(1)+b*lattice(2)+c*lattice(3)));
-    //          if(LDEBUG) {cerr << "minimumDistance: atoms[" << i << "," << k << "]: a=" << a << ",b=" << b << ",c=" << c << "; min_dist=" << min_dist << endl;}
+    //          if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a << ",b=" << b << ",c=" << c << "; min_dist=" << min_dist << endl;}
     //        }
     //      }
     //    }
     //  }
     //}
-    if(LDEBUG) cerr << "minimumDistance: DIST BETWEEN ATOMS [4] " << min_dist << endl;
+    if(LDEBUG) cerr << function_name << " DIST BETWEEN ATOMS [4] " << min_dist << endl;
 
     //rescale
     min_dist*=scale;
-    if(LDEBUG) cerr << "minimumDistance: RESCALED [5] " << min_dist << endl;
+    if(LDEBUG) cerr << function_name << " RESCALED [5] " << min_dist << endl;
 
     //if(min_dist<_XPROTO_TOO_CLOSE_ERROR_){
-    //  cerr << "minimumDistance: ERROR atoms appear to be overlapping (min_dist=" << min_dist << "<" << _XPROTO_TOO_CLOSE_ERROR_ << ")" << endl;
-    //  exit(1);
+    //  stringstream message;
+    //  message << "Atoms appear to be overlapping (min_dist=" << min_dist << "<" << _XPROTO_TOO_CLOSE_ERROR_ << ")";
+    //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
     //}
 
     return min_dist;
@@ -397,7 +399,6 @@ namespace SYM {
         }
         else {
           cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; //DX20180426 - changed xstr.directory to directory (pwd)
-          //DX20170901 exit(0);
           //count -=1;
           no_scan = true;
           tolerance = orig_tolerance; //DX20170906
@@ -415,76 +416,6 @@ namespace SYM {
     tolerance = orig_tolerance; //DX20170906
     //cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [dir=" << xstr.directory << "]" << endl;
     return FALSE;
-
-    //DX [OBSOLETE]    cerr << "determine orig tolerance: " << endl;
-    //DX [OBSOLETE]    double times = (call_count/2);
-    //DX [OBSOLETE]    int remainder = call_count%2;
-    //DX [OBSOLETE]    if(remainder==0){
-    //DX [OBSOLETE]      sign =1.0;
-    //DX [OBSOLETE]    }
-    //DX [OBSOLETE]    else {
-    //DX [OBSOLETE]      sign =-1.0;
-    //DX [OBSOLETE]    }
-    //DX [OBSOLETE]    cerr << "times: " << times << endl;
-    //DX [OBSOLETE]    cerr << "remainder: " << remainder << endl;
-    //DX [OBSOLETE]    cerr << "sign: " << sign << endl;
-    //DX [OBSOLETE]    cerr << "tolerance: " << tolerance << endl;
-    //DX [OBSOLETE]    double orig_tolerance = tolerance / (1.0+(sign*times*(5.0/100.0)));
-    //DX [OBSOLETE]    cerr << "orig_tolerance: " << orig_tolerance << endl;
-    //DX [OBSOLETE]    
-    //DX [OBSOLETE]    double tol_increment = 5.0*orig_tolerance/100.0;
-    //DX [OBSOLETE]
-    //DX [OBSOLETE]    call_count++;
-    //DX [OBSOLETE]    times = (call_count/2);
-    //DX [OBSOLETE]    if(remainder==0){
-    //DX [OBSOLETE]      sign =-1.0;
-    //DX [OBSOLETE]    }
-    //DX [OBSOLETE]    else {
-    //DX [OBSOLETE]      sign =1.0;
-    //DX [OBSOLETE]    }
-    //DX [OBSOLETE]    cerr << "times: " << times << endl;
-    //DX [OBSOLETE]    cerr << "call count" << call_count << endl;   
-    //DX [OBSOLETE]    if(!no_scan){
-    //DX [OBSOLETE]      if(tolerance>orig_tolerance){ // previous iteration was an increase in tolerance, the next should decrease
-    //DX [OBSOLETE]	sign = -1.0;
-    //DX [OBSOLETE]	tol_increment = tol_increment;
-    //DX [OBSOLETE]      }
-    //DX [OBSOLETE]      if(call_count<=max_count){
-    //DX [OBSOLETE]	tolerance = orig_tolerance + sign*(times*tol_increment);
-    //DX [OBSOLETE]	if(tolerance >= min_dist){ //if larger than min distance, force lower scan
-    //DX [OBSOLETE]	  sign = -1.0;
-    //DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
-    //DX [OBSOLETE]          call_count +=1;
-    //DX [OBSOLETE]	}
-    //DX [OBSOLETE]	//DX if(tolerance < 0.0){
-    //DX [OBSOLETE]	if(tolerance < _ZERO_TOL_){
-    //DX [OBSOLETE]	  sign = 1.0;
-    //DX [OBSOLETE]	  call_count += 1;
-    //DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
-    //DX [OBSOLETE]	}
-    //DX [OBSOLETE]	//DX20170904 [OBSOLETE] if(LDEBUG) {cerr << "CHANGING TOLERANCE TO: " << tolerance << " (" << count << "/" << max_count << ")" << endl;} 
-    //DX [OBSOLETE]	//if(sign<0.0){ // one count involves scanning up and then down once
-    //DX [OBSOLETE]	//  count += 1;
-    //DX [OBSOLETE]	//}
-    //DX [OBSOLETE]        if(call_count <= max_count){
-    //DX [OBSOLETE]          cerr << "WARNING: Inconsistent symmetry, changing tolerance to: " << tolerance << endl; 
-    //DX [OBSOLETE]	}
-    //DX [OBSOLETE]      }
-    //DX [OBSOLETE]      cerr << "new tol: " << tolerance << endl;
-    //DX [OBSOLETE]	cerr << "tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
-    //DX [OBSOLETE]      if(call_count > max_count){
-    //DX [OBSOLETE]	//DX cerr << "ERROR: Symmetry routine failed, tolerance range (" << orig_tolerance-(max_count*tol_increment) << " to " << orig_tolerance+(max_count*tol_increment) << ") tested [dir=" << xstr.directory << "]. Report to David Hicks (d.hicks@duke.edu). EXITING." << endl;
-    //DX [OBSOLETE]	cerr << "WARNING: Inconsistent symmetry, tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
-    //DX [OBSOLETE]	//DX20170901 exit(0);
-    //DX [OBSOLETE]        no_scan = true;
-    //DX [OBSOLETE]	return FALSE;
-    //DX [OBSOLETE]      }
-    //DX [OBSOLETE]      return TRUE;
-    //DX [OBSOLETE]    }
-    //DX [OBSOLETE]    else {
-    //DX [OBSOLETE]      return false;
-    //DX [OBSOLETE]    }
-    //DX [OBSOLETE]  }
   }
 } // namespace SYM
 
@@ -928,7 +859,6 @@ namespace SYM {
 //DX20190613 [OBSOLETE]         //DEBUGGER
 //DX20190613 [OBSOLETE]         //cerr << "ijk(i): " << ijk(i) << endl;
 //DX20190613 [OBSOLETE]         //cerr << "ERROR (PBC Function): More than three cells away!" << endl;
-//DX20190613 [OBSOLETE]         //exit(1);
 //DX20190613 [OBSOLETE]         return false;
 //DX20190613 [OBSOLETE]       }
 //DX20190613 [OBSOLETE]     }
@@ -1494,7 +1424,7 @@ namespace SYM {
         }
       }
       if(matched == false){
-        if(num_lattice_points == 3 && !reverse_tested){ // Need to test reverse setting before exiting
+        if(num_lattice_points == 3 && !reverse_tested){ // Need to test reverse setting before returning
           // reverse setting
           tmp(1)=1.0/3.0; tmp(2)=2.0/3.0; tmp(3)=1.0/3.0; // (1/3,2/3,1/3)
           conv_lattice_points.push_back(tmp);
@@ -1522,7 +1452,6 @@ namespace SYM {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(multiplicity_of_primitive<0){
       cerr << "SYM::ComparePointGroupAndSpaceGroupString: ERROR: Multiplicity of original to primitive cell is negative [dir=" << xstr.directory << "]. " << endl;
-      //exit(1);
     }
     string space_group_string = "";
     if(xstr.space_group_ITC != 0){ 
@@ -1753,6 +1682,9 @@ namespace SYM {
   }
 
   _atom ApplyAtom_20161115(const _atom &atom_in,const _sym_op &symop,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c,bool skew, bool _incell_,bool roff,bool validatePosition, double _eps_) {
+
+    string function_name = XPID + "SYM::ApplyAtom():";
+    stringstream message;
     _atom atom;
     atom=atom_in;  // copies all the info !
     //[OBSOLETE] check check=symop.is_pgroup+symop.is_fgroup+symop.is_sgroup+symop.is_agroup;
@@ -1762,16 +1694,16 @@ namespace SYM {
     //bool roff=TRUE;
 
     if(check!=1) {
-      cerr << "SYM::ApplyAtom: error [1]" << endl;
-      cerr << "symop.is_pgroup=" << symop.is_pgroup << endl;
-      cerr << "symop.is_pgroupk=" << symop.is_pgroupk << endl;
-      cerr << "symop.is_pgroup_xtal=" << symop.is_pgroup_xtal << endl;
-      cerr << "symop.is_pgroupk_xtal=" << symop.is_pgroupk_xtal << endl; //DX20191207 - added pgroupk_xtal
-      cerr << "symop.is_fgroup=" << symop.is_fgroup << endl;
-      cerr << "symop.is_sgroup=" << symop.is_sgroup << endl;
-      cerr << "symop.is_agroup=" << symop.is_agroup << endl;
-      cerr << "SYM::ApplyAtom error in symop.is_pgroup symop.is_fgroup symop.is_sgroup symop.is_agroup " << endl;
-      exit(0);
+      message << "Error [1]" << endl;
+      message << "  symop.is_pgroup=" << symop.is_pgroup << endl;
+      message << "  symop.is_pgroupk=" << symop.is_pgroupk << endl;
+      message << "  symop.is_pgroup_xtal=" << symop.is_pgroup_xtal << endl;
+      message << "  symop.is_pgroupk_xtal=" << symop.is_pgroupk_xtal << endl; //DX20191207 - added pgroupk_xtal
+      message << "  symop.is_fgroup=" << symop.is_fgroup << endl;
+      message << "  symop.is_sgroup=" << symop.is_sgroup << endl;
+      message << "  symop.is_agroup=" << symop.is_agroup << endl;
+      message << "Error in symop.is_pgroup symop.is_fgroup symop.is_sgroup symop.is_agroup " << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
     //check original atom first
     /*xvector<double> fdiff = (c2f*atom.cpos)-atom.fpos;
@@ -1786,17 +1718,17 @@ namespace SYM {
       if(modulus(f2c*fdiff)>_eps_) {*/
     if(validatePosition){
       if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
-        cerr << "SYM::ApplyAtom: error [2]" << endl;
-        cerr << "  atom_in.cpos=" << atom_in.cpos << endl;
-        cerr << "  atom_in.fpos=" << atom_in.fpos << endl;
-        cerr << "  f2c=" << endl << f2c << endl;
-        cerr << "  f2c*atom_in.fpos=" << f2c*atom.fpos << endl;
-        cerr << "  c2f=" << endl << c2f << endl;
-        cerr << "  c2f*atom_in.cpos=" << c2f*atom.cpos << endl;
-        cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-        cerr << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
-        cerr << "  EPS=" << _eps_ << endl;
-        exit(0);
+        message << "Error [2]" << endl;
+        message << "  atom_in.cpos=" << atom_in.cpos << endl;
+        message << "  atom_in.fpos=" << atom_in.fpos << endl;
+        message << "  f2c=" << endl << f2c << endl;
+        message << "  f2c*atom_in.fpos=" << f2c*atom.fpos << endl;
+        message << "  c2f=" << endl << c2f << endl;
+        message << "  c2f*atom_in.cpos=" << c2f*atom.cpos << endl;
+        message << "  f2c*c2f=" << endl << f2c*c2f << endl;
+        message << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
+        message << "  EPS=" << _eps_ << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
     }
 
@@ -1827,21 +1759,21 @@ namespace SYM {
 
       if(validatePosition){
         if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
-          cerr << "SYM::ApplyAtom: error [3]" << endl;
-          cerr << "  atom_in.cpos=" << atom_in.cpos << endl;
-          cerr << "  atom_in.fpos=" << atom_in.fpos << endl;
-          cerr << "  _sym_op=" << endl;
-          cerr << symop << endl;
-          cerr << "  atom.cpos=" << atom.cpos << endl;
-          cerr << "  atom.fpos=" << atom.fpos << endl;
-          cerr << "  f2c=" << endl << f2c << endl;
-          cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
-          cerr << "  c2f=" << endl << c2f << endl;
-          cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
-          cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-          cerr << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
-          cerr << "  EPS=" << _eps_ << endl;
-          exit(0);
+          message << "Error [3]" << endl;
+          message << "  atom_in.cpos=" << atom_in.cpos << endl;
+          message << "  atom_in.fpos=" << atom_in.fpos << endl;
+          message << "  _sym_op=" << endl;
+          message << symop << endl;
+          message << "  atom.cpos=" << atom.cpos << endl;
+          message << "  atom.fpos=" << atom.fpos << endl;
+          message << "  f2c=" << endl << f2c << endl;
+          message << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
+          message << "  c2f=" << endl << c2f << endl;
+          message << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
+          message << "  f2c*c2f=" << endl << f2c*c2f << endl;
+          message << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
+          message << "  EPS=" << _eps_ << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
         }
       }
       //}
@@ -1888,33 +1820,33 @@ namespace SYM {
 
     if(validatePosition){
       if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
-        cerr << "SYM::ApplyAtom: error [4]" << endl;
-        cerr << "  atom_in.cpos=" << atom_in.cpos << endl;
-        cerr << "  atom_in.fpos=" << atom_in.fpos << endl;
-        cerr << "  _sym_op=" << endl;
-        cerr << symop << endl;
-        cerr << "  atom.cpos=" << atom.cpos << endl;
-        cerr << "  atom.fpos=" << atom.fpos << endl;
-        cerr << "  f2c=" << endl << f2c << endl;
-        cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
-        cerr << "  c2f=" << endl << c2f << endl;
-        cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
-        cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-        cerr << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
-        cerr << "  EPS=" << _eps_ << endl;
-        exit(0);
+        message << "Error [4]" << endl;
+        message << "  atom_in.cpos=" << atom_in.cpos << endl;
+        message << "  atom_in.fpos=" << atom_in.fpos << endl;
+        message << "  _sym_op=" << endl;
+        message << symop << endl;
+        message << "  atom.cpos=" << atom.cpos << endl;
+        message << "  atom.fpos=" << atom.fpos << endl;
+        message << "  f2c=" << endl << f2c << endl;
+        message << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
+        message << "  c2f=" << endl << c2f << endl;
+        message << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
+        message << "  f2c*c2f=" << endl << f2c*c2f << endl;
+        message << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
+        message << "  EPS=" << _eps_ << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
     }
     //}
     if(_incell_) atom.ijk=xint(floor(atom.fpos));
     if(symop.basis_map_calculated){ //FIXING FOR ME CO20180420
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
-        cerr << "SYM::ApplyAtom: error [5]" << endl;
-        cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
-        cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
-        cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
-        cerr << "SYM::ApplyAtom: fgroup is mapping out of range" << endl;
-        exit(0);
+        message << "Error [5]" << endl;
+        message << "  atom_in.basis=" << atom_in.basis << endl;
+        message << "  symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
+        message << "  symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
+        message << "  fgroup is mapping out of range" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }
@@ -1970,32 +1902,32 @@ namespace SYM {
       //this is SAFE because fgroups already validated, and sgroup is simply a shift to another cell
       if(0&&validatePosition){  
         if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
-          cerr << "SYM::ApplyAtom: error [6]" << endl;
-          cerr << "  atom_in.cpos=" << atom_in.cpos << endl;
-          cerr << "  atom_in.fpos=" << atom_in.fpos << endl;
-          cerr << "  _sym_op=" << endl;
-          cerr << symop << endl;
-          cerr << "  atom.cpos=" << atom.cpos << endl;
-          cerr << "  atom.fpos=" << atom.fpos << endl;
-          cerr << "  f2c=" << endl << f2c << endl;
-          cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
-          cerr << "  c2f=" << endl << c2f << endl;
-          cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
-          cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-          cerr << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
-          cerr << "  EPS=" << _eps_ << endl;
-          exit(0);
+          message << "Error [6]" << endl;
+          message << "  atom_in.cpos=" << atom_in.cpos << endl;
+          message << "  atom_in.fpos=" << atom_in.fpos << endl;
+          message << "  _sym_op=" << endl;
+          message << symop << endl;
+          message << "  atom.cpos=" << atom.cpos << endl;
+          message << "  atom.fpos=" << atom.fpos << endl;
+          message << "  f2c=" << endl << f2c << endl;
+          message << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
+          message << "  c2f=" << endl << c2f << endl;
+          message << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
+          message << "  f2c*c2f=" << endl << f2c*c2f << endl;
+          message << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
+          message << "  EPS=" << _eps_ << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
         }
       }
       //}
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
-        cerr << "SYM::ApplyAtom: error [7]" << endl;
-        cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
-        cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
-        cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
-        cerr << "SYM::ApplyAtom: sgroup is mapping out of range" << endl;
-        exit(0);
+        message << "Error [7]" << endl;
+        message << "  atom_in.basis=" << atom_in.basis << endl;
+        message << "  symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
+        message << "  symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
+        message << "sgroup is mapping out of range" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }

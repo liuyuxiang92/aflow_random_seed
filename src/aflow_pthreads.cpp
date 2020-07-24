@@ -60,6 +60,7 @@ namespace AFLOW_PTHREADS {
 namespace AFLOW_PTHREADS {
   bool Check_Threads(vector<string> argv,const bool& VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "AFLOW_PTHREADS::Check_Threads():";
     if(VERBOSE) {;} // dummy load
     AFLOW_PTHREADS::FLAG=FALSE;
     AFLOW_PTHREADS::MAX_PTHREADS=1;
@@ -84,12 +85,12 @@ namespace AFLOW_PTHREADS {
       if(LDEBUG) cerr << "AAAAA  AFLOW SERIAL VERSION threads=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
     }
     //  AFLOW_PTHREADS::FLAG=TRUE;
-    if(LDEBUG) cerr << XPID << "AFLOW_PTHREADS::Check_Threads: fnp=" << fnp << endl;
-    if(LDEBUG) cerr << XPID << "AFLOW_PTHREADS::Check_Threads: fnpmax=" << fnpmax << endl;
-    if(LDEBUG) cerr << XPID << "AFLOW_PTHREADS::Check_Threads: multi_sh=" << multi_sh << endl;
-    if(LDEBUG) cerr << XPID << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
-    if(LDEBUG) cerr << XPID << "AFLOW_PTHREADS::Check_Threads: AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
-    //  if(LDEBUG) exit(0); // for debug
+    if(LDEBUG) cerr << function_name << " fnp=" << fnp << endl;
+    if(LDEBUG) cerr << function_name << " fnpmax=" << fnpmax << endl;
+    if(LDEBUG) cerr << function_name << " multi_sh=" << multi_sh << endl;
+    if(LDEBUG) cerr << function_name << " AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+    if(LDEBUG) cerr << function_name << " AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
+    //  if(LDEBUG) throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_); // for debug
     return AFLOW_PTHREADS::FLAG;
   }
 } // namespace AFLOW_PTHREADS
@@ -207,10 +208,23 @@ pthread_mutex_t mutex_PTHREAD=PTHREAD_MUTEX_INITIALIZER;
 
 namespace KBIN {
   void RUN_Directory_PTHREADS(_aflags &aflags) {
+
+    string function_name = XPID + "KBIN::RUN_Directory_PTHREADS():";
+    stringstream message;
+
     int ithread=aflags.AFLOW_PTHREADS_NUMBER;
-    if(ithread<0) {cerr << "ERROR KBIN::RUN_Directory_PTHREADS: ithread<0  ithread=" << ithread << endl;exit(0);};
-    if(ithread>=MAX_ALLOCATABLE_PTHREADS) {cerr << "ERROR KBIN::RUN_Directory_PTHREADS: ithread>=MAX_ALLOCATABLE_PTHREADS  ithread=" << ithread << endl;exit(0);};
-    if(ithread>=AFLOW_PTHREADS::MAX_PTHREADS) {cerr << "ERROR KBIN::RUN_Directory_PTHREADS: ithread>=AFLOW_PTHREADS::MAX_PTHREADS  ithread=" << ithread << endl;exit(0);};
+    if(ithread<0) {
+      message << "ithread<0  ithread=" << ithread;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INDEX_BOUNDS_);
+    }
+    if(ithread>=MAX_ALLOCATABLE_PTHREADS) {
+      message << "ithread>=MAX_ALLOCATABLE_PTHREADS  ithread=" << ithread;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INDEX_BOUNDS_);
+    }
+    if(ithread>=AFLOW_PTHREADS::MAX_PTHREADS) {
+      message << "ithread>=AFLOW_PTHREADS::MAX_PTHREADS  ithread=" << ithread;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INDEX_BOUNDS_);
+    }
     taflags[ithread]=aflags;
     params[ithread].paflags=&taflags[ithread];
     params[ithread].command="";//command;
@@ -263,10 +277,23 @@ namespace KBIN {
 
 namespace KBIN {
   void MULTIRUN_PTHREADS(_aflags &aflags,string command) {
+
+    string function_name = XPID + "KBIN::MULTIRUN_PTHREADS():";
+    stringstream message;
+
     int ithread=aflags.AFLOW_PTHREADS_NUMBER;
-    if(ithread<0) {cerr << "ERROR KBIN::MULTIRUN_PTHREADS: ithread<0  ithread=" << ithread << endl;exit(0);};
-    if(ithread>=MAX_ALLOCATABLE_PTHREADS) {cerr << "ERROR KBIN::MULTIRUN_PTHREADS: ithread>=MAX_ALLOCATABLE_PTHREADS  ithread=" << ithread << endl;exit(0);};
-    if(ithread>=AFLOW_PTHREADS::MAX_PTHREADS) {cerr << "ERROR KBIN::MULTIRUN_PTHREADS: ithread>=AFLOW_PTHREADS::MAX_PTHREADS  ithread=" << ithread << endl;exit(0);};
+    if(ithread<0) {
+      message << "ithread<0  ithread=" << ithread;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INDEX_BOUNDS_);
+    }
+    if(ithread>=MAX_ALLOCATABLE_PTHREADS) {
+      message << "ithread>=MAX_ALLOCATABLE_PTHREADS  ithread=" << ithread;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INDEX_BOUNDS_);
+    }
+    if(ithread>=AFLOW_PTHREADS::MAX_PTHREADS) {
+      message << "ithread>=AFLOW_PTHREADS::MAX_PTHREADS  ithread=" << ithread;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INDEX_BOUNDS_);
+    }
     taflags[ithread]=aflags;
     params[ithread].paflags=&taflags[ithread];
     params[ithread].command=command;
@@ -278,6 +305,9 @@ namespace KBIN {
 
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv) {
+
+    string function_name = "AFLOW_PTHREADS::MULTI_sh()";
+    stringstream message;
     ostringstream aus;
     _aflags aflags;
     // [OBSOLETE]    string file_name=aurostd::args2string(argv,"--FILE|--F|--f","xxxx");
@@ -288,8 +318,8 @@ namespace AFLOW_PTHREADS {
     AFLOW_PTHREADS::FLAG=TRUE;
     AFLOW_PTHREADS::MAX_PTHREADS=PTHREAD_DEFAULT; // safety...
 
-    if(!aurostd::FileExist(file_name)) {aus << "EEEEE FILE_NOT_FOUND = " << file_name << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
-    if( aurostd::FileEmpty(file_name)) {aus << "EEEEE FILE_EMPTY = " << file_name << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_CORRUPT_);}
     aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
     vector<string> vcmds;
     vcmds.clear();
@@ -336,13 +366,16 @@ namespace AFLOW_PTHREADS {
 
 namespace AFLOW_PTHREADS {
   void *_threaded_COMMANDS(void *ptr) {
+
+    string function_name = "AFLOW_PTHREADS::_threaded_COMMANDS():";
+    stringstream message;
     if(AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_) {
       //cerr << XPID << "AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_ AFLOW_PTHREADS::_threaded_COMMANDS" << endl;
       KBIN::_threaded_params* pparams=(KBIN::_threaded_params*) ptr;
       string command;
       AFLOW_PTHREADS::vpthread_busy[pparams->itbusy]=TRUE;
       AFLOW_PTHREADS::RUNNING++;
-      if((pparams->VERBOSE)) {pthread_mutex_lock(&mutex_PTHREAD);cout << "AFLOW_PTHREADS::_threaded_COMMANDS " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;pthread_mutex_unlock(&mutex_PTHREAD);}
+      if((pparams->VERBOSE)) {pthread_mutex_lock(&mutex_PTHREAD);cout << function_name << " " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;pthread_mutex_unlock(&mutex_PTHREAD);}
       for(uint ithread=(pparams->ITHREAD);ithread<(*pparams->dcmds).size();ithread+=(pparams->THREADS_MAX)) {
         if((pparams->VERBOSE)) {pthread_mutex_lock(&mutex_PTHREAD);cout << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << " " << ithread << " " << (*pparams->dcmds).at(ithread) << endl;pthread_mutex_unlock(&mutex_PTHREAD);}
         command=(*pparams->dcmds).at(ithread);
@@ -379,8 +412,8 @@ namespace AFLOW_PTHREADS {
       return NULL;
     }
     if(!AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_ && !AFLOW_PTHREADS::MULTISH_TIMESHARING_CONCURRENT_) {
-      cerr << "ERROR: AFLOW_PTHREADS::*_threaded_COMMANDS: you must specify MULTISH_TIMESHARING_SEQUENTIAL_ of MULTISH_TIMESHARING_CONCURRENT_" << endl;
-      exit(0);
+      message << "You must specify MULTISH_TIMESHARING_SEQUENTIAL_ of MULTISH_TIMESHARING_CONCURRENT_";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_MISSING_);
     }
     return NULL;
   }
@@ -389,6 +422,9 @@ namespace AFLOW_PTHREADS {
 
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv) {
+
+    string function_name = XPID + "AFLOW_PTHREADS::MULTI_sh():";
+    stringstream message;
     ostringstream aus;
     _aflags aflags;
     // [OBSOLETE] string file_name=aurostd::args2string(argv,"--FILE|--F|--f","xxxx");
@@ -397,8 +433,8 @@ namespace AFLOW_PTHREADS {
     //  bool free_thread;int ithread=0;
     bool VERBOSE=FALSE;
 
-    if(!aurostd::FileExist(file_name)) {aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
-    if( aurostd::FileEmpty(file_name)) {aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_CORRUPT_);}
     if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
     vector<string> vcmds;vcmds.clear();
     aurostd::file2vectorstring(file_name,vcmds);
@@ -489,6 +525,9 @@ namespace aurostd {
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
   bool MULTI_zip(vector<string> argv) {
+
+    string function_name = XPID + "AFLOW_PTHREADS::MULTI_zip():";
+    stringstream message;
     ostringstream aus;
     _aflags aflags;
     bool VERBOSE=FALSE;
@@ -499,8 +538,8 @@ namespace AFLOW_PTHREADS {
     if(XHOST.vflag_control.flag("FILE")) {
       string file_name=XHOST.vflag_control.getattachedscheme("FILE");
       // if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
-      if(!aurostd::FileExist(file_name)) {aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
-      if( aurostd::FileEmpty(file_name)) {aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+      if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);}
+      if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_CORRUPT_);}
       if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
       aurostd::file2vectorstring(file_name,vdirs);
     }
@@ -530,13 +569,13 @@ namespace AFLOW_PTHREADS {
       }
       //    cerr << vdirs.at(i) << endl;
     }
-    //  cerr << vdirs.size() << endl; exit(0);
+    //  cerr << vdirs.size() << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     int size=aurostd::args2attachedutype<int>(argv,"--size=",(int) (100));if(size<=0) size=1;
     string prefix=aurostd::args2attachedstring(argv,"--prefix=",(string) "m");
     bool flag_ADD=aurostd::args2flag(argv,"--add");
 
-    //  cerr << prefix << endl; exit(0);
+    //  cerr << prefix << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     int numzipsCE=(int) ceil(((double) vdirs.size())/((double) size));
     int numzipsFL=(int) floor(((double) vdirs.size())/((double) size));
@@ -562,8 +601,8 @@ namespace AFLOW_PTHREADS {
       }
     }
 
-    // cerr << numzips << endl; exit(0);
-    // cerr << sysconf(_SC_ARG_MAX)  << endl;//exit(0);
+    // cerr << numzips << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // cerr << sysconf(_SC_ARG_MAX)  << endl;//throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
     for(i=0;i<(uint) numzips;i++) {
       command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303
       // command="zip -9rv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
@@ -733,8 +772,10 @@ namespace sflow {
 // ***************************************************************************
 namespace sflow {
   void JUST(string options,istream& input,string mode) {
+
+    string function_name = XPID + "sflow::JUST():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "sflow::JUST: BEGIN" << endl;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
 
@@ -746,7 +787,6 @@ namespace sflow {
     if(mode=="JUSTAFTER" || mode=="AFTER") {
       if(tokens.size()!=1 ) {
         init::ErrorOption(options,"sflow::JUST","aflow --justafter=string < something");
-        exit(0);
       }
       vector<string> vline;
       aurostd::string2vectorstring(strout,vline);
@@ -759,7 +799,6 @@ namespace sflow {
     if(mode=="JUSTBEFORE" || mode=="BEFORE") {
       if(tokens.size()!=1 ) {
         init::ErrorOption(options,"sflow::JUST","aflow --justbefore=string < something");
-        exit(0);
       }
       if(strout.find(tokens.at(0))==string::npos) cout << strout;
       strout=strout.substr(0,strout.find(tokens.at(0)));
@@ -770,7 +809,6 @@ namespace sflow {
     if(mode=="JUSTBETWEEN" || mode=="BETWEEN") {
       if(tokens.size()>2) {
         init::ErrorOption(options,"sflow::JUST","aflow --justbetween=string_start[,string_stop] < something");
-        exit(0);
       }
 
       string strfind_from,strfind_to,avoid1_strfind_from,avoid1_strfind_to;
@@ -791,16 +829,16 @@ namespace sflow {
         if(aurostd::substring2bool(vstranalyze.at(i),strfind_from)) istart=i;
         if(aurostd::substring2bool(vstranalyze.at(i),strfind_to)) istop=i;
       }
-      if(LDEBUG) cerr << XPID << "sflow::JUST: istart=" << istart << endl;
-      if(LDEBUG) cerr << XPID << "sflow::JUST: istop=" << istop << endl;
+      if(LDEBUG) cerr << function_name << " istart=" << istart << endl;
+      if(LDEBUG) cerr << function_name << " istop=" << istop << endl;
 
       for(uint i=0;i<vstranalyze.size();i++)
         if(i>istart && i<istop) 
           cout << vstranalyze.at(i) << endl;
     }
 
-    if(LDEBUG) cerr << XPID << "sflow::JUST: END" << endl;
-    exit(0);
+    if(LDEBUG) cerr << function_name << " END" << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
   }  
 } // namespace sflow
 
@@ -873,7 +911,6 @@ namespace sflow {
 
     if(tokens.size()!=2) {
       init::ErrorOption(options,"sflow::QSUB","aflow --qsub=N,file");
-      exit(0);
     }
 
     vector<string> vcmds;
@@ -900,7 +937,6 @@ namespace sflow {
 
     if(tokens.size()!=2) {
       init::ErrorOption(options,"sflow::QSUB","aflow --qsub=N,file");
-      exit(0);
     }
 
     vector<string> vcmds;

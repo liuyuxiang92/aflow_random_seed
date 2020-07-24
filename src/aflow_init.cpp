@@ -1867,7 +1867,7 @@ bool AFLOW_BlackList(const string& h) { //CO20200713
 // init::ErrorOptions
 // ***************************************************************************
 namespace init {
-  bool MessageOption(const string& options, const string& routine,vector<string> vusage) {  //CO20200624
+  void MessageOption(const string& options, const string& routine,vector<string> vusage) {  //CO20200624 //DX20200724 - bool to void
     ostream& oss=cerr;
     string usage="      "+routine+" Usage: ";  //CO20200624
     for(uint i=0;i<vusage.size();i++) {
@@ -1875,14 +1875,14 @@ namespace init {
       if(vusage.at(i)!="") oss << usage << vusage.at(i) << endl;
     }
     oss << "       options=[" << options << "]" << endl;
-    return true;
+    //DX20200724 [OBSOLETE] return true;
   }
-  bool MessageOption(const string& options, const string& routine,string usage) { //CO20200624
+  void MessageOption(const string& options, const string& routine,string usage) { //CO20200624 //DX20200724 - bool to void
     vector<string> vusage;
     aurostd::string2vectorstring(usage,vusage);
-    return MessageOption(options,routine,vusage);
+    MessageOption(options,routine,vusage); //DX20200724 - removed return
   }
-  bool ErrorOption(const string& options, const string& routine,vector<string> vusage) {
+  void ErrorOption(const string& options, const string& routine,vector<string> vusage) { //DX20200724 - bool to void
     string soliloquy=XPID+"init::ErrorOption():";
     stringstream message;
 
@@ -1893,12 +1893,14 @@ namespace init {
     //[CO20200624 - OBSOLETE]oss << "ERROR: " << routine << ":" << endl;
     //[CO20200624 - OBSOLETE]oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
     
-    return MessageOption(options,routine,vusage);
+    //DX20200724 [OBSOLETE] return MessageOption(options,routine,vusage);
+    MessageOption(options,routine,vusage); //DX20200724
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Incorrect usage.",_RUNTIME_ERROR_); //DX20200724
   }
-  bool ErrorOption(const string& options, const string& routine,string usage) {
+  void ErrorOption(const string& options, const string& routine,string usage) { //DX20200725 - bool to void
     vector<string> vusage;
     aurostd::string2vectorstring(usage,vusage);
-    return ErrorOption(options,routine,vusage);
+    ErrorOption(options,routine,vusage); //DX20200724 - removed return
   }
 }
 
