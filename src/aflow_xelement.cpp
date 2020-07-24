@@ -150,7 +150,7 @@ void free();                                              // free space
 std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
 namespace pflow {
-  void XelementPrint(string options,ostream& oss) {
+  void XelementPrint(const string& options,ostream& oss) {
     bool LDEBUG=0;//(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "pflow::XelementPrint [BEGIN]" << endl;
     if(LDEBUG) cerr << "options=" << options << endl;
