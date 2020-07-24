@@ -55,7 +55,7 @@ namespace cce {
     vector<double> superox_correction; // superoxide correction per cell for functionals and temperatures as above
     vector<double> cce_correction; // total correction per cell for functionals and temperatures as above
     vector<double> cce_form_energy_cell; // CCE formation enthalpy per cell for functionals and temperatures as above
-    stringstream oss;
+    string os; // output-string for gathering output before CCE corrections, e.g. oxidation numbers
   };
 
   // main CCE functions
