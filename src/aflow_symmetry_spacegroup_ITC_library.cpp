@@ -503,6 +503,8 @@ namespace SYM {
   }
 
   xvector<double> operator*(Glide& G, const xvector<double>& P) {
+    string function_name = "SYM::glide::operator*():";
+    stringstream message;
     if(G.DIRECT == true) {
       //cerr << "DIRECT = true" << endl;
       double tol = 0.0001;
@@ -511,10 +513,10 @@ namespace SYM {
       double d1 = distance_between_points(x_0, P);
       double d2 = distance_between_points(x_0 + tol * G.a, P);
       if(d2 == d1) {
-        cerr << "THERE IS A PROBLEM in operator* Glide(DIRECT=true): " << endl;
-        cerr << "d1,d2: " << d1 << " " << d2 << endl;
-        cerr << "x_0: " << x_0 << endl;
-        exit(0);
+        message << "THERE IS A PROBLEM in operator* Glide(DIRECT=true): " << endl;
+        message << "d1,d2: " << d1 << " " << d2 << endl;
+        message << "x_0: " << x_0 << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_GENERIC_ERROR_);
       }
       if(d2 < d1) {  //Normal not oriented properly, switch sign. (G.a -> -G.a) et.c
         orient = -1;
@@ -599,7 +601,7 @@ void xb() {
 // **********************************************************************************************************************
 namespace SYM {
   double get_angle(xvector<double> a, xvector<double> b, string c) {
-    double ang = acos(DotPro(a, b) / (aurostd::modulus(a) * aurostd::modulus(b)));
+    double ang = acos(aurostd::scalar_product(a, b) / (aurostd::modulus(a) * aurostd::modulus(b)));
     if(c == "deg" || c == "Deg" || c == "d" || c == "D") {
       ang = (180 / Pi_r) * ang;
     }
@@ -613,6 +615,8 @@ namespace SYM {
 // **********************************************************************************************************************
 namespace SYM {
   xvector<double> get_random_point_in_plane(string plane) {
+    string function_name = "SYM::get_random_point_in_plane():";
+    stringstream message;
     vector<string> parametric_plane = splitstring(plane);
     vector<char> params;
     char c;
@@ -625,8 +629,8 @@ namespace SYM {
       }
     }
     if(params.size() > 2) {
-      cerr << "!NOT A VALID REPRESENTATION OF A PLANE" << endl;
-      exit(0);
+      message << "Not a valid representation of a plane.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
     vector<double> x, y;
     x.push_back((double)rand() / RAND_MAX);

@@ -571,9 +571,9 @@ namespace SYM {
   //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
   //DX20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
-  double DotPro(xvector<double> a, xvector<double> b);
+  //DX20190905 [OBSOLETE] double DotPro(xvector<double> a, xvector<double> b);
   //  double modulus(xvector<double> a);
-  double modulus(vector<double> a);
+  //DX20190905 [OBSOLETE] double modulus(vector<double> a);
   //  //Linear Algebra Functions:
   void swap_rows(xmatrix<double>& M, int a, int b);
   //  }
