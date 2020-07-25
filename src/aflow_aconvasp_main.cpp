@@ -3601,6 +3601,7 @@ namespace pflow {
 namespace pflow {
   //DX20181101 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input)
   string BZDirectionsSTRUCTURE(istream& input, aurostd::xoption& vpflow) {
+    string soliloquy=XPID+"pflow::BZDirectionsSTRUCTURE():";
 
     xstructure a(input,IOAFLOW_AUTO);
     bool foundBZ;
@@ -3614,8 +3615,7 @@ namespace pflow {
       a.transform_coordinates_original2new=aurostd::eye<double>(); //CO20190520
     }
     else if(a.volume_changed_original2new==true){
-      cerr << "BZDirectionsSTRUCTURE::ERROR: The volume changed between the input and final structure; cannot transform kpoints." << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"The volume changed between the input and final structure; cannot transform kpoints",_RUNTIME_ERROR_);  //CO20200624
     }
     cerr << "LATTICE INFORMATION" << endl;
     cerr << " Real space lattice primitive           = " << a.bravais_lattice_type << endl;
@@ -4766,7 +4766,7 @@ namespace pflow {
     // output usage
     if(LDEBUG) oss << soliloquy << "CHECK USAGE" << endl; 
     if(vpflow.flag("CHGDIFF::USAGE")) {
-      init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF()",aurostd::liststring2string(usage_usage,usage_options));
+      init::MessageOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF()",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
     }
 
@@ -4778,8 +4778,7 @@ namespace pflow {
       oss << soliloquy << "ERROR: No input given." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
-      return oss.str();
+      //[CO20200624 - OBSOLETE]init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
     }
 
     // check inputs
@@ -4792,8 +4791,7 @@ namespace pflow {
       oss << soliloquy << "ERROR: Incorrect input arguments. List two CHGCARs separated by commas." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
-      return oss.str();
+      //[CO20200624 - OBSOLETE]init::ErrorOption(vpflow.getattachedscheme("CHGDIFF"),"pflow::CHGDIFF",aurostd::liststring2string(usage_usage,usage_options));
     }
 
     chgcar1_file=input_tokens.at(0);chgcar2_file=input_tokens.at(1);
@@ -4967,8 +4965,7 @@ namespace pflow {
     // output usage
     if(LDEBUG) oss << soliloquy << "CHECK USAGE" << endl; 
     if(vpflow.flag("CHGSUM::USAGE")) {
-      init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
-      return oss.str();
+      init::MessageOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
     }
 
     // no input
@@ -4979,9 +4976,9 @@ namespace pflow {
       oss << soliloquy << "ERROR: No input given." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
       oss << endl;
       return oss.str();
+      //[CO20200624 - OBSOLETE]init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
     }
 
     // check inputs
@@ -4994,8 +4991,8 @@ namespace pflow {
       oss << soliloquy << "ERROR: Incorrect input arguments. List at least two CHGCARs separated by commas." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
       return oss.str();
+      //[CO20200624 - OBSOLETE]init::ErrorOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
     } else {
       // get inputs
       for(uint i=0;i<input_tokens.size();i++) {
@@ -5215,7 +5212,7 @@ namespace pflow {
 namespace pflow {
   void CIF(istream& input, aurostd::xoption& vpflow) {
     if(vpflow.flag("CIF::USAGE")) {
-      init::ErrorOption("--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance|=tight|=loose] [--setting=1|2] [--no_symmetry] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
+      init::MessageOption("--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance|=tight|=loose] [--setting=1|2] [--no_symmetry] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
       return;
     }
     xstructure a(input,IOAFLOW_AUTO);
@@ -5275,7 +5272,6 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=6) {
       init::ErrorOption(options,soliloquy,"aflow --clat=a,b,c,alpha,beta,gamma");
-      exit(0);
     }
     xvector<double> data(6);
     if(tokens.size()>=1) data[1]=aurostd::string2utype<double>(tokens.at(0));
@@ -5332,7 +5328,6 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=12) {
       init::ErrorOption(options,soliloquy,"aflow --compare=a,b,c,d,e,f,g,h,k,j,i,l");
-      exit(0);
     }
     xvector<double> aa(12);
     for(int i=1;i<=12;i++) 
@@ -5348,7 +5343,6 @@ namespace pflow {
     cout << endl;
     cout << "MIN " << min(bb1,min(bb2,min(bb3,min(bb4,min(bb5,bb6))))) << endl;
     cout << "MAX " << max(bb1,max(bb2,max(bb3,max(bb4,max(bb5,bb6))))) << endl;
-    // exit(0);
   }
 } // namespace pflow
 
@@ -5408,7 +5402,6 @@ namespace pflow {
     cerr << "STANDARD_CONVENTIONAL" << endl;
     cerr << Getabc_angles(str_sc.lattice,DEGREES) << endl;
     cerr << str_sc;
-    exit(0);
     return str_sp;
   }
 } // namespace pflow
@@ -5436,8 +5429,9 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(options,soliloquy,
+        init::MessageOption(options,soliloquy,
             aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
+        return true;  //CO20200624 - the option was expressed successfully
       }
     }
     xstructure _a(input,IOAFLOW_AUTO);
@@ -5523,7 +5517,6 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
       init::ErrorOption(options,soliloquy,"aflow --data1=rcut < POSCAR");
-      exit(0);
     }
     double rcut=0.0;
     if(tokens.size()>=1) rcut=aurostd::string2utype<double>(tokens.at(0));
@@ -5531,7 +5524,7 @@ namespace pflow {
     cout << aflow::Banner("BANNER_TINY") << endl;
     xstructure a(input,IOAFLOW_AUTO);
     // Read in input file.
-    // cerr << rcut << endl;exit(0);
+    // cerr << rcut << endl;
     pflow::PrintData1(a,rcut,cout);
     if(LDEBUG) cerr << soliloquy << " END" << endl;
   }
@@ -5560,7 +5553,6 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
       init::ErrorOption(options,soliloquy,"aflow --disp=cutoff < POSCAR");
-      exit(0);
     }
     double cutoff=0.0;
     if(tokens.size()>=1) cutoff=aurostd::string2utype<double>(tokens.at(0)); 
@@ -5583,7 +5575,6 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
       init::ErrorOption(options,soliloquy,"aflow --dist=cutoff < POSCAR");
-      exit(0);
     }
     double cutoff=0.0;
     if(tokens.size()>=1) cutoff=aurostd::string2utype<double>(tokens.at(0));
@@ -5606,7 +5597,6 @@ namespace pflow {
 //     if(argv.size() != 3)
 //       {  // user control lines - aflow specific.
 //    init::ErrorOption("","pflow::DYNADIEL","aflow --dynadiel OUTCAR*");
-// 	exit(0) ;
 //       }
 //     outcar = argv.at(2) ;
 //     KBIN::GetDynaDiel(outcar, real, imag) ;
@@ -5807,6 +5797,7 @@ namespace pflow {
   string EQUIVALENT(_aflags &aflags,istream& input, aurostd::xoption& vpflow) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::EQUIVALENT():";  //CO20200624
+    stringstream message;
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     xstructure _a(input,IOAFLOW_AUTO);
     bool PRINT_SCREEN=FALSE;
@@ -5830,9 +5821,9 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(options,soliloquy,
+        init::MessageOption(options,soliloquy,
             aurostd::liststring2string("aflow --equivalent|--equiv|--inequivalent|--inequiv|--iatoms|--eatoms[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0"));
-        exit(0);
+        return "";
       }
     }
     //DX20170804 - need to rescale, so we make a fast copy and calculate
@@ -5874,8 +5865,7 @@ namespace pflow {
       tolerance = default_tolerance;
     }
     if(tolerance < 1e-10){
-      cerr << XPID << "pflow::EQUIVALENT ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Tolerance cannot be zero (i.e. less than 1e-10)",_INPUT_ILLEGAL_); //CO20200624
     }
     //DX NOT REALLY NEEDED FOR THIS FUNCTION
     //DX20170803 - Add format flag - START
@@ -5897,8 +5887,8 @@ namespace pflow {
     }
 
     if(!pflow::PerformFullSymmetry(a,tolerance,no_scan,force_perform,FileMESSAGE,aflags,kflags,PRINT_SCREEN,cout)){
-      cerr << XPID << "pflow::EQUIVALENT ERROR: Could not find commensurate symmetry at tolerance = " << tolerance << " " << print_directory << "." << endl; 
-      exit(1);
+      message << "Could not find commensurate symmetry at tolerance = " << tolerance << " " << print_directory;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_); //CO20200624
     }
     //pflow::PerformFullSymmetry(a,File,aflags,kflags,PRINT_SCREEN,cout); //DX20170815 - Add in consistency checks
     //SYM::CalculatePointGroup(File,a,aflags,TRUE,PRINT_SCREEN,cout);
@@ -6543,8 +6533,9 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(options,soliloquy,
+        init::MessageOption(options,soliloquy,
             aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
+        return false; //CO20200624 - there has been NO calculation of symmetry
       }
     }
     //DX20170804 - need to rescale, so we make a fast copy and calculate
@@ -11254,7 +11245,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(options,soliloquy,
+        init::MessageOption(options,soliloquy,
             aurostd::liststring2string("aflow --platonSG[_label,_number][=EQUAL| EXACT][,ang,d1,d2,d3] < POSCAR  default:"+
               string("EQUAL=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EQUAL)+","+
               string("EXACT=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EXACT)+","+
@@ -11262,6 +11253,7 @@ namespace pflow {
               aurostd::utype2string(DEFAULT_PLATON_P_D1,5)+","+
               aurostd::utype2string(DEFAULT_PLATON_P_D2,5)+","+
               aurostd::utype2string(DEFAULT_PLATON_P_D3,5)));
+        return "";  //CO20200624 - the option was expressed successfully
       } 
     }
     // move on
@@ -12535,7 +12527,7 @@ namespace pflow {
     // check usage
     if(LDEBUG) cerr << soliloquy << " CHECK USAGE" << endl; 
     if(vpflow.flag("PROTO_AFLOW::USAGE") || PARAMS.ucell.size()==0) {
-      init::ErrorOption(vpflow.getattachedscheme("PROTO_AFLOW"),"pflow::PROTO_AFLOW",
+      init::MessageOption(vpflow.getattachedscheme("PROTO_AFLOW"),"pflow::PROTO_AFLOW",
           aurostd::liststring2string("aflow [options] --aflow_proto[|_icsd]=label*:speciesA*[:speciesB*][:volumeA*[:volumeB*]|:volume] [--params=... [--hex]]",
             "       options:",
             "                --usage",
@@ -12581,6 +12573,7 @@ namespace pflow {
             "                --list",
             "                --params=....  { check aflow --readme=anrl }",
             "                --hex          { check aflow --readme=anrl }"));
+        return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PROTO_AFLOW::USAGE\")=" << vpflow.flag("PROTO_AFLOW::USAGE") << endl;
 
@@ -13072,10 +13065,11 @@ namespace pflow {
     // check usage
     if(LDEBUG) cerr << soliloquy << " CHECK USAGE" << endl; 
     if(vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") || file=="") {
-      init::ErrorOption(vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),"pflow::PSEUDOPOTENTIALS_CHECK",
+      init::MessageOption(vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),"pflow::PSEUDOPOTENTIALS_CHECK",
           aurostd::liststring2string("aflow [options] --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=",
             "       options:",
             "                --usage"));
+      return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PSEUDOPOTENTIALS_CHECK::USAGE\")=" << vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") << endl;
     //if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
@@ -13728,7 +13722,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(options,soliloquy,
+        init::MessageOption(options,soliloquy,
             aurostd::liststring2string("aflow --aflowSG[=tolerance|=tight|=loose] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: (minimum_interatomic_distance)/100.0",
               "aflow --platonSG[_label,_number][=EQUAL| EXACT][,ang,d1,d2,d3] < POSCAR  default:"+
               string("EQUAL=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EQUAL)+","+
@@ -13738,6 +13732,7 @@ namespace pflow {
               aurostd::utype2string(DEFAULT_PLATON_P_D2,5)+","+
               aurostd::utype2string(DEFAULT_PLATON_P_D3,5)+"",
               "aflow --findsymSG[_label,_number][=tolerance] < POSCAR   default:"+aurostd::utype2string(DEFAULT_FINDSYM_TOL,5)));
+        return "";  //CO20200624 - the option was expressed successfully
       } 
     }
     // move on
@@ -13995,8 +13990,9 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::ErrorOption(options,soliloquy,
+        init::MessageOption(options,soliloquy,
             aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic")); //DX20200724 - removed return
+        return true;  //CO20200624 - the option was expressed successfully
       }
     }
     xstructure _a(input,IOAFLOW_AUTO);
@@ -14326,8 +14322,9 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(vpflow.flag("WYCCAR::USAGE")) {
-      init::ErrorOption(options,soliloquy,
+      init::MessageOption(options,soliloquy,
           aurostd::liststring2string("aflow --wyccar[=tolerance|=tight|=loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
+      return "";  //CO20200624 - the option was expressed successfully
     }
     //DX20190201 START
     bool letters_only = false;
