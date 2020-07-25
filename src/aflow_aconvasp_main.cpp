@@ -5949,13 +5949,16 @@ namespace pflow {
 namespace pflow {
   string EXTRACT_xcar(_aflags &aflags,vector<string> argv,string mode,string file) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "pflow::EXTRACT_xcar: mode=" << mode << endl;
-    if(LDEBUG) cerr << XPID << "pflow::EXTRACT_xcar: file=" << file << endl;
+    string soliloquy=XPID+"pflow::EXTRACT_xcar():"; //CO20200624
+    if(LDEBUG) cerr << soliloquy << " mode=" << mode << endl;
+    if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
     if(argv.size()) {;} // phony just to keep argv busy no complaining about unused
     ofstream FileMESSAGE("/dev/null");
     _kflags kflags;kflags.AFLOW_MODE_VASP=TRUE;
     _vflags vflags;_xvasp xvasp;xvasp.clear();
-    if(!aurostd::FileExist(file)) {cerr << XPID << "pflow::EXTRACT_xcar: mode=" << mode << "  file=" << file << " not found .." << endl;exit(0);};
+    if(!aurostd::FileExist(file)) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"mode="+mode+"  file="+file+" not found",_FILE_CORRUPT_); //CO20200624
+    }
     string AflowIn; aurostd::file2string(file,AflowIn);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN //CO20180502
     aflags.QUIET=TRUE;XHOST.QUIET=TRUE;
@@ -6149,8 +6152,6 @@ namespace pflow {
       } //DX20170814
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK){ //DX20170814
         if(!SYM::CalculatePointGroupKLattice(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_WRITE,osswrite,oss,format)){
-          //cerr << "CO TESTING POINTGROUP KLATTICE FAILED!!! exiting for now" << endl;
-          //exit(1);
           if(!no_scan){
             a.ClearSymmetry();
             //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
@@ -6766,13 +6767,13 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   string EXTRACT_Symmetry(_aflags &aflags,vector<string> argv) {
+    string soliloquy=XPID+"pflow::EXTRACT_Symmetry():"; //CO20200624
     string directory=argv.at(2);
     bool tocompress=FALSE;
     directory=aurostd::RemoveSubStringFirst(directory,_AFLOWIN_);
     aflags.Directory=directory;
     if(aurostd::FileExist(directory+"/"+_AFLOWIN_)==FALSE) {
-      cerr << XPID << "pflow::EXTRACT_Symmetry:  File/Directory not found, nothing to do" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"File/Directory not found, nothing to do",_FILE_CORRUPT_);  //CO20200624
     }
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+XHOST.vext.at(iext)) ||
@@ -7067,7 +7068,6 @@ namespace pflow {
             cerr << "closest is vbzpoint.at(index)=" << vbzpoint.at(index) << "   with err=" << err << endl;
             cerr << "************************************************" << endl;
             return FALSE;
-            exit(0);
           }
           // in index there is the good point
 
@@ -7209,12 +7209,15 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   string FROZSL_INPUT(void) {
+    string soliloquy=XPID+"pflow::FROZSL_INPUT():"; //CO20200624
     _aflags aflags;aflags.Directory="./";
     _kflags kflags;
     ofstream oss;
     string aflowin,MESSAGE="pflow::FROZSL_INPUT ERROR";
     aflowin=string(aflags.Directory+_AFLOWIN_);
-    if(!aurostd::FileExist(aflowin)) {cerr << MESSAGE << ": file not found " << aflowin << endl;exit(0);}
+    if(!aurostd::FileExist(aflowin)) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+aflowin,_FILE_CORRUPT_); //CO20200624
+    }
 
     string AflowIn;aurostd::file2string(aflowin,AflowIn);
     FROZSL::WGET_INPUT(oss,AflowIn,aflags,kflags);
@@ -7228,12 +7231,15 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   string FROZSL_OUTPUT(void) {
+    string soliloquy=XPID+"pflow::FROZSL_OUTPUT():"; //CO20200624
     _aflags aflags;aflags.Directory="./";
     _kflags kflags;
     ofstream oss;
     string aflowin,MESSAGE="pflow::FROZSL_OUTPUT ERROR";
     aflowin=string(aflags.Directory+_AFLOWIN_);
-    if(!aurostd::FileExist(aflowin)) {cerr << MESSAGE << ": file not found " << aflowin << endl;exit(0);}
+    if(!aurostd::FileExist(aflowin)) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+aflowin,_FILE_CORRUPT_); //CO20200624
+    }
     FROZSL::WGET_OUTPUT(oss,aflags,kflags);
     stringstream sss;
     aurostd::file2stringstream(aflags.Directory+"/"+DEFAULT_AFLOW_FROZSL_EIGEN_OUT,sss);
@@ -7497,6 +7503,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {	//DF20190329
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow) {	//DF20190329
+    string soliloquy=XPID+"pflow::GLASS_FORMING_ABILITY():";  //CO20200624
 
     string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     string AE_file_read = vpflow.getattachedscheme("GFA::AE_FILE");
@@ -7504,7 +7511,7 @@ namespace pflow {	//DF20190329
     double fe_cut=DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF;
 
     if(!vpflow.flag("PFLOW::ALLOY")) {
-      cerr << endl << "ERROR:  Must specify an alloy system; e.g.: --alloy=CaMg" << endl << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Must specify an alloy system; e.g.: --alloy=CaMg",_INPUT_MISSING_); //CO20200624
     }
 
     cout << endl << "Calculating glass-forming ability for " << alloy << "." << endl;
@@ -7611,7 +7618,6 @@ namespace pflow {
     if(tokens.size()>2) iparams(3)=aurostd::string2utype<double>(tokens.at(2)); 
     if(tokens.size()>3) iparams(4)=aurostd::string2utype<double>(tokens.at(3)); 
     if(LDEBUG) cerr << XPID << "pflow::HKLSearch: iparams=" << iparams << endl;
-    //   if(LDEBUG) exit(0);
 
     surface::GetSurfaceHKLSearch(a,aflags,iparams,planesreducible,planesirreducible,planesirreducible_images,cout,smode);
     cout << "REDUCIBLE_SIZE " << planesreducible.size() << endl;
@@ -7786,7 +7792,6 @@ namespace pflow {
       //  oss << endl;
       //oss << "[AFLOW] supercells = " << vB.size() << endl;
       oss << "[AFLOW] supercells = " << sHNF.size() << endl;
-      //  exit(0);
       oss << AFLOWIN_SEPARATION_LINE << endl;  // --------------------------------
       oss.flush();
       for(uint j=0;j<sHNF.size();j++) {
@@ -7934,12 +7939,10 @@ namespace pflow {
       init::ErrorOption(options,soliloquy,"aflow --intpol=file1,file2,nimages,nearest_image_flag");
     }
     if(!aurostd::FileExist(tokens.at(0))) {
-      cerr << "ERROR - pflow::INTPOL: file1=" << tokens.at(0) << " does not exist..." << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+tokens[0],_FILE_CORRUPT_); //CO20200624
     }
     if(!aurostd::FileExist(tokens.at(1))) {
-      cerr << "ERROR - pflow::INTPOL: file2=" << tokens.at(1) << " does not exist..." << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+tokens[1],_FILE_CORRUPT_); //CO20200624
     }
     xstructure strA(tokens.at(0),IOAFLOW_AUTO);
     xstructure strB(tokens.at(1),IOAFLOW_AUTO);
@@ -8209,7 +8212,7 @@ namespace pflow {
     oss << aflow::Banner("BANNER_TINY") << endl;
     xstructure str(input,IOAFLOW_AUTO);
     if(NK==0) {
-      cerr << "ERROR - " << soliloquy << " --kpoints=NUMBER: NUMBER must be bigger than zero" << endl;exit(0); //CO20190520
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"--kpoints=NUMBER: NUMBER must be bigger than zero",_INPUT_ILLEGAL_); //CO20200624
     } else {
       ofstream FileDUMMY;
       if(NK>10000000) NK=10000000;
@@ -8254,7 +8257,9 @@ namespace pflow {
     oss << aflow::Banner("BANNER_TINY") << endl;
     xstructure str(input,IOAFLOW_AUTO);
     if(DK<=1.0E-6) {
-      cerr << "ERROR - pflow::KPOINTS_DELTA: --delta_kpoints=NUMBER: NUMBER must be bigger than zero (dk=" << DK << ")" << endl;exit(0);
+      stringstream message;
+      message << "--delta_kpoints=NUMBER: NUMBER must be bigger than zero (dk=" << DK << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
     } else {
       ofstream FileDUMMY;
       oss << kintro << "DK     = " << DK << " (requested) " << endl;
@@ -8381,7 +8386,7 @@ namespace pflow {
       for(uint i=0;i<tokens.size();i++){ stoichiometry.push_back(aurostd::string2utype<uint>(tokens[i])); }
       if(arity!=0 && arity!=stoichiometry.size()){
         message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_); //DX20191107 - exit() -> throw
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_); //DX20191107 - exit -> throw
       }
       std::sort(stoichiometry.begin(),stoichiometry.end()); // must sort to properly filter
     }
@@ -8401,7 +8406,7 @@ namespace pflow {
       Wyckoff_letters = vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::WYCKOFF_STRING");
       if(space_group_number == 0){
         message << "Space group must be given with Wyckoff letters; please specify." << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20191107 - exit() -> throw
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20191107 - exit -> throw
       }
     }
 
@@ -15115,7 +15120,7 @@ int order_parameter_sum(const xstructure& str) {
 //    cout << "partial_occupation_sum=" << poccsum << endl;
 //    if((int)poccsum < 0 || poccsum > 8) {
 //      cerr << "opar_sum in [0,8]" << endl;
-//      exit(0);
+//      return false;
 //    }
 //  }
 //  // priorities
@@ -15234,7 +15239,7 @@ int order_parameter_sum(const xstructure& str) {
 //            }
 //          }
 //          // search
-//          if(LDEBUG) {cerr << "DEBUG  " << str_ord_pocc << endl; exit(0);}
+//          if(LDEBUG) {cerr << "DEBUG  " << str_ord_pocc << endl; return false;}
 //          // check if already in the set
 //          bool found=FALSE;
 //          for(uint ifgroup=0;ifgroup<str.fgroup.size()&&found==FALSE;ifgroup++) {                  // cycle through the fgroup of str
@@ -15321,7 +15326,7 @@ int order_parameter_sum(const xstructure& str) {
 //    cout << "partial_occupation_total_atoms=" << partial_occupation_total_atoms << endl;
 //    if(oparsum < 56 || oparsum > 64) {
 //      cerr << "opar_sum in [56,64]" << endl;
-//      exit(0);
+//      return false;
 //    }
 //  }
 //  // priorities
@@ -15396,7 +15401,7 @@ int order_parameter_sum(const xstructure& str) {
 //                str_ord_pocc.RemoveAtom(str.partial_occupation_atoms.at(iat));
 //              }
 //            }
-//            if(LDEBUG) {cerr << "DEBUG  " << str_ord_pocc << endl; exit(0);}
+//            if(LDEBUG) {cerr << "DEBUG  " << str_ord_pocc << endl; return false;}
 //            // check if already in the set
 //            found=FALSE;
 //            for(uint ifgroup=0;ifgroup<str.fgroup.size()&&found==FALSE;ifgroup++) {                  // cycle through the fgroup of str
@@ -15467,7 +15472,7 @@ int order_parameter_sum(const xstructure& str) {
 //    cout << "partial_occupation_sum=" << poccsum << endl;
 //    if(poccsum < 0 || poccsum > (int) str.partial_occupation_atoms.size()) {
 //      cerr << "pocc_sum in [0," << str.partial_occupation_atoms.size() << "]" << endl;
-//      exit(0);
+//      return false;
 //    }
 //  }
 //  // GET SYMMETRY
@@ -15665,10 +15670,9 @@ void helpIndividualOption(vector<string> & argv) {
     string option_raw = option.substr(2, pos-2);
     cerr << "No option \"" << option_raw << "\" is found." << endl;
     cerr << "Try \"aflow --help\" to see all supported options." << endl;
-    exit(1);
-  } else {
-    exit(0);
+    return;
   }
+  return;
 }
 
 // ***************************************************************************
