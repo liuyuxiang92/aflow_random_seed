@@ -311,7 +311,7 @@ namespace KBIN {
   //
   // Run AEL postprocessing: calls AEL from other parts of AFLOW, to run AEL postprocessing on previously run calculations
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
-  void VASP_RunPhonons_AEL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName) {  
+  void VASP_RunPhonons_AEL_postprocess(const string& directory_LIB, string& AflowInName, string& FileLockName) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
     // OBSOLETE uint aelerror = 0;

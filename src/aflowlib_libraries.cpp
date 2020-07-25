@@ -16,6 +16,8 @@
 #include "aflow_pocc.h" //CO20200624
 #include "aflow_matlab_funcs.cpp" //CO20200508
 #include "aflow_gnuplot_funcs.cpp" //CO20200508
+#include "aflow_agl_debye.h" //CT20200713
+#include "aflow_ael_elasticity.h" //CT20200713
 
 using std::vector;
 using std::deque;
@@ -1014,7 +1016,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
     
     // Call to LIB2LIB function to run postprocessing - added by CT20181212
-    bool perform_LIB2LIB=false; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
+    bool perform_LIB2LIB=true; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
     if(perform_LIB2LIB && !LIB2LIB(options, flag_FORCE, LOCAL)) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aflowlib::LIB2LIB() failed",_RUNTIME_ERROR_);
       //[CO20200624 - OBSOLETE]cerr << soliloquy << " LIB2LIB failed" << endl;
@@ -5993,6 +5995,8 @@ namespace aflowlib {
     }
     
     bool run_directory=false;
+    bool agl_aflowin_found = false;
+    bool ael_aflowin_found = false;        
     string AflowInName = _AFLOWIN_;
     string FileLockName = _AFLOWLOCK_;
 
@@ -6005,59 +6009,75 @@ namespace aflowlib {
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".OLD")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".OLD",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
       }
-    }
-    else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
-      run_directory=true;
-      for(uint iext=0;iext<XHOST.vext.size();iext++) {
-        aurostd::RemoveFile(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.json"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_energies_temperature.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_energy.json"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_energy_structures.json"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_energy_volume.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_gibbs_energy_pT.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_Hugoniot.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_thermal_properties_temperature.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AGL_THERMO"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
-        aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
+    } else {
+      // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
+      AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name
+      if (agl_aflowin_found) {
+	run_directory=true;
+	for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	  aurostd::RemoveFile(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.json"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_energies_temperature.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_energy.json"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_energy_structures.json"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_energy_volume.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_gibbs_energy_pT.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_Hugoniot.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_thermal_properties_temperature.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AGL_THERMO"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
+	}
+	// CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
+	//   cerr << XPID << "CORMAC" << endl;exit(0);
+	if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+	  // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+	  // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+	  // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
+	  FileLockName = "agl.LOCK";
+	}
+	// [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
+	// [OBSOLETE]  AflowInName="agl_aflow.in";
+	// [OBSOLETE] }
+      } else {
+	// Check for AEL input file
+	AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found); //CT20200715 Call function to find correct aflow.in file name
+	if (ael_aflowin_found) {
+	  run_directory=true;
+	  for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	    aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
+	    aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
+	    aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
+	    aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
+	    aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
+	  }
+	  // cerr << XPID << "CORMAC" << endl;exit(0);
+	  // if(_AFLOWIN_=="aflow.in")
+	  if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
+	    //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
+	    //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
+	    FileLockName = "ael.LOCK";
+	  }
+	  // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
+	  // [OBSOLETE]  AflowInName="ael_aflow.in";
+	  // [OBSOLETE] }
+	}
       }
-      // CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
-      //   cerr << XPID << "CORMAC" << endl;exit(0);
-      if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-        // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-        // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-        // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
-        FileLockName = "agl.LOCK";
-      }
-      if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
-        AflowInName="agl_aflow.in";
-      }
-      //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
-      //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
-      //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
-      // cerr << XPID << "CORMAC" << endl;exit(0);
-      // if(_AFLOWIN_=="aflow.in")
-      if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
-        //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
-        //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
-        FileLockName = "ael.LOCK";
-      }
-      if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
-        AflowInName="ael_aflow.in";
-      }      
-      //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
-      // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
-      // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
-      // [OBSOLETE] } else {
-      // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
-      // [OBSOLETE] }
-    }
+    }	
+    //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
+    //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
+    //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
+    //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
+    // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
+    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
+    // [OBSOLETE] } else {
+    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
+    // [OBSOLETE] }
 
     //KBIN::RUN_Directory() should be used instead of individual post-processing functions
     //otherwise we will have to program every single instance here
