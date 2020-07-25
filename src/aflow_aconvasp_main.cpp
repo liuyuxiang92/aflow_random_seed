@@ -10598,7 +10598,9 @@ namespace pflow {
       mlt(3,1)=aurostd::string2utype<double>(tokens.at(6)); 
       mlt(3,2)=aurostd::string2utype<double>(tokens.at(7)); 
       mlt(3,3)=aurostd::string2utype<double>(tokens.at(8)); 
-      if(abs(det(mlt))<0.01) {cerr << "ERROR - pflow::LTCELL: singular ltcell matrix" << endl;exit(0);}
+      if(abs(det(mlt))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular ltcell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
       if(LDEBUG) cerr << soliloquy << " END" << endl;
       return GetLTCell(mlt,str);
     }
@@ -10608,7 +10610,9 @@ namespace pflow {
       mlt(1,1)=aurostd::string2utype<double>(tokens.at(0)); 
       mlt(2,2)=aurostd::string2utype<double>(tokens.at(1)); 
       mlt(3,3)=aurostd::string2utype<double>(tokens.at(2)); 
-      if(abs(det(mlt))<0.01) {cerr << "ERROR - pflow::LTCELL: singular ltcell matrix" << endl;exit(0);}
+      if(abs(det(mlt))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular ltcell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
       if(LDEBUG) cerr << soliloquy << " END" << endl;
       return GetLTCell(mlt,str);
     }
@@ -10620,7 +10624,9 @@ namespace pflow {
       for(int i=1;i<=3;i++)
         for(int j=1;j<=3;j++)
           infile >> mlt(i,j);
-      if(abs(det(mlt))<0.01) {cerr << "ERROR - pflow::LTCELL: singular ltcell matrix" << endl;exit(0);}
+      if(abs(det(mlt))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular ltcell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
       if(LDEBUG) cerr << soliloquy << " END" << endl;
       return GetLTCell(mlt,str);
     }
@@ -10646,7 +10652,6 @@ namespace pflow {
 // [OBSOLETE]   xstructure LTCELLFV(const string& options,istream& input) {
 // [OBSOLETE]     //  if(argv.size()!=a.num_each_type.size()+2) {
 // [OBSOLETE]     //  cerr << "ERROR - pflow::LTCELLFV: you need to specify as many names as atom types" << endl;
-// [OBSOLETE]     //   exit(0);
 // [OBSOLETE]     // }
 // [OBSOLETE]     // Read in input file.
 // [OBSOLETE]     bool LDEBUG=1;//(FALSE || XHOST.DEBUG);
@@ -10991,10 +10996,10 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure NAMES(vector<string> argv,istream& input) {
+    string soliloquy=XPID+"pflow::NAMES():";
     xstructure a(input,IOAFLOW_AUTO);
     if(argv.size()!= a.num_each_type.size()+2) {
-      cerr << "ERROR - pflow::NAMES: you need to specify as many names as atom types" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"you need to specify as many names as atom types",_INPUT_ILLEGAL_); //CO20200624
     }
     xstructure b=a;
     int iatom=0;
@@ -11132,10 +11137,10 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure NUMNAMES(vector<string> argv,istream& input) {
+    string soliloquy=XPID+"pflow::NUMNAMES():";
     xstructure a(input,IOAFLOW_AUTO);
     if(argv.size()!=a.num_each_type.size()+2) {
-      cerr << "ERROR - pflow::NUMNAMES: you need to specify as many names as atom types" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"you need to specify as many names as atom types",_INPUT_ILLEGAL_); //CO20200624
     }
     xstructure b=a;
     int iatom=0;
@@ -11458,24 +11463,25 @@ bool RequestedAlphabeticLabeling(string &label) {
 
 bool AlphabetizePrototypeLabelSpecies(deque<string> &species,deque<string> &species_pp,deque<double> &vvolume,deque<double> &vmass,string &label) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"AlphabetizePrototypeLabelSpecies():";
   // DEBUG=TRUE;
   uint nspeciesHTQC=species.size();
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: species.size()=" << species.size() << endl;
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: species_pp.size()=" << species_pp.size() << endl;
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: vvolume.size()=" << vvolume.size() << endl;
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: vmass.size()=" << vmass.size() << endl;
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: nspeciesHTQC=" << nspeciesHTQC << endl;
-  // if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: alphabetic=" << alphabetic << endl;
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: label=" << label << endl;
+  if(LDEBUG) cerr << soliloquy << " species.size()=" << species.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp.size()=" << species_pp.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vvolume.size()=" << vvolume.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vmass.size()=" << vmass.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " nspeciesHTQC=" << nspeciesHTQC << endl;
+  // if(LDEBUG) cerr << soliloquy << " alphabetic=" << alphabetic << endl;
+  if(LDEBUG) cerr << soliloquy << " label=" << label << endl;
   aurostd::StringSubst(label,".alphabetic","");
   aurostd::StringSubst(label,".alpha","");
   deque<string> rnd_species,rnd_species_pp,rnd_label1,rnd_label2;
   deque<double> rnd_vvolume;
   deque<double> rnd_vmass;
-  if(nspeciesHTQC!=species.size()) { cerr << "AlphabetizePrototypeLabelSpecies: ERROR nspeciesHTQC!=species.size" << endl;exit(0);}
-  if(nspeciesHTQC!=species_pp.size()) { cerr << "AlphabetizePrototypeLabelSpecies: ERROR nspeciesHTQC!=species_pp.size" << endl;exit(0);}
-  if(nspeciesHTQC!=vvolume.size()) { cerr << "AlphabetizePrototypeLabelSpecies: ERROR nspeciesHTQC!=vvolume.size" << endl;exit(0);}
-  if(nspeciesHTQC!=vmass.size()) { cerr << "AlphabetizePrototypeLabelSpecies: ERROR nspeciesHTQC!=vmass.size" << endl;exit(0);}
+  if(nspeciesHTQC!=species.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"nspeciesHTQC!=species.size",_INPUT_ILLEGAL_);} //CO20200624
+  if(nspeciesHTQC!=species_pp.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"nspeciesHTQC!=species_pp.size",_INPUT_ILLEGAL_);} //CO20200624
+  if(nspeciesHTQC!=vvolume.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"nspeciesHTQC!=vvolume.size",_INPUT_ILLEGAL_);} //CO20200624
+  if(nspeciesHTQC!=vmass.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"nspeciesHTQC!=vmass.size",_INPUT_ILLEGAL_);} //CO20200624
   for(uint i=0;i<nspeciesHTQC;i++) {
     rnd_species.push_back(species.at(i));   // LOAD FROM SPECIES
     rnd_species_pp.push_back(species_pp.at(i));   // LOAD FROM SPECIES
@@ -11492,9 +11498,9 @@ bool AlphabetizePrototypeLabelSpecies(deque<string> &species,deque<string> &spec
     aurostd::sort(rnd_label1,rnd_label2);             // how to go back from rnd_labe1 to rnd_label2
     label=label+".";for(uint i=0;i<rnd_label2.size();i++) label=label+rnd_label2.at(i);  // FIXING LABEL
   }  
-  if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: label=" << label << endl;
+  if(LDEBUG) cerr << soliloquy << " label=" << label << endl;
   for(uint i=0;i<nspeciesHTQC;i++)
-    if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: BEFORE species.at(" << i << ")=" 
+    if(LDEBUG) cerr << soliloquy << " BEFORE species.at(" << i << ")=" 
       << species.at(i) << " species_pp.at(" << i << ")=" << species_pp.at(i) 
         << " vvolume.at(" << i << ")=" << vvolume.at(i) 
         << " vmass.at(" << i << ")=" << vmass.at(i) << endl;
@@ -11503,11 +11509,11 @@ bool AlphabetizePrototypeLabelSpecies(deque<string> &species,deque<string> &spec
   for(uint i=0;i<nspeciesHTQC;i++) vvolume.at(i)=rnd_vvolume.at(i);
   for(uint i=0;i<nspeciesHTQC;i++) vmass.at(i)=rnd_vmass.at(i);
   for(uint i=0;i<nspeciesHTQC;i++)
-    if(LDEBUG) cerr << "AlphabetizePrototypeLabelSpecies: AFTER species.at(" << i << ")=" 
+    if(LDEBUG) cerr << soliloquy << " AFTER species.at(" << i << ")=" 
       << species.at(i) << " species_pp.at(" << i << ")=" 
         << species_pp.at(i) << " vvolume.at(" << i << ")="
         << vvolume.at(i) << " vmass.at(" << i << ")=" << vmass.at(i) << endl;
-  if(LDEBUG) {cerr << "AlphabetizePrototypeLabelSpecies: EXIT" << endl;  exit(0);}
+  if(LDEBUG) {cerr << soliloquy << " END" << endl;}
   return TRUE;
 }
 
@@ -12621,7 +12627,6 @@ namespace pflow {
 
     if(LDEBUG) {cerr << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;}
     PARAMS.vparams.push_attached("AFLOWIN_STRING::POTENTIAL",string_POTENTIAL);
-    //    exit(0);
 
     // reverse
     if(LDEBUG) cerr << soliloquy << " CHECK REVERSE" << endl; 
@@ -13038,7 +13043,6 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABCCAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR") << endl; //DX20190123 - add ABCCAR
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ELK\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ELK") << endl; //DX202003133 - add ELK
 
-    //    if(LDEBUG) exit(0);
 
     if(PARAMS.ucell.size()==1 && aurostd::substring2bool(PARAMS.vparams.getattachedscheme("AFLOWIN_STRING::LABEL"),"_ICSD_") && !PARAMS.vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) {
       if(LDEBUG) cerr << soliloquy << " running AVASP_MakePrototypeICSD_AFLOWIN" << endl;
@@ -13050,8 +13054,6 @@ namespace pflow {
       return AVASP_MakePrototype_AFLOWIN((_AVASP_PROTO*)&PARAMS);
     }
     if(LDEBUG) cerr << soliloquy << " END" << endl;
-
-    // if(LDEBUG) exit(0);
 
     return FALSE;
   }
@@ -13464,7 +13466,7 @@ namespace pflow {
     cerr << "[1]" << endl;
     pflow::GetRDF(a,rmax,nbins,rdf_all);
     cerr << "[1]" << endl;
-    // for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;};exit(0);
+    // for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;}
     aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
     rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
     aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
@@ -13494,12 +13496,10 @@ namespace pflow {
     int nsh=(int) aurostd::string2utype<int>(tokens.at(3));
 
     if(!aurostd::FileExist(tokens.at(4))) {
-      cerr << "ERROR - pflow::RDFCMP: file1=" << tokens.at(4) << " does not exist..." << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+tokens.at(4),_FILE_CORRUPT_); //CO20200624
     }
     if(!aurostd::FileExist(tokens.at(5))) {
-      cerr << "ERROR - pflow::RDFCMP: file2=" << tokens.at(5) << " does not exist..." << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+tokens.at(5),_FILE_CORRUPT_); //CO20200624
     }
     xstructure strA(tokens.at(4),IOAFLOW_AUTO);
     xstructure strB(tokens.at(5),IOAFLOW_AUTO);
@@ -13522,7 +13522,6 @@ namespace pflow {
     pflow::CmpRDFShells(strA,strB,rdfsh_all_A,rdfsh_all_B,nsh,best_match,rms_mat);
     PrintRDFCmp(strA,strB,rmax,nbins,smooth_width,nsh,rdfsh_all_A,rdfsh_all_B,best_match,rms_mat,cout);
     if(LDEBUG) cerr << soliloquy << " END" << endl;
-    // exit(1);
   }
 } // namespace pflow
 
@@ -13759,7 +13758,7 @@ namespace pflow {
     }
     //DX20180527 - use pwd - END
     //DX20180124 [OBSOLETE] a.is_vasp4_poscar_format=TRUE; a.is_vasp5_poscar_format=FALSE;
-    //   cerr << a << endl; exit(0);
+    //   cerr << a << endl;
     // AFLOW ENGINE RHT
     if(mode=="AFLOW" || mode=="aflow") { //RHT
       if(LDEBUG) cerr << XPID << "pflow::SG: aflow" << endl;
@@ -13906,8 +13905,7 @@ namespace pflow {
     cout << aflow::Banner("BANNER_TINY") << endl;
     xstructure a(input,IOAFLOW_AUTO);
     if(0) if(tokens.size()!=a.num_each_type.size()) {
-      cerr << "ERROR - pflow::SHELL: you need to specify as many names as atom types" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"you need to specify as many names as atom types",_INPUT_ILLEGAL_); //CO20200624
     }
 
     PrintShell(a,ns,r1,r2,name,dens,cout);
@@ -14162,7 +14160,7 @@ namespace pflow {
     }
 
     if(tokens.size()==9) {
-      if(LDEBUG) cerr << XPID << "pflow::SUPERCELL: 9 entries" << endl;
+      if(LDEBUG) cerr << soliloquy << " 9 entries" << endl;
       msc(1,1)=aurostd::string2utype<double>(tokens.at(0)); 
       msc(1,2)=aurostd::string2utype<double>(tokens.at(1)); 
       msc(1,3)=aurostd::string2utype<double>(tokens.at(2)); 
@@ -14172,29 +14170,35 @@ namespace pflow {
       msc(3,1)=aurostd::string2utype<double>(tokens.at(6)); 
       msc(3,2)=aurostd::string2utype<double>(tokens.at(7)); 
       msc(3,3)=aurostd::string2utype<double>(tokens.at(8)); 
-      if(abs(det(msc))<0.01) {cerr << "ERROR - pflow::SUPERCELL: singular supercell matrix" << endl;exit(0);}
+      if(abs(det(msc))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular supercell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
       if(LDEBUG) cerr << soliloquy << " END" << endl;
       return GetSuperCell(str,msc);
     }
 
     if(tokens.size()==3) {
-      if(LDEBUG) cerr << XPID << "pflow::SUPERCELL: 3 entries" << endl;
+      if(LDEBUG) cerr << soliloquy << " 3 entries" << endl;
       msc(1,1)=aurostd::string2utype<double>(tokens.at(0)); 
       msc(2,2)=aurostd::string2utype<double>(tokens.at(1)); 
       msc(3,3)=aurostd::string2utype<double>(tokens.at(2)); 
-      if(abs(det(msc))<0.01) {cerr << "ERROR - pflow::SUPERCELL: singular supercell matrix" << endl;exit(0);}
+      if(abs(det(msc))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular supercell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
       if(LDEBUG) cerr << soliloquy << " END" << endl;
       return GetSuperCell(str,msc);
     }
 
     if(tokens.size()==1) {
-      if(LDEBUG) cerr << XPID << "pflow::SUPERCELL: 1 entries" << endl;
+      if(LDEBUG) cerr << soliloquy << " 1 entries" << endl;
       ifstream infile(tokens.at(0).c_str());
-      aurostd::InFileExistCheck("pflow::SUPERCELL",tokens.at(0).c_str(),infile,cerr);
+      aurostd::InFileExistCheck(soliloquy,tokens.at(0).c_str(),infile,cerr);
       for(int i=1;i<=3;i++)
         for(int j=1;j<=3;j++)
           infile >> msc(i,j);
-      if(abs(det(msc))<0.01) {cerr << "ERROR - pflow::SUPERCELL: singular supercell matrix" << endl;exit(0);}
+      if(abs(det(msc))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular supercell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
       if(LDEBUG) cerr << soliloquy << " END" << endl;
       return GetSuperCell(str,msc);
     }
@@ -14224,7 +14228,7 @@ namespace pflow {
     }
 
     if(tokens.size()==10) {
-      if(LDEBUG) cerr << XPID << "pflow::SUPERCELLSTRLIST: 10 entries" << endl;
+      if(LDEBUG) cerr << soliloquy << " 10 entries" << endl;
       msc(1,1)=aurostd::string2utype<double>(tokens.at(0)); 
       msc(1,2)=aurostd::string2utype<double>(tokens.at(1)); 
       msc(1,3)=aurostd::string2utype<double>(tokens.at(2)); 
@@ -14235,41 +14239,47 @@ namespace pflow {
       msc(3,2)=aurostd::string2utype<double>(tokens.at(7)); 
       msc(3,3)=aurostd::string2utype<double>(tokens.at(8)); 
       infile_name=tokens.at(9);
-      if(abs(det(msc))<0.01) {cerr << "ERROR - pflow::SUPERCELLSTRLIST: singular supercell matrix" << endl;exit(0);}
+      if(abs(det(msc))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular supercell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
     }
     if(tokens.size()==4) {
-      if(LDEBUG) cerr << XPID << "pflow::SUPERCELLSTRLIST: 4 entries" << endl;
+      if(LDEBUG) cerr << soliloquy << " 4 entries" << endl;
       msc(1,1)=aurostd::string2utype<double>(tokens.at(0)); 
       msc(2,2)=aurostd::string2utype<double>(tokens.at(1)); 
       msc(3,3)=aurostd::string2utype<double>(tokens.at(2)); 
       infile_name=tokens.at(3);
-      if(abs(det(msc))<0.01) {cerr << "ERROR - pflow::SUPERCELLSTRLIST: singular supercell matrix" << endl;exit(0);}
+      if(abs(det(msc))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular supercell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
     }    
     if(tokens.size()==2) {
-      if(LDEBUG) cerr << XPID << "pflow::SUPERCELLSTRLIST: 2 entries" << endl;
+      if(LDEBUG) cerr << soliloquy << " 2 entries" << endl;
       ifstream infile(tokens.at(0).c_str());
-      aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",tokens.at(0).c_str(),infile,cerr);
+      aurostd::InFileExistCheck(soliloquy,tokens.at(0).c_str(),infile,cerr);
       for(int i=1;i<=3;i++)
         for(int j=1;j<=3;j++)
           infile >> msc(i,j);
       infile_name=tokens.at(1);
-      if(abs(det(msc))<0.01) {cerr << "ERROR - pflow::SUPERCELLSTRLIST: singular supercell matrix" << endl;exit(0);}
+      if(abs(det(msc))<0.01) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"singular supercell matrix",_INPUT_ILLEGAL_); //CO20200624
+      }
     }
     //    ifstream infile(infile_name.c_str());
     // aurostd::InFileExistCheck("aflow",infile_name,infile,cerr);
     aurostd::matrix<double> mmsc(3,3); //CO20200404 pflow::matrix()->aurostd::matrix()
-    // if(LDEBUG) cerr << XPID << "pflow::SUPERCELLSTRLIST: msc=" << msc << endl;
+    // if(LDEBUG) cerr << soliloquy << " msc=" << msc << endl;
     mmsc=aurostd::xmatrix2matrix(msc); //CO20200404 pflow::matrix()->aurostd::matrix()
     //  pflow::Mout(mmsc,cout);
     ifstream list_inf(infile_name.c_str());
-    aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",infile_name,list_inf,cerr);
+    aurostd::InFileExistCheck(soliloquy,infile_name,list_inf,cerr);
     vector<xstructure> vstr;
     vector<xstructure> vstr_sc;
     pflow::ReadInStrVec(vstr,list_inf);
     for(uint i=0;i<vstr.size();i++) vstr_sc.push_back(vstr.at(i));
     pflow::SuperCellStrVec(vstr_sc,mmsc);
     pflow::PrintStrVec(vstr_sc,cout);
-    cerr << XPID << "pflow::SUPERCELLSTRLIST: vstr_sc.size()=" << vstr_sc.size() << endl;
+    cerr << soliloquy << " vstr_sc.size()=" << vstr_sc.size() << endl;
   } 
 } // namespace pflow
 
@@ -14278,13 +14288,22 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure xstrSWAP(vector<string> argv,istream& input) {
+    string soliloquy=XPID+"pflow::xstrSWAP():";
     xstructure a(input,IOAFLOW_AUTO);
     int speciesA=aurostd::string2utype<int>(argv.at(2));
     int speciesB=aurostd::string2utype<int>(argv.at(3));
-    if(speciesA<0) {cerr << XPID << "pflow::xstrSWAP: Error, speciesA<0 (speciesA=" << speciesA << ")" << endl;exit(0);}
-    if(speciesA>=(int) a.num_each_type.size()) {cerr << XPID << "pflow::xstrSWAP: Error, speciesA>=num_each_type.size() (speciesA=" << speciesA << ")" << endl;exit(0);}
-    if(speciesB<0) {cerr << XPID << "pflow::xstrSWAP: Error, speciesB<0 (speciesB=" << speciesB << ")" << endl;exit(0);}
-    if(speciesB>=(int) a.num_each_type.size()) {cerr << XPID << "pflow::xstrSWAP: Error, speciesB>=num_each_type.size() (speciesB=" << speciesB << ")" << endl;exit(0);}
+    if(speciesA<0) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"speciesA<0 (speciesA="+aurostd::utype2string(speciesA)+")",_INPUT_ILLEGAL_); //CO20200624
+    }
+    if(speciesA>=(int) a.num_each_type.size()) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"speciesA>=num_each_type.size() (speciesA="+aurostd::utype2string(speciesA)+")",_INPUT_ILLEGAL_); //CO20200624
+    }
+    if(speciesB<0) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"speciesB<0 (speciesB="+aurostd::utype2string(speciesB)+")",_INPUT_ILLEGAL_); //CO20200624
+    }
+    if(speciesB>=(int) a.num_each_type.size()) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"speciesB>=num_each_type.size() (speciesB="+aurostd::utype2string(speciesB)+")",_INPUT_ILLEGAL_); //CO20200624
+    }
     a.SpeciesSwap(speciesA,speciesB);
     return a;
   }
