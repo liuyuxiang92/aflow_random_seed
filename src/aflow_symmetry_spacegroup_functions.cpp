@@ -387,6 +387,7 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC){ //DX20191030 - added const
+    string function_name = XPID + "SYM::ExtractLatticeParametersFromWyccar():";
     vector<double> lattice_parameters;
     if(wyccar_ITC.size()>3){
       vector<string> tokens;
@@ -396,8 +397,7 @@ namespace SYM {
       }
     }
     else {
-      cerr << "ExtractWyckoffParametersFromWyccar()::ERROR: Invalid WYCCAR." << endl;
-      exit(1); 
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Invalid WYCCAR",_FILE_WRONG_FORMAT_);
     }
     return lattice_parameters;
   }
@@ -515,6 +515,8 @@ namespace SYM {
 
     // Split the site symmetry symbol into its primary, secondary, and teriary
     // directions (see ITC-A pgs. 28-29 for site symmetry info).
+
+    string function_name = XPID + "SYM::splitSiteSymmetry():";
 
     vector<string> split_site_symmetry; 
     stringstream ss_primary, ss_secondary, ss_tertiary;
@@ -655,8 +657,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
-            cerr << "SYM::splitSiteSymmetry():ERROR: Did not account for this site symmetry: " << site_symmetry << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
         }
         if(dot_direction[0]=="secondary"){ 
@@ -701,8 +702,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
-            cerr << "SYM::splitSiteSymmetry():ERROR: Did not account for this site symmetry: " << site_symmetry << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
           ss_tertiary << site_symmetry[dot_index[0]];
           split_site_symmetry.push_back(ss_tertiary.str());
@@ -749,8 +749,7 @@ namespace SYM {
     }
 
     if(split_site_symmetry.size()!=3){
-      cerr << "SYM::splitSiteSymmetry():ERROR: Did not account for this site symmetry: " << site_symmetry << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
     }
 
     return split_site_symmetry;
@@ -1003,35 +1002,35 @@ namespace SYM {
 //DX20190905 [OBSOLETE - using aurostd::vector_product()]   }
 //DX20190905 [OBSOLETE - using aurostd::vector_product()] } //namespace SYM
 
-// ******************************************************************************
-// DotPro (Dot Product)
-// ******************************************************************************
-namespace SYM {
-  double DotPro(xvector<double> a, xvector<double> b) {
-    double out = 0.0;
-    if(a.urows != b.urows) {
-      cerr << "Vectors must be same size!" << endl;
-      exit(1);
-    }
-    for (uint i = 0; i < (uint)a.urows; i++) {
-      out += a(i + 1) * b(i + 1);
-    }
-    return out;
-  }
-} //namespace SYM
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()] // ******************************************************************************
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()] // DotPro (Dot Product)
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()] // ******************************************************************************
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()] namespace SYM {
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]   double DotPro(xvector<double> a, xvector<double> b) {
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     double out = 0.0;
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     if(a.urows != b.urows) {
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       cerr << "Vectors must be same size!" << endl;
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       exit(1);
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     }
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     for (uint i = 0; i < (uint)a.urows; i++) {
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       out += a(i + 1) * b(i + 1);
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     }
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     return out;
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]   }
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()] } //namespace SYM
 
-// ******************************************************************************
-// modulus (Modulus) (Overloaded)
-// ******************************************************************************
-namespace SYM {
-  double modulus(vector<double> a) {
-    double out = 0.0;
-    for (uint i = 0; i < a.size(); i++) {
-      out += a[i] * a[i];
-    }
-    return sqrt(out);
-  }
-} //namespace SYM
+//DX20190905 [OBSOLETE - using aurostd::modulus()] // ******************************************************************************
+//DX20190905 [OBSOLETE - using aurostd::modulus()] // modulus (Modulus) (Overloaded)
+//DX20190905 [OBSOLETE - using aurostd::modulus()] // ******************************************************************************
+//DX20190905 [OBSOLETE - using aurostd::modulus()] namespace SYM {
+//DX20190905 [OBSOLETE - using aurostd::modulus()]   double modulus(vector<double> a) {
+//DX20190905 [OBSOLETE - using aurostd::modulus()]     double out = 0.0;
+//DX20190905 [OBSOLETE - using aurostd::modulus()]     for (uint i = 0; i < a.size(); i++) {
+//DX20190905 [OBSOLETE - using aurostd::modulus()]       out += a[i] * a[i];
+//DX20190905 [OBSOLETE - using aurostd::modulus()]     }
+//DX20190905 [OBSOLETE - using aurostd::modulus()]     return sqrt(out);
+//DX20190905 [OBSOLETE - using aurostd::modulus()]   }
+//DX20190905 [OBSOLETE - using aurostd::modulus()] } //namespace SYM
 
 // ******************************************************************************
 // DotPro (Modulus) (Overloaded)
@@ -1397,9 +1396,9 @@ namespace SYM {
           bool found = true;
           for (uint ii = 0; ii < LHS_cart.size(); ii += 3) {
             xvector<double> coord;
-            coord(1) = DotPro(LHS[ii], origin_shift) - RHS[ii];
-            coord(2) = DotPro(LHS[ii + 1], origin_shift) - RHS[ii + 1];
-            coord(3) = DotPro(LHS[ii + 2], origin_shift) - RHS[ii + 2];
+            coord(1) = aurostd::scalar_product(LHS[ii], origin_shift) - RHS[ii]; //DX20200724 - SYM::DotPro to aurostd::scalar_product
+            coord(2) = aurostd::scalar_product(LHS[ii + 1], origin_shift) - RHS[ii + 1]; //DX20200724 - SYM::DotPro to aurostd::scalar_product
+            coord(3) = aurostd::scalar_product(LHS[ii + 2], origin_shift) - RHS[ii + 2]; //DX20200724 - SYM::DotPro to aurostd::scalar_product
             double min_dist = 1e9; //DX20190613
             if(skew) {
               xvector<double> origin;
@@ -5057,9 +5056,9 @@ namespace SYM {
     double tol = 1e-6;
     bool inside = false;
     //Either the point falls within the cell or the components outside the cell are linearly dependent on the Normal.
-    if((P(1) < (1.0 - tol) && P(1) >= -tol) || aurostd::abs(DotPro(a, N)) > tol) {
-      if((P(2) < (1.0 - tol) && P(2) >= -tol) || aurostd::abs(DotPro(b, N)) > tol) {
-        if((P(3) < (1.0 - tol) && P(3) >= -tol) || aurostd::abs(DotPro(c, N)) > tol) {
+    if((P(1) < (1.0 - tol) && P(1) >= -tol) || aurostd::abs(aurostd::scalar_product(a, N)) > tol) { //DX20200724 - SYM::DotPro to aurostd::scalar_product
+      if((P(2) < (1.0 - tol) && P(2) >= -tol) || aurostd::abs(aurostd::scalar_product(b, N)) > tol) { //DX20200724 - SYM::DotPro to aurostd::scalar_product
+        if((P(3) < (1.0 - tol) && P(3) >= -tol) || aurostd::abs(aurostd::scalar_product(c, N)) > tol) { //DX20200724 - SYM::DotPro to aurostd::scalar_product
           inside = true;
         }
       }

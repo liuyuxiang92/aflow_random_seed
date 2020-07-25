@@ -471,7 +471,7 @@ namespace KBIN {
   // Run AGL postprocessing: calls AGL from other parts of AFLOW, to run AGL postprocessing on previously run calculations
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
   //  void VASP_RunPhonons_AGL_postprocess(  _xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE)
-  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName) {  
+  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, string& AflowInName, string& FileLockName) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
     // [OBSOLETE] uint aglerror = 0;
@@ -560,8 +560,7 @@ namespace AGL_functions {
     } else {
       AflowInName = _AFLOWIN_;
     }
-
-
+    
     // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
     uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
 

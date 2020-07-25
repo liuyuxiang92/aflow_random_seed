@@ -2153,7 +2153,6 @@ namespace aflowrc {
       }
     }
     if(LDEBUG) oss << soliloquy << " END" << endl;
-    //    exit(0);
     return TRUE;
   }
 } // namespace aflowrc
@@ -2664,7 +2663,6 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: END" << endl;
 
     oss.flush();
-    //    exit(0);
     return FALSE;
   }
 } // namespace aflowrc
