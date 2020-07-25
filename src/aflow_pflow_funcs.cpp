@@ -3719,7 +3719,7 @@ namespace pflow {
 namespace pflow {
   void RayTraceManager(vector<string> argv) {
     ifstream rtinfile(argv.at(2).c_str()); // File where RT params are input.
-    aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",argv.at(2),rtinfile,cerr);
+    aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",argv.at(2),rtinfile);
     pflow::rtparams rtp; // Object that stores RT params.
     ReadInRTParams(rtinfile,rtp); // Sets RT params object from input.
     switch (rtp.calc_type) {
@@ -3733,7 +3733,7 @@ namespace pflow {
                  exit(1);
                }
                ifstream strlist_inf(rtp.input_files[0].c_str());
-               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf,cerr);
+               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf);
                vector<xstructure> vstr;
                cout << endl;
                cout << "Reading in structure list." << endl;
@@ -4602,7 +4602,7 @@ namespace pflow {
     string s;
     char c;
     ifstream infile(pd.PROOUTinfile.c_str());
-    aurostd::InFileExistCheck("ReadInProj",pd.PROOUTinfile.c_str(),infile,cerr);
+    aurostd::InFileExistCheck("ReadInProj",pd.PROOUTinfile.c_str(),infile);
     string sdum;
     // Initial data
     infile >> sdum; // Title
@@ -5083,7 +5083,7 @@ namespace pflow {
   void ReadInPDOSData(const pflow::projdata& prd, pflow::pdosdata& pdd) {
 
     ifstream infile(pdd.PDOSinfile.c_str());
-    aurostd::InFileExistCheck("ReadInPDOSData",pdd.PDOSinfile.c_str(),infile,cerr);
+    aurostd::InFileExistCheck("ReadInPDOSData",pdd.PDOSinfile.c_str(),infile);
 
     // Defaults (emin,emax,nbins,smooth_sigma,print_params)
     double emn=prd.ener_k_b_u[0][0];

@@ -6812,7 +6812,7 @@ namespace pflow {
     _kflags kflags;kflags.AFLOW_MODE_VASP=TRUE;
     _vflags vflags;_xvasp xvasp;xvasp.clear();
     ifstream FileAFLOWIN(string(directory+string("/"+_AFLOWIN_)).c_str());
-    aurostd::InFileExistCheck("pflow::EXTRACT_Symmetry",string(directory+string("/"+_AFLOWIN_)).c_str(),FileAFLOWIN,cerr);
+    aurostd::InFileExistCheck("pflow::EXTRACT_Symmetry",string(directory+string("/"+_AFLOWIN_)).c_str(),FileAFLOWIN);
     string AflowIn;
     AflowIn="";char c; while (FileAFLOWIN.get(c)) AflowIn+=c; // READ _AFLOWIN_ and put into AflowIn
     FileAFLOWIN.close();
@@ -8285,9 +8285,9 @@ namespace pflow {
 namespace pflow {
   void JOINSTRLIST(vector<string> argv) {
     ifstream list1_inf(argv.at(2).c_str());
-    aurostd::InFileExistCheck("aflow",argv.at(2).c_str(),list1_inf,cerr);
+    aurostd::InFileExistCheck("aflow",argv.at(2).c_str(),list1_inf);
     ifstream list2_inf(argv.at(3).c_str());
-    aurostd::InFileExistCheck("aflow",argv.at(3).c_str(),list2_inf,cerr);
+    aurostd::InFileExistCheck("aflow",argv.at(3).c_str(),list2_inf);
     std::vector<xstructure> str_vec_1(0),str_vec_2(0),str_vec_tot(0);
     pflow::ReadInStrVec(str_vec_1,list1_inf);
     pflow::ReadInStrVec(str_vec_2,list2_inf);
@@ -10617,7 +10617,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(LDEBUG) cerr << XPID << "pflow::LTCELL: 1 entries" << endl;
       ifstream infile(tokens.at(0).c_str());
-      aurostd::InFileExistCheck("pflow::LTCELL",tokens.at(0).c_str(),infile,cerr);
+      aurostd::InFileExistCheck("pflow::LTCELL",tokens.at(0).c_str(),infile);
       for(int i=1;i<=3;i++)
         for(int j=1;j<=3;j++)
           infile >> mlt(i,j);
@@ -10735,9 +10735,9 @@ namespace pflow {
 namespace pflow {
   void MAKESTRLIST(vector<string> argv) {
     ifstream outcar_inf(argv.at(2).c_str());
-    aurostd::InFileExistCheck("convasp",argv.at(2).c_str(),outcar_inf,cerr);
+    aurostd::InFileExistCheck("convasp",argv.at(2).c_str(),outcar_inf);
     ifstream xdatcar_inf(argv.at(3).c_str());
-    aurostd::InFileExistCheck("convasp",argv.at(3).c_str(),xdatcar_inf,cerr);
+    aurostd::InFileExistCheck("convasp",argv.at(3).c_str(),xdatcar_inf);
     vector<xstructure> str_vec=pflow::GetStrVecFromOUTCAR_XDATCAR(outcar_inf,xdatcar_inf);
     pflow::PrintStrVec(str_vec,cout);
   }
@@ -14127,9 +14127,9 @@ namespace pflow {
   void SUMPDOS(vector<string> argv) {
     cerr << "# WARNING: THIS REQUIRES THAT YOU HAVE PDOS IN DOSCAR FILE - THIS IS OBTAINED BY RUNNING WITH LORBIT=2 - SEE aflow --h" << endl;
     ifstream SumPDOSParams_infile(argv.at(2).c_str());
-    aurostd::InFileExistCheck("convasp.cc",argv.at(2),SumPDOSParams_infile,cerr);
+    aurostd::InFileExistCheck("convasp.cc",argv.at(2),SumPDOSParams_infile);
     ifstream PDOS_infile(argv.at(3).c_str());
-    aurostd::InFileExistCheck("convasp.cc",argv.at(3),PDOS_infile,cerr);
+    aurostd::InFileExistCheck("convasp.cc",argv.at(3),PDOS_infile);
     pflow::pdosdata pdd;
     aurostd::matrix<aurostd::matrix<double> > allpdos; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::ReadSumDOSParams(SumPDOSParams_infile,pdd);
@@ -14189,7 +14189,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(LDEBUG) cerr << XPID << "pflow::SUPERCELL: 1 entries" << endl;
       ifstream infile(tokens.at(0).c_str());
-      aurostd::InFileExistCheck("pflow::SUPERCELL",tokens.at(0).c_str(),infile,cerr);
+      aurostd::InFileExistCheck("pflow::SUPERCELL",tokens.at(0).c_str(),infile);
       for(int i=1;i<=3;i++)
         for(int j=1;j<=3;j++)
           infile >> msc(i,j);
@@ -14247,7 +14247,7 @@ namespace pflow {
     if(tokens.size()==2) {
       if(LDEBUG) cerr << XPID << "pflow::SUPERCELLSTRLIST: 2 entries" << endl;
       ifstream infile(tokens.at(0).c_str());
-      aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",tokens.at(0).c_str(),infile,cerr);
+      aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",tokens.at(0).c_str(),infile);
       for(int i=1;i<=3;i++)
         for(int j=1;j<=3;j++)
           infile >> msc(i,j);
@@ -14261,7 +14261,7 @@ namespace pflow {
     mmsc=aurostd::xmatrix2matrix(msc); //CO20200404 pflow::matrix()->aurostd::matrix()
     //  pflow::Mout(mmsc,cout);
     ifstream list_inf(infile_name.c_str());
-    aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",infile_name,list_inf,cerr);
+    aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",infile_name,list_inf);
     vector<xstructure> vstr;
     vector<xstructure> vstr_sc;
     pflow::ReadInStrVec(vstr,list_inf);

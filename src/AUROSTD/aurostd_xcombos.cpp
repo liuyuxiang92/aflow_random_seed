@@ -404,7 +404,6 @@ namespace aurostd {
             cerr << endl;
             cerr << "x=" << m_x << "(1)" << endl;
             cerr << "y=" << m_y << "(0)" << endl;
-            //exit(0);
           }
         }
       }

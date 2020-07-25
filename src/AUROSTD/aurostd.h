@@ -456,7 +456,7 @@ namespace aurostd {
   unsigned int getFileCheckSum(const string&, const string&);  //ME20190219
   unsigned int getFletcher32(unsigned short*, size_t);  //ME20190219
   string FileToString(const string& FileName);
-  void InFileExistCheck(const string& routine,const string& filename,ifstream& file_to_check,std::ostream& outf);
+  void InFileExistCheck(const string& routine,const string& filename,ifstream& file_to_check);
   bool IsCommandAvailable(const string& command);
   bool IsCommandAvailable(const string& command, string& position);
   bool IsCommandAvailableModify(string& command);

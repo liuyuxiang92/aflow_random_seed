@@ -444,40 +444,6 @@ namespace apl {
     //_scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, _derivative_structure);  //now gets symmetries too! no need for full_basis (just a check)
     _scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, get_full_sym, false, true);  //now gets symmetries too! no need for full_basis (just a check) //CO20190409 - force_supercell_matrix==false as we might have a derivative structure, force_strict_pc2scMap==true because we want to map to true primitive cell, no equivalent atoms
 
-    //  cerr << _scStructure << std::endl;
-    //  for(uint i=0;i<_scStructure.agroup.size();i++){
-    //    cerr << "AGROUP " << i << ": " << _scStructure.agroup[i].size() << std::endl;
-    //for(uint j=0;j<a.agroup[i].size();j++){
-    //}
-    //  }
-    //for(uint i=0;i<_scStructure.agroup.size();i++){
-    //cerr << "SITE " << i << std::endl;
-    //for(uint j=0;j<_scStructure.agroup[i].size();j++){
-    //cerr << "OPERATION " << j << std::endl;
-    //cerr << _scStructure.agroup[i][j] << std::endl;
-    ////for(uint j=0;j<a.agroup[i].size();j++){
-    //}
-    //}
-    //}
-    //  exit(0);
-
-    //for(uint i=0;i<_scStructure.agroup[0].size();i++){
-    //  cerr << _scStructure.agroup[0][i] << std::endl;
-    //}
-    //exit(0);  //CO REMOVE
-    //_scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, GETFULLSYMBASIS);  //now gets symmetries too! no need for full_basis (just a check)
-    //_scStructure.ReScale(1.0); no longer needed, pc is already rescaled, also, try not to change structure much after calculating symmetry
-
-    //it is TRUE that the symmetry of the supercell != symmetry of primitive cell if
-    //!(nx==ny==nz), we now have a derivative structure
-    //derivative structures have REDUCED symmetry, but instead of recalculating,
-    //we will IGNORE failed mappings ONLY if we have a derivative structure
-    //if(!( nx == ny && ny == nz)) {
-    //  //SUPER slow
-    //  _logger << "Supercell is not symmetric, hence we need to recalculate the whole symmetry. (very slow)" << apl::endl;
-    //  calculateWholeSymmetry(_scStructure);
-    //}
-
     // Setup output flags
     _scStructure.write_inequivalent_flag = TRUE;
 

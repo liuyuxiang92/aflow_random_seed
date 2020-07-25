@@ -44,7 +44,7 @@ namespace aurostd {  // namespace aurostd
       if(argi.at(argi.size()-1)=='=' && i<_argc-1) {argi+=string(_argv[i+1]);i++;}  // fixing space after "= "
       out_argv.push_back(argi);
     }
-    if(LDEBUG) for(uint i=0;i<out_argv.size();i++) cerr << "out_argv.at(" << i << ")=" << out_argv.at(i) << endl; // exit(0);
+    if(LDEBUG) for(uint i=0;i<out_argv.size();i++) cerr << "out_argv.at(" << i << ")=" << out_argv.at(i) << endl;
     return out_argv;
   }
 }
@@ -267,7 +267,11 @@ namespace aurostd {
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
   bool get_itemized_vector_string_from_input(const vector<string> &argv,const string& s0,vector<string>& tokens,const string& delimiter) {// =":") {
-    if(aurostd::substring2bool(s0,"|")) {cerr << "get_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
+    if(aurostd::substring2bool(s0,"|")) {
+      string function = XPID + "aurostd::get_itemized_vector_string_from_input():";
+      string message = "not ported to \"|\"";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
     uint icount=0;
     string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";
     if(aurostd::args2attachedflag(argv,s0equ)) {icount+=aurostd::string2tokens(aurostd::args2attachedstring(argv,s0equ,EMPTY_WORDING),tokens,delimiter);}
@@ -346,7 +350,6 @@ namespace aurostd {  // namespace aurostd
 //[CO20200624 - OBSOLETE]  }
 //[CO20200624 - OBSOLETE]  
 //[CO20200624 - OBSOLETE]  bool getproto_itemized_vector_string_from_input(vector<string> &argv,const string& s0,vector<string>& tokens,const string& delimiter) {// =":") {
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s0,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
 //[CO20200624 - OBSOLETE]    string ss;tokens.clear();vector<string> stokens;
 //[CO20200624 - OBSOLETE]    string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";
 //[CO20200624 - OBSOLETE]    if(aurostd::args2attachedflag(argv,s0equ)) ss=aurostd::args2attachedstring(argv,s0equ,EMPTY_WORDING);
@@ -367,8 +370,6 @@ namespace aurostd {  // namespace aurostd
 //[CO20200624 - OBSOLETE]    return TRUE;
 //[CO20200624 - OBSOLETE]  }
 //[CO20200624 - OBSOLETE]  bool getproto_itemized_vector_string_from_input(vector<string> &argv,const string& s0,const string& s1,vector<string>& tokens,const string& delimiter) {// =":") {
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s0,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
-//[CO20200624 - OBSOLETE]     if(aurostd::substring2bool(s1,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
 //[CO20200624 - OBSOLETE]     string ss;tokens.clear();vector<string> stokens;
 //[CO20200624 - OBSOLETE]    string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";
 //[CO20200624 - OBSOLETE]    string s1neq=s1,s1equ;aurostd::StringSubst(s1neq,"=","");s1equ=s1neq+"=";
@@ -392,9 +393,6 @@ namespace aurostd {  // namespace aurostd
 //[CO20200624 - OBSOLETE]    return TRUE;
 //[CO20200624 - OBSOLETE]  }
 //[CO20200624 - OBSOLETE]  bool getproto_itemized_vector_string_from_input(vector<string> &argv,const string& s0,const string& s1,const string& s2,vector<string>& tokens,const string& delimiter) {// =":") {
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s0,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s1,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s2,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
 //[CO20200624 - OBSOLETE]    string ss;tokens.clear();vector<string> stokens;
 //[CO20200624 - OBSOLETE]    string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";
 //[CO20200624 - OBSOLETE]    string s1neq=s1,s1equ;aurostd::StringSubst(s1neq,"=","");s1equ=s1neq+"=";
@@ -421,10 +419,6 @@ namespace aurostd {  // namespace aurostd
 //[CO20200624 - OBSOLETE]    return TRUE;
 //[CO20200624 - OBSOLETE]  }
 //[CO20200624 - OBSOLETE]  bool getproto_itemized_vector_string_from_input(vector<string> &argv,const string& s0,const string& s1,const string& s2,const string& s3,vector<string>& tokens,const string& delimiter) {// =":") {
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s0,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s1,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s2,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
-//[CO20200624 - OBSOLETE]    if(aurostd::substring2bool(s3,"|")) {cerr << "getproto_itemized_vector_string_from_input not ported to \"|\"" << endl;exit(0);}
 //[CO20200624 - OBSOLETE]    string ss;tokens.clear();vector<string> stokens;
 //[CO20200624 - OBSOLETE]    string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";
 //[CO20200624 - OBSOLETE]    string s1neq=s1,s1equ;aurostd::StringSubst(s1neq,"=","");s1equ=s1neq+"=";
@@ -491,13 +485,6 @@ namespace aurostd {  // namespace aurostd
 // args2attachedstring(argv,"-xxx=",abc) returns the content of xxx= or abc
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
-  // [OBSOLETE]  string args2attachedstring(const vector<string>& argv,const string& s0) {
-  // [OBSOLETE]    if(aurostd::substring2bool(s0,"|")) {cerr << "args2attachedstring not ported to \"|\"" << endl;exit(0);}
-  // [OBSOLETE]    vector<string> tokens;
-  // [OBSOLETE]    for(uint i=0;i<argv.size();i++)
-  // [OBSOLETE]      if(argv.at(i).find(s0)!=string::npos) return argv.at(i).substr(argv.at(i).find(s0)+s0.length());
-  // [OBSOLETE]    return string("");
-  // [OBSOLETE]  }
   string args2attachedstring(const vector<string>& argv,const string& s0,string s_def) { // string=""
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
     string s=aurostd::RemoveWhiteSpaces(s0),output="";
@@ -639,8 +626,6 @@ namespace aurostd {  // namespace aurostd
 
 // [OBSOLETE]  template<typename utype>
 // [OBSOLETE]  utype args2attachedutype(const vector<string>& argv,const string& str1,const string& str2,const utype& utype_default) {
-// [OBSOLETE]    if(aurostd::substring2bool(str1,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
-// [OBSOLETE]    if(aurostd::substring2bool(str2,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
 // [OBSOLETE]    string s1=str1,s1eq,s1neq;     //   s1=aurostd::RemoveSubString(s1,"-");s1=aurostd::RemoveSubString(s1,"-");
 // [OBSOLETE]    s1=aurostd::RemoveSubString(s1,"=");
 // [OBSOLETE]    s1eq=s1+"=";s1neq=s1;//cerr << s1eq << " " << s1neq << endl;
@@ -661,9 +646,6 @@ namespace aurostd {  // namespace aurostd
 // [OBSOLETE]  
 // [OBSOLETE]  template<typename utype>
 // [OBSOLETE]  utype args2attachedutype(const vector<string>& argv,const string& str1,const string& str2,const string& str3,const utype& utype_default) {
-// [OBSOLETE]    if(aurostd::substring2bool(str1,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
-// [OBSOLETE]    if(aurostd::substring2bool(str2,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
-// [OBSOLETE]    if(aurostd::substring2bool(str3,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
 // [OBSOLETE]    string s1=str1,s1eq,s1neq;     //   s1=aurostd::RemoveSubString(s1,"-");s1=aurostd::RemoveSubString(s1,"-");
 // [OBSOLETE]    s1=aurostd::RemoveSubString(s1,"=");
 // [OBSOLETE]    s1eq=s1+"=";s1neq=s1;//cerr << s1eq << " " << s1neq << endl;
@@ -687,10 +669,6 @@ namespace aurostd {  // namespace aurostd
 // [OBSOLETE]  
 // [OBSOLETE]  template<typename utype>
 // [OBSOLETE]  utype args2attachedutype(const vector<string>& argv,const string& str1,const string& str2,const string& str3,const string& str4,const utype& utype_default) {
-// [OBSOLETE]    if(aurostd::substring2bool(str1,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
-// [OBSOLETE]    if(aurostd::substring2bool(str2,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
-// [OBSOLETE]    if(aurostd::substring2bool(str3,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
-// [OBSOLETE]    if(aurostd::substring2bool(str4,"|")) {cerr << "args2attachedutype not ported to \"|\"" << endl;exit(0);}
 // [OBSOLETE]    string s1=str1,s1eq,s1neq;     //   s1=aurostd::RemoveSubString(s1,"-");s1=aurostd::RemoveSubString(s1,"-");
 // [OBSOLETE]    s1=aurostd::RemoveSubString(s1,"=");
 // [OBSOLETE]    s1eq=s1+"=";s1neq=s1;//cerr << s1eq << " " << s1neq << endl;

@@ -54,10 +54,13 @@ namespace init {
     if(ncpus<1) ncpus=1;
     return ncpus;
   }
-  bool InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& oss) {
+  //ME20200724 - returns an int now to remove exits. -1 means that aflow can
+  //continue, otherwise terminate with exit code.
+  int InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& oss) {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG),found=FALSE;
     string soliloquy=XPID+"init::InitMachine():";
+    string message = "";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
     int depth_short=20,depth_long=45;
     string position;
@@ -88,11 +91,10 @@ namespace init {
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     //  XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
-    // if(XHOST.vflag_control.flag("AFLOWRC::OVERWRITE")) {aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);exit(1);}
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
-    if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);exit(1);}
+    if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
 
     // IMMEDIATELY GET PIDS
     XHOST.PID=getpid();    // PID number
@@ -207,9 +209,8 @@ namespace init {
     if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.mems.duke.edu";
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("hostname = ",depth_short) << XHOST.hostname << endl;
     if(AFLOW_BlackList(XHOST.hostname)) {
-      cout << "MMMMM  HOSTNAME BLACKLISTED = " << XHOST.hostname << endl;
-      cerr << "MMMMM  HOSTNAME BLACKLISTED = " << XHOST.hostname << endl;
-      exit(0);
+      message = "HOSTNAME BLACKLISTED = " + XHOST.hostname;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message);
     }
 
     // MACHINE TYPE
@@ -408,7 +409,6 @@ namespace init {
     }
     // maxmem
     XHOST.maxmem=aurostd::args2attachedutype<double>(XHOST.argv,"--mem=|--maxmem=",101.0);
-    // DEBUG  cerr << "XHOST.maxmem=" << XHOST.maxmem << endl;exit(0);
 
     // MPIs
     if(INIT_VERBOSE) {
@@ -486,10 +486,8 @@ namespace init {
     vector<string> vstrs;
     // DO VARIABLES
     aurostd::string2tokens(DEFAULT_VASP_POTCAR_DIRECTORIES,vVASP_POTCAR_DIRECTORIES,",");// vVASP_POTCAR_DIRECTORIES;
-    // for(uint i=0;i<vVASP_POTCAR_DIRECTORIES.size();i++) oss << "vVASP_POTCAR_DIRECTORIES.at(" << i << ")=" << vVASP_POTCAR_DIRECTORIES.at(i) << endl; // exit(0);
     // LIBRARIES
     aurostd::string2tokens(DEFAULT_AFLOW_LIBRARY_DIRECTORIES,vAFLOW_LIBRARY_DIRECTORIES,",");// vAFLOW_LIBRARY_DIRECTORIES;
-    //for(uint i=0;i<vAFLOW_LIBRARY_DIRECTORIES.size();i++) oss << vAFLOW_LIBRARY_DIRECTORIES.at(i) << endl;exit(0);
     // PROJECTS
     vAFLOW_PROJECTS_DIRECTORIES.clear();
     // XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
@@ -552,9 +550,7 @@ namespace init {
       if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl; }
     }
 
-    // for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) oss << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;exit(0);
     // OLD aurostd::string2tokens(string(AFLOW_PROJECTS_DIRECTORIES),vAFLOW_PROJECTS_DIRECTORIES,",");// vAFLOW_PROJECTS_DIRECTORIES;
-    // OLD for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) oss << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;exit(0);
 
     // check for MACHINES MARYLOU
     XHOST.is_MACHINE_FULTON_MARYLOU=FALSE;
@@ -631,7 +627,7 @@ namespace init {
     directory_clean=aurostd::RemoveWhiteSpaces(directory_clean);
     if(directory_clean.empty() || directory_clean=="./" || directory_clean==".") {directory_clean=aurostd::getPWD()+"/";}  //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     if(!directory_clean.empty()) {XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
-    if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
+    if(LDEBUG) {cerr << directory_clean << endl;}
     //CO20190402 STOP - cleaning directory, giving us something to print with logger
 
     // LOGICS to intercept --file= => XHOST.vflag_control.flag("FILE") XHOST.vflag_control.getattachedscheme("FILE")
@@ -665,7 +661,6 @@ namespace init {
     XHOST.vflag_control.flag("VFILES",found);  // if found
     if(XHOST.vflag_control.flag("VFILES")) XHOST.vflag_control.push_attached("VFILES",files); 
     if(XHOST.vflag_control.flag("VFILES")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"VFILES\")=[" << XHOST.vflag_control.getattachedscheme("VFILES") << "]" << endl; 
-    // exit(0); 
 
     XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"-h|--help"));
     XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  //ME20180531
@@ -932,8 +927,8 @@ namespace init {
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER") &&
         !(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="aflowlib.duke.edu" || XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="materials.duke.edu")) {
-      cerr << XPID << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
-      exit(0);
+      message = XPID + "\"--server=\" can only be \"aflowlib.duke.edu\" or \"materials.duke.edu\"";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
     }
     // LOAD options
     if(INIT_VERBOSE) oss << "--- LOADING @ options --- " << endl;
@@ -946,8 +941,6 @@ namespace init {
     XHOST.AFLOW_RUNDIRflag=aurostd::args2flag(XHOST.argv,"--run|-run");
     XHOST.AFLOW_MULTIflag=aurostd::args2flag(XHOST.argv,"--run=multi|-run=multi|--multi|-multi");	
     XHOST.AFLOW_RUNXflag=!XHOST.AFLOW_MULTIflag && (aurostd::args2attachedflag(XHOST.argv,"--run=") || aurostd::args2attachedflag(XHOST.argv,"-run="));
-
-    //   cerr << XPID << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
 
     XHOST.AFLOW_RUNXnumber=0;
     XHOST.vflag_pflow.clear(); 
@@ -998,7 +991,7 @@ namespace init {
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
     if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
-    if(INIT_VERBOSE) exit(0);
+    if(INIT_VERBOSE) return 0;
     // CHECK CRC
     // aurostd::crc64_main();
 
@@ -1008,7 +1001,7 @@ namespace init {
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
 
-    return TRUE;
+    return -1;
   }
 } // namespace init
 
