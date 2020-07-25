@@ -529,9 +529,9 @@ namespace SYM {
 // If the lattice too skewed to used the PBC function? 
 namespace SYM {
   bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
-    double max_skew = aurostd::max(aurostd::abs(SYM::DotPro(lattice(1),lattice(2))/(aurostd::modulus(lattice(1))*aurostd::modulus(lattice(2)))),
-        aurostd::max(aurostd::abs(SYM::DotPro(lattice(2),lattice(3))/(aurostd::modulus(lattice(2))*aurostd::modulus(lattice(3)))),
-          aurostd::abs(SYM::DotPro(lattice(3),lattice(1)/(aurostd::modulus(lattice(3))*aurostd::modulus(lattice(1)))))));
+    double max_skew = aurostd::max(aurostd::abs(aurostd::scalar_product(lattice(1),lattice(2))/(aurostd::modulus(lattice(1))*aurostd::modulus(lattice(2)))),
+        aurostd::max(aurostd::abs(aurostd::scalar_product(lattice(2),lattice(3))/(aurostd::modulus(lattice(2))*aurostd::modulus(lattice(3)))),
+          aurostd::abs(aurostd::scalar_product(lattice(3),lattice(1)/(aurostd::modulus(lattice(3))*aurostd::modulus(lattice(1))))))); //DX20200724 - SYM::DotPro to aurostd::scalar_product
     double skew_tol = (1.0-aurostd::abs(max_skew))*min_dist;
     XHOST.SKEW_TOL=skew_tol; //DX20171019
     return (skew_tol<tol);
@@ -1946,6 +1946,8 @@ namespace SYM {
 
 #ifndef COMPILE_SLIM
   _atom ApplyAtom_20160101(const _atom &atom_in,const _sym_op &symop,const xstructure& str,bool _incell_) {
+    string function_name = XPID + "SYM::ApplyAtom():";
+    stringstream message;
     _atom atom;
     atom=atom_in;  // copies all the info !
     char check=symop.is_pgroup+symop.is_fgroup+symop.is_sgroup+symop.is_agroup;
@@ -1955,13 +1957,13 @@ namespace SYM {
     bool roff=TRUE;
 
     if(check!=1) {
-      cerr << "symop.is_pgroup=" << symop.is_pgroup << endl;
-      cerr << "symop.is_pgroup_xtal=" << symop.is_pgroup_xtal << endl;
-      cerr << "symop.is_fgroup=" << symop.is_fgroup << endl;
-      cerr << "symop.is_sgroup=" << symop.is_sgroup << endl;
-      cerr << "symop.is_agroup=" << symop.is_agroup << endl;
-      cerr << "SYM::ApplyAtom error in symop.is_pgroup symop.is_fgroup symop.is_sgroup symop.is_agroup " << endl;
-      exit(0);
+      message << "symop.is_pgroup=" << symop.is_pgroup << endl;
+      message << "symop.is_pgroup_xtal=" << symop.is_pgroup_xtal << endl;
+      message << "symop.is_fgroup=" << symop.is_fgroup << endl;
+      message << "symop.is_sgroup=" << symop.is_sgroup << endl;
+      message << "symop.is_agroup=" << symop.is_agroup << endl;
+      message << "Error in symop.is_pgroup symop.is_fgroup symop.is_sgroup symop.is_agroup " << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
     atom.ijk=atom_in.ijk;
     if(symop.is_pgroup==TRUE || symop.is_agroup==TRUE) {
@@ -1971,17 +1973,17 @@ namespace SYM {
       atom.cpos=symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       // atom.cpos=f2c*atom.fpos;
       if(modulus(atom.cpos-f2c*atom.fpos)>_EPS_) {
-        cerr << "SYM::ApplyAtom: error [1]" << endl;
-        cerr << "  atom.cpos=" << atom.cpos << endl;
-        cerr << "  atom.fpos=" << atom.fpos << endl;
-        cerr << "  f2c=" << endl << f2c << endl;
-        cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
-        cerr << "  c2f=" << endl << c2f << endl;
-        cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
-        cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-        cerr << "  modulus = " << modulus(atom.cpos-f2c*atom.fpos) << endl;
-        cerr << "  EPS=" << _EPS_ << endl;
-        exit(0);
+        message << "Error [1]" << endl;
+        message << "  atom.cpos=" << atom.cpos << endl;
+        message << "  atom.fpos=" << atom.fpos << endl;
+        message << "  f2c=" << endl << f2c << endl;
+        message << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
+        message << "  c2f=" << endl << c2f << endl;
+        message << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
+        message << "  f2c*c2f=" << endl << f2c*c2f << endl;
+        message << "  modulus = " << modulus(atom.cpos-f2c*atom.fpos) << endl;
+        message << "  EPS=" << _EPS_ << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       atom.basis=atom_in.basis;
@@ -1992,20 +1994,20 @@ namespace SYM {
       atom.cpos=symop.ctau+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       //  atom.cpos=f2c*atom.fpos;
       if(modulus(atom.cpos-f2c*atom.fpos)>_EPS_) {
-        cerr << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
-        cerr << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
-        cerr << f2c*atom.fpos << endl;
-        cerr << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
-        cerr << "SYM::ApplyAtom: error [2]" << endl;
-        exit(0);
+        message << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
+        message << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
+        message << f2c*atom.fpos << endl;
+        message << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
+        message << "Error [2]" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
-        cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
-        cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
-        cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
-        cerr << "SYM::ApplyAtom: fgroup is mapping out of range" << endl;
-        exit(0);
+        message << "atom_in.basis=" << atom_in.basis << endl;
+        message << "symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
+        message << "symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
+        message << "fgroup is mapping out of range" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }
@@ -2015,20 +2017,20 @@ namespace SYM {
       atom.cpos=symop.ctau+symop.ctrasl+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       // atom.cpos=f2c*atom.fpos;
       if(modulus(atom.cpos-f2c*atom.fpos)>_EPS_) {
-        cerr << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
-        cerr << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
-        cerr << f2c*atom.fpos << endl;
-        cerr << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
-        cerr << "SYM::ApplyAtom: error [3]" << endl;
-        exit(0);
+        message << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
+        message << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
+        message << f2c*atom.fpos << endl;
+        message << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
+        message << "Error [3]" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
-        cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
-        cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
-        cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
-        cerr << "SYM::ApplyAtom: sgroup is mapping out of range" << endl;
-        exit(0);
+        message << "atom_in.basis=" << atom_in.basis << endl;
+        message << "symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
+        message << "symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
+        message << "sgroup is mapping out of range" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }
@@ -2073,6 +2075,9 @@ namespace SYM {
 
 namespace SYM {
   xvector<int> ApplyIJK(const xvector<int> &ijk_in,const _sym_op &symop,const xstructure& str) {
+
+    string function_name = XPID + "SYM::ApplyIJK():";
+    stringstream message;
     xvector<double> fijk(3),cijk(3);
     xvector<int>    ijk(3);
     bool roff=TRUE;
@@ -2088,31 +2093,34 @@ namespace SYM {
 
       cijk=symop.Uc*cijk;if(roff) roundoff(cijk,_EPS_roundoff_);
       if(modulus(fijk-cijk)>0.01) {
-        cerr << "ERROR SYM::ApplyIJK mismatch error modulus(fijk-cijk)" << endl;
-        cerr << fijk << endl;
-        cerr << C2F(str.lattice,cijk) << endl;
-        exit(0);
+        message << "Mismatch error modulus(fijk-cijk)" << endl;
+        message << fijk << endl;
+        message << C2F(str.lattice,cijk) << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       for(int i=1;i<=3;i++) {
         if(abs(fijk[i]-ijk[i])>0.01) {
-          cerr << "ERROR SYM::ApplyIJK mismatch error" << endl;
-          cerr << ijk_in << endl;
-          cerr << fijk << endl;
-          cerr << ijk << endl;
-          cerr << symop.Uf << endl;
-          exit(0);
+          message << "Mismatch error" << endl;
+          message << ijk_in << endl;
+          message << fijk << endl;
+          message << ijk << endl;
+          message << symop.Uf << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
         }
       }
     }
-    if(symop.is_fgroup==TRUE) {cerr << "SYM::ApplyIJK not defined for fgroup" << endl;exit(0);}
-    if(symop.is_sgroup==TRUE) {cerr << "SYM::ApplyIJK not defined for sgroup" << endl;exit(0);}
+    if(symop.is_fgroup==TRUE) {message << "Not defined for fgroup"; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);}
+    if(symop.is_sgroup==TRUE) {message << "Not defined for sgroup"; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);}
     return ijk;
   }
 } // namespace SYM
 
 namespace SYM {
   int ApplyL(const int &l,const _sym_op &symop,const xstructure& str) {
-    if(str.lijk_calculated==FALSE) {cerr << "SYM::ApplyL, str.lijk_calculated must be calculated" << endl;exit(0);}
+    string function_name = XPID + "SYM::ApplyL():";
+    if(str.lijk_calculated==FALSE) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"str.lijk_calculated must be calculated",_RUNTIME_ERROR_);
+    }
     return ijk2l(str,SYM::ApplyIJK(l2ijk(str,l),symop,str));
   }
 } // namespace SYM
@@ -2183,8 +2191,10 @@ namespace SYM {
 #ifndef COMPILE_SLIM
   bool AtomsEquivalent_20160101(xstructure& str, _atom& atom1, _atom& atom2, double& eps) {
     // if(modulus(atom1.fpos-atom2.fpos)<ep s&& atom1.type==atom2.type) return TRUE;
+    string function_name = XPID + "SYM::AtomsEquivalent():";
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
-      cerr << "AtomsEquivalen: syummetry must have been calculated" << endl;exit(0);}
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
+    }
     _atom tatom;
     for(uint fg=0;fg<str.fgroup.size();fg++) {
       tatom=SYM::ApplyAtom(atom2,str.fgroup[fg],str);
@@ -2199,8 +2209,9 @@ namespace SYM {
 #endif
 
   bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+    string function_name = XPID + "SYM::AtomsEquivalent():";
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
-      cerr << "SYM::AtomsEquivalent: symmetry must have been calculated" << endl;exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     _atom tatom;
     for(uint fg=0;fg<str.fgroup.size();fg++) {
@@ -2219,8 +2230,9 @@ namespace SYM {
 
 namespace SYM {
   bool AtomsEquivalent_Basis(xstructure& str, int atom1_indx,int atom2_indx){
+    string function_name = XPID + "SYM::AtomsEquivalent_Basis():";
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
-      cerr << "SYM::AtomsEquivalent_Basis: symmetry must have been calculated" << endl;exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     for(uint fg=0;fg<str.fgroup.size();fg++) {
       if(str.fgroup[fg].basis_atoms_map[atom1_indx]==atom2_indx || str.fgroup[fg].basis_atoms_map[atom2_indx]==atom1_indx){
@@ -2234,8 +2246,10 @@ namespace SYM {
 
 namespace SYM {
   bool CposEquivalent(const xstructure& str,const xvector<double> &cpos1,const xvector<double>& cpos2,const double& eps) {
+    string function_name = XPID + "SYM::CposEquivalent():";
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
-      cerr << "SYM::CposEquivalent: symmetry must have been calculated" << endl;exit(0);}
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
+    }
     _atom iatom1,iatom2,tatom;
     iatom1.cpos=cpos1;iatom1.fpos=C2F(str.lattice,iatom1.cpos);
     iatom2.cpos=cpos2;iatom2.fpos=C2F(str.lattice,iatom2.cpos);
@@ -2249,8 +2263,9 @@ namespace SYM {
 
 namespace SYM {
   bool FposEquivalent(const xstructure& str,const xvector<double>& fpos1,const xvector<double>& fpos2,const double& eps) {
+    string function_name = XPID + "SYM::FposEquivalent():";
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
-      cerr << "SYM::FposEquivalent: symmetry must have been calculated" << endl;exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     _atom iatom1,iatom2,tatom;
     iatom1.fpos=fpos1;iatom1.cpos=F2C(str.lattice,iatom1.fpos);
@@ -3320,7 +3335,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
     //DX20170906 [OBSOLETE] return Krun;
     return pg_found;
@@ -3688,7 +3702,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
     return Krun;
   }
@@ -4072,7 +4085,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss);
     return Krun;
   }
@@ -4280,22 +4292,23 @@ namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) { 
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
     string soliloquy = XPID + "SYM::CalculatePointGroup():";
+    stringstream message;
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     // Obtain the structure tolerance
     //DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); //DX20180426 - added current working directory
     a.sym_eps=_eps_; //DX
 
     // AFLOW_FUNCTION_IMPLEMENTATION
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroup" << endl;
+    if(DEBUG_SYMMETRY) cerr << soliloquy << " DEBUG" << endl;
     // ------------------------------------------------------------------------------
     // Some of this routine is inspired by AVDV structure::calc_point_group() code.
     //SC made modificatios for speed and consistency with aflow architecture
     //a.MinkowskiBasisReduction();
     ostringstream aus;
     bool Krun=TRUE;
-    string message="PGROUP";
-    if(a.title=="KLATTICE") message="PGROUP_KLATTICE";
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    string pgroup_type="PGROUP";
+    if(a.title=="KLATTICE") pgroup_type="PGROUP_KLATTICE";
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // generic variables
     //  double _eps_=_EPS_; optional
@@ -4359,7 +4372,7 @@ namespace SYM {
     //  dims(i)=3;
     //}
     //DX ===
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // seek for lattice points within the sphere with radius
@@ -4404,7 +4417,7 @@ namespace SYM {
         }
       }
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // for each set of three lattice points within the sphere see which one has the
@@ -4479,7 +4492,7 @@ namespace SYM {
                           if(sym_found==FALSE) {                                 // new operation, generate and save it
                             clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
                             kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
-                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << a.pgroup[kk-1].str_type
+                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " " << a.pgroup[kk-1].str_type
                               << " theta=";
                             if(a.pgroup[kk-1].angle<100) aus << " ";
                             if(a.pgroup[kk-1].angle<10) aus << " ";
@@ -4498,18 +4511,17 @@ namespace SYM {
                                 cerr << "Bct" << endl << Bct << endl;
                                 cerr << "Uf" << endl << Uf << endl;
                                 cerr << "Uc" << endl << Uc << endl;
-                                //	exit(0);
                               }
                             }
                             //DX _eps_ to _ZERO_TOL_
                             if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_ZERO_TOL_) //DX used to be _eps_
-                            {cerr << "SYM::CalculatePointGroup Uf error[1] [dir=" << a.directory << "]" << endl;exit(0);} 
+                            {message << "Uf error[1] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_ZERO_TOL_) //DX used to be _eps_
-                            {cerr << "SYM::CalculatePointGroup Uc error[2] [dir=" << a.directory << "]" << endl;exit(0);}
+                            {message << "Uc error[2] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_ZERO_TOL_) //DX used to be _eps_
-                            {cerr << "SYM::CalculatePointGroup Uf error[3] [dir=" << a.directory << "]" << endl;exit(0);}
+                            {message << "Uc error[3] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_ZERO_TOL_) //DX used to be _eps_
-                            {cerr << "SYM::CalculatePointGroup Uc error[4] [dir=" << a.directory << "]" << endl;exit(0);}
+                            {message << "Uc error[4] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
                             //DX _eps_ to _ZERO_TOL_
                           }
@@ -4543,10 +4555,9 @@ namespace SYM {
     grid_flattice.clear();
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_,osswrite,oss,format);
     string pgname = ""; //DX20170906
     string operations = ""; //DX20170906
@@ -4561,16 +4572,18 @@ namespace SYM {
   //DX bool CalculatePointGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_)        // AFLOW_FUNCTION_IMPLEMENTATION
   bool CalculatePointGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_)        // AFLOW_FUNCTION_IMPLEMENTATION
   { //CO20200106 - patching for auto-indenting
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroup" << endl;
+    string soliloquy = XPID + "SYM::CalculatePointGroup():";
+    stringstream message;
+    if(DEBUG_SYMMETRY) cerr << soliloquy << " DEBUG" << endl;
     // ------------------------------------------------------------------------------
     // Some of this routine is inspired by AVDV structure::calc_point_group() code.
     //SC made modificatios for speed and consistency with aflow architecture
     //a.MinkowskiBasisReduction();
     ostringstream aus;
     bool Krun=TRUE;
-    string message="PGROUP";
-    if(a.title=="KLATTICE") message="PGROUP_KLATTICE";
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    string pgroup_type="PGROUP";
+    if(a.title=="KLATTICE") pgroup_type="PGROUP_KLATTICE";
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // generic variables
     //  double _eps_=_EPS_; optional
@@ -4625,7 +4638,7 @@ namespace SYM {
     radius=RadiusSphereLattice(lattice);  // smarter !
     dims=LatticeDimensionSphere(lattice,radius);
     // for(i=1;i<=3;i++) if(dims(i)>3)dims(i)=3; // check for safety
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // seek for lattice points within the sphere with radius
@@ -4661,7 +4674,7 @@ namespace SYM {
         }
       }
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // for each set of three lattice points within the sphere see which one has the
@@ -4710,7 +4723,7 @@ namespace SYM {
                           if(sym_found==FALSE) {                                 // new operation, generate and save it
                             clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
                             kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_);  // kk number pgroups
-                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << a.pgroup[kk-1].str_type
+                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " " << a.pgroup[kk-1].str_type
                               << " theta=";
                             if(a.pgroup[kk-1].angle<100) aus << " ";
                             if(a.pgroup[kk-1].angle<10) aus << " ";
@@ -4729,17 +4742,16 @@ namespace SYM {
                                 cerr << "Bct" << endl << Bct << endl;
                                 cerr << "Uf" << endl << Uf << endl;
                                 cerr << "Uc" << endl << Uc << endl;
-                                //	exit(0);
                               }
                             }
                             if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uf error[1]" << endl;exit(0);}
+                            {message << "Uf error[1] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uc error[2]" << endl;exit(0);}
+                            {message << "Uf error[2] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uf error[3]" << endl;exit(0);}
+                            {message << "Uf error[3] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uc error[4]" << endl;exit(0);}
+                            {message << "Uf error[4] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);}
                             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
                           }
                         }
@@ -4770,10 +4782,9 @@ namespace SYM {
     grid_flattice.clear();
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_,osswrite,oss);
     return Krun;
   }
@@ -5196,7 +5207,7 @@ namespace SYM {
     //CO20180420 - fixing for ME
     bool basis_map_calculated_orig=symOp.basis_map_calculated;
     symOp.basis_map_calculated=false;
-    symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/exit!!!!!
+    symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/throw!!!!!
 
     //bool cont = true;
     uint count=0;
@@ -5214,7 +5225,7 @@ namespace SYM {
       //DX tmp=ApplyAtom(atoms[k],symOp,lattice,c2f,f2c,skew,true,false,ignoreFractionalOperation,tolerance); //incell, but no roff
       if(!ApplyAtomValidate(atoms[k],tmp,symOp,lattice,c2f,f2c,skew,true,false,tolerance)){ //incell, but no roff
         // Applying c2f and f2c to the Cartesian and fractional positions give different results (a tolerance issue) 
-        symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/exit!!!!!
+        symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/throw!!!!!
         return FALSE;
       }
       //DX TEST
@@ -5260,7 +5271,7 @@ namespace SYM {
           cerr << "normal atom " << atoms.at(i).fpos << " | " << tmp.fpos << ", diff = " << fdiff << " (mod=" << aurostd::modulus(f2c*fdiff) << ")" << endl;
           }
           }*/
-        symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/exit!!!!!
+        symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/throw!!!!!
         return FALSE;
       }
     }
@@ -5276,7 +5287,7 @@ namespace SYM {
         for(uint i=0;i<mappings.size();i++){
           for(uint j=i+1;j<mappings.size();j++){
             if(mappings[i] == mappings[j]){
-              symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/exit!!!!!
+              symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/throw!!!!!
               return FALSE;
             }
           }
@@ -5285,13 +5296,13 @@ namespace SYM {
         } 
       }
       //DX20170731 - Check one-to-one speed increase : END
-      symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/exit!!!!!
+      symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/throw!!!!!
       return TRUE;
     }
     if(LDEBUG) {
       cerr << "SYM::getFullSymBasis: FAILED 2 - total mappings = " << count << ", should be " << atoms.size() << endl;
     }
-    symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/exit!!!!!
+    symOp.basis_map_calculated=basis_map_calculated_orig;  //CO20140420 - make sure to include me before any return/throw!!!!!
     return FALSE;
   }
   //DX+CO END
@@ -5410,12 +5421,14 @@ namespace SYM {
 namespace SYM {
   bool CalculateFactorGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "SYM::CalculateFactorGroup():";
+    stringstream message;
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
     // Obtain the structure tolerance
     a.sym_eps=_eps_;
     bool skew = isLatticeSkewed(a.lattice,a.dist_nn_min,_eps_);
 
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculateFactorGroup" << endl;
+    if(DEBUG_SYMMETRY) cerr << soliloquy << " DEBUG" << endl;
     // ------------------------------------------------------------------------------
     ostringstream aus;
     bool Krun=TRUE,sym_found;
@@ -5440,13 +5453,13 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
-    if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup breaking up by types" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " DEBUG breaking up by types" << endl;}
     deque<deque<_atom> > atoms_by_type = break_up_by_type(a.atoms);
     if(atoms_by_type.size()==0){
-      cerr << "SYM::CalculateFactorGroup ERROR:  Structure could not be broken up by atoms. Exiting [dir=" << a.directory << "]" << endl;
+      cerr << soliloquy << " ERROR: Structure could not be broken up by atoms [dir=" << a.directory << "]" << endl;
       return false;
     }
-    if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup breaking up by types DONE" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " DEBUG breaking up by types DONE" << endl;}
     uint smallest_group = atoms_by_type[0].size();
     uint index_for_smallest_group = 0;
     for(uint i=1;i<atoms_by_type.size();i++){
@@ -5455,7 +5468,7 @@ namespace SYM {
         index_for_smallest_group = i;
       }
     }
-    if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup grabbed index for smallest group" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " DEBUG grabbed index for smallest group" << endl;}
 
     // ===== Loop over symmetry elements ===== //
     //xmatrix<double> R;
@@ -5475,20 +5488,20 @@ namespace SYM {
       //CO START
       symOp.Uf=a.pgroup[pg].Uf;
       symOp.Uc=a.pgroup[pg].Uc;
-      if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup starting pg=" << pg << endl;}
+      if(LDEBUG) {cerr << soliloquy << " DEBUG starting pg=" << pg << endl;}
       //symOp.str_Hermann_Mauguin=a.pgroup[pg].str_Hermann_Mauguin; //no longer necessary
       //CO END
       for(uint j=0;j<atoms_by_type[index_for_smallest_group].size();j++){
-        if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup j=" << j << endl;}
-        if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup index_for_smallest_group=" << index_for_smallest_group << endl;}
-        if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup atoms_by_type.size()=" << atoms_by_type.size() << endl;}
-        if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup atoms_by_type[index_for_smallest_group].size()=" << atoms_by_type[index_for_smallest_group].size() << endl;}
+        if(LDEBUG) {cerr << soliloquy << " DEBUG j=" << j << endl;}
+        if(LDEBUG) {cerr << soliloquy << " DEBUG index_for_smallest_group=" << index_for_smallest_group << endl;}
+        if(LDEBUG) {cerr << soliloquy << " DEBUG atoms_by_type.size()=" << atoms_by_type.size() << endl;}
+        if(LDEBUG) {cerr << soliloquy << " DEBUG atoms_by_type[index_for_smallest_group].size()=" << atoms_by_type[index_for_smallest_group].size() << endl;}
         //DX20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau = mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos);
         symOp.ftau = atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos; //DX20190905 - uses new bring in cell function
         BringInCellInPlace(symOp.ftau); //DX20190905 - uses new bring in cell function
         //CO START
         symOp.ctau=a.f2c*symOp.ftau;
-        if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup about to test symop" << endl;}
+        if(LDEBUG) {cerr << soliloquy << " DEBUG about to test symop" << endl;}
         //CO END
         //if(getFullSymBasis(a.atoms,a.pgroup[pg].Uf,a.c2f,a.f2c,a.pgroup[pg].str_Hermann_Mauguin,symOp.ftau,skew,_eps_,basis_atoms_map,basis_types_map))
         if(getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,TRUE,skew,_eps_,basis_atoms_map,basis_types_map))
@@ -5553,7 +5566,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss,format);
     return Krun;
   }
@@ -5610,7 +5622,7 @@ namespace SYM {
 
     // cerr << Getabc_angles(a.lattice,DEGREES) << endl;
     // int ijk=1;  // Y. La Page 1982 J. Appl. Cryst. 15, 255-259  need to cycle -2,-1,0,1,2
-    // cerr << a << endl; exit(0);
+    // cerr << a << endl;
 
     xvector<double> corigin,forigin;
     //  corigin=a.atoms[0].cpos;
@@ -5679,7 +5691,7 @@ namespace SYM {
       }
     }
 
-    //  cerr << vfshifts.size() << endl; exit(0);
+    //  cerr << vfshifts.size() << endl;
 
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { //SC
@@ -5734,7 +5746,6 @@ namespace SYM {
         // 		cerr << "temp =" << temp << endl;
         // 		cerr << "BringInCell(temp)=" << BringInCell(temp) << endl;
         // 		cerr << "BringInCell2(temp)=" << BringInCell2(temp) << endl;
-        // 		exit(0);
         // 	    }
 
         if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
@@ -5797,7 +5808,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
   }
@@ -5850,7 +5860,7 @@ namespace SYM {
 
     cerr << a.lattice << endl;
     //  int ijk=1;  // Y. La Page 1982 J. Appl. Cryst. 15, 255-259  need to cycle -2,-1,0,1,2
-    // cerr << a << endl; exit(0);
+    // cerr << a << endl;
 
     xvector<double> corigin,forigin;
     //  corigin=a.atoms[0].cpos;
@@ -5894,7 +5904,6 @@ namespace SYM {
       }
     }
     cerr << vfshifts.size() << endl;
-    //  exit(0);
 
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { //SC
@@ -6064,7 +6073,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
   }
@@ -6122,7 +6130,6 @@ namespace SYM {
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
 
     // all symmetry operations are done within the fractional coordinate system
     // since translations back into the unit cell are straightforward
@@ -6205,7 +6212,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
   }
@@ -6350,7 +6356,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
   }
@@ -6477,7 +6482,6 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
   }
@@ -7002,14 +7006,16 @@ namespace SYM {
 namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "SYM::CalculateSitePointGroup():";
+    stringstream message;
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
     string directory=aurostd::getPWD(); //DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
     //CALCULATION_MODE == 0 (default) - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for all
     //CALCULATION_MODE == 1 - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for iatoms ONLY
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
     if(!(CALCULATION_MODE == 0 || CALCULATION_MODE == 1 || CALCULATION_MODE == 2)) {
-      cerr << "SYM::CalculateSitePointGroup ERROR:  Invalid calculation mode.  Must be 0, 1, or 2. Exiting [dir=" << a.directory << "]" << endl;
-      exit(0); //CO20180502 - normally don't use exit()'s, this one indicates input is INVALID
+      message << "Invalid calculation mode.  Must be 0, 1, or 2. [dir=" << a.directory << "]";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
     }
 
     // Obtain the structure tolerance
@@ -7121,7 +7127,6 @@ namespace SYM {
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP SYMMETRY: propagating to equivalent sites" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
       if(!CalculateSitePointGroup_EquivalentSites(a,CALCULATION_MODE!=1,_eps_)){
-        //exit(1);  //this SHOULD work
         return FALSE; 
       }
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
@@ -7304,6 +7309,7 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
+    string soliloquy = XPID + "SYM::CalculateSitePointGroup_EquivalentSites():";
     string directory=aurostd::getPWD(); //DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
@@ -7380,7 +7386,7 @@ namespace SYM {
                 //  continue;
                 //} else {
                 if(DEBUG_SYMMETRY){ 
-                  cerr << "SYM::CalculateSitePointGroup_Equivalent warning[1] - Cannot find full atom/types basis [dir=" << a.directory << "]" << endl; 
+                  cerr << soliloquy << " warning[1] - Cannot find full atom/types basis [dir=" << a.directory << "]" << endl;
                 }
                 return FALSE; //CO REMOVE
                 //}
@@ -7398,12 +7404,12 @@ namespace SYM {
         } else {
           //if(!found_fgroup){  //[CO20200106 - close bracket for indenting]}
           if(DEBUG_SYMMETRY){
-            cerr << "SYM::CalculateSitePointGroup_Equivalent warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; //DX20180426 - changed a.directory to directory (pwd)
+            cerr << soliloquy << " warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; //DX20180426 - changed a.directory to directory (pwd)
           }
           return FALSE;
-          //cerr << "Not exiting though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
+          //cerr << "Not throwing though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
           //a.agroup[eat]=a.agroup.at(iat);
-          //exit(0);
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
         }
       } 
     }
@@ -7451,7 +7457,7 @@ namespace SYM {
     ////if(derivative_structure){
     ////  continue;
     ////} else {
-    //cerr << "SYM::CalculateSitePointGroup_Equivalent error[2] - Cannot find full atom/types basis" << endl;
+    //cerr << soliloquy << " error[2] - Cannot find full atom/types basis" << endl;
     //return FALSE;
     ////}
     //}
@@ -7466,11 +7472,11 @@ namespace SYM {
     //}
     //} else {
     ////if(!found_fgroup){
-    //cerr << "SYM::CalculateSitePointGroup_Equivalent error[1b] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << endl;
+    //cerr << soliloquy << " error[1b] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << endl;
     //return FALSE;
-    ////cerr << "Not exiting though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
+    ////cerr << "Not throwing though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
     ////a.agroup[eat]=a.agroup.at(iat);
-    ////exit(0);
+    ////throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
     //}
     //} 
     //}
@@ -7501,6 +7507,9 @@ namespace SYM {
 
     //written by wahyu@alumni.duke.edu (2009) with the block to calculate the point group taken from
     //SYM::CalculatePointGroup function.
+
+    string soliloquy = XPID + "SYM::CalculateSitePointGroup2():";
+    stringstream message;
 
     uint i,j,ib,jp;
     ostringstream aus;
@@ -7639,13 +7648,13 @@ namespace SYM {
                             aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")"
                               << endl;  // remember vectors start from 0
                             if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uf error[1]" << endl;exit(0);}
+                            {message << "Uf error[1]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uc error[2]" << endl;exit(0);}
+                            {message << "Uf error[2]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uf error[3]" << endl;exit(0);}
+                            {message << "Uf error[3]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
-                            {cerr << "SYM::CalculatePointGroup Uc error[4]" << endl;exit(0);}
+                            {message << "Uf error[4]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
                           }
                         }
             }
@@ -7739,7 +7748,6 @@ namespace SYM {
             modulus(rlatt(2))>(radius+3*_eps_abc_) ||
             modulus(rlatt(3))>(radius+3*_eps_abc_)
           ) {
-          cerr<<"ERROR: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
           flog<<"ERROR: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
           flog.close();
           //deallocate pointer
@@ -7749,7 +7757,8 @@ namespace SYM {
           for(uint i=0;i<grid_flattice.size();i++)
             delete grid_flattice[i];
           grid_flattice.clear();
-          exit(1);
+          message << "One of the rlatt points is outside radius, algorithm 1.5*Rsphere failed.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
         }
 
         flog<<"rlatt row-lattice vectors new coord: "<<endl<<rlatt<<endl
@@ -7854,7 +7863,6 @@ namespace SYM {
                     modulus(rlatt(2))>(radius+3*_eps_abc_) ||
                     modulus(rlatt(3))>(radius+3*_eps_abc_)
                   ) {
-                  cerr<<"ERROR mid: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
                   flog<<"ERROR mid: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
                   flog.close();
                   //deallocate pointer
@@ -7864,7 +7872,8 @@ namespace SYM {
                   for(uint i=0;i<grid_flattice.size();i++)
                     delete grid_flattice[i];
                   grid_flattice.clear();
-                  exit(1);
+                  message << "Mid: One of the rlatt points is outside radius, algorithm 1.5*Rsphere failed.";
+                  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
                 }
                 //check mapping
                 sym_found=false;

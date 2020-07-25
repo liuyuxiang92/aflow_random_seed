@@ -318,7 +318,6 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO20180705 STOP
-  //[CO20190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
@@ -1900,8 +1899,7 @@ void _xinput::setXALIEN(_xalien& in_xalien) {
 
 xstructure& _xinput::getXStr() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    cerr << "_xinput::getXStr: no xstructure available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.str;}
   if(AFLOW_MODE_AIMS) {return xaims.str;}
@@ -1910,8 +1908,7 @@ xstructure& _xinput::getXStr() {
 
 string& _xinput::getDirectory() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    cerr << "_xinput::getDirectory: no Directory available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.Directory;}
   if(AFLOW_MODE_AIMS) {return xaims.Directory;}
@@ -1921,8 +1918,7 @@ string& _xinput::getDirectory() {
 
 void _xinput::setXStr(const xstructure& str,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    cerr << "_xinput::setStr: no xstructure available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP || set_all) {xvasp.str=str;}
   if(AFLOW_MODE_AIMS || set_all) {xaims.str=str;}
@@ -1930,8 +1926,7 @@ void _xinput::setXStr(const xstructure& str,bool set_all) {
 
 void _xinput::setDirectory(string Directory,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    cerr << "_xinput::setDirectory: no Directory available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP  || set_all) {xvasp.Directory=  Directory;}
   if(AFLOW_MODE_AIMS  || set_all) {xaims.Directory=  Directory;}
