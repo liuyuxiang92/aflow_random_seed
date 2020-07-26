@@ -89,7 +89,7 @@ namespace KBIN{
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << endl;
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size() << endl;
       if(aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() != aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size()) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() != aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size()",_FILE_CORRUPT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() != aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size()",_FILE_CORRUPT_);  //CO20200624
       }
       for(uint i=0;i<aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++)
         if(LDEBUG) cerr << "DEBUG= " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.at(i) << endl;
