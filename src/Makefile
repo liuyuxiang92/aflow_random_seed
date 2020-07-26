@@ -1502,5 +1502,5 @@ else
 endif
 check_aflow_exits:
 	@echo "Running aflow_exits test 1: NO 'exit's" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
-		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code; this is NOT good coding. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
+		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
 ###################################################################################################
