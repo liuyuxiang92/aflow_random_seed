@@ -1297,7 +1297,6 @@ void MakeVaspIn(bool VERB) {
   cerr << " *********************************************************************** END " << endl;
   LatexSideMarginThesisOFF();
   //cout << "\\end{document}" << endl;  
-  exit(0);
 }
 
 void ZungerConversionChart(void) {
