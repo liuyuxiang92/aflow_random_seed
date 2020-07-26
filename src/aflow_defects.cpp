@@ -101,6 +101,7 @@ acage::acage(const acage& b) {
 bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
     const xvector<double>& v1,const xvector<double>& v2,
     const xvector<double>& v3,const xvector<double>& v4) {
+  string soliloquy=XPID+"GetSphereFromFourPoints():";
   double eps=_EPS_;
   xmatrix<double> A(5,5);
   A[1][1]=1.0;A[1][2]=1.0;A[1][3]=1.0;A[1][4]=0;A[1][5]=1.0;
@@ -121,10 +122,10 @@ bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
   orig[3]= (M14/M11)/2.0;
   radius=sqrt(orig[1]*orig[1]+orig[2]*orig[2]+orig[3]*orig[3]-M15/M11);
 
-  double d1=modulus(v1-orig);if(d1<radius-eps || d1>radius+eps) {cerr << "Sphere Error [d1]" << endl;exit(0);}
-  double d2=modulus(v2-orig);if(d2<radius-eps || d2>radius+eps) {cerr << "Sphere Error [d2]" << endl;exit(0);}
-  double d3=modulus(v3-orig);if(d3<radius-eps || d3>radius+eps) {cerr << "Sphere Error [d3]" << endl;exit(0);}
-  double d4=modulus(v4-orig);if(d4<radius-eps || d4>radius+eps) {cerr << "Sphere Error [d4]" << endl;exit(0);}
+  double d1=modulus(v1-orig);if(d1<radius-eps || d1>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d1]",_RUNTIME_ERROR_);} //CO20200624
+  double d2=modulus(v2-orig);if(d2<radius-eps || d2>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d2]",_RUNTIME_ERROR_);} //CO20200624
+  double d3=modulus(v3-orig);if(d3<radius-eps || d3>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d3]",_RUNTIME_ERROR_);} //CO20200624
+  double d4=modulus(v4-orig);if(d4<radius-eps || d4>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d4]",_RUNTIME_ERROR_);} //CO20200624
   return TRUE;
 }
 
@@ -148,9 +149,9 @@ bool GetCircumCircleeFromThreePoints(xvector<double>& orig,double& radius,
   orig[3]= (M14/M11)/2.0;
   radius=modulus(v1-orig);
   if(abs(modulus(v1-orig)-modulus(v2-orig))<eps && abs(modulus(v2-orig)-modulus(v3-orig))<eps) return TRUE;
-  cout << modulus(v1-orig) << " " << modulus(v2-orig) << " " << modulus(v3-orig) << " " << endl;
-  exit(0);
-  return TRUE;
+  stringstream message;
+  message << modulus(v1-orig) << " " << modulus(v2-orig) << " " << modulus(v3-orig) << " ";
+  return FALSE; //CO20200624 - previously an exit
 }
 
 bool GetCircleFromTwoPoints(xvector<double>& orig,double& radius,const xvector<double>& v1,const xvector<double>& v2) {
@@ -181,7 +182,7 @@ bool EmptySphere(const deque<_atom>& grid_atoms,const xvector<double>& origin_cp
 }
 
 bool EmptySphere(const xstructure& str,const xvector<double>& origin_cpos,const double& radius) {
-  if(!str.grid_atoms_calculated) {cerr << "EmptySphere: str.grid_atoms must be calculated" << endl;exit(0);}
+  if(!str.grid_atoms_calculated) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"EmptySphere():","str.grid_atoms must be calculated",_INPUT_MISSING_);} //CO20200624
   return EmptySphere(str.grid_atoms,origin_cpos,radius);
 }
 
@@ -203,7 +204,7 @@ uint CoordinationPoint(const deque<_atom>& atoms,deque<_atom>& ratoms,const xvec
 }
 
 uint CoordinationPoint(const xstructure& str,deque<_atom>& ratoms,const xvector<double>& point,const double& rmin,const double& rmax) {
-  if(!str.grid_atoms_calculated) {cerr << "CoordinationPoint: str.grid_atoms must be calculated" << endl;exit(0);}
+  if(!str.grid_atoms_calculated) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"CoordinationPoint():","str.grid_atoms must be calculated",_INPUT_MISSING_);} //CO20200624
   return CoordinationPoint(str.grid_atoms,ratoms,point,rmin,rmax);
 }
 
@@ -520,6 +521,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,
     vector<acage>& cages4,vector<acage>& cages3,vector<acage>& cages2,
     const double& _roughness,const bool& osswrite,ostream& oss) {
+  string soliloquy=XPID+"GetCages():";
   // oss << "CAGES BEGIN" << endl;
   bool Krun=TRUE;
   string species=string_species;
@@ -616,7 +618,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   oss << "str.scale=" << str.scale << endl;
   GenerateGridAtoms(str,dims);
   oss << "size of the grid=" << str.grid_atoms.size() << endl;
-  //  for(uint i=0;i<4;i++) cout << i << " " << str.grid_atoms.at(i).cpos << endl;// exit(0);
+  //  for(uint i=0;i<4;i++) cout << i << " " << str.grid_atoms.at(i).cpos << endl;
 
   bool go4=1,go3=1,go2=1;
   string caption="        x(fract)          y(fract)          z(fract)       S   radius(A)   T  C  P   coordination";
@@ -801,7 +803,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
             cerr << tatom.fpos[1] << " " << tatom.fpos[2] << " " << tatom.fpos[3] << " " << endl;
             cerr << ratom.cpos[1] << " " << ratom.cpos[2] << " " << ratom.cpos[3] << " " << endl;
             cerr << tatom.cpos[1] << " " << tatom.cpos[2] << " " << tatom.cpos[3] << " " << endl;
-            exit(0);
+            return false; //debug
           }
         }
       }
