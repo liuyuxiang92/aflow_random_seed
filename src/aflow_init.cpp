@@ -996,7 +996,7 @@ namespace init {
     // aurostd::crc64_main();
 
     // NOW LOAD schema
-    init::InitSchema(INIT_VERBOSE);
+    if (init::InitSchema(INIT_VERBOSE) == 0) return 0;
 
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
@@ -1018,7 +1018,11 @@ namespace init {
   }
   long _GetRAM(void) {
     struct sysinfo s;
-    if(sysinfo(&s)!=0) {cerr << "sysinfo error" << endl;exit(0);}
+    if(sysinfo(&s)!=0) {
+      string function = XPID + "init::_GetRAM()";
+      string message = "sysinfo error";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
     return s.totalram;
   }
 #endif
@@ -1029,7 +1033,11 @@ namespace init {
     u_int namelen=sizeof(mib)/sizeof(mib[0]);
     uint64_t size;
     size_t len=sizeof(size);
-    if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {cerr << "ERROR sysctl in init::GetRAM" << endl;exit(0);}
+    if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
+      string function = XPID + "init::GetRAM()";
+      string message = "sysctl returned an error";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
     return (long) size;
   }
 #endif
@@ -1047,8 +1055,8 @@ namespace init {
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again
 
     if(!XHOST.is_command("aflow_data")) {
-      cerr << "AFLOW Error: " << "aflow_data" << " is not in the path... exiting.." << endl;
-      exit(0);
+      string message = "aflow_data is not in the path.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     } 
     if(LDEBUG) cerr << "00000  MESSAGE AFLOW INIT Loading data = [" << str2load << "]";
     if(LDEBUG) cerr.flush();
@@ -1071,7 +1079,6 @@ namespace init {
     }
     if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
-    //    if(LDEBUG) exit(0);
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
 
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()!=3) {
@@ -1374,16 +1381,13 @@ namespace init {
           }
         } // cycle through possible directories
         if((*vLibrary).empty()) {
-          cerr << "WARNING - init::InitGlobalObject: " << str << " not found! " << endl;// exit(0);
+          cerr << "WARNING - init::InitGlobalObject: " << str << " not found! " << endl;
           return "";
         }
         out=(*vLibrary);
       }
     } 
 
-    if(out=="") {
-      //    cerr << "ERROR: init::InitGlobalObject str = " << str << " not found ..." << endl; // exit(0);
-    }
     return out;
   }
 } // namespace init
@@ -1416,7 +1420,6 @@ namespace init {
       if(LDEBUG || LVERBOSE) cerr << "00000  MESSAGE InitLibraryObject: AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl;
     } else {
       cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") initLibraryObject: AFLOW_LIBRARY not found! " << endl;
-      //     exit(0);
     }
 
     return out;
@@ -1579,7 +1582,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
     double Tzero=30.0;
-    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; exit(1);
+    oss << "00000  MESSAGE " << aurostd::get_time() << " ";
     if(RUNSTAT || (!RUNSTAT && !RUNBAR)) {
       string soss="- [temp(C)=";
       for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {soss+=aurostd::utype2string(XHOST.vTemperatureCore.at(i),3)+(i<XHOST.vTemperatureCore.size()-1?",":"]");}
@@ -1664,10 +1667,12 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
-  cerr << "AFLOW ERROR: Your machine is \"" << XHOST.hostname << "\"." << endl;
-  if(message.length()>0) cerr << "AFLOW ERROR: command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
-  else cerr << "AFLOW ERROR: the procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
-  exit(0);
+  string function = XPID + "init::CheckMaterialServer():";
+  stringstream messagestream;
+  messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
+  if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
+  else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, messagestream, _RUNTIME_ERROR_);
   return FALSE;
 }
 
@@ -2886,7 +2891,7 @@ namespace init {
 
     if(LDEBUG) cerr << "nschema=" << nschema << endl;
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchema: [END]" << endl;
-    if(LDEBUG) exit(0);
+    if(LDEBUG) return 0;
 
     return nschema;
 
