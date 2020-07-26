@@ -1028,7 +1028,7 @@ class _xflags {
 // aflow_init.cpp
 namespace init {
   int GetCPUCores();
-  bool InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& outf);
+  int InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& outf);  //ME20200724 - changed to int
   string InitLoadString(string string2load,bool=FALSE);
   string InitGlobalObject(string string2load,string="",bool=FALSE);
   string InitLibraryObject(string string2load,bool=FALSE);
