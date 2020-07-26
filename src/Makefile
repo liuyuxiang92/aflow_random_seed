@@ -1133,6 +1133,7 @@ check:
 .PHONY: check_full
 check_full:
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
+	#$(MAKE) check_aflow_exits
 	$(MAKE) check_gcd
 	$(MAKE) check_smith
 	$(MAKE) check_proto
