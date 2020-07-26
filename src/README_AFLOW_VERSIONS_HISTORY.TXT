@@ -403,7 +403,7 @@
         -- added environment analysis (isoconfigurational) to structure comparison (DX)
         -- fixed multiple thread calls in structure comparison and building prototype structures (DX)
         -- suppress permutation calculation for AFLOW prototypes in structure comparison (DX)
-        -- replaced exit() with throws in structure comparison functions (DX)
+        -- replaced exit with throws in structure comparison functions (DX)
         -- added database comparison functionality (DX)
         -- added directory information to structure comparison for debugging  (DX)
         -- multithreaded prototype casting in structure comparison (DX)
@@ -1286,7 +1286,7 @@
 3.1.170 - 2018/02/18
         Location: http://materials.duke.edu/AFLOW/HISTORIC/aflow.3.1.170.tar.xz    
         -- fixed chmod in LIB2RAW (CO)
-        -- fixed DOS-extraction bug (exit() vs. return false) in LIB2RAW for POCC+AEL/AGL runs (CO)
+        -- fixed DOS-extraction bug (exit vs. return false) in LIB2RAW for POCC+AEL/AGL runs (CO)
         -- fixed joinWDelimiter() xvector<int> bug: removed erroneous delimiter at the end (CO)
         -- fixed DOSDATA_JSON() + BANDSDATA_JSON() amalgamation: removed erroneous wrapping brackets around DOS (CO)
         -- fixed misleading logging message in APL on primitivization of input (CO)
@@ -1600,7 +1600,7 @@
         (avasp.cpp ow_chull,aflowlib_web_interface,aflowlib_libraries,kbin,apl_phoncalc,README_AFLOW_VERSIONS_HISTORY.TXT,pflow_print,pflow_funcs,main,aurostd.h,bader,Makefile,aflow,SQLITE) (CO)
 3.1.110 - 2017/06/13 -
         fixed chull invalid inputs,
-        removed exit(0) in loadLIBX,
+        removed exit in loadLIBX,
         force output for mpi settings in APL,
         fixed settings in CIF writer,
         removed aflow.end.out from CompressDirectory(),
