@@ -2793,7 +2793,6 @@ namespace pocc {
       }
       //v_config_order=getConfigOrder(v_types_config);
       //cerr << "WOW2 " << v_types_config.size() << endl;
-      //exit(0);
       return true;
     }
     for(uint site=0;site<v_config_iterators.size();site++){
@@ -2825,7 +2824,6 @@ namespace pocc {
   //    }
   //    v_config_order=getConfigOrder(v_types_config);
   //    //cerr << "WOW2 " << v_types_config.size() << endl;
-  //    //exit(0);
   //    return true;
   //  }
   //  //starting condition STOP - v_types_config is empty!
@@ -2968,10 +2966,8 @@ namespace pocc {
     //  xmatrix<double> newlattice = scell * v_unique_superlattices[i];
     //  cerr << "radius = " << RadiusSphereLattice(newlattice) << endl;
     //}
-    //if(ENUMERATE_ALL_HNF){exit(0);}  //for debugging purposes - EXCEPTION
     message << "Total count of unique HNF matrices = " << hnf_count;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-    //exit(0);
 
     //starting criteria for site combinations
     //vector<vector<int> > v_types_config;
@@ -3004,7 +3000,6 @@ namespace pocc {
       types_config_permutations_count+=str_config_permutations_count;
     }
     //cerr << types_config_permutations_count << endl;
-    //exit(0);
     message << "Total count of unique types-configuration permutations = " << types_config_permutations_count;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
@@ -3018,7 +3013,6 @@ namespace pocc {
         //for(uint i=0;i<v_types_config.size();i++){
         //  cerr << "LOOK i=" << i << " " << v_types_config[i].size() << endl;
         //}
-        //exit(0);
         cerr << soliloquy << " Permutation " << types_config_permutations_count << "  "; 
         for(uint i=0;i<v_types_config.size();i++){
           for(uint j=0;j<v_types_config[i].size();j++){
@@ -3067,7 +3061,6 @@ namespace pocc {
   //uffb.calculate(types2uffparams_map[type1],types2uffparams_map[type2],distance_matrix(atom1,atom2));
   //if(MODE==BOND_MODE){energy += 0.5 * uffb.Kij * uffb.delta * uffb.delta;}
   //else if(MODE==NONBOND_MODE){energy += uffb.Dij * (uffb.X12 - 2.0 * uffb.X6);}
-  //else {exit(1);}
   //}
   //energy*=KCAL_2_EV;
   //return energy;
@@ -3086,7 +3079,7 @@ namespace pocc {
   //for(uint site=0;site<v_types_config.size();site++){
   //if(pocc_sites[site].partial_occupation_flag){  //slight optimization
   ////test of stupidity
-  //if(pocc_sites[site].v_occupants.size()<2){cerr << "WHOOOOOOPS" << endl;exit(1);}
+  //if(pocc_sites[site].v_occupants.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pocc::POccUFFEnergyAnalyzer::getXStructure():","pocc_sites[site].v_occupants.size()<2",_RUNTIME_ERROR_);}
   ////find index of atom first in v_occupants list, that's the one that remained
   //starting_supercell_atom_index=pc2sc_map[pocc_sites[site].v_occupants[0]];
   //for(uint i=0;i<v_types_config[site].size();i++){
@@ -3122,7 +3115,6 @@ namespace pocc {
 
   ////cerr << pocc::CalculateUFFEnergy(supercell) << endl;
   ////cerr << supercell << endl;
-  ////exit(0);
   //return supercell;
   //}
 
@@ -3302,7 +3294,6 @@ namespace pocc {
   //[OBSOLETE]}
 
   //[OBSOLETE]//cerr << distance_matrix << endl;
-  //[OBSOLETE]//exit(0);
 
 
   //}
@@ -3478,7 +3469,6 @@ namespace pocc {
     //cerr << bb << endl;
     bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     //cerr << are_equivalent << endl;
-    //exit(1);
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }
@@ -3640,7 +3630,6 @@ namespace pocc {
       cerr << endl;
       }
       } */
-    //exit(0);
 
     //getTotalPermutationsCount();  //done separately
 
@@ -3740,7 +3729,6 @@ namespace pocc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       //cerr << "probably broken pointers" << endl;
-      //exit(1);
     }
 
 
@@ -4012,7 +4000,6 @@ namespace pocc {
     //    //}
     //    //cerr << endl;
     //    }
-    //exit(0);
     //
     //  //cerr << "end hnf" << endl << endl;
     //  }
@@ -4023,7 +4010,6 @@ namespace pocc {
     //message << "Total number of derivative structure possibilities = " << total_permutations_count;
     //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    //exit(0);
 
     //return true;
   }
@@ -4131,7 +4117,6 @@ namespace pocc {
     xvector<double> xvd_dummy(pocc_groups_count-1,0);
     //cerr << pocc_groups_count << endl;
     //cerr << xvd_dummy.rows << endl;
-    //exit(0);
     xv_occupation_count_input=xvi_dummy;
     xv_occupation_multiple=xvi_dummy;
     xv_occupation_count_supercell=xvi_dummy;
@@ -5103,7 +5088,6 @@ namespace pocc {
     ///////////////////////////////////////////////////////////////////
 
     calculateSymNonPOccStructure(true); //calculate standard parent structure symmetry, report results
-    //exit(1);
   }
 
   const xmatrix<double>& POccCalculator::getLattice() const {return xstr_sym.lattice;}
@@ -5350,7 +5334,7 @@ namespace pocc {
   }
 
   //double POccStructure::calculateStoichDiff(deque<double>& s1,deque<double>& s2){
-  //  if(s1.size()!=s2.size()){exit(1);}
+  //  if(s1.size()!=s2.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pocc::POccStructure::calculateStoichDiff():","s1.size()!=s2.size(),_INPUT_ILLEGAL_);}
   //  double error=0.0;
   //  for(uint i=0;i<s1.size();i++){
   //    error+=abs(s1[i]-s2[i]);
@@ -5415,7 +5399,6 @@ namespace pocc {
         //cerr << endl << endl;
       }
     }
-    //exit(0);
     //we need to fundamentally change scheme here to satisfy STRICT_STOICH_EQUIVALENCE
     //we cannot simply permute through each config on each site
     //only certain configs work together, we must define these
@@ -5484,7 +5467,6 @@ namespace pocc {
     //  }
     //}
     //cerr << "HERE" << endl;
-    //exit(0);
 
     //perform calculation
     //double eps;
@@ -5591,7 +5573,6 @@ namespace pocc {
     cerr << soliloquy << " xstr_nopocc.lattice=" << endl;
     cerr << xstr_nopocc.lattice << endl;
     }
-    //exit(0);
     }
     */
 
@@ -5683,7 +5664,6 @@ namespace pocc {
           }
         }
         if(LDEBUG) {cerr << soliloquy << " species_std_resorted=" << aurostd::joinWDelimiter(species,",") << endl;}
-        //exit(0);
       }
 
       //redecorate xstr_pocc (tmp) to create xstr_nopocc
@@ -5733,7 +5713,6 @@ namespace pocc {
         cerr << soliloquy << " xstr_nopocc post-decoration" << endl;
         cerr << xstr_nopocc << endl;
       }
-      //exit(0);
     }
 
     if(species.size()!=xstr_pocc.species.size()){
@@ -5910,7 +5889,6 @@ namespace pocc {
             cerr << "v_str_configs[" << str_config << "].site_configs[" << site << "].xv_partial_occupation_value=" << v_str_configs[str_config].site_configs[site].xv_partial_occupation_value << endl;
             cerr << endl << endl;
           }
-          //exit(0);
         }
       }  //i am interested in finding an example!
     }
@@ -6518,17 +6496,14 @@ namespace pocc {
       }
       //cerr << "_atom1=" << _atom1 << " " << count << endl;
     }
-    //exit(0);
 
     //for(uint i=0;i<v_dist_nn.size();i++){cerr << "i=" << i << " " << v_dist_nn[i] << endl;}
     //cerr << distance_matrix << endl;
-    //exit(0);
 
     //cerr << *xstr_nopocc << endl;
     //cerr << xstr_ss << endl;
     //cerr << dims << endl;
     //cerr << xstr_cluster.atoms << endl;
-    //exit(0);
     //cerr << "DONE" << endl;
   }
   if(LDEBUG) {cerr << soliloquy << " bonding set" << endl;}
@@ -6765,11 +6740,9 @@ namespace pocc {
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       cout << supercell << endl;
-      //exit(0);
       //}
     }
 
-    //exit(0);
     return m_energy_uff;
   }
 
