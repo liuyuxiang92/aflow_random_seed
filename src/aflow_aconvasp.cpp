@@ -791,7 +791,7 @@ namespace pflow {
     string soliloquy=XPID+"pflow::SetAllAtomNames():";
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"this routine must be fixed... it does not work here",_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"this routine must be fixed, it does not work here",_RUNTIME_ERROR_);
 
       for(uint iat=0;iat<b.num_each_type.size();iat++) {
         b.atoms.at(iat).name=in.at(b.atoms.at(iat).type);       // CONVASP_MODE
