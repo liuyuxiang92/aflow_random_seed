@@ -722,7 +722,7 @@ namespace pocc {
     }
     // string aflowin;
     // aflowin=string(directory +"/"+_AFLOWIN_);
-    // if(!aurostd::FileExist(aflowin)) {cerr << soliloquy << " file not found " << aflowin << endl; exit(1);}
+    // if(!aurostd::FileExist(aflowin)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pocc::POccCalculator::generateDebyeThermalProperties():",_RUNTIME_ERROR_);}
     // string str_AflowIn; aurostd::file2string(aflowin, str_AflowIn);
     double agl_debye_temperature = 0.0, agl_debye_acoustic = 0.0, agl_gruneisen = 0.0;
     double agl_heat_capacity_Cv_300K = 0.0, agl_heat_capacity_Cp_300K = 0.0;
