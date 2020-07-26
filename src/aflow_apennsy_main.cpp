@@ -134,22 +134,22 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
   cerr << aflow::Banner("BANNER_BIG");
   // *****************************************************************************
   if(!XHOST.is_command("gnuplot")) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"gnuplot is missing",_RUNTIME_ERROR_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"gnuplot is missing",_RUNTIME_INIT_); //CO20200624
   } 
   if(!XHOST.is_command("latex")) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"latex is missing",_RUNTIME_ERROR_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"latex is missing",_RUNTIME_INIT_); //CO20200624
   }
   if(!XHOST.is_command("pdflatex")) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pdflatex is missing",_RUNTIME_ERROR_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pdflatex is missing",_RUNTIME_INIT_); //CO20200624
   }
   if(!XHOST.is_command("dvips")) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"dvips is missing",_RUNTIME_ERROR_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"dvips is missing",_RUNTIME_INIT_); //CO20200624
   }
   if(!XHOST.is_command("dvipdf")) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"dvipdf is missing",_RUNTIME_ERROR_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"dvipdf is missing",_RUNTIME_INIT_); //CO20200624
   }
   if(!XHOST.is_command("ps2pdf")) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ps2pdf is missing",_RUNTIME_ERROR_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ps2pdf is missing",_RUNTIME_INIT_); //CO20200624
   }
 
   // [OBSOLETE] XHOST.vflag_apennsy.clear();                                 // inside init::Init::InitMachine
