@@ -30,9 +30,7 @@ bool ACEGetStructureType(const string& structure_type_in) {
   if( structure_type == "fcc" || structure_type == "bcc" || structure_type == "hcp") {
     ACEFlag = true;
   } else {
-    string errmsg = "The structure given must be one of fcc[FCC]/bcc[BCC]/hcp[HCP]!";
-    ACEFlag = false;
-    ErrorMessage(errmsg, _EXIT_WRONGTYPE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ACEGetStructureType():","The structure given must be one of fcc[FCC]/bcc[BCC]/hcp[HCP]",_INPUT_ILLEGAL_); //CO20200624
   }
 
   return ACEFlag;
@@ -114,9 +112,7 @@ vector<cestructure>  ReadInFitStructure(istream & ins, string & structure_type) 
 
 
   if( str_out_list.size() == 0) {
-    string errmsg = "aconvasp: No " + structure_type
-      + " structure is found. Check your input file!";
-    ErrorMessage(errmsg, _EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ReadInFitStructure():","No "+structure_type+" structure is found. Check your input file",_FILE_CORRUPT_); //CO20200624
   }
 
   return str_out_list;

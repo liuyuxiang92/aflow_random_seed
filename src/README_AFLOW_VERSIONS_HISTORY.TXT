@@ -60,7 +60,7 @@
         -- fixing empty ael_*_tensor appearing in aflowlib.out (CO)
         -- fixed _atom.CleanName() (CO)
         -- converted all exits to throw (CO+ME+DX)
-        -- removing exits from: aflow.cpp,aflow_aconvasp.cpp,aflow_aconvasp_main.cpp,aflow_aflowrc.cpp,aflow_anrl.cpp,aflow_apennsy.cpp,aflow_apennsy_gndstate.cpp,aflow_apennsy_main.cpp,aflow_apennsy_vaspin.cpp,aflow_contrib_cormac.cpp,aflow_contrib_shidong.cpp (CO)
+        -- removing exits from: aflow.cpp,aflow_aconvasp.cpp,aflow_aconvasp_main.cpp,aflow_aflowrc.cpp,aflow_anrl.cpp,aflow_apennsy.cpp,aflow_apennsy_gndstate.cpp,aflow_apennsy_main.cpp,aflow_apennsy_vaspin.cpp,aflow_contrib_cormac.cpp,aflow_contrib_shidong.cpp,aflow_contrib_shidong_auxiliary.cpp (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
