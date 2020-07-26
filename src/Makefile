@@ -1501,6 +1501,6 @@ else
 	@echo "aflow_gcc_compatibility test 1 (no 'nullptr') requires GNU grep, try: find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)'"
 endif
 check_aflow_exits:
-	@echo "Running aflow_exits test 1: NO 'exit's" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
+	@echo "Running aflow_exits test 1: NO 'exit's" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | grep -v aflow_data_readme.cpp | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
 		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code; this is NOT good coding. Please swap with 'aurostd::xerror()' and recompile." && exit; fi
 ###################################################################################################
