@@ -831,9 +831,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // not found
     if(!found) {
-
-      cerr << "ERROR - anrl::PrototypeANRL: prototype not found [label=" << label << "]" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"prototype not found [label="+label+"]",_INPUT_ILLEGAL_); //CO20200624
     }
 
     if(LDEBUG) { cerr << function_name << ": FOUND" << endl;}
@@ -4167,7 +4165,7 @@ namespace anrl {
 
     //DX20200207 [OBSOLETE] if(XHOST.vflag_control.flag("WWW")) {
     //DX20200207 [OBSOLETE]   cout << web.str() << endl;
-    //DX20200207 [OBSOLETE]   exit(0);
+    //DX20200207 [OBSOLETE]   return str;
     //DX20200207 [OBSOLETE] }
 
     //CO20181216 - fudging until real fix goes in - DX REMOVE
@@ -4759,8 +4757,7 @@ namespace anrl {
         }
       }
       else {
-        cerr << function_name << "::ERROR: The equations for site " << i << "are not provided. Check symmetry." << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"The equations for site "+aurostd::utype2string(i)+"are not provided. Check symmetry",_INPUT_MISSING_); //CO20200624
       }
     }
 

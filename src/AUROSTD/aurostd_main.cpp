@@ -1015,20 +1015,7 @@ namespace aurostd {
       if((isprint(c) || isspace(c) || FALSE) && ((c != '\r') || FALSE)) {ss_out << c;}  //CO20190620 - add more cases before FALSE
       else{detected_control_char = true;}
     }
-    //uint count=0;
-    //while(tmp.get(c1) && ss_out.get(c2)){
-    //  count+=1;
-    //  if(c1!=c2){
-    //     cerr << "WARNING: characters in input and output are not equal: " << c1 << " vs " << c2 << " count=" << count << endl;
-    //     if(isprint(c1) || isspace(c1)){
-    //       cerr << "VALID CHARACTER WAS ERASED! c=\"" << c1 << "\"" << endl;
-    //       exit(1);
-    //
-    //         }
-    //      }
 
-
-    //}
     return detected_control_char;
   }
   //DX20190516 - remove control code characters - END
@@ -1067,8 +1054,11 @@ namespace aurostd {
       }
       // file is ok, do not update
       else{ return false; } //signals file is unchanged
+    } else {
+      string function = XPID + "aurostd::RemoveControlCodeCharactersFromFile():";
+      string message = "File does not exist: " + directory + "/" + filename;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
-    else{ cerr << "ERROR - aurostd::RemoveControlCodeCharactersFromFile(): File does not exist: " << directory << "/" << filename << endl;exit(0); }
     return false;
   }
   //DX20190211 - remove control code characters from file - END
@@ -1103,7 +1093,11 @@ namespace aurostd {
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
     deque<string> vcmd; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcmd,",");
     deque<string> vzip; aurostd::string2tokens("bzip2,xz,gzip",vzip,",");vzip.push_front(""); // cheat for void string
-    if(vext.size()!=vcmd.size()) { cerr << "ERROR - aurostd::RemoveBinaryCharactersFromFile: vext.size()!=vcmd.size()" << endl;exit(0); }
+    if(vext.size()!=vcmd.size()) {
+      string function = XPID + "aurostd::RemoveBinaryCharactersFromFile():";
+      string message = "vext.size()!=vcmd.size()";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
 
     for(uint iext=0;iext<vext.size();iext++){ // check filename.EXT
       if(aurostd::FileExist(directory+"/" + filename + vext.at(iext))){
@@ -2267,14 +2261,12 @@ namespace aurostd {
   // ***************************************************************************
   // Dane Morgan
   void InFileExistCheck(const string& routine, const string& _FileName,
-      ifstream& file_to_check, std::ostream& outf) {
+      ifstream& file_to_check) {
     string FileName(CleanFileName(_FileName));
     if(!file_to_check) {
-      outf << "Aflow VERSION "<< string(AFLOW_VERSION) << endl;
-      outf << " ERROR: in " << routine << endl;
-      outf << " ERROR: Cannot open file: \"" << FileName << "\"" << endl;
-      outf << " ERROR: Exiting" << endl;
-      exit(1);
+      string function = XPID + "aurostd::InFileExistCheck()";
+      string message = "In routine " + routine + ". Cannot open file " + FileName + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }
 
@@ -2320,8 +2312,9 @@ namespace aurostd {
     position=aurostd::execute2string("which "+command);
     aurostd::StringSubst(position,"\n","");
     if(position.length()>0) return TRUE;
-    cerr << "ERROR: CommandRequired \"" << command << "\" is not available" << endl;
-    exit(0);
+    string function = XPID + "CommandRequired()";
+    string message = "\"" + command + "\" is not available";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     return FALSE;
   }
 
@@ -4987,7 +4980,6 @@ namespace aurostd {
     if(!FileFile) {
       cerr << "ERROR  FileName=" << FileName << "   not found" << endl;
       return FALSE;
-      //    exit(0);
     }
     StringFile="";char c; while (FileFile.get(c)) StringFile+=c;
     FileFile.close();
@@ -4996,6 +4988,8 @@ namespace aurostd {
 
   bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN) {
     // be careful, this does not filter-out # comments
+    string function = XPID + "aurostd::substring_present_file_FAST()";
+    string message = "";
     string temp_file=aurostd::TmpFileCreate("substring");
     ostringstream aus;
     ifstream FileFile;
@@ -5007,12 +5001,12 @@ namespace aurostd {
     aus << "echo >> " << temp_file << endl; // to give EOL
     aurostd::execute(aus);
     if(!aurostd::FileExist(FileName)) {
-      cerr << "ERROR: substring_present_file_FAST: file input not found =" << FileName << endl;
-      exit(0);
+      message = "file input not found =" + FileName;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     if(!aurostd::FileExist(temp_file)) {
-      cerr << "ERROR: substring_present_file_FAST: file output not found =" << temp_file << endl;
-      exit(0);
+      message = "file output not found =" + FileName;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     FileFile.open(temp_file.c_str(),std::ios::in);
     FileFile.clear();FileFile.seekg(0);
@@ -5998,7 +5992,11 @@ namespace aurostd  {
 namespace aurostd  {
   vector<vector<double> > NormalizeAndSum3DVector(const vector<vector<vector<double> > >& vvva, const vector<double>& vFi) {
     //normalize DOS and sum
-    if(vvva.size()!=vFi.size()) {cerr << "Vector sizes are not equal! Aborting!" << endl; exit(2);}
+    if(vvva.size()!=vFi.size()) {
+      string function = XPID + "aurostd::NormalizeAndSum3DVector()";
+      string message = "Vector sizes are not equal.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
     vector<vector<double> > vvb, vv_tmp, vv_tmp_shrinked;
     vector<vector<vector<double> > > vvvc;
     double Fi;
@@ -6034,7 +6032,11 @@ namespace aurostd  {
 // ***************************************************************************
 namespace aurostd  {
   vector<vector<double> > Sum2DVectorExceptFirstColumn(const vector<vector<double> >& vva, const vector<vector<double> >& vvb) {
-    if((vva.size()!=vvb.size()) && (vva.at(0).size() != vvb.at(0).size())) {cerr << "Error, two vectors! Aborting! " << endl; exit(2);}
+    if((vva.size()!=vvb.size()) && (vva.at(0).size() != vvb.at(0).size())) {
+      string function = XPID + "aurostd::Sum2DVectorExceptFirstColumn()";
+      string message = "Vector sizes are not equal.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
 
     vector<vector<double> > vv_sum; vv_sum.resize(vva.size());
     for (uint i=0; i<vva.size(); i++) {

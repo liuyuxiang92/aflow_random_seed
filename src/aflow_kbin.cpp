@@ -290,7 +290,7 @@ namespace KBIN {
     // do some running
 
 
-    //   cerr << soliloquy << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
+    //   cerr << soliloquy << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; //
 
     if(XHOST.AFLOW_RUNXflag) {
       vector<string> tokens;
@@ -318,7 +318,7 @@ namespace KBIN {
       XHOST.AFLOW_RUNXflag=FALSE;
     }
 
-    //    cerr << soliloquy << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
+    //    cerr << soliloquy << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; //
 
     if(XHOST.vflag_aflow.flag("LOOP")) {aus << "MMMMM  KBIN option XHOST.vflag_aflow.flag(\"LOOP\") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
     if(XHOST.AFLOW_RUNDIRflag) {aus << "MMMMM  KBIN option [--run] (XHOST.AFLOW_RUNDIRflag=TRUE) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
@@ -478,10 +478,10 @@ namespace KBIN {
       // [OBSOLETE]   string file_name=aurostd::args2string(argv,"--FILE|--F|--f","xxxx");
       string file_name=XHOST.vflag_control.getattachedscheme("FILE");
       if(!aurostd::FileExist(file_name)) {
-        aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);
+        aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);return 1;  //CO20200624 - previously exit
       }
       if(aurostd::FileEmpty(file_name)) {
-        aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);
+        aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);return 1;  //CO20200624 - previously exit
       }
       aus << "MMMMM  Loading File = " << file_name << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       vector<string> vlines;
@@ -512,7 +512,6 @@ namespace KBIN {
       aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VRUNS = "+aurostd::utype2string(vruns.size()),40) << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       // aus << "MMMMM  Legitimate VRUNS = " << vruns.size() << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       // cerr << vlines.size() << endl;
-      // exit(0);
     }
 
     if(aflags.AFLOW_PERFORM_CLEAN && !XHOST.AFLOW_RUNDIRflag && !XHOST.AFLOW_MULTIflag && !XHOST.AFLOW_RUNXflag) {
@@ -520,8 +519,7 @@ namespace KBIN {
     }
 
     if(aflags.AFLOW_PERFORM_CLEAN && !aflags.AFLOW_PERFORM_DIRECTORY) {
-      cerr << "AFLOW: to use --clean, you must specify one or more directories" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"to use --clean, you must specify one or more directories",_INPUT_MISSING_);  //CO20200624
     }
     if(aflags.AFLOW_PERFORM_CLEAN && aflags.AFLOW_PERFORM_DIRECTORY) {
       //    cout << "DEBUG CLEAN = " << vruns.size() << endl;
@@ -698,7 +696,7 @@ namespace KBIN {
         aus << "MMMMM  AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
         aus << "MMMMM  AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
         aurostd::PrintMessageStream(aus,XHOST.QUIET);
-        exit(0);
+        return 1; //CO20200624 - previously exit
       }
       if(AFLOW_PTHREADS::MAX_PTHREADS>1) {
         aus << "MMMMM  AFLOW: MULTI THREAD START: phread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
@@ -775,7 +773,7 @@ namespace KBIN {
         aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VAFLOWIN = "+aurostd::utype2string(vaflowin.size()),40) << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
         //      aus << "MMMMM  Legitimate VAFLOWIN = " << vaflowin.size() << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
 
-        //	for(uint i=0;i<vaflowin.size();i++) cerr << i << " " << vaflowin.at(i) << endl; 	exit(0);
+        //	for(uint i=0;i<vaflowin.size();i++) cerr << i << " " << vaflowin.at(i) << endl;
 
         // clean AFLOWIN // SAFETY
         for(uint i=0;i<vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");  
@@ -783,7 +781,6 @@ namespace KBIN {
         if(MULTI_DEBUG) {aus << "MMMMM  SIZE vaflowin=" << vaflowin.size() << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
         if(MULTI_DEBUG) {for(uint i=0;i<vaflowin.size();i++) {aus << "MMMMM  vaflowin.at(i)=" << vaflowin.at(i) << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}}
         // cerr << vaflowin.at(10) << " " << vaflowin.at(20) << " " << vaflowin.at(30) << endl;
-        // exit(0);
         // if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
 
         FOUND=FALSE;
@@ -820,7 +817,7 @@ namespace KBIN {
           } // DIRECTORY UN LOCKED
         } // DIRECTORY FOUND
         // exiting if STOP_DEBUG
-        if(STOP_DEBUG) {cout << "aflow_kbin.cpp: STOP_DEBUG" << endl; exit(0);}
+        if(STOP_DEBUG) {cout << "aflow_kbin.cpp: STOP_DEBUG" << endl; return 1;}  //CO20200624 - previously exit
 
         // FOUND SOMETHING
         if(FOUND==FALSE) {
@@ -1131,7 +1128,6 @@ namespace KBIN {
           aus << "LLLLL  UNWRITABLE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(aus,XHOST.QUIET);
         }
-        //     exit(1);
       } else {                                                                                                  // ******* Directory is fine
         // make a dumb lock as soon as possible -------------------------------------
         aus.clear();aus.str(std::string());
@@ -1253,7 +1249,6 @@ namespace KBIN {
               // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
               Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
               // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
-              // exit(0);
             }
           }
           // ************************************************************************************************************************************
@@ -1356,7 +1351,6 @@ namespace KBIN {
     // [OBSOLETE] cerr << vfiles.size() << endl;
     // [OBSOLETE] aurostd::StringstreamClean(aus);
     // [OBSOLETE] cerr << "CO " << aurostd::joinWDelimiter(vfiles," ") << endl;
-    // [OBSOLETE] exit(0);
     if(vfiles.size()){
       ostringstream aus;
       //aurostd::StringstreamClean(aus);
@@ -1494,12 +1488,12 @@ namespace KBIN {
 namespace KBIN {
   void XClean(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "KBIN::XClean: BEGIN" << endl;  
+    string soliloquy=XPID+"KBIN::XClean():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;  
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=0) {
-      init::ErrorOption(options,"KBIN::XClean","aflow --xclean");
-      exit(0);
+      init::ErrorOption(options,soliloquy,"aflow --xclean");
     }
 
     vector<string> vcheck1;aurostd::string2tokens(string("OUTCAR.static,OUTCAR.relax2,OUTCAR.relax1"),vcheck1,",");
@@ -1516,28 +1510,27 @@ namespace KBIN {
     vector<string> vfile;
     bool test=false;
 
-    cout << XPID << "KBIN::XClean: checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
+    cout << soliloquy << " checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+_AFLOWLOCK_),vfile);
     for(uint j=0;j<vfile.size();j++) {
       aurostd::StringSubst(vfile.at(j),_AFLOWLOCK_,"");
       if(!aurostd::FileExist(vfile.at(j)+"OUTCAR") && !aurostd::EFileExist(vfile.at(j)+"OUTCAR.relax1")) {
-        cout << XPID << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
+        cout << soliloquy << " cleaning=" << vfile.at(j) << endl;
         if(!test) KBIN::Clean(vfile.at(j));
       }
     }
     for(uint i=0;i<vcheck1.size();i++) {
-      cout << XPID << "KBIN::XClean: checking missing " << vcheck2.at(i) << " with " << vcheck1.at(i) << endl;  // check OUTCAR.static
+      cout << soliloquy << " checking missing " << vcheck2.at(i) << " with " << vcheck1.at(i) << endl;  // check OUTCAR.static
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+vcheck1.at(i)),vfile);
       for(uint j=0;j<vfile.size();j++) {
         aurostd::StringSubst(vfile.at(j),vcheck1.at(i),"");
         if(!aurostd::FileExist(vfile.at(j)+vcheck2.at(i))) {
-          cout << XPID << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
+          cout << soliloquy << " cleaning=" << vfile.at(j) << endl;
           if(!test) KBIN::Clean(vfile.at(j));
         }
       }
     }    
-    if(LDEBUG) cerr << XPID << "KBIN::XClean: END" << endl;  
-    // exit(0);
+    if(LDEBUG) cerr << soliloquy << " END" << endl;  
   }
 } // namespace KBIN
 

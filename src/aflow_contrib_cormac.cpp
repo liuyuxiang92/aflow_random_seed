@@ -26,12 +26,12 @@ namespace pflow {
     //
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "pflow::DEBYE: BEGIN" << endl;
+    string soliloquy=XPID+"pflow::DEBYE():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=1) {
-      init::ErrorOption(options,"pflow::DEBYE","aflow --debye=THERMO[.bz2|.gz|.xz]");
-      exit(0);
+      init::ErrorOption(options,soliloquy,"aflow --debye=THERMO[.bz2|.gz|.xz]");
     }
     string thermofilename="";
     if(tokens.size()>=1) thermofilename=tokens.at(0);
@@ -404,7 +404,7 @@ namespace pflow {
     if(thermofilename == "THERMO.gz") { aurostd::execute("gzip -9fq THERMO"); }
     if(thermofilename == "THERMO.xz") { aurostd::execute("xz -9fq THERMO"); }
     // END
-    if(LDEBUG) cerr << XPID << "pflow::DEBYE: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
   }
 }
 

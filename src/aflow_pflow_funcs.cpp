@@ -136,7 +136,6 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
   if(composition_matrix.rows<=composition_matrix.cols){
     message << "Composition matrix (m<=n) will NOT yield a viable null space for this analysis";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20190226
-    //exit(1);  //CO20190226
   }
   //[CO20191110 - OBSOLETE]xmatrix<double> composition_matrix=_composition_matrix;
   //[CO20191110 - OBSOLETE]xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(composition_matrix);
@@ -160,7 +159,6 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
     if(coef[i]<-_ZERO_TOL_){
       message << "Found negative coef[" << i << "], invalid chemical equation (run with --debug to see): coef=" << coef;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190226
-      //exit(1);  //CO20190226
     }
   }
   if(LDEBUG) {cerr << soliloquy << " checking: all scalar products should yield 0" << endl;}
@@ -173,7 +171,6 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
     if(abs(sum)>_ZERO_TOL_){
       message << "Chemical equation was not balanced (run with --debug to see): coef=" << coef;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190226
-      //exit(1);  //CO20190226
     }
   }
   return coef;
@@ -379,7 +376,6 @@ namespace pflow {
     //cerr << rotation << endl << endl;
     //rotation=inverse(xstr_bulk.lattice)*xstr_slab_newbasis.lattice;
     //cerr << rotation << endl << endl;
-    //exit(0);
 
     //xmatrix<double> rotation=xstr_slab_newbasis.c2f*xstr_bulk.f2c;  //VERY POWERFUL
     //xmatrix<double> rotation=trasp(trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_bulk.lattice)));
@@ -1253,7 +1249,6 @@ namespace pflow {
 
     message.precision(prec_original); //set back
     message.flags(ff_original); //set back
-    //exit(0);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - read flags
@@ -2233,7 +2228,7 @@ namespace pflow {
     deque<deque<_atom> > nmat;
     // [OBSOLETE]    pflow::GetStrNeighData(str,rmax,nmat);
     str.GetStrNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy
-    // for(int i=0;i<nmat[0].size();i++) cout << AtomDist(nmat[0][0],nmat[0][i]) << " "; cout << endl; exit(0);
+    // for(int i=0;i<nmat[0].size();i++) cout << AtomDist(nmat[0][0],nmat[0][i]) << " "; cout << endl;
     for(int I1=0;I1<(int)nmat.size();I1++) { // Each atom for which we find RDF.
       int I2=1;
       double dist=0;
@@ -2419,16 +2414,13 @@ namespace pflow {
       const aurostd::matrix<double>& rdfsh_all_B,
       const int nsh, vector<int>& best_match,
       aurostd::matrix<double>& rms_mat) {  //CO20200404 pflow::matrix()->aurostd::matrix()
+    string soliloquy=XPID+"pflow::CmpRDFShells():";
     double TOL=1e-15;
     std::deque<int> netype_A=str_A.num_each_type;
     std::deque<int> netype_B=str_B.num_each_type;
     // Exit if A and B have different numbers of any types of atoms.
     if(!pflow::VVequal(netype_A,netype_B) || netype_A.size()!=netype_B.size()) {
-      cerr << "ERROR: in CmpRDFShell" << endl;
-      cerr << "ERROR: structures A and B do not have the same "<< endl;
-      cerr << "ERROR: number of each type of atom. "<< endl;
-      cerr << "ERROR: Exiting" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"structures A and B do not have the same number of each type of atom",_INPUT_ILLEGAL_); //CO20200624
     }
     int nat=str_A.atoms.size();
     int nt=netype_A.size();
@@ -2928,6 +2920,7 @@ namespace pflow {
 // follows a "#".
 namespace pflow {
   void ReadInRTParams(ifstream& rtinfile, pflow::rtparams& rtp) {
+    string soliloquy=XPID+"pflow::ReadInRTParams():";
 
     // Read in all the tokens.
     string s,s_ns;
@@ -2941,9 +2934,7 @@ namespace pflow {
           string token,sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-            cout << "ERROR: Exiting" << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -3213,9 +3204,7 @@ namespace pflow {
       }// PLANECOLOR
 
       if(!found_token) {
-        cerr << "ERROR: You have input a token " << tok <<endl;
-        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
 
     } // for i
@@ -3718,22 +3707,19 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void RayTraceManager(vector<string> argv) {
+    string soliloquy=XPID+"pflow::RayTraceManager():";
     ifstream rtinfile(argv.at(2).c_str()); // File where RT params are input.
-    aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",argv.at(2),rtinfile,cerr);
+    aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",argv.at(2),rtinfile);
     pflow::rtparams rtp; // Object that stores RT params.
     ReadInRTParams(rtinfile,rtp); // Sets RT params object from input.
     switch (rtp.calc_type) {
       case 0:{ // A single file of structures.
                // Read in structure list.
                if(rtp.input_files.size()<1) {
-                 cerr << "ERROR: RayTraceManager" << endl;
-                 cerr << "ERROR: You must specify a structure list file to open with the token INFILE." << endl;
-                 cerr << "ERROR: For example:  INFILE = STRLIST ." << endl;
-                 cerr << "ERROR: Exiting." << endl;
-                 exit(1);
+                 throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"must specify a structure list file to open with the token INFILE (e.g., INFILE = STRLIST)",_FILE_CORRUPT_); //CO20200624
                }
                ifstream strlist_inf(rtp.input_files[0].c_str());
-               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf,cerr);
+               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf);
                vector<xstructure> vstr;
                cout << endl;
                cout << "Reading in structure list." << endl;
@@ -3806,13 +3792,7 @@ namespace pflow {
                break;
              }
       default:{
-                cout << endl;
-                cerr << "ERROR: RTManager" <<endl;
-                cerr << "ERROR: You have set CALCTYPE= " << rtp.calc_type << endl;
-                cerr << "ERROR: This does not correspond to any function. "<< endl;
-                cerr << "ERROR: exiting" << endl;
-                cout << endl;
-                exit(1);
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"invalid CALCTYPE = "+rtp.calc_type,_INPUT_ILLEGAL_); //CO20200624
               }
     }//switch
   }
@@ -4602,7 +4582,7 @@ namespace pflow {
     string s;
     char c;
     ifstream infile(pd.PROOUTinfile.c_str());
-    aurostd::InFileExistCheck("ReadInProj",pd.PROOUTinfile.c_str(),infile,cerr);
+    aurostd::InFileExistCheck("ReadInProj",pd.PROOUTinfile.c_str(),infile);
     string sdum;
     // Initial data
     infile >> sdum; // Title
@@ -5081,9 +5061,11 @@ namespace pflow {
 //   will be calculated.
 namespace pflow {
   void ReadInPDOSData(const pflow::projdata& prd, pflow::pdosdata& pdd) {
+    string soliloquy=XPID+"pflow::ReadInPDOSData():";
+    stringstream message;
 
     ifstream infile(pdd.PDOSinfile.c_str());
-    aurostd::InFileExistCheck("ReadInPDOSData",pdd.PDOSinfile.c_str(),infile,cerr);
+    aurostd::InFileExistCheck("ReadInPDOSData",pdd.PDOSinfile.c_str(),infile);
 
     // Defaults (emin,emax,nbins,smooth_sigma,print_params)
     double emn=prd.ener_k_b_u[0][0];
@@ -5119,9 +5101,7 @@ namespace pflow {
           string sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-            cout << "ERROR: Exiting" << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -5236,9 +5216,7 @@ namespace pflow {
       }// PRINT_PARAMS
 
       if(!found_token) {
-        cerr << "ERROR: You have input a token " << tok <<endl;
-        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
 
     } // for i
@@ -5268,45 +5246,37 @@ namespace pflow {
       for(int ia=0;ia<(int)pdd.pdos_at[i].size();ia++) {
         int atp=pdd.pdos_at[i][ia];
         if(atp<1 || atp>prd.nions) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high an atom number in entry: " << ia+1 << endl;
-          cerr << "ERROR: Bad value is: " << atp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high an atom number has been entered in entry: " << ia+1 << endl;
+          message << "Bad value is: " << atp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ik=0;ik<(int)pdd.pdos_k[i].size();ik++) {
         int kp=pdd.pdos_k[i][ik];
         if(kp<1 || kp>prd.nkpts) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high a kpt number in entry: " << ik+1 << endl;
-          cerr << "ERROR: Bad value is: " << kp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high a kpt number has been entered in entry: " << ik+1 << endl;
+          message << "Bad value is: " << kp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ib=0;ib<(int)pdd.pdos_b[i].size();ib++) {
         int bp=pdd.pdos_b[i][ib];
         if(bp<1 || bp>prd.nbands) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high a bnd number in entry: " << ib+1 << endl;
-          cerr << "ERROR: Bad value is: " << bp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high a bnd number has been entered in entry: " << ib+1 << endl;
+          message << "Bad value is: " << bp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
         int lmp=pdd.pdos_lm[i][ilm];
         if(lmp<1 || lmp>prd.nlmtot) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
-          cerr << "ERROR: Bad value is: " << lmp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high an lm number has been entered in entry: " << ilm+1 << endl;
+          message << "Bad value is: " << lmp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
     }
@@ -5449,13 +5419,13 @@ namespace pflow {
 // Smooths the total PDOS based on Gaussian smoothing.
 namespace pflow {
   void AtomCntError(const string& tok, const int tokcnt, const int atom_cnt) {
-    cerr << "ERROR: in AtomCntError " <<endl;
-    cerr << "ERROR: The token " << tok << " has been defined (possibly by default) this many times: " << tokcnt << endl;
-    cerr << "ERROR: You have used the token ATOMS this many times: " << atom_cnt << endl;
-    cerr << "ERROR: These must be equal and >0 - the token ATOMS must precede each case and must occurr at least once. "<< endl;
-    cerr << "ERROR: This error is probably due to your having forgot to use the ATOMS token. Please type ATOMS=*** as the first line for each case."<< endl;
-    cerr << "ERROR: Exiting!" << endl;
-    exit(1);
+    stringstream message;
+    message << "in AtomCntError " <<endl;
+    message << "The token " << tok << " has been defined (possibly by default) this many times: " << tokcnt << endl;
+    message << "You have used the token ATOMS this many times: " << atom_cnt << endl;
+    message << "These must be equal and >0 - the token ATOMS must precede each case and must occurr at least once. "<< endl;
+    message << "This error is probably due to your having forgot to use the ATOMS token. Please type ATOMS=*** as the first line for each case."<< endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::AtomCntError():",message,_INPUT_ILLEGAL_); //CO20200624
   }
 }
 
@@ -5475,6 +5445,8 @@ namespace pflow {
 namespace pflow {
   void ReadSumDOSParams(ifstream& infile, pflow::pdosdata& pdd) {
     // Defaults (emin,emax,nbins,smooth_sigma,print_params,efermi)
+    string soliloquy=XPID+"pflow::ReadSumDOSParams():";
+    stringstream message;
     pdd.emin=0.0;
     pdd.emax=0.0;
     pdd.nbins=301;
@@ -5497,9 +5469,7 @@ namespace pflow {
           string sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-            cout << "ERROR: Exiting" << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -5581,9 +5551,7 @@ namespace pflow {
         found_token=1;
       }// NLM
       if(!found_token) {
-        cerr << "ERROR: You have input a token " << tok <<endl;
-        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
     } // for i over tokens
 
@@ -5592,12 +5560,10 @@ namespace pflow {
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
         int lmp=pdd.pdos_lm[i][ilm];
         if(lmp<1 || lmp>pdd.nlm) {
-          cerr << "ERROR: SumPDOSFuncs/ReadSumDOSParams" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
-          cerr << "ERROR: Bad value is: " << lmp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "You have entered too low or high an lm number in entry: " << ilm+1 << endl;
+          message << "Bad value is: " << lmp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
     }
@@ -5675,6 +5641,8 @@ namespace pflow {
 // Sums the PDOS accoring to the parameters specified.
 namespace pflow {
   void SumPDOS(const aurostd::matrix<aurostd::matrix<double> >& allpdos, pflow::pdosdata& pdd) { //CO20200404 pflow::matrix()->aurostd::matrix()
+    string soliloquy=XPID+"pflow::SumPDOS():";
+    stringstream message;
     if(pdd.spin==1) {
       pdd.pdos = aurostd::matrix<double> (pdd.nbins,3);  //CO20200404 pflow::matrix()->aurostd::matrix()
     }
@@ -5691,26 +5659,22 @@ namespace pflow {
         int ia=pdd.pdos_at[ic][ida]-1;
         // Error check
         if(ia<0 || ia>=pdd.natoms) {
-          cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-          cerr << "ERROR: Error in case: " << ic+1 << endl;
-          cerr << "ERROR: You have entered too low or high an atom number in entry: " << ida+1 << endl;
-          cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
-          cerr << "ERROR: Bad value is: " << ia+1 << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << ic+1 << endl;
+          message << "You have entered too low or high an atom number in entry: " << ida+1 << endl;
+          message << "Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
+          message << "Bad value is: " << ia+1 << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
         // Loop over each lm
         for(int idlm=0;idlm<(int)pdd.pdos_lm[ic].size();idlm++) {
           int ilm=pdd.pdos_lm[ic][idlm];
           // Error check
           if(ilm<1 || ilm>pdd.nlm) {
-            cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-            cerr << "ERROR: Error in case: " << ic+1 << endl;
-            cerr << "ERROR: You have entered too low or high an lm number in entry: " << idlm+1 << endl;
-            cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
-            cerr << "ERROR: Bad value is: " << ilm << endl;
-            cerr << "ERROR: Exiting." << endl;
-            exit(1);
+            message << "Error in case: " << ic+1 << endl;
+            message << "You have entered too low or high an lm number in entry: " << idlm+1 << endl;
+            message << "Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
+            message << "Bad value is: " << ilm << endl;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
           }
           // Loop over each bin
           for(int ib=0;ib<pdd.nbins;ib++) {
@@ -5728,13 +5692,11 @@ namespace pflow {
                        break;
                      }
               default:
-                     cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-                     cerr << "ERROR: Error in case: " << ic+1 << endl;
-                     cerr << "ERROR: You have entered too low or high an spin number" << endl;
-                     cerr << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
-                     cerr << "ERROR: Bad value is: " << pdd.spin << endl;
-                     cerr << "ERROR: Exiting." << endl;
-                     exit(1);
+                     message << "ERROR: Error in case: " << ic+1 << endl;
+                     message << "ERROR: You have entered too low or high an spin number" << endl;
+                     message << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
+                     message << "ERROR: Bad value is: " << pdd.spin << endl;
+                     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
             } // switch spin
           } // bin
         } // lm
@@ -6674,6 +6636,7 @@ namespace pflow {
 namespace pflow {
 
   void ReadPlaneDensParams(const xstructure& str, pd_params& pdp, istream& infile) {
+    string soliloquy=XPID+"pflow::ReadPlaneDensParams():";
     // Note that this converts everything to direct coordinates.
     string s;
     double TOL=1e-7;
@@ -6707,10 +6670,7 @@ namespace pflow {
       pdp.dpts[2]=pflow::CompAperpB(pdp.dpts[2],pdp.dpts[1]);
       double norm_new=norm(pdp.dpts[2]);
       if(norm_new<TOL) {
-        cout << "ERROR: ChgFuncs/ReadPlaneDensParams" << endl;
-        cout << "Your two axis are parallel and no plane can be determined." << endl;
-        cout << "Exiting." << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"two axis are parallel and no plane can be determined",_INPUT_ILLEGAL_); //CO20200624
       }
       pdp.dpts[2]=SVprod(norm_orig/norm_new,pdp.dpts[2]);
     }

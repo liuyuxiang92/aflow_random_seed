@@ -54,10 +54,13 @@ namespace init {
     if(ncpus<1) ncpus=1;
     return ncpus;
   }
-  bool InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& oss) {
+  //ME20200724 - returns an int now to remove exits. -1 means that aflow can
+  //continue, otherwise terminate with exit code.
+  int InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& oss) {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG),found=FALSE;
     string soliloquy=XPID+"init::InitMachine():";
+    string message = "";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
     int depth_short=20,depth_long=45;
     string position;
@@ -88,11 +91,10 @@ namespace init {
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     //  XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
-    // if(XHOST.vflag_control.flag("AFLOWRC::OVERWRITE")) {aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);exit(1);}
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
-    if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);exit(1);}
+    if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
 
     // IMMEDIATELY GET PIDS
     XHOST.PID=getpid();    // PID number
@@ -207,9 +209,8 @@ namespace init {
     if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.mems.duke.edu";
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("hostname = ",depth_short) << XHOST.hostname << endl;
     if(AFLOW_BlackList(XHOST.hostname)) {
-      cout << "MMMMM  HOSTNAME BLACKLISTED = " << XHOST.hostname << endl;
-      cerr << "MMMMM  HOSTNAME BLACKLISTED = " << XHOST.hostname << endl;
-      exit(0);
+      message = "HOSTNAME BLACKLISTED = " + XHOST.hostname;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message);
     }
 
     // MACHINE TYPE
@@ -408,7 +409,6 @@ namespace init {
     }
     // maxmem
     XHOST.maxmem=aurostd::args2attachedutype<double>(XHOST.argv,"--mem=|--maxmem=",101.0);
-    // DEBUG  cerr << "XHOST.maxmem=" << XHOST.maxmem << endl;exit(0);
 
     // MPIs
     if(INIT_VERBOSE) {
@@ -486,10 +486,8 @@ namespace init {
     vector<string> vstrs;
     // DO VARIABLES
     aurostd::string2tokens(DEFAULT_VASP_POTCAR_DIRECTORIES,vVASP_POTCAR_DIRECTORIES,",");// vVASP_POTCAR_DIRECTORIES;
-    // for(uint i=0;i<vVASP_POTCAR_DIRECTORIES.size();i++) oss << "vVASP_POTCAR_DIRECTORIES.at(" << i << ")=" << vVASP_POTCAR_DIRECTORIES.at(i) << endl; // exit(0);
     // LIBRARIES
     aurostd::string2tokens(DEFAULT_AFLOW_LIBRARY_DIRECTORIES,vAFLOW_LIBRARY_DIRECTORIES,",");// vAFLOW_LIBRARY_DIRECTORIES;
-    //for(uint i=0;i<vAFLOW_LIBRARY_DIRECTORIES.size();i++) oss << vAFLOW_LIBRARY_DIRECTORIES.at(i) << endl;exit(0);
     // PROJECTS
     vAFLOW_PROJECTS_DIRECTORIES.clear();
     // XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
@@ -552,9 +550,7 @@ namespace init {
       if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl; }
     }
 
-    // for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) oss << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;exit(0);
     // OLD aurostd::string2tokens(string(AFLOW_PROJECTS_DIRECTORIES),vAFLOW_PROJECTS_DIRECTORIES,",");// vAFLOW_PROJECTS_DIRECTORIES;
-    // OLD for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) oss << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;exit(0);
 
     // check for MACHINES MARYLOU
     XHOST.is_MACHINE_FULTON_MARYLOU=FALSE;
@@ -631,7 +627,7 @@ namespace init {
     directory_clean=aurostd::RemoveWhiteSpaces(directory_clean);
     if(directory_clean.empty() || directory_clean=="./" || directory_clean==".") {directory_clean=aurostd::getPWD()+"/";}  //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     if(!directory_clean.empty()) {XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
-    if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
+    if(LDEBUG) {cerr << directory_clean << endl;}
     //CO20190402 STOP - cleaning directory, giving us something to print with logger
 
     // LOGICS to intercept --file= => XHOST.vflag_control.flag("FILE") XHOST.vflag_control.getattachedscheme("FILE")
@@ -665,7 +661,6 @@ namespace init {
     XHOST.vflag_control.flag("VFILES",found);  // if found
     if(XHOST.vflag_control.flag("VFILES")) XHOST.vflag_control.push_attached("VFILES",files); 
     if(XHOST.vflag_control.flag("VFILES")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"VFILES\")=[" << XHOST.vflag_control.getattachedscheme("VFILES") << "]" << endl; 
-    // exit(0); 
 
     XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"-h|--help"));
     XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  //ME20180531
@@ -932,8 +927,8 @@ namespace init {
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER") &&
         !(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="aflowlib.duke.edu" || XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="materials.duke.edu")) {
-      cerr << XPID << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
-      exit(0);
+      message = XPID + "\"--server=\" can only be \"aflowlib.duke.edu\" or \"materials.duke.edu\"";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
     }
     // LOAD options
     if(INIT_VERBOSE) oss << "--- LOADING @ options --- " << endl;
@@ -946,8 +941,6 @@ namespace init {
     XHOST.AFLOW_RUNDIRflag=aurostd::args2flag(XHOST.argv,"--run|-run");
     XHOST.AFLOW_MULTIflag=aurostd::args2flag(XHOST.argv,"--run=multi|-run=multi|--multi|-multi");	
     XHOST.AFLOW_RUNXflag=!XHOST.AFLOW_MULTIflag && (aurostd::args2attachedflag(XHOST.argv,"--run=") || aurostd::args2attachedflag(XHOST.argv,"-run="));
-
-    //   cerr << XPID << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
 
     XHOST.AFLOW_RUNXnumber=0;
     XHOST.vflag_pflow.clear(); 
@@ -998,17 +991,17 @@ namespace init {
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
     if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
-    if(INIT_VERBOSE) exit(0);
+    if(INIT_VERBOSE) return 0;
     // CHECK CRC
     // aurostd::crc64_main();
 
     // NOW LOAD schema
-    init::InitSchema(INIT_VERBOSE);
+    if (init::InitSchema(INIT_VERBOSE) == 0) return 0;
 
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
 
-    return TRUE;
+    return -1;
   }
 } // namespace init
 
@@ -1025,7 +1018,11 @@ namespace init {
   }
   long _GetRAM(void) {
     struct sysinfo s;
-    if(sysinfo(&s)!=0) {cerr << "sysinfo error" << endl;exit(0);}
+    if(sysinfo(&s)!=0) {
+      string function = XPID + "init::_GetRAM()";
+      string message = "sysinfo error";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
     return s.totalram;
   }
 #endif
@@ -1036,7 +1033,11 @@ namespace init {
     u_int namelen=sizeof(mib)/sizeof(mib[0]);
     uint64_t size;
     size_t len=sizeof(size);
-    if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {cerr << "ERROR sysctl in init::GetRAM" << endl;exit(0);}
+    if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
+      string function = XPID + "init::GetRAM()";
+      string message = "sysctl returned an error";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
     return (long) size;
   }
 #endif
@@ -1054,8 +1055,8 @@ namespace init {
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again
 
     if(!XHOST.is_command("aflow_data")) {
-      cerr << "AFLOW Error: " << "aflow_data" << " is not in the path... exiting.." << endl;
-      exit(0);
+      string message = "aflow_data is not in the path.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     } 
     if(LDEBUG) cerr << "00000  MESSAGE AFLOW INIT Loading data = [" << str2load << "]";
     if(LDEBUG) cerr.flush();
@@ -1078,7 +1079,6 @@ namespace init {
     }
     if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
-    //    if(LDEBUG) exit(0);
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
 
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()!=3) {
@@ -1381,16 +1381,13 @@ namespace init {
           }
         } // cycle through possible directories
         if((*vLibrary).empty()) {
-          cerr << "WARNING - init::InitGlobalObject: " << str << " not found! " << endl;// exit(0);
+          cerr << "WARNING - init::InitGlobalObject: " << str << " not found! " << endl;
           return "";
         }
         out=(*vLibrary);
       }
     } 
 
-    if(out=="") {
-      //    cerr << "ERROR: init::InitGlobalObject str = " << str << " not found ..." << endl; // exit(0);
-    }
     return out;
   }
 } // namespace init
@@ -1423,7 +1420,6 @@ namespace init {
       if(LDEBUG || LVERBOSE) cerr << "00000  MESSAGE InitLibraryObject: AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl;
     } else {
       cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") initLibraryObject: AFLOW_LIBRARY not found! " << endl;
-      //     exit(0);
     }
 
     return out;
@@ -1586,7 +1582,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
     double Tzero=30.0;
-    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; exit(1);
+    oss << "00000  MESSAGE " << aurostd::get_time() << " ";
     if(RUNSTAT || (!RUNSTAT && !RUNBAR)) {
       string soss="- [temp(C)=";
       for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {soss+=aurostd::utype2string(XHOST.vTemperatureCore.at(i),3)+(i<XHOST.vTemperatureCore.size()-1?",":"]");}
@@ -1671,10 +1667,12 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
-  cerr << "AFLOW ERROR: Your machine is \"" << XHOST.hostname << "\"." << endl;
-  if(message.length()>0) cerr << "AFLOW ERROR: command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
-  else cerr << "AFLOW ERROR: the procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
-  exit(0);
+  string function = XPID + "init::CheckMaterialServer():";
+  stringstream messagestream;
+  messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
+  if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
+  else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, messagestream, _RUNTIME_ERROR_);
   return FALSE;
 }
 
@@ -2893,7 +2891,7 @@ namespace init {
 
     if(LDEBUG) cerr << "nschema=" << nschema << endl;
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchema: [END]" << endl;
-    if(LDEBUG) exit(0);
+    if(LDEBUG) return 0;
 
     return nschema;
 

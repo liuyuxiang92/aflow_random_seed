@@ -578,10 +578,10 @@ namespace pflow {
 namespace pflow {
   void PrintClat(const xvector<double>& data, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
+    string soliloquy=XPID+"pflow::PrintClat():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     if(data.rows!=6) {
-      init::ErrorOption("","pflow::PrintClat",aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
-      exit(0);
+      init::ErrorOption("",soliloquy,aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
     }
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
@@ -591,7 +591,7 @@ namespace pflow {
     oss << lattice(1,1) << " " << lattice(1,2) << " " << lattice(1,3) << endl;
     oss << lattice(2,1) << " " << lattice(2,2) << " " << lattice(2,3) << endl;
     oss << lattice(3,1) << " " << lattice(3,2) << " " << lattice(3,3) << endl;
-    if(LDEBUG) cerr << XPID << "pflow::PrintClat: BEGIN" << endl;
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
   }
 } // namespace pflow
 
@@ -1591,7 +1591,7 @@ namespace pflow {
       //  cerr << cutoff << endl;
       //  if(rcut<0) cutoff=max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))); // better way to nail it for sure I`ll hit something.
       //  cerr << cutoff << endl;
-      if(LDEBUG) {cerr << "PrintData1 [4]  " << 4*0.6204*std::pow((double) v1,(double) 1.0/3.0)<< " " << RadiusSphereLattice(str1_newvol.lattice) << " " << max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))) << endl;}// exit(0);}
+      if(LDEBUG) {cerr << "PrintData1 [4]  " << 4*0.6204*std::pow((double) v1,(double) 1.0/3.0)<< " " << RadiusSphereLattice(str1_newvol.lattice) << " " << max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))) << endl;}
     pflow::CmpStrDist(str1_newvol,str1_newvol,cutoff*rescale1,dist1,dist2,dist_diff,dist_diff_n);
     int nprs1=dist1.size();
     oss << "Avg of Distance Magnitude Differences" << endl;
@@ -2035,6 +2035,7 @@ void PrintImages(xstructure strA, xstructure strB, const int& ni, const string& 
 //  This funtion prints out structural data in a msi format (for cerius).
 // Dane Morgan - Stefano Curtarolo
 void PrintMSI(const xstructure& str, ostream& oss) {
+  string soliloquy=XPID+"PrintMSI():";
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(10);
   xstructure sstr=str;
@@ -2051,8 +2052,7 @@ void PrintMSI(const xstructure& str, ostream& oss) {
   for(uint i=0;i<sstr.atoms.size();i++) {
     sstr.atoms.at(i).CleanName();
     if(sstr.atoms.at(i).atomic_number<1) {
-      cerr << "ERROR - PrintMSI: atomic_number not found: sstr.atoms.at(" << i << ").cleanname=" << sstr.atoms.at(i).cleanname << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
     }
   }
 
