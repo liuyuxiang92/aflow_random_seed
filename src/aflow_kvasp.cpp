@@ -2233,6 +2233,15 @@ namespace KBIN {
                       stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE,xvasp.str.iomode,foundBZ); // rlattice = updated structure
                     } else {
                       foundBZ=FALSE;
+                      //AS20200724 BEGIN
+                      // when KBIN_VASP_KPOINTS_BANDS_LATTICE=AUTO we need to retrieve
+                      // the lattice type. For example, if CONVERT_UNIT_CELL=PRES the
+                      // call to KPOINTS_Directions() will lead to an error since 
+                      // vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string is empty
+                      xvasp.str.GetLatticeType();
+                      vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();
+                      vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.push(xvasp.str.bravais_lattice_variation_type);
+                      //AS20200724 END
                     }
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << stringBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
