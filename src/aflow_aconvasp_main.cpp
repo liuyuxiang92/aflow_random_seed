@@ -8406,7 +8406,7 @@ namespace pflow {
       Wyckoff_letters = vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::WYCKOFF_STRING");
       if(space_group_number == 0){
         message << "Space group must be given with Wyckoff letters; please specify." << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20191107 - exit -> throw
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
       }
     }
 
@@ -13749,7 +13749,7 @@ namespace pflow {
     // [OBSOLETE] xstructure a(input,IOVASP_POSCAR);
     if(input.peek() == EOF) {
       message << "File is empty. Check POSCAR.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_MISSING_); //DX20200103 - exit to xerror
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_MISSING_);
     }
     xstructure a(input,IOAFLOW_AUTO);
     //DX20180527 - use pwd - START

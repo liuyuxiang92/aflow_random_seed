@@ -850,7 +850,7 @@ namespace anrl {
       message << "vproto_nspecies.at(ifound)=" << vproto_nspecies.at(ifound) << endl;
       message << "vpermutation.size()=" << vpermutation.size() << endl;
       message << "vpermutation ="; for(uint i=0;i<vpermutation.size();i++) {message << " " << vpermutation.at(i);} message << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
     // ---------------------------------------------------------------------------
     // check for vatomX size and errors
@@ -860,7 +860,7 @@ namespace anrl {
       message << "vproto_nspecies.at(ifound)=" << vproto_nspecies.at(ifound) << endl;
       message << "vatomX.size()=" << vatomX.size() << endl;
       message << "vatomX ="; for(uint i=0;i<vatomX.size();i++) {message << " " << vatomX.at(i);} message << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
 
     for(uint i=0;i<vproto_nspecies.at(ifound);i++) { // number of species
@@ -908,7 +908,7 @@ namespace anrl {
         if(number_id.size()!=0){ 
           stringstream message;
           message << vlabel.at(ifound) << " only has one degree of freedom (lattice parameter), i.e., no enumerated suffix necessary." << endl; 
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
         }
       }
       // if number ID is given, i.e., 001, 002, etc.
@@ -922,7 +922,7 @@ namespace anrl {
     if(vparameters.size()==0){  //CO20181226 DX fix
       stringstream message;
       message << "no parameters provided; add parameter values with --params=... or use tabulated enumeration suffix (see aflow --protos)" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
     if(aurostd::string2utype<double>(vparameters[0])<=0.0){ //CO20181226 forget signbit, also include 0
       scale_volume_by_species=true;
@@ -4088,6 +4088,14 @@ namespace anrl {
     //}
 
     // after you generate them you should try them with aflowSG  and if they are small with the pearson
+
+    //DX20200727 - START
+    // the lines below are a hack: we have to exit to print out the web string; otherwise xstructure/aflow.ins will fail
+    // future version will separate prototype vs web generation
+    if(!web.str().empty()){ //DX20200727 - this is a hack, future version will separate prototype vs web generation
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Printing web only.",_GENERIC_ERROR_);
+    }
+    //DX20200727 - END
 
     //DX NOT NEEDED: Parameters are always in RHL if(XHOST.vflag_pflow.flag("PROTO::RHL")) cout << "DX WE GOT RHL"<< endl;
     if(XHOST.vflag_pflow.flag("PROTO::HEX") && vproto_Pearson_symbol[ifound][1] == 'R') {
