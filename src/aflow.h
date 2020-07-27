@@ -1228,7 +1228,7 @@ uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX);
 uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, vector<double> &natomsX);
 uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX);
 uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
-vector<uint> composition2stoichiometry(string& composition); //DX20181009
+//DX20200724 [OBSOLETE] vector<uint> composition2stoichiometry(string& composition); //DX20181009
 // neighbour things
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 
@@ -1498,7 +1498,12 @@ class xstructure {
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
     string platon2print(bool,bool,double,double,double,double);   // Create Platon input file >=51108
-    void FakeNames(void);                                         // Fix names as fakes - useful for platon
+    void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
+    void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
+    vector<string> GetElements(bool clean_name=false,
+        bool fake_names=false);                                   //DX20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name);     //Dx20200724
+    vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
         double P_ang=DEFAULT_PLATON_P_ANG,

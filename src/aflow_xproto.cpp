@@ -327,7 +327,9 @@ namespace aflowlib {
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
       if(prototype_number_of_species == number_of_species || number_of_species==0){ //DX20191107 - add number_of_species==0 if stoich is not specified
 
-        vector<uint> unreduced_prototype_stoichiometry = composition2stoichiometry(compositions[i]); //DX20191125
+        //DX20200724 [OBSOLETE] vector<uint> unreduced_prototype_stoichiometry = composition2stoichiometry(compositions[i]); //DX20191125
+        vector<uint> unreduced_prototype_stoichiometry;
+        aurostd::getElements(compositions[i],unreduced_prototype_stoichiometry); //DX20200724
         vector<uint> prototype_stoichiometry; aurostd::reduceByGCD(unreduced_prototype_stoichiometry, prototype_stoichiometry); //DX20191125
         //DX20191125 [OBSOLETE] prototype_stoichiometry=compare::gcdStoich(prototype_stoichiometry);
 

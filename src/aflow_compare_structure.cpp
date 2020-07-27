@@ -237,8 +237,8 @@ namespace compare{
     StructurePrototype structure;
     structure.structure_representative = xstr;
     structure.structure_representative_name = "input geometry";
-    structure.stoichiometry = compare::getStoichiometry(xstr,true);
-    structure.elements = compare::getElements(xstr);
+    structure.stoichiometry = xstr.GetReducedComposition(false);
+    structure.elements = xstr.GetElements(true,true); // true: clean names
     // update xstructure species
     if(structure.structure_representative.species.size()==0){
       deque<string> deque_species; for(uint j=0;j<structure.elements.size();j++){deque_species.push_back(structure.elements[j]);}
@@ -736,7 +736,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // stoichiometry
-    vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
+    vector<uint> stoichiometry = xstr.GetReducedComposition(true);
 
     // ---------------------------------------------------------------------------
     // symmetry
@@ -990,8 +990,8 @@ namespace compare {
     StructurePrototype input_structure;
     input_structure.structure_representative = xstr;
     input_structure.structure_representative_name = "input geometry";
-    input_structure.stoichiometry = compare::getStoichiometry(xstr,true); //true preserves the stoich order for the structure
-    input_structure.elements = compare::getElements(xstr);
+    input_structure.stoichiometry = xstr.GetReducedComposition(); //preserves the stoich order for the structure
+    input_structure.elements = xstr.GetElements(true,true); // true: clean names
     input_structure.structure_representative_compound = compare::getCompoundName(xstr);
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
@@ -1423,7 +1423,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // get stoichiometries
-    vector<uint> stoichiometry = compare::getStoichiometry(xstr,same_species);
+    vector<uint> stoichiometry = xstr.GetReducedComposition(!same_species);
     uint stoichiometry_sum = aurostd::sum(stoichiometry);
     vector<double> normalized_stoichiometry;
     for(uint i=0;i<stoichiometry.size();i++){normalized_stoichiometry.push_back((double)stoichiometry[i]/(double)stoichiometry_sum);}
@@ -1589,8 +1589,8 @@ namespace compare {
     input_structure.structure_representative.ReScale(1.0); //DX20191105
     input_structure.structure_representative.BringInCell(); //DX20200707
     input_structure.structure_representative_name = "input geometry";
-    input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
-    input_structure.elements = compare::getElements(xstr);
+    input_structure.stoichiometry = xstr.GetReducedComposition(!same_species);
+    input_structure.elements = xstr.GetElements(true,true); // true: clean names
     input_structure.structure_representative_compound = compare::getCompoundName(xstr);
     //DX20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.structure_representative); //DX20190711
     input_structure.structure_representative_generated = true; 
@@ -3043,8 +3043,8 @@ namespace compare {
       // if atoms are not labeled in either structure; assign fake names
       if(xstr_base.atoms.at(0).name == "" || xstr_test.atoms.at(0).name == ""){ 
         if(LDEBUG) {cerr << "compare:: " << "Atoms not labeled ... Assigning fake names." << endl;}
-        fakeAtomsName(xstr_base);
-        fakeAtomsName(xstr_test);
+        xstr_base.DecorateWithFakeElements();
+        xstr_test.DecorateWithFakeElements();
       }
     }
     else if(same_species == false){
@@ -3112,8 +3112,8 @@ namespace compare {
       // ---------------------------------------------------------------------------
       // assign fake atom names 
       if(type_match==1){
-        fakeAtomsName(xstr_base);
-        fakeAtomsName(xstr_test);
+        xstr_base.DecorateWithFakeElements();
+        xstr_test.DecorateWithFakeElements();
       }
 
       // OBSOLETE THIS PRINTS OUT XSTRUCTURES WITH ATOM ZERO SHIFTED TO ORIGIN...
@@ -3123,7 +3123,7 @@ namespace compare {
       // OBSOLETE comparison_log << xstr_test << endl;		
 
       // ---------------------------------------------------------------------------
-      // assign fake atom names 
+      // print lattice parameters
       printParameters(xstr_base,comparison_log);
       printParameters(xstr_test,comparison_log);
 

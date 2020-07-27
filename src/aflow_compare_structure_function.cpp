@@ -1015,8 +1015,8 @@ namespace compare {
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
         structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = directory+"/"+vfiles[i];
-        structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
-        structure_tmp.elements = compare::getElements(xstr1);
+        structure_tmp.stoichiometry = xstr1.GetReducedComposition(!same_species);
+        structure_tmp.elements = xstr1.GetElements(true,true); // true: clean names
         structure_tmp.natoms = xstr1.atoms.size(); //DX20190425
         structure_tmp.ntypes = xstr1.num_each_type.size(); //DX20190425
         structure_tmp.structure_representative_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
@@ -1127,8 +1127,8 @@ namespace compare {
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
         structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = designation.str();
-        structure_tmp.stoichiometry = compare::getStoichiometry(structure_tmp.structure_representative,same_species);
-        structure_tmp.elements = compare::getElements(structure_tmp.structure_representative);
+        structure_tmp.stoichiometry = structure_tmp.structure_representative.GetReducedComposition(!same_species);
+        structure_tmp.elements = structure_tmp.structure_representative.GetElements(true,true); // true: clean names
         structure_tmp.natoms = structure_tmp.structure_representative.atoms.size(); //DX20190425
         structure_tmp.ntypes = structure_tmp.structure_representative.num_each_type.size(); //DX20190425
         structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr
@@ -1208,8 +1208,8 @@ namespace compare {
       structure_tmp.structure_representative.ReScale(1.0); //DX20190715
       structure_tmp.structure_representative.BringInCell(); //DX20200707
       structure_tmp.structure_representative_name = filenames[i];
-      structure_tmp.stoichiometry = compare::getStoichiometry(xstr,same_species);
-      structure_tmp.elements = compare::getElements(xstr);
+      structure_tmp.stoichiometry = xstr.GetReducedComposition(!same_species);
+      structure_tmp.elements = xstr.GetElements(true,true); // true: clean names and assign fake names
       structure_tmp.natoms = xstr.atoms.size(); //DX20190425
       structure_tmp.ntypes = xstr.num_each_type.size(); //DX20190425
       structure_tmp.structure_representative_compound = compare::getCompoundName(xstr); //remove ones is true  //DX20190311 //DX20190313 - use xstr
@@ -1623,7 +1623,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // get stoichiometry
-    vector<uint> stoichiometry = compare::getStoichiometry(structure.structure_representative,true);
+    vector<uint> stoichiometry = structure.structure_representative.GetReducedComposition();
 
     // ---------------------------------------------------------------------------
     // calculate symmetry (if not already calculated)
@@ -1874,7 +1874,7 @@ namespace compare{
       str_proto_tmp.structure_representative_source = ss_str.str(); //DX20190730
       str_proto_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input is assumed to be unrelaxed
       str_proto_tmp.copyPrototypeInformation(structure);
-      str_proto_tmp.stoichiometry = compare::getStoichiometry(str_proto_tmp.structure_representative, true); //DX20190529 - need updated stoich
+      str_proto_tmp.stoichiometry = str_proto_tmp.structure_representative.GetReducedComposition(); //DX20190529 - need updated stoich
       // compound name is always alphabetic; order swapping is dictated by stoichiometry
       //tmp.structure_representative_compound = compare::getCompoundName(name_order[0],tmp.stoichiometry,false); //remove ones is true //DX20190529 - need compound name to group later;
       str_proto_tmp.structure_representative_compound = compare::getCompoundName(str_proto_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
@@ -2173,62 +2173,62 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from composition string
-// ***************************************************************************
-namespace compare{
-  vector<uint> getStoichiometry(string& composition, const bool& same_species){
-
-    // Obtains the least common multiple representation of the stoichiometry.
-
-    //cerr << "composition string: " << composition << endl;
-
-    vector<uint> stoich;
-    if(composition.size()==1){
-      stoich.push_back(1);
-    }
-    else {
-      bool is_previous_alpha = false;
-      vector<uint> stoichiometry;
-      stringstream tmp;
-      for(uint i=0;i<composition.size();i++){
-        if(isalpha(composition[i])){
-          if(is_previous_alpha){
-            stoichiometry.push_back(1);
-          }
-          else if(i!=0 && tmp.str().size() == 0){
-            stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
-            tmp.str("");
-          }
-        }
-        else if(isdigit(composition[i])){
-          tmp << composition[i];
-        }    
-        is_previous_alpha = isalpha(composition[i]);
-      }
-      if(is_previous_alpha){
-        stoichiometry.push_back(1);
-      }
-      else if(tmp.str().size() == 0){
-        stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
-        tmp.str("");
-      }
-      //::print(stoichiometry);
-      //DX20191125 [OBSOLETE] stoich=gcdStoich(stoichiometry);
-      stoich = stoichiometry;
-      aurostd::reduceByGCD(stoichiometry, stoich); //DX20191125
-    }
-    // If a structure prototype comparison (not material type), ensure 
-    // stoichiometries are in numerical order for comparison.  Else, 
-    // leave in position indicating atomic species count.
-    if(same_species==false){
-      for(uint i=0; i<stoich.size(); i++){
-        std::sort(stoich.begin(),stoich.end());
-      }
-    }
-    return stoich;
-  }
-}
+//DX20200727 [OBSOLETE] // ***************************************************************************
+//DX20200727 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from composition string
+//DX20200727 [OBSOLETE] // ***************************************************************************
+//DX20200727 [OBSOLETE] namespace compare{
+//DX20200727 [OBSOLETE]   vector<uint> getStoichiometry(string& composition, const bool& same_species){
+//DX20200727 [OBSOLETE] 
+//DX20200727 [OBSOLETE]     // Obtains the least common multiple representation of the stoichiometry.
+//DX20200727 [OBSOLETE] 
+//DX20200727 [OBSOLETE]     //cerr << "composition string: " << composition << endl;
+//DX20200727 [OBSOLETE] 
+//DX20200727 [OBSOLETE]     vector<uint> stoich;
+//DX20200727 [OBSOLETE]     if(composition.size()==1){
+//DX20200727 [OBSOLETE]       stoich.push_back(1);
+//DX20200727 [OBSOLETE]     }
+//DX20200727 [OBSOLETE]     else {
+//DX20200727 [OBSOLETE]       bool is_previous_alpha = false;
+//DX20200727 [OBSOLETE]       vector<uint> stoichiometry;
+//DX20200727 [OBSOLETE]       stringstream tmp;
+//DX20200727 [OBSOLETE]       for(uint i=0;i<composition.size();i++){
+//DX20200727 [OBSOLETE]         if(isalpha(composition[i])){
+//DX20200727 [OBSOLETE]           if(is_previous_alpha){
+//DX20200727 [OBSOLETE]             stoichiometry.push_back(1);
+//DX20200727 [OBSOLETE]           }
+//DX20200727 [OBSOLETE]           else if(i!=0 && tmp.str().size() == 0){
+//DX20200727 [OBSOLETE]             stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
+//DX20200727 [OBSOLETE]             tmp.str("");
+//DX20200727 [OBSOLETE]           }
+//DX20200727 [OBSOLETE]         }
+//DX20200727 [OBSOLETE]         else if(isdigit(composition[i])){
+//DX20200727 [OBSOLETE]           tmp << composition[i];
+//DX20200727 [OBSOLETE]         }    
+//DX20200727 [OBSOLETE]         is_previous_alpha = isalpha(composition[i]);
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]       if(is_previous_alpha){
+//DX20200727 [OBSOLETE]         stoichiometry.push_back(1);
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]       else if(tmp.str().size() == 0){
+//DX20200727 [OBSOLETE]         stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
+//DX20200727 [OBSOLETE]         tmp.str("");
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]       //::print(stoichiometry);
+//DX20200727 [OBSOLETE]       //DX20191125 [OBSOLETE] stoich=gcdStoich(stoichiometry);
+//DX20200727 [OBSOLETE]       stoich = stoichiometry;
+//DX20200727 [OBSOLETE]       aurostd::reduceByGCD(stoichiometry, stoich); //DX20191125
+//DX20200727 [OBSOLETE]     }
+//DX20200727 [OBSOLETE]     // If a structure prototype comparison (not material type), ensure 
+//DX20200727 [OBSOLETE]     // stoichiometries are in numerical order for comparison.  Else, 
+//DX20200727 [OBSOLETE]     // leave in position indicating atomic species count.
+//DX20200727 [OBSOLETE]     if(same_species==false){
+//DX20200727 [OBSOLETE]       for(uint i=0; i<stoich.size(); i++){
+//DX20200727 [OBSOLETE]         std::sort(stoich.begin(),stoich.end());
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]     }
+//DX20200727 [OBSOLETE]     return stoich;
+//DX20200727 [OBSOLETE]   }
+//DX20200727 [OBSOLETE] }
 
 // ***************************************************************************
 //  addAFLOWPrototypes2StructurePrototypeVector() 

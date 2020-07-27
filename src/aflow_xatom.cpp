@@ -1175,43 +1175,130 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
   return species_ppX.size();
 }
 
-//DX composition2stoichiometry - 20181009 - START
-vector<uint> composition2stoichiometry(string& composition){
-  vector<uint> stoichiometry;
-  bool is_previous_alpha = false;
-  bool is_previous_digit = false;
-  string number_string = "";
-  for(uint i=0;i<composition.size();i++){
-    if(isalpha(composition[i])){
-      if(is_previous_alpha){
-        stoichiometry.push_back(1);
+//DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - START
+//DX20200724 [OBSOLETE] vector<uint> composition2stoichiometry(string& composition){
+//DX20200724 [OBSOLETE]   vector<uint> stoichiometry;
+//DX20200724 [OBSOLETE]   bool is_previous_alpha = false;
+//DX20200724 [OBSOLETE]   bool is_previous_digit = false;
+//DX20200724 [OBSOLETE]   string number_string = "";
+//DX20200724 [OBSOLETE]   for(uint i=0;i<composition.size();i++){
+//DX20200724 [OBSOLETE]     if(isalpha(composition[i])){
+//DX20200724 [OBSOLETE]       if(is_previous_alpha){
+//DX20200724 [OBSOLETE]         stoichiometry.push_back(1);
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]       else if(is_previous_digit){
+//DX20200724 [OBSOLETE]         stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]     }
+//DX20200724 [OBSOLETE]     else if(isdigit(composition[i])){
+//DX20200724 [OBSOLETE]       if(is_previous_digit){
+//DX20200724 [OBSOLETE]         stringstream tmp; tmp << number_string << composition[i];
+//DX20200724 [OBSOLETE]         number_string = tmp.str();
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]       else {
+//DX20200724 [OBSOLETE]         stringstream tmp; tmp << composition[i];
+//DX20200724 [OBSOLETE]         number_string = tmp.str();
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]     }
+//DX20200724 [OBSOLETE]     is_previous_alpha = isalpha(composition[i]);
+//DX20200724 [OBSOLETE]     is_previous_digit = isdigit(composition[i]);
+//DX20200724 [OBSOLETE]   }
+//DX20200724 [OBSOLETE]   if(is_previous_alpha){
+//DX20200724 [OBSOLETE]     stoichiometry.push_back(1);
+//DX20200724 [OBSOLETE]   }
+//DX20200724 [OBSOLETE]   else if(is_previous_digit){
+//DX20200724 [OBSOLETE]     stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
+//DX20200724 [OBSOLETE]   }
+//DX20200724 [OBSOLETE]   return stoichiometry;
+//DX20200724 [OBSOLETE] }
+//DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - END
+
+// **************************************************************************
+// Function xstructure::GetElements()
+// **************************************************************************
+vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
+
+  // Returns the elements in the xstructure
+  // default: returns xstr.species
+  // But, it also check
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetElements():";
+
+  // ---------------------------------------------------------------------------
+  // 1) try xstructure.species
+  if(!species.empty()){
+    if(clean_name){
+      vector<string> vspecies;
+      for(uint i=0;i<species.size();i++){
+        vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(species[i]));
       }
-      else if(is_previous_digit){
-        stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
-      }
+      return vspecies;
     }
-    else if(isdigit(composition[i])){
-      if(is_previous_digit){
-        stringstream tmp; tmp << number_string << composition[i];
-        number_string = tmp.str();
-      }
-      else {
-        stringstream tmp; tmp << composition[i];
-        number_string = tmp.str();
-      }
-    }
-    is_previous_alpha = isalpha(composition[i]);
-    is_previous_digit = isdigit(composition[i]);
+    else{ return aurostd::deque2vector((*this).species); }
   }
-  if(is_previous_alpha){
-    stoichiometry.push_back(1);
+  // ---------------------------------------------------------------------------
+  // 2) try element names (check if first atom name is given)
+  else if (!atoms[0].name.empty()){
+    return GetElementsFromAtomNames(clean_name);
   }
-  else if(is_previous_digit){
-    stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
+  // ---------------------------------------------------------------------------
+  // 3) if all are empty, decorate with fake elements (optional)
+  else if (atoms[0].name.empty() && fake_names){
+    if(LDEBUG) {cerr << function_name << " WARNING: Atoms are not labeled, assigning fake names." << endl;}
+    DecorateWithFakeElements();
+    return aurostd::deque2vector(species);
   }
-  return stoichiometry;
+
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "There are no element names in the structure.",_RUNTIME_ERROR_);
 }
-//DX composition2stoichiometry - 20181009 - END
+
+// **************************************************************************
+// Function xstructure::GetElements()
+// **************************************************************************
+vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
+
+  string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
+
+  uint iat=0;
+  vector<string> species;
+  for(uint i=0;i<num_each_type.size();i++){
+    string species_tmp = atoms[iat].name; //always the first in the species set
+    for(int j=0;j<num_each_type[i];j++){
+      // check all atoms of the same type have the same name
+      if(atoms[iat].name!=species_tmp){
+        stringstream message;
+        message << "The number of each type and atom names do not agree." << endl;
+        message << (*this) << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
+      }
+      iat++;
+    }
+    if(clean_name){ species.push_back(KBIN::VASP_PseudoPotential_CleanName(species_tmp)); }
+    else{ species_tmp; }
+  }
+  return species;
+}
+
+// **************************************************************************
+// Function xstructure::GetReducedComposition()
+// **************************************************************************
+vector<uint> xstructure::GetReducedComposition(bool numerical_sort){
+
+  string function_name = XPID + "xstructure::GetReducedComposition():";
+
+  vector<uint> composition;
+  for(uint i=0;i<num_each_type.size();i++){composition.push_back((uint)num_each_type[i]);}
+  vector<uint> reduced_composition;
+
+  // sort in numerical order (useful for prototypes)
+  if(numerical_sort){ std::stable_sort(composition.begin(),composition.end()); }
+
+  // reduce by GCD
+  aurostd::reduceByGCD(composition, reduced_composition);
+
+  return reduced_composition;
+}
 
 // ***************************************************************************
 // ***************************************************************************
@@ -14729,26 +14816,67 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   return oss.str();
 }
 
+// ***************************************************************************
+// Function DecorateWithElements()
+// ***************************************************************************
+void xstructure::DecorateWithElements(void) {
+  
+  // Apply an element to each atom type.
+  // Elements are first alphabetized to follow the AFLOW convention
+  
+  string function_name = XPID + "xstructure::DecorateWithElements():";
+  
+  // elements need to be alphabetic for AFLOW
+  deque<string> elements;
+  for(uint i=0;i<velement.size();i++){ elements.push_back(velement[i].symbol); } // from xelement
+  std::stable_sort(elements.begin(), elements.end());
+ 
+  // update species and atom names;
+  SetSpecies(elements);
+
+  //DX20200727 [OBSOLETE] int iatom=0;
+  //DX20200727 [OBSOLETE] for(uint itype=0;itype<num_each_type.size();itype++)
+  //DX20200727 [OBSOLETE]   for(int j=0;j<num_each_type.at(itype);j++) {
+  //DX20200727 [OBSOLETE]     //    if(atoms.at(iatom).name_is_given==FALSE)
+  //DX20200727 [OBSOLETE]     {
+  //DX20200727 [OBSOLETE]       atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
+  //DX20200727 [OBSOLETE]       if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
+  //DX20200727 [OBSOLETE]       //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
+  //DX20200727 [OBSOLETE]       atoms.at(iatom).CleanName();
+  //DX20200727 [OBSOLETE]       //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
+  //DX20200727 [OBSOLETE]       atoms.at(iatom).name_is_given=TRUE;
+  //DX20200727 [OBSOLETE]     }
+  //DX20200727 [OBSOLETE]     iatom++;
+  //DX20200727 [OBSOLETE]   }
+}
 
 // ***************************************************************************
-// Function FakeNames
+// xstructure::DecorateWithFakeElements() //DX20200724
 // ***************************************************************************
-void xstructure::FakeNames(void) {
-  // fix names
-  int iatom=0;
-  for(uint itype=0;itype<num_each_type.size();itype++)
-    for(int j=0;j<num_each_type.at(itype);j++) {
-      //    if(atoms.at(iatom).name_is_given==FALSE)
-      {
-        atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
-        if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
-        //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
-        atoms.at(iatom).CleanName();
-        //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
-        atoms.at(iatom).name_is_given=TRUE;
-      }
-      iatom++;
-    }
+void xstructure::DecorateWithFakeElements(){
+
+  // Apply a fake letter to each atom type.
+  // Using letters (not elements) to avoid confusion with real materials
+  // i.e., prototype vs material
+  // In the case of compounds with more
+  // than 26 species it is necessary to add more characters to this string
+
+  string function_name = XPID + "xstructure::DecorateWithFakeElements():";
+
+  string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  if((*this).num_each_type.size()>letters.size()){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more species than 26 species, the function must be modified.",_RUNTIME_ERROR_);
+  }
+
+  deque<string> fake_elements;
+  for(uint i=0;i<num_each_type.size();i++){
+    stringstream letter_ss; letter_ss << letters[i];
+    fake_elements.push_back(letter_ss.str());
+  }
+
+  // update species atom names;
+  SetSpecies(fake_elements);
 }
 
 // ***************************************************************************
@@ -14765,7 +14893,7 @@ string xstructure::platon2sg(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,
   string output;
   vector<string> space_group;
   aurostd::DirectoryMake(directory);
-  str.FakeNames();
+  str.DecorateWithElements(); //DX20200727 - FakeNames() -> DecorateWithElements();
   aus << str.platon2print(P_EQUAL,P_EXACT,P_ang,P_d1,P_d2,P_d3);
   aurostd::stringstream2file(aus,file_spf);aus.clear();aus.str(std::string());
   aus << "cd " << directory << endl;

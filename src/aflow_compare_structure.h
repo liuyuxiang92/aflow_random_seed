@@ -229,7 +229,7 @@ namespace compare{
   void generateStructures(vector<StructurePrototype>& structures, ostream& oss=cout, uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20191122
   bool generateStructure(string& structure_name, string& structure_source, uint relaxation_step, xstructure& structure, ostream& oss); //DX20200429 - added relaxation_step
   void removeNonGeneratedStructures(vector<StructurePrototype>& structures); //DX20191105
-  vector<uint> getStoichiometry(string& compositions, const bool& same_species);
+  //DX20200727 [OBSOLETE] vector<uint> getStoichiometry(string& compositions, const bool& same_species);
   bool addAFLOWPrototypes2StructurePrototypeVector(vector<StructurePrototype>& all_structures, vector<string>& vlabel);
   string getCompoundName(xstructure& xstr, bool remove_ones=false);
   string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones=false);

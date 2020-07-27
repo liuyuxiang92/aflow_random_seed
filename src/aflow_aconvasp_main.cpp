@@ -11304,7 +11304,7 @@ namespace pflow {
       Platon_d2=aurostd::string2utype<double>(tokens.at(tokens.size()-2));
       Platon_d3=aurostd::string2utype<double>(tokens.at(tokens.size()-1));
     }
-    a.FakeNames();
+    a.DecorateWithElements(); //DX20200727 - FakeNames() -> DecorateWithElements();
     return a.platon2print(Platon_EQUAL,Platon_EXACT,Platon_ang,Platon_d1,Platon_d2,Platon_d3);
     // aflow --platon [EQUAL] [EXACT] [ang d1 d2 d3]
     // CALC ADDSYM (EQUAL) (EXACT) (ang d1 d2 d3)

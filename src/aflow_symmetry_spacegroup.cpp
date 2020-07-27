@@ -3428,18 +3428,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   if(generatefakenames == true) {
     if(LDEBUG) { cerr << "SYM::SpaceGroup_ITC: Atoms in POSCAR not labeled ... assigning fake names [dir=" << (*this).directory << "]." << endl; }
-    xstructure tmp_xstr = (*this);
-    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    int n = 0;
-    for (uint i = 0; i < tmp_xstr.num_each_type.size(); i++) {
-      tmp_xstr.species.at(i) = letters[i];
-      for (int j = 0; j < tmp_xstr.num_each_type.at(i); j++) {
-        tmp_xstr.atoms.at(n).name = letters[i];
-        tmp_xstr.atoms.at(n).name_is_given = TRUE;
-        n++;
-      }
-    }
-    xstr = tmp_xstr;
+    xstr.DecorateWithFakeElements();
   }
   xstr_orig = xstr;
   xstr.MinkowskiBasisReduction();

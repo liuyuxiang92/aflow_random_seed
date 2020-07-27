@@ -1859,19 +1859,15 @@ namespace anrl {
     }
 
     // ---------------------------------------------------------------------------
-    // check stoichometry
-    string composition = tokens[0];
-    vector<uint> stoichiometry = ::composition2stoichiometry(composition);
+    // check stoichometry and get species
+    string compound_string = tokens[0];
+    vector<uint> stoichiometry;
+    vector<string> species = aurostd::getElements(compound_string, stoichiometry); //DX20200724
     vector<uint> reduced_stoich; aurostd::reduceByGCD(stoichiometry, reduced_stoich);
     if(!compare::sameStoichiometry(stoichiometry,reduced_stoich)){
-      message << "The input stoichiometry (first field in label=" << composition << ") is not reduced, it should be: " << aurostd::joinWDelimiter(reduced_stoich,":");
+      message << "The input stoichiometry (first field in label=" << compound_string << ") is not reduced, it should be: " << aurostd::joinWDelimiter(reduced_stoich,":");
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
-
-    // ---------------------------------------------------------------------------
-    // iniialize species variables
-    vector<string> species;
-    XATOM_SplitAlloySpecies(composition, species);
 
     for(uint i=0;i<species.size();i++) { // number of species
       str.num_each_type.push_back(0);str.comp_each_type.push_back(0.0);
