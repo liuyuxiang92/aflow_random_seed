@@ -297,8 +297,7 @@ namespace SYM {
   template <class d>
     d infnorm(vector<d> vec) {
       if (vec.size() == 0) {
-        cerr << "Empty vector!:infnorm" << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::infnorm()","Empty vector.",_GENERIC_ERROR_);
       }
       d largest = vec[0];
       for (uint i = 0; i < vec.size(); i++) {
@@ -312,8 +311,7 @@ namespace SYM {
   template <class d>
     int infnormindex(vector<d> vec) {
       if (vec.size() == 0) {
-        cerr << "Empty vector!:infnormindex" << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::infnormindex()","Empty vector.",_GENERIC_ERROR_);
       }
       d largest = vec[0];
       int out;
@@ -329,8 +327,7 @@ namespace SYM {
   template <class d>
     d infnorm(xvector<d> xvec) {
       if (xvec.urows == 0) {
-        cerr << "Empty vector!:infnorm xvec" << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::infnormindex()","Empty vector.",_GENERIC_ERROR_);
       }
       d largest = aurostd::abs(xvec[1]);
       for (int i = 0; i < xvec.urows; i++) {
