@@ -66,6 +66,7 @@ namespace cce {
   void print_corrections(const xstructure& structure, aurostd::xoption& flags);
   void print_corrections(const xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void print_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
+  void determine_oxidation_numbers(std::istream& ist, ostream& oss=std::cout);
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(xstructure& structure, string functional);
   void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);

@@ -133,6 +133,28 @@ namespace cce {
 
 
 
+  //determine_oxidation_numbers///////////////////////////////////////////////////////////////////////
+  // For determining only oxidation numbers of the system (from Allen electronegativities) without corrections
+  void determine_oxidation_numbers(std::istream& ist, ostream& oss) {
+    // read structure
+    xstructure structure=read_structure(ist);
+
+    // initialise flags and variables
+    aurostd::xoption cce_flags = init_flags();
+    CCE_Variables cce_vars = init_variables(structure);
+    cce_flags.flag("SCREEN_ONLY",TRUE);
+    cce_flags.flag("PRINT_ONLY_OX_NUMS",TRUE);
+
+    // determine oxidation numbers
+    cce_vars.oxidation_states=get_oxidation_states_from_electronegativities(structure);
+
+    // print oxidation numbers
+    print_oxidation_states_and_sum(structure, cce_flags, cce_vars);
+    oss << cce_vars.os; // print previously gathered output
+  }
+
+
+
   //calculate_corrections////////////////////////////////////////////////////////
   // main CCE function for calling inside AFLOW providing only directory path where data neded for correction (POSCAR.static & aflow.in) are located
   // for setting parameters, analyzing structure, determining oxidation numbers, assigning corrections,
@@ -699,6 +721,7 @@ namespace cce {
   aurostd::xoption init_flags() {
     aurostd::xoption flags;
     flags.flag("SCREEN_ONLY", false);
+    flags.flag("PRINT_ONLY_OX_NUMS", false);
     flags.flag("TEST", false);
     flags.flag("CORRECTABLE", true); // first assuming that formation energy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     flags.flag("OX_NUMS_PROVIDED", false);
@@ -1197,7 +1220,7 @@ namespace cce {
           cce_flags.flag("CORRECTABLE",FALSE);
           oss << cce_vars.os; // print previously gathered output e.g. from determination of oxidation numbers
           message << "BAD NEWS: The determined oxidation numbers do not add up to zero!"  << endl;
-          if(cce_flags.flag("SCREEN_ONLY")){
+          if(cce_flags.flag("SCREEN_ONLY") && !cce_flags.flag("PRINT_ONLY_OX_NUMS")){
             message << "The formation energy of this system is hence not correctable!"  << endl;
             message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           }
@@ -1206,7 +1229,7 @@ namespace cce {
       } else{ // error message that oxidation numbers cannot be determined since for at least one species there are no known oxidation numbers is already included in load_ox_states_templates_each_species function
         cce_flags.flag("CORRECTABLE",FALSE);
         oss << cce_vars.os; // print previously gathered output e.g. from determination of oxidation numbers
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("SCREEN_ONLY") && !cce_flags.flag("PRINT_ONLY_OX_NUMS")){
           message << "The formation energy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
@@ -1328,6 +1351,10 @@ namespace cce {
         cce_flags.flag("NO_OX_STATES",TRUE);
         message << "BAD NEWS: There are no known oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << ")."  << endl;
         message << "Therefore the oxidation states cannot be determined on this basis." << endl;
+        if(cce_flags.flag("SCREEN_ONLY") && !cce_flags.flag("PRINT_ONLY_OX_NUMS")){
+          message << "The formation energy of this system is hence not correctable!"  << endl;
+          message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+        }
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
     }
