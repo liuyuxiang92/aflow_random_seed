@@ -762,7 +762,7 @@ namespace SYM {
 //// ******************************************************************************
 //void AtomicEnvironment(istream & cin, vector<string> av ){
 //
-//  if(av.size() != 3) {cerr << "please enter radius" << endl; exit(1);}
+//  if(av.size() != 3) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"AtomicEnvironment():","Please enter a radius.",_INPUT_NUMBER_);}
 //  double radius = atof(av[2].c_str());
 //  //double tol = 1e-6;
 //  CrystalStructure C(cin);//Gives primitive lattice
@@ -1009,8 +1009,7 @@ namespace SYM {
 //DX20190905 [OBSOLETE - using aurostd::scalar_product()]   double DotPro(xvector<double> a, xvector<double> b) {
 //DX20190905 [OBSOLETE - using aurostd::scalar_product()]     double out = 0.0;
 //DX20190905 [OBSOLETE - using aurostd::scalar_product()]     if(a.urows != b.urows) {
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       cerr << "Vectors must be same size!" << endl;
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       exit(1);
+//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::DotPro():","Vectors must be the same size.",_VALUE_RANGE_);
 //DX20190905 [OBSOLETE - using aurostd::scalar_product()]     }
 //DX20190905 [OBSOLETE - using aurostd::scalar_product()]     for (uint i = 0; i < (uint)a.urows; i++) {
 //DX20190905 [OBSOLETE - using aurostd::scalar_product()]       out += a(i + 1) * b(i + 1);
@@ -1070,8 +1069,7 @@ namespace SYM {
     // DXdouble epsilon = .00001;
     double epsilon = 1e-10;
     if(a.size() != b.size()) {
-      cerr << "vectors are different size" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::vec_compare():","Vectors are different sizes.",_VALUE_RANGE_);
     }
     bool out = true;
     for (uint i = 0; i < a.size(); i++) {
@@ -1093,8 +1091,7 @@ namespace SYM {
     //double epsilon = .00001;
     double epsilon = 1e-10;
     if(a.urows != b.urows) {
-      cerr << "vectors are different size" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::vec_compare():","Vectors are different sizes.",_VALUE_RANGE_);
     }
     bool out = true;
     for (uint i = 1; i <= (uint)a.urows; i++) {
@@ -1969,7 +1966,6 @@ namespace SYM {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    //if(!invec<int>(mult_vec,mult)){cerr << "ERROR: no wyckoff position with multiplicity "<<mult << "."<<endl;exit(1);}
     if(!invec<int>(mult_vec, mult)) {
       if(LDEBUG) { cerr << "SYM::get_wyckoff_equation: WARNING: no wyckoff position with multiplicity " << mult << "." << endl; }
       vector<string> none;
@@ -2039,7 +2035,6 @@ namespace SYM {
     string function_name = XPID + "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    //if(!invec<int>(mult_vec,mult)){cerr << "ERROR: no wyckoff position with multiplicity "<<mult << "."<<endl;exit(1);}
     if(!invec<int>(mult_vec, Wyckoff_multiplicity)) {
       if(LDEBUG) { cerr << function_name << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
       vector<vector<string> > none;
@@ -2337,7 +2332,6 @@ namespace SYM {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    //if(!invec<int>(mult_vec,mult)){cerr << "ERROR: no wyckoff position with multiplicity "<<mult << "."<<endl;exit(1);}
     if(!invec<int>(mult_vec, mult)) {
       if(LDEBUG) { cerr << "SYM::get_wyckoff_pos: WARNING: no wyckoff position with multiplicity " << mult << "." << endl; }
       vector<vector<vector<string> > > none;
@@ -3597,8 +3591,7 @@ namespace SYM {
   double distance_between_points(const xvector<double>& a, const xvector<double>& b) {
     double dist = 0;
     if(a.urows != b.urows) {
-      cerr << "vectors not equal length (distance_between_points): wyckoff_functions.cpp" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::distance_between_points():","Vectors are not equal length.",_VALUE_RANGE_);
     }
     for (uint i = 1; i <= (uint)a.urows; i++) {
       dist += (a(i) - b(i)) * (a(i) - b(i));
@@ -5315,7 +5308,7 @@ namespace SYM {
     //cerr << gl_sgs[spacegroupnum] << endl;
     //cerr << "WYCKOFF POSTIONS: " << endl;
     //print_wyckoff_pos(tmpvvvstring);
-    //exit(0);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::ReturnITCGenShift():","Throw for debugging purposes.",_GENERIC_ERROR_);
 
     //for(int k=0;k<tmpvvvsd[s].size();k++){
     //  for(int j=0;j<tmpvvvsd[s][k].size();j++){
@@ -5367,8 +5360,7 @@ namespace SYM {
       l = atoi(num[5].c_str());  // which sub group within multiplicity group (first, second, third, etc)
     }
     if(l < 1) {
-      cerr << "aflow_symmetry_spacegroup.cpp::ReverseSpaceGroup: ERROR: sub multiplicity groups count from 1" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::ReverseSpaceGroup():","Sub multiplicity groups start at 1.",_INPUT_ILLEGAL_);
     }
 
     string axis_cell = "";
@@ -5662,8 +5654,7 @@ namespace SYM {
     int size = points[0].urows;
     for (uint i = 0; i < points.size(); i++) {
       if(points[i].urows != size) {
-        cerr << "aflow_symmetry_spacegroup.cpp::get_mod_angle_tensor: ERROR: Points must all be same dimension" << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::get_mod_angle_tensor():","Points must have the same dimension.",_VALUE_RANGE_);
       }
     }
     //Choose first point as origin

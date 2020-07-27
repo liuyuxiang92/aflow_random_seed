@@ -3683,8 +3683,8 @@ namespace estructure {
 namespace estructure {
   bool GET_DOS_DATA(const string& str_dir, double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS, vector<vector<vector<double> > >& PDOS) {
     stringstream ss_dosfile, ss_outfile, ss_line;
-    if(aflowlib::VaspFileExist(str_dir, "OUTCAR")) aflowlib::vaspfile2stringstream(str_dir, "OUTCAR", ss_outfile); //Not exit even OUTCAR does not exist
-    aflowlib::vaspfile2stringstream(str_dir, "DOSCAR", ss_dosfile); //exit if DOSCAR does not exist
+    if(aflowlib::VaspFileExist(str_dir, "OUTCAR")) aflowlib::vaspfile2stringstream(str_dir, "OUTCAR", ss_outfile); //Not return even OUTCAR does not exist
+    aflowlib::vaspfile2stringstream(str_dir, "DOSCAR", ss_dosfile); //return if DOSCAR does not exist
     return estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS);
   }
 }
@@ -3736,7 +3736,7 @@ namespace estructure {
     //CO20180217 - I added the (-6) because header is 6 lines
     //usually, DOSGRID is 301, and TotNoDOSCAR is 307, so 307-6 == 301 ! conservation of lines
     //therefore TotNoDOSCAR-6 should never be less than DOSGRID, but at least equal
-    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; /*exit(1)*/return false;  //CO20180216
+    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; return false;  //CO20180216
     bool FLAG_PDOS = false;
     if(NIONS==0) NIONS = (int (TotNoDOSCAR-5)/(DOSGRID+1))-1; //if OUTCAR does not exist
     //CO20180217
@@ -3796,7 +3796,7 @@ namespace estructure {
     //************************************************************************************************************************
     //----------------------GETTING PDOS DATA-------------------------
     //vector<vector<vector<double> > > PDOS(NIONS);
-    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; /*exit(1)*/return false;} //CO20180216 //we may not have PDOS in static anymore, see AGL
+    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; return false;} //CO20180216 //we may not have PDOS in static anymore, see AGL
     if(FLAG_PDOS) {
       PDOS.resize(NIONS);
       getline(ss_dosfile, line); //Negelecting the title line after the TDOS
