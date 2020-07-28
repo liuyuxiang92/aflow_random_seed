@@ -2428,6 +2428,13 @@ xstructure input2VASPxstr(istream& input);
 xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------
+// centroid functions for structures //DX20200728
+xvector<double> getCentroidOfStructure(const xstructure& xstr, bool use_cpos=true, bool use_atom_mass=false);
+xvector<double> getCentroidOfStructure(const deque<_atom>& atoms, bool use_cpos=true, bool use_atom_mass=false);
+xvector<double> getCentroidOfStructurePBC(const xstructure& xstr, bool use_cpos=true, bool use_atom_mass=false);
+xvector<double> getCentroidOfStructurePBC(const deque<_atom>& atoms,xmatrix<double> lattice,bool use_cpos=true,bool use_atom_mass=false);
+
+// ----------------------------------------------------------------------------
 // functions related to AtomEnvironment - DX20191122
 vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode=ATOM_ENVIRONMENT_MODE_1);
 vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode=ATOM_ENVIRONMENT_MODE_1);

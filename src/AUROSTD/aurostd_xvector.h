@@ -497,6 +497,13 @@ namespace aurostd {
 
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) __xprototype;
+  template<class utype> xvector<utype> //get centroid of data points with weights //DX20200728
+    getCentroid(const vector<xvector<utype> >& points, const vector<utype>& weights) __xprototype;
+
+  template<class utype> xvector<double> //get centroid of data points //CO20180409
+    getCentroidPBC(const vector<xvector<utype> >& points, const xmatrix<utype>& lattice) __xprototype;
+  template<class utype> xvector<double> //get centroid of data points with weights //DX20200728
+    getCentroidPBC(const vector<xvector<utype> >& points, const vector<utype>& weights, const xmatrix<utype>& lattice) __xprototype;
 
   // TRIGONOMETRIC OPERATIONS BETWEEN TWO GENERAL VECTORS //CO20180409
   template<class utype> xvector<double> 

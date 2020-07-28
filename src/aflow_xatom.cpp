@@ -1214,7 +1214,7 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
 //DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - END
 
 // **************************************************************************
-// Function xstructure::GetElements()
+// Function xstructure::GetElements() //DX20200728
 // **************************************************************************
 vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
 
@@ -1256,7 +1256,7 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
 }
 
 // **************************************************************************
-// Function xstructure::GetElements()
+// Function xstructure::GetElements() //DX20200728
 // **************************************************************************
 vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 
@@ -1285,7 +1285,7 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 }
 
 // **************************************************************************
-// Function xstructure::GetReducedComposition()
+// Function xstructure::GetReducedComposition() //DX20200728
 // **************************************************************************
 vector<uint> xstructure::GetReducedComposition(bool numerical_sort){
 
@@ -1302,6 +1302,94 @@ vector<uint> xstructure::GetReducedComposition(bool numerical_sort){
   aurostd::reduceByGCD(composition, reduced_composition);
 
   return reduced_composition;
+}
+
+// ***************************************************************************
+// Function getCentroidOfStructure() //DX20200728
+// ***************************************************************************
+xvector<double> getCentroidOfStructure(const xstructure& xstr, bool use_cpos, bool use_atom_mass){
+  return getCentroidOfStructure(xstr.atoms,use_cpos,use_atom_mass);
+}
+
+// useful for molecules/non-periodic structures too
+xvector<double> getCentroidOfStructure(const deque<_atom>& atoms, bool use_cpos, bool use_atom_mass){
+
+  // Calculate centroid in a structure
+  // This overload is useful for non-periodic structures as well
+  // (e.g., needed for symmetry analysis of molecules)
+  // Uses aurostd::getCentroid()
+
+  // ---------------------------------------------------------------------------
+  // coordinate type
+  vector<xvector<double> > coordinates;
+  // cpos
+  if(use_cpos){
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].cpos); }
+  }
+  // fpos
+  else{
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].fpos); }
+  }
+
+  // ---------------------------------------------------------------------------
+  // coordinate weights
+  vector<double> weights;
+  // uses mass of atomic species
+  if(use_atom_mass){
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(atoms[i].mass); }
+  }
+  // consider as geometric points
+  else{
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(1.0); }
+  }
+
+  return getCentroid(coordinates,weights);
+}
+
+// ***************************************************************************
+// Function getCentroidOfStructurePBC() //DX20200728
+// ***************************************************************************
+xvector<double> getCentroidOfStructurePBC(const xstructure& xstr, bool use_cpos, bool use_atom_mass){
+  return getCentroidOfStructurePBC(xstr.atoms,xstr.lattice,use_cpos,use_atom_mass);
+}
+
+xvector<double> getCentroidOfStructurePBC(const deque<_atom>& atoms,
+    xmatrix<double> lattice,
+    bool use_cpos,
+    bool use_atom_mass){
+
+  // Calculate centroid in a structure with periodic boundary conditions
+  // Uses aurostd::getCentroidPBC()
+
+  xmatrix<double> cell;
+
+  // ---------------------------------------------------------------------------
+  // coordinate type
+  vector<xvector<double> > coordinates;
+  // cpos
+  if(use_cpos){
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].cpos); }
+    cell = lattice; // use lattice
+  }
+  // fpos
+  else{
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].fpos); }
+    cell = aurostd::eye<double>(); // use unit cube
+  }
+
+  // ---------------------------------------------------------------------------
+  // coordinate weights
+  vector<double> weights;
+  // uses mass of atomic species
+  if(use_atom_mass){
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(atoms[i].mass); }
+  }
+  // consider as geometric points
+  else{
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(1.0); }
+  }
+
+  return getCentroidPBC(coordinates,weights,cell);
 }
 
 // ***************************************************************************

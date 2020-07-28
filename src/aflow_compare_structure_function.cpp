@@ -1209,9 +1209,7 @@ namespace compare {
       structure_tmp.structure_representative.BringInCell(); //DX20200707
       structure_tmp.structure_representative_name = filenames[i];
       structure_tmp.stoichiometry = xstr.GetReducedComposition(!same_species);
-      cerr << aurostd::joinWDelimiter(structure_tmp.stoichiometry, ",") << endl;
       structure_tmp.elements = xstr.GetElements(true,true); // true: clean names and assign fake names
-      cerr << aurostd::joinWDelimiter(structure_tmp.elements, ",") << endl;
       structure_tmp.natoms = xstr.atoms.size(); //DX20190425
       structure_tmp.ntypes = xstr.num_each_type.size(); //DX20190425
       structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr
@@ -6047,147 +6045,149 @@ namespace compare{
 //DX20191122 [MOVED TO XATOM]   }
 //DX20191122 [MOVED TO XATOM] }
 
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid_with_PBC(const xstructure& xstr){
 
-    // Calculate the "best" centroid in a system with periodic boundary conditions.
-    // This is based on the algorithm proposed in: 
-    // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
-    // Used to find the best origin/centroid for a crystal structure.
-    // Use of this for finding the best origin is still in beta testing; 
-    // the method has some issues
-
-    vector<xvector<double> > coordinates;
-    for(uint i=0;i<xstr.atoms.size();i++){
-      coordinates.push_back(xstr.atoms[i].cpos); //or cpos
-    }
-
-    return centroid_with_PBC(coordinates,xstr.lattice);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice){
-
-    // Calculate the "best" centroid in a system with periodic boundary conditions.
-    // This is based on the algorithm proposed in: 
-    // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
-    // If there are no weights (geometric center), then the weights are set to 1
-
-    vector<double> weights;
-    for(uint i=0;i<coordinates.size();i++){
-      weights.push_back(1.0);
-    }
-    return centroid_with_PBC(coordinates,weights,lattice);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights, 
-      const xmatrix<double>& lattice){
-
-    // Calculate the "best" centroid in a system with periodic boundary conditions.
-    // This is based on the algorithm proposed in: 
-    // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
-
-    xvector<double> centroid;
-    for(uint i=1;i<4;i++){
-      double zi_avg = 0.0;
-      double zeta_avg = 0.0;
-      double theta_avg =0.0;
-      for(uint j=0;j<coordinates.size();j++){
-        double theta = coordinates[j][i]*(2.0*Pi_r)/(aurostd::modulus(lattice(i)));
-        double zi = std::cos(theta)*weights[j];
-        double zeta = std::sin(theta)*weights[j];
-        zi_avg += zi/coordinates.size();
-        zeta_avg += zeta/coordinates.size();
-      }
-      theta_avg = std::atan2(-zeta_avg,-zi_avg);
-      centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*Pi_r));
-    }
-    return centroid;
-  } 
-}
-
-// ***************************************************************************
-// Find centroid for system (NO periodic boundary conditions)
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid(const xstructure& xstr){
-
-    // Calculate the centroid in a non-periodic system.
-    // Takes the cpos coordinates
-
-    vector<xvector<double> > coordinates;
-    for(uint i=0;i<xstr.atoms.size();i++){
-      coordinates.push_back(xstr.atoms[i].cpos); //or cpos
-    }
-
-    return centroid(coordinates);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system (NO periodic boundary conditions)
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid(const deque<_atom>& atoms){
-
-    // Calculate the centroid in a non-periodic system.
-    // Takes the cpos coordinates
-
-    vector<xvector<double> > coordinates;
-    for(uint i=0;i<atoms.size();i++){
-      coordinates.push_back(atoms[i].cpos); //or cpos
-    }
-
-    return centroid(coordinates);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system (NO periodic boundary conditions)
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid(const vector<xvector<double> >& coordinates){
-
-    // Calculate the centroid in a non-periodic system.
-    // Sets weights equal to one in this function.
-
-    vector<double> weights;
-    for(uint i=0;i<coordinates.size();i++){
-      weights.push_back(1.0);
-    }
-    return centroid(coordinates,weights);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights){
-
-    // Calculate the centroid in a non-periodic system.
-
-    xvector<double> centroid;
-    for(uint i=0;i<coordinates.size();i++){
-      centroid += coordinates[i]*weights[i];
-    }
-    centroid /= coordinates.size();
-
-    return centroid;
-  } 
-}
+//DX20200728 [Moved centroid (NON-PBC and PBC) into XATOM and extended AUROSTD getCentroid()]
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid_with_PBC(const xstructure& xstr){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the "best" centroid in a system with periodic boundary conditions.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // This is based on the algorithm proposed in: 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Used to find the best origin/centroid for a crystal structure.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Use of this for finding the best origin is still in beta testing; 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // the method has some issues
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<xvector<double> > coordinates;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<xstr.atoms.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       coordinates.push_back(xstr.atoms[i].cpos); //or cpos
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid_with_PBC(coordinates,xstr.lattice);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the "best" centroid in a system with periodic boundary conditions.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // This is based on the algorithm proposed in: 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // If there are no weights (geometric center), then the weights are set to 1
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<double> weights;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<coordinates.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       weights.push_back(1.0);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid_with_PBC(coordinates,weights,lattice);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights, 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       const xmatrix<double>& lattice){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the "best" centroid in a system with periodic boundary conditions.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // This is based on the algorithm proposed in: 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     xvector<double> centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=1;i<4;i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       double zi_avg = 0.0;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       double zeta_avg = 0.0;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       double theta_avg =0.0;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       for(uint j=0;j<coordinates.size();j++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         double theta = coordinates[j][i]*(2.0*Pi_r)/(aurostd::modulus(lattice(i)));
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         double zi = std::cos(theta)*weights[j];
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         double zeta = std::sin(theta)*weights[j];
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         zi_avg += zi/coordinates.size();
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         zeta_avg += zeta/coordinates.size();
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       theta_avg = std::atan2(-zeta_avg,-zi_avg);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*Pi_r));
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   } 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system (NO periodic boundary conditions)
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const xstructure& xstr){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Takes the cpos coordinates
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<xvector<double> > coordinates;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<xstr.atoms.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       coordinates.push_back(xstr.atoms[i].cpos); //or cpos
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid(coordinates);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system (NO periodic boundary conditions)
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const deque<_atom>& atoms){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Takes the cpos coordinates
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<xvector<double> > coordinates;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<atoms.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       coordinates.push_back(atoms[i].cpos); //or cpos
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid(coordinates);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system (NO periodic boundary conditions)
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const vector<xvector<double> >& coordinates){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Sets weights equal to one in this function.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<double> weights;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<coordinates.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       weights.push_back(1.0);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid(coordinates,weights);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     xvector<double> centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<coordinates.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       centroid += coordinates[i]*weights[i];
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     centroid /= coordinates.size();
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   } 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
 
 // ***************************************************************************
 // Find Matches
@@ -6221,9 +6221,9 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
     deque<_atom> xstr1_atoms = _xstr1_atoms;
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> xstr1_centroid = centroid(xstr1_atoms);
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> xstr1_centroid = getCentroidOfStructure(xstr1_atoms);
     deque<_atom> PROTO_atoms = _PROTO_atoms;
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> PROTO_centroid = centroid(PROTO_atoms);
+    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> PROTO_centroid = getCentroidOfStructure(PROTO_atoms);
 
     //DX20200716 [BETA- NEEDS FUTHER TESTING] if(LDEBUG){
     //DX20200716 [BETA- NEEDS FUTHER TESTING]   cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
