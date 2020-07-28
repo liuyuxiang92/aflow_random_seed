@@ -231,10 +231,10 @@ namespace compare{
   void removeNonGeneratedStructures(vector<StructurePrototype>& structures); //DX20191105
   //DX20200727 [OBSOLETE] vector<uint> getStoichiometry(string& compositions, const bool& same_species);
   bool addAFLOWPrototypes2StructurePrototypeVector(vector<StructurePrototype>& all_structures, vector<string>& vlabel);
-  string getCompoundName(xstructure& xstr, bool remove_ones=false);
-  string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones=false);
-  vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species);
-  vector<string> getElements(xstructure& xstr);
+  //DX20200727 [OBSOLETE - USE PFLOW] string getCompoundName(xstructure& xstr, bool remove_ones=false);
+  //DX20200727 [OBSOLETE - USE PFLOW] string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones=false);
+  //DX20200727 [OBSOLETE - USE PFLOW] vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species);
+  //DX20200727 [OBSOLETE - USE PFLOW] vector<string> getElements(xstructure& xstr);
   //DX20191125 [OBSOLETE - USING AUROSTD VERSION] vector<uint> gcdStoich(const vector<uint>& numbers); //DX20181009
   //DX20191125 [OBSOLETE - USING AUROSTD VERSION] vector<uint> gcdStoich(const deque<int>& numbers);
   //DX20191108 [OBSOLETE - switching to getThreadDistribution] bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
@@ -416,7 +416,7 @@ namespace compare{
   void rescaleStructure(xstructure& x1, xstructure& x2);
   void atomicNumberDensity(xstructure& xstr1, xstructure& xstr2);
   vector<string> fakeElements(const uint& number_of_species);
-  void fakeAtomsName(xstructure& x1);
+  //DX20200728 [OBSOLETE-MOVED TO XATOM] void fakeAtomsName(xstructure& x1);
   void printParameters(xstructure& xstr, ostream& oss);
   string leastFrequentAtom(const xstructure& xstr);
   vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr);

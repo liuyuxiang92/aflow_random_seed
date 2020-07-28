@@ -7339,9 +7339,21 @@ namespace pflow {
     return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO20190629
   }
 
+  string prettyPrintCompound(const vector<string>& vspecies,const vector<uint>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //DX20200727
+    vector<double> vcomposition_dbl;
+    for(uint i=0;i<vcomposition.size();i++){vcomposition_dbl.push_back((double)vcomposition[i]);}
+    return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition_dbl),vred,exclude1,ftype); //mode //CO20190629
+  }
+
   // Moved here from the ConvexHull class
   string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO20190629
     return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO20190629
+  }
+
+  string prettyPrintCompound(const vector<string>& vspecies,const xvector<uint>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //DX20200727
+    xvector<double> vcomposition_dbl(vcomposition.rows);
+    for(int i=1;i<=vcomposition.rows;i++){vcomposition_dbl(i)=(double)vcomposition[i];}
+    return prettyPrintCompound(vspecies,vcomposition_dbl,vred,exclude1,ftype); //mode //CO20190629
   }
 
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
@@ -7375,6 +7387,33 @@ namespace pflow {
       }
     }
     return output.str();
+  }
+}
+
+// ***************************************************************************
+// pflow::FakeElements()
+// ***************************************************************************
+namespace pflow{
+  vector<string> fakeElements(uint nspecies){
+
+    // Return vector of fake elements
+    // Useful for determining "elements" for prototypes
+
+    string function_name = XPID + "pflow::fakeElements():";
+
+    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    if(nspecies>letters.size()){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
+    }
+
+    vector<string> elements;
+    for(uint i=0;i<nspecies;i++){
+      stringstream ss_letter; ss_letter << letters[i]; // cannot type cast char to string directly
+      elements.push_back(ss_letter.str());
+    }
+
+    return elements;
   }
 }
 

@@ -992,7 +992,7 @@ namespace compare {
     input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = xstr.GetReducedComposition(); //preserves the stoich order for the structure
     input_structure.elements = xstr.GetElements(true,true); // true: clean names
-    input_structure.structure_representative_compound = compare::getCompoundName(xstr);
+    input_structure.structure_representative_compound = pflow::prettyPrintCompound(input_structure.elements,input_structure.stoichiometry,no_vrt,false,txt_ft);
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
     input_structure.structure_representative_source = ss_input.str();
@@ -1591,7 +1591,7 @@ namespace compare {
     input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = xstr.GetReducedComposition(!same_species);
     input_structure.elements = xstr.GetElements(true,true); // true: clean names
-    input_structure.structure_representative_compound = compare::getCompoundName(xstr);
+    input_structure.structure_representative_compound = pflow::prettyPrintCompound(input_structure.elements,input_structure.stoichiometry,no_vrt,false,txt_ft);
     //DX20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.structure_representative); //DX20190711
     input_structure.structure_representative_generated = true; 
     stringstream ss_input; ss_input << xstr;
@@ -1682,7 +1682,7 @@ namespace compare {
           str_proto_tmp.structure_representative_source="aurl";
           str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
           str_proto_tmp.stoichiometry=tmp_reduced_stoich;
-          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]); //DX20190430 - added
+          str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
           //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
           str_proto_tmp.elements=species;
           str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
@@ -2336,7 +2336,7 @@ namespace compare {
       if(all_structures[i].structure_representative_generated){
         deque<string> deque_species; for(uint j=0;j<all_structures[i].elements.size();j++){deque_species.push_back(all_structures[i].elements[j]);}
         all_structures[i].structure_representative.SetSpecies(deque_species);
-        all_structures[i].structure_representative_compound = compare::getCompoundName(all_structures[i].structure_representative);
+        all_structures[i].structure_representative_compound = pflow::prettyPrintCompound(all_structures[i].elements,all_structures[i].stoichiometry,no_vrt,false,txt_ft);
       }
     }
 
@@ -2436,7 +2436,7 @@ namespace compare {
         str_proto_tmp.elements=species;
         str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
         str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
-        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]);
+        str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
         //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX20190711
         str_proto_tmp.property_names = property_list; //DX20190326
         str_proto_tmp.property_units = property_units; //DX20190326

@@ -1220,14 +1220,16 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
 
   // Returns the elements in the xstructure
   // default: returns xstr.species
-  // But, it also check
+  // If no species are given, it also checks atom.name and has the option to
+  // assign fake elements if none are given
+  // Note: GetElementsFromAtomNames() updates the xstructure
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "xstructure::GetElements():";
 
   // ---------------------------------------------------------------------------
   // 1) try xstructure.species
-  if(!species.empty()){
+  if(!species.size()){
     if(clean_name){
       vector<string> vspecies;
       for(uint i=0;i<species.size();i++){
@@ -1258,6 +1260,8 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
 // **************************************************************************
 vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 
+  // Extracts the species from the atom names
+
   string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
 
   uint iat=0;
@@ -1275,7 +1279,7 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
       iat++;
     }
     if(clean_name){ species.push_back(KBIN::VASP_PseudoPotential_CleanName(species_tmp)); }
-    else{ species_tmp; }
+    else{ species.push_back(species_tmp); }
   }
   return species;
 }
@@ -14863,20 +14867,11 @@ void xstructure::DecorateWithFakeElements(){
 
   string function_name = XPID + "xstructure::DecorateWithFakeElements():";
 
-  string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  if((*this).num_each_type.size()>letters.size()){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more species than 26 species, the function must be modified.",_RUNTIME_ERROR_);
-  }
-
-  deque<string> fake_elements;
-  for(uint i=0;i<num_each_type.size();i++){
-    stringstream letter_ss; letter_ss << letters[i];
-    fake_elements.push_back(letter_ss.str());
-  }
+  // get fake elements
+  vector<string> fake_elements = pflow::fakeElements(num_each_type.size());
 
   // update species atom names;
-  SetSpecies(fake_elements);
+  SetSpecies(aurostd::vector2deque(fake_elements));
 }
 
 // ***************************************************************************

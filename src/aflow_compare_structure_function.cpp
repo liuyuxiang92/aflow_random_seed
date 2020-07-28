@@ -521,7 +521,7 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
   // only add xstructure if it has been generated
   if(b.structure_representative_generated){
     structures_duplicate.push_back(b.structure_representative);
-    structures_duplicate_compounds.push_back(compare::getCompoundName(b.structure_representative)); //DX20190111 - added compound, e.g., Ag1Br2
+    structures_duplicate_compounds.push_back(pflow::prettyPrintCompound(b.elements,b.stoichiometry,no_vrt,false,txt_ft)); //DX20190111 - added compound, e.g., Ag1Br2
   }
   else if(!b.structure_representative_compound.empty()){
     structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX20190111 - added compound, e.g., Ag1Br2
@@ -1019,7 +1019,7 @@ namespace compare {
         structure_tmp.elements = xstr1.GetElements(true,true); // true: clean names
         structure_tmp.natoms = xstr1.atoms.size(); //DX20190425
         structure_tmp.ntypes = xstr1.num_each_type.size(); //DX20190425
-        structure_tmp.structure_representative_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
+        structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft);//remove ones is true  //DX20190311 //DX20190313 - use xstr1
         // update xstructure species
         if(structure_tmp.structure_representative.species.size()==0){
           deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
@@ -1131,7 +1131,7 @@ namespace compare {
         structure_tmp.elements = structure_tmp.structure_representative.GetElements(true,true); // true: clean names
         structure_tmp.natoms = structure_tmp.structure_representative.atoms.size(); //DX20190425
         structure_tmp.ntypes = structure_tmp.structure_representative.num_each_type.size(); //DX20190425
-        structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr
+        structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr
         // update xstructure species
         if(structure_tmp.structure_representative.species.size()==0){
           deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
@@ -1209,10 +1209,12 @@ namespace compare {
       structure_tmp.structure_representative.BringInCell(); //DX20200707
       structure_tmp.structure_representative_name = filenames[i];
       structure_tmp.stoichiometry = xstr.GetReducedComposition(!same_species);
+      cerr << aurostd::joinWDelimiter(structure_tmp.stoichiometry, ",") << endl;
       structure_tmp.elements = xstr.GetElements(true,true); // true: clean names and assign fake names
+      cerr << aurostd::joinWDelimiter(structure_tmp.elements, ",") << endl;
       structure_tmp.natoms = xstr.atoms.size(); //DX20190425
       structure_tmp.ntypes = xstr.num_each_type.size(); //DX20190425
-      structure_tmp.structure_representative_compound = compare::getCompoundName(xstr); //remove ones is true  //DX20190311 //DX20190313 - use xstr
+      structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr
       // update xstructure species
       if(structure_tmp.structure_representative.species.size()==0){
         deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
@@ -1763,7 +1765,7 @@ namespace compare{
 
     vector<StructurePrototype> permutation_structures;
 
-    vector<string> names = fakeElements(structure.stoichiometry.size());
+    vector<string> names = pflow::fakeElements(structure.stoichiometry.size()); //DX20200728 - now in pflow
     vector<uint> indices = structure.stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = structure.stoichiometry.size();
@@ -1876,8 +1878,7 @@ namespace compare{
       str_proto_tmp.copyPrototypeInformation(structure);
       str_proto_tmp.stoichiometry = str_proto_tmp.structure_representative.GetReducedComposition(); //DX20190529 - need updated stoich
       // compound name is always alphabetic; order swapping is dictated by stoichiometry
-      //tmp.structure_representative_compound = compare::getCompoundName(name_order[0],tmp.stoichiometry,false); //remove ones is true //DX20190529 - need compound name to group later;
-      str_proto_tmp.structure_representative_compound = compare::getCompoundName(str_proto_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
+      str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
       str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
       str_proto_tmp.grouped_Wyckoff_positions = permutation_grouped_Wyckoff_positions[i];
       permutation_structures.push_back(str_proto_tmp);
@@ -1903,7 +1904,7 @@ namespace compare{
 
     vector<StructurePrototype> permutation_structures;
 
-    vector<string> names = fakeElements(stoichiometry.size());
+    vector<string> names = pflow::fakeElements(stoichiometry.size()); //DX20200728 - now in pflow
     vector<uint> indices = stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = stoichiometry.size();
@@ -2265,8 +2266,8 @@ namespace compare{
           //structure_tmp.space_group = prototype_space_groups[i]; 
           structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
           structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
-          structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
-          structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
+          structure_tmp.elements = pflow::fakeElements(all_structures[0].stoichiometry.size()); //DX20200728 - now in pflow
+          structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,true,txt_ft); //remove ones is true
           structure_tmp.structure_representative_generated = false; 
           structure_tmp.structure_representative_source = "aflow_prototypes";
           structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
@@ -2283,8 +2284,8 @@ namespace compare{
         structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
         structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
         vector<string> elements;
-        structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
-        structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
+        structure_tmp.elements = pflow::fakeElements(all_structures[0].stoichiometry.size()); //DX20200728 - now in pflow
+        structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,true,txt_ft); //remove ones is true
         structure_tmp.structure_representative_generated = false; 
         structure_tmp.structure_representative_source = "aflow_prototypes";
         structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
@@ -2295,108 +2296,108 @@ namespace compare{
   }
 } 
 
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from xstructure
-// ***************************************************************************
-namespace compare{
-  string getCompoundName(xstructure& xstr, bool remove_ones){
-
-    // Obtains compound name from xstructure in the reduced stoichiometric form.
-
-    vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
-    vector<string> elements = compare::getElements(xstr);
-
-    return getCompoundName(elements,stoichiometry,remove_ones);
-  }
-}
-
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from xstructure
-// ***************************************************************************
-namespace compare{
-  string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones){
-
-    // Obtains compound name from the elements and stoichiometry vectors.
-    // Note: Does not guarantee reduced stoichiometric form.
-
-    stringstream compound_name;
-    if(stoichiometry.size() == elements.size()){
-      for(uint i=0;i<stoichiometry.size();i++){
-        if(remove_ones && stoichiometry[i]==1){
-          compound_name << elements[i];
-        }
-        else {
-          compound_name << elements[i] << stoichiometry[i];
-        }
-      }
-    }
-    else {
-      cerr << "compare::getCompoundName():WARNING: Size of elements != stoichiometry. Not returning reduced compound name" << endl;
-      return "";
-    }
-    return compound_name.str();
-  }
-}
-
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from xstructure
-// ***************************************************************************
-namespace compare{
-  vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species){
-
-    // Obtains the least common multiple representation of the stoichiometry.
-
-    deque<int> stoich;
-    if(xstr.species.size()==1){
-      stoich.push_back(1);
-    }
-    else {
-      //DX20191125 stoich=gcdStoich(xstr.num_each_type);
-      stoich = xstr.num_each_type;
-      aurostd::reduceByGCD(xstr.num_each_type, stoich); //DX20191125
-    }
-    // If a structure prototype comparison (not material type), ensure 
-    // stoichiometries are in numerical order for comparison.  Else, 
-    // leave in position indicating atomic species count.
-    if(same_species==false){
-      //DX20191125 for(uint i=0; i<stoich.size(); i++){
-      std::sort(stoich.begin(),stoich.end());
-      //DX20191125 }
-    }
-
-    // convert to vector<uint>
-    vector<uint> stoich_uint;
-    for(uint i=0;i<stoich.size();i++){ stoich_uint.push_back((uint)stoich[i]); }
-    return stoich_uint;
-  }
-}
-
-// ***************************************************************************
-//  Get Elements 
-// ***************************************************************************
-namespace compare{
-  vector<string> getElements(xstructure& xstr){
-
-    // Obtains the elements in the xstructure.
-
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    vector<string> velements;
-    // If atoms in poscar not labeled in either POSCAR; assign fake names
-    if (xstr.atoms[0].name == ""){
-      if(LDEBUG) {cerr << "compare::getElements():" << "WARNING!!!!! Atoms not labeled ... Assigning Fake names" << endl;}
-      fakeAtomsName(xstr);
-    }
-
-    string prev_element="";
-    for(uint i=0; i<xstr.atoms.size(); i++){
-      if(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name) != prev_element){ //DX20190329 - remove pseudopotential info
-        velements.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name)); //DX20190329 - remove pseudopotential info
-        prev_element=KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name); //DX20190329 - remove pseudopotential info
-      }
-    }
-    return velements;
-  }
-}
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from xstructure
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   string getCompoundName(xstructure& xstr, bool remove_ones){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains compound name from xstructure in the reduced stoichiometric form.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
+//DX20200728 [OBSOLETE]     vector<string> elements = compare::getElements(xstr);
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     return getCompoundName(elements,stoichiometry,remove_ones);
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from xstructure
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains compound name from the elements and stoichiometry vectors.
+//DX20200728 [OBSOLETE]     // Note: Does not guarantee reduced stoichiometric form.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     stringstream compound_name;
+//DX20200728 [OBSOLETE]     if(stoichiometry.size() == elements.size()){
+//DX20200728 [OBSOLETE]       for(uint i=0;i<stoichiometry.size();i++){
+//DX20200728 [OBSOLETE]         if(remove_ones && stoichiometry[i]==1){
+//DX20200728 [OBSOLETE]           compound_name << elements[i];
+//DX20200728 [OBSOLETE]         }
+//DX20200728 [OBSOLETE]         else {
+//DX20200728 [OBSOLETE]           compound_name << elements[i] << stoichiometry[i];
+//DX20200728 [OBSOLETE]         }
+//DX20200728 [OBSOLETE]       }
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     else {
+//DX20200728 [OBSOLETE]       cerr << "compare::getCompoundName():WARNING: Size of elements != stoichiometry. Not returning reduced compound name" << endl;
+//DX20200728 [OBSOLETE]       return "";
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     return compound_name.str();
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from xstructure
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains the least common multiple representation of the stoichiometry.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     deque<int> stoich;
+//DX20200728 [OBSOLETE]     if(xstr.species.size()==1){
+//DX20200728 [OBSOLETE]       stoich.push_back(1);
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     else {
+//DX20200728 [OBSOLETE]       //DX20191125 stoich=gcdStoich(xstr.num_each_type);
+//DX20200728 [OBSOLETE]       stoich = xstr.num_each_type;
+//DX20200728 [OBSOLETE]       aurostd::reduceByGCD(xstr.num_each_type, stoich); //DX20191125
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     // If a structure prototype comparison (not material type), ensure 
+//DX20200728 [OBSOLETE]     // stoichiometries are in numerical order for comparison.  Else, 
+//DX20200728 [OBSOLETE]     // leave in position indicating atomic species count.
+//DX20200728 [OBSOLETE]     if(same_species==false){
+//DX20200728 [OBSOLETE]       //DX20191125 for(uint i=0; i<stoich.size(); i++){
+//DX20200728 [OBSOLETE]       std::sort(stoich.begin(),stoich.end());
+//DX20200728 [OBSOLETE]       //DX20191125 }
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // convert to vector<uint>
+//DX20200728 [OBSOLETE]     vector<uint> stoich_uint;
+//DX20200728 [OBSOLETE]     for(uint i=0;i<stoich.size();i++){ stoich_uint.push_back((uint)stoich[i]); }
+//DX20200728 [OBSOLETE]     return stoich_uint;
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Elements 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   vector<string> getElements(xstructure& xstr){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains the elements in the xstructure.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     bool LDEBUG=(FALSE || XHOST.DEBUG);
+//DX20200728 [OBSOLETE]     vector<string> velements;
+//DX20200728 [OBSOLETE]     // If atoms in poscar not labeled in either POSCAR; assign fake names
+//DX20200728 [OBSOLETE]     if (xstr.atoms[0].name == ""){
+//DX20200728 [OBSOLETE]       if(LDEBUG) {cerr << "compare::getElements():" << "WARNING!!!!! Atoms not labeled ... Assigning Fake names" << endl;}
+//DX20200728 [OBSOLETE]       fakeAtomsName(xstr);
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     string prev_element="";
+//DX20200728 [OBSOLETE]     for(uint i=0; i<xstr.atoms.size(); i++){
+//DX20200728 [OBSOLETE]       if(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name) != prev_element){ //DX20190329 - remove pseudopotential info
+//DX20200728 [OBSOLETE]         velements.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name)); //DX20190329 - remove pseudopotential info
+//DX20200728 [OBSOLETE]         prev_element=KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name); //DX20190329 - remove pseudopotential info
+//DX20200728 [OBSOLETE]       }
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     return velements;
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
 
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION] // ***************************************************************************
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION] // gcdStoich - Euler's Greatest Common Divisor Algorithm
@@ -3574,7 +3575,7 @@ namespace compare{
           str_proto_tmp.structure_representative=vxstrs[i];
           str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
           str_proto_tmp.natoms=vxstrs[i].atoms.size();
-          str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX20190111 - added compound, e.g., Ag1Br2
+          str_proto_tmp.structure_representative_compound=pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
         }
         comparison_schemes.push_back(str_proto_tmp);
       }
@@ -3634,7 +3635,7 @@ namespace compare{
                  //cerr << "adding to " << j << " (from): " << comparison_schemes[j].structures_duplicate_source.size() << endl;
                  if(vstructures_generated[i]){
                    comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
-                   comparison_schemes[j].structures_duplicate_compounds.push_back(getCompoundName(vxstrs[i])); //DX20190111 - added compound, e.g., Ag1Br2
+                   comparison_schemes[j].structures_duplicate_compounds.push_back(pflow::prettyPrintCompound(comparison_schemes[j].elements,comparison_schemes[j].stoichiometry,no_vrt,false,txt_ft));
                  }
                  structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX20191218
                  comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX20191218
@@ -3673,7 +3674,7 @@ namespace compare{
             str_proto_tmp.structure_representative=vxstrs[i];
             str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
             str_proto_tmp.natoms=vxstrs[i].atoms.size();
-            str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX20190111 - added compound, e.g., Ag1Br2
+            str_proto_tmp.structure_representative_compound=pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
           }
           comparison_schemes.push_back(str_proto_tmp);
         }
@@ -5527,47 +5528,47 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-// Fake Atoms Name
-// ***************************************************************************
-namespace compare{
-  vector<string> fakeElements(const uint& number_of_species){
+//DX20200728 [OBSOLETE - moved to pflow] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to pflow] // Fake Atoms Name
+//DX20200728 [OBSOLETE - moved to pflow] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to pflow] namespace compare{
+//DX20200728 [OBSOLETE - moved to pflow]   vector<string> fakeElements(const uint& number_of_species){
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     // Return vector of fake letters
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     vector<string> elements;
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//DX20200728 [OBSOLETE - moved to pflow]     for(uint i=0;i<number_of_species;i++){
+//DX20200728 [OBSOLETE - moved to pflow]       stringstream ss_letter; ss_letter << letters[i]; // cannot type cast char to string directly
+//DX20200728 [OBSOLETE - moved to pflow]       elements.push_back(ss_letter.str());
+//DX20200728 [OBSOLETE - moved to pflow]     }
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     return elements;
+//DX20200728 [OBSOLETE - moved to pflow]   }
+//DX20200728 [OBSOLETE - moved to pflow] }
 
-    // Return vector of fake letters
-
-    vector<string> elements;
-
-    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for(uint i=0;i<number_of_species;i++){
-      stringstream ss_letter; ss_letter << letters[i]; // cannot type cast char to string directly
-      elements.push_back(ss_letter.str());
-    }
-
-    return elements;
-  }
-}
-
-// ***************************************************************************
-// Fake Atoms Name
-// ***************************************************************************
-namespace compare{
-  void fakeAtomsName(xstructure& xstr){
-
-    // Assign a fake letter to each atom type. In case of materials with more 
-    // than 26 species it is necessary to add more characters to this string
-
-    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    int iat=0;
-
-    for(uint i=0; i<xstr.num_each_type.size(); i++){
-      xstr.species[i]=letters[i];
-      for(int j=0; j<xstr.num_each_type[i]; j++){
-        xstr.atoms[iat].name=letters[i];
-        iat++;
-      }
-    }
-  }
-}
+//DX20200728 [OBSOLETE - moved to xatom] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to xatom] // Fake Atoms Name
+//DX20200728 [OBSOLETE - moved to xatom] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to xatom] namespace compare{
+//DX20200728 [OBSOLETE - moved to xatom]   void fakeAtomsName(xstructure& xstr){
+//DX20200728 [OBSOLETE - moved to xatom] 
+//DX20200728 [OBSOLETE - moved to xatom]     // Assign a fake letter to each atom type. In case of materials with more 
+//DX20200728 [OBSOLETE - moved to xatom]     // than 26 species it is necessary to add more characters to this string
+//DX20200728 [OBSOLETE - moved to xatom] 
+//DX20200728 [OBSOLETE - moved to xatom]     string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//DX20200728 [OBSOLETE - moved to xatom]     int iat=0;
+//DX20200728 [OBSOLETE - moved to xatom] 
+//DX20200728 [OBSOLETE - moved to xatom]     for(uint i=0; i<xstr.num_each_type.size(); i++){
+//DX20200728 [OBSOLETE - moved to xatom]       xstr.species[i]=letters[i];
+//DX20200728 [OBSOLETE - moved to xatom]       for(int j=0; j<xstr.num_each_type[i]; j++){
+//DX20200728 [OBSOLETE - moved to xatom]         xstr.atoms[iat].name=letters[i];
+//DX20200728 [OBSOLETE - moved to xatom]         iat++;
+//DX20200728 [OBSOLETE - moved to xatom]       }
+//DX20200728 [OBSOLETE - moved to xatom]     }
+//DX20200728 [OBSOLETE - moved to xatom]   }
+//DX20200728 [OBSOLETE - moved to xatom] }
 
 // ***************************************************************************
 // Print Structure Parameters

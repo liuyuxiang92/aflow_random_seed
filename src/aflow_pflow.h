@@ -897,10 +897,16 @@ namespace pflow {
   const int COEF_PRECISION = 4;
 
   string prettyPrintCompound(const string&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft); //char=_latex_  //CO20190629
+  string prettyPrintCompound(const vector<string>&, const vector<uint>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //DX20200727 - uint variant
   string prettyPrintCompound(const vector<string>&, const vector<double>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO20190629
+  string prettyPrintCompound(const vector<string>&, const aurostd::xvector<uint>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO20200727 - uint variant
   string prettyPrintCompound(const vector<string>&, const aurostd::xvector<double>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO20190629
 
 }  // namespace pflow
+
+namespace pflow {
+  vector<string> fakeElements(uint nspecies); //DX20200728
+}
 
 #endif
 // ***************************************************************************

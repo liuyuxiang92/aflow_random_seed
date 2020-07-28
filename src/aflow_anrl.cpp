@@ -525,8 +525,10 @@ namespace anrl {
     xstructure tmp_xstr=xstr; // make new one so we do not override atom names
     ReScale(tmp_xstr,1.0); //DX20191031
     bool remove_ones=true;
-    compare::fakeAtomsName(tmp_xstr);
-    string reduced_stoichiometry = compare::getCompoundName(tmp_xstr,remove_ones);
+    tmp_xstr.DecorateWithFakeElements(); //DX20200728 - fakeAtomNames() -> DecorateWithFakeElements()
+    vector<uint> reduced_composition = tmp_xstr.GetReducedComposition(true); // numerical sort is true
+    vector<string> fake_elements = tmp_xstr.GetElements();
+    string reduced_stoichiometry = pflow::prettyPrintCompound(fake_elements,reduced_composition,no_vrt,remove_ones,txt_ft);//remove ones is true
 
     // Pearson symbol (quick)
     uint conventional_cell_atoms_count = 0;
