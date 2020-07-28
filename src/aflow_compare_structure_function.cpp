@@ -1874,6 +1874,7 @@ namespace compare{
       str_proto_tmp.structure_representative_source = ss_str.str(); //DX20190730
       str_proto_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input is assumed to be unrelaxed
       str_proto_tmp.copyPrototypeInformation(structure);
+      str_proto_tmp.elements = xstr_tmp.GetElements(true,true); //DX20200728 - was missing
       str_proto_tmp.stoichiometry = str_proto_tmp.structure_representative.GetReducedComposition(); //DX20190529 - need updated stoich
       // compound name is always alphabetic; order swapping is dictated by stoichiometry
       str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
