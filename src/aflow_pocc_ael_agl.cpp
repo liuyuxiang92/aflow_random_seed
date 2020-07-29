@@ -856,6 +856,9 @@ namespace pocc {
       agl_aflowin_found = false;
       AflowInName = _AFLOWIN_;
       FileLockName = _AFLOWLOCK_;
+      agl_temperature.clear(); //CT20200729
+      agl_gibbs_energy_atom.clear(); //CT20200729
+      agl_vibrational_energy_atom.clear(); //CT20200729
       // [OBSOLETE] aglerror = AGL_functions::Get_ThermalProperties_AGL_postprocess(pocc_directory_abs, ntemperature, stemperature, npressure, spressure, agl_temperature, agl_gibbs_energy_atom, agl_vibrational_energy_atom);
       // [OBSOLETE] if (aglerror > 0) {
       // [OBSOLETE]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
@@ -984,6 +987,9 @@ namespace pocc {
       isupercell=std::distance(l_supercell_sets.begin(),it);
       pocc_directory_abs=m_aflags.Directory+"/"+m_ARUN_directories[isupercell];
       aurostd::StringstreamClean(aflow_agl_out);
+      agl_temperature.clear(); //CT20200729
+      agl_gibbs_energy_atom.clear(); //CT20200729
+      agl_vibrational_energy_atom.clear(); //CT20200729
       agl_filename=pocc_directory_abs+"/aflow.agl.out";
       if(aurostd::EFileExist(agl_filename,agl_filename)){
         message << "Reading " << m_ARUN_directories[isupercell]+"/aflow.agl.out";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
@@ -992,66 +998,66 @@ namespace pocc {
         //[CO20200404 - OBSOLETE]} else if (aurostd::FileExist(agl_filename)) {
         //[CO20200404 - OBSOLETE]  aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
         //[CO20200404 - OBSOLETE]  aglfilezipped = false;
-    } else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.agl.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
-    }
-    if(LDEBUG) {
-      cerr << soliloquy << " aflow.agl.out:" << endl << aflow_agl_out.str() << endl;
-    }
-    aurostd::stream2vectorstring(aflow_agl_out,vline);
-    for (uint i=0;i<vline.size();i++) {
-      aurostd::StringSubst(vline.at(i),"="," ");
-      aurostd::string2tokens(vline.at(i),tokens," ");
-      // cout << "Tokens = " << tokens << endl;
-      if(tokens.size()>=2) {
-        if(tokens.at(0)=="agl_debye") agl_debye_temperature=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_acoustic_debye") agl_debye_acoustic=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_gruneisen") agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_heat_capacity_Cv_300K") agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_heat_capacity_Cp_300K") agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));	      
-        if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
-        if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+      } else {
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.agl.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
-    }
-    aurostd::StringstreamClean(aflow_agl_energies_out);
-    if (aglfilezipped) {
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
-    } else {
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
-    }
-    if(LDEBUG) {
-      cerr << soliloquy << " aflow_agl_energies:" << endl << aflow_agl_energies_out.str() << endl;
-    }
-    aurostd::stream2vectorstring(aflow_agl_energies_out,vline);
-    for (uint i=0;i<vline.size();i++) {
-      aurostd::StringSubst(vline.at(i),"="," ");
-      aurostd::string2tokens(vline.at(i),tokens," ");
-      if(tokens.size()>=9) {
-        if (tokens.at(0) == "#") {
-          continue;
+      if(LDEBUG) {
+	cerr << soliloquy << " aflow.agl.out:" << endl << aflow_agl_out.str() << endl;
+      }
+      aurostd::stream2vectorstring(aflow_agl_out,vline);
+      for (uint i=0;i<vline.size();i++) {
+	aurostd::StringSubst(vline.at(i),"="," ");
+	aurostd::string2tokens(vline.at(i),tokens," ");
+	// cout << "Tokens = " << tokens << endl;
+	if(tokens.size()>=2) {
+	  if(tokens.at(0)=="agl_debye") agl_debye_temperature=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_acoustic_debye") agl_debye_acoustic=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_gruneisen") agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_heat_capacity_Cv_300K") agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_heat_capacity_Cp_300K") agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));	      
+	  if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
+	  if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+	}
+      }
+      aurostd::StringstreamClean(aflow_agl_energies_out);
+      if (aglfilezipped) {
+	aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
+      } else {
+	aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
+      }
+      if(LDEBUG) {
+	cerr << soliloquy << " aflow_agl_energies:" << endl << aflow_agl_energies_out.str() << endl;
+      }
+      aurostd::stream2vectorstring(aflow_agl_energies_out,vline);
+      for (uint i=0;i<vline.size();i++) {
+	aurostd::StringSubst(vline.at(i),"="," ");
+	aurostd::string2tokens(vline.at(i),tokens," ");
+	if(tokens.size()>=9) {
+	  if (tokens.at(0) == "#") {
+	    continue;
         } else {
-          agl_temperature.push_back(aurostd::string2utype<double>(tokens.at(0)));
-          agl_gibbs_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(5)));
-          agl_vibrational_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(6)));
-        }
+	    agl_temperature.push_back(aurostd::string2utype<double>(tokens.at(0)));
+	    agl_gibbs_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(5)));
+	    agl_vibrational_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(6)));
+	  }
+	}
       }
-    }
-    Debye_temperature.push_back(agl_debye_temperature);
-    Debye_acoustic.push_back(agl_debye_acoustic);
-    Gruneisen.push_back(agl_gruneisen);
-    Cv300K.push_back(agl_heat_capacity_Cv_300K);
-    Cp300K.push_back(agl_heat_capacity_Cp_300K);
-    Fvib300K_atom.push_back(agl_vibrational_free_energy_300K_atom);
-    Fvib300K_cell.push_back(agl_vibrational_free_energy_300K_cell);
-    Svib300K_atom.push_back(agl_vibrational_entropy_300K_atom);
-    Svib300K_cell.push_back(agl_vibrational_entropy_300K_cell);	
-    kappa300K.push_back(agl_thermal_conductivity_300K);
-    agl_temperatures.push_back(agl_temperature);
-    agl_gibbs_energies_atom.push_back(agl_gibbs_energy_atom);
-    agl_vibrational_energies_atom.push_back(agl_vibrational_energy_atom);
+      Debye_temperature.push_back(agl_debye_temperature);
+      Debye_acoustic.push_back(agl_debye_acoustic);
+      Gruneisen.push_back(agl_gruneisen);
+      Cv300K.push_back(agl_heat_capacity_Cv_300K);
+      Cp300K.push_back(agl_heat_capacity_Cp_300K);
+      Fvib300K_atom.push_back(agl_vibrational_free_energy_300K_atom);
+      Fvib300K_cell.push_back(agl_vibrational_free_energy_300K_cell);
+      Svib300K_atom.push_back(agl_vibrational_entropy_300K_atom);
+      Svib300K_cell.push_back(agl_vibrational_entropy_300K_cell);	
+      kappa300K.push_back(agl_thermal_conductivity_300K);
+      agl_temperatures.push_back(agl_temperature);
+      agl_gibbs_energies_atom.push_back(agl_gibbs_energy_atom);
+      agl_vibrational_energies_atom.push_back(agl_vibrational_energy_atom);
     }
   }
 } // namespace pocc
@@ -1128,6 +1134,8 @@ namespace pocc {
       kappa300K_ave = 0.0;
       gibbs_energy_atom_ave = 0.0;
       vibrational_energy_atom_ave = 0.0;
+      agl_gibbs_energies_atom_ave.clear(); //CT20200729
+      agl_vibrational_energies_atom_ave.clear(); //CT20200729
       unsigned long long int isupercell = 0;
       for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
         isupercell = std::distance(l_supercell_sets.begin(), it);
