@@ -340,6 +340,7 @@ namespace AEL_functions {
                 aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALCS",TRUE) || FALSE)){
             FileNameAFLOWIN = FileNameAFLOWINcheck;
             ael_aflowin_found = true;
+	    AflowInName = aflowinname;
           } else if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
               !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
                 aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
@@ -351,6 +352,7 @@ namespace AEL_functions {
             if (USER_AEL_POISSON_RATIO.option) {
               FileNameAFLOWIN = FileNameAFLOWINcheck;
               ael_aflowin_found = true;
+	      AflowInName = aflowinname;
             }
           }
         }
