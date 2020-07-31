@@ -38,7 +38,6 @@ const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000
 const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY
 
 //some constants
-const int BAR_WIDTH = 70;
 const int A_START = 1, C_START = 1, F_START = 1;
 const int B_START = 0, D_START = 0, E_START = 0;
 
@@ -166,7 +165,12 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  bool structuresGenerated(const string& directory){return aurostd::EFileNotEmpty(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);}
+  bool structuresGenerated(const string& directory){
+    string file=directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE;
+    if(!aurostd::EFileExist(file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
+    if(aurostd::EFileNotEmpty(file)){return true;}
+    return false;
+  }
   xstructure extractPARTCAR(const string& AflowIn){
     string soliloquy = XPID + "pocc::extractPARTCAR():";
     stringstream ss_pocc_structure;
@@ -887,7 +891,10 @@ namespace pocc {
         if(m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()",_INDEX_MISMATCH_);}
         if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
           message << "Mismatch SPIN-ON/SPIN-OFF settings, attempting to rectify";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
-          if(m_xdoscar.viDOS.size()==1){m_xdoscar.convertSpinOFF2ON();} //make duplicate for spin-off
+          if(m_xdoscar.viDOS.size()==1){ //make duplicate for spin-off
+            m_xdoscar.convertSpinOFF2ON();
+            m_Egap.push_back(m_Egap.back());  //need to extend m_Egap too
+          }
           else if(xdoscar.viDOS.size()==1){xdoscar.convertSpinOFF2ON();}
           if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.viDOS.size()!=xdoscar.viDOS.size() ["+aurostd::utype2string(m_xdoscar.viDOS.size())+"!="+aurostd::utype2string(xdoscar.viDOS.size())+"]",_INDEX_MISMATCH_);
@@ -3157,22 +3164,6 @@ namespace pocc {
     return add2DerivativeStructuresList(psc,l_supercell_sets.begin(),l_supercell_sets.end());
   }
 
-  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff //CO20200404 - new web flag
-    double progress = (double)current/(double)end;
-    int pos = BAR_WIDTH * progress;
-
-    oss << "[";
-    for (int i = 0; i < BAR_WIDTH; ++i) {
-      if (i < pos) oss << "=";
-      else if (i == pos) oss << ">";
-      else oss << " ";
-    }
-    oss << "] " << int(progress * 100.0) << " %\r";
-    oss.flush();
-    if(current==end){ oss << endl; }
-  }
-
   void POccCalculator::getHNFMatSiteConfig(const POccSuperCell& psc,
       xmatrix<double>& _hnf_mat,
       vector<vector<int> >& _v_types_config){
@@ -3253,7 +3244,7 @@ namespace pocc {
     bool test_iterator_insertion=false; //short circuit
     xstructure a,b;
     uint starting_index=1;
-    updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
+    pflow::updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
     for(uint i=starting_index;i<vpsc.size();i++){
       const POccSuperCell& psc_b=vpsc[i];
       b=createXStructure(psc_b,n_hnf,hnf_count,types_config_permutations_count,true,false);  //PRIMITIVIZE==false, in general it is faster to find whether two structures are equivalent than it is to find primitive cell
@@ -3283,7 +3274,7 @@ namespace pocc {
         unique_structure_bins.push_back(vector<uint>(0));
         unique_structure_bins.back().push_back(i);
       }
-      updateProgressBar(i,vpsc.size(),*p_oss);
+      pflow::updateProgressBar(i,vpsc.size(),*p_oss);
     }
 
     //test of stupidity
@@ -3432,7 +3423,7 @@ namespace pocc {
     if(struct_gen_algo=="UFF"){
       POccSuperCell psc;
       resetHNFMatrices();
-      updateProgressBar(current_iteration,total_permutations_count,*p_oss);
+      pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
       while(iterateHNFMatrix()){
         energy_analyzer.getCluster(hnf_mat);
         psc.m_hnf_index=hnf_index;
@@ -3445,7 +3436,7 @@ namespace pocc {
           psc.m_degeneracy=1; //degeneracy of 1
           add2DerivativeStructuresList(psc);
           site_config_index++;
-          updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
+          pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
         }
         hnf_index++;
       }
@@ -3547,8 +3538,6 @@ namespace pocc {
         }
       }
       
-      exit(0);
-
       resetSiteConfigurations();
       while(getNextSiteConfiguration()){vv_types_config.push_back(v_types_config);}
       if(LDEBUG){cerr << soliloquy << " vv_types_config.size()=" << vv_types_config.size() << endl;}
@@ -3604,7 +3593,8 @@ namespace pocc {
       }
 
       if(LDEBUG){cerr << soliloquy << " vv_types_config.size()=" << vv_types_config.size() << endl;}
-      exit(0);
+
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"approach not complete yet",_RUNTIME_ERROR_);
     }
 
     //ORIGINAL
@@ -3635,7 +3625,7 @@ namespace pocc {
     //    add2DerivativeStructuresList(pds);
     //    //cerr << "DONE ADDING " << endl;
     //    site_config_index++;
-    //		updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
+    //		pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
     //    //cerr << "HERE10" << endl;
     //  }
     //  hnf_index++;
@@ -3872,13 +3862,13 @@ namespace pocc {
     }
 
     unsigned long long int current_iteration=0;
-    updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
+    pflow::updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
     POccSuperCell psc;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       psc=(*it).getSuperCell();
       psc.m_degeneracy=(*it).getDegeneracy(); //BEWARE OF DEGENERACY of this special POccSuperCell, representative of all supercells in that set
       v_xstr.push_back(createXStructure(psc,n_hnf,hnf_count,types_config_permutations_count,true,PRIMITIVIZE));
-      updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
+      pflow::updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
       //cout << AFLOWIN_SEPARATION_LINE << endl;
       //cout << createXStructure((*it),true);
       //cout << AFLOWIN_SEPARATION_LINE << endl;

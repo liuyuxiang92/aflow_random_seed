@@ -2197,6 +2197,23 @@ namespace aurostd {
     }
 }
 
+//ME20200511 - vector projections (taken from old APL/aflow_apl.h)
+namespace aurostd {
+
+  // Calculate the vector projection of b on a
+  template<class utype> xvector<utype>
+    getVectorProjection(const xvector<utype>& b, const xvector<utype>& a) {
+      return (a * (utype)(scalar_product(a, b)/scalar_product(a, a)));
+    }
+
+  // Project vector c using the projection of b on a
+  template<class utype> xvector<utype>
+    getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a) {
+      return (c * (utype) (scalar_product(a, b)/scalar_product(a, a)));
+    }
+
+}
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------- simple sort routines
 

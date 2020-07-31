@@ -5738,6 +5738,9 @@ namespace aflowlib {
       // **********************************************************************************************************
       // TRY AUID
       // **********************************************************************************************************
+      // ME20200707 - Also check for AUIDs without the aflow: prefix
+      string option_orig = option;
+      if ((option.size() == 16) && aurostd::_ishex(option)) option = "aflow:" + option;
       if(!vflags.flag("FLAG::FOUND") && aurostd::substring2bool(aurostd::tolower(option),"aflow:")) { // CHECK AUID
         if(LDEBUG) cout << "WEB_Aflowlib_Entry: option=" << option << endl;
         string auid=aurostd::tolower(option);
@@ -5782,6 +5785,8 @@ namespace aflowlib {
           }
         }
       }
+      //ME20200707 - Restore
+      option = option_orig;
 
       // **********************************************************************************************************
       // TRY DIRECTORY
@@ -5855,6 +5860,9 @@ namespace aflowlib {
       // TRY ICSD LINK
       // **********************************************************************************************************
       if(!vflags.flag("FLAG::FOUND")) { // icsd link
+        //ME20200707 - Remove possible icsd: prefix
+        option_orig = option;
+        if (option.find("icsd") == 0) option = option.substr(5);
         string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+option;
         aurostd::StringSubst(directory_ICSD2LINK,"ICSD:","icsd:");
         aurostd::StringSubst(directory_ICSD2LINK,"icsd:icsd:","icsd:");    
@@ -5872,6 +5880,8 @@ namespace aflowlib {
           label=directory;
           //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
         }
+        //ME20200707 - Restore
+        option = option_orig;
       }
 
       // **********************************************************************************************************
@@ -6136,8 +6146,14 @@ namespace aflowlib {
 
           content = "";
           if (vflags.flag("FLAG::ELECTRONIC")) {
-            string system_name = KBIN::ExtractSystemName(directory_LIB);
-            content = aurostd::efile2string(directory_RAW + "/" + system_name + "_bandsdata.json");
+            //ME20200616 - Made less dependent on file name conventions
+            //string system_name = KBIN::ExtractSystemName(directory_LIB);
+            vector<string> vfiles;
+            aurostd::DirectoryLS(directory_RAW, vfiles);
+            uint nfiles = vfiles.size();
+            for (uint f = 0; f < nfiles; f++) {
+              if (vfiles[f].find("_bandsdata.json") != string::npos) content = aurostd::efile2string(directory_RAW + "/" + vfiles[f]);
+            }
           }
           aflowlib_json << ", \"bandsdata\":" << (content.empty()?"null":content);
         }

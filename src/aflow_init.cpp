@@ -79,6 +79,7 @@ namespace init {
 
     XHOST.user=aurostd::execute2string("whoami");  //AS SOON AS POSSIBLE
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
+    if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
@@ -109,7 +110,7 @@ namespace init {
     XHOST.sTID="";
     XHOST.showTID=aurostd::args2flag(argv,cmds,"--showTID");
     if(XHOST.showTID) XHOST.sTID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment
-    
+
     //    if(XHOST.showPID) XHOST.sPID="[TID="+aurostd::PaddedPRE(XHOST.ostrTID.str(),7)+"] "; // TID as a comment  //CO20200502 - threadID
     //   XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // for the time being (LIB4)
 
@@ -870,7 +871,9 @@ namespace init {
 
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
-      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
+      deque<string> vshort; //  aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
+      for(uint ishort=0;ishort<=64;ishort++)
+        vshort.push_back(aurostd::utype2string(ishort));
       for(uint ishort=0;ishort<vshort.size();ishort++) {
         if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
           XHOST.vflag_control.flag("MULTI=SH",TRUE);
@@ -1420,18 +1423,20 @@ namespace init {
     bool LDEBUG=FALSE;
     if(LDEBUG) {;} //CO20190906 - keep LDEBUG busy
     string out="";
-    if(lib=="AUID" || lib=="auid") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
-    if(lib=="ICSD" || lib=="icsd") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
-    if(lib=="LIB0" || lib=="lib0" ||  lib=="0") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0);
-    if(lib=="LIB1" || lib=="lib1" ||  lib=="1") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1);
-    if(lib=="LIB2" || lib=="lib2" ||  lib=="2") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2);
-    if(lib=="LIB3" || lib=="lib3" ||  lib=="3") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3);
-    if(lib=="LIB4" || lib=="lib4" ||  lib=="4") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4);
-    if(lib=="LIB5" || lib=="lib5" ||  lib=="5") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5);
-    if(lib=="LIB6" || lib=="lib6" ||  lib=="6") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6);
-    if(lib=="LIB7" || lib=="lib7" ||  lib=="7") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7);
-    if(lib=="LIB8" || lib=="lib8" ||  lib=="8") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
-    if(lib=="LIB9" || lib=="lib9" ||  lib=="9") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);    
+    //ME20200707 - The LIBRARY_NOTHING check is important or this function
+    //breaks when the LIB directory does not exist
+    if((XHOST_LIBRARY_AUID != LIBRARY_NOTHING) && (aurostd::toupper(lib)=="AUID")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
+    if((XHOST_LIBRARY_ICSD != LIBRARY_NOTHING) && (aurostd::toupper(lib)=="ICSD")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    if((XHOST_LIBRARY_LIB0 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB0") ||  lib=="0")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0);
+    if((XHOST_LIBRARY_LIB1 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB1") ||  lib=="1")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1);
+    if((XHOST_LIBRARY_LIB2 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB2") ||  lib=="2")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2);
+    if((XHOST_LIBRARY_LIB3 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB3") ||  lib=="3")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3);
+    if((XHOST_LIBRARY_LIB4 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB4") ||  lib=="4")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4);
+    if((XHOST_LIBRARY_LIB5 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB5") ||  lib=="5")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5);
+    if((XHOST_LIBRARY_LIB6 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB6") ||  lib=="6")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6);
+    if((XHOST_LIBRARY_LIB7 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB7") ||  lib=="7")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7);
+    if((XHOST_LIBRARY_LIB8 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB8") ||  lib=="8")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
+    if((XHOST_LIBRARY_LIB9 != LIBRARY_NOTHING) && ((aurostd::toupper(lib)=="LIB9") ||  lib=="9")) out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);
     return out;
 
     //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)" "init::AFLOW_Projects_Directories(\"AUID\")" *cpp
