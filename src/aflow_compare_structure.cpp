@@ -111,9 +111,11 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: usage
     if(vpflow.flag("COMPARE_PERMUTATION::USAGE")) {
-      stringstream ss_usage;
-      init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      return "";
     }
 
     // ---------------------------------------------------------------------------
@@ -338,20 +340,23 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: usage
     if(vpflow.flag("COMPARE_STRUCTURE::USAGE")) {
-      stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
       // material-type comparisons
       if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")){
         string usage_material_comparison="aflow --compare_materials -D <dir_path>";
         string options_material_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
       }
       // structure-type comparisons
       else if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")){
         string usage_structure_comparison="aflow --compare_structures -D <dir_path>";
         string options_structure_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--remove_duplicates|--remove_duplicate_compounds]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
       }
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      return "";
     }
 
     // ---------------------------------------------------------------------------
@@ -390,7 +395,7 @@ namespace compare {
     else if(structures_source=="directory") {
       directory=vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY");
       if(!aurostd::FileExist(directory)) {
-        message << "Unable to locate directory: " << directory << ". Exiting." << endl;
+        message << "Unable to locate directory: " << directory << "." << endl;
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
         return oss.str();
       }
@@ -402,7 +407,7 @@ namespace compare {
     else if(structures_source=="file") {
       filename=vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE");
       if(!aurostd::FileExist(filename)) {
-        message << "Unable to locate file: " << filename << ". Exiting." << endl;
+        message << "Unable to locate file: " << filename << "." << endl;
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
         return oss.str();
       }
@@ -410,7 +415,7 @@ namespace compare {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     else {
-      message << "Need to specify location of structures to compare: -D <directory> or -F=<filename>. Exiting." << endl;
+      message << "Need to specify location of structures to compare: -D <directory> or -F=<filename>." << endl;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
     }
 
@@ -928,7 +933,7 @@ namespace compare {
       catalog=aurostd::tolower(vpflow.getattachedscheme("COMPARE2PROTOTYPES::CATALOG"));
       if(catalog!="htqc" && catalog!="anrl" && catalog!="all"){
         message << "Catalog/library can only be htqc, anrl, or all.";     
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_); //DX20191031 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
       }
       message << "OPTIONS: Catalog/library (htqc, anrl, or all): " << catalog << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -1128,7 +1133,7 @@ namespace compare {
         if(!final_prototypes[i].structure_representative_generated){
           if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
             message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
           }
         }        
         if(LDEBUG){ //DX20190601 - added LDEBUG
@@ -1619,7 +1624,7 @@ namespace compare {
         }
         else {
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
 
@@ -1704,7 +1709,7 @@ namespace compare {
         }
         else {
           message << "More structures loaded than anticipated for auid=" << auids[i] << " (# structures=" << entry.vstr.size() << ").";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
     }
@@ -2269,9 +2274,7 @@ namespace compare {
         }
         else{
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
-          //DX20191031 pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
-          //DX20191031 exit(1);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
 
@@ -2370,7 +2373,7 @@ namespace compare {
         }
         else{
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
 
@@ -2457,7 +2460,7 @@ namespace compare {
       }
       else{
         message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
       }
       //}
     }
@@ -2755,7 +2758,7 @@ namespace compare {
           if(!final_prototypes[i].structure_representative_generated){
             if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
               message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
             }
           }
           vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),oss,FileMESSAGE); //DX20200103 - condensed booleans to xoptions

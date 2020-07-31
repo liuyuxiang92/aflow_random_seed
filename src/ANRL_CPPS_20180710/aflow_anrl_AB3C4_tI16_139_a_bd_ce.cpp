@@ -21,11 +21,12 @@ namespace anrl {
     if(XHOST.vflag_control.flag("WWW")) {
       WebANRL_AB3C4_tI16_139_a_bd_ce(web,LDEBUG); // PLUG WEB STUFF
 #ifdef _ANRL_NOWEB_
-      cout << "no web" << endl;
+      web << "no web";
+      cout << web.str() << endl;
 #else
       cout << web.str() << endl;
 #endif
-      exit(0);
+      return 0; //DX20200727
     }
 
     vector<double> vparameters;

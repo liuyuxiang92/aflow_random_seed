@@ -150,9 +150,10 @@ void free();                                              // free space
 std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
 namespace pflow {
-  void XelementPrint(string options,ostream& oss) {
+  void XelementPrint(const string& options,ostream& oss) {
     bool LDEBUG=0;//(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [BEGIN]" << endl;
+    string soliloquy=XPID+"pflow::XelementPrint():";
+    if(LDEBUG) cerr << soliloquy << " [BEGIN]" << endl;
     if(LDEBUG) cerr << "options=" << options << endl;
     if(LDEBUG) cerr << "velement.size()=" << velement.size() << endl;
 
@@ -160,8 +161,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(LDEBUG) cerr << "tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0) {
-      init::ErrorOption(cout,options,"pflow::XelementPrint","aflow --element=Z|name|symbol[,property[,property]....]");
-      exit(0);
+      init::ErrorOption(options,soliloquy,"aflow --element=Z|name|symbol[,property[,property]....]");
     } 
     // move on
     string species=tokens.at(0);
@@ -169,7 +169,7 @@ namespace pflow {
     // try with number
     if(tokens.size()>=1) if(aurostd::string2utype<uint>(species)>0) Z=aurostd::string2utype<uint>(species);
     if(Z>103) {
-      init::ErrorOption(cout,options,"pflow::XelementPrint",aurostd::liststring2string("aflow --element=Z|name|symbol[,property[,property]....]","Z outside [1,103] or name or symbol unrecognized"));
+      init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --element=Z|name|symbol[,property[,property]....]","Z outside [1,103] or name or symbol unrecognized"));
     }
     // try with symbol
     if(Z==0) {
@@ -283,7 +283,7 @@ namespace pflow {
       }
     }
 
-    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [END]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [END]" << endl;
   }
 }
 

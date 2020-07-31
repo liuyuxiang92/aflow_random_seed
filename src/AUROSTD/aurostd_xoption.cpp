@@ -16,7 +16,13 @@ namespace aurostd {
   // ***************************************************************************
 
   // constructure
-  xoption::xoption() {
+  xoption::xoption() {free();}  //CO20200624 - moved to free()
+
+  // destructor
+  xoption::~xoption() {free();} //CO20200624 - moved to free()
+
+  // free
+  void xoption::free() {
     keyword=""; //DX20180824 - missing from constructor
     isentry=FALSE; 
     content_string="";
@@ -30,15 +36,6 @@ namespace aurostd {
     vxsghost.clear();
     preserved=FALSE;
     LDEBUG=FALSE;
-  }
-
-  // destructor
-  xoption::~xoption() {
-    free();
-  }
-
-  // free
-  void xoption::free() {
   }
 
   // copy fuction
@@ -80,8 +77,9 @@ namespace aurostd {
   }
 
   void xoption::clear() {
-    xoption aflow_option_temp;
-    copy(aflow_option_temp);
+    //[CO20200624 - creating objects is SLOW]xoption aflow_option_temp;
+    //[CO20200624 - creating objects is SLOWcopy(aflow_option_temp);
+    free();
   }
 
   // **************************************************************************
@@ -241,24 +239,17 @@ namespace aurostd {
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: preserved=" << (preserved?"TRUE":"FALSE") << endl;
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme=" << xscheme << endl << endl;
     if(isentry && content_string.empty()) {
-      // check for errors
-      cerr << "ERROR - aurostd::xoption::options2entry: content_string=" <<  content_string << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: content_double=" <<  content_double << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: content_int=" <<  content_int << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: content_uint=" <<  content_uint << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: keyword=" << keyword  << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: isentry=" << isentry  << endl;
-      // check for errors
-      cout << "ERROR - aurostd::xoption::options2entry: content_string=" <<  content_string << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: content_double=" <<  content_double << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: content_int=" <<  content_int << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: content_uint=" <<  content_uint << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: keyword=" << keyword  << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: isentry=" << isentry  << endl;
-      exit(0);
+      string function = XPID + "aurostd::xoption::options2entry():";
+      stringstream message;
+      message << "Content string empty. content_string=" <<  content_string
+              << ", content_double=" <<  content_double
+              << ", content_int=" <<  content_int
+              << ", content_uint=" << content_uint
+              << ", keyword=" << keyword
+              << ", isentry=" << isentry;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: END" << endl;
-    //  exit(0);
     // return isentry;
   }
 

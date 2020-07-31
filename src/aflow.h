@@ -79,7 +79,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 "";
 
 //MESSAGE defaults - CO20200502
-#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -179,6 +179,9 @@ extern string _AFLOWLOCK_;
 #define VASP_OPTIONS_MPI_DEFAULT         ""
 #define VASPLS_BIN_POSTFIX_DEFAULT       "LS"
 #define GRND_BIN_DEFAULT                 "./grnd_intel"
+
+#define _VASP_POSCAR_MODE_EXPLICIT_START_ "[VASP_POSCAR_MODE_EXPLICIT]START."  //CO20200624
+#define _VASP_POSCAR_MODE_EXPLICIT_STOP_ "[VASP_POSCAR_MODE_EXPLICIT]STOP."  //CO20200624
 
 // --------------------------------------------------------------------------
 // definitions for projects
@@ -307,7 +310,9 @@ class _XHOST {
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
-    bool POSTPROCESS; //CT20181212
+    bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
+    bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too
+    bool AVOID_RUNNING_VASP; //CO20200624
     bool PSEUDOPOTENTIAL_GENERATOR; //SC20200327
     // HARDWARE/SOFTWARE
     string hostname,machine_type,tmpfs,user,group,home,shell,progname;
@@ -772,6 +777,7 @@ class _kflags {
     bool   KBIN_POCC;
     bool   KBIN_POCC_CALCULATION;
     string KBIN_POCC_TEMPERATURE_STRING;  //CO20191114
+    string KBIN_POCC_ARUNS2SKIP_STRING;   //CO20200627
     // frozsl operation lists
     bool   KBIN_FROZSL;
     bool   KBIN_FROZSL_DOWNLOAD;
@@ -1022,7 +1028,7 @@ class _xflags {
 // aflow_init.cpp
 namespace init {
   int GetCPUCores();
-  bool InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& outf);
+  int InitMachine(bool INIT_VERBOSE,vector<string>& argv,vector<string>& cmds,std::ostream& outf);  //ME20200724 - changed to int
   string InitLoadString(string string2load,bool=FALSE);
   string InitGlobalObject(string string2load,string="",bool=FALSE);
   string InitLibraryObject(string string2load,bool=FALSE);
@@ -1036,19 +1042,22 @@ namespace init {
 uint AFLOW_getTEMP(vector<string> argv);
 uint AFLOW_monitor(vector<string> argv);
 double AFLOW_checkMEMORY(string="",double=102.0);
-bool CheckMaterialServer(string message);
+bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
+string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
 
-string Message(string="");
-string Message(string str1,string list2print);
-string Message(const _aflags& aflags,string="",string="");
-bool AFLOW_BlackList(string h);
+string Message(const string& list2print="");  //CO20200713
+string Message(const string& list2print,const string& filename);  //CO20200713
+string Message(const _aflags& aflags,const string& list2print="",const string& filename="");  //CO20200713
+bool AFLOW_BlackList(const string& h);  //CO20200713
 namespace init {
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,vector<string> vusage);
-  bool ErrorOption(ostream &oss,const string& options, const string& routine,string vusage);
+  void MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
+  void MessageOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
+  void ErrorOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
+  void ErrorOption(const string& options, const string& routine,string vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
 }
 
 // --------------------------------------------------------------------------
@@ -2545,9 +2554,9 @@ namespace aflowlib {
   string CALCULATED(string options);
   string CALCULATED_ICSD_RANDOM(void);
   // aflow_xproto_gus.cpp
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label);
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atA,string atB);
-  xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atA,double volA,string atB,double volB,double vol_in);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label,string atA,string atB);
+  xstructure PrototypeBinaryGUS(ostream &oss,string label,string atA,double volA,string atB,double volB,double vol_in);
 }
 
 extern string PrototypeBinaryGUS_Cache_Library[];
@@ -2631,7 +2640,7 @@ string MessageHostTime(const _aflags& aflags);
 string MessageDir(const _aflags& aflags);
 string MessageDirTime(const _aflags& aflags);
 string MessageDirHostTime(const _aflags& aflags);
-bool AFLOW_BlackList(string hostname);
+//[CO20200624 - REDUNDANT]bool AFLOW_BlackList(string hostname);
 
 // ----------------------------------------------------------------------------
 // aflow_pthreads.cpp
@@ -2694,6 +2703,8 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir);
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
+  void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
+  void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
   int get_NCPUS();  //ME20200219
   int get_NCPUS(const _kflags&);  //ME20200219
 }
@@ -2791,8 +2802,10 @@ namespace FINDSYM {
 // aflow_kvasp.cpp
 
 namespace KBIN {
-  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,_aflags &aflags,_kflags& kflags);
-  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags& kflags);
+  _kflags VASP_Get_Kflags_from_AflowIN(const string &AflowIn,_aflags &aflags,ostream& oss=cout);
+  _kflags VASP_Get_Kflags_from_AflowIN(const string &AflowIn,ofstream &FileMESSAGE,_aflags &aflags,ostream& oss=cout);
+  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,_aflags &aflags,_kflags& kflags,ostream& oss=cout);
+  _vflags VASP_Get_Vflags_from_AflowIN(const string &AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags& kflags,ostream& oss=cout);
   bool VASP_Fix_Machine_Kflags_from_AflowIN(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags);
   bool VASP_Directory(ofstream& FileERROR,_aflags& aflags,_kflags& kflags);
   void VASP_BackupOriginal(_aflags aflags);
@@ -2911,8 +2924,8 @@ namespace KBIN {
   double XVASP_Afix_GENERIC(string mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double=0.0,int=0);
 
   string ExtractSystemName(const string& directory);  //ME20200217
-  string ExtractSystemNameFromAFLOWIN(string directory);  //ME20200217
-  string ExtractSystemNameFromVASP(string directory);  //ME20200217
+  string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
+  string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);
@@ -4376,7 +4389,9 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
 // ----------------------------------------------------------------------------
 // aflow_pocc //CO20180502
 namespace KBIN {
-  void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE);
+  void VASP_RunPOCC(const string& directory,ostream& oss=std::cout);  //CO20200624
+  void VASP_RunPOCC(const string& directory,ofstream& FileMESSAGE,ostream& oss=std::cout);  //CO20200624
+  void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=std::cout);
 }
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
@@ -4390,10 +4405,12 @@ namespace KBIN {
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AGL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
+  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, string& AflowInName, string& FileLockName);  //CT20200624
   // ----------------------------------------------------------------------------
   // aflow_ael_elasticity.cpp
   uint relaxStructureAEL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
   void VASP_RunPhonons_AEL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
+  void VASP_RunPhonons_AEL_postprocess(const string& directory_LIB, string& AflowInName, string& FileLockName);  //CT20200624
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -53,10 +53,11 @@ namespace aflowlib {
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
       string title;                                             //ME20190125 - title of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
-      string aflowlib_date,aflowlib_version;                    // version/creation
+      string aflowlib_date;vector<string> vaflowlib_date;       // CONTAINS 2 DATES: [0]=lock_date, [1]=lib2raw_date
+      string aflowlib_version;                                  // version
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
       int aflowlib_entries_number;                              // their number
-      string aflow_version;                                     // version/creation
+      string aflow_version;                                     // version
       string catalog;                                           // ICSD,LIB2, etc.
       string data_api,data_source,data_language;                // version/source/language
       string error_status;                                            // ERROR ??
@@ -90,6 +91,8 @@ namespace aflowlib {
       double kpoints_bands_path_grid;
       double enthalpy_cell,enthalpy_atom;
       double enthalpy_formation_cell,enthalpy_formation_atom;
+      double enthalpy_formation_cce_300K_cell,enthalpy_formation_cce_300K_atom; //CO20200624
+      double enthalpy_formation_cce_0K_cell,enthalpy_formation_cce_0K_atom; //CO20200624
       double entropic_temperature;
       string files;vector<string> vfiles;
       string files_LIB;vector<string> vfiles_LIB;
@@ -254,7 +257,10 @@ namespace aflowlib {
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
-      bool directory2auid(string directory);                                                // from directory and AURL gives AUID and VAUID
+      string directory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
+      bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
+      double enthalpyFormationCell(int T=300) const;                                        //CO20200624 - CCE correction added
+      double enthalpyFormationAtom(int T=300) const;                                        //CO20200624 - CCE correction added
       void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
       void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
       bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
@@ -268,6 +274,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
+  string VASPdirectory2auid(const string& directory,const string& aurl);   //CO20200624 - moving from inside _aflowlib_entry
   uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
   string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
 }
@@ -364,30 +371,32 @@ namespace aflowlib {
 // ***************************************************************************
 // LIBS to RAWS of each entry
 namespace aflowlib {
-  uint GetSpeciesDirectory(string directory,vector<string>& vspecies);
+  uint GetSpeciesDirectory(const string& directory,vector<string>& vspecies);
 }
 namespace aflowlib {
   void XFIX_LIBRARY_ALL(string LIBRARY_IN,vector<string>);
   // void LIB2RAW_LIBRARY_ALL(string LIBRARY_IN);
-  string LIB2RAW_CheckProjectFromDirectory(string directory);
+  string LIB2RAW_CheckProjectFromDirectory(const string& directory);
   bool LIB2RAW_ALL(string options,bool overwrite);
-  bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,string MESSAGE);
+  bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,const string& MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
-  bool LIB2RAW(string options,bool overwrite,bool LOCAL=false);
+  void CleanDirectoryLIB(string& directory);  //CO20200624
+  bool LIB2RAW(const string& options,bool overwrite,bool LOCAL=false);
   bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
   bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
   bool XPLUG(const vector<string>& argv);  //CO20200501
   bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
-  bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
-  // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2RAW_Loop_Bands(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_Magnetic(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_Bader(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_AGL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_LOCK(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT20181212
+  bool LIB2RAW_Loop_Thermodynamics(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE,bool LOCAL=false);
+  // [OBSOLETE]  bool LIB2RAW_Loop_DATA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2RAW_Loop_Bands(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_Magnetic(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_Bader(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_AGL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_LOCK(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //CO20200624
+  bool LIB2RAW_Loop_PATCH(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2LIB(const string& options,bool overwrite,bool LOCAL=false); //CT20181212
 }
 
 namespace aflowlib {

@@ -2546,7 +2546,7 @@ namespace compare{
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     } 
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     if(recovered != vxstrs.size()){
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]       message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << vxstrs.size();
-//DX20191108 [OBSOLETE - switching to getThreadDistribution]       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_); //DX20190717 - exit to xerror
+//DX20191108 [OBSOLETE - switching to getThreadDistribution]       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     }
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG for(uint i=0;i<vxstrs_split.size();i++){
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG   cerr << "num of xstrs for thread: " << i << " = " << vxstrs_split[i].size() << endl;
@@ -2684,7 +2684,7 @@ namespace compare{
       } 
       if(recovered != number_of_comparisons){
         message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_comparisons;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_); //DX20190717 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
     }
     return true;
@@ -4361,7 +4361,7 @@ namespace compare{
         if(!comparison_schemes[i].structure_representative_generated){
           if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_source,comparison_schemes[i].structure_representative_relaxation_step,structure_representative,oss)){ //DX20200429
             message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
           }
         }
         else {
@@ -4374,7 +4374,7 @@ namespace compare{
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
           if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_source[j],comparison_schemes[i].structures_duplicate_relaxation_step[j],duplicate_structure,oss)){ //DX20200429
             message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
           }
         }
         else {
@@ -4490,7 +4490,7 @@ namespace compare{
           if(!comparison_schemes[i].structure_representative_generated){
             if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_source,comparison_schemes[i].structure_representative_relaxation_step,structure_representative,oss)){ //DX20200429
               message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
             }
           }
           else {
@@ -4505,7 +4505,7 @@ namespace compare{
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
           if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_source[j],comparison_schemes[i].structures_duplicate_relaxation_step[j],duplicate_structure,oss)){ //DX20200429
             message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
           }
         }
         else {
@@ -7998,8 +7998,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]             }
 // [OBSOLETE - DX20190717]           } 
 // [OBSOLETE - DX20190717]           if(recovered != lattices.size()){
-// [OBSOLETE - DX20190717]             cerr << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << lattices.size() << endl;
-// [OBSOLETE - DX20190717]             exit(1);
+// [OBSOLETE - DX20190717]             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "The splitting of jobs failed...not all were accounted for: "+recovered+" != "+lattices.size(), _INPUT_ERROR_);
 // [OBSOLETE - DX20190717]           }
 // [OBSOLETE - DX20190717]           if(LDEBUG) {cerr << XPID << "pflow::threadGeneration: Performing structure search on " << lattices.size() << " lattices ..." << endl;}
 // [OBSOLETE - DX20190717]           
@@ -8259,7 +8258,7 @@ namespace compare{
                 index_match_2 = map_index_str2;
                 min_distances = min_dists;
               }
-              // If we want to simply find a match and not find the best match, we can exit early
+              // If we want to simply find a match and not find the best match, we can return early
               if(mis<0.1 && !optimize_match) {
                 return true;
               }
@@ -8723,7 +8722,7 @@ namespace compare{
 // [OBSOLETE - DX20190717] 		  vprotos.push_back(proto); //to here
 // [OBSOLETE - DX20190717] 		}
 // [OBSOLETE - DX20190717] 	      }
-// [OBSOLETE - DX20190717]               // If we want to simply find a match and not find the best match, we can exit early
+// [OBSOLETE - DX20190717]               // If we want to simply find a match and not find the best match, we can return early
 // [OBSOLETE - DX20190717] 	      if(mis<0.1 && !optimize_match) {
 // [OBSOLETE - DX20190717]                 return true;
 // [OBSOLETE - DX20190717] 	        //DEBUGGING

@@ -1133,6 +1133,7 @@ check:
 .PHONY: check_full
 check_full:
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
+	$(MAKE) check_aflow_exits
 	$(MAKE) check_gcd
 	$(MAKE) check_smith
 	$(MAKE) check_proto
@@ -1482,21 +1483,24 @@ check_cce:
 	@echo "Running CCE test 16: FeTiO3"
 	@./aflow --proto=AB3C_hR10_148_c_f_c:Fe:O:Ti --params=5.08264,2.77119,0.648852,0.852345,0.436666,0.768665,0.0556432 > POSCAR_proto_Fe1O3Ti1_ICSD_187688; ANSWER=3.402,3.240,0.414,0.258,-1.258,-1.442,-25.786,-25.624,-25.612,-25.456,-25.808,-25.624; RESULT=$$(./aflow --cce=POSCAR_proto_Fe1O3Ti1_ICSD_187688 --cce_test --dft_formation_energies=-22.384,-25.198,-27.066 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 16 failed!, check CCE on POSCAR_proto_Fe1O3Ti1_ICSD_187688" && exit 1; else echo "CCE test 16 passed!"; rm -f POSCAR_proto_Fe1O3Ti1_ICSD_187688 ; fi
 	@echo "Running CCE test 17: BaO2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Ba1O2_ICSD_24248/CONTCAR.relax.vasp; ANSWER=1.055,1.043,-6.638,-6.626,-6.743; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ba1O2_ICSD_24248; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ba1O2_ICSD_24248 --cce_test --dft_formation_energies=-5.583,0 --functionals=PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 17 failed!, check CCE on CONTCAR.relax.vasp_Ba1O2_ICSD_24248" && exit 1; else echo "CCE test 17 passed!"; rm -f CONTCAR.relax.vasp_Ba1O2_ICSD_24248 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Ba1O2_ICSD_24248/CONTCAR.relax.vasp; ANSWER=1.055,1.043,-6.638,-6.626,-6.743; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ba1O2_ICSD_24248; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ba1O2_ICSD_24248 --cce_test --dft_formation_energies=-5.583,0 --functionals=PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 17 failed!, check CCE on CONTCAR.relax.vasp_Ba1O2_ICSD_24248" && exit 1; else echo "CCE test 17 passed!"; rm -f CONTCAR.relax.vasp_Ba1O2_ICSD_24248 ; fi
 	@echo "Running CCE test 18: NaO2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/CUB/Na1O2_ICSD_87178/CONTCAR.relax.vasp; ANSWER=-0.205,-0.310,-9.363,-9.258,-5.972; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Na1O2_ICSD_87178; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Na1O2_ICSD_87178 --cce_test --dft_formation_energies=-9.568,0 --functionals=PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 18 failed!, check CCE on CONTCAR.relax.vasp_Na1O2_ICSD_87178" && exit 1; else echo "CCE test 18 passed!"; rm -f CONTCAR.relax.vasp_Na1O2_ICSD_87178 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/CUB/Na1O2_ICSD_87178/CONTCAR.relax.vasp; ANSWER=-0.205,-0.310,-9.363,-9.258,-5.972; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Na1O2_ICSD_87178; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Na1O2_ICSD_87178 --cce_test --dft_formation_energies=-9.568,0 --functionals=PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 18 failed!, check CCE on CONTCAR.relax.vasp_Na1O2_ICSD_87178" && exit 1; else echo "CCE test 18 passed!"; rm -f CONTCAR.relax.vasp_Na1O2_ICSD_87178 ; fi
 	@echo "Running CCE test 19: HfN"
-	@./aflow --proto=AB_cF8_225_a_b:Hf:N --params=4.4938 > POSCAR_proto_Hf1N1_ICSD_53025; ANSWER=0.359,0.338,-0.557,-0.581,-0.086,-0.109,0.356,0.335,-3.872,-3.851,-3.872,-3.848,-3.872,-3.849,-3.872,-3.851,-3.872; RESULT=$$(./aflow --cce=POSCAR_proto_Hf1N1_ICSD_53025 --cce_test --dft_formation_energies=-3.513,-4.429,-3.958,-3.516,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 19 failed!, check CCE on POSCAR_proto_Hf1N1_ICSD_53025" && exit 1; else echo "CCE test 19 passed!"; rm -f POSCAR_proto_Hf1N1_ICSD_53025 ; fi
+	@./aflow --proto=AB_cF8_225_a_b:Hf:N --params=4.4938 > POSCAR_proto_Hf1N1_ICSD_53025; ANSWER=0.359,0.338,-0.557,-0.581,-0.086,-0.109,0.356,0.335,-3.872,-3.851,-3.872,-3.848,-3.872,-3.849,-3.872,-3.851,-3.872; RESULT=$$(./aflow --cce=POSCAR_proto_Hf1N1_ICSD_53025 --cce_test --dft_formation_energies=-3.513,-4.429,-3.958,-3.516,0 --functionals=PBE,LDA,SCAN,PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 19 failed!, check CCE on POSCAR_proto_Hf1N1_ICSD_53025" && exit 1; else echo "CCE test 19 passed!"; rm -f POSCAR_proto_Hf1N1_ICSD_53025 ; fi
 	@echo "Running CCE test 20: LiCaN"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304" && exit 1; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304" && exit 1; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
 #RF20200302 - STOP
 .PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
 ifeq ($(UNAME),Linux)
 	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \
-		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
+		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS nullptrs in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit 1; fi
 	@echo "aflow_gcc_compatibility test 1 passed!"
 else
 	@echo "aflow_gcc_compatibility test 1 (no 'nullptr') requires GNU grep, try: find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)'"
 endif
+check_aflow_exits:
+	@echo "Running aflow_exits test 1: NO 'exit()'" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
+		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
 ###################################################################################################

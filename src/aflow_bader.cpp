@@ -16,7 +16,7 @@
 // bader_functions::BaderCalc
 // ***************************************************************************//
 namespace bader_functions {
-  string BaderCalc(aurostd::xoption vpflow) {  //CO
+  string BaderCalc(aurostd::xoption vpflow) {  //CO //keep as non-const, non-reference
     ostringstream oss;
     string soliloquy = XPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
     //debug
@@ -46,7 +46,7 @@ namespace bader_functions {
     // output usage
     if(LDEBUG) cerr << soliloquy << "CHECK USAGE" << endl;
     if(vpflow.flag("BADER::USAGE")) {
-      init::ErrorOption(cout, "--usage", "pflow::BADER()", usage_options);
+      init::ErrorOption( "--usage", "pflow::BADER()", usage_options);
       return oss.str();
     }
     //FIRST STOP FOR CALLS MADE FROM COMMAND LINE
@@ -92,7 +92,7 @@ namespace bader_functions {
 namespace bader_functions {
   bool BaderCalc(aurostd::xoption& vpflow,
       const string& bader_options,
-      string& directory,
+      const string& _directory,
       ostream& oss) {
     //SECOND STOP FOR CALLS MADE FROM COMMAND_LINE
     string soliloquy = XPID + "bader_functions::BaderCalc():  ";          // so you know who's speaking
@@ -100,6 +100,9 @@ namespace bader_functions {
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
+
+    string directory=_directory;  //CO20200624
+    FixDirectory(directory);  //CO20200624
 
     // get species names and valence charges from OUTCAR
     if(LDEBUG) cerr << soliloquy << "LOOKING FOR SUITABLE OUTCAR" << endl;
@@ -288,7 +291,7 @@ namespace bader_functions {
       const vector<double>& vZVAL,
       const vector<double>& cutoffs,
       const vector<int>& downsample_ratios,
-      string& directory,
+      const string& _directory,
       ostream& oss) {
     //MAIN FUNCTION
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -297,6 +300,7 @@ namespace bader_functions {
 
     //CO20180220 moved up from below
     string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string directory=_directory;  //CO20200624
     FixDirectory(directory);
     oss << soliloquy << "working within " << directory << "." << endl;
 
@@ -1433,7 +1437,7 @@ namespace bader_functions {
       const vector<double>& vZVAL,
       const vector<double>& cutoffs,
       const vector<int>& downsample_ratios,
-      string& directory,
+      const string& directory,
       ostream& oss) {
     //NO FLAGS GIVEN
     aurostd::xoption bader_flags;
@@ -1931,7 +1935,7 @@ namespace bader_functions {
 // ***************************************************************************//
 namespace bader_functions {
   bool listORrange2vec(const string& misc_option, vector<int>& vout, ostream& oss) {
-    string soliloquy = XPID + "bader_functions::BaderCalc():  ";  // so you know who's speaking
+    string soliloquy = XPID + "bader_functions::listORrange2vec():  ";  // so you know who's speaking
     int test_value;
     //debug
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -2108,7 +2112,7 @@ namespace bader_functions {
     // output usage
     if(LDEBUG) cerr << soliloquy << "CHECK USAGE" << endl;
     if(vpflow.flag("PREPARE_CHGCAR_4_JMOL::USAGE")) {
-      init::ErrorOption(cout, vpflow.getattachedscheme("PREPARE_CHGCAR_4_JMOL"), "bader_functions::prepare_CHGCAR_4_Jmol()", aurostd::liststring2string(usage_usage, usage_options));
+      init::ErrorOption( vpflow.getattachedscheme("PREPARE_CHGCAR_4_JMOL"), "bader_functions::prepare_CHGCAR_4_Jmol()", aurostd::liststring2string(usage_usage, usage_options));
       return oss.str();
     }
     if(LDEBUG) cerr << soliloquy << "GATHER CHGCAR_FILES" << endl;

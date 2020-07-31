@@ -440,12 +440,18 @@ namespace plotter {
       }
       if ((tokens.size() == 2) || (tokens.size() == 3)) {
         string proto = tokens[1];
+        if(LDEBUG){cerr << soliloquy << " proto=" << proto << endl;}
         vector<string> protos;
         aflowlib::GetAllPrototypeLabels(protos, "anrl");
         if (aurostd::WithinList(protos, proto)) {
+          if(LDEBUG){cerr << soliloquy << " found proto in ANRL" << endl;}
           if (tokens.size() == 3) proto += "." + tokens[2];
           vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
+          if(LDEBUG){
+            cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
+            cerr << soliloquy << " composition=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(composition,5),",") << endl;
+          }
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
           title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO20190629
         } else {
@@ -458,6 +464,10 @@ namespace plotter {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
             vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
+            if(LDEBUG){
+              cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
+              cerr << soliloquy << " composition=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(composition,5),",") << endl;
+            }
             title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO20190629
           } else {  // Title not in prototype format
             return aurostd::fixStringLatex(default_title, false, false);
