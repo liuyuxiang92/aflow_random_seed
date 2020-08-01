@@ -93,6 +93,7 @@ namespace aflowlib {
       double enthalpy_formation_cell,enthalpy_formation_atom;
       double enthalpy_formation_cce_300K_cell,enthalpy_formation_cce_300K_atom; //CO20200624
       double enthalpy_formation_cce_0K_cell,enthalpy_formation_cce_0K_atom; //CO20200624
+      double entropy_forming_ability; //CO20200624
       double entropic_temperature;
       string files;vector<string> vfiles;
       string files_LIB;vector<string> vfiles_LIB;
