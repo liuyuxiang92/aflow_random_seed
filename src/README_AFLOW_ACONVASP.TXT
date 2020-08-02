@@ -1063,6 +1063,7 @@ LATTICES = (the ones with "")
         [--include_unreliable_hulls|--include_unreliable|--iuh] : process hull despite poor statistics (binary hull count < 200).
         [--include_outliers|--io] : include any detected outliers (output/warning is still shown).
         [--force] : force output despite warnings.
+        [--force_outliers|--fo] : force output despite outlier warnings.
 
         PDF/LATEX OPTIONS:
         [--image_only|--imageonly|--image] : Latex/PDF output mode only. Similar to --document_only, 

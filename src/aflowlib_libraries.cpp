@@ -5250,6 +5250,9 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - begin " << directory_LIB << endl;
     data.vloop.push_back("pocc");
     
+    vector<string> vline,tokens;
+    stringstream aflow_pocc_out;
+    
     if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE)) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_OUT_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_OUT_FILE,vfile,MESSAGE);  // aflow.pocc.out
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,vfile,MESSAGE);  // aflow.pocc.structures_unique.out
@@ -5273,6 +5276,18 @@ namespace aflowlib {
           aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_atoms_
         }
       }
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE) << endl;
+      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE),aflow_pocc_out,"[AFLOW_POCC]START_TEMPERATURE=ALL","[AFLOW_POCC]STOP_TEMPERATURE=ALL");
+      aurostd::stream2vectorstring(aflow_pocc_out,vline);
+      for (uint i=0;i<vline.size();i++) {
+        aurostd::StringSubst(vline.at(i),"="," ");
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        if(tokens.size()>=2) {
+          if(tokens.at(0)=="entropy_forming_ability") data.entropy_forming_ability=aurostd::string2utype<double>(tokens.at(1));
+        }
+      }
+    } else {
+      return FALSE;
     }
     if(aurostd::EFileExist(directory_LIB+"/"+"aflow.pocc_agl.out")) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.pocc_agl.out",directory_RAW,"aflow.pocc_agl.out",vfile,MESSAGE);  // aflow.pocc_agl.out

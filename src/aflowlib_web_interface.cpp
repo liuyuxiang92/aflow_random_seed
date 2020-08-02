@@ -73,6 +73,7 @@ namespace aflowlib {
     enthalpy_formation_cell=AUROSTD_NAN;enthalpy_formation_atom=AUROSTD_NAN;
     enthalpy_formation_cce_300K_cell=AUROSTD_NAN;enthalpy_formation_cce_300K_atom=AUROSTD_NAN;  //CO20200624
     enthalpy_formation_cce_0K_cell=AUROSTD_NAN;enthalpy_formation_cce_0K_atom=AUROSTD_NAN;  //CO20200624
+    entropy_forming_ability=AUROSTD_NAN;  //CO20200624
     entropic_temperature=AUROSTD_NAN;
     files.clear();vfiles.clear();
     files_LIB.clear();vfiles_LIB.clear();
@@ -280,6 +281,7 @@ namespace aflowlib {
     enthalpy_formation_cell=b.enthalpy_formation_cell;enthalpy_formation_atom=b.enthalpy_formation_atom;
     enthalpy_formation_cce_300K_cell=b.enthalpy_formation_cce_300K_cell;enthalpy_formation_cce_300K_atom=b.enthalpy_formation_cce_300K_atom;  //CO20200624
     enthalpy_formation_cce_0K_cell=b.enthalpy_formation_cce_0K_cell;enthalpy_formation_cce_0K_atom=b.enthalpy_formation_cce_0K_atom;  //CO20200624
+    entropy_forming_ability=b.entropy_forming_ability;  //CO20200624
     entropic_temperature=b.entropic_temperature;
     files=b.files;vfiles.clear();for(uint i=0;i<b.vfiles.size();i++) vfiles.push_back(b.vfiles.at(i));
     files_LIB=b.files_LIB;vfiles_LIB.clear();for(uint i=0;i<b.vfiles_LIB.size();i++) vfiles_LIB.push_back(b.vfiles_LIB.at(i));
@@ -622,6 +624,7 @@ namespace aflowlib {
         else if(keyword=="enthalpy_formation_atom") {enthalpy_formation_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="enthalpy_formation_cce_300K_atom") {enthalpy_formation_cce_300K_atom=aurostd::string2utype<double>(content);} //CO20200624
         else if(keyword=="enthalpy_formation_cce_0K_atom") {enthalpy_formation_cce_0K_atom=aurostd::string2utype<double>(content);} //CO20200624
+        else if(keyword=="entropy_forming_ability") {entropy_forming_ability=aurostd::string2utype<double>(content);} //CO20200624
         else if(keyword=="entropic_temperature") {entropic_temperature=aurostd::string2utype<double>(content);}
         else if(keyword=="files") {files=content;for(uint j=0;j<stokens.size();j++) vfiles.push_back(stokens.at(j));}
         else if(keyword=="files_LIB") {files_LIB=content;for(uint j=0;j<stokens.size();j++) vfiles_LIB.push_back(stokens.at(j));}
@@ -955,6 +958,7 @@ namespace aflowlib {
       oss << "enthalpy_formation_atom=" << enthalpy_formation_atom << (html?"<br>":"") << endl; 
       oss << "enthalpy_formation_cce_300K_atom=" << enthalpy_formation_cce_300K_atom << (html?"<br>":"") << endl;   //CO20200624
       oss << "enthalpy_formation_cce_0K_atom=" << enthalpy_formation_cce_0K_atom << (html?"<br>":"") << endl;   //CO20200624
+      oss << "entropy_forming_ability=" << entropy_forming_ability << (html?"<br>":"") << endl;   //CO20200624
       oss << "entropic_temperature=" << entropic_temperature << (html?"<br>":"") << endl; 
       // oss << "files=" << files << "  vfiles= ";for(uint j=0;j<vfiles.size();j++) oss << vfiles.at(j) << " "; oss << (html?"<br>":"") << endl;
       // oss << "files_LIB=" << files_LIB << "  vfiles_LIB= ";for(uint j=0;j<vfiles_LIB.size();j++) oss << vfiles_LIB.at(j) << " "; oss << (html?"<br>":"") << endl;
@@ -1211,6 +1215,7 @@ namespace aflowlib {
       if(enthalpy_formation_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_atom=" << enthalpy_formation_atom << eendl;
       if(enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_300K_atom=" << enthalpy_formation_cce_300K_atom << eendl; //CO20200624
       if(enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_0K_atom=" << enthalpy_formation_cce_0K_atom << eendl; //CO20200624
+      if(entropy_forming_ability!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "entropy_forming_ability=" << entropy_forming_ability << eendl; //CO20200624
       if(entropic_temperature!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "entropic_temperature=" << entropic_temperature << eendl;
       if(PV_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "PV_cell=" << PV_cell << eendl;
       if(PV_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "PV_atom=" << PV_atom << eendl;
@@ -2043,6 +2048,15 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
+      //////////////////////////////////////////////////////////////////////////
+      if(entropy_forming_ability!=AUROSTD_NAN) {  //CO20200624
+        sscontent_json << "\"entropy_forming_ability\":" << entropy_forming_ability;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"entropy_forming_ability\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+      
       //////////////////////////////////////////////////////////////////////////
       if(entropic_temperature!=AUROSTD_NAN) {
         sscontent_json << "\"entropic_temperature\":" << entropic_temperature;

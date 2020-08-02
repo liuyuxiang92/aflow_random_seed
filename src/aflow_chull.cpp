@@ -136,6 +136,7 @@ namespace chull {
     usage_options.push_back("--include_outliers|--io");
     usage_options.push_back("--include_ill_converged|--iic");
     usage_options.push_back("--force");
+    usage_options.push_back("--force_outliers");
     usage_options.push_back(" ");
     usage_options.push_back("LATEX/PDF/PNG OPTIONS:");
     usage_options.push_back("--image_only|--imageonly|--image");
@@ -924,6 +925,9 @@ namespace chull {
     }
     if(vpflow.flag("FORCE")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
+    if(vpflow.flag("CHULL::FORCE_OUTLIERS")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
   }
 } // namespace chull
@@ -3590,12 +3594,12 @@ namespace chull {
     uint iqr_count_threshold=4; //3 results in degenerate quartile indices
     if((uint)energies.rows<iqr_count_threshold){ //ALWAYS not enough points to do statistics (need 3 quartiles)
       message << "Not enough degrees of freedom for outlier detection analysis per interquartile-range (count=" << energies.rows << " < " << iqr_count_threshold << ")";
-      if(m_cflags.flag("FORCE")){
+      if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::FORCE_OUTLIERS")){
         message << ", skipping outlier analysis";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         return;
       } else {
-        message << ". Override with --force (results may not be reliable).";
+        message << ". Override with --force_outliers (results may not be reliable).";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
     }
@@ -3757,14 +3761,14 @@ namespace chull {
       uint binaries_half_hull_threshold=DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES;
       if(points_to_consider.size()<binaries_half_hull_threshold){
         message << "Not enough degrees of freedom for outlier detection analysis per user defined threshold (count=" << points_to_consider.size() << " < " << binaries_half_hull_threshold << ")";
-        if(m_cflags.flag("FORCE")){
+        if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::FORCE_OUTLIERS")){
           message << ", skipping outlier analysis";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           vector<uint> outliers;
           return outliers;
         }
         else {
-          message << ". Override with --force (results may not be reliable).";
+          message << ". Override with --force_outliers (results may not be reliable).";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
         }
       }
@@ -4089,7 +4093,7 @@ namespace chull {
       } else {outliers=getOutliers();}
     }
 
-    if(!remove_outliers){
+    if(keep_outliers){
       message << "NOT removing outliers";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
       outliers.clear();
@@ -4484,7 +4488,7 @@ namespace chull {
           cerr << soliloquy << " is_vertical=" << h_facets[i].m_is_vertical << endl;
         }
         message << "Neighbor count (" << h_facets[i].f_neighbors.size() << ") and facet dimension (" << h_dim << ") mismatch";
-        if(m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
+        if(0&&m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
         else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
       }
     }
@@ -7098,6 +7102,7 @@ namespace chull {
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"relative_stability_criterion";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"N+1_energy_gain";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"entropy_stabilization_coefficient";}
 
     return headers;
   }
@@ -10806,6 +10811,14 @@ namespace chull {
           if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
           value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
         }
+      }
+    }
+    else if(property=="entropy_stabilization_coefficient"){
+      //check that H_f and EFA are set and EFA!=0 (division by 0)
+      if(H_f_atom(point)!=AUROSTD_NAN && point.m_entry.entropy_forming_ability!=AUROSTD_NAN && nonZeroWithinTol(point.m_entry.entropy_forming_ability)){
+        tmp_precision=precision;
+        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+        value=aurostd::utype2string( sqrt(H_f_atom(point) / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}

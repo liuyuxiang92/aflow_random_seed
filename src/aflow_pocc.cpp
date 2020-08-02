@@ -1186,6 +1186,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     string enthalpy_tag="enthalpy"; //H
+    unsigned long long int isupercell=0;
 
     //int pocc_precision=12;
     //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
@@ -1196,9 +1197,25 @@ namespace pocc {
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
+    
+    //supercell degeneracy
+    isupercell=0;
+    for(std::list<POccSuperCellSet>::const_iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+      isupercell=std::distance(l_supercell_sets.begin(),it);
+      pocc_out_ss << "degeneracy_supercell_" << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets.size())) << isupercell+1  << "=" << aurostd::utype2string((*it).getDegeneracy()) << "  [" << m_ARUN_directories[isupercell] << "]" << endl; //+1 so we start at 1, not 0 (count)
+    }
+    //supercell enthalpy_atom
+    isupercell=0;
+    for(std::list<POccSuperCellSet>::const_iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+      isupercell=std::distance(l_supercell_sets.begin(),it);
+      pocc_out_ss << enthalpy_tag << "_atom_supercell_" << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets.size())) << isupercell+1  << "=" << aurostd::utype2string((*it).m_energy_dft,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[isupercell] << "]";
+      if(isupercell==m_ARUN_directory_ground){pocc_out_ss << "  [ground]";}
+      pocc_out_ss << endl; //+1 so we start at 1, not 0 (count)
+    }
+    //if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
     if(m_Hmix!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_mix=" << aurostd::utype2string(m_Hmix,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
     if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "entropy_forming_ability=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
+    
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
