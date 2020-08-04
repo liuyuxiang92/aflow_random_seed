@@ -59,6 +59,11 @@ Details for the options available are explained in the following.
                               each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 --print=                      Obtain output in standard format (--print=out) or as json (--print=json).
                               Default: out.
+--get_ox_nums < STRUCT_FILE   Determine only the oxidation numbers for the structure in file STRUCT_FILE.
+                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                              QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                              is used the species must be written on the right side next to the coordinates for
+                              each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)

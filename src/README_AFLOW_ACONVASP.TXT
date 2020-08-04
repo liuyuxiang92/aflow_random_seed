@@ -1364,6 +1364,12 @@ LATTICES = (the ones with "")
         Outputs to standard out a new POSCAR file with
         atom positions in direct (fractional) coordinates.
 
+  aflow --get_ox_nums < STRUCT_FILE
+        Determines the oxidation numbers for the structure in file STRUCT_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR
+        is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
+        the coordinates for each atom.
+
   aflow --getTEMP[s] [--runstat | --runbar | --refresh=X | --warning_beep=T | --warning_halt=T ]
         If available, the command outputs the hostname and temperatures of the machine. Useful to find hardware issues:
 	          with --runstat the command continuously prints the temperature, refreshing every XX refresh seconds;

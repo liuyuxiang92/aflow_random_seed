@@ -1,5 +1,10 @@
 3.2.5 - 2020/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- Implemented option (--poscar2ox_nums) for printing oxidation numbers for given POSCAR (RF)
+        -- Separated CCE corrections listing into different anion types (RF)
+        -- Moved CCE corrections and Bader charges to main CCE file (RF)
+        -- fixed output printing of CCE (RF)
+        -- fixed CCE for ICSD (RF)
         -- Made search --aflowlib more inclusive. (ME)
         -- Fixed out of bounds error in init::AFLOW_Projects_Directories for missing LIB directories. (ME)
         -- Added aurostd::_ishex. (ME)

@@ -5278,8 +5278,8 @@ namespace xelement {
       electronegativity_Pearson=3.1;
       electronegativity_Ghosh=4.439;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=48;
       Miedema_phi_star=3.05;
       Miedema_nws=1.09;
@@ -5362,8 +5362,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.561;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(4); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.18;
       Miedema_nws=1.19;
@@ -5445,8 +5445,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.682;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(4); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.19;
       Miedema_nws=1.20;
@@ -5528,8 +5528,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.804;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.19;
       Miedema_nws=1.20;
@@ -5611,8 +5611,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.925;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.19;
       Miedema_nws=1.21;
@@ -5694,8 +5694,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.047;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -5777,8 +5777,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.168;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -5860,8 +5860,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.290;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -5943,8 +5943,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.411;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(4); oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.21;
       Miedema_nws=1.22;
@@ -6026,8 +6026,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.533;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.21;
       Miedema_nws=1.22;
@@ -6109,8 +6109,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.654;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.22;
@@ -6192,8 +6192,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.776;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.23;
@@ -6275,8 +6275,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.897;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.23;
@@ -6358,8 +6358,8 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.019;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.push_back(3); oxidation_states.push_back(2);
-      oxidation_states_preferred.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.23;
