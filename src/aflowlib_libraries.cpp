@@ -5328,7 +5328,7 @@ namespace aflowlib {
     _XHOST aus_XHOST;
     // ---------------------------------------------------------------
     data.vaflowlib_date.clear(); //clear here, 
-    for(uint iline=0;iline<vlock.size();iline++) //CO20200624 - adding lock date to vaflowlib_date  //grab LAST date - data.vaflowlib_date.empty()
+    for(uint iline=0;iline<vlock.size();iline++) //CO20200624 - adding lock date to vaflowlib_date  //grab both FIRST and LAST dates - data.vaflowlib_date.empty()
       if(aurostd::substring2bool(vlock[iline],"date=") && aurostd::substring2bool(vlock[iline],"[") && aurostd::substring2bool(vlock[iline],"]")) {
         loc=vlock[iline].find("date=");
         tmp=vlock[iline].substr(loc,string::npos);
@@ -5338,9 +5338,16 @@ namespace aflowlib {
         aurostd::StringSubst(tmp,"[","");aurostd::StringSubst(tmp,"]","");  //just in case
         aurostd::StringSubst(tmp,"date=",""); //just in case
         tmp=aflow_convert_time_ctime2aurostd(tmp);
-        if(!tmp.empty()){data.vaflowlib_date.clear();data.vaflowlib_date.push_back(tmp+"_GMT-5");}
+        if(!tmp.empty()){
+          if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT-5");} //get first date
+          else{ //get last date
+            if(data.vaflowlib_date.size()>1){data.vaflowlib_date.pop_back();}
+            data.vaflowlib_date.push_back(tmp+"_GMT-5");
+          }
+        }
       }
-    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date = " << ((data.vaflowlib_date.size())?data.vaflowlib_date.front():"unavailable") << endl;
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date (START) = " << ((data.vaflowlib_date.size()>0)?data.vaflowlib_date[0]:"unavailable") << endl;
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date (END) = " << ((data.vaflowlib_date.size()>1)?data.vaflowlib_date[1]:"unavailable") << endl;
     // ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&data.aflow_version.empty();iline++)
       if(aurostd::substring2bool(vlock[iline],"NFS") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {

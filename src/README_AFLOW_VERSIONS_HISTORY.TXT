@@ -39,7 +39,7 @@
         -- soft patch for FR+web: cout->cerr in aflowlib::WEB_Aflowlib_Entry() (CO)
         -- patching pocc_tol :TOL_0.001:0.001 -> :TOL_0.001_0.001 (CO)
         -- adding overloads to get_date() variants for an input time structure (CO)
-        -- adding lock_date to aflowlib.out via aflowlib_date ([0]=lock_date, [1]=lib2raw_date) (CO)
+        -- adding lock_date to aflowlib.out via aflowlib_date ([0]=lock_date_start,[1]=lock_date_end,[2]=lib2raw_date) (CO)
         -- cleaned up PrintMessageStream()/PrintErrorStream()/PrintWarningStream() (CO)
         -- included nice colors to screen for PrintMessageStream()/PrintErrorStream()/PrintWarningStream() (CO)
         -- integrated PrintMessageStream()/PrintErrorStream()/PrintWarningStream() with logger() (CO)
