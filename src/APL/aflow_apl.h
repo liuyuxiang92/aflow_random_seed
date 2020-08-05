@@ -1240,7 +1240,7 @@ namespace apl
           ofstream &FileMESSAGE, ostream &oss);
       ~QHA();
       const QHA& operator=(const QHA &qha);
-      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
+      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags);
       void clear();
       double calcFrequencyFit(double V, xvector<double> &xomega);
       double calcGrueneisen(double V, xvector<double> &xomega, double &w);
@@ -1337,21 +1337,29 @@ namespace apl
       vector<string> subdirectories_apl_gp;
       vector<string> subdirectories_apl_qhanp;
       vector<string> subdirectories_static;
+      vector<string> arun_runnames_apl_eos;
+      vector<string> arun_runnames_apl_gp;
+      vector<string> arun_runnames_apl_qhanp;
       vector<string> arun_runnames_static;
       _xinput xinput;
       string currentDirectory;
       // methods
-      int  checkStaticCalculations(vector<vector<bool> > &file_is_present);
-      void read();
-      bool runAPLcalculations(const vector<string> &subdirectories,
-          const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
-          _kflags &kflags, string &aflowin, QHAtype type);
-      bool readStaticCalculationsData();
-      void calculate();
+      // related to static DFT calculations
       void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
           const _kflags &kflags, const vector<vector<bool> > &list);
+      int  checkStaticCalculations(vector<vector<bool> > &file_is_present);
       void printMissingStaticFiles(const vector<vector<bool> > & list,
           const vector<string> &subdirectories);
+      bool readStaticCalculationsData();
+      // related to APL calculations
+      void createSubdirectoriesAPLRun(const _xflags &xflags, const _aflags &aflags,
+          const _kflags &kflags, const vector<vector<bool> > &list, QHAtype qhatype);
+      int  checkAPLCalculations(vector<vector<bool> > &file_is_present, QHAtype qhatype);
+      void printMissingAPLFiles(const vector<vector<bool> > & list, QHAtype qhatype);
+      bool readAPLCalculationData(const vector<string> &subdirectories,
+          const vector<double> &coefVolumes, _kflags &kflags, QHAtype type);
+      bool runAPL(_xflags &xflags, _aflags &aflags, _kflags &kflags, QHAtype qhatype);
+      // mandatory
       void free();
       void copy(const QHA &qha);
   };

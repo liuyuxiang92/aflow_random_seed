@@ -32,7 +32,10 @@
 #define DEBUG_QHA_GP_FIT false // toggles debug output related to the fit functionality
 // in the calcGrueneisen function
 
-enum DATA_FILE {DF_DIRECTORY, DF_OUTCAR, DF_EIGENVAL, DF_IBZKPT};
+// files required by static DFT calculation
+enum ST_DATA_FILE {ST_DF_DIRECTORY, ST_DF_OUTCAR, ST_DF_EIGENVAL, ST_DF_IBZKPT};
+// files required by APL calculation
+enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC};
 
 #define EOS_METHOD_FILE_POLYNOMIAL "polynomial."
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN "birch-murnaghan."
@@ -161,7 +164,7 @@ namespace apl
   ///
   bool NonlinearFit::fitLevenbergMarquardt()
   {
-    string function = XPID + "NonlinearFit::fit(): ";
+    string function = XPID + "NonlinearFit::fitLevenbergMarquardt(): ";
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
     if (LDEBUG) cerr << function << "begin"  << std::endl;
 
@@ -483,6 +486,9 @@ namespace apl
     subdirectories_apl_eos.clear();
     subdirectories_apl_qhanp.clear();
     subdirectories_static.clear();
+    arun_runnames_apl_eos.clear();
+    arun_runnames_apl_gp.clear();
+    arun_runnames_apl_qhanp.clear();
     arun_runnames_static.clear();
     xinput.clear();
     currentDirectory = ".";
@@ -539,6 +545,9 @@ namespace apl
     subdirectories_apl_gp   = qha.subdirectories_apl_gp;
     subdirectories_apl_qhanp   = qha.subdirectories_apl_qhanp;
     subdirectories_static   = qha.subdirectories_static;
+    arun_runnames_apl_eos   = qha.arun_runnames_apl_eos;
+    arun_runnames_apl_gp    = qha.arun_runnames_apl_gp;
+    arun_runnames_apl_qhanp = qha.arun_runnames_apl_qhanp;
     arun_runnames_static    = qha.arun_runnames_static;
     xinput            = qha.xinput;
     currentDirectory  = qha.currentDirectory;
@@ -640,8 +649,10 @@ namespace apl
     gprange[0] = 1.0-gp_distortion; gprange[1] = 1.0; gprange[2] = 1.0+gp_distortion;
     N_GPvolumes = 3;
     for (int j=0; j<N_GPvolumes; j++){
-      subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + "_PHONON_"
+      arun_runnames_apl_gp.push_back("PHONON_"
           + aurostd::utype2string(gprange[j],precision_format,false,FIXED_STREAM));
+      subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+          arun_runnames_apl_gp.back());
 
       coefGPVolumes.push_back(gprange[j]);
       GPvolumes.push_back(gprange[j]*Volume/NatomsOrigCell);
@@ -672,8 +683,10 @@ namespace apl
       // get a set of volumes that would be used for the QHA-EOS calculation
       string dirname = "";
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
-        subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
-            "_PHONON_" + aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
+        arun_runnames_apl_eos.push_back( "PHONON_" +
+            aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
+        subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+            arun_runnames_apl_eos.back());
 
         arun_runnames_static.push_back("STATIC_" + 
             aurostd::utype2string(i, precision_format, false, FIXED_STREAM));
@@ -695,8 +708,10 @@ namespace apl
       double coef = 0.0;
       for (int i=0; i<N_QHANPvolumes; i++){
         coef = 1.0 + (-TaylorExpansionOrder + i)*gp_distortion; //dV = 2*gp_distortion
-        subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + 
-            "_PHONON_"+aurostd::utype2string(coef,precision_format,false,FIXED_STREAM));
+        arun_runnames_apl_qhanp.push_back("PHONON_"+
+            aurostd::utype2string(coef,precision_format,false,FIXED_STREAM));
+        subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+            arun_runnames_apl_qhanp.back());
 
         coefQHANPVolumes.push_back(coef);
         QHANPvolumes.push_back(coef*Volume/NatomsOrigCell);
@@ -756,7 +771,7 @@ namespace apl
   /// QHANP calculation requires 2*TaylorExpansionOrder+1 phonon calculations and 
   /// N_EOSvolumes static calculations.
   ///
-  void QHA::run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin)
+  void QHA::run(_xflags &xflags, _aflags &aflags, _kflags &kflags)
   {
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
 
@@ -811,8 +826,7 @@ namespace apl
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
       if (isEOS && runQHA){
-        eos_apl_data_available = runAPLcalculations(subdirectories_apl_eos,
-            coefEOSVolumes, xflags, aflags, kflags, aflowin, QHA_EOS);
+        eos_apl_data_available = runAPL(xflags, aflags, kflags, QHA_EOS);
 
         if (eos_apl_data_available && eos_static_data_available){
           if (includeElectronicContribution && doSommerfeldExpansion) DOSatEf();
@@ -829,8 +843,7 @@ namespace apl
 
       bool qhanp_data_available = false;
       if (runQHANP){
-        qhanp_data_available = runAPLcalculations(subdirectories_apl_qhanp, 
-            coefQHANPVolumes, xflags, aflags, kflags, aflowin, QHA_TE);
+        qhanp_data_available = runAPL(xflags, aflags, kflags, QHA_TE);
         if (qhanp_data_available){
           writeThermalProperties(EOS_POLYNOMIAL, QHANP_CALC);
           writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
@@ -842,8 +855,7 @@ namespace apl
       // calculated via a finite difference numerical derivative.
       // For a QHA calculation, use the GP_FD flag to turn on this type of calculation.
       if (isGP_FD || runQHA3P || runSCQHA){
-        gp_data_available = runAPLcalculations(subdirectories_apl_gp, coefGPVolumes,
-            xflags, aflags, kflags, aflowin, QHA_FD);
+        gp_data_available = runAPL(xflags, aflags, kflags, QHA_FD);
 
         if (gp_data_available){
           if (runQHA || runQHA3P){
@@ -900,10 +912,10 @@ namespace apl
     // The existing aflow.in file will not be overwritten.
     for (uint i=0; i<subdirectories_static.size(); i++){
       if (includeElectronicContribution){
-        if (file_is_present[i][DF_EIGENVAL] && file_is_present[i][DF_IBZKPT] &&
-            file_is_present[i][DF_OUTCAR]) continue;
+        if (file_is_present[i][ST_DF_EIGENVAL] && file_is_present[i][ST_DF_IBZKPT] &&
+            file_is_present[i][ST_DF_OUTCAR]) continue;
       }
-      else if (file_is_present[i][DF_OUTCAR]) continue;
+      else if (file_is_present[i][ST_DF_OUTCAR]) continue;
 
       if (aurostd::FileExist(subdirectories_static[i]+'/'+_AFLOWIN_)) continue;
 
@@ -952,13 +964,13 @@ namespace apl
       all_files_are_present = true;
 
       if (aurostd::IsDirectory(subdirectories_static[i]))
-        file_is_present[i][DF_DIRECTORY] = true;
+        file_is_present[i][ST_DF_DIRECTORY] = true;
       else
         all_files_are_present = false;
 
       outcarfile = subdirectories_static[i]+"/OUTCAR.static";
       if (aurostd::EFileExist(outcarfile))
-        file_is_present[i][DF_OUTCAR] = true;
+        file_is_present[i][ST_DF_OUTCAR] = true;
       else
         all_files_are_present = false;
 
@@ -967,12 +979,12 @@ namespace apl
         ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
 
         if (aurostd::EFileExist(eigenvfile))
-          file_is_present[i][DF_EIGENVAL] = true;
+          file_is_present[i][ST_DF_EIGENVAL] = true;
         else
           all_files_are_present = false;
 
         if (aurostd::EFileExist(ibzkptfile))
-          file_is_present[i][DF_IBZKPT] = true;
+          file_is_present[i][ST_DF_IBZKPT] = true;
         else
           all_files_are_present = false;
       }
@@ -989,21 +1001,21 @@ namespace apl
     string function = XPID + "QHA::printMissingStaticFiles():";
     string msg = "", missing_files = "";
     for (uint i=0; i<subdirectories.size(); i++){
-      if (!list[i][DF_DIRECTORY]){
+      if (!list[i][ST_DF_DIRECTORY]){
         msg += "Directory " + subdirectories[i] + " is missing.\n";
       }
       else{
         missing_files = "";
-        if (!list[i][DF_OUTCAR]){
+        if (!list[i][ST_DF_OUTCAR]){
           missing_files = "OUTCAR.static";
         }
         if (includeElectronicContribution){
-          if(!list[i][DF_EIGENVAL]){
+          if(!list[i][ST_DF_EIGENVAL]){
             if (!missing_files.empty()) missing_files += ",";
             missing_files += "EIGENVAL.static";
           }
 
-          if(!list[i][DF_IBZKPT]){
+          if(!list[i][ST_DF_IBZKPT]){
             if (!missing_files.empty()) missing_files += ",";
             missing_files += "IBZKPT.static";
           }
@@ -1026,14 +1038,185 @@ namespace apl
     }
   }
 
-  /// Creates a set of EOS APL subdirectories with corresponding aflow.in or gathers
-  /// and processes data from finished APL calculations.
-  /// 
-  bool QHA::runAPLcalculations(const vector<string> &subdirectories,
-      const vector<double> &coefVolumes, _xflags &xflags,
-      _aflags &aflags, _kflags &kflags, string &aflowin, QHAtype type)
+  ///////////////////////////////////////////////////////////////////////////////////////
+
+  /// Creates subdirectories with aflow.in for a set of APL calculations.
+  ///
+  void QHA::createSubdirectoriesAPLRun(const _xflags &xflags, const _aflags &aflags,
+      const _kflags &kflags, const vector<vector<bool> > &file_is_present,
+      QHAtype qhatype)
   {
-    string function = XPID + "QHA::runAPLcalculations():";
+    string function = XPID + "QHA:createSubdirectoriesAPLRun():", msg = "";
+
+    xinput.xvasp.aopts.opattachedscheme("AFLOWIN_FLAG::MODULE","APL",true);
+    xinput.xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",true);
+    xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","OFF",true);
+    xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_HIBERNATE","ON",true);
+
+    stringstream aflow;
+
+    vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
+      (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
+    vector<string> &arun_runnames = (QHA_FD==qhatype) ? arun_runnames_apl_gp :
+      (QHA_EOS==qhatype) ? arun_runnames_apl_eos : arun_runnames_apl_qhanp;
+    vector<double> &coefVolumes = (QHA_FD==qhatype) ? coefGPVolumes :
+      (QHA_EOS==qhatype) ? coefEOSVolumes : coefQHANPVolumes;
+
+    // create aflow.in if there are no outputs with results in the directory.
+    // The existing aflow.in file will not be overwritten.
+    for (uint i=0; i<subdirectories.size(); i++){
+      if (file_is_present[i][0]) continue;
+
+      if (aurostd::FileExist(subdirectories[i]+'/'+_AFLOWIN_)) continue;
+
+      msg = "Generate aflow.in file in " + subdirectories[i] + " directory.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+        *p_oss, _LOGGER_MESSAGE_);
+
+      xinput.xvasp.str = origStructure;
+      xinput.xvasp.str.InflateVolume(coefVolumes[i]);
+
+      xinput.setDirectory(currentDirectory);
+      xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
+      xinput.xvasp.AVASP_arun_runname = arun_runnames[i];
+
+      AVASP_populateXVASP(aflags,kflags,xflags.vflags, xinput.xvasp);
+      AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
+    }
+  }
+
+  /// Checks if all required APL calculations exist and returns the number of
+  /// finished calculations.
+  ///
+  int QHA::checkAPLCalculations(vector<vector<bool> > &file_is_present, QHAtype qhatype)
+  {
+    string function = XPID + "QHA::checkAPLCalculations():", msg = "";
+
+    if (!isInitialized){
+      msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+          *p_oss, _LOGGER_ERROR_);
+      return 0;
+    }
+
+    vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
+      (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
+
+    int count = 0;
+    string harmifcfile = "";
+    bool all_files_are_present = true;
+    for (uint i=0; i<subdirectories.size(); i++){
+      all_files_are_present = true;
+
+      if (aurostd::IsDirectory(subdirectories[i]))
+        file_is_present[i][PH_DF_DIRECTORY] = true;
+      else
+        all_files_are_present = false;
+
+      harmifcfile=subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
+      if (aurostd::EFileExist(harmifcfile))
+        file_is_present[i][PH_DF_HARMIFC] = true;
+      else
+        all_files_are_present = false;
+
+      if (all_files_are_present) count++;
+    }
+
+    return count;
+  }
+
+  /// Prints what data output files from APL calculations are missing.
+  void QHA::printMissingAPLFiles(const vector<vector<bool> > & list, QHAtype qhatype)
+  {
+    string function = XPID + "QHA::printMissingAPLFiles():";
+
+    vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
+      (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
+
+    string msg = "", missing_files = "";
+    for (uint i=0; i<subdirectories.size(); i++){
+      if (!list[i][PH_DF_DIRECTORY]){
+        msg += "Directory " + subdirectories[i] + " is missing.\n";
+      }
+      else{
+        missing_files = "";
+        if (!list[i][PH_DF_HARMIFC]){
+          missing_files = DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
+        }
+        if (!missing_files.empty()){
+          msg += "File(s)   "+subdirectories[i]+"/"+missing_files+" is (are) missing.\n";
+        }
+      }
+    }
+
+    // No exception is thrown since QHA is handling the problem of missing files
+    // in a way that a method that depends on missing data will not be evaluated.
+    // Since the user might request a number of methods to be run in one aflow run,
+    // we want to allow the ones that do not depend on the missing data to finish
+    // successfully. For example, a finite difference calculation of Grueneisen
+    // parameters does not depend on any data from any static DFT calculation.
+    if (!msg.empty()){
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
+    }
+  }
+
+  /// Runs APL-realted processing and postprocessing logic.
+  ///
+  /// Reads data from a set of APL calculations only when all required output files are
+  /// present.
+  /// Post-processing will happen only when all required data from this set was read
+  /// successfully.
+  bool QHA::runAPL(_xflags &xflags, _aflags &aflags, _kflags &kflags, QHAtype qhatype)
+  {
+    string function = XPID + "QHA::runAPL():";
+    string msg = "Checking if all required files from ";
+    switch(qhatype){
+      case (QHA_EOS):
+        msg += "EOS";
+        break;
+      case (QHA_FD):
+        msg += "FD";
+        break;
+      case (QHA_TE):
+        msg += "TE";
+        break;
+    }
+    msg+=" APL calculations exist.";
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+      *p_oss, _LOGGER_MESSAGE_);
+
+    vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
+        (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
+
+    vector<double> &coefVolumes = (QHA_FD==qhatype) ? coefGPVolumes :
+      (QHA_EOS==qhatype) ? coefEOSVolumes : coefQHANPVolumes;
+
+    vector<vector<bool> > file_is_present(subdirectories_apl_eos.size(),vector<bool>(2));
+
+    bool apl_data_available = false;
+    uint n_apl_calcs = checkAPLCalculations(file_is_present, qhatype);
+    if (n_apl_calcs == subdirectories.size()){
+      apl_data_available = readAPLCalculationData(subdirectories, coefVolumes, kflags,
+          qhatype);
+    }
+    else{
+      /// if there exists data for at least one completed APL calculation, an error is
+      /// printed listing missing files/directories.
+      /// Thus, errors are not printed if it is a first QHA run or QHA was run by
+      /// mistake after the first run before the APL calculations were executed.
+      if (n_apl_calcs > 0) printMissingAPLFiles(file_is_present, qhatype);
+      createSubdirectoriesAPLRun(xflags, aflags, kflags, file_is_present, qhatype);
+    }
+    return apl_data_available;
+  }
+
+  /// Gathers and processes data from finished APL calculations.
+  /// 
+  bool QHA::readAPLCalculationData(const vector<string> &subdirectories,
+      const vector<double> &coefVolumes, _kflags &kflags, QHAtype type)
+  {
+    string function = XPID + "QHA::readAPLCalculationData():";
     string msg = "Reading phonon DOS and dispersion relations.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
@@ -1046,7 +1229,7 @@ namespace apl
     }
 
     int Nqpoints = 0;
-    bool apl_data_calculated = true;
+    bool apl_data_read_successfully = true;
 
     for (uint i=0; i<subdirectories.size(); i++){
       xinput.xvasp.str = origStructure;
@@ -1069,44 +1252,21 @@ namespace apl
 
       string hibernation_file = subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX + 
         DEFAULT_APL_HARMIFC_FILE;
-      bool was_awakened = false;
       if (aurostd::EFileExist(hibernation_file)){
         msg = "Reading hibernation file...";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_MESSAGE_);
         try{
           phcalc.awake();
-          was_awakened = true;
         } catch (aurostd::xerror& e){
-          was_awakened = false;
           pflow::logger(QHA_ARUN_MODE, function, e.error_message, currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
           msg = "Reading data from the hibernation file failed.";
           msg += " Force constants and the relevant data will be recalculated.";
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
+          return false;
         }
-      }
-
-      if (!was_awakened){
-        ForceConstantCalculator fccalc(phcalc.getSupercell(), apl_options, *p_FileMESSAGE, *p_oss);
-        // set the name of the subdirectory
-        xinput.setDirectory(subdirectories[i]);
-  
-        // if it is the first run, create APL subdirectories with corresponding aflow.in
-        // files and skip to the next volume calculation
-        if (fccalc.runVASPCalculations(xinput, aflags, kflags, xflags, aflowin)){
-          apl_data_calculated = false;
-          continue;
-        }
-  
-        // check if APL calculation is ready and calculate the force constants
-        if (!fccalc.run()){
-          apl_data_calculated = false;
-          continue;
-        }
-        fccalc.hibernate();
-        phcalc.setHarmonicForceConstants(fccalc);
       }
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and
@@ -1150,7 +1310,7 @@ namespace apl
 
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
-          apl_data_calculated = false;
+          apl_data_read_successfully = false;
         }
       }
 
@@ -1257,7 +1417,7 @@ namespace apl
       }
     }
 
-    return apl_data_calculated;
+    return apl_data_read_successfully;
   }
 
   /// Reads data from a set of static DFT calculations.
@@ -1507,7 +1667,7 @@ namespace apl
   ///
   xvector<double> QHA::fitToEOSmodel(xvector<double> &E, EOSmethod method)
   {
-    string function = XPID + "EOSfit::fit():", msg = "";
+    string function = XPID + "QHA::fitToEOSmodel():", msg = "";
     xvector<double> V = aurostd::vector2xvector(EOSvolumes);
     xvector<double> fit_params;
     xvector<double> guess(4);
@@ -1565,7 +1725,7 @@ namespace apl
   /// Returns the (free) energy at a given volume for a chosen EOS model.
   double QHA::evalEOSmodel(double V, const xvector<double> &p, EOSmethod method)
   {
-    string function = XPID + "EOSfit::eval():", msg = "";
+    string function = XPID + "QHA::evalEOSmodel():", msg = "";
     double energy = 0;
 
     static xvector<double> dydp(4);

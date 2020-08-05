@@ -795,7 +795,7 @@ namespace KBIN {
       apl::QHA qha(xinput, qhaopts, aplopts, FileMESSAGE, oss);
 
       qha.system_title = phcalc._system;
-      qha.run(xflags, aflags, kflags, AflowIn);
+      qha.run(xflags, aflags, kflags);
       return;
     }
     //AS20200513 END
