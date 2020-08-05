@@ -46,6 +46,7 @@ namespace xelement {
       double volume;                          // atomic volume in A^3 from the FCC vasp table and/or successive calculations // DONE SC20190524
       double Miedema_Vm;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
       // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
+      //
       double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
       double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
       double valence_PT;                      //           http://periodictable.com      //DU20190517
@@ -72,7 +73,6 @@ namespace xelement {
       double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
       double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
       double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
-
       //RF+SK20200410 START
       // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
       // https://en.wikipedia.org/wiki/Oxidation_state#Determination
@@ -84,11 +84,11 @@ namespace xelement {
       vector<double> oxidation_states_preferred;
       vector<double> oxidation_states;
       //RF+SK20200410 END
-
       double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
       double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
       double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
       double Miedema_gamma_s;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
+      //
       double Pettifor_scale;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
       //                                          
       double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
