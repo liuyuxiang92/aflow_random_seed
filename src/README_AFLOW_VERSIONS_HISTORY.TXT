@@ -64,6 +64,10 @@
         -- added --force_outliers to chull (CO)
         -- added EFA to _aflowlib_entry (CO)
         -- added entropy_stabilization_coefficient to chull (CO)
+        -- adding null_xv (CO)
+        -- patched xvector for null_xv (CO)
+        -- optimized stability criterion and n+1 enthalpy gain algorithms: shaved minutes off the full analysis for ternaries, even bigger gains for higher N (CO)
+        -- added --n+1_enthalpy_gain and --skip_n_plus_1_enthalpy_gain_analysis for chull (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

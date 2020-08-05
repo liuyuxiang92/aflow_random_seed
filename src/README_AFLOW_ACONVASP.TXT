@@ -1050,6 +1050,11 @@ LATTICES = (the ones with "")
               a warning if structure is not a ground state one. It removes the point from the 
               hull, calculates the new hull, and calculates the distance of this point from
               below/above (Hf/Ts) hull.
+        [--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774] :
+              Calculates the N+1 enthalpy gain of the ground state structure. Will return
+              a warning if structure is not a ground state one. It removes all points having the 
+              same dimensionality from the hull, calculates the new hull, and calculates the 
+              distance of this point from below/above (Hf/Ts) hull.
         [--hull_formation_enthalpy=|--hull_energy=0.25,0.25] : Returns the value of the convex hull surface at the specified coordinate/concentration.
               For stoichiometric hulls, provide the reduced composition form, i.e., for the compound Mn2PdPt, use
               --hull_formation_enthalpy=0.5,0.25, where the composition of the last component is implicitly 1-sum(0.5+0.25).
@@ -1059,6 +1064,8 @@ LATTICES = (the ones with "")
               equivalent ground state structures is skipped (can be time consuming).
         [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion] : analysis
               of stability criterion for ground state structures is skipped (can be time consuming).
+        [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo] : analysis
+              of N+1 enthalpy gain for ground state structures is skipped (can be time consuming).
         [--include_skewed_hulls|--include_skewed|--ish] : process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
         [--include_unreliable_hulls|--include_unreliable|--iuh] : process hull despite poor statistics (binary hull count < 200).
         [--include_outliers|--io] : include any detected outliers (output/warning is still shown).

@@ -292,7 +292,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::INCLUDE_PAW_GGA",aurostd::args2flag(argv,cmds,"--include_paw_gga|--paw_gga")); //include entries calculated with PAW_GGA
     vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",aurostd::args2flag(argv,cmds,"--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_stability_criterion_analysis|--skip_stability_criterion|--skipstabilitycriterionanalysis|--skipstabilitycriterion|--skipscriterion|--sscriterion"));    //use entropic temperature instead of enthalpy of formation
-    vpflow.flag("CHULL::NPLUS1_ENTHALPY_GAIN",aurostd::args2flag(argv,cmds,"--n1eg|--n1enthalpygain|--np1|--nplus1|--nplusone")); //SK20200325 - skip all n-dimensional points and calculate new hull
+    vpflow.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS",aurostd::args2flag(argv,cmds,"--include_skewed_hulls|--include_skewed|--ish"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_UNRELIABLE_HULLS",aurostd::args2flag(argv,cmds,"--include_unreliable_hulls|--include_unreliable|--iuh"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_OUTLIERS",aurostd::args2flag(argv,cmds,"--include_outliers|--io"));    //use entropic temperature instead of enthalpy of formation
@@ -340,8 +340,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     } else {vpflow.flag("CHULL::LATEX_DOC",TRUE);}   //default
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::DIST2HULL","--distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=",""); //calculate distance to hull for point
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::STABILITY_CRITERION","--stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=",""); //calculate stable criterion for point
+    vpflow.args2addattachedscheme(argv,cmds,"CHULL::N+1_ENTHALPY_GAIN","--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=",""); //calculate stable criterion for point
+    vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN",aurostd::args2flag(argv,cmds,"--n1eg|--n1enthalpygain|--np1|--nplus1|--nplusone")); //SK20200325 - skip all n-dimensional points and calculate new hull
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::HULL_FORMATION_ENTHALPY","--hull_formation_enthalpy=|--hull_energy=",""); //calculate stable criterion for point
-    if(vpflow.flag("CHULL::STABILITY_CRITERION")||vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
+    if(vpflow.flag("CHULL::STABILITY_CRITERION")||vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")||vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
       //vpflow.flag("CHULL::TEXT_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
       //vpflow.flag("CHULL::JSON_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
       vpflow.flag("CHULL::WEB_DOC",FALSE);    //turn off
@@ -2307,9 +2309,11 @@ namespace pflow {
     strstream << tab << xspaces << " " << "ANALYSIS OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
     strstream << tab << xspaces << " " << "              --stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
+    strstream << tab << xspaces << " " << "              --n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
     strstream << tab << xspaces << " " << "              --hull_formation_enthalpy=|--hull_energy=0.25,0.25" << endl;
     strstream << tab << xspaces << " " << "              --skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc" << endl;
     strstream << tab << xspaces << " " << "              --skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion" << endl;
+    strstream << tab << xspaces << " " << "              --skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo" << endl;
     strstream << tab << xspaces << " " << "              --include_skewed_hulls|--include_skewed|--ish" << endl;
     strstream << tab << xspaces << " " << "              --include_unreliable_hulls|--include_unreliable|--iuh" << endl;
     strstream << tab << xspaces << " " << "              --include_outliers|--io" << endl;

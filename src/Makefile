@@ -1219,6 +1219,9 @@ check_chull:
 	@ALLOY="CuZr" && STOICH="x=0.5" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - $$ALLOY hull energy at $$STOICH" | tee -a $(COUNTER_FILE) && ANSWER="-158." && COMMAND="./aflow --chull --alloy=$$ALLOY --hull_energy=0.5" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
 		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
 		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a $$ALLOY hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at $$STOICH, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPdPt" && COMPOUND="Mn2PdPt" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - N+1 enthalpy gain of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="32." && COMMAND="./aflow --chull --alloy=$$ALLOY --n+1_enthalpy_gain=aflow:fb9eaa58604ce774" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return an enthalpy gain, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return an enthalpy gain of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
 	@echo "CHULL tests passed"
 	@rm -f $(COUNTER_FILE)
 .PHONY: check_pocc

@@ -56,6 +56,7 @@ namespace aurostd {
         void set(const utype&);
         void reset(void);
         void clear(void);
+        void null(void);  //CO20200731 - to create null vector
       private:
         utype *corpus;
         // bool isfloat,iscomplex;
@@ -247,6 +248,7 @@ namespace aurostd {
 // ----------------------------------------------------------- xvector example types
 namespace aurostd {
   //CO20180419
+  template<class utype> xvector<utype> null_xv() __xprototype;  //CO20200731 - friend so it can access refresh()
   template<class utype> xvector<utype> ones_xv(int=3,int=1) __xprototype;
   template<class utype> xvector<utype> box_filter_xv(int window,int lrows=1) __xprototype;
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shiftlrows()
