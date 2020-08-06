@@ -6470,20 +6470,25 @@ namespace chull {
       return AUROSTD_MAX_DOUBLE; //0; //return null
     }
 
-    //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
-    uint j_nary=AUROSTD_MAX_UINT,j_alloy=AUROSTD_MAX_UINT;
-    if(!getAlloyIndex(point,j_nary,j_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-    xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
-    if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
-    point.cleanPointForHullTransfer();      //clean now
-    point.setHullCoords(elements_present);  //just to be sure
-
-    if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
-    if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
+    //set fake_hull
+    xvector<int> elements_present_points=point.m_elements_present;
+    xvector<int> elements_present_hull=elements_present_points;
+    if(sum(elements_present_hull)==1){
+      //pick ANY other index to be 1 as well
+      if(elements_present_hull[elements_present_hull.lrows]==0){elements_present_hull[elements_present_hull.lrows]=1;}
+      else{
+        if(elements_present_hull.rows<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present.rows<2",_INPUT_ILLEGAL_);} //we cannot have unary hulls as input (facets issue)
+        if(elements_present_hull[elements_present_hull.lrows+1]==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present mismatch for unary hull",_INDEX_MISMATCH_);}
+        elements_present_hull[elements_present_hull.lrows+1]=1;
+      }
+    }
+    if(sum(elements_present_hull)==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not fix sum(elements_present_hull)==1",_RUNTIME_ERROR_);}
 
     //get full set of points to neglect
     //neglect ALL points with equal or higher dimensionality
     if(hull_set==false){
+      uint j_nary=AUROSTD_MAX_UINT,j_alloy=AUROSTD_MAX_UINT;
+      if(!getAlloyIndex(point,j_nary,j_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
       uint i_coord_group=AUROSTD_MAX_UINT;
       vector<uint> vcpoints;
       for(uint fl_size_i_nary=m_naries.size(),i_nary=(fl_size_i_nary-1);i_nary<fl_size_i_nary&&i_nary>=j_nary;i_nary--){ //go backwards!
@@ -6506,21 +6511,18 @@ namespace chull {
         cerr << endl;
       }
       
-      //set fake_hull
-      xvector<int> elements_present_points=point.m_elements_present;
-      xvector<int> elements_present_hull=elements_present_points;
-      if(sum(elements_present_hull)==1){
-        //pick ANY other index to be 1 as well
-        if(elements_present_hull[elements_present_hull.lrows]==0){elements_present_hull[elements_present_hull.lrows]=1;}
-        else{
-          if(elements_present_hull.rows<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present.rows<2",_INPUT_ILLEGAL_);} //we cannot have unary hulls as input (facets issue)
-          if(elements_present_hull[elements_present_hull.lrows+1]==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present mismatch for unary hull",_INDEX_MISMATCH_);}
-          elements_present_hull[elements_present_hull.lrows+1]=1;
-        }
-      }
-      if(sum(elements_present_hull)==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not fix sum(elements_present_hull)==1",_RUNTIME_ERROR_);}
       getFakeHull(vcpoints,elements_present_hull,elements_present_points,fake_hull);
     }
+    
+    //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
+    //xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
+    //if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
+    //point.setHullCoords(elements_present);  //just to be sure
+    point.cleanPointForHullTransfer();      //clean now
+    point.reduceCoords(elements_present_hull);  //reduce to minimum hull necessary to calculate scriterion (for unaries this will be a binary)
+    point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
+    if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
+    if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
 
     return fake_hull.getDistanceToHull(point,false);
   }
@@ -6623,8 +6625,7 @@ namespace chull {
     //CONSISTENCY CHECKS?
     //yes - for unaries/binaries N+1 == formation enthalpy
     //[MATHEMATICALLY ALLOWED but our definition of N+1 energy does not allow for unaries, so don't check]if(m_points[i_point].m_i_nary==0 || m_points[i_point].m_i_nary==1)
-    if(m_points[i_point].m_i_nary==1)
-    {
+    if(m_points[i_point].m_i_nary==1) {
       if(m_points[i_point].m_has_entry&&H_f_atom(m_points[i_point].m_entry)!=AUROSTD_NAN){  //m_points[i_point].m_entry.enthalpy_formation_atom
         if(!aurostd::identical(abs(np1egain),abs(H_f_atom(m_points[i_point].m_entry)),ZERO_MEV_TOL)){ //m_points[i_point].m_entry.enthalpy_formation_atom
           message << "abs(np1egain) != abs(H_f_atom(m_points[i_point].m_entry)) [ " << abs(np1egain) << " != " << abs(H_f_atom(m_points[i_point].m_entry)) << " ], please check"; //m_points[i_point].m_entry.enthalpy_formation_atom

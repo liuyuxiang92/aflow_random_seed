@@ -1284,6 +1284,13 @@ namespace aflowlib {
     
 
     string system_name=KBIN::ExtractSystemName(directory_LIB);
+
+    if(perform_THERMODYNAMICS||perform_POCC) {
+      aurostd::string2tokens(directory_LIB,tokens,"/");
+      aflowlib_data.prototype=tokens.at(tokens.size()-1);
+      aurostd::StringSubst(aflowlib_data.prototype,":LDAU2","");
+      aurostd::StringSubst(aflowlib_data.prototype,"\n","");aurostd::StringSubst(aflowlib_data.prototype," ","");aurostd::StringSubst(aflowlib_data.prototype," ","");
+    }
     
     if(LDEBUG) cerr << soliloquy << " [3]" << endl;
 
@@ -2542,10 +2549,10 @@ namespace aflowlib {
     data.vloop.push_back("thermodynamics");
     // star
 
-    aurostd::string2tokens(directory_LIB,tokens,"/");
-    data.prototype=tokens.at(tokens.size()-1);
-    aurostd::StringSubst(data.prototype,":LDAU2","");
-    aurostd::StringSubst(data.prototype,"\n","");aurostd::StringSubst(data.prototype," ","");aurostd::StringSubst(data.prototype," ","");
+    //[CO20200731 - moving to main LIB2RAW() loop]aurostd::string2tokens(directory_LIB,tokens,"/");
+    //[CO20200731 - moving to main LIB2RAW() loop]data.prototype=tokens.at(tokens.size()-1);
+    //[CO20200731 - moving to main LIB2RAW() loop]aurostd::StringSubst(data.prototype,":LDAU2","");
+    //[CO20200731 - moving to main LIB2RAW() loop]aurostd::StringSubst(data.prototype,"\n","");aurostd::StringSubst(data.prototype," ","");aurostd::StringSubst(data.prototype," ","");
 
     // FILES
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,_AFLOWIN_,directory_RAW,_AFLOWIN_,vfile,MESSAGE);  // _AFLOWIN_
@@ -5283,6 +5290,7 @@ namespace aflowlib {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
+          if(tokens.at(0)=="enthalpy_mix_atom") data.energy_atom=aurostd::string2utype<double>(tokens.at(1));
           if(tokens.at(0)=="entropy_forming_ability") data.entropy_forming_ability=aurostd::string2utype<double>(tokens.at(1));
         }
       }
