@@ -1213,8 +1213,8 @@ namespace pocc {
       //[CO20200731 - OBSOLETE]ossmain << "[POCC_AGL_RESULTS]START" << endl;
       ossmain << "[POCC_AGL_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << "pocc_temperature=" << T << "  (K)" << endl;
-      ossmain << "pocc_agl_debye_temperature=" << Debye_temperature_ave << "  (K)" << endl;
-      ossmain << "pocc_agl_debye_acoustic=" << Debye_acoustic_ave << "  (K)" << endl;
+      ossmain << "pocc_agl_debye=" << Debye_temperature_ave << "  (K)" << endl; //CO20200731 - debye_temperature -> debye (matching old AGL designation)
+      ossmain << "pocc_agl_acoustic_debye=" << Debye_acoustic_ave << "  (K)" << endl; //CO20200731 - debye_acoustic -> acoustic_debye (matching old AGL designation)
       ossmain << "pocc_agl_gruneisen=" << Gruneisen_ave << endl;
       ossmain << "pocc_agl_heat_capacity_Cv_300K=" << Cv300K_ave << "  (kB/cell)" << endl;
       ossmain << "pocc_agl_heat_capacity_Cp_300K=" << Cp300K_ave << "  (kB/cell)" << endl;
