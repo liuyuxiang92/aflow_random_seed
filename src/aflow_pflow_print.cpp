@@ -910,38 +910,38 @@ namespace pflow {
 // This funtion prints out structural data.
 // Stefano Curtarolo
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { //CO20171027 //DX20180806 - added space group setting
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,const string& smode, const string& format,bool already_calculated) { //CO20171027 //DX20180806 - added space group setting
     //DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
     double tolerance = SYM::defaultTolerance(str_sym); //DX20180215 START with default tolerance //DX20180226 - str_sym not str_sp
     if(already_calculated){tolerance=str_sp.sym_eps;} //CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); //CO20171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,tolerance,smode,no_scan,sg_setting,format,already_calculated); //CO20171027
   }
 }
 
 //DX20180822 - add xoption - START
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format,bool already_calculated) {
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,aurostd::xoption& vpflow,const string& smode,const string& format,bool already_calculated) {
     //DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
     double tolerance = SYM::defaultTolerance(str_sym); //DX20180215 START with default tolerance //DX20180226 - str_sym not str_sp
     if(already_calculated){tolerance=str_sp.sym_eps;} //CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); //CO20171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,vpflow,tolerance,smode,no_scan,sg_setting,format,already_calculated); //CO20171027
   }
 }
 
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) {
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,double tolerance,const string& smode, bool no_scan, int sg_setting, const string& format,bool already_calculated) {
     aurostd::xoption vpflow;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); 
+    PrintData(str,str_sym,str_sp,str_sc,oss,vpflow,tolerance,smode,no_scan,sg_setting,format,already_calculated); 
   }
 }
 
 //DX20180822 - add xoption - END
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { //CO20171027 //DX20180822 -added xoption
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode, bool no_scan, int sg_setting, const string& format,bool already_calculated) { //CO20171027 //DX20180822 -added xoption
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "pflow::PrintData: BEGIN" << endl;
     // smode=="DATA" or "EDATA"
@@ -1484,19 +1484,26 @@ namespace pflow {
   } // namespace pflow
 
   namespace pflow {
-    void PrintData(const xstructure& str,ostream& oss,string smode, const string& format) {
+    void PrintData(const xstructure& str,ostream& oss,const string& smode,const string& format) {
       xstructure str_sym,str_sp,str_sc; //CO20171027
       double tolerance = AUROSTD_NAN;
       bool no_scan = false;
       int sg_setting = 1;
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); //CO20171027
+      return PrintData(str,str_sym,str_sp,str_sc,oss,tolerance,smode,no_scan,sg_setting,format); //CO20171027
+    }
+    void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode,const string& format) {
+      xstructure str_sym,str_sp,str_sc; //CO20171027
+      double tolerance = AUROSTD_NAN;
+      bool no_scan = false;
+      int sg_setting = 1;
+      return PrintData(str,str_sym,str_sp,str_sc,oss,vpflow,tolerance,smode,no_scan,sg_setting,format); //CO20171027
     }
   } // namespace pflow
 
   namespace pflow {
-    void PrintData(const xstructure& str,ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format) {
+    void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode, bool no_scan, int sg_setting, const string& format) {
       xstructure str_sym,str_sp,str_sc; //CO20171027
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); //CO20171027
+      return PrintData(str,str_sym,str_sp,str_sc,oss,tolerance,smode,no_scan,sg_setting,format); //CO20171027
     }
   } // namespace pflow
 
@@ -2689,7 +2696,7 @@ namespace pflow {
 
 //DX20180822 - add xoption - START
 namespace pflow {
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss, bool no_scan, const int& sg_setting, bool standalone, const string& format,bool already_calculated) { 
+  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss, bool no_scan, int sg_setting, bool standalone, const string& format,bool already_calculated) { 
     aurostd::xoption vpflow;
     return PrintSGData(str_sg,tolerance,oss,vpflow,no_scan,sg_setting,standalone,format,already_calculated);
   }
@@ -2697,7 +2704,7 @@ namespace pflow {
 //DX20180822 - add xoption - END
 
 namespace pflow {
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, int setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << XPID << "pflow::PrintSGData: BEGIN" << endl;
     stringstream oss;

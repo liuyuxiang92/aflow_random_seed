@@ -3763,11 +3763,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_orig; //DX20180823 - added xoption
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"EDATA",vpflow_edata_orig,"txt",false); // 1=EDATA //CO20171025 //CO20171027
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_orig,"EDATA","txt",false); // 1=EDATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing orig (POSCAR.orig) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"EDATA",vpflow_edata_orig,"json",true); // 1=EDATA, already_calculated!  //CO20171025 //CO20171027
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_orig,"EDATA","json",true); // 1=EDATA, already_calculated!  //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4067,11 +4067,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_relax; //DX20180823 - added xoption
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"EDATA",vpflow_edata_relax,"txt",false); // EDATA //CO20171025 //CO20171027
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_relax,"EDATA","txt",false); // EDATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing relax (CONTCAR.relax) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"EDATA",vpflow_edata_relax,"json",true); // EDATA already_calculated! //CO20171025 //CO20171027
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_relax,"EDATA","json",true); // EDATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4310,11 +4310,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_bands; //DX20180823 - added xoption
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"EDATA",vpflow_edata_bands,"txt",false); // EDATA //CO20171025 //CO20171027
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_bands,"EDATA","txt",false); // EDATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing bands (POSCAR.bands) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"EDATA",vpflow_edata_bands,"json",true); // EDATA already_calculated! //CO20171025 //CO20171027
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_bands,"EDATA","json",true); // EDATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -5470,28 +5470,29 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE && data.ldau_TLUJ.size()) cout << MESSAGE << " LDAU_string=" << data.ldau_TLUJ << endl;
     data.pressure=xOUT.pressure;
 
-    //POSAR.orig
-    stringstream xstr_ss,sss;
+    //if you want to grab from the derivative structure, do as below
+    //xstructure xstr_orig;
+    //stringstream xstr_ss;
+    //if(xstr_orig.atoms.size()==0 && aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/POSCAR.orig",filename)){
+    //  aurostd::efile2stringstream(filename,xstr_ss);
+    //  if(LDEBUG){cerr << soliloquy << " found POSCAR.orig:" << endl;cerr << xstr_ss.str() << endl;}
+    //  xstr_ss >> xstr_orig;
+    //  if(LDEBUG){cerr << soliloquy << " loaded POSCAR.orig" << endl;}
+    //}
+    //if(xstr_orig.atoms.size()==0 && aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/POSCAR.relax1",filename)){
+    //  aurostd::efile2stringstream(filename,xstr_ss);
+    //  if(LDEBUG){cerr << soliloquy << " found POSCAR.relax1:" << endl;cerr << xstr_ss.str() << endl;}
+    //  xstr_ss >> xstr_orig;
+    //  if(LDEBUG){cerr << soliloquy << " loaded POSCAR.relax1" << endl;}
+    //}
+    //if(xstr_orig.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"xstr_orig cannot be extracted",_FILE_CORRUPT_);}
+    
+    //parent structure
+    if(pcalc.xstr_sym.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pcalc.xstr_sym was not found",_RUNTIME_ERROR_);}
+    stringstream sss;
     aurostd::xoption vpflow_edata; //DX20180823 - added xoption
-    xstructure xstr_sym,xstr_sp,xstr_sc;
-    xstructure xstr_orig;
-    if(xstr_orig.atoms.size()==0 && aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/POSCAR.orig",filename)){
-      aurostd::efile2stringstream(filename,xstr_ss);
-      if(LDEBUG){cerr << soliloquy << " found POSCAR.orig:" << endl;cerr << xstr_ss.str() << endl;}
-      xstr_ss >> xstr_orig;
-      if(LDEBUG){cerr << soliloquy << " loaded POSCAR.orig" << endl;}
-    }
-    if(xstr_orig.atoms.size()==0 && aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/POSCAR.relax1",filename)){
-      aurostd::efile2stringstream(filename,xstr_ss);
-      if(LDEBUG){cerr << soliloquy << " found POSCAR.relax1:" << endl;cerr << xstr_ss.str() << endl;}
-      xstr_ss >> xstr_orig;
-      if(LDEBUG){cerr << soliloquy << " loaded POSCAR.relax1" << endl;}
-    }
-    if(xstr_orig.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"xstr_orig cannot be extracted",_FILE_CORRUPT_);}
     if(LDEBUG){cerr << soliloquy << " starting EDATA analysis" << endl;}
-    vpflow_edata.clear();
-    xstr_sym=xstr_orig;
-    pflow::PrintData(xstr_orig,xstr_sym,xstr_sp,xstr_sc,sss,"EDATA",vpflow_edata,"txt",false); // 1=EDATA //CO20171025 //CO20171027
+    pflow::PrintData(pcalc.xstr_sym,sss,vpflow_edata,"EDATA"); // 1=EDATA //CO20171025 //CO20171027
     if(LDEBUG){cerr << soliloquy << " EDATA analysis finished" << endl;}
     //do NOT write out file, not all the properties are applicable
     if(vpflow_edata.flag("EDATA::CALCULATED")) {

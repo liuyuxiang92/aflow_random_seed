@@ -114,8 +114,8 @@ namespace pflow {
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190314 - overloaded 
-  //DX20170901 [OBSOLETE] void DATA(string smode,istream& input);
-  bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170901 - SGDATA + JSON
+  //DX20170901 [OBSOLETE] void DATA(const string& smode="DATA",istream& input);
+  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode="DATA",ostream& oss=cout); //DX20170901 - SGDATA + JSON
   void DATA1(const string& options,istream& input);
   void DATA2(istream& input);
   void DEBYE(const string& options);
@@ -484,13 +484,13 @@ namespace pflow {
   void PrintCIF(ostream& oss,const xstructure&,int=1,int=1); //DX20180806 - added setting default
   void PrintClat(const xvector<double>& data,ostream& oss=cout);
   void PrintCmpStr(const xstructure& str1,const xstructure& str2,const double& rcut,ostream& oss=cout);
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,string mode, const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format="txt",bool already_calculated=false); //DX20180823
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt",bool already_calculated=false); //DX20180822
-  //DX20170901 [OBSOLETE] void PrintData(const xstructure&,ostream& oss,string mode,const string& format="txt",bool already_calculated=false);
-  void PrintData(const xstructure& str,ostream& oss,string smode,double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt");
-  void PrintData(const xstructure& str,ostream& oss,string smode,const string& format="txt");
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //CO20171027
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //CO20171027
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //DX20180823
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //DX20180822
+  void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
+  void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
+  void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);
@@ -498,9 +498,9 @@ namespace pflow {
   void PrintDistances(xstructure str,const double cutoff,ostream& oss=cout);
   void PrintEwald(const xstructure& in_str,double& epoint,double& ereal,double& erecip,double& eewald,double& eta,const double& SUMTOL,ostream& oss=cout);
   void PrintGulp(const xstructure&,ostream& oss=cout);
-  bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone=true, const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss, bool no_scan, const int& setting=1, bool standalone=true, const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& sg_setting=1, bool standalone=true, const string& format="txt",bool already_calculated=false); //DX20180822
+  bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
+  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
 }
 void PrintKmesh(const xmatrix<double>& kmesh,ostream& oss=cout);    // HERE
 void PrintImages(xstructure strA,xstructure strB,const int& ni,const string& path_flag);

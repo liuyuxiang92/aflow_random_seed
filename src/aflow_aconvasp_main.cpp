@@ -1726,8 +1726,8 @@ namespace pflow {
       if(vpflow.flag("CE::SUPERLATTICE")) {pflow::Superlattice(vpflow.getattachedscheme("CE::SUPERLATTICE")); _PROGRAMRUN=true;}
       if(vpflow.flag("CE::SQS")) {pflow::SQS(vpflow.getattachedscheme("CE::SQS")); _PROGRAMRUN=true;}
       // D
-      //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin,vpflow,cout); _PROGRAMRUN=true;}
+      //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA(cin,"DATA"); _PROGRAMRUN=true;}
+      if(vpflow.flag("DATA")) {pflow::DATA(cin,vpflow,"DATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA2")) {pflow::DATA2(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DEBYE")) {pflow::DEBYE(vpflow.getattachedscheme("DEBYE")); _PROGRAMRUN=true;}
@@ -1736,8 +1736,8 @@ namespace pflow {
       if(vpflow.flag("DIST")) {pflow::DIST(vpflow.getattachedscheme("DIST"),cin); _PROGRAMRUN=true;}
       //if(DYNADIEL) {pflow::DYNADIEL(argv) ; _PROGRAMRUN=true ;} // CAMILO
       // E
-      //DX20170901 [OBSOLETE] if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin,vpflow,cout); _PROGRAMRUN=true;}
+      //DX20170901 [OBSOLETE] if(vpflow.flag("EDATA")) {pflow::DATA(cin,"EDATA"); _PROGRAMRUN=true;}
+      if(vpflow.flag("EDATA")) {pflow::DATA(cin,vpflow,"EDATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EDOS")) {pflow::EDOS(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("EFFMASS")) { pflow::EFFMASS(argv, cout) ; _PROGRAMRUN=true ; } // CAMILO
       //  if(vpflow.flag("EFFECTIVEMASS")) {pflow::EffectiveMass(argv,aurostd::args2string(argv,"--em","./"),cout); _PROGRAMRUN=true;}
@@ -5416,7 +5416,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   //void DATA(string smode,istream& input)
-  bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss) {
+  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode,ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::DATA()";
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -5505,7 +5505,7 @@ namespace pflow {
       cout << aflow::Banner("BANNER_TINY") << endl;
     }
     // pflow::PrintData(a,cerr,smode);
-    pflow::PrintData(a,oss,smode,tolerance,no_scan,setting,format); //DX cout to oss
+    pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
     return true;
   }
 } // namespace pflow
