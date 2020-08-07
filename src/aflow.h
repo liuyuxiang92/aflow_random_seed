@@ -85,6 +85,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
 #define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
 #define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
+#define _AFLOW_STOICH_PRECISION_ 9  //CO20200731
 
 //XRD
 #define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO20190622

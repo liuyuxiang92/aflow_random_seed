@@ -55,42 +55,13 @@ namespace pocc {
   //does NOT handle aflow.in generation well at all
   bool poccInput() {
     string soliloquy = XPID + "pocc::poccInput():";
-    stringstream message;
-
-    //streams
-    ostream& oss=cout;
+    //aflow_pocc.log
     ofstream FileMESSAGE; FileMESSAGE.open("aflow_pocc.log");
-
-    //aflags
-    _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
-
-    //aflow.in
-    string AflowIn_file,AflowIn;
-    try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
-    catch(aurostd::xerror& err){
-      pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-      FileMESSAGE.close();
-      return false;
-    }
-
-    //other flags
-    _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
-    _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
-
-    pocc::POccCalculator pcalc;
-    try{
-      pcalc.initialize(aflags,kflags,vflags,FileMESSAGE,oss);
-      _xvasp xvasp;
-      pcalc.generateStructures(xvasp);
-    }
-    catch(aurostd::xerror& err){
-      pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-      FileMESSAGE.close();
-      return false;
-    }
-    FileMESSAGE.close();
+    //directory
+    string directory="";
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(directory.empty() || directory=="./" || directory=="."){directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    KBIN::VASP_RunPOCC(directory,FileMESSAGE);
     return true;
   }
 } // namespace pocc
