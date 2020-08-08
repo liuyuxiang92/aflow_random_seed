@@ -94,6 +94,8 @@ namespace pocc {
 
   void poccOld2New(ostream& oss=cout);
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
+  
+  string addDefaultPOCCTOL2string(const string& input);
 } // namespace pocc
 
 namespace pocc {

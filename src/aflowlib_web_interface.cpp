@@ -177,6 +177,7 @@ namespace aflowlib {
     anrl_parameter_list_relax="";
     anrl_parameter_values_relax="";
     //DX20190209 - added anrl info - END
+    pocc_parameters=""; //CO20200731
     // AGL/AEL
     agl_thermal_conductivity_300K=AUROSTD_NAN;
     agl_debye=AUROSTD_NAN;
@@ -386,6 +387,7 @@ namespace aflowlib {
     anrl_parameter_list_relax=b.anrl_parameter_list_relax;
     anrl_parameter_values_relax=b.anrl_parameter_values_relax;
     //DX20190209 - added anrl info - END
+    pocc_parameters=b.pocc_parameters;  //CO20200731
     // AGL/AEL
     agl_thermal_conductivity_300K=b.agl_thermal_conductivity_300K;
     agl_debye=b.agl_debye;
@@ -773,6 +775,7 @@ namespace aflowlib {
         else if(keyword=="anrl_parameter_list_relax") {anrl_parameter_list_relax=content;}
         else if(keyword=="anrl_parameter_values_relax") {anrl_parameter_values_relax=content;}
         //DX20190209 - added anrl info - END
+        else if(keyword=="pocc_parameters") {pocc_parameters=content;}  //CO20200731
         // AGL/AEL
         else if(keyword=="agl_thermal_conductivity_300K") {agl_thermal_conductivity_300K=aurostd::string2utype<double>(content);}
         else if(keyword=="agl_debye") {agl_debye=aurostd::string2utype<double>(content);}
@@ -1075,6 +1078,7 @@ namespace aflowlib {
       oss << "anrl_parameter_list_relax" << anrl_parameter_list_relax << (html?"<br>":"") << endl;
       oss << "anrl_parameter_values_relax" << anrl_parameter_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
+      oss << "pocc_parameters" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
       oss << "agl_thermal_conductivity_300K" << agl_thermal_conductivity_300K << (html?"<br>":"") << endl; 
       oss << "agl_debye" << agl_debye << (html?"<br>":"") << endl; 
@@ -1304,6 +1308,7 @@ namespace aflowlib {
       if(anrl_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_list_relax=" << anrl_parameter_list_relax << eendl;
       if(anrl_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_values_relax=" << anrl_parameter_values_relax << eendl;
       //DX20190208 - added anrl info - END
+      if(pocc_parameters.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "pocc_parameters=" << pocc_parameters << eendl; //CO20200731
       // AGL/AEL
       if(agl_thermal_conductivity_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "agl_thermal_conductivity_300K=" << agl_thermal_conductivity_300K << eendl;
       if(agl_debye!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "agl_debye=" << agl_debye << eendl;
@@ -2881,6 +2886,16 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //DX20190208 - added anrl info - END
+ 
+      //CO20200731
+      //////////////////////////////////////////////////////////////////////////
+      if(pocc_parameters.size()){
+        sscontent_json << "\"pocc_parameters\":\"" << pocc_parameters << "\"";
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"pocc_parameters\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
 
       // AGL/AEL
       //////////////////////////////////////////////////////////////////////////
@@ -3726,13 +3741,7 @@ namespace aflowlib {
     string system_name=KBIN::ExtractSystemName(directory);
     if(system_name.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name found",_FILE_CORRUPT_);}
     if(LDEBUG){cerr << soliloquy << " system_name=" << system_name << endl;}
-    if(system_name.find(":TOL_")==string::npos){
-      int prec=3;
-      prec=(int)ceil(log10(1.0/DEFAULT_POCC_SITE_TOL));
-      system_name+=":TOL_"+aurostd::utype2string(DEFAULT_POCC_SITE_TOL,prec);
-      prec=(int)ceil(log10(1.0/DEFAULT_POCC_STOICH_TOL));
-      system_name+="_"+aurostd::utype2string(DEFAULT_POCC_STOICH_TOL,prec);
-    }
+    system_name=pocc::addDefaultPOCCTOL2string(system_name);
     if(LDEBUG){cerr << soliloquy << " system_name(with TOL)=" << system_name << endl;}
 
     _aflags aflags;aflags.Directory=directory;

@@ -29,9 +29,6 @@ using aurostd::xoption;
 
 static const string BANDDOS_SIZE = "8, 4.5";
 
-static const string POCC_TAG=":POCC_";
-static const string ARUN_TAG=":ARUN.";
-static const string POCC_ARUN_TAG=ARUN_TAG+"POCC_";
 static const string DEFAULT_IMAGE_FORMAT = "pdf";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -424,7 +421,7 @@ namespace plotter {
       } else { // Title not in ICSD format
         return aurostd::fixStringLatex(default_title, false, false);
       }
-    } else if (aurostd::substring2bool(default_title, POCC_TAG)) {  // Check if in POCC format
+    } else if (aurostd::substring2bool(default_title, POCC_TITLE_TAG)) {  // Check if in POCC format
       if(LDEBUG){cerr << soliloquy << " found POCC" << endl;}
       title = formatDefaultTitlePOCC(plotoptions,FileMESSAGE,oss); //CO20200404
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
@@ -556,14 +553,14 @@ namespace plotter {
     //convert to: --proto=AB3C_cP5_221_a_c_b:Cs_sv:Eu:I:Pb_d --pocc_params=S0-1xA_S1-1xC_S2-0.5xB-0.5xD
     //arun stuff separate
 
-    if(!aurostd::substring2bool(default_title,POCC_TAG)){  //use generic
-      message << "No POCC_TAG found [" << POCC_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
+    if(!aurostd::substring2bool(default_title,POCC_TITLE_TAG)){  //use generic
+      message << "No POCC_TITLE_TAG found [" << POCC_TITLE_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
       return aurostd::fixStringLatex(default_title, false, false);
     }
     //Get all the pieces of the default title
-    string::size_type t = default_title.find(POCC_TAG);
+    string::size_type t = default_title.find(POCC_TITLE_TAG);
     string elements_prototype_str = default_title.substr(0, t);  //contains elements and prototype
-    string pocc_params_arun_str = default_title.substr(t + POCC_TAG.length(), string::npos);  //pocc_params and ARUN(?)
+    string pocc_params_arun_str = default_title.substr(t + POCC_TITLE_TAG.length(), string::npos);  //pocc_params and ARUN(?)
     if(LDEBUG){
       cerr << soliloquy << " elements_prototype_str=" << elements_prototype_str << endl;
       cerr << soliloquy << " pocc_params_arun_str=" << pocc_params_arun_str << endl;
@@ -592,7 +589,7 @@ namespace plotter {
       if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
       pocc_params=pocc_params_arun_str;
-      c=pocc_params_arun_str.find(POCC_ARUN_TAG);
+      c=pocc_params_arun_str.find(POCC_ARUN_TITLE_TAG);
       if(c!=string::npos && (c+1)<pocc_params_arun_str.length()){
         pocc_params=pocc_params_arun_str.substr(0,c);
         arun=pocc_params_arun_str.substr(c+1,string::npos);

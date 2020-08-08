@@ -196,6 +196,7 @@ namespace aflowlib {
       string anrl_parameter_list_relax;
       string anrl_parameter_values_relax;
       //DX20190208 - added anrl info - END
+      string pocc_parameters; //CO20200731
       // AGL/AEL
       double agl_thermal_conductivity_300K;//  (W/m*K)
       double agl_debye;//  (K)

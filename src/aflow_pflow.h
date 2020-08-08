@@ -491,6 +491,7 @@ namespace pflow {
   void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
   void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
   void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);

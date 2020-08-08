@@ -1491,8 +1491,15 @@ namespace pflow {
       int sg_setting = 1;
       return PrintData(str,str_sym,str_sp,str_sc,oss,tolerance,smode,no_scan,sg_setting,format); //CO20171027
     }
-    void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode,const string& format) {
+    void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode,const string& format) {  //CO20200731
       xstructure str_sym,str_sp,str_sc; //CO20171027
+      double tolerance = AUROSTD_NAN;
+      bool no_scan = false;
+      int sg_setting = 1;
+      return PrintData(str,str_sym,str_sp,str_sc,oss,vpflow,tolerance,smode,no_scan,sg_setting,format); //CO20171027
+    }
+    void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode,const string& format) {  //CO20200731
+      xstructure str_sym; //CO20171027
       double tolerance = AUROSTD_NAN;
       bool no_scan = false;
       int sg_setting = 1;

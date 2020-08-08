@@ -70,6 +70,8 @@
         -- added --n+1_enthalpy_gain and --skip_n_plus_1_enthalpy_gain_analysis for chull (CO)
         -- adding pocc_agl properties to aflowlib.out (CO)
         -- some cleaning of PrintData() (CO)
+        -- added pocc_parameters to _aflowlib_entry (CO)
+        -- added anrl parameters to pocc _aflowlib_entry (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
