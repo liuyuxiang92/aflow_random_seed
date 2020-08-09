@@ -1043,7 +1043,7 @@ namespace aflowlib {
     }
 
     if(tokens.size()>=1) {
-      if(tokens.at(0)=="all") {
+      if(tokens[0]=="all") {
         XHOST.sensors_allowed=FALSE;
         XHOST.vflag_pflow.flag("MULTI=SH",FALSE);
         return LIB2RAW_ALL(options,flag_FORCE);
@@ -2876,7 +2876,8 @@ namespace aflowlib {
     data.volume_cell=str_relax.GetVolume();
     data.volume_atom=str_relax.GetVolume()/(double) data.natoms;
     data_abcabc=Getabc_angles(str_relax.lattice,DEGREES);
-    data.vgeometry.clear(); for(uint i=1;i<=6;i++) data.vgeometry.push_back(data_abcabc(i));
+    data.vgeometry=aurostd::xvector2vector(data_abcabc);
+    //[CO20200731 - OBSOLETE]data.vgeometry.clear(); for(int i=data_abcabc.lrows;i<=data_abcabc.urows;i++) data.vgeometry.push_back(data_abcabc(i));
 
     //DX20190124 - add original crystal info - START
     // LOAD ORIGINAL STRUCTURE
@@ -2884,7 +2885,8 @@ namespace aflowlib {
     data.volume_cell_orig=str_orig.GetVolume();
     data.volume_atom_orig=str_orig.GetVolume()/(double) data.natoms_orig;
     data_abcabc=Getabc_angles(str_orig.lattice,DEGREES);
-    data.vgeometry_orig.clear(); for(uint i=1;i<=6;i++) data.vgeometry_orig.push_back(data_abcabc(i));
+    data.vgeometry_orig=aurostd::xvector2vector(data_abcabc);
+    //[CO20200731 - OBSOLETE]data.vgeometry_orig.clear(); for(int i=data_abcabc.lrows;i<=data_abcabc.urows;i++) data.vgeometry_orig.push_back(data_abcabc(i));
 
     //DX20190124 - add original crystal info - END
 
@@ -2904,20 +2906,21 @@ namespace aflowlib {
     }
     data.positions_fractional=aurostd::joinWDelimiter(fpos_strings_combined,";");
 
-    data.geometry="";
-    if(data.vgeometry.size()) {
-      for(uint i=0;i<data.vgeometry.size();i++) {
-        data.geometry+=aurostd::utype2string(data.vgeometry.at(i),7)+(i<data.vgeometry.size()-1?",":"");
-      }
-    }
-
-    //DX20190124 - add original crystal info - START
-    data.geometry_orig="";
-    if(data.vgeometry_orig.size()) {
-      for(uint i=0;i<data.vgeometry_orig.size();i++) {
-        data.geometry_orig+=aurostd::utype2string(data.vgeometry_orig.at(i),7)+(i<data.vgeometry_orig.size()-1?",":"");
-      }
-    }
+    data.geometry=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vgeometry,_AFLOWLIB_DATA_GEOMETRY_PREC_),",");
+    data.geometry_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vgeometry_orig,_AFLOWLIB_DATA_GEOMETRY_PREC_),",");
+    //[CO20200731 - OBSOLETE]data.geometry="";
+    //[CO20200731 - OBSOLETE]if(data.vgeometry.size()) {
+    //[CO20200731 - OBSOLETE]  for(uint i=0;i<data.vgeometry.size();i++) {
+    //[CO20200731 - OBSOLETE]    data.geometry+=aurostd::utype2string(data.vgeometry.at(i),_AFLOWLIB_DATA_GEOMETRY_PREC_)+(i<data.vgeometry.size()-1?",":"");
+    //[CO20200731 - OBSOLETE]  }
+    //[CO20200731 - OBSOLETE]}
+    //[CO20200731 - OBSOLETE]//DX20190124 - add original crystal info - START
+    //[CO20200731 - OBSOLETE]data.geometry_orig="";
+    //[CO20200731 - OBSOLETE]if(data.vgeometry_orig.size()) {
+    //[CO20200731 - OBSOLETE]  for(uint i=0;i<data.vgeometry_orig.size();i++) {
+    //[CO20200731 - OBSOLETE]    data.geometry_orig+=aurostd::utype2string(data.vgeometry_orig.at(i),_AFLOWLIB_DATA_GEOMETRY_PREC_)+(i<data.vgeometry_orig.size()-1?",":"");
+    //[CO20200731 - OBSOLETE]  }
+    //[CO20200731 - OBSOLETE]}
     //DX20190124 - add original crystal info - END
 
     //[CO20200731 - OBSOLETE]data.vstoichiometry.clear();
@@ -3164,7 +3167,7 @@ namespace aflowlib {
     data.species_pp_AUID="";
     data.valence_cell_iupac=0.0;
     data.valence_cell_std=0.0;
-    for(uint i=0;i<(uint) data.nspecies;i++) {
+    for(uint i=0;i<data.nspecies;i++) {
       data.compound+=str_relax.species.at(i)+aurostd::utype2string(str_relax.num_each_type.at(i)); // if(i<data.nspecies-1) data.compound+=",";
       data.composition+=aurostd::utype2string(str_relax.num_each_type.at(i)); if(i<data.nspecies-1) data.composition+=",";
       data.vcomposition.push_back(str_relax.num_each_type.at(i));
@@ -4990,8 +4993,8 @@ namespace aflowlib {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          if(tokens.at(0)=="bader_net_charges") data.bader_net_charges=tokens.at(1);
-          if(tokens.at(0)=="bader_atomic_volumes") data.bader_atomic_volumes=tokens.at(1);
+          if(tokens[0]=="bader_net_charges") data.bader_net_charges=tokens.at(1);
+          if(tokens[0]=="bader_atomic_volumes") data.bader_atomic_volumes=tokens.at(1);
         }
       }
       aurostd::string2tokens<double>(data.bader_net_charges,data.vbader_net_charges,",");         //be careful, sets precision to 20
@@ -5062,20 +5065,20 @@ namespace aflowlib {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          if(tokens.at(0)=="agl_thermal_conductivity_300K") data.agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_debye") data.agl_debye=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_acoustic_debye") data.agl_acoustic_debye=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_gruneisen") data.agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_heat_capacity_Cv_300K") data.agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_heat_capacity_Cp_300K") data.agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_thermal_expansion_300K") data.agl_thermal_expansion_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_bulk_modulus_static_300K") data.agl_bulk_modulus_static_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_bulk_modulus_isothermal_300K") data.agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="agl_poisson_ratio_source") data.agl_poisson_ratio_source=tokens.at(1); //CT20181212
-          if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") data.agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") data.agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") data.agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") data.agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="agl_thermal_conductivity_300K") data.agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_debye") data.agl_debye=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_acoustic_debye") data.agl_acoustic_debye=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_gruneisen") data.agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_heat_capacity_Cv_300K") data.agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_heat_capacity_Cp_300K") data.agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_thermal_expansion_300K") data.agl_thermal_expansion_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_bulk_modulus_static_300K") data.agl_bulk_modulus_static_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_bulk_modulus_isothermal_300K") data.agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="agl_poisson_ratio_source") data.agl_poisson_ratio_source=tokens.at(1); //CT20181212
+          if(tokens[0]=="agl_vibrational_free_energy_300K_cell") data.agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="agl_vibrational_free_energy_300K_atom") data.agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="agl_vibrational_entropy_300K_cell") data.agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="agl_vibrational_entropy_300K_atom") data.agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
         }
       }
     } else {
@@ -5135,22 +5138,22 @@ namespace aflowlib {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          if(tokens.at(0)=="ael_poisson_ratio") data.ael_poisson_ratio=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_bulk_modulus_voigt" || tokens.at(0)=="ael_bulk_modulus_voight") data.ael_bulk_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_bulk_modulus_reuss") data.ael_bulk_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_shear_modulus_voigt" || tokens.at(0)=="ael_shear_modulus_voigth") data.ael_shear_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_shear_modulus_reuss") data.ael_shear_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_bulk_modulus_vrh") data.ael_bulk_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_shear_modulus_vrh") data.ael_shear_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="ael_elastic_anisotropy") data.ael_elastic_anisotropy=aurostd::string2utype<double>(tokens.at(1)); //CO20181129
-          if(tokens.at(0)=="ael_youngs_modulus_vrh") data.ael_youngs_modulus_vrh=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_speed_sound_transverse") data.ael_speed_sound_transverse=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_speed_sound_longitudinal") data.ael_speed_sound_longitudinal=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_speed_sound_average") data.ael_speed_sound_average=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_pughs_modulus_ratio") data.ael_pughs_modulus_ratio=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_debye_temperature") data.ael_debye_temperature=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_applied_pressure") data.ael_applied_pressure=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="ael_average_external_pressure") data.ael_average_external_pressure=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_poisson_ratio") data.ael_poisson_ratio=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_bulk_modulus_voigt" || tokens[0]=="ael_bulk_modulus_voight") data.ael_bulk_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_bulk_modulus_reuss") data.ael_bulk_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_shear_modulus_voigt" || tokens[0]=="ael_shear_modulus_voigth") data.ael_shear_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_shear_modulus_reuss") data.ael_shear_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_bulk_modulus_vrh") data.ael_bulk_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_shear_modulus_vrh") data.ael_shear_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="ael_elastic_anisotropy") data.ael_elastic_anisotropy=aurostd::string2utype<double>(tokens.at(1)); //CO20181129
+          if(tokens[0]=="ael_youngs_modulus_vrh") data.ael_youngs_modulus_vrh=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_speed_sound_transverse") data.ael_speed_sound_transverse=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_speed_sound_longitudinal") data.ael_speed_sound_longitudinal=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_speed_sound_average") data.ael_speed_sound_average=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_pughs_modulus_ratio") data.ael_pughs_modulus_ratio=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_debye_temperature") data.ael_debye_temperature=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_applied_pressure") data.ael_applied_pressure=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="ael_average_external_pressure") data.ael_average_external_pressure=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
         }
       }
 
@@ -5289,7 +5292,7 @@ namespace aflowlib {
       //get DOSCAR.pocc + png's
       vector<string> vfiles;
       aurostd::DirectoryLS(directory_LIB,vfiles);
-      for(uint i=0;i<vfiles.size();i++){
+      for(i=0;i<vfiles.size();i++){
         if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
           aurostd::LinkFile(directory_LIB+"/"+vfiles[i],directory_RAW);  //link the file, no need to de-compress
           //aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // DOSCAR.pocc_
@@ -5307,12 +5310,12 @@ namespace aflowlib {
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE) << endl;
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE),aflow_pocc_out,"[AFLOW_POCC]START_TEMPERATURE=ALL","[AFLOW_POCC]STOP_TEMPERATURE=ALL");
       aurostd::stream2vectorstring(aflow_pocc_out,vline);
-      for (uint i=0;i<vline.size();i++) {
+      for(i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          if(tokens.at(0)=="enthalpy_mix_atom") data.energy_atom=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="entropy_forming_ability") data.entropy_forming_ability=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="enthalpy_mix_atom") data.energy_atom=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="entropy_forming_ability") data.entropy_forming_ability=aurostd::string2utype<double>(tokens.at(1));
         }
       }
       if(AFLOWLIB_VERBOSE && data.energy_atom!=AUROSTD_NAN) cout << MESSAGE << " energy_atom=" << data.energy_atom << endl;
@@ -5329,24 +5332,24 @@ namespace aflowlib {
       //0K START
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),aflow_pocc_agl_out,"[POCC_AGL_RESULTS]START_TEMPERATURE=0000_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0000_K");
       aurostd::stream2vectorstring(aflow_pocc_agl_out,vline);
-      for (uint i=0;i<vline.size();i++) {
+      for(i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          if(tokens.at(0)=="pocc_agl_debye") data.agl_debye=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_acoustic_debye") data.agl_acoustic_debye=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_gruneisen") data.agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_heat_capacity_Cv_300K") data.agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_heat_capacity_Cp_300K") data.agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_thermal_expansion_300K") data.agl_thermal_expansion_300K=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_bulk_modulus_static_300K") data.agl_bulk_modulus_static_300K=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_bulk_modulus_isothermal_300K") data.agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_poisson_ratio_source") data.agl_poisson_ratio_source=tokens.at(1); //CT20181212
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_vibrational_free_energy_300K_cell") data.agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_vibrational_free_energy_300K_atom") data.agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_vibrational_entropy_300K_cell") data.agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_vibrational_entropy_300K_atom") data.agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          //[PULLING FROM 300K section]if(tokens.at(0)=="pocc_agl_thermal_conductivity_300K") data.agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_debye") data.agl_debye=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_acoustic_debye") data.agl_acoustic_debye=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_gruneisen") data.agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_heat_capacity_Cv_300K") data.agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_heat_capacity_Cp_300K") data.agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_thermal_expansion_300K") data.agl_thermal_expansion_300K=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_bulk_modulus_static_300K") data.agl_bulk_modulus_static_300K=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_bulk_modulus_isothermal_300K") data.agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_poisson_ratio_source") data.agl_poisson_ratio_source=tokens.at(1); //CT20181212
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_vibrational_free_energy_300K_cell") data.agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_vibrational_free_energy_300K_atom") data.agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_vibrational_entropy_300K_cell") data.agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_vibrational_entropy_300K_atom") data.agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          //[PULLING FROM 300K section]if(tokens[0]=="pocc_agl_thermal_conductivity_300K") data.agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
           //what to do about:
           //pocc_agl_gibbs_energy_atom_ave
           //pocc_agl_vibrational_energy_atom_ave
@@ -5360,24 +5363,24 @@ namespace aflowlib {
       //300K START
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),aflow_pocc_agl_out,"[POCC_AGL_RESULTS]START_TEMPERATURE=0300_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0300_K");
       aurostd::stream2vectorstring(aflow_pocc_agl_out,vline);
-      for (uint i=0;i<vline.size();i++) {
+      for(i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          //[PULLING FROM 0K section]if(tokens.at(0)=="pocc_agl_debye") data.agl_debye=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 0K section]if(tokens.at(0)=="pocc_agl_acoustic_debye") data.agl_acoustic_debye=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 0K section]if(tokens.at(0)=="pocc_agl_gruneisen") data.agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_heat_capacity_Cv_300K") data.agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_heat_capacity_Cp_300K") data.agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_thermal_expansion_300K") data.agl_thermal_expansion_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_bulk_modulus_static_300K") data.agl_bulk_modulus_static_300K=aurostd::string2utype<double>(tokens.at(1));
-          if(tokens.at(0)=="pocc_agl_bulk_modulus_isothermal_300K") data.agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(tokens.at(1));
-          //[PULLING FROM 0K section]if(tokens.at(0)=="pocc_agl_poisson_ratio_source") data.agl_poisson_ratio_source=tokens.at(1); //CT20181212
-          if(tokens.at(0)=="pocc_agl_vibrational_free_energy_300K_cell") data.agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="pocc_agl_vibrational_free_energy_300K_atom") data.agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="pocc_agl_vibrational_entropy_300K_cell") data.agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="pocc_agl_vibrational_entropy_300K_atom") data.agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
-          if(tokens.at(0)=="pocc_agl_thermal_conductivity_300K") data.agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 0K section]if(tokens[0]=="pocc_agl_debye") data.agl_debye=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 0K section]if(tokens[0]=="pocc_agl_acoustic_debye") data.agl_acoustic_debye=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 0K section]if(tokens[0]=="pocc_agl_gruneisen") data.agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_heat_capacity_Cv_300K") data.agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_heat_capacity_Cp_300K") data.agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_thermal_expansion_300K") data.agl_thermal_expansion_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_bulk_modulus_static_300K") data.agl_bulk_modulus_static_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens[0]=="pocc_agl_bulk_modulus_isothermal_300K") data.agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(tokens.at(1));
+          //[PULLING FROM 0K section]if(tokens[0]=="pocc_agl_poisson_ratio_source") data.agl_poisson_ratio_source=tokens.at(1); //CT20181212
+          if(tokens[0]=="pocc_agl_vibrational_free_energy_300K_cell") data.agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="pocc_agl_vibrational_free_energy_300K_atom") data.agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="pocc_agl_vibrational_entropy_300K_cell") data.agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="pocc_agl_vibrational_entropy_300K_atom") data.agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1)); //CT20181212
+          if(tokens[0]=="pocc_agl_thermal_conductivity_300K") data.agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
           //what to do about:
           //pocc_agl_gibbs_energy_atom_ave
           //pocc_agl_vibrational_energy_atom_ave
@@ -5401,17 +5404,25 @@ namespace aflowlib {
     if(LDEBUG){cerr << soliloquy << " loaded aflow.in from dir=" << directory_LIB << endl;}
     xstructure xstr_pocc=pocc::extractPARTCAR(AflowIn);
     if(LDEBUG){cerr << soliloquy << " loaded PARTCAR" << endl;cerr << xstr_pocc << endl;}
+    //
+    data.volume_cell_orig=xstr_pocc.GetVolume();
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " volume_cell_orig=" << data.volume_cell_orig << endl;
+    //
+    xvector<double> data_abcabc;
+    data_abcabc=Getabc_angles(xstr_pocc.scale*xstr_pocc.lattice,DEGREES);
+    data.vgeometry_orig=aurostd::xvector2vector(data_abcabc);
+    data.geometry_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vgeometry_orig,_AFLOWLIB_DATA_GEOMETRY_PREC_),",");
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " geometry_orig=" << data.geometry_orig << endl;
+    //
     data.compound=getGenericTitleXStructure(xstr_pocc,false);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " compound=" << data.compound << endl;
-
+    //
     data.vstoichiometry=aurostd::deque2vector(xstr_pocc.stoich_each_type);
     data.stoichiometry=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vstoichiometry,_AFLOW_STOICH_PRECISION_),",");
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " stoichiometry=" << data.stoichiometry << endl;
     //CO20200624 START - mimic stoich from PrintData1(): aflow_pflow_print.cpp, this is really obsolete
     stringstream stoich_ss;stoich_ss.precision(4);
-    for(uint it=0;it<xstr_pocc.stoich_each_type.size();it++) {
-      stoich_ss << setw(8) << xstr_pocc.stoich_each_type[it] << " ";
-    }
+    for(i=0;i<xstr_pocc.stoich_each_type.size();i++) {stoich_ss << setw(8) << xstr_pocc.stoich_each_type[i] << " ";}
     data.stoich=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stoich_ss.str());
     //CO20200624 END - mimic stoich from PrintData1(): aflow_pflow_print.cpp, this is really obsolete
     //CO20200731 - we don't calculate enthalpy_formation_atom for POCC (yet)
@@ -5524,47 +5535,48 @@ namespace aflowlib {
     if(LDEBUG){cerr << soliloquy << " starting EDATA analysis" << endl;}
     pflow::PrintData(xstr_pocc_parent,xstr_sp,xstr_sc,sss,vpflow_edata,"EDATA"); // 1=EDATA //CO20171025 //CO20171027
     if(LDEBUG){cerr << soliloquy << " EDATA analysis finished" << endl;}
+    xmatrix<double> klattice;
     //do NOT write out file, not all the properties are applicable
     if(vpflow_edata.flag("EDATA::CALCULATED")) {
-      //[CO20200731 - not applicable to POCC]if(data.Bravais_lattice_orig.empty()){data.Bravais_lattice_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE");} // Bravais_Lattice_orig
-      //[CO20200731 - not applicable to POCC]if(data.lattice_variation_orig.empty()){data.lattice_variation_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE");} // Bravais_Lattice_Variation_orig
-      //[CO20200731 - not applicable to POCC]if(data.lattice_system_orig.empty()){data.lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM");} // Lattice_System_orig
-      //[CO20200731 - not applicable to POCC]if(data.Pearson_symbol_orig.empty()){data.Pearson_symbol_orig=vpflow_edata.getattachedscheme("EDATA::PEARSON_SYMBOL");} // Pearson_orig
+      //[CO20200731 - not applicable to POCC]data.Bravais_lattice_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE"); // Bravais_Lattice_orig
+      //[CO20200731 - not applicable to POCC]data.lattice_variation_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE"); // Bravais_Lattice_Variation_orig
+      //[CO20200731 - not applicable to POCC]data.lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM"); // Lattice_System_orig
+      //[CO20200731 - not applicable to POCC]data.Pearson_symbol_orig=vpflow_edata.getattachedscheme("EDATA::PEARSON_SYMBOL"); // Pearson_orig
       //DX20190124 - extract additional info from xoption - START
-      //[CO20200731 - not applicable to POCC]if(data.crystal_system_orig.empty()){data.crystal_system_orig=vpflow_edata.getattachedscheme("EDATA::CRYSTAL_SYSTEM");} // crystal_system_orig
-      //[CO20200731 - not applicable to POCC]if(data.crystal_family_orig.empty()){data.crystal_family_orig=vpflow_edata.getattachedscheme("EDATA::CRYSTAL_FAMILY");} // crystal_family_orig
-      //[CO20200731 - not applicable to POCC]if(data.point_group_Hermann_Mauguin_orig.empty()){data.point_group_Hermann_Mauguin_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN");} // point_group_Hermann_Mauguin_orig
-      //[CO20200731 - not applicable to POCC]if(data.crystal_class_orig.empty()){data.crystal_class_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS");} // crystal_class_orig
-      //[CO20200731 - not applicable to POCC]if(data.point_group_Schoenflies_orig.empty()){data.point_group_Schoenflies_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES");} // point_group_Schoenflies_orig
-      //[CO20200731 - not applicable to POCC]if(data.point_group_orbifold_orig.empty()){data.point_group_orbifold_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD");} // point_group_orbifold_orig
-      //[CO20200731 - not applicable to POCC]if(data.point_group_type_orig.empty()){data.point_group_type_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_TYPE");} // point_group_type_orig
-      //[CO20200731 - not applicable to POCC]if(data.point_group_order_orig==AUROSTD_NAN){data.point_group_order_orig=vpflow_edata.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER");} // point_group_order_orig
-      //[CO20200731 - not applicable to POCC]if(data.point_group_structure_orig.empty()){data.point_group_structure_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE");} // point_group_structure_orig
-      if(data.Bravais_lattice_lattice_type_orig.empty()){data.Bravais_lattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE");} // Bravais_lattice_lattice_type_orig
-      if(data.Bravais_lattice_lattice_variation_type_orig.empty()){data.Bravais_lattice_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE");} // Bravais_lattice_lattice_variation_type_orig
-      if(data.Bravais_lattice_lattice_system_orig.empty()){data.Bravais_lattice_lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM");} // Bravais_lattice_lattice_system_orig
-      if(data.Bravais_superlattice_lattice_type_orig.empty()){data.Bravais_superlattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE");} // Bravais_superlattice_lattice_type_orig 
-      if(data.Bravais_superlattice_lattice_variation_type_orig.empty()){data.Bravais_superlattice_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE");} // Bravais_superlattice_lattice_variation_type_orig
-      if(data.Bravais_superlattice_lattice_system_orig.empty()){data.Bravais_superlattice_lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM");} // Bravais_superlattice_lattice_system_orig
-      if(data.Pearson_symbol_superlattice_orig.empty()){data.Pearson_symbol_superlattice_orig=vpflow_edata.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE");} // Pearson_symbol_superlattice_orig
-      //[CO20200731 - not applicable to POCC]if(data.reciprocal_geometry_orig.empty()){ // reciprocal_geometry_orig
-      //[CO20200731 - not applicable to POCC]  data.reciprocal_geometry_orig=vpflow_edata.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
-      //[CO20200731 - not applicable to POCC]  vector<string> ktokens; 
-      //[CO20200731 - not applicable to POCC]  aurostd::string2tokens(data.reciprocal_geometry_orig,ktokens,",");
-      //[CO20200731 - not applicable to POCC]  for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry_orig.push_back(aurostd::string2utype<double>(ktokens[t])); }
-      //[CO20200731 - not applicable to POCC]}
-      //[CO20200731 - not applicable to POCC]if(data.reciprocal_volume_cell_orig==AUROSTD_NAN){data.reciprocal_volume_cell_orig=vpflow_edata.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME");} // reciprocal_volume_cell_orig
-      if(data.reciprocal_lattice_type_orig.empty()){data.reciprocal_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE");} // reciprocal_lattice_type_orig
-      if(data.reciprocal_lattice_variation_type_orig.empty()){data.reciprocal_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE");} // reciprocal_lattice_variation_type_orig
+      //[CO20200731 - not applicable to POCC]data.crystal_system_orig=vpflow_edata.getattachedscheme("EDATA::CRYSTAL_SYSTEM"); // crystal_system_orig
+      //[CO20200731 - not applicable to POCC]data.crystal_family_orig=vpflow_edata.getattachedscheme("EDATA::CRYSTAL_FAMILY"); // crystal_family_orig
+      //[CO20200731 - not applicable to POCC]data.point_group_Hermann_Mauguin_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN"); // point_group_Hermann_Mauguin_orig
+      //[CO20200731 - not applicable to POCC]data.crystal_class_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS"); // crystal_class_orig
+      //[CO20200731 - not applicable to POCC]data.point_group_Schoenflies_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES"); // point_group_Schoenflies_orig
+      //[CO20200731 - not applicable to POCC]data.point_group_orbifold_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD"); // point_group_orbifold_orig
+      //[CO20200731 - not applicable to POCC]data.point_group_type_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_TYPE"); // point_group_type_orig
+      //[CO20200731 - not applicable to POCC]data.point_group_order_orig=vpflow_edata.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER"); // point_group_order_orig
+      //[CO20200731 - not applicable to POCC]data.point_group_structure_orig=vpflow_edata.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE"); // point_group_structure_orig
+      data.Bravais_lattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); // Bravais_lattice_lattice_type_orig
+      data.Bravais_lattice_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); // Bravais_lattice_lattice_variation_type_orig
+      data.Bravais_lattice_lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); // Bravais_lattice_lattice_system_orig
+      data.Bravais_superlattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); // Bravais_superlattice_lattice_type_orig 
+      data.Bravais_superlattice_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); // Bravais_superlattice_lattice_variation_type_orig
+      data.Bravais_superlattice_lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); // Bravais_superlattice_lattice_system_orig
+      data.Pearson_symbol_superlattice_orig=vpflow_edata.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); // Pearson_symbol_superlattice_orig
+      //reciprocal_geometry_orig
+      klattice=ReciprocalLattice(xstr_pocc.lattice,xstr_pocc.scale);
+      data_abcabc=Getabc_angles(klattice,DEGREES);
+      data.vreciprocal_geometry_orig=aurostd::xvector2vector(data_abcabc);
+      data.reciprocal_geometry_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vreciprocal_geometry_orig,_AFLOWLIB_DATA_GEOMETRY_PREC_),",");
+      data.reciprocal_volume_cell_orig=det(klattice);
+      //
+      data.reciprocal_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE"); // reciprocal_lattice_type_orig
+      data.reciprocal_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); // reciprocal_lattice_variation_type_orig
       //DX20190131 - use self-consistent space group orig - START
       //[CO20200731 - not applicable to POCC]if(data.spacegroup_orig.empty()) {
       //[CO20200731 - not applicable to POCC]  data.spacegroup_orig=vpflow_edata.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
       //[CO20200731 - not applicable to POCC]  if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_ORIG = " << data.spacegroup_orig << endl;
       //[CO20200731 - not applicable to POCC]} 
       //DX20190131 - use self-consistent space group orig - END
-      //[CO20200731 - not applicable to POCC]if(data.Wyckoff_letters_orig.empty()){data.Wyckoff_letters_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_LETTERS");} // Wyckoff_letters_orig
-      //[CO20200731 - not applicable to POCC]if(data.Wyckoff_multiplicities_orig.empty()){data.Wyckoff_multiplicities_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES");} // Wyckoff_multiplicities_orig
-      //[CO20200731 - not applicable to POCC]if(data.Wyckoff_site_symmetries_orig.empty()){data.Wyckoff_site_symmetries_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES");} // Wyckoff_site_symmetries_orig
+      //[CO20200731 - not applicable to POCC]data.Wyckoff_letters_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_LETTERS"); // Wyckoff_letters_orig
+      //[CO20200731 - not applicable to POCC]data.Wyckoff_multiplicities_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES"); // Wyckoff_multiplicities_orig
+      //[CO20200731 - not applicable to POCC]data.Wyckoff_site_symmetries_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES"); // Wyckoff_site_symmetries_orig
     }
     //print
     if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_type_orig.empty()) cout << MESSAGE << " Bravais_lattice_lattice_type_orig=" << data.Bravais_lattice_lattice_type_orig << endl;
@@ -5575,32 +5587,43 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_system_orig.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_system_orig=" << data.Bravais_superlattice_lattice_system_orig << endl;
     if(AFLOWLIB_VERBOSE && !data.Pearson_symbol_superlattice_orig.empty()) cout << MESSAGE << " Pearson_symbol_superlattice_orig=" << data.Pearson_symbol_superlattice_orig << endl;
     //
+    if(AFLOWLIB_VERBOSE && !data.reciprocal_geometry_orig.empty()) cout << MESSAGE << " reciprocal_geometry_orig=" << data.reciprocal_geometry_orig << endl;
+    if(AFLOWLIB_VERBOSE && data.reciprocal_volume_cell_orig!=AUROSTD_NAN) cout << MESSAGE << " reciprocal_volume_cell_orig=" << data.reciprocal_volume_cell_orig << endl;
     if(AFLOWLIB_VERBOSE && !data.reciprocal_lattice_type_orig.empty()) cout << MESSAGE << " reciprocal_lattice_type_orig=" << data.reciprocal_lattice_type_orig << endl;
     if(AFLOWLIB_VERBOSE && !data.reciprocal_lattice_variation_type_orig.empty()) cout << MESSAGE << " reciprocal_lattice_variation_type_orig=" << data.reciprocal_lattice_variation_type_orig << endl;
-    //there is no relaxed pocc material: so copy over the original properties
-    //this may change in the future
-    //set
-    if(!data.Bravais_lattice_lattice_type_orig.empty()){data.Bravais_lattice_lattice_type=data.Bravais_lattice_lattice_type_orig;}
-    if(!data.Bravais_lattice_lattice_variation_type_orig.empty()){data.Bravais_lattice_lattice_variation_type=data.Bravais_lattice_lattice_variation_type_orig;}
-    if(!data.Bravais_lattice_lattice_system_orig.empty()){data.Bravais_lattice_lattice_system=data.Bravais_lattice_lattice_system_orig;}
-    if(!data.Bravais_superlattice_lattice_type_orig.empty()){data.Bravais_superlattice_lattice_type=data.Bravais_superlattice_lattice_type_orig;}
-    if(!data.Bravais_superlattice_lattice_variation_type_orig.empty()){data.Bravais_superlattice_lattice_variation_type=data.Bravais_superlattice_lattice_variation_type_orig;}
-    if(!data.Bravais_superlattice_lattice_system_orig.empty()){data.Bravais_superlattice_lattice_system=data.Bravais_superlattice_lattice_system_orig;}
-    if(!data.Pearson_symbol_superlattice_orig.empty()){data.Pearson_symbol_superlattice=data.Pearson_symbol_superlattice_orig;}
-    //
-    if(!data.reciprocal_lattice_type_orig.empty()){data.reciprocal_lattice_type=data.reciprocal_lattice_type_orig;}
-    if(!data.reciprocal_lattice_variation_type_orig.empty()){data.reciprocal_lattice_variation_type=data.reciprocal_lattice_variation_type_orig;}
-    //print
-    if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_type.empty()) cout << MESSAGE << " Bravais_lattice_lattice_type=" << data.Bravais_lattice_lattice_type << endl;
-    if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_variation_type.empty()) cout << MESSAGE << " Bravais_lattice_lattice_variation_type=" << data.Bravais_lattice_lattice_variation_type << endl;
-    if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_system.empty()) cout << MESSAGE << " Bravais_lattice_lattice_system=" << data.Bravais_lattice_lattice_system << endl;
-    if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_type.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_type=" << data.Bravais_superlattice_lattice_type << endl;
-    if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_variation_type.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_variation_type=" << data.Bravais_superlattice_lattice_variation_type << endl;
-    if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_system.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_system=" << data.Bravais_superlattice_lattice_system << endl;
-    if(AFLOWLIB_VERBOSE && !data.Pearson_symbol_superlattice.empty()) cout << MESSAGE << " Pearson_symbol_superlattice=" << data.Pearson_symbol_superlattice << endl;
-    //
-    if(AFLOWLIB_VERBOSE && !data.reciprocal_lattice_type.empty()) cout << MESSAGE << " reciprocal_lattice_type=" << data.reciprocal_lattice_type << endl;
-    if(AFLOWLIB_VERBOSE && !data.reciprocal_lattice_variation_type.empty()) cout << MESSAGE << " reciprocal_lattice_variation_type=" << data.reciprocal_lattice_variation_type << endl;
+    
+    if(0){
+      //there is no relaxed pocc material: so copy over the original properties
+      //this may change in the future
+      //set
+      data.Bravais_lattice_lattice_type=data.Bravais_lattice_lattice_type_orig;
+      data.Bravais_lattice_lattice_variation_type=data.Bravais_lattice_lattice_variation_type_orig;
+      data.Bravais_lattice_lattice_system=data.Bravais_lattice_lattice_system_orig;
+      data.Bravais_superlattice_lattice_type=data.Bravais_superlattice_lattice_type_orig;
+      data.Bravais_superlattice_lattice_variation_type=data.Bravais_superlattice_lattice_variation_type_orig;
+      data.Bravais_superlattice_lattice_system=data.Bravais_superlattice_lattice_system_orig;
+      data.Pearson_symbol_superlattice=data.Pearson_symbol_superlattice_orig;
+      //reciprocal_geometry
+      data.vreciprocal_geometry=data.vreciprocal_geometry_orig;
+      data.reciprocal_geometry=data.reciprocal_geometry_orig;
+      data.reciprocal_volume_cell=data.reciprocal_volume_cell_orig;
+      //
+      data.reciprocal_lattice_type=data.reciprocal_lattice_type_orig;
+      data.reciprocal_lattice_variation_type=data.reciprocal_lattice_variation_type_orig;
+      //print
+      if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_type.empty()) cout << MESSAGE << " Bravais_lattice_lattice_type=" << data.Bravais_lattice_lattice_type << endl;
+      if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_variation_type.empty()) cout << MESSAGE << " Bravais_lattice_lattice_variation_type=" << data.Bravais_lattice_lattice_variation_type << endl;
+      if(AFLOWLIB_VERBOSE && !data.Bravais_lattice_lattice_system.empty()) cout << MESSAGE << " Bravais_lattice_lattice_system=" << data.Bravais_lattice_lattice_system << endl;
+      if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_type.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_type=" << data.Bravais_superlattice_lattice_type << endl;
+      if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_variation_type.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_variation_type=" << data.Bravais_superlattice_lattice_variation_type << endl;
+      if(AFLOWLIB_VERBOSE && !data.Bravais_superlattice_lattice_system.empty()) cout << MESSAGE << " Bravais_superlattice_lattice_system=" << data.Bravais_superlattice_lattice_system << endl;
+      if(AFLOWLIB_VERBOSE && !data.Pearson_symbol_superlattice.empty()) cout << MESSAGE << " Pearson_symbol_superlattice=" << data.Pearson_symbol_superlattice << endl;
+      //
+      if(AFLOWLIB_VERBOSE && !data.reciprocal_geometry_orig.empty()) cout << MESSAGE << " reciprocal_geometry_orig=" << data.reciprocal_geometry_orig << endl;
+      if(AFLOWLIB_VERBOSE && data.reciprocal_volume_cell_orig!=AUROSTD_NAN) cout << MESSAGE << " reciprocal_volume_cell_orig=" << data.reciprocal_volume_cell_orig << endl;
+      if(AFLOWLIB_VERBOSE && !data.reciprocal_lattice_type.empty()) cout << MESSAGE << " reciprocal_lattice_type=" << data.reciprocal_lattice_type << endl;
+      if(AFLOWLIB_VERBOSE && !data.reciprocal_lattice_variation_type.empty()) cout << MESSAGE << " reciprocal_lattice_variation_type=" << data.reciprocal_lattice_variation_type << endl;
+    }
     
     //anrl properties
     xstructure xstr_anrl=xstr_pocc_parent;  //make a copy so functions don't pollute structure
@@ -5620,6 +5643,36 @@ namespace aflowlib {
     data.anrl_parameter_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
     if(AFLOWLIB_VERBOSE && !data.anrl_parameter_values_orig.empty()) cout << MESSAGE << " anrl_parameter_values_orig=" << data.anrl_parameter_values_orig << endl;
 
+    //get other _atom/_cell properties
+    double data_natoms=0.0; //needs to be double for pocc
+    for(i=0;i<xstr_pocc.comp_each_type.size();i++){data_natoms+=xstr_pocc.comp_each_type[i];}
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " natoms=" << data_natoms << endl;
+    //
+    if(data.volume_cell_orig!=AUROSTD_NAN){
+      data.volume_atom_orig=data.volume_cell_orig/data_natoms;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " volume_atom_orig=" << data.volume_atom_orig << endl;
+    }
+    //
+    if(data.energy_atom!=AUROSTD_NAN){
+      data.energy_cell=data.energy_atom*data_natoms;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " energy_cell=" << data.energy_cell << endl;
+    }
+    //
+    if(data.enthalpy_atom!=AUROSTD_NAN){
+      data.enthalpy_cell=data.enthalpy_atom*data_natoms;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " enthalpy_cell=" << data.enthalpy_cell << endl;
+    }
+    //
+    if(data.volume_cell_orig!=AUROSTD_NAN){
+      data.density_orig=0.0;
+      for(i=0;i<xstr_pocc.comp_each_type.size();i++){data.density_orig+=xstr_pocc.comp_each_type[i]*GetAtomMass(xstr_pocc.species[i]);}
+      data.density_orig/=data.volume_cell_orig;
+      data.density_orig*=1000.0; // grams instead of kilos
+      data.density_orig*=1e8*1e8*1e8; // cm^3 instead of A^3
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DENSITY_ORIG (grams/cm^3) = " << data.density_orig << endl;
+    }
+
+    
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << soliloquy << " - end " << directory_LIB << endl;
     return true;
   }
@@ -6351,7 +6404,7 @@ namespace aflowlib {
     }
 
     if(tokens.size()>=1) {
-      if(tokens.at(0)=="all") {
+      if(tokens[0]=="all") {
         XHOST.sensors_allowed=FALSE;
         XHOST.vflag_pflow.flag("MULTI=SH",FALSE);
         return LIB2RAW_ALL(options,flag_FORCE);
