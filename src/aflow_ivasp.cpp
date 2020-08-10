@@ -5838,6 +5838,8 @@ namespace KBIN {
       string message = "Could not extract system.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
+    aurostd::StringSubst(system_name,":.","."); //CO20200731 - patching bug in system name generation
+    aurostd::StringSubst(system_name,"@",".");  //CO20200731 - patching for AEL/AGL ARUNs
     return system_name;
   }
 
@@ -5856,9 +5858,12 @@ namespace KBIN {
       for (uint iline = 0; iline < nlines && system_name.empty(); iline++) {
         if (aflowin[iline].find("SYSTEM") != string::npos) {
           line = aflowin[iline];
-          if (aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "[AFLOW]SYSTEM=")) {
+          if (aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "[AFLOW]SYSTEM=") || 
+              aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "SYSTEM=") ||  //CO20200731 - so it can find "SYSTEM=XXXX" in INCAR section, good for AEL/AGL ARUNs
+              FALSE) {
             string::size_type t = line.find_first_of("=");
             system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line.substr(t + 1));
+            if(!system_name.empty()){return system_name;}
           }
         }
       }

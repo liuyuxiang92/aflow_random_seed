@@ -1022,7 +1022,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
     
     // Call to LIB2LIB function to run postprocessing - added by CT20181212
-    bool perform_LIB2LIB=false; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
+    bool perform_LIB2LIB=true; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
     if(perform_LIB2LIB && !LIB2LIB(options, flag_FORCE, LOCAL)) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aflowlib::LIB2LIB() failed",_RUNTIME_ERROR_);
       //[CO20200624 - OBSOLETE]cerr << soliloquy << " LIB2LIB failed" << endl;
@@ -4982,7 +4982,7 @@ namespace aflowlib {
 
     vector<string> vline,tokens;
     stringstream abader_ss;
-    string abader_out=data.prototype+"_abader.out";
+    string abader_out=data.title+"_abader.out"; //CO20200731 - not prototype, title
 
     abader_ss.clear();
     if(aurostd::FileExist(directory_RAW+"/"+abader_out)) {
