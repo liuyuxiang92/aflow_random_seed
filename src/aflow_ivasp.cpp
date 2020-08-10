@@ -117,6 +117,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    string soliloquy=XPID+"KBIN::VASP_Write_INPUT():";
     ifstream DirectoryStream;
     DirectoryStream.open(xvasp.Directory.c_str(),std::ios::in);
     if(!DirectoryStream) {
@@ -127,6 +128,10 @@ namespace KBIN {
       system(str.c_str());
     }
     DirectoryStream.close();
+    if(XHOST.AVOID_RUNNING_VASP){  //CO20200624
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"VASP should NOT be running",_INPUT_ILLEGAL_);  //better to throw to avoid VASP_Backup(), etc.
+      //return false;
+    }
     bool Krun=TRUE;
     // VASP VASP WRITE
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));

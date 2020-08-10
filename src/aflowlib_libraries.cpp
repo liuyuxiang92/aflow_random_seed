@@ -5287,8 +5287,6 @@ namespace aflowlib {
     if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE)) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_OUT_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_OUT_FILE,vfile,MESSAGE);  // aflow.pocc.out
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,vfile,MESSAGE);  // aflow.pocc.structures_unique.out
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,vfile,MESSAGE);  // aflow.pocc.hnf_matrices.out
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE,vfile,MESSAGE);  // aflow.pocc.site_configurations.out
       //get DOSCAR.pocc + png's
       vector<string> vfiles;
       aurostd::DirectoryLS(directory_LIB,vfiles);
@@ -5320,8 +5318,13 @@ namespace aflowlib {
       }
       if(AFLOWLIB_VERBOSE && data.energy_atom!=AUROSTD_NAN) cout << MESSAGE << " energy_atom=" << data.energy_atom << endl;
       if(AFLOWLIB_VERBOSE && data.entropy_forming_ability!=AUROSTD_NAN) cout << MESSAGE << " entropy_forming_ability=" << data.entropy_forming_ability << endl;
-    } else {
-      return FALSE;
+    }
+
+    if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE)) {  //old pocc doesn't print this
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,vfile,MESSAGE);  // aflow.pocc.hnf_matrices.out
+    }
+    if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE)) {  //old pocc doesn't print this
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_SITE_CONFIGURATIONS_FILE,vfile,MESSAGE);  // aflow.pocc.site_configurations.out
     }
 
     if(aurostd::EFileExist(directory_LIB+"/"+"aflow.pocc_agl.out")) {

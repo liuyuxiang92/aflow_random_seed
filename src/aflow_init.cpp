@@ -853,7 +853,7 @@ namespace init {
     if(XHOST.vflag_control.flag("AGL_SPRESSURE")) XHOST.vflag_control.push_attached("AGL_SPRESSURE",aurostd::args2attachedstring(argv,"--agl_spressure=","1.0")); //CT20200323
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_SPRESSURE") << endl;  //CT20200323
 
-    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp");  //CO20200624 - VERY important, prevents VASP from running
+    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp|--no_vasp|--novasp");  //CO20200624 - VERY important, prevents VASP from running
     if( XHOST.GENERATE_AFLOWIN_ONLY ||
         XHOST.POSTPROCESS || 
         XHOST.ARUN_POSTPROCESS ||
