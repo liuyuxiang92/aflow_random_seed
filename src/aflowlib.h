@@ -22,7 +22,7 @@ using std::string;
 #define CHMODWEB FALSE
 #define INF 1E9
 #define ENERGY_ATOM_ERROR_meV 50
-#define PRESSURE_ZERO_ENTHALPY_ENERGY 1e-6
+#define PRESSURE_ZERO_ENTHALPY_ENERGY _FLOAT_TOL_ //1e-6
 
 extern vector<string> vLibrary_LIB2;   // need to remove somwhoe
 extern vector<string> vLibrary_LIB3;

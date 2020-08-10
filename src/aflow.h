@@ -18,11 +18,25 @@
 //[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 
-//COMMON TOLERANCES
-#define _ZERO_TOL_ 1e-10 //DX
-#define _ZERO_TOL_LOOSE_ 1e-6  //ME20200519 - tolerance for float precision
+//ZERO PRECISION DEFINITIONS - TIGHT (DEFAULT) AND LOOSE
+#define _ZERO_PRECISION_ 10
+#define _ZERO_TOL_ std::pow(10,-_ZERO_PRECISION_) //DX
+#define _ZERO_PRECISION_LOOSE_ 3
+#define _ZERO_TOL_LOOSE_ std::pow(10,-_ZERO_PRECISION_LOOSE_) //DX
+#define _DOUBLE_PRECISION_ 8
+#define _DOUBLE_TOL_ std::pow(10,-_DOUBLE_PRECISION_) 
+#define _FLOAT_PRECISION_ 6
+#define _FLOAT_TOL_ std::pow(10,-_FLOAT_PRECISION_)  //ME20200519 - tolerance for float precision
+//PRECISION and TOLERANCE definitions
+#define _DOUBLE_WRITE_PRECISION_MAX_ 14  //CO20180509 - used for xstrctures
+#define _DOUBLE_WRITE_PRECISION_ 12  //CO20180509 - used in writing doubles in qmvasp
+#define _AFLOWLIB_STOICH_PRECISION_ _DOUBLE_PRECISION_ //[CO20200731 - too many different precisions... just use default]9  //CO20200731
+#define _AFLOWLIB_DATA_DOUBLE_PREC_ _DOUBLE_PRECISION_ //[CO20200731 - too many different precisions... just use default]6 //CO20200731
+#define _AFLOWLIB_DATA_GEOMETRY_PREC_ _DOUBLE_PRECISION_ //[CO20200731 - too many different precisions... just use default]7 //CO20200731
+#define _AFLOW_POCC_PRECISION_ _DOUBLE_PRECISION_ //8 //must be less than _DOUBLE_WRITE_PRECISION_MAX_, which is currently set to 14
+#define _AFLOW_POCC_ZERO_TOL_ std::pow(10,-_AFLOW_POCC_PRECISION_) 
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
-#define _XPROTO_ZERO_VOL_ 1.0e-6  //CO20190218
+#define _XPROTO_ZERO_VOL_ _FLOAT_TOL_  //CO20190218
 
 //ME20190628 BEGIN - moved from CHULL for broader access
 // Output formats
@@ -80,14 +94,6 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 
 //MESSAGE defaults - CO20200502
 #define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
-
-//XSTRUCTURE definitions
-#define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
-#define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
-#define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
-#define _AFLOWLIB_DATA_DOUBLE_PREC_ 6 //CO20200731
-#define _AFLOWLIB_DATA_GEOMETRY_PREC_ 7 //CO20200731
-#define _AFLOW_STOICH_PRECISION_ 9  //CO20200731
 
 //CO20200731 START
 static const string POCC_TITLE_TAG=":POCC_";

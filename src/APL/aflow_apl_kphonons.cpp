@@ -1023,7 +1023,7 @@ namespace KBIN {
           const vector<double>& idos = dosc.getIDOS();
           uint i = 0;
           for (i = 0; i < freqs.size(); i++) {
-            if (freqs[i] > -_ZERO_TOL_LOOSE_) break;
+            if (freqs[i] > -_FLOAT_TOL_) break;
           }
           if (i > 0) {
             double idos_percent = 100.0 * idos[i - 1]/idos.back();
@@ -1267,7 +1267,7 @@ namespace apl {
         message = "Start temperature is larger than end temperature.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
-      if (tstep < _ZERO_TOL_LOOSE_) {
+      if (tstep < _FLOAT_TOL_) {
         message = "Temperature step cannot be zero or negative.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }

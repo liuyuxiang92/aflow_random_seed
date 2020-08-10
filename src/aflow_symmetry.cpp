@@ -16,7 +16,7 @@
 #define _EPS_ 0.02 //JX
 // #define _EPS_ 0.001 // shidong
 //#define _EPS_ 0.02  // seems to work in the mean time of a self correcting one
-#define _EPS_roundoff_ 1.0e-8
+#define _EPS_roundoff_ _DOUBLE_TOL_ //CO20200731 //1.0e-8
 #define COMPILE_SLIM
 
 using aurostd::isdiagonal;

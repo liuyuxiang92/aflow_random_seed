@@ -965,15 +965,12 @@ namespace aurostd{
     if (T>_ZERO_TOL_){
       return 1/(1+std::exp((E-mu)/(KBOLTZEV*T)));
     }
-    else
-      // At T=0 FD transforms to Heaviside step function
-      if (E<mu){
-        return 1;
-      }
-      else if (E>mu){
-        return 0;
-      }
-      else return 0.5;
+    //[//CO20200731 - what else is there?]else
+    // At T=0 FD transforms to Heaviside step function
+    if (E<mu) return 1;
+    else if (E>mu) return 0;
+    //CO20200731 - what else is there?else 
+    return 0.5;
   }
 }
 //AS20200513 END

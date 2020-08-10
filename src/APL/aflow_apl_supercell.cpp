@@ -509,12 +509,12 @@ namespace apl {
               atom.fpos = C2F(_scStructure.lattice, atom.cpos);
 
               // Add only atoms inside the cell
-              if (atom.fpos(1) > 1.0 - _ZERO_TOL_LOOSE_ ||
-                  atom.fpos(2) > 1.0 - _ZERO_TOL_LOOSE_ ||
-                  atom.fpos(3) > 1.0 - _ZERO_TOL_LOOSE_ ||
-                  atom.fpos(1) < 0.0 - _ZERO_TOL_LOOSE_ ||
-                  atom.fpos(2) < 0.0 - _ZERO_TOL_LOOSE_ ||
-                  atom.fpos(3) < 0.0 - _ZERO_TOL_LOOSE_) continue;
+              if (atom.fpos(1) > 1.0 - _FLOAT_TOL_ ||
+                  atom.fpos(2) > 1.0 - _FLOAT_TOL_ ||
+                  atom.fpos(3) > 1.0 - _FLOAT_TOL_ ||
+                  atom.fpos(1) < 0.0 - _FLOAT_TOL_ ||
+                  atom.fpos(2) < 0.0 - _FLOAT_TOL_ ||
+                  atom.fpos(3) < 0.0 - _FLOAT_TOL_) continue;
 
               // Increase the number of atoms of this type...
               _scStructure.num_each_type[atom.type]++;
@@ -567,12 +567,12 @@ namespace apl {
               symOp.ctau = symOp.ctau + cshift;
               symOp.ftau = C2F(_scStructure.lattice, symOp.ctau);
 
-              if (symOp.ftau(1) > 1.0 - _ZERO_TOL_LOOSE_ ||
-                  symOp.ftau(2) > 1.0 - _ZERO_TOL_LOOSE_ ||
-                  symOp.ftau(3) > 1.0 - _ZERO_TOL_LOOSE_ ||
-                  symOp.ftau(1) < 0.0 - _ZERO_TOL_LOOSE_ ||
-                  symOp.ftau(2) < 0.0 - _ZERO_TOL_LOOSE_ ||
-                  symOp.ftau(3) < 0.0 - _ZERO_TOL_LOOSE_) continue;
+              if (symOp.ftau(1) > 1.0 - _FLOAT_TOL_ ||
+                  symOp.ftau(2) > 1.0 - _FLOAT_TOL_ ||
+                  symOp.ftau(3) > 1.0 - _FLOAT_TOL_ ||
+                  symOp.ftau(1) < 0.0 - _FLOAT_TOL_ ||
+                  symOp.ftau(2) < 0.0 - _FLOAT_TOL_ ||
+                  symOp.ftau(3) < 0.0 - _FLOAT_TOL_) continue;
 
               // We have to correct the Uf for each symop since we have changed the lattice...
               //SC formula - great help!
@@ -588,14 +588,14 @@ namespace apl {
     for (int i = 0; i < (int)_scStructure.num_each_type.size(); i++) {
       int end = start + _scStructure.num_each_type[i];
       for (int j = start; j < end - 1; j++) {
-        if (aurostd::abs(_scStructure.atoms[j].fpos(1)) < _ZERO_TOL_LOOSE_) _scStructure.atoms[j].fpos(1) = 0.0;
-        if (aurostd::abs(_scStructure.atoms[j].fpos(2)) < _ZERO_TOL_LOOSE_) _scStructure.atoms[j].fpos(2) = 0.0;
-        if (aurostd::abs(_scStructure.atoms[j].fpos(3)) < _ZERO_TOL_LOOSE_) _scStructure.atoms[j].fpos(3) = 0.0;
+        if (aurostd::abs(_scStructure.atoms[j].fpos(1)) < _FLOAT_TOL_) _scStructure.atoms[j].fpos(1) = 0.0;
+        if (aurostd::abs(_scStructure.atoms[j].fpos(2)) < _FLOAT_TOL_) _scStructure.atoms[j].fpos(2) = 0.0;
+        if (aurostd::abs(_scStructure.atoms[j].fpos(3)) < _FLOAT_TOL_) _scStructure.atoms[j].fpos(3) = 0.0;
 
         for (int k = j + 1; k < end; k++) {
-          if (aurostd::abs(_scStructure.atoms[k].fpos(1)) < _ZERO_TOL_LOOSE_) _scStructure.atoms[k].fpos(1) = 0.0;
-          if (aurostd::abs(_scStructure.atoms[k].fpos(2)) < _ZERO_TOL_LOOSE_) _scStructure.atoms[k].fpos(2) = 0.0;
-          if (aurostd::abs(_scStructure.atoms[k].fpos(3)) < _ZERO_TOL_LOOSE_) _scStructure.atoms[k].fpos(3) = 0.0;
+          if (aurostd::abs(_scStructure.atoms[k].fpos(1)) < _FLOAT_TOL_) _scStructure.atoms[k].fpos(1) = 0.0;
+          if (aurostd::abs(_scStructure.atoms[k].fpos(2)) < _FLOAT_TOL_) _scStructure.atoms[k].fpos(2) = 0.0;
+          if (aurostd::abs(_scStructure.atoms[k].fpos(3)) < _FLOAT_TOL_) _scStructure.atoms[k].fpos(3) = 0.0;
 
           if (_scStructure.atoms[k].fpos(1) < _scStructure.atoms[j].fpos(1)) {
             _atom ta = _scStructure.atoms[j];
@@ -1591,7 +1591,7 @@ namespace apl {
         rshell = aurostd::modulus(rc);
         delta = _scStructure.atoms[at1sc].cpos - _scStructure.atoms[at2sc].cpos;
         // Get the phase vectors for all atoms that sit on the shell
-        if (!_isShellRestricted || (rshell <= _maxShellRadius[centerIDsc] + _ZERO_TOL_LOOSE_)) {
+        if (!_isShellRestricted || (rshell <= _maxShellRadius[centerIDsc] + _FLOAT_TOL_)) {
           for (int ii = -1; ii <= 1; ii++) {
             for (int jj = -1; jj <= 1; jj++) {
               for (int kk = -1; kk <= 1; kk++) {
@@ -1599,7 +1599,7 @@ namespace apl {
                 pf[2] = rf[2] + jj;
                 pf[3] = rf[3] + kk;
                 pc = _scStructure.f2c * pf;
-                if (aurostd::isequal(aurostd::modulus(pc), rshell, _ZERO_TOL_LOOSE_)) {
+                if (aurostd::isequal(aurostd::modulus(pc), rshell, _FLOAT_TOL_)) {
                   pc -= delta;
                   phase_vectors[centerID][atomID].push_back(pc);
                 }

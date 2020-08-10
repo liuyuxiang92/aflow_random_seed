@@ -1164,7 +1164,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
 
-#define pocc_precision 12
+#define pocc_precision _DOUBLE_WRITE_PRECISION_ //12
 #define pocc_roundoff_tol 5.0*pow(10,-((int)pocc_precision)-1)
   void POccCalculator::writeResults() const { //TEMPERATURE-INDEPENDENT
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);

@@ -2664,7 +2664,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // VASP OUTPUT
   if(a_iomode==IOVASP_AUTO || a_iomode==IOVASP_POSCAR || a_iomode==IOVASP_ABCCAR || a_iomode==IOVASP_WYCKCAR) { // VASP POSCAR
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     //DX20180618 - Check for symbolic representaion only - START
     if(a.symbolic_math_representation_only){
@@ -2996,7 +2996,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     //oss << aurostd::PaddedPOST(" ecutrho=_AFLOW_ECUTRHO_",depthQE," ") << " ! // fix these " << endl;   //CO20171010
     oss << " /" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     if(a.coord_flag==_COORDS_FRACTIONAL_) oss << "ATOMIC_POSITIONS (crystal)" << endl;
     if(a.coord_flag==_COORDS_CARTESIAN_)  oss << "ATOMIC_POSITIONS (angstrom)" << endl;
@@ -3057,7 +3057,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   //  ABINIT OUTPUT
   if(a_iomode==IOABINIT_AUTO || a_iomode==IOABINIT_GEOM) { // VASP POSCAR
     oss << "# AFLOW::ABINIT BEGIN " << endl;
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     if(a_iomode==IOABINIT_AUTO) oss << "# " << a.title <<endl;//<< " (AUTO)" << endl;
@@ -3133,7 +3133,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   //  ELK OUTPUT //DX20200315
   if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
     oss << "# AFLOW::ELK BEGIN " << endl;
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss << "# " << a.title <<endl;
@@ -3195,7 +3195,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   if(a_iomode==IOAIMS_AUTO || a_iomode==IOAIMS_GEOM) { // VASP POSCAR
     xstructure aa(a);
     aa.ReScale(1.0); //very important because there is NO scale factor in AIMS //CO20180420
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss << "# " << aa.title <<endl;//<< " (AUTO)" << endl;
@@ -3446,7 +3446,7 @@ string xstructure::PrintUNCLE(void) {   // Print in uncle format
 // // **************************************************************************
 // string xstructure::PrintADO(string strin) {   // Print in ado format
 //   stringstream oss;
-//   uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+//   uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
 //   oss.setf(std::ios::fixed,std::ios::floatfield);
 //   oss.precision(_precision_);
 //   // oss << "# Structure name number of atoms in the cell:" << endl;
@@ -16000,7 +16000,7 @@ string xstructure2json(xstructure& xstr) {
 
   // LATTICE
   if(xstr.lattice.rows){
-    sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_AFLOW_XSTR_PRINT_PRECISION_,roff) << "]" << eendl; //CO20180515
+    sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_DOUBLE_WRITE_PRECISION_MAX_,roff) << "]" << eendl; //CO20180515
   } else {
     if(PRINT_NULL){ sscontent_json << "\"lattice\":null" << eendl;}
   }
@@ -16072,9 +16072,9 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
   // POSITION
   if(coord_flag==_COORDS_FRACTIONAL_){
-    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.fpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO20180515
+    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.fpos,_DOUBLE_WRITE_PRECISION_MAX_,roff),",") << "]" << eendl; //CO20180515
   } else if(coord_flag==_COORDS_CARTESIAN_){
-    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO20180515
+    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_DOUBLE_WRITE_PRECISION_MAX_,roff),",") << "]" << eendl; //CO20180515
   } else {
     if(PRINT_NULL){ sscontent_json << "\"position\":null" << eendl;}
   }

@@ -3039,7 +3039,7 @@ namespace aflowlib {
     data.vforces=data_vforces;
     data_vpositions_cartesian.clear(); for(uint i=0;i<xOUT.vpositions_cartesian.size();i++)  data_vpositions_cartesian.push_back(xOUT.vpositions_cartesian.at(i));
     data.vpositions_cartesian=data_vpositions_cartesian;
-    int precfp=8; //DX20190320 - changed from uint to int, otherwise breaks
+    int precfp=_DOUBLE_PRECISION_; //DX20190320 - changed from uint to int, otherwise breaks
     data.forces="";
     data.positions_cartesian="";
     for(uint i=0;i<(uint) data.natoms;i++) {
@@ -3172,7 +3172,7 @@ namespace aflowlib {
       data.composition+=aurostd::utype2string(str_relax.num_each_type.at(i)); if(i<data.nspecies-1) data.composition+=",";
       data.vcomposition.push_back(str_relax.num_each_type.at(i));
       data.density+=(double) str_relax.num_each_type.at(i)*GetAtomMass(str_relax.species.at(i));
-      data.stoichiometry+=aurostd::utype2string(data.vstoichiometry.at(i),_AFLOW_STOICH_PRECISION_); if(i<data.nspecies-1) data.stoichiometry+=",";
+      data.stoichiometry+=aurostd::utype2string(data.vstoichiometry.at(i),_AFLOWLIB_STOICH_PRECISION_); if(i<data.nspecies-1) data.stoichiometry+=",";
       //data.stoich+=aurostd::utype2string(data.vstoichiometry.at(i),4); if(i<data.nspecies-1) data.stoichiometry+="   "; //mimic old BS format, 4 digits of accuracy and 3 spaces between, stoich=0.5000   0.1667   0.3333
       data.species+=str_relax.species.at(i);if(i<data.nspecies-1) data.species+=",";
       data.species_pp+=str_relax.species_pp.at(i);if(i<data.nspecies-1) data.species_pp+=",";
@@ -5319,8 +5319,6 @@ namespace aflowlib {
         }
       }
       if(AFLOWLIB_VERBOSE && data.energy_atom!=AUROSTD_NAN) cout << MESSAGE << " energy_atom=" << data.energy_atom << endl;
-      if(data.energy_atom!=AUROSTD_NAN){data.enthalpy_atom=data.energy_atom;}
-      if(AFLOWLIB_VERBOSE && data.enthalpy_atom!=AUROSTD_NAN) cout << MESSAGE << " enthalpy_atom=" << data.enthalpy_atom << endl;
       if(AFLOWLIB_VERBOSE && data.entropy_forming_ability!=AUROSTD_NAN) cout << MESSAGE << " entropy_forming_ability=" << data.entropy_forming_ability << endl;
     } else {
       return FALSE;
@@ -5418,7 +5416,7 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " compound=" << data.compound << endl;
     //
     data.vstoichiometry=aurostd::deque2vector(xstr_pocc.stoich_each_type);
-    data.stoichiometry=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vstoichiometry,_AFLOW_STOICH_PRECISION_),",");
+    data.stoichiometry=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(data.vstoichiometry,_AFLOWLIB_STOICH_PRECISION_),",");
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " stoichiometry=" << data.stoichiometry << endl;
     //CO20200624 START - mimic stoich from PrintData1(): aflow_pflow_print.cpp, this is really obsolete
     stringstream stoich_ss;stoich_ss.precision(4);
@@ -5503,10 +5501,18 @@ namespace aflowlib {
     //ME20190124 END
     data.METAGGA=xOUT.METAGGA;
     if(AFLOWLIB_VERBOSE && !data.METAGGA.empty()) cout << MESSAGE << " METAGGA=" << data.METAGGA << endl;
-    data.pressure=xOUT.pressure;
-    if(AFLOWLIB_VERBOSE && data.pressure!=AUROSTD_NAN) cout << MESSAGE << " pressure=" << data.pressure << endl;
     data.energy_cutoff=xOUT.ENCUT;
     if(AFLOWLIB_VERBOSE && data.energy_cutoff!=AUROSTD_NAN) cout << MESSAGE << " energy_cutoff=" << data.energy_cutoff << endl;
+    if(abs(xOUT.PV_atom)<PRESSURE_ZERO_ENTHALPY_ENERGY){ //only set if it's zero because that means ALL ARUNs are zero (as input), otherwise it's ARUN-specific
+      data.pressure=xOUT.pressure;
+      if(AFLOWLIB_VERBOSE && data.pressure!=AUROSTD_NAN) cout << MESSAGE << " pressure=" << data.pressure << endl;
+      data.PV_cell=xOUT.PV_cell;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PV total E0 (eV) = " << data.PV_cell << endl;
+      data.PV_atom=xOUT.PV_atom;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PV per atom E0/N (eV) = " << data.PV_atom << endl;
+      if(data.energy_atom!=AUROSTD_NAN){data.enthalpy_atom=data.energy_atom;}
+      if(AFLOWLIB_VERBOSE && data.enthalpy_atom!=AUROSTD_NAN) cout << MESSAGE << " enthalpy_atom=" << data.enthalpy_atom << endl;
+    }
 
     //if you want to grab from the derivative structure, do as below
     //xstructure xstr_orig;
