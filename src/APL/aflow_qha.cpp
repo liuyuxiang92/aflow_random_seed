@@ -905,6 +905,7 @@ namespace apl
     xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::MODULE");
 
     stringstream aflow;
+    string incar_explicit = xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str();
 
     // create aflow.in if there are no outputs with results in the directory:
     // OUTCAR, EIGENVAL and IBZKPT. The last two are only required when electronic
@@ -940,6 +941,10 @@ namespace apl
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
+
+      xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str(std::string());
+      xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.clear();
+      xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP << incar_explicit;
     }
   }
 
@@ -1054,6 +1059,7 @@ namespace apl
     xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_HIBERNATE","ON",true);
 
     stringstream aflow;
+    string incar_explicit = xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str();
 
     vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
       (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
@@ -1065,7 +1071,7 @@ namespace apl
     // create aflow.in if there are no outputs with results in the directory.
     // The existing aflow.in file will not be overwritten.
     for (uint i=0; i<subdirectories.size(); i++){
-      if (file_is_present[i][0]) continue;
+      if (file_is_present[i][PH_DF_HARMIFC]) continue;
 
       if (aurostd::FileExist(subdirectories[i]+'/'+_AFLOWIN_)) continue;
 
@@ -1081,7 +1087,19 @@ namespace apl
       xinput.xvasp.AVASP_arun_runname = arun_runnames[i];
 
       AVASP_populateXVASP(aflags,kflags,xflags.vflags, xinput.xvasp);
+      if (xinput.xvasp.AVASP_path_BANDS.empty()){
+        if (xflags.vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string.empty())
+          xinput.xvasp.AVASP_path_BANDS = AFLOWRC_DEFAULT_BANDS_LATTICE;
+        else
+          xinput.xvasp.AVASP_path_BANDS = xflags.vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string;
+      }
+      if (!xinput.xvasp.AVASP_value_BANDS_GRID)
+        xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
+
+      xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str(std::string());
+      xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.clear();
+      xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP << incar_explicit;
     }
   }
 
