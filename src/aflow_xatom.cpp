@@ -4693,6 +4693,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // for(uint i=0;i<a.atoms.size();i++) cerr << "a.atoms.at(i).type=" << a.atoms.at(i).type << endl;
     a.SpeciesPutAlphabetic(); // fight analphabetization
     uint iat=0;
+    a.title=""; //CO20200731 - NO_TITLE_GIVEN clear
     for(uint itype=0;itype<a.num_each_type.size();itype++) 
       for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
         if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
