@@ -5849,33 +5849,29 @@ namespace KBIN {
   }
 
   string ExtractSystemNameFromAFLOWIN(const string& _directory) {
+    //CO20200731 - adjusting for old aflow.ins that only contain 'SYSTEM=' in INCAR section, or
+    //[AFLOW] SYSTEM = Mo_pvRu_pv.A30B0
     string directory=_directory;  //CO20200624
     if (directory.empty()) directory = ".";
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
-    if(aurostd::FileExist(aflowin_path)) {
-      // ME20200525 - Need to take potential white space between [AFLOW],
-      // SYSTEM, and = into account.
-      vector<string> aflowin;
-      aurostd::file2vectorstring(aflowin_path, aflowin);
-      uint nlines = aflowin.size();
-      string line = "";
-      for (uint iline = 0; iline < nlines && system_name.empty(); iline++) {
-        if (aflowin[iline].find("SYSTEM") != string::npos) {
-          line = aflowin[iline];
-          if (aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "[AFLOW]SYSTEM=") || 
-              aurostd::substring2bool(aurostd::RemoveWhiteSpaces(line), "SYSTEM=") ||  //CO20200731 - so it can find "SYSTEM=XXXX" in INCAR section, good for AEL/AGL ARUNs
-              FALSE) {
-            string::size_type t = line.find_first_of("=");
-            system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line.substr(t + 1));
-            if(!system_name.empty()){return system_name;}
-          }
-        }
-      }
-    } else {
+    if(!aurostd::FileExist(aflowin_path)) {
       string function = "KBIN::ExtractSystemNameFromAFLOWIN():";
       string message = "Could not find file " + aflowin_path + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+    // ME20200525 - Need to take potential white space between [AFLOW],
+    // SYSTEM, and = into account.
+    string AflowIn=aurostd::RemoveComments(aurostd::file2string(aflowin_path)); // for safety //CO20180502
+    vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn);
+    uint nlines = vAflowIn.size();
+    for (uint iline = 0; iline < nlines && system_name.empty(); iline++) {
+      if (vAflowIn[iline].find("SYSTEM") != string::npos) {
+        const string& line = vAflowIn[iline];
+        string::size_type t = line.find_first_of("=");
+        system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line.substr(t + 1));
+        if(!system_name.empty()){return system_name;}
+      }
     }
 
     return system_name;

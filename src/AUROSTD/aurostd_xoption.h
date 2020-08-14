@@ -42,7 +42,6 @@ namespace aurostd {
       vector<string> vxscheme;   // tokenized "," content
       vector<string> vxsghost;   // tokenized "," content
       bool preserved;            // the output
-      bool LDEBUG;               // to print or not to print
       // LOAD BOOLS FUNCTIONS
       void options2entry(string,string,int=aurostd_xoptionONOFF,string="");
       void scheme2scheme(char,string);

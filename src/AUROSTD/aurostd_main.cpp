@@ -5025,7 +5025,8 @@ namespace aurostd {
   // ***************************************************************************
   string substring2string(const string& strstream, const string& strsub1, bool CLEAN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "DEBUG substring2string3: (BEGIN) " << strsub1 << " " << CLEAN << endl;
+    string soliloquy=XPID+"aurostd::substring2string():";
+    if(LDEBUG) cerr << "DEBUG " << soliloquy << " (BEGIN) " << strsub1 << " " << CLEAN << endl;
     string _strstream(strstream),_strline,_strsub1(strsub1);
     string strout="";
     string::size_type idxS1;
@@ -5043,7 +5044,7 @@ namespace aurostd {
       if(idxS1!=string::npos) {
         strout=_strline.substr(_strline.find(_strsub1)+_strsub1.length());
         strout=aurostd::RemoveWhiteSpacesFromTheBack(strout);
-        if(LDEBUG) cerr << "DEBUG substring2string3: (END) " << strsub1 << " " << CLEAN << endl;
+        if(LDEBUG) cerr << "DEBUG " << soliloquy << " (END) " << strsub1 << " " << CLEAN << endl;
         return (string) strout;
       }
     }
