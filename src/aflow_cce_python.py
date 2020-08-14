@@ -21,7 +21,7 @@ class CCE:
         except subprocess.CalledProcessError:
             raise AssertionError('aflow executable not found: ' + self.aflow_executable)
 
-    def cce(self, STRUCT_FILE, dft_formation_energies = [], functionals = [], oxidation_numbers = []):
+    def get_corrections(self, STRUCT_FILE, dft_formation_energies = [], functionals = [], oxidation_numbers = []):
         #initial cce command
         command = ' --cce'
 
