@@ -900,8 +900,7 @@ namespace plotter {
 
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
-    string aflowin_path=directory+"/"+_AFLOWIN_;
-    string SYSTEM=KBIN::ExtractSystemNameFromAFLOWIN(aflowin_path); //CO20200731
+    string SYSTEM=KBIN::ExtractSystemNameFromAFLOWIN(directory); //CO20200731
     if(!SYSTEM.empty()){
       if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
       plotoptions.pop_attached("DEFAULT_TITLE");
