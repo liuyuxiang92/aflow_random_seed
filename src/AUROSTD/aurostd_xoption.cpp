@@ -387,7 +387,7 @@ namespace aurostd {
     return FALSE;   //SC20200114
   }   //SC20200114
 
-  string xoption::getattachedscheme(string xscheme) const {
+  string xoption::getattachedscheme(const string& xscheme) const {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(vxsghost.size()==0) return "";
     for(uint i=0;i<vxsghost.size()-1;i+=2) {
@@ -397,7 +397,7 @@ namespace aurostd {
     }
     return "";
   }
-  template<class utype> utype xoption::getattachedutype(string xscheme) {
+  template<class utype> utype xoption::getattachedutype(const string& xscheme) const { //CO20200731
     return aurostd::string2utype<utype>(getattachedscheme(xscheme));
   }
 
