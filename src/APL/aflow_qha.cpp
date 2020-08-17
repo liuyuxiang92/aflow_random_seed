@@ -1305,7 +1305,7 @@ namespace apl
           dummy_dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
-      dosc.writePHDOSCAR(subdirectories[i]);
+//      dosc.writePHDOSCAR(subdirectories[i]);
 
       if (dosc.hasNegativeFrequencies()){
         stringstream msg;
@@ -1355,7 +1355,7 @@ namespace apl
       apl::PhononDispersionCalculator pdisc(phcalc);
       pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
-      pdisc.writePHEIGENVAL(subdirectories[i]);
+//      pdisc.writePHEIGENVAL(subdirectories[i]);
 
       // save all the data that is necessary for QHA calculations
       if (i==0){// qmesh data is the same for all volumes: need to store only once
