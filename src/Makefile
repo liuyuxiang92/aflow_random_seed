@@ -1132,6 +1132,7 @@ check:
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:
+	$(MAKE) check_CeramGen
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
 	$(MAKE) check_aflow_exits
 	$(MAKE) check_gcd
@@ -1164,6 +1165,10 @@ check_proto:
 check_Egap:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --Egap_test
+.PHONY: check_CeramGen
+check_CeramGen:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --CeramGen_test
 .PHONY: check_gcd
 check_gcd:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi

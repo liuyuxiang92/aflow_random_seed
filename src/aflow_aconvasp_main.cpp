@@ -13128,31 +13128,31 @@ namespace pflow {
     //get vNinbetween_std
     vector<uint> vNinbetween_std;vNinbetween_std.assign(vNinbetween.size(),0);vNinbetween_std.back()=metal_arity;
     
-    uint k=0;
+    uint k=0; //index of nonmetals
     vector<string> vcommands,vtmp;
     string command="",tmp;
-    bool is_beginning=false;
     while(vcommands.size()<1e4){  //not simple as number of combinations since we could have 2 or more nonmetals
       command="";
-      k=0;  //index of nonmetals
       
-      is_beginning=(vNinbetween.front()==0);
-      if(LDEBUG){cerr << soliloquy << " is_beginning=" << is_beginning << endl;}
-      
-      if(is_beginning){command+=vnonmetals[k++];}
-      for(i=0;i<vNinbetween.size();i++){
+      for(i=0,k=0;i<vNinbetween.size();i++){
         tmp=aurostd::joinWDelimiter(vvinbetween[i],",");
         vtmp.clear();
-        for(j=0;j<vNinbetween[i];j++){vtmp.push_back(tmp);}
-        if(!command.empty()&&vNinbetween[i]>0){command+=":";}
-        command+=aurostd::joinWDelimiter(vtmp,":");
-        if(k<vnonmetals.size()&&!command.empty()){command+=":"+vnonmetals[k++];}
+        if(vNinbetween[i]>0){
+          if(!command.empty()){command+=":";}
+          for(j=0;j<vNinbetween[i];j++){vtmp.push_back(tmp);}
+          command+=aurostd::joinWDelimiter(vtmp,":");
+        }
+        if(k<vnonmetals.size()){
+          if(!command.empty()){command+=":";}
+          command+=vnonmetals[k++];
+        }
       }
       
       if(LDEBUG){cerr << soliloquy << " command=" << command << endl;}
       vcommands.push_back(command);
       if(vNinbetween==vNinbetween_std){break;}
 
+      //adjust vNinbetween
       for(i=0;i<vNinbetween.size()-1;i++){
         if(vNinbetween[i]==0){continue;}
         vNinbetween[i]--;
