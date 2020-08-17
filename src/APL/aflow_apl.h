@@ -1356,8 +1356,8 @@ namespace apl
           const _kflags &kflags, const vector<vector<bool> > &list, QHAtype qhatype);
       int  checkAPLCalculations(vector<vector<bool> > &file_is_present, QHAtype qhatype);
       void printMissingAPLFiles(const vector<vector<bool> > & list, QHAtype qhatype);
-      bool readAPLCalculationData(const vector<string> &subdirectories,
-          const vector<double> &coefVolumes, _kflags &kflags, QHAtype type);
+      bool readAPLCalculationData(const vector<string> &subdirectories, _kflags &kflags,
+          QHAtype type);
       bool runAPL(_xflags &xflags, _aflags &aflags, _kflags &kflags, QHAtype qhatype);
       // mandatory
       void free();

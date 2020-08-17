@@ -35,7 +35,7 @@
 // files required by static DFT calculation
 enum ST_DATA_FILE {ST_DF_DIRECTORY, ST_DF_OUTCAR, ST_DF_EIGENVAL, ST_DF_IBZKPT};
 // files required by APL calculation
-enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC};
+enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 
 #define EOS_METHOD_FILE_POLYNOMIAL "polynomial."
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN "birch-murnaghan."
@@ -1121,7 +1121,7 @@ namespace apl
       (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
 
     int count = 0;
-    string harmifcfile = "";
+    string harmifcfile = "", phposcarfile = "";
     bool all_files_are_present = true;
     for (uint i=0; i<subdirectories.size(); i++){
       all_files_are_present = true;
@@ -1134,6 +1134,12 @@ namespace apl
       harmifcfile=subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
       if (aurostd::EFileExist(harmifcfile))
         file_is_present[i][PH_DF_HARMIFC] = true;
+      else
+        all_files_are_present = false;
+
+      phposcarfile=subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      if (aurostd::EFileExist(phposcarfile))
+        file_is_present[i][PH_DF_PHPOSCAR] = true;
       else
         all_files_are_present = false;
 
@@ -1160,6 +1166,10 @@ namespace apl
         missing_files = "";
         if (!list[i][PH_DF_HARMIFC]){
           missing_files = DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
+        }
+        if (!list[i][PH_DF_PHPOSCAR]){
+          if (!missing_files.empty()) missing_files += ",";
+          missing_files +=  DEFAULT_APL_PHPOSCAR_FILE;
         }
         if (!missing_files.empty()){
           msg += "File(s)   "+subdirectories[i]+"/"+missing_files+" is (are) missing.\n";
@@ -1207,16 +1217,12 @@ namespace apl
     vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
         (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
 
-    vector<double> &coefVolumes = (QHA_FD==qhatype) ? coefGPVolumes :
-      (QHA_EOS==qhatype) ? coefEOSVolumes : coefQHANPVolumes;
-
     vector<vector<bool> > file_is_present(subdirectories_apl_eos.size(),vector<bool>(2));
 
     bool apl_data_available = false;
     uint n_apl_calcs = checkAPLCalculations(file_is_present, qhatype);
     if (n_apl_calcs == subdirectories.size()){
-      apl_data_available = readAPLCalculationData(subdirectories, coefVolumes, kflags,
-          qhatype);
+      apl_data_available = readAPLCalculationData(subdirectories, kflags, qhatype);
     }
     else{
       /// if there exists data for at least one completed APL calculation, an error is
@@ -1231,8 +1237,8 @@ namespace apl
 
   /// Gathers and processes data from finished APL calculations.
   /// 
-  bool QHA::readAPLCalculationData(const vector<string> &subdirectories,
-      const vector<double> &coefVolumes, _kflags &kflags, QHAtype type)
+  bool QHA::readAPLCalculationData(const vector<string> &subdirectories, _kflags &kflags,
+      QHAtype type)
   {
     string function = XPID + "QHA::readAPLCalculationData():";
     string msg = "Reading phonon DOS and dispersion relations.";
@@ -1249,18 +1255,10 @@ namespace apl
     int Nqpoints = 0;
     bool apl_data_read_successfully = true;
 
+    string phposcarfile = "";
     for (uint i=0; i<subdirectories.size(); i++){
-      xinput.xvasp.str = origStructure;
-      xinput.xvasp.str.InflateVolume(coefVolumes[i]);
-
-      // save the corresponding structure into PHPOSCAR
-      string phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
-      if (!aurostd::EFileExist(phposcarfile)){
-        xinput.xvasp.str.is_vasp5_poscar_format = true;
-        stringstream poscar;
-        poscar << xinput.xvasp.str;
-        aurostd::stringstream2file(poscar, phposcarfile);
-      }
+      phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      xinput.xvasp.str = xstructure(phposcarfile, IOVASP_POSCAR);
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xinput.getXStr());
