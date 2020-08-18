@@ -508,6 +508,8 @@ namespace apl
   ///
   void QHA::free()
   {
+    apl_options.clear();
+    qha_options.clear();
     system_title = "";
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
@@ -563,6 +565,7 @@ namespace apl
     if (this==&qha) return;
 
     apl_options       = qha.apl_options;
+    qha_options       = qha.qha_options;
     system_title      = qha.system_title;
     isEOS             = qha.isEOS;
     isGP_FD           = qha.isGP_FD;
@@ -648,6 +651,7 @@ namespace apl
 
     this->xinput = xinput;
     this->apl_options = apl_options;
+    this->qha_options = qha_options;
 
     currentDirectory = xinput.xvasp.Directory; // remember the current directory
 
@@ -897,12 +901,25 @@ namespace apl
           if (LDEBUG) writeFrequencies();
           writeFVT();
 
-          writeThermalProperties(EOS_SJ, QHA_CALC);
-          writeThermalProperties(EOS_MURNAGHAN, QHA_CALC);
-          writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
-          writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
+          if (qha_options.flag("EOS_MODEL:SJ")){
+            writeThermalProperties(EOS_SJ, QHA_CALC);
+            writeTphononDispersions(QHA_CALC, EOS_SJ);
+          }
 
-          writeTphononDispersions(QHA_CALC, EOS_SJ);
+          if (qha_options.flag("EOS_MODEL:BM3")){
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
+            writeTphononDispersions(QHA_CALC, EOS_BIRCH_MURNAGHAN3);
+          }
+
+          if (qha_options.flag("EOS_MODEL:BM4")){
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
+            writeTphononDispersions(QHA_CALC, EOS_BIRCH_MURNAGHAN4);
+          }
+
+          if (qha_options.flag("EOS_MODEL:M")){
+            writeThermalProperties(EOS_MURNAGHAN, QHA_CALC);
+            writeTphononDispersions(QHA_CALC, EOS_MURNAGHAN);
+          }
         }
       }
 
@@ -910,10 +927,21 @@ namespace apl
       if (runQHANP){
         qhanp_data_available = runAPL(xflags, aflags, kflags, QHA_TE);
         if (qhanp_data_available){
-          writeThermalProperties(EOS_SJ, QHANP_CALC);
-          writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
-          writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC);
-          writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC);
+          if (qha_options.flag("EOS_MODEL:SJ")){
+            writeThermalProperties(EOS_SJ, QHANP_CALC);
+          }
+
+          if (qha_options.flag("EOS_MODEL:BM3")){
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC);
+          }
+
+          if (qha_options.flag("EOS_MODEL:BM4")){
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC);
+          }
+
+          if (qha_options.flag("EOS_MODEL:M")){
+            writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
+          }
         }
       }
 
@@ -931,22 +959,45 @@ namespace apl
             writeAverageGPfiniteDifferences();
 
             if (runQHA3P && eos_static_data_available){
-              writeThermalProperties(EOS_SJ, QHA3P_CALC);
-              writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
-              writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
-              writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
+              if (qha_options.flag("EOS_MODEL:SJ")){
+                writeThermalProperties(EOS_SJ, QHA3P_CALC);
+                writeTphononDispersions(QHA3P_CALC, EOS_SJ);
+              }
 
-              writeTphononDispersions(QHA3P_CALC, EOS_SJ);
+              if (qha_options.flag("EOS_MODEL:BM3")){
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
+                writeTphononDispersions(QHA3P_CALC, EOS_BIRCH_MURNAGHAN3);
+              }
+
+              if (qha_options.flag("EOS_MODEL:BM4")){
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
+                writeTphononDispersions(QHA3P_CALC, EOS_BIRCH_MURNAGHAN4);
+              }
+
+              if (qha_options.flag("EOS_MODEL:M")){
+                writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
+                writeTphononDispersions(QHA3P_CALC, EOS_MURNAGHAN);
+              }
             }
           }
 
           if (runSCQHA && eos_static_data_available){
-            RunSCQHA(EOS_SJ, true);
-            RunSCQHA(EOS_MURNAGHAN, true);
-            RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
-            RunSCQHA(EOS_BIRCH_MURNAGHAN4, true);
-
-            writeTphononDispersions(SCQHA_CALC, EOS_SJ);
+            if (qha_options.flag("EOS_MODEL:SJ")){
+              RunSCQHA(EOS_SJ, true);
+              writeTphononDispersions(SCQHA_CALC, EOS_SJ);
+            }
+            if (qha_options.flag("EOS_MODEL:BM3")){
+              RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
+              writeTphononDispersions(SCQHA_CALC, EOS_BIRCH_MURNAGHAN3);
+            }
+            if (qha_options.flag("EOS_MODEL:BM4")){
+              RunSCQHA(EOS_BIRCH_MURNAGHAN4, true);
+              writeTphononDispersions(SCQHA_CALC, EOS_BIRCH_MURNAGHAN4);
+            }
+            if (qha_options.flag("EOS_MODEL:M")){
+              RunSCQHA(EOS_MURNAGHAN, true);
+              writeTphononDispersions(SCQHA_CALC, EOS_MURNAGHAN);
+            }
           }
         }
       }

@@ -1287,6 +1287,7 @@ namespace apl
       void   writeTphononDispersions(QHAmethod qha_method, EOSmethod eos_method);
       // members
       xoption apl_options;
+      xoption qha_options;
       string system_title;
       double EOS_volume_at_equilibrium;
       double EOS_energy_at_equilibrium;
