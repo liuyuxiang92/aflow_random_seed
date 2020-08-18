@@ -76,6 +76,7 @@
         -- clearing title in qe input (CO)
         -- patching "[AFLOW] SYSTEM = " extraction problem (CO)
         -- adding --gen_ceram generating elemental combinations for --aflow_proto (CO)
+        -- added LIB2RAW_Loop_Static() to --lib2raw (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)

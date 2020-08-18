@@ -1175,7 +1175,8 @@ namespace aflowlib {
     if(!directory_LIB.empty()) {XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_LIB);} //CO20200624 - fix error messages to point to directory_LIB
 
     bool perform_LOCK=FALSE;  //CO20200624 - turning off in general, check below
-    bool perform_BANDS=FALSE,perform_BADER=FALSE,perform_MAGNETIC=FALSE,perform_THERMODYNAMICS=FALSE;
+    bool perform_STATIC=FALSE;
+    bool perform_BANDS=FALSE,perform_BADER=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
     bool perform_POCC=FALSE;  //CO20200624
     bool perform_PATCH=FALSE; // to inject updates while LIB2RAW  //CO20200624 - turning off in general, check below
@@ -1188,14 +1189,14 @@ namespace aflowlib {
           aurostd::FileExist(directory_LIB+"/OUTCAR.relax3"+XHOST.vext.at(iext)) || //CO20180827 
           aurostd::FileExist(directory_LIB+"/OUTCAR.static"+XHOST.vext.at(iext)) || //CO20180827
           FALSE) perform_THERMODYNAMICS=TRUE; //CO20180827
-      if(aurostd::FileExist(directory_LIB+"/OUTCAR.static"+XHOST.vext.at(iext))) perform_MAGNETIC=TRUE;
+      if(aurostd::FileExist(directory_LIB+"/OUTCAR.static"+XHOST.vext.at(iext))) perform_STATIC=TRUE;
       if(aurostd::FileExist(directory_LIB+"/OUTCAR.bands"+XHOST.vext.at(iext))) perform_BANDS=TRUE;
       if(aurostd::FileExist(directory_LIB+"/AECCAR0.static"+XHOST.vext.at(iext)) && aurostd::FileExist(directory_LIB+"/AECCAR2.static"+XHOST.vext.at(iext))) perform_BADER=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext))) perform_AGL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext))) perform_AEL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+XHOST.vext.at(iext))) perform_POCC=TRUE; //CO20200624
     }
-    if((perform_THERMODYNAMICS || perform_BANDS || perform_MAGNETIC)){perform_PATCH=true;} //CO20200624
+    if((perform_THERMODYNAMICS || perform_BANDS || perform_STATIC)){perform_PATCH=true;} //CO20200624
 
     // override for the web
     //    if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("ICSD")) directory_WEB=aurostd::CleanFileName(PROJECT_AFLOWLIB_WEB);
@@ -1257,7 +1258,7 @@ namespace aflowlib {
 
     cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
     
-    //[CO20200624 - OBSOLETE]if((perform_THERMODYNAMICS || perform_BANDS ||  perform_MAGNETIC))
+    //[CO20200624 - OBSOLETE]if((perform_THERMODYNAMICS || perform_BANDS ||  perform_STATIC))
     _aflags aflags;
     cout << soliloquy << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",TRUE,XHOST.sPID); 
@@ -1377,6 +1378,13 @@ namespace aflowlib {
     }
     if(LDEBUG) cerr << soliloquy << " [4]" << endl;
     // ---------------------------------------------------------------------------------------------------------------------------------
+    // do the STATIC
+    if(perform_STATIC) {
+      cout << soliloquy << " STATIC LOOP ---------------------------------------------------------------------------------" << endl;
+      aflowlib::LIB2RAW_Loop_Static(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (static):");
+      // MOVE/LINK PICS data
+    }
+    // ---------------------------------------------------------------------------------------------------------------------------------
     // do the BANDS
     if(perform_BANDS) {
       cout << soliloquy << " BANDS LOOP ---------------------------------------------------------------------------------" << endl;
@@ -1385,7 +1393,7 @@ namespace aflowlib {
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
     // do the MAGNETIC
-    if((perform_MAGNETIC || perform_BANDS)) { //JX
+    if((perform_STATIC || perform_BANDS)) { //CO20200731 - MAGNETIC->STATIC //JX
       cout << soliloquy << " MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
       aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (magnetic):"); 
     }
@@ -1968,15 +1976,54 @@ namespace aflowlib {
 // aflowlib::LIB2RAW_Loop_Bands
 // ***************************************************************************
 namespace aflowlib {
+  bool LIB2RAW_Loop_Static(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    // LDEBUG=TRUE;
+    string soliloquy=XPID+"aflowlib::LIB2RAW_Loop_Static():";
+    if(LDEBUG) cerr << soliloquy << " [1]" << endl;
+
+    cout << MESSAGE << " " << soliloquy << " begin " << directory_LIB << endl;
+    cout << MESSAGE << " " << soliloquy << " species = " << data.vspecies.size() << endl;
+    data.vloop.push_back("static");
+    
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB,_AFLOWIN_,directory_RAW,_AFLOWIN_,vfile,MESSAGE);  // _AFLOWIN_
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.static",directory_RAW,"DOSCAR.static",vfile,MESSAGE);  // DOSCAR.static
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OUTCAR.static",directory_RAW,"OUTCAR.static",vfile,MESSAGE);  // OUTCAR.static
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OSZICAR.static",directory_RAW,"OSZICAR.static",vfile,MESSAGE);  // OSZICAR.static
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"KPOINTS.static",directory_RAW,"KPOINTS.static",vfile,MESSAGE);  // KPOINTS.static  // not needed but good for show off SC 0914
+
+    bool flag_use_GNUPLOT=true;
+
+    if(flag_use_GNUPLOT) {
+      //ME20190614 BEGIN
+      // This has to come first because FIXBANDS messes up the EIGENVAL files
+      aurostd::xoption opts, plotoptions;
+      string dosscale = aurostd::utype2string<double>(DEFAULT_DOS_SCALE);
+      opts.push_attached("PLOT_DOS", directory_RAW + ",,," + dosscale);
+      opts.push_attached("PLOT_PDOS", directory_RAW + ",-1,,," + dosscale);
+      opts.push_attached("PLOTTER::PRINT", "png");
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_DOS");
+      plotter::PLOT_DOS(plotoptions);
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_PDOS", true);
+      plotter::PLOT_PDOS(plotoptions);
+      //ME20190614 END
+    }
+
+    return true;
+  }
+}
+// ***************************************************************************
+// aflowlib::LIB2RAW_Loop_Bands
+// ***************************************************************************
+namespace aflowlib {
   bool LIB2RAW_Loop_Bands(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // LDEBUG=TRUE;
-    if(LDEBUG) cerr << XPID << "aflowlib::LIB2RAW_Loop_Bands [1]" << endl;
-    // Stefano Curtarolo 2009-2010-2011-2012
-    //[CO20200624 - OBSOLETE]vector<string> vspecies;aurostd::string2tokens(data.species,vspecies,",");
+    string soliloquy=XPID+"aflowlib::LIB2RAW_Loop_Bands():";
+    if(LDEBUG) cerr << soliloquy << " [1]" << endl;
 
-    cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Bands: begin " << directory_LIB << endl;
-    cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Bands: species = " << data.vspecies.size() << endl;
+    cout << MESSAGE << " " << soliloquy << " begin " << directory_LIB << endl;
+    cout << MESSAGE << " " << soliloquy << " species = " << data.vspecies.size() << endl;
     data.vloop.push_back("bands");
 
     stringstream command;command.clear();command.str(std::string());
@@ -2158,7 +2205,7 @@ namespace aflowlib {
     //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]aurostd::execute(command);
 
     // DONE
-    cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Bands: end " << directory_LIB << endl;
+    cout << MESSAGE << " " << soliloquy << " end " << directory_LIB << endl;
     return TRUE;
   }
 }
