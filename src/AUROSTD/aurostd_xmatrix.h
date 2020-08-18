@@ -751,6 +751,11 @@ namespace aurostd {
       cematrix(const xmatrix<double> & A_in);
       ~cematrix();
       void LeastSquare(xvector<double> & y_vec, xvector<double> & y_sigma);
+      void LeastSquare(xvector<double> & y_vec){
+        xvector<double> y_sigma(y_vec.rows);
+        for (int i=y_sigma.lrows; i<=y_sigma.urows; i++) y_sigma[i] = 1.0;
+        LeastSquare(y_vec, y_sigma);
+      }//AS20200811
       //void SVDcmp_NR(); // Singular Value Decomposition
       bool SVDcmp_NR(); // Singular Value Decomposition
       void SVDsolve(xvector<double>& b_vec); // Solve vector a

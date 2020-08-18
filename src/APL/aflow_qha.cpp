@@ -37,8 +37,9 @@ enum ST_DATA_FILE {ST_DF_DIRECTORY, ST_DF_OUTCAR, ST_DF_EIGENVAL, ST_DF_IBZKPT};
 // files required by APL calculation
 enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 
-#define EOS_METHOD_FILE_POLYNOMIAL "polynomial."
-#define EOS_METHOD_FILE_BIRCH_MURNAGHAN "birch-murnaghan."
+#define EOS_METHOD_FILE_SJ "stabilized-jellium."
+#define EOS_METHOD_FILE_BIRCH_MURNAGHAN3 "birch-murnaghan3."
+#define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
 
 //=============================================================================
@@ -287,45 +288,78 @@ bool isMinimumWithinBounds(const xvector<double> &y){
   return false;
 }
 
-/// The polynomial model that is used for equation of state fitting.
+/// Evaluates the value of the polynomial with coefficients p at the value x.
 ///
-/// E = a + b*V^(-2/3) + c*V^(-4/3) + d*V^(-6/3) + e*V^(-8/3)
-/// Ref: (eq (5.2) page 106)  https://doi.org/10.1017/CBO9781139018265
+/// The polynomial is represented in the following form:
+/// p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
+double eval_polynomial(double x, const xvector<double> &p)
+{
+  double res = p[p.urows];
+  for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
+  return res;
+}
+
+/// Evaluates the value and the derivatives of the polynomial with coefficients p at
+/// the value x.
 ///
-double EOSpoly(double V, const xvector<double> &p){
-  if (p.rows != 5) return 0;
-  return p[1] + p[2]*pow(V,-2/3.0) + p[3]*pow(V,-4/3.0)
-    + p[4]*pow(V,-6/3.0) + p[5]*pow(V,-8/3.0);
+/// The highest derivative is determined by the size of the dp array and the result
+/// is stored in the accending order starting from the zero's derivative.
+void eval_polynomial_deriv(double x, const xvector<double> &p, xvector<double> &dp)
+{
+  for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
+  dp[dp.lrows] = p[p.urows];
+  for (int i=p.urows-1; i>=p.lrows; i--){
+    for (int j=dp.urows; j>=dp.lrows+1; j--) dp[j] = dp[j]*x + dp[j-1];
+    dp[dp.lrows] = dp[dp.lrows]*x + p[i];
+  }
+
+  int factor = 1;
+  for (int i=dp.lrows+1; i<dp.urows; i++){
+    factor *= i;
+    dp[i+1] *= factor;
+  }
 }
 
-/// First derivative w.r.t volume of the polynomial model
-double dEOSpoly(double x, const xvector<double> &p){
-  if (p.rows != 5) return 0;
-  return -2/3.0*p[2]*pow(x,-5/3.0) - 4/3.0*p[3]*pow(x, -7/3.0)
-    -6/3.0*p[4]*pow(x,-9/3.0) - 8/3.0*p[5]*pow(x,-11/3.0);
-}
-
-/// Second derivative w.r.t volume of the polynomial model
-double d2EOSpoly(double x, const xvector<double> &p){
-  if (p.rows != 5) return 0;
-  return  10/9.0*p[2]*pow(x, -8/3.0) + 28/9.0*p[3]*pow(x,-10/3.0)
-    +     6*p[4]*pow(x,-12/3.0) + 88/9.0*p[5]*pow(x,-14/3.0);
-}
-
-/// Third derivative w.r.t volume of the polynomial model
-double d3EOSpoly(double x, const xvector<double> &p){
-  if (p.rows != 5) return 0;
-  return -(80.0/27.0*p[2]*pow(x, -11.0/3.0) + 280.0/27.0*p[3]*pow(x, -13.0/3.0) +
-      24.0*p[4]*pow(x, -15.0/3.0) + 88*14/27.0*p[5]*pow(x, -17.0/3.0));
-}
-
-/// Calculates the equilibrium volume for the polynomial model.
+/// Evaluates the value and the derivatives of the polynomial with coefficients p at
+/// the value x and returns the result as an array.
 ///
-/// Veq is determined as a solution of dE/dV=0 using the bisection method.
+/// The result is stored in the accending order starting from the zero's derivative.
+/// @param n is the highsted order of derivative to be calculated.
+xvector<double> eval_polynomial_deriv(double x, const xvector<double> &p, uint n)
+{
+  xvector<double> dp(n+1);
+  eval_polynomial_deriv(x, p, dp);
+  return dp;
+}
+
+/// Constructs Vandermonde matrix with columns up to a given order n.
+/// Vandermonde matrix:
+/// 1 x1^2 x1^3 .. x1^n
+/// 1 x2^2 x2^3 .. x2^n
+/// ...
+/// 1 xm^2 xm^3 .. xm^n
+/// where m is the size of x array
+xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
+{
+  xmatrix<double> VM(x.rows, n);
+
+  for (int i=1; i<=x.rows; i++){
+    VM[i][1] = 1.0;
+    for (int j=2; j<=n; j++) VM[i][j] = std::pow(x[i], j-1);
+  }
+
+  return VM;
+}
+
+/// Calculates the extremum of polynomial bounded by the region [xmin,xmax] by searching
+/// for the value x where the derviative of polynomial equals to zero using the
+/// bisection method.
+///
 /// The function returns a negative number if an error has occurred.
 ///
-/// It is assumed that only one minimum exists between Vmin and Vmax,
-/// since it is the only physically meaningful situation.
+/// It is assumed that only one extremum exists between xmin and xmax.
+/// The specific use of this function is to search for the equilibrium volume of a given
+/// polynomial E(V) dependency.
 ///
 /// The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
 /// then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
@@ -337,18 +371,22 @@ double d3EOSpoly(double x, const xvector<double> &p){
 /// In this situation, f(x0)~0 and this condition is used as a criterion to stop the
 /// iteration procedure.
 ///
-double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax, 
+double polynomial_find_extremum(const xvector<double> &p, double xmin, double xmax,
     double tol=_mm_epsilon) {
   bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
-  string function = XPID + "EOSpolyGetEqVolume(): ";
+  string function = XPID + "polynomial_find_extremum(): ";
   if (LDEBUG) cerr << function << "begin" << std::endl;
 
-  double left_end = Vmin; double right_end = Vmax;
+  double left_end = xmin; double right_end = xmax;
   double middle = 0.5*(left_end + right_end);
 
-  double f_at_left_end  = dEOSpoly(left_end, p);
-  double f_at_right_end = dEOSpoly(right_end, p);
-  double f_at_middle    = dEOSpoly(middle, p);
+  xvector<double> dp(2); // index 1 - value, index 2 - first derivative
+  eval_polynomial_deriv(left_end, p, dp);
+  double f_at_left_end  = dp[2];
+  eval_polynomial_deriv(right_end, p, dp);
+  double f_at_right_end = dp[2];
+  eval_polynomial_deriv(middle, p, dp);
+  double f_at_middle    = dp[2];
 
   // no root within a given interval
   if (sign(f_at_left_end) == sign(f_at_right_end)) return -1;
@@ -376,7 +414,8 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
     }
 
     middle = 0.5*(left_end + right_end);
-    f_at_middle = dEOSpoly(middle, p);
+    eval_polynomial_deriv(middle, p, dp);
+    f_at_middle = dp[2];
 
     if (LDEBUG){
       cerr << function << "left_end= "  << left_end  << "middle= ";
@@ -394,31 +433,56 @@ double EOSpolyGetEqVolume(const xvector<double> &p, double Vmin, double Vmax,
   return middle;
 }
 
-/// Perform a fit to the polynomial EOS model for a given set of volumes and energies
-/// using the linear least squares method.
-///
-xvector<double> fitEOSpoly(const xvector<double> &Volumes, xvector<double> &E){
-  xmatrix<double> M(Volumes.rows,5);
-  xvector<double> sigma(Volumes.rows);
-  for (int i=sigma.lrows;i<=sigma.urows;i++) sigma[i]=1.0;
-
-  for (int i=Volumes.lrows; i<=Volumes.urows; i++) {
-    for (int j=0; j<=4; j++) M[i][j+1] = pow(Volumes[i],-2*j/3.0);
-  }
-
-  aurostd::cematrix M_ce(M);
-  M_ce.LeastSquare(E, sigma);
-  return M_ce.GetFitVector();
+/// Calculates the bulk modulus for the Birch-Murnaghan EOS model.
+double BulkModulus_BM(double x_eq, const xvector<double> &dEdp)
+{
+  double B = 4.0/9.0*std::pow(x_eq,5)*dEdp[3]+10.0/9.0*std::pow(x_eq,4)*dEdp[2];
+  B *= eV2GPa*std::pow(x_eq,-3.0/2.0);
+  return B;
 }
 
-/// Calculates the bulk modulus for the polynomial EOS model.
-double BulkModulus(double V0, const xvector<double> &fit_parameters){
-  return eV2GPa*V0*d2EOSpoly(V0,fit_parameters);
+/// Calculates the pressure derivative of the bulk modulus for the Birch-Murnaghan EOS
+/// model.
+double Bprime_BM(double x, const xvector<double> &dEdp)
+{
+  // -(V*d^3E/dV^3/d^2E/dV^2 + 1)
+  double d3EdV3 = -8.0/27.0*std::pow(x,15.0/2.0)*dEdp[4];
+  d3EdV3 -= 20.0/9.0*std::pow(x, 13.0/2.0)*dEdp[3];
+  d3EdV3 -= 80.0/28.0*std::pow(x, 11.0/2.0)*dEdp[2];
+
+  double d2EdV2 = 4.0/9.0*std::pow(x, 5)*dEdp[3];
+  d2EdV2 += 10.0/9.0*std::pow(x, 4)*dEdp[2];
+
+  return -(std::pow(x,-3.0/2.0)*d3EdV3/d2EdV2 + 1);
 }
 
-/// Calculates the pressure derivative of bulk modulus for the polynomial EOS model.
-double Bprime(double V0, const xvector<double> &fit_parameters){
-  return -(V0*d3EOSpoly(V0, fit_parameters)/d2EOSpoly(V0, fit_parameters) + 1);
+/// Calculates the bulk modulus for the stabilized jellium EOS model.
+/// Stabilized jellium model: https://doi.org/10.1103/PhysRevB.63.224115
+/// It is equaivalent to the model introduced in:
+/// https://doi.org/10.1103/PhysRevB.52.8064
+double BulkModulus_SJ(double x, const xvector<double> &dEdp)
+{
+  double B = 1.0/9.0*std::pow(x,8)*dEdp[3]+4.0/9.0*std::pow(x,7)*dEdp[2];
+  B *= eV2GPa*std::pow(x,-3);
+  return B;
+}
+
+/// Calculates the pressure derivative of the bulk modulus for the stabilized jellium EOS
+/// model.
+/// Stabilized jellium model: https://doi.org/10.1103/PhysRevB.63.224115
+/// It is equaivalent to the model introduced in:
+/// https://doi.org/10.1103/PhysRevB.52.8064
+double Bprime_SJ(double x, const xvector<double> &dEdp)
+{
+  // -(V*d^3E/dV^3/d^2E/dV^2 + 1)
+  double d3EdV3 = -1.0/27.0*std::pow(x,12)*dEdp[4];
+  d3EdV3 -= 4.0/9.0*std::pow(x,11)*dEdp[3];
+  d3EdV3 -= 28.0/27.0*std::pow(x,10)*dEdp[2];
+
+  double d2EdV2 = 1.0/9.0*std::pow(x, 8)*dEdp[3];
+  d2EdV2 += 4.0/9.0*std::pow(x, 7)*dEdp[2];
+
+  return -(std::pow(x,-3)*d3EdV3/d2EdV2 + 1);
 }
 
 //=============================================================================
@@ -833,11 +897,12 @@ namespace apl
           if (LDEBUG) writeFrequencies();
           writeFVT();
 
-          writeThermalProperties(EOS_POLYNOMIAL, QHA_CALC);
+          writeThermalProperties(EOS_SJ, QHA_CALC);
           writeThermalProperties(EOS_MURNAGHAN, QHA_CALC);
-          writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHA_CALC);
+          writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
+          writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
 
-          writeTphononDispersions(QHA_CALC);
+          writeTphononDispersions(QHA_CALC, EOS_SJ);
         }
       }
 
@@ -845,9 +910,10 @@ namespace apl
       if (runQHANP){
         qhanp_data_available = runAPL(xflags, aflags, kflags, QHA_TE);
         if (qhanp_data_available){
-          writeThermalProperties(EOS_POLYNOMIAL, QHANP_CALC);
+          writeThermalProperties(EOS_SJ, QHANP_CALC);
           writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
-          writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHANP_CALC);
+          writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC);
+          writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC);
         }
       }
 
@@ -865,19 +931,22 @@ namespace apl
             writeAverageGPfiniteDifferences();
 
             if (runQHA3P && eos_static_data_available){
-              writeThermalProperties(EOS_POLYNOMIAL, QHA3P_CALC);
+              writeThermalProperties(EOS_SJ, QHA3P_CALC);
               writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
-              writeThermalProperties(EOS_BIRCH_MURNAGHAN, QHA3P_CALC);
+              writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
+              writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
 
-              writeTphononDispersions(QHA3P_CALC);
+              writeTphononDispersions(QHA3P_CALC, EOS_SJ);
             }
           }
 
           if (runSCQHA && eos_static_data_available){
-            RunSCQHA(EOS_POLYNOMIAL, true);
-            RunSCQHA(EOS_POLYNOMIAL, false);
+            RunSCQHA(EOS_SJ, true);
+            RunSCQHA(EOS_MURNAGHAN, true);
+            RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
+            RunSCQHA(EOS_BIRCH_MURNAGHAN4, true);
 
-            writeTphononDispersions(SCQHA_CALC);
+            writeTphononDispersions(SCQHA_CALC, EOS_SJ);
           }
         }
       }
@@ -1258,10 +1327,9 @@ namespace apl
     string phposcarfile = "";
     for (uint i=0; i<subdirectories.size(); i++){
       phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
-      xinput.xvasp.str = xstructure(phposcarfile, IOVASP_POSCAR);
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
-      phcalc.initialize_supercell(xinput.getXStr());
+      phcalc.initialize_supercell(xstructure(phposcarfile, IOVASP_POSCAR));
       phcalc.getSupercell().build(apl_options);  // ME20200518
       phcalc.setDirectory(subdirectories[i]);
       phcalc.setNCPUs(kflags);
@@ -1648,9 +1716,121 @@ namespace apl
     return evalEOSmodel(V, p, eos_method);
   }
 
+  /// Calculates the bulk modulus for a given EOS model.
+  double QHA::BulkModulus(double V, const xvector<double> &parameters, EOSmethod method)
+  {
+    double B = 0.0;
+    switch(method){
+      case(EOS_SJ):
+        {
+          double x = std::pow(V, -1.0/3.0);
+          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 2);
+          B = BulkModulus_SJ(x, dEdp);
+        }
+        break;
+      case(EOS_BIRCH_MURNAGHAN3):
+      case(EOS_BIRCH_MURNAGHAN4):
+        {
+          double x = std::pow(V, -2.0/3.0);
+          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 2);
+          B = BulkModulus_BM(x, dEdp);
+        }
+        break;
+      case(EOS_MURNAGHAN):
+        // B = B0*(V0/V)^Bp0 | parameters = {E, V0, B0, Bp0}
+        B = eV2GPa*parameters[3]*std::pow(parameters[2]/V, parameters[4]);
+        break;
+    }
+
+    return B;
+  }
+
+  /// Calculates the pressure derivative of the bulk modulus for a given EOS model.
+  double QHA::Bprime(double V, const xvector<double> &parameters, EOSmethod method)
+  {
+    double Bp = 0.0;
+    switch(method){
+      case(EOS_SJ):
+        {
+          double x = std::pow(V, -1.0/3.0);
+          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 3);
+          Bp = Bprime_SJ(x, dEdp);
+        }
+        break;
+      case(EOS_BIRCH_MURNAGHAN3):
+      case(EOS_BIRCH_MURNAGHAN4):
+        {
+          double x = std::pow(V, -2.0/3.0);
+          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 3);
+          Bp = Bprime_BM(x, dEdp);
+        }
+        break;
+      case(EOS_MURNAGHAN):
+        Bp = parameters[4]; // for Murnaghan EOS Bp does not depend on volume
+        break;
+    }
+    return Bp;
+  }
+
+  /// For a given E(V) relations calculates a pressure the corresponds to a given
+  /// volume V.
+  double QHA::EOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method)
+  {
+    double P = 0.0;
+    switch(method){
+      case(EOS_SJ):
+        {
+          double x = std::pow(V, -1.0/3.0);
+          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 1);
+          P = -std::pow(x,4)/3.0*dEdp[2];
+        }
+        break;
+      case(EOS_BIRCH_MURNAGHAN3):
+      case(EOS_BIRCH_MURNAGHAN4):
+        {
+          double x = std::pow(V, -2.0/3.0);
+          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 1);
+          P = -2.0/3.0*std::pow(x,5.0/2.0)*dEdp[2];
+        }
+        break;
+      case(EOS_MURNAGHAN):
+        P = parameters[3]*(1-std::pow(parameters[2]/V,parameters[4]))/parameters[4];
+        break;
+    }
+    return -P;
+  }
+
+  /// Calculates an equilibrium volume for a given EOS model.
+  double QHA::EquilibriumVolume(const xvector<double> &parameters, EOSmethod method)
+  {
+    double Veq = 0.0;
+    switch(method){
+      case(EOS_SJ):
+        {
+          double xmin = std::pow(max(EOSvolumes), -1.0/3.0);
+          double xmax = std::pow(min(EOSvolumes), -1.0/3.0);
+          Veq = std::pow(polynomial_find_extremum(parameters, xmin, xmax), -3);
+        }
+        break;
+      case(EOS_BIRCH_MURNAGHAN3):
+      case(EOS_BIRCH_MURNAGHAN4):
+        {
+          double xmin = std::pow(max(EOSvolumes), -2.0/3.0);
+          double xmax = std::pow(min(EOSvolumes), -2.0/3.0);
+          Veq = std::pow(polynomial_find_extremum(parameters, xmin, xmax), -3.0/2.0);
+        }
+        break;
+      case(EOS_MURNAGHAN):
+        Veq = parameters[2]; // parameters = {E, V, B, Bp}
+        break;
+    }
+    return Veq;
+  }
+
+
   /// Calculates the internal energy as a function of volume and temperature.
   ///
-  double QHA::InternalEnergyFit(double T, double V)
+  double QHA::InternalEnergyFit(double T, double V, EOSmethod method)
   {
     static xvector<double> U(N_EOSvolumes);
     static xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
@@ -1662,7 +1842,7 @@ namespace apl
       U[i+1] /= NatomsOrigCell;
     }
 
-    return EOSpoly(V, fitEOSpoly(xvolumes, U));
+    return evalEOSmodel(V, fitToEOSmodel(U, method), method);
   }
 
   /// Calculates the free energy (without electronic contribution) for a calculation at
@@ -1676,7 +1856,7 @@ namespace apl
 
   /// Fits the (free) energy-volume dependency to one of the following equation of state
   /// models:
-  /// polynomial: (eq (5.2) page 106)  https://doi.org/10.1017/CBO9781139018265
+  /// stabilized jellium: https://doi.org/10.1103/PhysRevB.63.224115
   /// Murnaghan: Proceedings of the National Academy of Sciences of the United States of 
   /// America, 30 (9): 244–247
   /// Birch-Murnaghan: Physical Review. 71 (11): 809–824
@@ -1688,28 +1868,55 @@ namespace apl
     xvector<double> fit_params;
     xvector<double> guess(4);
     switch(method){
-      case(EOS_POLYNOMIAL):
-        fit_params = fitEOSpoly(V, E);
-        EOS_volume_at_equilibrium = EOSpolyGetEqVolume(fit_params, min(V), max(V));
-        EOS_energy_at_equilibrium = EOSpoly(EOS_volume_at_equilibrium, fit_params);
-        EOS_bulk_modulus_at_equilibrium = BulkModulus(EOS_volume_at_equilibrium,fit_params);
-        EOS_Bprime_at_equilibrium  = Bprime(EOS_volume_at_equilibrium, fit_params);
-        break;
-      case(EOS_BIRCH_MURNAGHAN):
+      case(EOS_SJ):
         {
-          guess[1] = min(E);
-          guess[2] = (max(V)+min(V))/2;
-          guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences
-          guess[4] = 3.5; // a reasonable initial value for most materials
+          xvector<double> x(V.rows);
+          for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-1.0/3.0);
+          aurostd::cematrix M(Vandermonde_matrix(x, 4));
+          M.LeastSquare(E);
+          fit_params = M.GetFitVector();
 
-          NonlinearFit bmfit(V,E,guess,BirchMurnaghan);
-          bmfit.fitLevenbergMarquardt();
+          double x_eq = polynomial_find_extremum(fit_params, min(x), max(x));
+          EOS_volume_at_equilibrium = std::pow(x_eq, -3);
+          // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
+          xvector<double> dEdp = eval_polynomial_deriv(x_eq, fit_params, 3);
+          EOS_energy_at_equilibrium = dEdp[1];
+          EOS_bulk_modulus_at_equilibrium = BulkModulus_SJ(x_eq, dEdp);
+          EOS_Bprime_at_equilibrium  = Bprime_SJ(x_eq, dEdp);
+        }
+        break;
+      case(EOS_BIRCH_MURNAGHAN3):
+        {
+          xvector<double> x(V.rows);
+          for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-2.0/3.0);
+          aurostd::cematrix M(Vandermonde_matrix(x, 4));
+          M.LeastSquare(E);
+          fit_params = M.GetFitVector();
 
-          fit_params = bmfit.p;
-          EOS_energy_at_equilibrium = bmfit.p[1];
-          EOS_volume_at_equilibrium = bmfit.p[2];
-          EOS_bulk_modulus_at_equilibrium   = bmfit.p[3]*eV2GPa;
-          EOS_Bprime_at_equilibrium  = bmfit.p[4];
+          double x_eq = polynomial_find_extremum(fit_params, min(x), max(x));
+          EOS_volume_at_equilibrium = std::pow(x_eq, -3.0/2.0);
+          // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
+          xvector<double> dEdp = eval_polynomial_deriv(x_eq, fit_params, 3);
+          EOS_energy_at_equilibrium = dEdp[1];
+          EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
+          EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
+        }
+        break;
+      case(EOS_BIRCH_MURNAGHAN4):
+        {
+          xvector<double> x(V.rows);
+          for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-2.0/3.0);
+          aurostd::cematrix M(Vandermonde_matrix(x, 5));
+          M.LeastSquare(E);
+          fit_params = M.GetFitVector();
+
+          double x_eq = polynomial_find_extremum(fit_params, min(x), max(x));
+          EOS_volume_at_equilibrium = std::pow(x_eq, -3.0/2.0);
+          // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
+          xvector<double> dEdp = eval_polynomial_deriv(x_eq, fit_params, 3);
+          EOS_energy_at_equilibrium = dEdp[1];
+          EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
+          EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
         }
         break;
       case(EOS_MURNAGHAN):
@@ -1746,11 +1953,12 @@ namespace apl
 
     static xvector<double> dydp(4);
     switch(method){
-      case(EOS_POLYNOMIAL):
-        energy = EOSpoly(V, p);
+      case(EOS_SJ):
+        energy = eval_polynomial(std::pow(V, -1.0/3.0), p);
         break;
-      case(EOS_BIRCH_MURNAGHAN):
-        energy = BirchMurnaghan(V, p, dydp);
+      case(EOS_BIRCH_MURNAGHAN3):
+      case(EOS_BIRCH_MURNAGHAN4):
+        energy = eval_polynomial(std::pow(V, -2.0/3.0), p);
         break;
       case(EOS_MURNAGHAN):
         energy = Murnaghan(V, p, dydp);
@@ -2399,7 +2607,7 @@ namespace apl
   /// Check for details:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
-  double QHA::SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params)
+  double QHA::SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method)
   {
     string function = XPID + "QHA::SCQHAgetEquilibriumVolume():";
     const static int max_scqha_iteration = 10000;
@@ -2410,9 +2618,9 @@ namespace apl
     double Vnew = 0.0, V = Vguess;
     int iter = 0;
     while (iter++ < max_scqha_iteration){
-      Pe   = dEOSpoly(V, fit_params);
+      Pe   = EOS2Pressure(V, fit_params, method);
       VPg  = VPgamma(T, V);
-      Vnew = VPg/Pe;
+      Vnew = -VPg/Pe;
       if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
     }
 
@@ -2426,13 +2634,13 @@ namespace apl
     return V;
   }
 
-  double QHA::SCQHAgetEquilibriumVolume(double T)
+  double QHA::SCQHAgetEquilibriumVolume(double T, EOSmethod method)
   {
     xvector<double> E = aurostd::vector2xvector<double>(E0_V);
-    xvector<double> fit_params = fitToEOSmodel(E, EOS_POLYNOMIAL);
-    double Vguess = 1.1*EOSpolyGetEqVolume(fit_params,min(EOSvolumes),max(EOSvolumes));
+    xvector<double> fit_params = fitToEOSmodel(E, method);
+    double Vguess = 1.1*EquilibriumVolume(fit_params, method);
 
-    return SCQHAgetEquilibriumVolume(T, Vguess, fit_params);
+    return SCQHAgetEquilibriumVolume(T, Vguess, fit_params, method);
   }
 
   /// Performs SCQHA calculations.
@@ -2464,18 +2672,21 @@ namespace apl
     // self-consistent loop to determine equilibrium volume at T=0K
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V0K = SCQHAgetEquilibriumVolume(0,1.1*EOS_volume_at_equilibrium,fit_params);
+    double V0K = SCQHAgetEquilibriumVolume(0,1.1*EOS_volume_at_equilibrium,fit_params, method);
 
     // the name of the output file depends on the EOS fit method
     stringstream file;
     string filename = DEFAULT_SCQHA_FILE_PREFIX;
     string sc = all_iterations_self_consistent ? "sc." : "";
     switch(method){
-      case(EOS_POLYNOMIAL):
-        filename += sc+EOS_METHOD_FILE_POLYNOMIAL;
+      case(EOS_SJ):
+        filename += sc+EOS_METHOD_FILE_SJ;
         break;
-      case(EOS_BIRCH_MURNAGHAN):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN;
+      case(EOS_BIRCH_MURNAGHAN3):
+        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
+        break;
+      case(EOS_BIRCH_MURNAGHAN4):
+        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN4;
         break;
       case(EOS_MURNAGHAN):
         filename += sc+EOS_METHOD_FILE_MURNAGHAN;
@@ -2507,7 +2718,7 @@ namespace apl
 
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V = SCQHAgetEquilibriumVolume(T, 1.1*EOS_volume_at_equilibrium, fit_params);
+    double V = SCQHAgetEquilibriumVolume(T, 1.1*EOS_volume_at_equilibrium, fit_params, method);
 
     double dT = (Temperatures[Ntemperatures-1]-Temperatures[0])/(Ntemperatures-1);
 
@@ -2542,7 +2753,7 @@ namespace apl
       // calculate the next equilibrium volume using a self-consistent loop if beta=0 or
       // if the user wants so
       if (all_iterations_self_consistent || !(std::abs(beta)>0)){
-        V = SCQHAgetEquilibriumVolume(T, V, fit_params);
+        V = SCQHAgetEquilibriumVolume(T, V, fit_params, method);
       }
       else{
         V *= (1 + beta*dT);
@@ -2605,7 +2816,7 @@ namespace apl
       Feq /= NatomsOrigCell;
       Feq += evalEOSmodel(V, fit_params, method);
 
-      Belec  = BulkModulus(V, fit_params);
+      Belec  = BulkModulus(V, fit_params, method);
       Bphononic *= eV2GPa/(NQpoints*NatomsOrigCell*V);
 
       B = Belec + Bphononic;
@@ -2675,11 +2886,14 @@ namespace apl
     // the name of the output file depends on the EOS fit method and on the type of
     // QHA calculation
     switch(eos_method){
-      case(EOS_POLYNOMIAL):
-        filename += EOS_METHOD_FILE_POLYNOMIAL;
+      case(EOS_SJ):
+        filename += EOS_METHOD_FILE_SJ;
         break;
-      case(EOS_BIRCH_MURNAGHAN):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN;
+      case(EOS_BIRCH_MURNAGHAN3):
+        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
+        break;
+      case(EOS_BIRCH_MURNAGHAN4):
+        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN4;
         break;
       case(EOS_MURNAGHAN):
         filename += EOS_METHOD_FILE_MURNAGHAN;
@@ -3052,7 +3266,7 @@ namespace apl
     }
   }
 
-  void QHA::writeTphononDispersions(QHAmethod qha_method)
+  void QHA::writeTphononDispersions(QHAmethod qha_method, EOSmethod eos_method)
   {
     string function = XPID + "QHA::writeTphononDispersions():", msg = "";
     double V = 0.0; int T = 0;
@@ -3065,15 +3279,15 @@ namespace apl
       switch(qha_method){
         case (QHA_CALC):
           xomega = xvector<double>(N_EOSvolumes);
-          V = getEqVolumeT(T, EOS_POLYNOMIAL, qha_method);
+          V = getEqVolumeT(T, eos_method, qha_method);
           break;
         case (QHA3P_CALC):
           xomega = xvector<double>(N_GPvolumes);
-          V = getEqVolumeT(T, EOS_POLYNOMIAL, qha_method);
+          V = getEqVolumeT(T, eos_method, qha_method);
           break;
         case (SCQHA_CALC):
           xomega = xvector<double>(N_GPvolumes);
-          V = SCQHAgetEquilibriumVolume(T);
+          V = SCQHAgetEquilibriumVolume(T, eos_method);
           break;
         case (QHANP_CALC):
           msg = "T-dependent phonon dispersion calculation is not supported for QHANP method";

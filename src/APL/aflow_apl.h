@@ -1221,7 +1221,7 @@ namespace apl
 
 namespace apl
 {
-  enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
+  enum EOSmethod {EOS_MURNAGHAN, EOS_SJ, EOS_BIRCH_MURNAGHAN3, EOS_BIRCH_MURNAGHAN4};
   enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC, QHANP_CALC};
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
@@ -1254,9 +1254,13 @@ namespace apl
       double IDOS(double e, double T, xEIGENVAL &eig);
       xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
-      double InternalEnergyFit(double T, double V);
+      double InternalEnergyFit(double T, double V, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
       double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
+      double BulkModulus(double V, const xvector<double> &parameters, EOSmethod method);
+      double Bprime(double V, const xvector<double> &parameters, EOSmethod method);
+      double EOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
+      double EquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
       double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
       double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
       double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
@@ -1270,8 +1274,8 @@ namespace apl
       double InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
       double VPgamma(double T, double V);
-      double SCQHAgetEquilibriumVolume(double T);
-      double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params);
+      double SCQHAgetEquilibriumVolume(double T, EOSmethod method);
+      double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
       void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
       // output
       void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
@@ -1280,7 +1284,7 @@ namespace apl
       void   writeAverageGPfiniteDifferences();
       void   writeGPmeshFD();
       void   writeFrequencies();
-      void   writeTphononDispersions(QHAmethod qha_method);
+      void   writeTphononDispersions(QHAmethod qha_method, EOSmethod eos_method);
       // members
       xoption apl_options;
       string system_title;
