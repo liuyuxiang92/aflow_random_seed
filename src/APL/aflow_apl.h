@@ -1284,7 +1284,7 @@ namespace apl
       void   writeAverageGPfiniteDifferences();
       void   writeGPmeshFD();
       void   writeFrequencies();
-      void   writeTphononDispersions(QHAmethod qha_method, EOSmethod eos_method);
+      void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method);
       // members
       xoption apl_options;
       xoption qha_options;
