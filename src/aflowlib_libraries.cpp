@@ -1976,7 +1976,7 @@ namespace aflowlib {
 // aflowlib::LIB2RAW_Loop_Bands
 // ***************************************************************************
 namespace aflowlib {
-  bool LIB2RAW_Loop_Static(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
+  bool LIB2RAW_Loop_Static(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) { //CO20200731
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // LDEBUG=TRUE;
     string soliloquy=XPID+"aflowlib::LIB2RAW_Loop_Static():";
@@ -1991,6 +1991,12 @@ namespace aflowlib {
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OUTCAR.static",directory_RAW,"OUTCAR.static",vfile,MESSAGE);  // OUTCAR.static
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OSZICAR.static",directory_RAW,"OSZICAR.static",vfile,MESSAGE);  // OSZICAR.static
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,"KPOINTS.static",directory_RAW,"KPOINTS.static",vfile,MESSAGE);  // KPOINTS.static  // not needed but good for show off SC 0914
+    //ONLY GET ONE POSCAR, bands is better as we need it later
+    if(aurostd::EFileExist(directory_LIB+"/POSCAR.bands")){
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"POSCAR.bands",directory_RAW,"POSCAR.bands",vfile,MESSAGE);  // POSCAR.bands
+    }else{
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"POSCAR.static",directory_RAW,"POSCAR.static",vfile,MESSAGE);  // POSCAR.static
+    }
 
     bool flag_use_GNUPLOT=true;
 
