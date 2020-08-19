@@ -1384,6 +1384,7 @@ namespace apl
       phcalc.getSupercell().build(apl_options);  // ME20200518
       phcalc.setDirectory(subdirectories[i]);
       phcalc.setNCPUs(kflags);
+      phcalc._system = system_title;
 
       string hibernation_file = subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX + 
         DEFAULT_APL_HARMIFC_FILE;
@@ -3378,6 +3379,7 @@ namespace apl
       lattice[3] = struc.c * 1E-10;
       eig.lattice = lattice;
       eig.carstring = "TPHON";
+      eig.title = system_title;
 
       //venergy.at(kpoint number).at(band number).at(spin number)
       for (uint q=0; q<eig.venergy.size(); q++){
