@@ -107,7 +107,7 @@ namespace cce {
       }
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        oss << print_JSON(structure, cce_vars) << std::endl;
+        oss << print_JSON_corrections(structure, cce_vars) << std::endl;
       } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
         oss << print_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
       } else {
@@ -135,9 +135,64 @@ namespace cce {
 
 
 
-  //determine_oxidation_numbers///////////////////////////////////////////////////////////////////////
+  //print_num_anion_neighbors///////////////////////////////////////////////////////////////////////
+  // For determining the number of anion neighbors for each cation
+  void print_num_anion_neighbors(aurostd::xoption& flags, std::istream& ist, ostream& oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::determine_num_anion_neighbors():";
+    // read structure
+    xstructure structure=read_structure(ist);
+
+    // initialise flags and variables
+    aurostd::xoption cce_flags = init_flags();
+    CCE_Variables cce_vars = init_variables(structure);
+
+    // determine which species is the anion (for single anion systems)
+    cce_vars.anion_species=determine_anion_species(structure, cce_vars);
+
+    // check whether it is a multi-anion system and set variables accordingly
+    cce_vars.multi_anion_atoms=check_for_multi_anion_system(structure, cce_flags, cce_vars);
+
+    // tolerance for counting anion neighbors should be adjusted if requested by user
+    double tolerance=_CCE_NN_DIST_TOL_;
+    if(!flags.getattachedscheme("CCE_CORRECTION::DIST_TOL").empty()){
+      tolerance=aurostd::string2utype<double>(flags.getattachedscheme("CCE_CORRECTION::DIST_TOL"));
+    }
+
+    // apply species selective cutoffs to determine only nearest neighbors within respective cutoff
+    cce_vars.num_neighbors=get_num_neighbors(structure, cce_vars.anion_species, cce_flags, cce_vars, tolerance);
+
+    // determine anion nearest neighbors for cations bound to multi anion atoms if needed
+    vector<vector<uint> > multi_anion_num_neighbors(cce_vars.multi_anion_species.size(), vector<uint>(structure.atoms.size()));
+    if (cce_flags.flag("MULTI_ANION_SYSTEM")){
+      for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
+        if(LDEBUG){
+          cerr << soliloquy << "getting neighbors for multi anion species " << k << " (" << cce_vars.multi_anion_species[k] << ")" << endl;
+        }
+        multi_anion_num_neighbors[k]=get_num_neighbors(structure, cce_vars.multi_anion_species[k], cce_flags, cce_vars, tolerance);
+      }
+    }
+
+    // check for per- and superoxide ions based on O-O bond length and set number of (su-)peroxide bonds 
+    // and indices accordingly if ions are detected
+    // added here to throw warning when (su-)peroxide is detected
+    if(cce_vars.anion_species == "O" || cce_flags.flag("O_MULTI_ANION_SPECIES")) {
+      check_per_super_oxides(structure, cce_flags, cce_vars);
+    }
+
+    if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+      oss << print_JSON_num_anion_neighbors(structure, cce_flags, cce_vars, multi_anion_num_neighbors) << std::endl;
+    } else {
+      // print number of anion neighbors
+      oss << print_output_num_anion_neighbors(structure, cce_flags, cce_vars, multi_anion_num_neighbors, tolerance);
+    }
+  }
+
+
+
+  //print_oxidation_numbers///////////////////////////////////////////////////////////////////////
   // For determining only oxidation numbers of the system (from Allen electronegativities) without corrections
-  void determine_oxidation_numbers(std::istream& ist, ostream& oss) {
+  void print_oxidation_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss) {
     // read structure
     xstructure structure=read_structure(ist);
 
@@ -148,8 +203,12 @@ namespace cce {
     // determine oxidation numbers
     cce_vars.oxidation_states=get_oxidation_states_from_electronegativities(structure);
 
-    // print oxidation numbers
-    oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
+    if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+      oss << print_JSON_ox_nums(cce_vars) << std::endl;
+    } else {
+      // print oxidation numbers
+      oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
+    }
   }
 
 
@@ -2860,14 +2919,88 @@ namespace cce {
 
   /////////////////////////////////////////////////////////////////////////////
   //                                                                         //
-  //                        WRITE OUTPUT AND CITATION                        //
+  //                        PRINT OUTPUT AND CITATION                        //
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
 
-  //print_JSON/////////////////////////////////////////////////////////////
+  //print_JSON_num_anion_neighbors/////////////////////////////////////////////////////////////
+  // Returns number of anion neighbors for each cation in JSON format
+  string print_JSON_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
+    stringstream json;
+    vector<string> cations_names_vector;
+    vector<uint> cations_num_neighbors_vector;
+
+    json << "{";
+    json << "\"number_anion_neighbors_each_cation\":{";
+    json << "\"anion=" << cce_vars.anion_species << "\":{";
+    // first populate vectors with names, atom indices of the cations, and num anion neighbors for each cation
+    for (uint i=0,isize=structure.atoms.size();i<isize;i++){
+      if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+        if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
+          cations_names_vector.push_back("\"" + structure.atoms[i].cleanname + "(ATOM[" + aurostd::utype2string<uint>(i) + "])\":");
+          cations_num_neighbors_vector.push_back(cce_vars.num_neighbors[i]);
+        }
+      }
+    }
+    // then append anion neighbors info for cations to json
+    uint ncations=cations_names_vector.size();
+    for (uint i=0; i<ncations ; i++){
+      json << cations_names_vector[i] << cations_num_neighbors_vector[i];
+      if (i<ncations-1){
+        json << ",";
+      }
+    }
+    json << "}";
+    if (cce_flags.flag("MULTI_ANION_SYSTEM")){
+      json << ",";
+      for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
+        json << "\"anion=" << cce_vars.multi_anion_species[k] << "\":{";
+        // first populate vectors with names, atom indices of the cations, and num anion neighbors for each cation
+        cations_names_vector.clear();
+        cations_num_neighbors_vector.clear();
+        for (uint i=0,isize=structure.atoms.size();i<isize;i++){
+          if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+            if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the (main) anion species
+              cations_names_vector.push_back("\"" + structure.atoms[i].cleanname + "(ATOM[" + aurostd::utype2string<uint>(i) + "])\":");
+              cations_num_neighbors_vector.push_back(multi_anion_num_neighbors[k][i]);
+            }
+          }
+        }
+        // then append anion neighbors info for cations to json
+        uint ncations=cations_names_vector.size();
+        for (uint i=0; i<ncations ; i++){
+          json << cations_names_vector[i] << cations_num_neighbors_vector[i];
+          if (i<ncations-1){
+            json << ",";
+          }
+        }
+        json << "}";
+        if (k<ksize-1){
+          json << ",";
+        }
+      }
+    }
+    json << "}";
+    json << "}";
+    return json.str();
+  }
+
+  //print_JSON_ox_nums/////////////////////////////////////////////////////////////
+  // Returns oxidation numbers in JSON format
+  string print_JSON_ox_nums(const CCE_Variables& cce_vars) {
+    stringstream json;
+
+    json << "{";
+    json << "\"oxidation_states\":";
+    json << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.oxidation_states),",") << "]";
+    json << "}";
+    return json.str();
+  }
+
+  //print_JSON_corrections/////////////////////////////////////////////////////////////
   //ME20200213
   // Returns CCE results in JSON format
-  string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars) {
+  string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars) {
     stringstream json;
     bool print_Hf = (cce_vars.dft_energies.size() > 0);
     uint nfuncs = cce_vars.vfunctionals.size();
@@ -2912,6 +3045,38 @@ namespace cce {
     json << "https://doi.org/10.1038/s41524-019-0192-1\"";
     json << "}";
     return json.str();
+  }
+
+  //print_output_num_anion_neighbors////////////////////////////////////////////////////////
+  // print number of anion neighbors for each cation
+  string print_output_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance) {
+    stringstream output;
+    output << endl;
+    output << "NUMBER OF ANION NEIGHBORS FOR EACH CATION:" << endl;
+    output << endl;
+    output << "ANION=" << cce_vars.anion_species << ":" << endl;
+    for (uint i=0,isize=structure.atoms.size();i<isize;i++){
+      if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+        if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
+          output << "Number of " << cce_vars.anion_species << " nearest neighbors within " << tolerance << " Ang. tolerance of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]): " << cce_vars.num_neighbors[i] << endl;
+        }
+      }
+    }
+    if (cce_flags.flag("MULTI_ANION_SYSTEM")){
+      for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
+        output << endl;
+        output << "ANION=" << cce_vars.multi_anion_species[k] << ":" << endl;
+        for (uint i=0,isize=structure.atoms.size();i<isize;i++){
+          if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+            if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the anion species under consideration
+              output << "Number of " << cce_vars.multi_anion_species[k] << " nearest neighbors within " << tolerance << " Ang. tolerance of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]): " << multi_anion_num_neighbors[k][i] << endl;
+            }
+          }
+        }
+      }
+    }
+    output << endl;
+    return output.str();
   }
 
   //print_output_oxidation_numbers////////////////////////////////////////////////////////
@@ -3058,38 +3223,43 @@ namespace cce {
     oss << "can be found in README_AFLOW_CCE.TXT." << endl;
     oss << endl;
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
-    oss << "--cce                         Prints these user instructions." << endl;
-    oss << "--cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure" << endl;
-    oss << "                              format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF." << endl;
-    oss << "                              For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species" << endl;
-    oss << "                              must be written on the right side next to the coordinates for each atom" << endl;
-    oss << "                              just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
-    oss << "--dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies," << endl; 
-    oss << "                              they are assumed to be: (i) negative for compounds lower in energy" << endl; 
-    oss << "                              than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
-    oss << "                              for PBE, LDA and SCAN." << endl;
-    oss << "--functionals=                Provide a comma separated list of functionals for which corrections" << endl;
-    oss << "                              should be returned. If used together with --dft_formation energies," << endl;
-    oss << "                              the functionals must be in the same sequence as the DFT formation" << endl;
-    oss << "                              energies they correspond to. Available functionals are:" << endl;
-    oss << "                              (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
-    oss << "                              energy is provided)." << endl;
-    oss << "--oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is" << endl;
-    oss << "                              assumed that: (i) one is provided for each atom of the structure and" << endl; 
-    oss << "                              (ii) they are in the same sequence as the corresponding atoms in the" << endl;
-    oss << "                              provided structure file." << endl;
-    oss << "--poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE." << endl;
-    oss << "                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
-    oss << "                              QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR" << endl;
-    oss << "                              is used, the species must be written on the right side next to the coordinates for" << endl;
-    oss << "                              each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
-    oss << "--print=                      Obtain output in standard format (--print=out) or as json (--print=json)." << endl;
-    oss << "                              Default: out." << endl;
-    oss << "--get_ox_nums < STRUCT_FILE   Determine only the oxidation numbers for the structure in file STRUCT_FILE." << endl;
-    oss << "                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
-    oss << "                              QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
-    oss << "                              is used the species must be written on the right side next to the coordinates for" << endl;
-    oss << "                              each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
+    oss << "--cce                            Prints these user instructions." << endl;
+    oss << "--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure" << endl;
+    oss << "                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF." << endl;
+    oss << "                                 For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species" << endl;
+    oss << "                                 must be written on the right side next to the coordinates for each atom" << endl;
+    oss << "                                 just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
+    oss << "--dft_formation_energies=        Provide a comma separated list of precalculated DFT formation energies," << endl; 
+    oss << "                                 they are assumed to be: (i) negative for compounds lower in energy" << endl; 
+    oss << "                                 than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
+    oss << "                                 for PBE, LDA and SCAN." << endl;
+    oss << "--functionals=                   Provide a comma separated list of functionals for which corrections" << endl;
+    oss << "                                 should be returned. If used together with --dft_formation energies," << endl;
+    oss << "                                 the functionals must be in the same sequence as the DFT formation" << endl;
+    oss << "                                 energies they correspond to. Available functionals are:" << endl;
+    oss << "                                 (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
+    oss << "                                 energy is provided)." << endl;
+    oss << "--oxidation_numbers=             Provide as a comma separated list the oxidation numbers. It is" << endl;
+    oss << "                                 assumed that: (i) one is provided for each atom of the structure and" << endl; 
+    oss << "                                 (ii) they are in the same sequence as the corresponding atoms in the" << endl;
+    oss << "                                 provided structure file." << endl;
+    oss << "--poscar2cce < STRUC_FILE        Determines the CCE corrections for the structure in file STRUC_FILE." << endl;
+    oss << "                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
+    oss << "                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR" << endl;
+    oss << "                                 is used, the species must be written on the right side next to the coordinates for" << endl;
+    oss << "                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
+    oss << "--get_ox_nums < STRUC_FILE       Determines the oxidation numbers for the structure in file STRUC_FILE." << endl;
+    oss << "                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
+    oss << "                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
+    oss << "                                 is used the species must be written on the right side next to the coordinates for" << endl;
+    oss << "                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
+    oss << "--num_anion_neigh < STRUC_FILE   Determines the number of anion neighbors for each cation for the structure in STRUC_FILE." << endl;
+    oss << "                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
+    oss << "                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
+    oss << "                                 is used the species must be written on the right side next to the coordinates for" << endl;
+    oss << "                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
+    oss << "--print=                         Obtain output in standard format (--print=out) or as json (--print=json)." << endl;
+    oss << "                                 Default: out." << endl;
     oss << endl;
     oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
     oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;

@@ -1364,8 +1364,8 @@ LATTICES = (the ones with "")
         Outputs to standard out a new POSCAR file with
         atom positions in direct (fractional) coordinates.
 
-  aflow --get_ox_nums < STRUCT_FILE
-        Determines the oxidation numbers for the structure in file STRUCT_FILE. It can be in any structure
+  aflow --get_ox_nums < STRUC_FILE
+        Determines the oxidation numbers for the structure in file STRUC_FILE. It can be in any structure
         format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR
         is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
         the coordinates for each atom.
@@ -1970,6 +1970,11 @@ LATTICES = (the ones with "")
         formatting.  Combined with the above --sd option this allows
         easy movement between POSCAR files with and without selective
         dynamics formatting.
+  aflow --num_anion_neigh < STRUC_FILE
+        Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE. 
+        It can be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. 
+        For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written 
+        on the right side next to the coordinates for each atom. (RF20200820)
   aflow --numnames A1 A2 ... < POSCAR
         Same as names except appends an increasing integer to
         each different atom type.  Starts counting at 1 again

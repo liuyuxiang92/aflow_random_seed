@@ -65,7 +65,8 @@ namespace cce {
   void print_corrections(xstructure& structure, aurostd::xoption& flags);
   void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void print_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
-  void determine_oxidation_numbers(std::istream& ist, ostream& oss=std::cout);
+  void print_num_anion_neighbors(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
+  void print_oxidation_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(xstructure& structure, string functional, ostream& oss=std::cout);
   void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
@@ -124,7 +125,10 @@ namespace cce {
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
   void apply_pbe_u_icsd_shifts(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // print output and citation
-  string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
+  string print_JSON_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
+  string print_JSON_ox_nums(const CCE_Variables& cce_vars);
+  string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
+  string print_output_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance);
   string print_output_oxidation_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);

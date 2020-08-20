@@ -32,38 +32,43 @@ be PBE (default).
 Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
---cce                         Prints user instructions.
---cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure 
-                              format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. 
-                              For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
-                              must be written on the right side next to the coordinates for each atom
-                              just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
---dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies, 
-                              they are assumed to be: (i) negative for compounds lower in energy 
-                              than the elements, (ii) in eV/cell. Currently, corrections are available 
-                              for PBE, LDA and SCAN.
---functionals=                Provide a comma separated list of functionals for which corrections 
-                              should be returned. If used together with --dft_formation energies, 
-                              the functionals must be in the same sequence as the DFT formation 
-                              energies they correspond to. Available functionals are:
-                              (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation 
-                              energy is provided).
---oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is 
-                              assumed that: (i) one is provided for each atom of the structure and 
-                              (ii) they are in the same sequence as the corresponding atoms in the 
-                              provided structure file.
---poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE. 
-                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                              QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                              is used the species must be written on the right side next to the coordinates for
-                              each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
---print=                      Obtain output in standard format (--print=out) or as json (--print=json).
-                              Default: out.
---get_ox_nums < STRUCT_FILE   Determine only the oxidation numbers for the structure in file STRUCT_FILE.
-                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                              QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                              is used the species must be written on the right side next to the coordinates for
-                              each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+--cce                            Prints user instructions.
+--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure
+                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF.
+                                 For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
+                                 must be written on the right side next to the coordinates for each atom
+                                 just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+--dft_formation_energies=        Provide a comma separated list of precalculated DFT formation energies,
+                                 they are assumed to be: (i) negative for compounds lower in energy
+                                 than the elements, (ii) in eV/cell. Currently, corrections are available
+                                 for PBE, LDA and SCAN.
+--functionals=                   Provide a comma separated list of functionals for which corrections
+                                 should be returned. If used together with --dft_formation energies,
+                                 the functionals must be in the same sequence as the DFT formation
+                                 energies they correspond to. Available functionals are:
+                                 (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation
+                                 energy is provided).
+--oxidation_numbers=             Provide as a comma separated list the oxidation numbers. It is
+                                 assumed that: (i) one is provided for each atom of the structure and
+                                 (ii) they are in the same sequence as the corresponding atoms in the
+                                 provided structure file.
+--poscar2cce < STRUC_FILE        Determines the CCE corrections for the structure in file STRUC_FILE.
+                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                                 is used the species must be written on the right side next to the coordinates for
+                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+--get_ox_nums < STRUC_FILE       Determines the oxidation numbers for the structure in file STRUC_FILE.
+                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                                 is used the species must be written on the right side next to the coordinates for
+                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+--num_anion_neigh < STRUC_FILE   Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE.
+                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                                 is used the species must be written on the right side next to the coordinates for
+                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+--print=                         Obtain output in standard format (--print=out) or as json (--print=json).
+                                 Default: out.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)
