@@ -2404,16 +2404,8 @@ namespace cce {
       message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U_ICSD.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
-    string aflowIn = aurostd::RemoveComments(aurostd::file2string(_AFLOWIN_));
-    vector<string> vlines = aurostd::string2vectorstring(aflowIn);
-    string line_a = "";
-    for (uint i = 0; i < vlines.size(); i++) { 
-      line_a = aurostd::RemoveSpaces(vlines[i]);
-      if (line_a.find("[AFLOW]SYSTEM=") != string::npos){ // string::npos is returned if string is not found
-        system_name = aurostd::RemoveSubStringFirst(line_a, "[AFLOW]SYSTEM=");
-        system_name=aurostd::RemoveSubString(system_name,"\r"); // remove carriage return characters at end of string in case they exist (maybe due to sending aflow.in via email); leads to problems with string addition
-      }
-    }
+    // Bader implementation works currently only with Bader file and aflow.in in directory where AFLOW is run
+    system_name=KBIN::ExtractSystemNameFromAFLOWIN(".");
     if(LDEBUG){
       cerr << soliloquy << "functional determined from aflow.in: " << functional << endl;
       cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
