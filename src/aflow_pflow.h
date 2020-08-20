@@ -909,6 +909,7 @@ namespace pflow {
 namespace pflow {
   vector<string> fakeElements(uint nspecies); //DX20200728
   double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
+  vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string);
 }
 
 #endif

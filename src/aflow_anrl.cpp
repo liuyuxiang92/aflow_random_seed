@@ -421,22 +421,7 @@ namespace anrl {
     //DX20191030 - add force Wyckoff choice option - END
 
     // symmetry tolerance
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("STRUCTURE2ANRL::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
-        tolerance=SYM::defaultTolerance(xstr); 
-      }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
-        tolerance=SYM::defaultTolerance(xstr)*10.0; 
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance=SYM::defaultTolerance(xstr); 
-    }
+    double tolerance = pflow::getSymmetryTolerance(xstr,vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
 
     // space group setting
     if(vpflow.flag("STRUCTURE2ANRL::SETTING")){

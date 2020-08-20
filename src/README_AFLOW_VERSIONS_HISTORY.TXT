@@ -21,6 +21,7 @@
         -- Consolidated symmetry tolerance command-line code into pflow::getSymmetryTolerance() (DX)
         -- Added input tolerance capabilities to --lattice and --lattice_type (DX)
         -- Added tolerance spectrum analysis functionality to symmetry routines (--aflowSG) (DX)
+        -- Added option to XtalFinder to ignore the atom decoration comparisons (DX)
         -- Created generic prototype generator: creates a geometry file regardless of whether it is located in the AFLOW Encyclopedia of Crystallographic Prototypes (DX)
         -- cleaning up all getElements() variants (CO+DX)
         -- adding aurostd_xparser.cpp .h (CO)

@@ -219,7 +219,7 @@ namespace compare{
         deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX20191125
         generatePermutationString(reduced_stoichiometry_uint, unique_permutations); //DX20190508
         if(format=="text"){ //DX20190506
-          ss_output << "Unique permutations (" << unique_permutations.size() << "): " << endl; 
+          ss_output << "Unique atom decorations (" << unique_permutations.size() << "): " << endl; 
           ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
         }
         if(format=="json"){ //DX20190506
@@ -250,13 +250,13 @@ namespace compare{
     structure.structure_representative_relaxation_step = 0; //DX20200429 input is assumed to be unrelaxed
 
     // ---------------------------------------------------------------------------
-    // get the unique permutations for the structure
+    // get the unique atom decorations for the structure
     vector<StructurePrototype> final_permutations = compare::comparePermutations(structure,num_proc,optimize_match,oss,FileMESSAGE); //DX20190319 - added FileMESSAGE
 
     // ---------------------------------------------------------------------------
     // print results
     if(format=="text"){ //DX20190506
-      ss_output << "Unique permutations (" << final_permutations.size() << "): " << endl; 
+      ss_output << "Unique atom decorations (" << final_permutations.size() << "): " << endl; 
 
       for(uint j=0;j<final_permutations.size();j++){
         ss_output << " " << final_permutations[j].structure_representative_name;
@@ -303,7 +303,7 @@ namespace compare{
     }
 
     // ---------------------------------------------------------------------------
-    // store unique permutations in vector
+    // store unique atom decorations in vector
     for(uint j=0;j<final_permutations.size();j++){
       unique_permutations.push_back(final_permutations[j].structure_representative_name);
     }
@@ -525,10 +525,10 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // FLAG: do not calculate unique permutations 
+    // FLAG: do not calculate unique atom decorations 
     if(vpflow.flag("COMPARE_STRUCTURE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
-      message << "OPTIONS: Do not calculate unique permutations."; 
+      message << "OPTIONS: Do not calculate unique atom decorations."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -775,7 +775,7 @@ namespace compare {
     vpflow.push_attached("COMPARE2PROTOTYPES::CATALOG",catalog); 
 
     // ---------------------------------------------------------------------------
-    // do not calculate unique permutations
+    // do not calculate unique atom decorations
     vpflow.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
     // ---------------------------------------------------------------------------
@@ -970,10 +970,10 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // FLAG: do not calculate unique permutations 
+    // FLAG: do not calculate unique atom decorations
     if(vpflow.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
-      message << "OPTIONS: Do not calculate unique permutations."; 
+      message << "OPTIONS: Do not calculate unique atom decorations."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -1118,9 +1118,9 @@ namespace compare {
     comparison_schemes.clear();
 
     // ---------------------------------------------------------------------------
-    // get unique permutations 
+    // get unique atom decorations
     if(comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){
-      message << "Identifying unique permutations for representative structures ...";
+      message << "Identifying unique atom decorations for representative structures ...";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
       for(uint i=0;i<final_prototypes.size();i++){
@@ -1132,7 +1132,7 @@ namespace compare {
           }
         }        
         if(LDEBUG){ //DX20190601 - added LDEBUG
-          cerr << "Finding unique permutations for " << final_prototypes[i].structure_representative_name << ".";
+          cerr << "Finding unique atom decorations for " << final_prototypes[i].structure_representative_name << ".";
         }        
         vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),oss,FileMESSAGE); //DX20200103 - condensed booleans to xoptions
         for(uint j=0;j<final_permutations.size();j++){
@@ -1142,7 +1142,7 @@ namespace compare {
           final_prototypes[i].atom_decorations_equivalent.push_back(tmp_permutations);
         }
       }
-      message << "Unique permutations found.";
+      message << "Unique atom decorations found.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
 
@@ -2050,10 +2050,10 @@ namespace compare {
     if(magnetic_comparison){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
-    // FLAG: do not calculate unique permutations 
+    // FLAG: do not calculate unique atom decorations 
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
-      message << "OPTIONS: Do not calculate unique permutations."; 
+      message << "OPTIONS: Do not calculate unique atom decorations."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -2744,11 +2744,11 @@ namespace compare {
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
 
     // ---------------------------------------------------------------------------
-    // get unique permutations of prototype (representative) structures
+    // get unique atom decorations prototype (representative) structures
     if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){ 
-      message << "Determining the unique permutations for each prototype.";
+      message << "Determining the unique atom decorations for each prototype.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-      // find unique permutations of prototype
+      // find unique atom decorations of prototype
       for(uint i=0;i<final_prototypes.size();i++){
         if(arePermutationsComparableViaComposition(final_prototypes[i].stoichiometry) && 
             arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions)){
@@ -2885,7 +2885,7 @@ namespace compare {
       vpflow_protos.push_attached("COMPARE2PROTOTYPES::NP",aurostd::utype2string<uint>(num_proc)); 
 
       // ---------------------------------------------------------------------------
-      // do not calculate unique permutations since this was already done
+      // do not calculate unique atom decorations since this was already done
       vpflow_protos.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
       // ---------------------------------------------------------------------------

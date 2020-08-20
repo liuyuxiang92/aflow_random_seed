@@ -462,6 +462,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE_STRUCTURE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX20190724
     vpflow.flag("COMPARE_STRUCTURE::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation")); //DX20190724
     vpflow.flag("COMPARE_STRUCTURE::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX20191212
+    vpflow.flag("COMPARE_STRUCTURE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",aurostd::args2flag(argv,cmds,"--ignore_atom_decoration_comparison|--ignore_decoration_comparison|--ignore_decorations")); //DX20190424
     vpflow.flag("COMPARE_STRUCTURE::USAGE",aurostd::args2flag(argv,cmds,"--usage")); //DX20190424
   }
   //DX20190424 [OBSOLETE]vpflow.flag("COMPARE_MATERIAL_DIRECTORY",aurostd::args2flag(argv,cmds,"--compare_material_directory|--compare_material_dir"));
@@ -1339,6 +1340,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("STRUCTURE2ANRL")){
     vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::SETTING","--setting=","");
     vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE","--tolerance=",""); //DX20191028
+    vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE_SPECTRUM","--tolerance_spectrum=",""); //DX20200820
     vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF",aurostd::args2flag(argv,cmds,"--force_Wyckoff|--force_wyckoff|--force_Wyckoff_order|--force_wyckoff_order")); //DX20191028
   }
   //DX20190128 - add structure2ANRL - END
@@ -13733,29 +13735,16 @@ namespace pflow {
       //DX [OBSOLETE] 20170921 -  }
       //DX [OBSOLETE] 20170921 -}
       //DX END
+
+      // get tolerance
+      double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SG::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+      
       bool tolerance_spectrum_analysis = false;
       vector<double> tolerance_spectrum;
-      double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SG::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
       //DX20200817 - SPACEGROUP SPECTRUM - START
       if(vpflow.flag("SG::TOLERANCE_SPECTRUM")){
         tolerance_spectrum_analysis = true;
-        string tolerance_range = vpflow.getattachedscheme("SG::TOLERANCE_SPECTRUM");
-        vector<string> tokens;
-        if(aurostd::string2tokens(tolerance_range,tokens,":") == 3){
-          double start = aurostd::string2utype<double>(tokens[0]);
-          double end = aurostd::string2utype<double>(tokens[1]);
-          uint nsteps = aurostd::string2utype<uint>(tokens[2])-1;
-          if(end<start){ 
-            message << "pflow::SG::ERROR: END cannot be before START."; 
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_ILLEGAL_);
-          }
-          double interval = (end-start)/(double)nsteps;
-          for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
-        }
-        else{
-          message << "pflow::SG::ERROR: Expected three inputs: first=range_start, second=range_end, third=nsteps."; 
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_ILLEGAL_);
-        }
+        tolerance_spectrum = pflow::getSymmetryToleranceSpectrum(vpflow.getattachedscheme("SG::TOLERANCE_SPECTRUM"));
       }
       else if(vpflow.flag("SG::TOLERANCE") && vpflow.flag("SG::TOLERANCE_SPECTRUM")){
         message << "pflow::SG::ERROR: Cannot specify a single tolerance value and perform the tolerance spectrum at the same time. Please choose one or the other."; 
@@ -13773,6 +13762,7 @@ namespace pflow {
         a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
       }
       else{
+        // perform space group analysis through a range of tolerances //DX20200820
         for(uint i=0;i<tolerance_spectrum.size();i++){
           uint sgroup=a.SpaceGroup_ITC(tolerance_spectrum[i],no_scan);
           try{
