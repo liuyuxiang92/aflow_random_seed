@@ -171,8 +171,10 @@ namespace pflow {
   void JOINSTRLIST(vector<string>);
   void MAKESTRLIST(vector<string>);
   xstructure LATTICEREDUCTION(istream& input);
-  string LATTICE_TYPE(istream& input);
-  string LATTICE_LATTICE_TYPE(istream& input);
+  //DX20200820 [OBSOLETE] string LATTICE_TYPE(istream& input);
+  //DX20200820 [OBSOLETE] string LATTICE_LATTICE_TYPE(istream& input);
+  string LATTICE_TYPE(istream& input,aurostd::xoption& vpflow); //DX20200820 - added vpflow
+  string LATTICE_LATTICE_TYPE(istream& input,aurostd::xoption& vpflow); //DX20200820
   string listPrototypeLabels(aurostd::xoption& vpflow); //DX20181004
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131 
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX20200131 
@@ -906,6 +908,7 @@ namespace pflow {
 
 namespace pflow {
   vector<string> fakeElements(uint nspecies); //DX20200728
+  double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
 }
 
 #endif

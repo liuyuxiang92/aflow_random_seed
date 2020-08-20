@@ -743,8 +743,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"LTCELL","--ltcell=","");
   vpflow.args2addattachedscheme(argv,cmds,"LTCELLFV","--ltcellfv=","");
 
-  vpflow.flag("LATTICE_TYPE",aurostd::args2flag(argv,cmds,"--lattice_type|--lattice|--lattice_crystal"));
-  vpflow.flag("LATTICE_LATTICE_TYPE",aurostd::args2flag(argv,cmds,"--lattice_lattice_type|--lattice_lattice"));
+  vpflow.args2addattachedscheme(argv,cmds,"LATTICE_TYPE","--lattice_type=|--lattice=|--lattice_crystal=",""); //DX20200820 - allow tolerance to be added
+  if(aurostd::args2attachedflag(argv,"--lattice_type=|--lattice=|--lattice_crystal=")){ //DX20200820 - add tolerance
+    vpflow.args2addattachedscheme(argv,cmds,"LATTICE::TOLERANCE","--lattice_type=|--lattice=|--lattice_crystal=","1");
+  }
+  vpflow.args2addattachedscheme(argv,cmds,"LATTICE_LATTICE_TYPE","--lattice_lattice_type=|--lattice_lattice=",""); //DX20200820 - allow tolerance to be added
+  if(aurostd::args2attachedflag(argv,"--lattice_lattice_type=|--lattice_lattice=")){ //DX20200820 - add tolerance
+    vpflow.args2addattachedscheme(argv,cmds,"LATTICE_LATTICE::TOLERANCE","--lattice_lattice_type=|--lattice_lattice=","1");
+  }
   vpflow.flag("LATTICE_HISTOGRAM",aurostd::args2flag(argv,cmds,"--latticehistogram"));
 
   //DX20181023 - list prototype labels - START
@@ -1245,6 +1251,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("SG::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--aflowSG=|--aflowSG_label=|--aflowSG_number=")){
       vpflow.args2addattachedscheme(argv,cmds,"SG::TOLERANCE","--aflowSG=|--aflowSG_label=|--aflowSG_number=","1");
+    }
+    if(aurostd::args2attachedflag(argv,"--tolerance_spectrum=|--tol_spectrum=")){
+      vpflow.args2addattachedscheme(argv,cmds,"SG::TOLERANCE_SPECTRUM","--tolerance_spectrum=|--tol_spectrum=","1");
     }
     //DX20170921 - MAGNETIC SYMMETRY - START
     vpflow.args2addattachedscheme(argv,cmds,"SG::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
@@ -1809,8 +1818,10 @@ namespace pflow {
       if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << compare::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX20200131
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("LATTICE_LATTICE_TYPE")) {cout << pflow::LATTICE_LATTICE_TYPE(cin); _PROGRAMRUN=true;}
+      //DX20200820 [OBSOELTE] if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
+      //DX20200820 [OBSOELTE] if(vpflow.flag("LATTICE_LATTICE_TYPE")) {cout << pflow::LATTICE_LATTICE_TYPE(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin,vpflow); _PROGRAMRUN=true;} //DX20200820 - added vpflow
+      if(vpflow.flag("LATTICE_LATTICE_TYPE")) {cout << pflow::LATTICE_LATTICE_TYPE(cin,vpflow); _PROGRAMRUN=true;} //DX20200820 - added vpflow
       if(vpflow.flag("LATTICE_HISTOGRAM")) {CheckLatticeHistogram(); _PROGRAMRUN=true;}
       if(vpflow.flag("LIST_PROTOTYPE_LABELS")) {cout << pflow::listPrototypeLabels(vpflow) << endl; _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("LIB2RAW")) {XHOST.sensors_allowed=FALSE;aflowlib::LIB2RAW(vpflow.getattachedscheme("LIB2RAW"),vpflow.flag("FORCE"),vpflow.flag("LIB2RAW_LOCAL"));XHOST.sensors_allowed=TRUE; _PROGRAMRUN=true;}
@@ -3112,27 +3123,8 @@ namespace pflow {
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
 
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("SYMMETRY::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("SYMMETRY::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SYMMETRY::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << soliloquy << " ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      return 0;
-    }
+    // Set tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
     //DX20170803 - Add format flag - START
     string format = "txt";
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
@@ -5231,23 +5223,8 @@ namespace pflow {
     }
     else {
       //put tolerance flag check in loop to save time if we aren't calculating, defaultTolerance can be expensive
-      double default_tolerance=SYM::defaultTolerance(a); 
-      double tolerance = AUROSTD_NAN;
-      if(vpflow.flag("CIF::TOLERANCE")){
-        string tolerance_string = vpflow.getattachedscheme("CIF::TOLERANCE");
-        if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-          tolerance=default_tolerance;
-        }
-        else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-          tolerance=default_tolerance*10.0;
-        }
-        else {
-          tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("CIF::TOLERANCE"));
-        }
-      }
-      else {
-        tolerance = default_tolerance;
-      }
+      double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("CIF::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+      // get setting
       int setting = 0;
       if(vpflow.flag("CIF::SETTING")){
         int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("CIF::SETTING"));
@@ -5454,27 +5431,8 @@ namespace pflow {
       ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
     }
     //DX20171128 - MAGNETIC SYMMETRY - END
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("DATA::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("DATA::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("DATA::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << "ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      return 0;
-    }
+    // get tolerance  
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("DATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
     //DX20180806 - added setting - START
     int setting = 0;
     if(vpflow.flag("DATA::SETTING")){
@@ -5850,27 +5808,8 @@ namespace pflow {
       ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("SYMMETRY::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("SYMMETRY::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SYMMETRY::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::EQUIVALENT ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      exit(1);
-    }
+    // get tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
     //DX NOT REALLY NEEDED FOR THIS FUNCTION
     //DX20170803 - Add format flag - START
     string format = "txt";
@@ -6552,27 +6491,9 @@ namespace pflow {
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
 
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("FULLSYMMETRY::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::CalculateFullSymmetry: ERROR: Tolerance cannot be zero (i.e. less than 1e-10)" << endl;
-      return 0;
-    }
+    // get tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    
     //DX20170803 - Add format flag - START
     string format = "txt";
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
@@ -8309,9 +8230,11 @@ namespace pflow {
 // pflow::LATTICE_TYPE
 // ***************************************************************************
 namespace pflow {
-  string LATTICE_TYPE(istream& input) {
+  string LATTICE_TYPE(istream& input, aurostd::xoption& vpflow) { //DX20200820
     stringstream sss;
     xstructure a(input,IOAFLOW_AUTO);
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("LATTICE::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    a.sym_eps = tolerance; //DX20200820 - add tolerance
     //DX20170824 [OBSOLETE] a.GetLatticeType();
     xstructure str_sp,str_sc; //DX20170824 - Speed increase
     bool full_sym=false; //DX20170829 - Speed increase
@@ -8330,9 +8253,11 @@ namespace pflow {
 // pflow::LATTICE_LATTICE_TYPE
 // ***************************************************************************
 namespace pflow {
-  string LATTICE_LATTICE_TYPE(istream& input) {
+  string LATTICE_LATTICE_TYPE(istream& input, aurostd::xoption& vpflow) { //DX20200820
     stringstream sss;
     xstructure a(input,IOAFLOW_AUTO);
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("LATTICE_LATTICE::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    a.sym_eps = tolerance; //DX20200820 - add tolerance
     //DX20170824 [OBSOLETE] a.GetLatticeType();
     xstructure str_sp,str_sc; //DX20170824 - Speed increase
     bool full_sym=false; //DX20170829 - Speed increase
@@ -13808,36 +13733,58 @@ namespace pflow {
       //DX [OBSOLETE] 20170921 -  }
       //DX [OBSOLETE] 20170921 -}
       //DX END
-      double default_tolerance=SYM::defaultTolerance(a);
-      double tolerance = AUROSTD_NAN;
-      if(vpflow.flag("SG::TOLERANCE")){
-        string tolerance_string = vpflow.getattachedscheme("SG::TOLERANCE");
-        if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-          tolerance=default_tolerance;
+      bool tolerance_spectrum_analysis = false;
+      vector<double> tolerance_spectrum;
+      double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SG::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+      //DX20200817 - SPACEGROUP SPECTRUM - START
+      if(vpflow.flag("SG::TOLERANCE_SPECTRUM")){
+        tolerance_spectrum_analysis = true;
+        string tolerance_range = vpflow.getattachedscheme("SG::TOLERANCE_SPECTRUM");
+        vector<string> tokens;
+        if(aurostd::string2tokens(tolerance_range,tokens,":") == 3){
+          double start = aurostd::string2utype<double>(tokens[0]);
+          double end = aurostd::string2utype<double>(tokens[1]);
+          uint nsteps = aurostd::string2utype<uint>(tokens[2])-1;
+          if(end<start){ 
+            message << "pflow::SG::ERROR: END cannot be before START."; 
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_ILLEGAL_);
+          }
+          double interval = (end-start)/(double)nsteps;
+          for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
         }
-        else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-          tolerance=default_tolerance*10.0;
-        }
-        else {
-          tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SG::TOLERANCE"));
+        else{
+          message << "pflow::SG::ERROR: Expected three inputs: first=range_start, second=range_end, third=nsteps."; 
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_ILLEGAL_);
         }
       }
-      else {
-        tolerance = default_tolerance;
+      else if(vpflow.flag("SG::TOLERANCE") && vpflow.flag("SG::TOLERANCE_SPECTRUM")){
+        message << "pflow::SG::ERROR: Cannot specify a single tolerance value and perform the tolerance spectrum at the same time. Please choose one or the other."; 
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_ILLEGAL_);
       }
-      if(tolerance < 1e-10){
-        message << "pflow::SG::ERROR: Tolerance cannot be zero (i.e. less than 1e-10).";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_VALUE_RANGE_); //DX20200103 - return to xerror
-      }
+      //DX20200817 - SPACEGROUP SPECTRUM - END
       //DX20170926 - NO SCAN - START
       bool no_scan = false;
       if(vpflow.flag("SG::NO_SCAN")){
         no_scan = true;
       }
       //DX20170926 - NO SCAN - END
-      uint sgroup=a.SpaceGroup_ITC(tolerance,no_scan);
-      // [OBSOLETE] uint sgroup=a.SpaceGroup_ITC(false,argv);    
-      a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
+      if(!tolerance_spectrum_analysis){
+        uint sgroup=a.SpaceGroup_ITC(tolerance,no_scan);
+        a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
+      }
+      else{
+        for(uint i=0;i<tolerance_spectrum.size();i++){
+          uint sgroup=a.SpaceGroup_ITC(tolerance_spectrum[i],no_scan);
+          try{
+            GetSpaceGroupName(sgroup,a.directory);
+            cout << "tol=" << tolerance_spectrum[i] << ": " << GetSpaceGroupName(sgroup,a.directory) << " #" << aurostd::utype2string(sgroup) << endl;
+          }
+          catch(aurostd::xerror& excpt) {
+            cout << "tol=" << tolerance_spectrum[i] << ": -" << endl;
+          }
+        }
+        return "";
+      }
       // [OBSOLETE] a.spacegroup=GetSpaceGroupName(a.SpaceGroup_ITC(false,argv))+" #"+aurostd::utype2string(a.SpaceGroup_ITC(false,argv)); //RHT
       //  return a.spacegroup; //RHT
     }
@@ -14037,27 +13984,9 @@ namespace pflow {
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
 
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("SGDATA::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("SGDATA::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SGDATA::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::SGDATA::ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      return 0;
-    }
+    // get tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SGDATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    
     //DX20180806 - added setting - START
     int setting = 0;
     if(vpflow.flag("SGDATA::SETTING")){
@@ -14369,27 +14298,7 @@ namespace pflow {
     str.ReScale(1.0);
 
     // get tolerance
-    double default_tolerance=SYM::defaultTolerance(str);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("WYCCAR::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("WYCCAR::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("WYCCAR::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::WYCCAR::ERROR: Tolerance cannot be zero (i.e. less than 1e-10)." << endl;
-      return 0;
-    }
+    double tolerance = pflow::getSymmetryTolerance(str,vpflow.getattachedscheme("WYCCAR::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
 
     // get setting
     int setting = 0;

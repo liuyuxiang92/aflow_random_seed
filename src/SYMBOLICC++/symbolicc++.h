@@ -25,24 +25,52 @@
 #include <iostream>
 #include <iterator>
 #include <list>
+#ifndef _SYMBOLIC_CLONING_CPP_
 #include "cloning.h"
+#endif
+#ifndef _SYMBOLIC_IDENTITY_CPP_
 #include "identity.h"
+#endif
 
 // phased include headers
 // according to class hierarchy
 // DX20200612 - removed class hierarchy (one-level, i.e., removed symbolic directory and moved everything to the same level)
+#ifndef _SYMBOLIC_SYMBOLIC_CPP_
 #include "symbolic.h"  // SymbolicInterface, Symbolic ...
+#endif
+#ifndef _SYMBOLIC_EQUATION_CPP_
 #include "equation.h"  //   Equation : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_NUMBER_CPP_
 #include "number.h"    //   Numeric  : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_PRODUCT_CPP_
 #include "product.h"   //   Product  : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_SUM_CPP_
 #include "sum.h"       //   Sum      : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_SYMBOL_CPP_
 #include "symbol.h"    //   Symbol   : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_FUNCTIONS_CPP_
 #include "functions.h" //     Sin    : Symbol ...
+#endif
+#ifndef _SYMBOLIC_SYMMATRIX_CPP_
 #include "symmatrix.h" //   SymbolicMatrix : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_SYMERROR_CPP_
 #include "symerror.h"  //   SymbolicError  : CloningSymbolicInterface
+#endif
+#ifndef _SYMBOLIC_CONSTANTS_CPP_
 #include "constants.h"
+#endif
+#ifndef _SYMBOLIC_INTEGRATE_CPP_
 #include "integrate.h"
+#endif
+#ifndef _SYMBOLIC_SOLVE_CPP_
 #include "solve.h"
+#endif
 
 #ifndef SYMBOLIC_CPLUSPLUS
 #define SYMBOLIC_CPLUSPLUS

@@ -526,7 +526,7 @@ namespace anrl {
     ReScale(tmp_xstr,1.0); //DX20191031
     bool remove_ones=true;
     tmp_xstr.DecorateWithFakeElements(); //DX20200728 - fakeAtomNames() -> DecorateWithFakeElements()
-    vector<uint> reduced_composition = tmp_xstr.GetReducedComposition(true); // numerical sort is true
+    vector<uint> reduced_composition = tmp_xstr.GetReducedComposition(false); // numerical sort is false
     vector<string> fake_elements = tmp_xstr.GetElements();
     string reduced_stoichiometry = pflow::prettyPrintCompound(fake_elements,reduced_composition,no_vrt,remove_ones,txt_ft);//remove ones is true
 

@@ -18,6 +18,10 @@
         -- Updated README_PROTO.TXT with new nitrides and oxides (DX+RF)
         -- Bug fixes in XtalFinder: precondition structures with BringInCell() for local geometry comparisons (DX)
         -- Bug fixes in XtalFinder: use more robust matching protocol; accounts for undecorated prototypes (i.e., small volumes) (DX)
+        -- Consolidated symmetry tolerance command-line code into pflow::getSymmetryTolerance() (DX)
+        -- Added input tolerance capabilities to --lattice and --lattice_type (DX)
+        -- Added tolerance spectrum analysis functionality to symmetry routines (--aflowSG) (DX)
+        -- Created generic prototype generator: creates a geometry file regardless of whether it is located in the AFLOW Encyclopedia of Crystallographic Prototypes (DX)
         -- cleaning up all getElements() variants (CO+DX)
         -- adding aurostd_xparser.cpp .h (CO)
 3.2.4 - 2020/06/25

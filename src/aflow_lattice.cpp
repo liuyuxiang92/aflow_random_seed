@@ -776,8 +776,10 @@ namespace LATTICE {
     //DX20190304 - moved above GetPrimitive - END
 
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
+    if(LDEBUG){ cerr << XPID << "LATTICE::Standard_Lattice_Structure: structure BEFORE primitivization:" << str_sp << endl; }
     str_sp.GetPrimitive(0.005);
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
+    if(LDEBUG){ cerr << XPID << "LATTICE::Standard_Lattice_Structure: structure AFTER primitivization:" << str_sp << endl; }
     str_sp.FixLattices();
 
     //DX20190304 - save transformation between orig and get prim (may have rotated) - START
@@ -814,6 +816,7 @@ namespace LATTICE {
       str_sp.rotate_lattice_original2new=aurostd::inverse(prim_lattice)*str_sp.lattice;   //DX20190307
     }
     //DX20181024 - save transformation - END
+    if(LDEBUG){ cerr << XPID << "LATTICE::Standard_Lattice_Structure: structure AFTER Minkowski reduction:" << str_sp << endl; }
 
     //DX20180522 TEST (why do we use the original, why not use the smaller one (i.e., primitive)?!?) str_sc=str_in; // copy it
     str_sc=str_sp; // copy it
@@ -1029,6 +1032,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "CUB: found consistent lattice choice: rdata = " << rdata << endl; }
               // do the STANDARD PRIMITIVE
               str_sp.bravais_lattice_type="CUB";
               str_sp.bravais_lattice_variation_type="CUB";
@@ -1069,6 +1073,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "BCC: found consistent lattice choice: rdata = " << rdata << endl; }
               str_sp.bravais_lattice_type="BCC";
               str_sp.bravais_lattice_variation_type="BCC";
               str_sp.bravais_lattice_system="cubic";
@@ -1115,6 +1120,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "FCC: found consistent lattice choice: rdata = " << rdata << endl; }
               str_sp.bravais_lattice_type="FCC";
               str_sp.bravais_lattice_variation_type="FCC";
               str_sp.bravais_lattice_system="cubic";
@@ -1186,6 +1192,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(orig_rlattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "TET: found consistent lattice choice: rdata = " << rdata << endl; }
               str_sp.bravais_lattice_type="TET";
               str_sp.bravais_lattice_variation_type="TET";
               str_sp.bravais_lattice_system="tetragonal";
@@ -1236,6 +1243,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
+                if(VERBOSE_PROGRESS){ cerr << "BCT: found consistent lattice choice: rdata = " << rdata << endl; }
                 str_sp.bravais_lattice_type="BCT";
                 str_sp.bravais_lattice_system="tetragonal";
                 str_sp.pearson_symbol="tI"+aurostd::utype2string(2*str_sp.atoms.size());
@@ -1296,6 +1304,7 @@ namespace LATTICE {
                 // RHL: a2=[a*cos(alpha/2)  a*sin(alpha/2) 0]
                 // RHL: a3=[a*cos(alpha)/cos(alpha/2) 0 a*sqrt(1-cos(alpha)*cos(alpha)/cos(alpha/2)/cos(alpha/2))]
                 found=TRUE;
+                if(VERBOSE_PROGRESS){ cerr << "RHL: found consistent lattice choice: rdata = " << rdata << endl; }
                 str_sp.bravais_lattice_type="RHL";
                 str_sp.bravais_lattice_system="rhombohedral";
                 str_sp.pearson_symbol="hR"+aurostd::utype2string(str_sp.atoms.size()); // FIX
@@ -1386,6 +1395,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(orig_rlattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "HEX: found consistent lattice choice: rdata = " << rdata << endl; }
               str_sp.bravais_lattice_type="HEX";
               str_sp.bravais_lattice_variation_type="HEX";
               str_sp.bravais_lattice_system="hexagonal";
@@ -1462,6 +1472,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(orig_rlattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "ORC: found consistent lattice choice: rdata = " << rdata << endl; }
               str_sp.bravais_lattice_type="ORC";
               str_sp.bravais_lattice_variation_type="ORC";
               str_sp.bravais_lattice_system="orthorhombic";
@@ -1515,6 +1526,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
+                if(VERBOSE_PROGRESS){ cerr << "ORCF: found consistent lattice choice: rdata = " << rdata << endl; }
                 str_sp.bravais_lattice_type="ORCF";
                 str_sp.bravais_lattice_system="orthorhombic";
                 str_sp.pearson_symbol="oF"+aurostd::utype2string(4*str_sp.atoms.size());
@@ -1578,6 +1590,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
+                if(VERBOSE_PROGRESS){ cerr << "ORCI: found consistent lattice choice: rdata = " << rdata << endl; }
                 str_sp.bravais_lattice_type="ORCI";
                 str_sp.bravais_lattice_variation_type="ORCI";
                 str_sp.bravais_lattice_system="orthorhombic";
@@ -1635,6 +1648,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
+                if(VERBOSE_PROGRESS){ cerr << "ORCC: found consistent lattice choice: rdata = " << rdata << endl; }
                 str_sp.bravais_lattice_type="ORCC";
                 str_sp.bravais_lattice_variation_type="ORCC";
                 str_sp.bravais_lattice_system="orthorhombic";
@@ -1680,10 +1694,12 @@ namespace LATTICE {
           }
         }
         // got alpha_max
+        if(VERBOSE_PROGRESS){ cerr << "MCL: finding lattice with: maximum alpha (<~90)=" << MCL_alpha_max << ", beta=90, and gamma=90" << endl; }
         for(uint i=0;i<vrlattice1.size()&&found==FALSE;i++) {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+          //if(VERBOSE_PROGRESS){ cerr << "MCL: rdata = " << rdata << endl; }
           //DX if(aurostd::isequal(alpha,MCL_alpha_max,epsang)  && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
           if(SYM::checkAngle(b,c,alpha,MCL_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
           { //CO20200106 - patching for auto-indenting
@@ -1699,6 +1715,7 @@ namespace LATTICE {
               else {
                 str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
               }
+              if(VERBOSE_PROGRESS){ cerr << "MCL: found consistent lattice choice: rdata = " << rdata << endl; }
               str_sp.bravais_lattice_type="MCL";
               str_sp.bravais_lattice_variation_type="MCL";
               str_sp.bravais_lattice_system="monoclinic";
@@ -1725,6 +1742,7 @@ namespace LATTICE {
         mclc[2][1]=1.0;mclc[2][2]=1.0;mclc[2][3]=0.0;
         mclc[3][1]=0.0;mclc[3][2]=0.0;mclc[3][3]=1.0;
         if(choice==0) { // only pristine
+          // find the lattice representation with the largest alpha (least skewed monoclinic cell)
           double MCLC_alpha_max=0.0,testphi,alpharad;
           for(uint i=0;i<vrlattice1.size()&&found==FALSE;i++) {
             rlattice=vrlattice1.at(i);
@@ -1737,15 +1755,17 @@ namespace LATTICE {
               //DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
               if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) //DX
               { //CO20200106 - patching for auto-indenting
-                if(alpha>MCLC_alpha_max) MCLC_alpha_max=alpha;
+                if(alpha>MCLC_alpha_max) {MCLC_alpha_max=alpha;}
               }
             }
           }
-          // got alpha_max
+          // got alpha_max, now loop through again to grab the lattice (DX: perhaps we could make this more efficient)
+          if(VERBOSE_PROGRESS){ cerr << "MCLC: searching lattice with: maximum alpha=" << MCLC_alpha_max << ", beta=90, and gamma=90" << endl; }
           for(uint i=0;i<vrlattice1.size()&&found==FALSE;i++) {
             rlattice=vrlattice1.at(i);
             rdata=Getabc_angles(mclc*rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+            //if(VERBOSE_PROGRESS){ cerr << "MCLC: rdata = " << rdata << endl; }
             // if rlattice==primitive lattice of MCLC then mclc*rlattice==conventional lattice of MCLC !
             // MCLC a b c alpha<90.0 90 90
             // [ac 0 0] [0 bc 0] [0 cc*cos(alpha) cc*sin(alpha) ]    Conventional direct lattice:
@@ -1766,6 +1786,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
+                if(VERBOSE_PROGRESS){ cerr << "MCLC: found consistent lattice choice: rdata = " << rdata << endl; }
                 str_sp.bravais_lattice_type="MCLC";
                 str_sp.bravais_lattice_system="monoclinic";
                 str_sp.pearson_symbol="mS"+aurostd::utype2string(2*str_sp.atoms.size());
@@ -1779,24 +1800,33 @@ namespace LATTICE {
                 str_sp.FixLattices();
                 klattice=str_sp.klattice;
                 kdata=Getabc_angles(klattice,DEGREES);kalpha=kdata[4];kbeta=kdata[5];kgamma=kdata[6];
+                // determine lattice variation 
+                if(VERBOSE_PROGRESS){ cerr << "MCLC: finding lattice variation" << endl; }
+                if(VERBOSE_PROGRESS){ cerr << "MCLC: kdata= " << kdata << endl; }
                 //DX if(aurostd::isequal(kgamma,90.0,epsang))
                 if(SYM::checkAngle(kdata[1],kdata[2],kgamma,90.0,is_deg,eps)) //DX
                 { //CO20200106 - patching for auto-indenting
                   found=TRUE; str_sp.bravais_lattice_variation_type="MCLC2";
+                  if(VERBOSE_PROGRESS){ cerr << "MCLC: found MCLC2 (kgamma==90: " << kgamma << ")" << endl; }
                 } else {
                   if(kgamma>90.0) {
                     found=TRUE; str_sp.bravais_lattice_variation_type="MCLC1";
+                    if(VERBOSE_PROGRESS){ cerr << "MCLC: found MCLC1 (kgamma>90: " << kgamma << ")" << endl; }
                   } else {
                     // kgamma<90
                     alpharad=alpha*PI/180.0;
+                    // testphi is a transformed version of b*cos(alpha/c)+(b^2)sin^2(alpha/a^2) using trig identities (i.e., it is normalized and thus easier to check against tolerances)
                     testphi=0.75-0.25*b*b/a/a-0.25*b/tan(alpharad)*(1/c/sin(alpharad)-1/b/tan(alpharad));
                     if(aurostd::isequal(testphi,0.5,1e-2)) { //DX: This is a normalized quantity, so we do not need to use checkAngle, should be approximately 0.5
                       found=TRUE; str_sp.bravais_lattice_variation_type="MCLC4";
+                      if(VERBOSE_PROGRESS){ cerr << "MCLC: found MCLC4 (kgamma<90: " << kgamma << ") AND (testphi==0.5: " << testphi << ")" << endl; }
                     } else {
                       if(testphi>0.5) {
                         found=TRUE; str_sp.bravais_lattice_variation_type="MCLC3";
+                        if(VERBOSE_PROGRESS){ cerr << "MCLC: found MCLC3 (kgamma<90: " << kgamma << ") AND (testphi>0.5: " << testphi << ")" << endl; }
                       } else {
                         found=TRUE; str_sp.bravais_lattice_variation_type="MCLC5";
+                        if(VERBOSE_PROGRESS){ cerr << "MCLC: found MCLC5 (kgamma<90: " << kgamma << ") AND (testphi<0.5: " << testphi << ")" << endl; }
                       }
                     }
                   }
@@ -1857,6 +1887,7 @@ namespace LATTICE {
             if(weight_TRI2b<=min(weight_TRI1a,weight_TRI2a,weight_TRI1b) && found_TRI==FALSE) { rlattice=rrlattice_TRI2b; found_TRI=TRUE; }
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+            if(VERBOSE_PROGRESS){ cerr << "TRI: found consistent lattice choice: rdata = " << rdata << endl; }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //CO20160217 Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
@@ -1868,19 +1899,23 @@ namespace LATTICE {
             // picked, put the label
             if(kalpha>90.0 && kbeta>90.0 && kgamma>90.0) {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI1a";
+              if(VERBOSE_PROGRESS){ cerr << "TRI: found TRI1a (kalpha>90: " << kalpha << ") AND (kbeta>90: " << kbeta << ") AND (kgamma>90: " << kgamma << ")" << endl; }
             }
             //DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
             if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
             {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI2a";
+              if(VERBOSE_PROGRESS){ cerr << "TRI: found TRI2a (kalpha>90: " << kalpha << ") AND (kbeta>90: " << kbeta << ") AND (kgamma==90: " << kgamma << ")" << endl; }
             }
             if(kalpha<90.0 && kbeta<90.0 && kgamma<90.0) {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI1b";
+              if(VERBOSE_PROGRESS){ cerr << "TRI: found TRI1b (kalpha<90: " << kalpha << ") AND (kbeta<90: " << kbeta << ") AND (kgamma<90: " << kgamma << ")" << endl; }
             }
             //DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
             if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
             { //CO20200106 - patching for auto-indenting
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI2b";
+              if(VERBOSE_PROGRESS){ cerr << "TRI: found TRI2b (kalpha<90: " << kalpha << ") AND (kbeta<90: " << kbeta << ") AND (kgamma==90: " << kgamma << ")" << endl; }
             }
             // found=false;
             // cerr << kalpha << " " << kbeta << " " << kgamma << " " << found << endl;

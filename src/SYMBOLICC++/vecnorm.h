@@ -28,7 +28,7 @@
 #include <iostream>
 #include <math.h>
 #include "vector.h"
-//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
+using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
 template <class T> T norm1(const Vector<T> &v)
@@ -57,7 +57,7 @@ template <class T> double norm2(const Vector<T> &v)
 {
    T result(0);
    for(int i=0;i<int(v.size());i++) result = result + v[i]*v[i];
-   return sqrt(double(result));
+   return std::sqrt(double(result)); //DX20200728 - need to specify std otherwise it is ambiguous
 }
 
 template <class T> T normI(const Vector<T> &v)

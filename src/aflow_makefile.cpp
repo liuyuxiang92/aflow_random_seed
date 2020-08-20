@@ -400,6 +400,30 @@ namespace makefile {
     if(vcpp_aurostd.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_aurostd.size()==0",_RUNTIME_ERROR_);}
     if(vcpp_aurostd[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_aurostd",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << soliloquy << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
+    
+    //do SYMBOLICC++ second - it gets compiled separately
+    file=directory+"/SYMBOLICC++/symbolicc++_master.h";
+    trimPath(file);
+    if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
+    vfiles.push_back(file);
+    vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+    mt_required=false;
+    getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
+    vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
+    vmt_required.push_back(mt_required);
+
+    //SC variables - hack
+    //SYMBOLIC
+    string var_vhpp_symbolic="SYMBOLIC_HPPS";
+    vector<string> vhpp_symbolic;
+    for(i=0;i<vvdependencies.back().size();i++){
+      const string& dep=vvdependencies.back()[i];
+      //if(dep.find("SYMBOLICC++")!=string::npos && dep.size()>4 && dep.find(".cpp")==dep.size()-4){vcpp_symbolic.push_back(dep);}
+      if(dep.find("SYMBOLICC++")!=string::npos && dep.size()>2 && dep.find(".h")==dep.size()-2){vhpp_symbolic.push_back(dep);}
+    }
+    //if(vcpp_symbolic.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_symbolic.size()==0",_RUNTIME_ERROR_);}
+    //if(vcpp_symbolic[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
+    //if(LDEBUG){cerr << soliloquy << " vcpp_symbolic=" << aurostd::joinWDelimiter(vcpp_symbolic,",") << endl;}
     //ANRL
     vector<string> vcpp_anrl;
     if(COMPILE_ANRL_SUBDIRECTORY){
@@ -517,6 +541,10 @@ namespace makefile {
         updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vvdependencies[i]);
         updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vvdependencies[i]);
       }
+      if(obj_file.find("symbolicc++.o")!=string::npos){ //exception for symbolicc++.o
+        //updateDependenciesVariable(vcpp_symbolic,var_vcpp_symbolic,vvdependencies[i]);
+        updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vvdependencies[i]);
+      }
       //makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << obj_file << ": " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")  //ME20200514 - Added CCFLAGS_MT
@@ -529,6 +557,8 @@ namespace makefile {
     //make some variable replacements before printing
     updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vdep_aflowh);
     updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vdep_aflowh);
+    //updateDependenciesVariable(vcpp_symbolic,var_vcpp_symbolic,vdep_aflowh);
+    updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vdep_aflowh);
 
     //this approach is not sustainable - do you think SC won't demand more hacks?
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//unfortunate hacks that are needed
@@ -556,6 +586,8 @@ namespace makefile {
     //MAIN DEPENDENCIES START
     if(vcpp_aurostd.size()){makefile_definitions_ss << var_vcpp_aurostd << "=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
     if(vhpp_aurostd.size()){makefile_definitions_ss << var_vhpp_aurostd << "=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
+    //if(vcpp_symbolic.size()){makefile_definitions_ss << var_vcpp_symbolic << "=" << aurostd::joinWDelimiter(vcpp_symbolic," ") << endl;} //SC variables - hack
+    if(vhpp_symbolic.size()){makefile_definitions_ss << var_vhpp_symbolic << "=" << aurostd::joinWDelimiter(vhpp_symbolic," ") << endl;} //SC variables - hack
     if(vdep_aflowh.size()){makefile_definitions_ss << var_vdep_aflowh << "=" << aurostd::joinWDelimiter(vdep_aflowh," ") << endl;} //SC variables - hack
     //MAIN DEPENDENCIES END
     if(vdep_aflow.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vdep_aflow," ") << endl;}  //SC variables - hack

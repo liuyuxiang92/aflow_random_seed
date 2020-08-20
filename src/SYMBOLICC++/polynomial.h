@@ -30,7 +30,7 @@
 #include <string>
 #include <utility>  // for pair
 #include "identity.h"
-//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
+using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 //Polynomial class
 
@@ -341,9 +341,10 @@ template <class T>
 Polynomial<T> &Polynomial<T>::operator%=(const T &c)
 { return *this %= Polynomial<T>(c); }
 
-template <class T>
-T Diff(const T &t,const string &x)
-{ return zero(T()); }
+//DX20200728 - When compiling into single target, we need to remove this function, it already exists in SYMBOLICC++/multinomial.h
+//DX20200728 template <class T>
+//DX20200728 T Diff(const T &t,const string &x)
+//DX20200728 { return zero(T()); }
 
 // partial template specialization for polynomials
 template <class T>
@@ -465,7 +466,7 @@ Polynomial<T> Polynomial<T>::Diff(const string &x) const
  {
   p2.variable = variable;
   for(;i!=terms.end();i++)
-    p2.terms.push_back(std::pair<T,int>(::Diff(i->first,x),i->second));
+    p2.terms.push_back(std::pair<T,int>(symbolic::Diff(i->first,x),i->second)); //DX20200728 - ::Diff to symbolic::Diff
   p2.remove_zeros();
   return p2;
  }
@@ -500,7 +501,7 @@ Polynomial<T> Polynomial<T>::Int(const string &x) const
  {
   p2.variable = variable;
   for(;i!=terms.end();i++)
-   p2.terms.push_back(std::pair<T,int>(::Int(i->first,x),i->second));
+   p2.terms.push_back(std::pair<T,int>(symbolic::Int(i->first,x),i->second)); //DX20200728 - ::Int to symbolic::Int
  }
 
  p2.variable = variable;

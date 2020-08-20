@@ -32,7 +32,7 @@
 #include <utility>  // for pair
 #include <vector>
 #include "identity.h"
-//using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
+using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 // Assumption : T has typecasts defined and can act as a numeric data type
 

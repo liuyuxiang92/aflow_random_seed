@@ -7418,6 +7418,46 @@ namespace pflow{
 }
 
 // ***************************************************************************
+// pflow::getSymmetryTolerance() //DX20200820
+// ***************************************************************************
+namespace pflow{
+  double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string){
+
+    // Return the symmetry tolerance
+    // options:
+    //  1) tight = min_nn_dist/100
+    //  2) loose = min_nn_dist/10
+    //  1) number = user defined (Angstroms)
+
+    string function_name = XPID + "pflow::getSymmetryTolerance():";
+    stringstream message;
+
+    double default_tolerance=SYM::defaultTolerance(xstr);
+    double tolerance = AUROSTD_NAN;
+    if(!tolerance_string.empty()){
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
+        tolerance=default_tolerance;
+      }
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
+        tolerance=default_tolerance*10.0;
+      }
+      else {
+        tolerance=aurostd::string2utype<double>(tolerance_string);
+      }
+    }
+    else {
+      tolerance = default_tolerance;
+    }
+    if(tolerance < 1e-10){
+      message << "Tolerance cannot be zero (i.e. less than 1e-10): tol=" << tolerance << ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+    }
+
+    return tolerance;
+  }
+}
+
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *

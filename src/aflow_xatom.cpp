@@ -5942,10 +5942,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
     a.isd=FALSE; // set Selective Dynamics to false
     //DX20191010 - moved loop that used to be here after re-alphabetizing
-    a.MakeBasis();
-    a.MakeTypes(); //DX20190508 - otherwise types are not created
     a.SpeciesPutAlphabetic(); //DX20190508 - put alphabetic, needed for many AFLOW functions to work properly
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames); //DX20200312
+    a.MakeBasis(); //DX20200803 - must be after alphabetic sort
+    a.MakeTypes(); //DX20190508 - otherwise types are not created //DX20200803 - must be after alphabetic sort
     //DX20191010 - moved this loop - START
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){

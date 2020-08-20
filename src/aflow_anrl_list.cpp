@@ -711,7 +711,7 @@ namespace anrl {
     vproto.push_back("A4B_mC20_15_2f_e;2;10;15;4;11;mC20;a,b/a,c/a,beta,y1,x2,y2,z2,x3,y3,z3;-;O4Os;O4Os (ICSD #23803)");
     vproto.push_back("A2B5_oP28_19_2a_5a;2;28;19;4;24;oP28;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;As2O5;As2O5 (ICSD #654040)");
     vproto.push_back("A2B_oP24_33_4a_2a;2;24;33;4;21;oP24;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;O2Sb;O2Sb (ICSD #4109)");
-    vproto.push_back("AB3_oC32_40_c_3c;2;16;40;4;15;oC32;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;CrO3;CrO3 (ICSD #16031)");
+    vproto.push_back("AB3_oC16_40_b_a2b;2;8;40;4;10;oC16;a,b/a,c/a,z1,y2,z2,y3,z3,y4,z4;-;CrO3;CrO3 (ICSD #16031)"); //DX20200805 - created with bad geometry file; fixed
     vproto.push_back("A5B2_oP14_59_a2e_e;2;14;59;4;10;oP14;a,b/a,c/a,z1,y2,z2,y3,z3,y4,z4;-;O5V2;O5V2 (ICSD #60767)");
     vproto.push_back("AB_oC16_64_e_f;2;8;64;4;6;oC16;a,b/a,c/a,y1,y2,z2;-;KO;KO (ICSD #180559)");
     vproto.push_back("A4B3_tP28_135_gh_dh;2;28;135;4;7;tP28;a,c/a,x2,x3,y3,x4,y4;-;O4Pb3;O4Pb3:vs (ICSD #29094)");
@@ -757,6 +757,7 @@ namespace anrl {
     // ternaries
     vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-;CaLiN;CaLiN (ICSD #107304)");
     vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-;Ca2N2Zn;Ca2N2Zn (ICSD #69049)");
+    vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
     // done now produce
 
     // FROM PROTO LIST
@@ -3473,8 +3474,8 @@ namespace anrl {
         vparameters.push_back("5.6320569384,0.884841795441,2.16335540838,0.6753,0.1608,0.593,0.6454,0.8379,0.906,0.834,0.699,0.6957,0.9256,0.188,0.8093,0.9786,0.9654,0.0,0.6272,0.9994,0.7473");
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="AB3_oC32_40_c_3c"){
-        vparameters.push_back("5.0629282861,1.7868030904,1.19920651493,0.0,0.09676,0.75,0.8841,0.0,0.5,0.8755,0.7677,0.25,0.3284,0.1078,0.75");
+      if(anrl_label=="AB3_oC16_40_b_a2b"){
+        vparameters.push_back("5.743,1.48999,0.833885,0.3841,0.90324,0.5,0.7323,0.3755,0.8922,0.8284");
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A5B2_oP14_59_a2e_e"){
@@ -3651,6 +3652,10 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_tI10_139_e_e_a"){
         vparameters.push_back("4.0191421247,3.53238454024,0.664,0.8545");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC2_hP6_191_f_a_d"){
+        vparameters.push_back("5.3369,0.57059342");
       }
 
     }

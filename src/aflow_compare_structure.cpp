@@ -2600,7 +2600,8 @@ namespace compare {
     // calculate symmetries of structures
     // if already calculated, do not recalculate
     bool all_symmetries_calculated = true;
-    for(uint i=0;i<all_structures.size();i++){ all_symmetries_calculated*=all_structures[i].isSymmetryCalculated(); }
+    //for(uint i=0;i<all_structures.size();i++){ all_symmetries_calculated*=all_structures[i].isSymmetryCalculated(); } //DX20200810 - gcc-10 warnings
+    for(uint i=0;i<all_structures.size();i++){ all_symmetries_calculated = (all_symmetries_calculated&&all_structures[i].isSymmetryCalculated()); } //DX20200810
 
     if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && !all_symmetries_calculated){
       message << "Calculating the symmetry of the structures.";
