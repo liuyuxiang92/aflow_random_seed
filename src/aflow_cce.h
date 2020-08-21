@@ -108,7 +108,7 @@ namespace cce {
   void treat_FeTiO3_LDA_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void check_ox_nums_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
-  void determine_cation_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars, const vector<vector<double> >& possible_ox_states); // ME Nov. 2019
+  void determine_cation_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars, const vector<vector<double> >& possible_ox_states); // ME201911, exact date is not known, only Nov.
   double get_oxidation_states_sum(CCE_Variables& cce_vars);
   // determine oxidation numbers from Bader charges (outdated)
   vector<double> get_oxidation_states_from_Bader(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);

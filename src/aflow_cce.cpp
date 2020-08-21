@@ -1218,7 +1218,7 @@ namespace cce {
     cce_flags.flag("NO_OX_STATES",FALSE);
     cce_flags.flag("OX_STATES_DETERMINED",FALSE);
     load_ox_states_templates_each_species(structure, cce_flags, cce_vars);
-    //ME Nov. 2019 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
+    //ME201911, exact date is not known, only that it was Nov.; for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
     uint natoms = structure.atoms.size();
     cce_vars.cations_map.resize(num_cation_species);
     uint i = 0;
@@ -1640,7 +1640,9 @@ namespace cce {
     double n = 0.0;
     bool magneli = false;
     for(n=3;n<101;n++){ // looping up to 101 should be enough
-      //cout << "n/(2*n-1)= " << n/(2*n-1) << endl;
+      if(LDEBUG){
+        cerr << "n/(2*n-1)= " << n/(2*n-1) << endl;
+      }
       if ( aurostd::isequal(Ti_O_ratio,n/(2*n-1)) ){
         stringstream message;
         message << " This system is identified as a mixed valence compound." << endl;
@@ -2200,7 +2202,7 @@ namespace cce {
   }
 
   //determine_cation_oxidation_states////////////////////////////////////////////////////////
-  //ME Nov. 2019
+  //ME201911, exact date is not knonw only that it was Nov.
   // for avoiding recursion algorithm to determine cation oxidation_numbers
   // determine the cation oxidation numbers by using possible oxidation states for each species 
   // which can be either the preferred or all known oxidation numbers
