@@ -3404,10 +3404,10 @@ namespace aflowlib {
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION total E0 (eV) = " << data.enthalpy_formation_cell << endl;
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION per atom E0/N (eV) = " << data.enthalpy_formation_atom << "   " << directory_LIB << endl;
       //CO20200624 START - CCE
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE total E(300K) (eV) = " << data.enthalpy_formation_cce_300K_cell << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE per atom E(300K)/N (eV) = " << data.enthalpy_formation_cce_300K_atom << "   " << directory_LIB << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE total E(0K) (eV) = " << data.enthalpy_formation_cce_0K_cell << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION CCE per atom E(0K)/N (eV) = " << data.enthalpy_formation_cce_0K_atom << "   " << directory_LIB << endl;
+      if(AFLOWLIB_VERBOSE && data.enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) cout << MESSAGE << " ENTHALPY FORMATION CCE total E(300K) (eV) = " << data.enthalpy_formation_cce_300K_cell << endl;
+      if(AFLOWLIB_VERBOSE && data.enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) cout << MESSAGE << " ENTHALPY FORMATION CCE per atom E(300K)/N (eV) = " << data.enthalpy_formation_cce_300K_atom << "   " << directory_LIB << endl;
+      if(AFLOWLIB_VERBOSE && data.enthalpy_formation_cce_0K_cell  !=AUROSTD_NAN) cout << MESSAGE << " ENTHALPY FORMATION CCE total E(0K) (eV) = " << data.enthalpy_formation_cce_0K_cell << endl;
+      if(AFLOWLIB_VERBOSE && data.enthalpy_formation_cce_0K_atom  !=AUROSTD_NAN) cout << MESSAGE << " ENTHALPY FORMATION CCE per atom E(0K)/N (eV) = " << data.enthalpy_formation_cce_0K_atom << "   " << directory_LIB << endl;
       //CO20200624 END - CCE
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTROPIC_TEMPERATURE (eV) = " << data.entropic_temperature*KBOLTZEV << endl;
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTROPIC_TEMPERATURE (K) = " << data.entropic_temperature << "   " << directory_LIB << endl;
