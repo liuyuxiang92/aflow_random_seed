@@ -25,8 +25,8 @@ static const uint CCE_num_functionals_Bader=4; // Currently, Bader charges used 
 
 namespace cce {
   struct CCE_Variables {
-    vector<double> dft_energies;
-    vector<string> vfunctionals; // should be needed as long as output for corrected dft formation energies is based on vfunctionals
+    vector<double> dft_enthalpies;
+    vector<string> vfunctionals; // should be needed as long as output for corrected dft formation enthalpies is based on vfunctionals
     vector<int> offset; // needed for reading corrections from lookup table for different functionals
     vector<string> vtemperatures;
     double standard_anion_charge;
@@ -54,7 +54,7 @@ namespace cce {
     vector<double> perox_correction; // peroxide correction per cell for functionals and temperatures as above
     vector<double> superox_correction; // superoxide correction per cell for functionals and temperatures as above
     vector<double> cce_correction; // total correction per cell for functionals and temperatures as above
-    vector<double> cce_form_energy_cell; // CCE formation enthalpy per cell for functionals and temperatures as above
+    vector<double> cce_form_enthalpy_cell; // CCE formation enthalpy per cell for functionals and temperatures as above
   };
 
   // main CCE functions
@@ -74,7 +74,7 @@ namespace cce {
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);
   xstructure check_structure(xstructure& structure);
-  void get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
+  void get_dft_form_enthalpies_functionals(const string& dft_enthalpies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
   int get_offset(const string& functional);
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   string get_functional_from_aflow_in_outcar(const xstructure& structure, string& aflowin_file, string& outcar_file);
@@ -130,8 +130,8 @@ namespace cce {
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
   string print_output_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance);
   string print_output_oxidation_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
-  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_enthalpy_cell);
+  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_enthalpy_cell);
   string print_citation();
   // print user instructions
   string print_usage();
@@ -140,7 +140,7 @@ namespace cce {
   string get_corrections_line_O(const string& cor_identifier);
   string get_corrections_line_N(const string& cor_identifier);
   string get_Bader_templates(const string& element);
-  double get_ref_energy_shift_pbe_u_icsd(const string& element);
+  double get_ref_enthalpy_shift_pbe_u_icsd(const string& element);
 }
 
 #endif  // _AFLOW_CCE_H_

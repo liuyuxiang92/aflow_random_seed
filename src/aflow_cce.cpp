@@ -66,9 +66,9 @@ namespace cce {
     CCE_Variables cce_vars = init_variables(structure);
 
     /********************************************************/
-    // Read DFT formation energies and functionals if provided
+    // Read DFT formation enthalpies and functionals if provided
     /********************************************************/
-    get_dft_form_energies_functionals(flags.getattachedscheme("CCE_CORRECTION::DFT_FORMATION_ENERGIES"), flags.getattachedscheme("CCE_CORRECTION::FUNCTIONALS"), cce_vars); //provide precalc. DFT formation energies & corresponding functionals
+    get_dft_form_enthalpies_functionals(flags.getattachedscheme("CCE_CORRECTION::DFT_FORMATION_ENTHALPIES"), flags.getattachedscheme("CCE_CORRECTION::FUNCTIONALS"), cce_vars); //provide precalc. DFT formation enthalpies & corresponding functionals
 
     /********************************************************/
     // Read oxidation numbers if provided
@@ -91,30 +91,30 @@ namespace cce {
 
     // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K ###################################
     if (cce_flags.flag("CORRECTABLE")){
-      //calculate CCE corrected DFT formation enthalpies if precalculated DFT formation energies are provided
+      //calculate CCE corrected DFT formation enthalpies if precalculated DFT formation enthalpies are provided
       uint num_funcs=cce_vars.vfunctionals.size();
       uint num_temps=cce_vars.vtemperatures.size();
-      for(uint k=0,ksize=num_funcs;k<ksize;k++){ // looping over and checking of vfunctionals is necessary to ensure correct correspondence between given formation energies [k] and corrections with respect to the functional
+      for(uint k=0,ksize=num_funcs;k<ksize;k++){ // looping over and checking of vfunctionals is necessary to ensure correct correspondence between given formation enthalpies [k] and corrections with respect to the functional
         if (cce_vars.vfunctionals[k] != "exp") {
-          if(cce_vars.dft_energies.size()!=0){ // only when precalculated DFT formation energies are provided, calculate corrected values
+          if(cce_vars.dft_enthalpies.size()!=0){ // only when precalculated DFT formation enthalpies are provided, calculate corrected values
             for (uint l = 0; l < num_temps; l++) {
-              cce_vars.cce_form_energy_cell[num_temps*k+l] = cce_vars.dft_energies[k] - cce_vars.cce_correction[num_temps*k+l] ; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+              cce_vars.cce_form_enthalpy_cell[num_temps*k+l] = cce_vars.dft_enthalpies[k] - cce_vars.cce_correction[num_temps*k+l] ; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
             }
           }
         } else { // for CCE@exp the formation enthalpy (only at 298.15 K) is directly calculated from the exp. formation enthalpies per bond times the number of cation-anion bonds and is not subtracted from a given value
-          cce_vars.cce_form_energy_cell[num_temps*k] = cce_vars.cce_correction[num_temps*k] ;
+          cce_vars.cce_form_enthalpy_cell[num_temps*k] = cce_vars.cce_correction[num_temps*k] ;
         }
       }
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         oss << print_JSON_corrections(structure, cce_vars) << std::endl;
       } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
-        oss << print_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
+        oss << print_test_output(cce_vars, cce_vars.cce_form_enthalpy_cell) << std::endl;
       } else {
         // print oxidation_numbers
         oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
         // print CCE corrections & corrected formation enthalpies per cell and atom
-        oss << print_output_corrections(structure, cce_vars, cce_vars.cce_form_energy_cell);
+        oss << print_output_corrections(structure, cce_vars, cce_vars.cce_form_enthalpy_cell);
         // print CCE citation
         oss << print_citation();
       }
@@ -286,13 +286,13 @@ namespace cce {
     // determine temperatures
     aurostd::string2tokens(CCE_temperatures, cce_vars.vtemperatures, ",");
     uint num_temps=cce_vars.vtemperatures.size();
-    // corrections_atom, (su-)perox_correction, cce_correction and cce_form_energy_cell can only be resized after vfunctionals.size() is known from previous main CCE functions calling CCE_core
+    // corrections_atom, (su-)perox_correction, cce_correction and cce_form_enthalpy_cell can only be resized after vfunctionals.size() is known from previous main CCE functions calling CCE_core
     // vfunctionals.size()*num_temps for corrections for different temperatures (currently 298.15 and 0K)
     cce_vars.corrections_atom.resize(cce_vars.vfunctionals.size()*num_temps, vector<double>(structure.atoms.size()));
     cce_vars.perox_correction.resize(cce_vars.vfunctionals.size()*num_temps);
     cce_vars.superox_correction.resize(cce_vars.vfunctionals.size()*num_temps);
     cce_vars.cce_correction.resize(cce_vars.vfunctionals.size()*num_temps);
-    cce_vars.cce_form_energy_cell.resize(cce_vars.vfunctionals.size()*num_temps);
+    cce_vars.cce_form_enthalpy_cell.resize(cce_vars.vfunctionals.size()*num_temps);
 
     // DETERMINE NUMBER OF NEAREST ANION NEIGHBORS FOR EACH CATION: STRUCTURAL PART OF CORRECTION ##
     /********************************************************/
@@ -424,7 +424,7 @@ namespace cce {
       if (cce_vars.num_perox_bonds > 0 || cce_vars.num_superox_bonds > 0){
         check_apply_per_super_ox_corrections(cce_vars);
       }
-      // add ref. energy shifts for PBE+U_ICSD if needed
+      // add ref. enthalpy shifts for PBE+U_ICSD if needed
       apply_pbe_u_icsd_shifts(structure, cce_flags, cce_vars);
     }
   } // main CCE function core
@@ -491,39 +491,39 @@ namespace cce {
     return structure;
   }
 
-  //get_dft_form_energies_functionals////////////////////////////////////////////////////////
-  // set the DFT formation energies and functionals according to the input and check consistency of functionals and formation energies
-  void get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars) {
+  //get_dft_form_enthalpies_functionals////////////////////////////////////////////////////////
+  // set the DFT formation enthalpies and functionals according to the input and check consistency of functionals and formation enthalpies
+  void get_dft_form_enthalpies_functionals(const string& dft_enthalpies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_dft_form_energies_functionals():";
+    string soliloquy="cce::get_dft_form_enthalpies_functionals():";
     stringstream message;
-    // vectorize precalculated DFT formation energies if provided
-    if(!dft_energies_input_str.empty()){ //if the DFT energies input string is not empty, convert it to vector of doubles
-      aurostd::string2tokens<double>(dft_energies_input_str,cce_vars.dft_energies,",");
+    // vectorize precalculated DFT formation enthalpies if provided
+    if(!dft_enthalpies_input_str.empty()){ //if the DFT enthalpies input string is not empty, convert it to vector of doubles
+      aurostd::string2tokens<double>(dft_enthalpies_input_str,cce_vars.dft_enthalpies,",");
     } 
     // vectorize corresponding functionals
     if(!functionals_input_str.empty()){ // if functionals input string is not empty, convert it to vector of strings
       aurostd::string2tokens(functionals_input_str,cce_vars.vfunctionals,",");
     }
-    //use PBE as default if only 1 DFT formation energy is provided
+    //use PBE as default if only 1 DFT formation enthalpy is provided
     ostream& oss = cout;
     ofstream FileMESSAGE;
     _aflags aflags;aflags.Directory=".";
-    if(functionals_input_str.empty() && cce_vars.dft_energies.size() == 1){
-      message << " Setting functionals=PBE since only 1 DFT formation energy is provided and PBE is the default functional!";
+    if(functionals_input_str.empty() && cce_vars.dft_enthalpies.size() == 1){
+      message << " Setting functionals=PBE since only 1 DFT formation enthalpy is provided and PBE is the default functional!";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       cce_vars.vfunctionals.push_back("PBE");
-      // otherwise if sizes of provided DFT formation energies and functionals do not match, throw error
+      // otherwise if sizes of provided DFT formation enthalpies and functionals do not match, throw error
       // if only functional argument is set corrections should only be returned for desired functional
-    } else if(cce_vars.dft_energies.size()!=cce_vars.vfunctionals.size() && !dft_energies_input_str.empty() ){ 
-      message << " BAD NEWS: The number of provided precalculated DFT formation energies and functionals must match.";
+    } else if(cce_vars.dft_enthalpies.size()!=cce_vars.vfunctionals.size() && !dft_enthalpies_input_str.empty() ){ 
+      message << " BAD NEWS: The number of provided precalculated DFT formation enthalpies and functionals must match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     //let the program spit out what it thinks
     if(LDEBUG){
       bool roff = false;
-      cerr << soliloquy << "INPUT DFT FORMATION ENERGIES & FUNCTIONALS:" << endl;
-      cerr << soliloquy << " input dft formation energies=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.dft_energies,6,roff),",") << " (assumed to be in eV/cell)" << endl;
+      cerr << soliloquy << "INPUT DFT FORMATION ENTHALPIES & FUNCTIONALS:" << endl;
+      cerr << soliloquy << " input dft formation enthalpies=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.dft_enthalpies,6,roff),",") << " (assumed to be in eV/cell)" << endl;
       cerr << soliloquy << " input functionals=" << functionals_input_str << endl;
     }
     // determine whether it is a functional for which corrections are available
@@ -546,7 +546,7 @@ namespace cce {
     // if only structure (and oxidation numbers) are provided, corrections should be given for PBE, LDA, and SCAN 
     // and the CCE@exp formation enthalpy from the exp. formation enthalpies per bond
     // ICSD correction should only be returned when explicitly asked for
-    if(functionals_input_str.empty() && dft_energies_input_str.empty()){
+    if(functionals_input_str.empty() && dft_enthalpies_input_str.empty()){
       vector<string> CCE_vdefault_output_functionals;
       aurostd::string2tokens(CCE_default_output_functionals, CCE_vdefault_output_functionals, ",");
       for(uint k=0,ksize=CCE_vdefault_output_functionals.size();k<ksize;k++){
@@ -595,7 +595,7 @@ namespace cce {
       if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
         oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
         string function = "cce::get_oxidation_states()";
-        message << " BAD NEWS: The formation energy of this system is not correctable!"
+        message << " BAD NEWS: The formation enthalpy of this system is not correctable!"
           << " The oxidation numbers that you provided do not add up to zero!"
           << " Please correct and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);	
@@ -770,7 +770,7 @@ namespace cce {
     aurostd::xoption flags;
     flags.flag("SCREEN_ONLY", false);
     flags.flag("TEST", false);
-    flags.flag("CORRECTABLE", true); // first assuming that formation energy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
+    flags.flag("CORRECTABLE", true); // first assuming that formation enthalpy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     flags.flag("OX_NUMS_PROVIDED", false);
     flags.flag("MULTI_ANION_SYSTEM", false);
     flags.flag("O_MULTI_ANION_SPECIES", false); // whether one of the multi anion species is O for which per/superoxide tests need to be made
@@ -782,7 +782,7 @@ namespace cce {
   // Initializes the variables struct.
   CCE_Variables init_variables(const xstructure& structure) {
     CCE_Variables cce_vars;
-    cce_vars.dft_energies.clear();
+    cce_vars.dft_enthalpies.clear();
     cce_vars.vfunctionals.clear();
     cce_vars.offset.clear();
     cce_vars.num_perox_bonds=0;
@@ -818,7 +818,7 @@ namespace cce {
     cce_vars.perox_correction.clear();
     cce_vars.superox_correction.clear();
     cce_vars.cce_correction.clear();
-    cce_vars.cce_form_energy_cell.clear();
+    cce_vars.cce_form_enthalpy_cell.clear();
     return cce_vars;
   }
 
@@ -1262,7 +1262,7 @@ namespace cce {
           oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
           message << "BAD NEWS: The determined oxidation numbers do not add up to zero!"  << endl;
           if(cce_flags.flag("SCREEN_ONLY")){
-            message << "The formation energy of this system is hence not correctable!"  << endl;
+            message << "The formation enthalpy of this system is hence not correctable!"  << endl;
             message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           }
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
@@ -1270,7 +1270,7 @@ namespace cce {
       } else{ // error message that oxidation numbers cannot be determined since for at least one species there are no known oxidation numbers is already included in load_ox_states_templates_each_species function
         cce_flags.flag("CORRECTABLE",FALSE);
         if(cce_flags.flag("SCREEN_ONLY")){
-          message << "The formation energy of this system is hence not correctable!"  << endl;
+          message << "The formation enthalpy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
         }
@@ -1392,7 +1392,7 @@ namespace cce {
         message << "BAD NEWS: There are no known oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << ")."  << endl;
         message << "Therefore the oxidation states cannot be determined on this basis." << endl;
         if(cce_flags.flag("SCREEN_ONLY")){
-          message << "The formation energy of this system is hence not correctable!"  << endl;
+          message << "The formation enthalpy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
         }
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
@@ -2179,7 +2179,7 @@ namespace cce {
     if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since set oxidation states should always work
       cce_flags.flag("CORRECTABLE",FALSE);
       oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
-      message << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+      message << "BAD NEWS: The formation enthalpy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
       message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     } else {
@@ -2366,7 +2366,7 @@ namespace cce {
                 if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
                   cce_flags.flag("CORRECTABLE",FALSE);
                   oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
-                  message << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+                  message << "BAD NEWS: The formation enthalpy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
                   message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
                   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
                 }
@@ -2575,7 +2575,7 @@ namespace cce {
     }
     if(!cce_flags.flag("SCREEN_ONLY")){ // throw following errors only when CCE is not called from the command line; otherwise automated checks break
       if (error1) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
-        message << " VERY BAD NEWS: The formation energy of this system is not correctlable since some of the species were not included in the set for deducing corrections!"  << endl;
+        message << " VERY BAD NEWS: The formation enthalpy of this system is not correctlable since some of the species were not included in the set for deducing corrections!"  << endl;
         message << " See the output for details.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       } else if (error2) {
@@ -2880,7 +2880,7 @@ namespace cce {
   }
 
   //apply_pbe_u_icsd_shifts////////////////////////////////////////////////////////
-  // apply the shifts for the ref. energies for PBE+U_ICSD if needed
+  // apply the shifts for the ref. enthalpies for PBE+U_ICSD if needed
   void apply_pbe_u_icsd_shifts(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::apply_pbe_u_icsd_shifts():";
@@ -2888,19 +2888,19 @@ namespace cce {
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
-      if (cce_vars.vfunctionals[k] == "PBE+U_ICSD") { // for PBE+U_ICSD additional ref. energy shifts must be applied since corrections have been fitted to ref. energies calculated with U but internal AFLOW ref. energies are from plain PBE
+      if (cce_vars.vfunctionals[k] == "PBE+U_ICSD") { // for PBE+U_ICSD additional ref. enthalpy shifts must be applied since corrections have been fitted to ref. enthalpies calculated with U but internal AFLOW ref. enthalpies are from plain PBE
         if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " applying ref. energy shifts for PBE+U_ICSD." << endl;
+          cerr << soliloquy << cce_vars.vfunctionals[k] << " applying ref. enthalpy shifts for PBE+U_ICSD." << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){
           for (uint l = 0; l < num_temps; l++) {
-            if (get_ref_energy_shift_pbe_u_icsd(structure.atoms[i].cleanname) != -1) {
-              if (get_ref_energy_shift_pbe_u_icsd(structure.atoms[i].cleanname) == -123456) {
+            if (get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname) != -1) {
+              if (get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname) == -123456) {
                 oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
-                message << " No ref. energy shift for " << structure.atoms[i].cleanname << " for PBE+U_ICSD yet.";
+                message << " No ref. enthalpy shift for " << structure.atoms[i].cleanname << " for PBE+U_ICSD yet.";
                 throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
               }
-              double shift=get_ref_energy_shift_pbe_u_icsd(structure.atoms[i].cleanname);
+              double shift=get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname);
               cce_vars.cce_correction[num_temps*k+l] += shift;
             }
           }
@@ -2994,7 +2994,7 @@ namespace cce {
   // Returns CCE results in JSON format
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars) {
     stringstream json;
-    bool print_Hf = (cce_vars.dft_energies.size() > 0);
+    bool print_Hf = (cce_vars.dft_enthalpies.size() > 0);
     uint nfuncs = cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     uint natoms = structure.atoms.size();
@@ -3012,8 +3012,8 @@ namespace cce {
           json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[num_temps*i+l]/natoms);
           if (print_Hf) {
             json << ",";
-            json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_energy_cell[num_temps*i+l] << ",";
-            json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_energy_cell[num_temps*i+l]/natoms);
+            json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_enthalpy_cell[num_temps*i+l] << ",";
+            json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_enthalpy_cell[num_temps*i+l]/natoms);
           }
           json << "}";
         }
@@ -3023,8 +3023,8 @@ namespace cce {
         json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[num_temps*i]/natoms);
         if (print_Hf) {
           json << ",";
-          json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_energy_cell[num_temps*i] << ",";
-          json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_energy_cell[num_temps*i]/natoms);
+          json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_enthalpy_cell[num_temps*i] << ",";
+          json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_enthalpy_cell[num_temps*i]/natoms);
         }
         json << "}";
       }
@@ -3093,11 +3093,11 @@ namespace cce {
 
   //print_output_corrections////////////////////////////////////////////////////////
   // print CCE corrections and corrected formation enthalpies if precalculated DFT values are provided
-  string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
+  string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_enthalpy_cell) {
     stringstream output;
     // print out CCE corrections per cell and atom for functionals selected
     if (!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == "exp")){ // if only exp is set as functional CCE CORRECTIONS: should not be written
-      output << "CCE CORRECTIONS (to be subtracted from precalculated DFT formation energies):" << endl;
+      output << "CCE CORRECTIONS (to be subtracted from precalculated DFT formation enthalpies):" << endl;
     }
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
@@ -3113,10 +3113,10 @@ namespace cce {
     }
     // exp result should always be written at the end, hence print only after writing output for other functionals
     for (uint k = 0; k < num_funcs; k++) {
-      if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_energies.size()==0) { // second condition for that if precalc. form. energies are given and asking for exp., exp. result is not written twice
+      if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_enthalpies.size()==0) { // second condition for that if precalc. form. enthalpies are given and asking for exp., exp. result is not written twice
         output << "CCE FORMATION ENTHALPIES:" << endl;
         for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
+          output << std::setprecision(3) << std::fixed << cce_form_enthalpy_cell[num_temps*k]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
         }
         output << "Note that this provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
         output << endl;
@@ -3124,20 +3124,20 @@ namespace cce {
     }
     // print CCE formation enthalpies per cell and atom for functionals selected 
     // if precalculated DFT values are provided
-    if(cce_vars.dft_energies.size()!=0){ 
+    if(cce_vars.dft_enthalpies.size()!=0){ 
       output << "CCE FORMATION ENTHALPIES:" << endl;
       uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
         if (cce_vars.vfunctionals[k] != "exp") {
           for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
             for (uint l = 0; l < num_temps; l++) {
-              output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k+l]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at " << cce_vars.vtemperatures[l] << "K." << endl;
+              output << std::setprecision(3) << std::fixed << cce_form_enthalpy_cell[num_temps*k+l]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at " << cce_vars.vtemperatures[l] << "K." << endl;
             }
           }
           output << endl;
         } else if (cce_vars.vfunctionals[k] == "exp") {
           for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
+            output << std::setprecision(3) << std::fixed << cce_form_enthalpy_cell[num_temps*k]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
           }
           output << "Note that this provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
           output << endl;
@@ -3149,32 +3149,32 @@ namespace cce {
 
   //print_test_output////////////////////////////////////////////////////////
   // print CCE corrections and corrected formation enthalpies for testing
-  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
+  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_enthalpy_cell) {
     stringstream output;
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] != "exp") {
         for (uint l = 0; l < num_temps; l++) {
-          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[num_temps*k+l] << (k<num_funcs-1 || l==0 || cce_vars.dft_energies.size()!=0?",":"");
+          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[num_temps*k+l] << (k<num_funcs-1 || l==0 || cce_vars.dft_enthalpies.size()!=0?",":"");
         }
       }
     }
     // exp part
     for (uint k = 0; k < num_funcs; k++) {
-      if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_energies.size()==0) { // second condition for that if precalc. form. energies are given and asking for exp., exp. result is not written twice
-        output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k];
+      if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_enthalpies.size()==0) { // second condition for that if precalc. form. enthalpies are given and asking for exp., exp. result is not written twice
+        output << std::setprecision(3) << std::fixed << cce_form_enthalpy_cell[num_temps*k];
       }
     }
-    // corrected DFT formation energies
-    if(cce_vars.dft_energies.size()!=0){
+    // corrected DFT formation enthalpies
+    if(cce_vars.dft_enthalpies.size()!=0){
       for (uint k = 0; k < num_funcs; k++) {
         if (cce_vars.vfunctionals[k] != "exp") {
           for (uint l = 0; l < num_temps; l++) {
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k+l] << (k<num_funcs-1 || l==0?",":"");
+            output << std::setprecision(3) << std::fixed << cce_form_enthalpy_cell[num_temps*k+l] << (k<num_funcs-1 || l==0?",":"");
           }
         } else if (cce_vars.vfunctionals[k] == "exp") {
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k] << (k<num_funcs-1?",":"");
+          output << std::setprecision(3) << std::fixed << cce_form_enthalpy_cell[num_temps*k] << (k<num_funcs-1?",":"");
         }
       }
     }
@@ -3221,16 +3221,16 @@ namespace cce {
     oss << "                                 For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species" << endl;
     oss << "                                 must be written on the right side next to the coordinates for each atom" << endl;
     oss << "                                 just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
-    oss << "--dft_formation_energies=        Provide a comma separated list of precalculated DFT formation energies," << endl; 
-    oss << "                                 they are assumed to be: (i) negative for compounds lower in energy" << endl; 
+    oss << "--dft_formation_enthalpies=      Provide a comma separated list of precalculated DFT formation enthalpies," << endl; 
+    oss << "                                 they are assumed to be: (i) negative for compounds lower in enthalpy" << endl; 
     oss << "                                 than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
     oss << "                                 for PBE, LDA and SCAN." << endl;
     oss << "--functionals=                   Provide a comma separated list of functionals for which corrections" << endl;
-    oss << "                                 should be returned. If used together with --dft_formation energies," << endl;
+    oss << "                                 should be returned. If used together with --dft_formation enthalpies," << endl;
     oss << "                                 the functionals must be in the same sequence as the DFT formation" << endl;
-    oss << "                                 energies they correspond to. Available functionals are:" << endl;
+    oss << "                                 enthalpies they correspond to. Available functionals are:" << endl;
     oss << "                                 (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
-    oss << "                                 energy is provided)." << endl;
+    oss << "                                 enthalpy is provided)." << endl;
     oss << "--oxidation_numbers=             Provide as a comma separated list the oxidation numbers. It is" << endl;
     oss << "                                 assumed that: (i) one is provided for each atom of the structure and" << endl; 
     oss << "                                 (ii) they are in the same sequence as the corresponding atoms in the" << endl;
@@ -3269,13 +3269,13 @@ namespace cce {
     oss << "Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO" << endl; 
     oss << "in the current directory as POSCAR, the following commands can be executed:" << endl;
     oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN" << endl;
+    oss << "aflow --cce=POSCAR --dft_formation_enthalpies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN" << endl;
     oss << "This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO." << endl;
     oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA" << endl;
+    oss << "aflow --cce=POSCAR --dft_formation_enthalpies=-6.220 --functionals=LDA" << endl;
     oss << "This gives you only the CCE corrections and CCE formation enthalpies for LDA." << endl;
     oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_energies=-5.434" << endl;
+    oss << "aflow --cce=POSCAR --dft_formation_enthalpies=-5.434" << endl;
     oss << "This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that" << endl; 
     oss << "PBE is assumed as functional." << endl;
     oss << endl;
@@ -3297,7 +3297,7 @@ namespace cce {
  
   //get_corrections_line////////////////////////////////////////////////////////
   // function to get corrections
-  //CCE corrections per bond for DFT formation energies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U_ICSD) 
+  //CCE corrections per bond for DFT formation enthalpies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U_ICSD) 
   //with PAW data sets for VASP 5.4.4 and measured experimental values according to the CCE paper 
   //Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019). 
   //The extensions after the binary formula indicate the source from which the experimental value was taken: 
@@ -3306,7 +3306,7 @@ namespace cce {
   //DFT+U calculations differ not only by the U value but also by other specifications of the implementation, see:
   //Kick, Reuter, and Oberhofer; Intricacies of DFT+U, Not Only in a Numeric Atom Centered Orbital Framework, JCTC (2019); DOI: 10.1021/acs.jctc.8b01211
   //The formation enthalpies per bond from the experimental data (Exp.) need to be multiplied by the number of M-anion bonds 
-  //and added (sign change compared to usual CCE corrections to be substracted from DFT formation energies) 
+  //and added (sign change compared to usual CCE corrections to be substracted from DFT formation enthalpies) 
   //for all cations to get an estimate for the formation enthalpy only based on experimental data; 
   //positive values for the peroxide and superoxide O-O bond formation enthalpy indicate that taking the cation-O2- 
   //correction for the cation-O bonds is not a very good approximation for per- and superoxides, 
@@ -3492,13 +3492,13 @@ namespace cce {
   else {return "";}                                                                                                      
   }
 
-  //get_ref_energy_shift_pbe_u_icsd////////////////////////////////////////////////////////
-  // Since the corrections for the PBE+U_ICSD calculations in the AFLOW ICSD were fit to ref. energies
+  //get_ref_enthalpy_shift_pbe_u_icsd////////////////////////////////////////////////////////
+  // Since the corrections for the PBE+U_ICSD calculations in the AFLOW ICSD were fit to ref. enthalpies
   // calculated with the same Us as for the species in the compound, a shift needs to be applied to 
-  // the PBE ref. energies that are used for formation energy calculations to bring them to the 
-  // PBE+U_ICSD ref. energy values. These shifts will be summed for all atoms in the structure as 
+  // the PBE ref. enthalpies that are used for formation enthalpy calculations to bring them to the 
+  // PBE+U_ICSD ref. enthalpy values. These shifts will be summed for all atoms in the structure as 
   // needed and included in the CCE correction
-  double get_ref_energy_shift_pbe_u_icsd(const string& element) {
+  double get_ref_enthalpy_shift_pbe_u_icsd(const string& element) {
     if (element=="Sc")          {return 1.1610235;} // AUID="4b48722b5ae8f9e9"
     if (element=="Ti")          {return 3.12868285;} // AUID="9cdd346558c528c6"
     if (element=="V")           {return 2.7806973;} // AUID="94da8dda3e65c762"
@@ -3527,18 +3527,18 @@ namespace cce {
     if (element=="Ir")          {return 2.8837526;} // AUID="9c41e654d31db16a"
     if (element=="Pt")          {return 2.4902537;} // AUID="59081d68fabd053c"
     if (element=="La")          {return 0.139627;} // AUID="8353806ee117d7fd"
-    if (element=="Ce")          {return -123456;} // AUID="6e846dc10a52b11b"; no energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Pr")          {return -123456;} // AUID="82dbd5ee06192a4c"; no energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Nd")          {return -123456;} // AUID="81811d7c33a85a8b"; no energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Sm")          {return -123456;} // AUID="e892f33edd3901b8"; no energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Ce")          {return -123456;} // AUID="6e846dc10a52b11b"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Pr")          {return -123456;} // AUID="82dbd5ee06192a4c"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Nd")          {return -123456;} // AUID="81811d7c33a85a8b"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Sm")          {return -123456;} // AUID="e892f33edd3901b8"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     if (element=="Eu")          {return 0.3926978;} // AUID="9b801fd8fd52e116"
-    if (element=="Gd")          {return -123456;} // AUID="c0f01c59eb971d30"; no energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Gd")          {return -123456;} // AUID="c0f01c59eb971d30"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     if (element=="Dy")          {return 0.00023385;} // AUID="0373199190a8abb7"; calc. with and without U gives basically same energy
-    if (element=="Tm")          {return -123456;} // AUID="766b44cce10b0315"; no energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Tm")          {return -123456;} // AUID="766b44cce10b0315"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     if (element=="Yb")          {return 0.5301314;} // AUID="de1c22a384a8d945"
-    if (element=="Lu")          {return -123456;} // AUID="98b3a5d589b252b5"; no energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Th")          {return -123456;} // AUID="78f7995fc479457d"; no energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="U")           {return -123456;} // AUID="2f0fba94372190f4"; no energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Lu")          {return -123456;} // AUID="98b3a5d589b252b5"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Th")          {return -123456;} // AUID="78f7995fc479457d"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="U")           {return -123456;} // AUID="2f0fba94372190f4"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     else {return -1;}
   }
 } // namespace cce
