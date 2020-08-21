@@ -583,6 +583,12 @@ int SignNoZero(const double& x);
 int Nint(const double& x);
 int Sign(const double& x);
 
+//CO20200731 START include from aflow_aconvasp.cpp
+namespace pflow {
+  void GetStrNeighData(const xstructure& str,const double cutoff,deque<deque<_atom> >& neigh_mat);   //CO20200731
+}
+//CO20200731 END include from aflow_aconvasp.cpp
+
 // ---------------------------------------------------------------------------
 // PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDO
 namespace pflow {

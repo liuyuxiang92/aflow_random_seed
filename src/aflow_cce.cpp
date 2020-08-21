@@ -164,7 +164,7 @@ namespace cce {
   // for setting parameters, analyzing structure, determining oxidation numbers, assigning corrections,
   // calculating total corrections, converting correction vector, and returning corrections
   //vector<double> CCE(xstructure& structure) // OLD: functional will be automatically determined during Bader charge analysis for the current implementation, later when using e.g. electronegativities, it might be needed as input
-  vector<double> calculate_corrections(xstructure& structure, string& functional) { // functional needed as input when determining oxidation numbers from electronegativities
+  vector<double> calculate_corrections(const xstructure& structure, string& functional) { // functional needed as input when determining oxidation numbers from electronegativities //CO20200731 - const xstructure
     string soliloquy="cce::calculate_corrections():";
     stringstream message;
     CCE_Variables cce_vars = init_variables(structure);
@@ -193,7 +193,7 @@ namespace cce {
   // main CCE function core called by all other main CCE functions
   // analyzing structure, determining oxidation numbers, assigning corrections,
   // and calculating total corrections
-  void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
+  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) { //CO20200731 - const xstructure
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::CCE_core():";
     // determine temperatures
@@ -786,7 +786,7 @@ namespace cce {
 
   //check_for_multi_anion_system////////////////////////////////////////////////////////
   // check whether it is a multi-anion system, i. e. whether atoms of another species than the the anion_species are only bound to atoms of lower electronegativity or of the same type
-  vector<uint> check_for_multi_anion_system(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) {
+  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) { //CO20200731 - const xstructure
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::check_for_multi_anion_system():";
     stringstream message;
@@ -799,7 +799,8 @@ namespace cce {
     cce_vars.cutoffs=get_dist_cutoffs(structure, tolerance);
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    //[CO20200731 - OBSOLETE]structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    pflow::GetStrNeighData(structure,cutoffs_max,neigh_mat); //CO20200731 - const xstructure
     uint z = 0;
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
@@ -889,7 +890,7 @@ namespace cce {
 
   //get_num_neighbors////////////////////////////////////////////////////////
   // trying to get the number of neighbors for each atom within respective species selective cutoff
-  vector<uint> get_num_neighbors(xstructure& structure, double tolerance) {
+  vector<uint> get_num_neighbors(const xstructure& structure, double tolerance) { //CO20200731 - const xstructure
     CCE_Variables cce_vars = init_variables(structure);
     string anion_species="";
     aurostd::xoption cce_flags = init_flags();
@@ -898,7 +899,7 @@ namespace cce {
 
   //get_num_neighbors////////////////////////////////////////////////////////
   // trying to get the number of neighbors of a special anion_species for each atom within respective species selective cutoff
-  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, double tolerance) {
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance) {  //CO20200731 - const xstructure
     CCE_Variables cce_vars = init_variables(structure);
     aurostd::xoption cce_flags = init_flags();
     return get_num_neighbors(structure, anion_species, cce_flags, cce_vars, tolerance);
@@ -906,7 +907,7 @@ namespace cce {
 
   //get_num_neighbors////////////////////////////////////////////////////////
   // trying to get the number of neighbors for each atom within respective species selective cutoff
-  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) { // anion_species here cannot be taken from cce_vars since function is also used to determine multi anion num_neighbors for which anion_species is the respective multi_anion_species
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) { // anion_species here cannot be taken from cce_vars since function is also used to determine multi anion num_neighbors for which anion_species is the respective multi_anion_species  //CO20200731 - const xstructure
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::get_num_neighbors():";
     if(LDEBUG){
@@ -916,7 +917,8 @@ namespace cce {
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     vector<uint> num_neighbors(structure.atoms.size());
     deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    //[CO20200731 - OBSOLETE]structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    pflow::GetStrNeighData(structure,cutoffs_max,neigh_mat); //CO20200731 - const xstructure
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
       bool warning = false;
@@ -982,7 +984,7 @@ namespace cce {
 
   //check_per_super_oxides////////////////////////////////////////////////////////
   // check whether the system contains per- or superoxide ions based on the O-O bond length and set variables accordingly
-  void check_per_super_oxides(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
+  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) { //CO20200731 - const xstructure
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::check_per_super_oxides():";
     stringstream message;
@@ -998,7 +1000,8 @@ namespace cce {
     cce_vars.cutoffs=get_dist_cutoffs(structure);
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    //[CO20200731 - OBSOLETE]structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    pflow::GetStrNeighData(structure,cutoffs_max,neigh_mat); //CO20200731 - const xstructure
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       if (structure.atoms[i].cleanname == "O"){ // identify per- and superoxides by O-O bond length
         for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by the cutoffs_max
