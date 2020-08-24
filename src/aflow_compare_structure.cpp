@@ -741,7 +741,8 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // symmetry
     if(xstr.space_group_ITC<1 || xstr.space_group_ITC>230){ // don't recalculate symmetry if already calculated 
-      xstr.SpaceGroup_ITC();
+      double use_tol = SYM::defaultTolerance(xstr); //DX20200821
+      xstr.SpaceGroup_ITC(use_tol, SG_SETTING_ANRL); //DX20200821 - added ANRL setting
     }
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);

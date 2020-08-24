@@ -2893,13 +2893,13 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
 }
 
 // ******************************************************************************
-// numberAtomsInConventionalCell()
+// numberOccupiedSitesInConventionalCell()
 // ******************************************************************************
 namespace SYM {
-  uint numberAtomsInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites){
+  uint numberOccupiedSitesInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites){
 
-    // get the number of atoms from the Wyckoff positions
-    // i.e., number atoms in conventional cell
+    // get the number of occupied sites from the Wyckoff positions
+    // i.e., number occupied sites in the conventional cell
 
     uint natoms = 0;
     for(uint i=0;i<Wyckoff_sites.size();i++){ natoms+=Wyckoff_sites[i].multiplicity; }

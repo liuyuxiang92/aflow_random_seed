@@ -465,7 +465,7 @@ namespace SYM {
   void get_certain_wyckoff_pos(string spaceg, int mult, string site_symmetry, vector<string>& site_symmetries, vector<string>& letters, vector<string>& positions);
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position);
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity);
-  uint numberAtomsInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites); //DX20200512
+  uint numberOccupiedSitesInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites); //DX20200512
   vector<uint> numberEachTypeFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_sites); //DX20200512
   vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting,
       string& Wyckoff_letter, uint Wyckoff_multiplicity, bool convert2frac=true); //DX 20191029 //DX20200423 - add convert2frac
