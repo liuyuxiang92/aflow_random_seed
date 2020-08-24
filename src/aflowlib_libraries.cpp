@@ -2561,7 +2561,7 @@ namespace aflowlib {
       if(!functional.empty()){
         bool found_correctable=false;
         if(aurostd::WithinList(data.vspecies,"O")) found_correctable=true;
-        //[CO20200624 - not yet]if(aurostd::WithinList(data.vspecies,"N")) found_correctable=true;
+        if(aurostd::WithinList(data.vspecies,"N")) found_correctable=true;
         if(found_correctable){
           data.enthalpy_formation_cce_300K_cell=data.enthalpy_formation_cce_0K_cell=data.enthalpy_formation_cell;
           vector<double> enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(xstr_cce,functional);
