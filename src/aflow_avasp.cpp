@@ -1903,7 +1903,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
         }
         // doesn't contain degree of freedom
         else {
-          if(anrl_base_label!=existing_prototype_labels[0]){ //DX20200710 - check to make sure the labels are the same an not just isopointal
+          if(anrl_base_label!=existing_prototype_labels[0]){ //DX20200710 - check to make sure the labels are the same and not just isopointal
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+existing_prototype_labels[0],_INPUT_ILLEGAL_);
           }
           anrl_add_on = "";
