@@ -394,7 +394,10 @@ namespace pflow {
   void POSCAR2WYCKOFF(istream& input);
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX20190314
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314
-  bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss=cout); //SC20200330
+  vector<string> GENERATE_CERAMICS(const vector<string>& nonmetals,const vector<string>& metals,uint metal_arity); //CO20200731
+  vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow); //CO20200731
+  string GENERATE_CERAMICS_PRINT(const aurostd::xoption& vpflow); //CO20200731
+  bool PSEUDOPOTENTIALS_CHECK(const aurostd::xoption& vpflow,const string& file,ostream& oss=cout); //SC20200330
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO20180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); //DX20180123 - added more robust QE reader
@@ -579,6 +582,12 @@ namespace pflow {
 int SignNoZero(const double& x);
 int Nint(const double& x);
 int Sign(const double& x);
+
+//CO20200731 START include from aflow_aconvasp.cpp
+namespace pflow {
+  void GetStrNeighData(const xstructure& str,const double cutoff,deque<deque<_atom> >& neigh_mat);   //CO20200731
+}
+//CO20200731 END include from aflow_aconvasp.cpp
 
 // ---------------------------------------------------------------------------
 // PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDO

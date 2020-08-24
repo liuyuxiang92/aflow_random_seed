@@ -1199,7 +1199,7 @@ namespace chull {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No formation energy available for ChullPoint",_INPUT_ILLEGAL_);
     return AUROSTD_NAN;
   }
-  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpyFormationAtom(),units);}  //entry.enthalpy_formation_atom - ADDING CCE
+  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpyFormationAtom(0),units);}  //entry.enthalpy_formation_atom - ADDING CCE @ 0K
   double T_S(const ChullPoint& point){
     if(point.m_has_entry){return T_S(point.m_entry);}
     return AUROSTD_NAN;

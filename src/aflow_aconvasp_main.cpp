@@ -619,6 +619,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF20190619
   }	//DF20190329
 
+  vpflow.flag("GENERATE_CERAMICS",aurostd::args2flag(argv,cmds,"--generate_ceramics|--gen_ceram"));  //CO20200731
+  if(vpflow.flag("GENERATE_CERAMICS")){ //CO20200731
+    vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::NON_METALS","--non_metals=|--nm=","C");
+    vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::METALS","--metals=|--m=","Mo,Nb,Ta,V,W");
+    vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::METAL_ARITY","--N=","5");
+  }
+
   vpflow.flag("GEOMETRY",aurostd::args2flag(argv,cmds,"--geometry|--abc_angles"));  //CO20190808
 
   vpflow.flag("GULP",aurostd::args2flag(argv,cmds,"--gulp"));
@@ -1140,7 +1147,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("PROTOINITIAL",aurostd::args2flag(argv,cmds,"--initial"));
 
   // PSEUDOPOTENTIAL CHECK
-  vpflow.args2addattachedscheme(argv,cmds,"PSEUDOPOTENTIALS_CHECK","--pseudopotentials_check=|--pp_check|--ppk=","");
+  vpflow.args2addattachedscheme(argv,cmds,"PSEUDOPOTENTIALS_CHECK","--pseudopotentials_check=|--pp_check=|--ppk=","");
   if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {
     vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
@@ -1618,6 +1625,7 @@ namespace pflow {
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
+      if(vpflow.flag("GENERATE_CERAMICS")){cout << pflow::GENERATE_CERAMICS_PRINT(vpflow) << endl; _PROGRAMRUN=true;} //CO20200731
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
       //DX+CO END
@@ -2354,6 +2362,7 @@ namespace pflow {
     strstream << tab << x << " --frac [-f,-d,--fract,--fractional,--direct] < POSCAR" << endl;
     strstream << tab << x << " --getTEMP [--runstat|--runbar|--refresh=X|--warning_beep=T|--warning_halt=T]" << endl;
     strstream << tab << x << " --gfa --alloy=CaCu [--ae_file=All_atomic_environments_read.dat] [--cutoff_energy=0.05]" << endl;
+    strstream << tab << x << " --generate_ceramics --nm=C --m=Mo,Nb,Ta,V,W -N=5" << endl; //CO20200731
     strstream << tab << x << " --gulp < POSCAR" << endl;
     strstream << tab << x << " --identical < POSCAR" << endl;
     strstream << tab << x << " --incell < POSCAR" << endl;
@@ -13064,12 +13073,114 @@ namespace pflow {
   }
 } // namespace pflow
 
+namespace pflow {
+  vector<string> GENERATE_CERAMICS(const vector<string>& _vnonmetals,const vector<string>& _vmetals,uint metal_arity){ //CO20200731
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::GENERATE_CERAMICS():";
+    if(LDEBUG){
+      cerr << soliloquy << " nonmetals=" << aurostd::joinWDelimiter(_vnonmetals,",") << endl;
+      cerr << soliloquy << " metals=" << aurostd::joinWDelimiter(_vmetals,",") << endl;
+      cerr << soliloquy << " metal_arity=" << metal_arity << endl;
+    }
+    if(_vnonmetals.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vnonmetals.size()==0",_INPUT_MISSING_);} //CO20200624
+    if(_vmetals.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vmetals.size()==0",_INPUT_MISSING_);} //CO20200624
+    vector<string> vnonmetals(_vnonmetals),vmetals(_vmetals);
+    std::sort(vnonmetals.begin(),vnonmetals.end()); //SORT FIRST
+    std::sort(vmetals.begin(),vmetals.end()); //SORT FIRST
+
+    uint i=0,j=0;
+
+    //get vmix
+    vector<string> vmix=vnonmetals;vmix.insert(vmix.end(),vmetals.begin(),vmetals.end());
+    std::sort(vmix.begin(),vmix.end());
+    
+    //get vind_nm
+    vector<uint> vind_nm;
+    if(LDEBUG){cerr << soliloquy << " vmix=" << aurostd::joinWDelimiter(vmix,",") << endl;}
+    std::vector<string>::iterator it;
+    for(i=0;i<vnonmetals.size();i++){
+      it=std::find(vmix.begin(),vmix.end(),vnonmetals[i]);
+      vind_nm.push_back(it-vmix.begin());
+    }
+    if(LDEBUG){cerr << soliloquy << " vind_nm=" << aurostd::joinWDelimiter(vind_nm,",") << endl;}
+
+    //get vvinbetween
+    vector<vector<string> > vvinbetween;vvinbetween.resize(vnonmetals.size()+1);  //pre==vvinbetween[0], post==vvinbetween[-1]
+    for(i=0,j=0;i<vmix.size();i++){
+      if(aurostd::WithinList(vind_nm,i)){j++;continue;}
+      vvinbetween[j].push_back(vmix[i]);
+    }
+    if(LDEBUG){
+      for(i=0;i<vvinbetween.size();i++){
+        cerr << soliloquy << " vvinbetween[i=" << i << "]=" << aurostd::joinWDelimiter(vvinbetween[i],",") << endl;
+      }
+    }
+    //get vNinbetween
+    vector<uint> vNinbetween;vNinbetween.assign(vvinbetween.size(),0); //assign all 0
+    uint sum_species=0; //colons
+    //think of it as drops of water into separate cups, start with first and fill until you have no more water
+    sum_species=0;
+    for(i=0;i<vvinbetween.size()&&sum_species<metal_arity;i++){
+      for(j=0;j<vvinbetween[i].size()&&sum_species<metal_arity;j++){vNinbetween[i]++;sum_species++;}
+    }
+    if(LDEBUG){cerr << soliloquy << " vNinbetween=" << aurostd::joinWDelimiter(vNinbetween,",") << endl;}
+
+    //get vNinbetween_std
+    vector<uint> vNinbetween_std;vNinbetween_std.assign(vNinbetween.size(),0);vNinbetween_std.back()=metal_arity;
+    
+    uint k=0; //index of nonmetals
+    vector<string> vcommands,vtmp;
+    string command="",tmp;
+    while(vcommands.size()<1e4){  //not simple as number of combinations since we could have 2 or more nonmetals
+      command="";
+      
+      for(i=0,k=0;i<vNinbetween.size();i++){
+        tmp=aurostd::joinWDelimiter(vvinbetween[i],",");
+        vtmp.clear();
+        if(vNinbetween[i]>0){
+          if(!command.empty()){command+=":";}
+          for(j=0;j<vNinbetween[i];j++){vtmp.push_back(tmp);}
+          command+=aurostd::joinWDelimiter(vtmp,":");
+        }
+        if(k<vnonmetals.size()){
+          if(!command.empty()){command+=":";}
+          command+=vnonmetals[k++];
+        }
+      }
+      
+      if(LDEBUG){cerr << soliloquy << " command=" << command << endl;}
+      vcommands.push_back(command);
+      if(vNinbetween==vNinbetween_std){break;}
+
+      //adjust vNinbetween
+      for(i=0;i<vNinbetween.size()-1;i++){
+        if(vNinbetween[i]==0){continue;}
+        vNinbetween[i]--;
+        vNinbetween[i+1]++;
+      }
+      if(LDEBUG){cerr << soliloquy << " vNinbetween=" << aurostd::joinWDelimiter(vNinbetween,",") << endl;}
+    }
+    
+    return vcommands;
+  }
+  vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow){ //CO20200731
+    vector<string> vnonmetals,vmetals;
+    string nonmetals=vpflow.getattachedscheme("GENERATE_CERAMICS::NON_METALS");aurostd::string2tokens(nonmetals,vnonmetals,",");
+    string metals=vpflow.getattachedscheme("GENERATE_CERAMICS::METALS");aurostd::string2tokens(metals,vmetals,",");
+    int metal_arity=vpflow.getattachedutype<uint>("GENERATE_CERAMICS::METAL_ARITY");
+    return GENERATE_CERAMICS(vnonmetals,vmetals,metal_arity);
+  }
+  string GENERATE_CERAMICS_PRINT(const aurostd::xoption& vpflow){ //CO20200731
+    return aurostd::joinWDelimiter(GENERATE_CERAMICS(vpflow),"\n");
+  }
+} // namespace pflow
+
 // ***************************************************************************
 // pflow::PSEUDOPOTENTIALS_CHECK
 // ***************************************************************************
 
 namespace pflow {
-  bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss) { // too many options
+  bool PSEUDOPOTENTIALS_CHECK(const aurostd::xoption& vpflow,const string& file,ostream& oss) { // too many options
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::PSEUDOPOTENTIALS_CHECK():";
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl; 
@@ -13084,7 +13195,7 @@ namespace pflow {
       return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PSEUDOPOTENTIALS_CHECK::USAGE\")=" << vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") << endl;
-    //if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
+    if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
     // now start
     if(aurostd::substring2bool(file,"POTCAR")) {
       XHOST.DEBUG=FALSE;

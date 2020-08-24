@@ -65,8 +65,8 @@ namespace cce {
   void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void print_corrections(aurostd::xoption& flags, std::istream& ist); //ME20200213
   vector<double> calculate_corrections(const string& directory_path);
-  vector<double> calculate_corrections(xstructure& structure, string& functional);
-  void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
+  vector<double> calculate_corrections(const xstructure& structure, string& functional);  //CO20200731 - const xstructure
+  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);  //CO20200731 - const xstructure
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);
@@ -80,12 +80,12 @@ namespace cce {
   CCE_Variables init_variables(const xstructure&); //ME20200213
   // structural analysis
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
-  vector<uint> check_for_multi_anion_system(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_, ostream& oss=std::cout);
-  vector<uint> get_num_neighbors(xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);
+  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_, ostream& oss=std::cout);  //CO20200731 - const xstructure
+  vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);  //CO20200731 - const xstructure
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_); //CO20200731 - const xstructure
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);  //CO20200731 - const xstructure
   vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
-  void check_per_super_oxides(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);  //CO20200731 - const xstructure
   // determine oxidation numbers from electronegativities
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);
   vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
