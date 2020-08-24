@@ -1896,7 +1896,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
         // contains degrees of freedom
         if(aurostd::substring2bool(existing_prototype_labels[0],"-")){ 
           vector<string> tmp_tokens; aurostd::string2tokens(existing_prototype_labels[0],tmp_tokens,"-");
-          if(anrl_base_label!=tmp_tokens[0]){ //DX20200710 - check to make sure the labels are the same an not just isopointal
+          if(anrl_base_label!=tmp_tokens[0]){ //DX20200710 - check to make sure the labels are the same and not just isopointal
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+tmp_tokens[0],_INPUT_ILLEGAL_);
           }
           anrl_add_on = "-" + tmp_tokens[1]; // e.g., 001
@@ -7201,4 +7201,3 @@ string AVASP_Shortcuts_for_Ternaries(string &label) {
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
-
