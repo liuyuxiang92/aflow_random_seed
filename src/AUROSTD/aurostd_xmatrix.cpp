@@ -4977,6 +4977,13 @@ namespace aurostd { // namespace aurostd
     SVDFit(y_vec, y_sigma);
   }
 
+  //AS20200811 BEGIN
+  void cematrix::LeastSquare(xvector<double> & y_vec){
+    xvector<double> y_sigma(y_vec.rows);
+    for (int i=y_sigma.lrows; i<=y_sigma.urows; i++) y_sigma[i] = 1.0;
+    LeastSquare(y_vec, y_sigma);
+  }//AS20200811 END
+
   double cematrix::Pythag2(double a, double b) { // calculate (a^2+ b^2)^(1/2)
     // from dlapy2.f in Lapack
     double aabs=abs(a),babs=abs(b);

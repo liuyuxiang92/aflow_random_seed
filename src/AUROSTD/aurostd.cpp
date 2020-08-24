@@ -50,6 +50,9 @@
 #ifndef _AUROSTD_XERROR_CPP_  //ME20180627
 #include "aurostd_xerror.cpp" //ME20180627
 #endif                        //ME20180627
+#ifndef _AUROSTD_XFIT_CPP_  //AS20200824
+#include "aurostd_xfit.cpp" //AS20200824
+#endif
 
 #endif  // _AURO_IMPLEMENTATIONS_
 

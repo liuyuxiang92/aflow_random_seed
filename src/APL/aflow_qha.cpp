@@ -28,6 +28,10 @@
 #define DCOEFF 1e-2 // this coefficient is used in numerical differentiation
 // (should not be too small). Usage dT = DCOEFF*T
 
+// to avoid division by zero in the self-consistent loop,
+// the initial volume is taken to be 10% bigger
+#define SCQHA_INITIAL_VOLUME_FACTOR 1.1
+
 #define DEBUG_QHA false // toggles QHA-related debug output
 #define DEBUG_QHA_GP_FIT false // toggles debug output related to the fit functionality
 // in the calcGrueneisen function
@@ -42,192 +46,6 @@ enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
 
-//=============================================================================
-//              Definitions of the NonlinearFit class members
-
-namespace apl
-{
-  NonlinearFit::NonlinearFit()
-  {
-    free();
-  }
-
-  NonlinearFit::NonlinearFit(const NonlinearFit &nlf)
-  {
-    if (this==&nlf) return;
-    free(); copy(nlf);
-  }
-
-  NonlinearFit::NonlinearFit(xvector<double> &x_in, xvector<double> &y_in,
-      xvector<double> &guess_in,
-      double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
-      double tol_in, double tau_in, int max_iter_in)
-  {
-    free();
-    Npoints = x_in.rows;
-    Nparams = guess_in.rows;
-    tol = tol_in;
-    tau = tau_in;
-    max_iter = max_iter_in;
-    x = x_in;
-    y = y_in;
-    residuals = xvector<double> (Npoints);
-    guess = guess_in;
-    p = xvector<double> (Nparams);
-    dydp = xvector<double> (Nparams);
-    A = xmatrix<double> (Nparams, Nparams);
-    J = xmatrix<double> (Npoints, Nparams);
-    f = foo;
-  }
-
-  NonlinearFit::~NonlinearFit() { free(); }
-
-  const NonlinearFit& NonlinearFit::operator=(const NonlinearFit &nlf)
-  {
-    copy(nlf);
-    return *this;
-  }
-
-  void NonlinearFit::clear() { free(); }
-  void NonlinearFit::free()
-  {
-    Npoints = 0;
-    Nparams = 0;
-    tol = 0.0;
-    tau = 0.0;
-    max_iter = 0;
-    x.clear();
-    y.clear();
-    residuals.clear();
-    guess.clear();
-    p.clear();
-    dydp.clear();
-    A.clear();
-    J.clear();
-    f = NULL;
-  }
-
-  void NonlinearFit::copy(const NonlinearFit &nlf)
-  {
-    if (this==&nlf) return;
-
-    Npoints = nlf.Npoints;
-    Nparams = nlf.Nparams;
-    tol = nlf.tol;
-    tau = nlf.tau;
-    max_iter = nlf.max_iter;
-    x = nlf.x;
-    y = nlf.y;
-    residuals = nlf.residuals;
-    guess = nlf.guess;
-    p = nlf.p;
-    dydp = nlf.dydp;
-    A = nlf.A;
-    J = nlf.J;
-    f = nlf.f;
-  }
-
-  /// Calculates the residual sum of squares of a model function w.r.t the given data
-  ///
-  double NonlinearFit::calculateResidualSquareSum(const xvector<double> &params)
-  {
-    double chi_sqr = 0.0;
-
-    calculateResiduals(params); // calculate residuals and save them to residuals
-    for (int i=1; i<= Npoints; i++) chi_sqr += pow(residuals[i], 2);
-
-    return chi_sqr;
-  }
-
-  /// Calculates residuals of a given model function and stores the results
-  ///
-  void NonlinearFit::calculateResiduals(const xvector<double> &params)
-  {
-    for (int i=1; i<=Npoints; i++) residuals[i] = y[i] - f(x[i], params, dydp);
-  }
-
-  /// Calculates the Jacobian of a given model function for the given "guess" parameters
-  ///
-  void NonlinearFit::Jacobian(const xvector<double> &guess)
-  {
-    for (int i=1; i<=Npoints; i++){
-      f(x[i], guess, dydp); 
-      for (int j=1; j<=Nparams; j++){
-        J[i][j] = -dydp[j]; // derivative of a given function w.r.t fit parameters
-      }
-    }
-  }
-
-  /// Nonlinear fit using the Levenberg-Marquardt algorithm.
-  /// The implementation here is based on the ideas from Numerical Recipes and
-  /// K.Madsen et al. Methods For Non-linear Least Squares Problems
-  /// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
-  ///
-  bool NonlinearFit::fitLevenbergMarquardt()
-  {
-    string function = XPID + "NonlinearFit::fitLevenbergMarquardt(): ";
-    bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
-    if (LDEBUG) cerr << function << "begin"  << std::endl;
-
-    static const double step_scaling_factor = 10.0;
-
-    xvector<double> pnew(Nparams);
-    xmatrix<double> G(Nparams, 1), M(Nparams, Nparams);
-
-    int iter = 0;
-    double chi_sqr = 0.0, new_chi_sqr =0.0; // old and new residual square sums
-
-    p = guess; Jacobian(p); calculateResiduals(p); // p are the fitted parameters
-
-    xmatrix<double> A = trasp(J)*J;
-    xvector<double> g = -trasp(J)*residuals;
-
-    // determine initial step
-    double lambda = tau*maxDiagonalElement(A);
-    if (LDEBUG) cerr << function << "lambda = " << lambda << std::endl;
-
-    while (iter<max_iter){
-      iter++;
-      if (LDEBUG) cerr << function << "iteration: " << iter << std::endl;
-
-      // M = A + lambda*diag(A)
-      M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
-
-      if (LDEBUG) cerr << function << " M:" << std::endl << M << std::endl;
-
-      // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
-      for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
-      aurostd::GaussJordan(M,G);
-
-      pnew = p + M*g;
-
-      chi_sqr = calculateResidualSquareSum(p);
-      new_chi_sqr = calculateResidualSquareSum(pnew);
-
-      if (std::abs(new_chi_sqr - chi_sqr) < tol){
-        p = pnew;
-        break;
-      }
-
-      // update only if step leads to a smaller residual sum of squares
-      if (new_chi_sqr < chi_sqr){
-        p = pnew; Jacobian(p); calculateResiduals(p);
-
-        A = trasp(J)*J;
-        g = -trasp(J)*residuals;
-
-        lambda /= step_scaling_factor;
-      }
-      else{
-        lambda *= step_scaling_factor;
-      }
-      if (LDEBUG) cerr << function << "pnew = " << p << std::endl;
-    }
-
-    if (LDEBUG) cerr << function << "end"  << std::endl;
-    return iter < max_iter;
-  }
-}
 
 //================================================================================
 //                    EOS related
@@ -277,7 +95,6 @@ double BirchMurnaghan(const double x, const xvector<double> &p, xvector<double> 
   return Eeq + 9.0/16.0*B*Veq*(pow(kappa-1.0,3.0)*Bp + pow(kappa-1.0,2.0)*(6.0-4.0*kappa));
 }
 
-
 /// Checks if there is a minimum within a given data set 
 /// (at least one internal point should be lower than the edge points)
 bool isMinimumWithinBounds(const xvector<double> &y){
@@ -286,151 +103,6 @@ bool isMinimumWithinBounds(const xvector<double> &y){
   }
 
   return false;
-}
-
-/// Evaluates the value of the polynomial with coefficients p at the value x.
-///
-/// The polynomial is represented in the following form:
-/// p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
-double eval_polynomial(double x, const xvector<double> &p)
-{
-  double res = p[p.urows];
-  for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
-  return res;
-}
-
-/// Evaluates the value and the derivatives of the polynomial with coefficients p at
-/// the value x.
-///
-/// The highest derivative is determined by the size of the dp array and the result
-/// is stored in ascending order starting from the zero's derivative.
-void eval_polynomial_deriv(double x, const xvector<double> &p, xvector<double> &dp)
-{
-  for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
-  dp[dp.lrows] = p[p.urows];
-  for (int i=p.urows-1; i>=p.lrows; i--){
-    for (int j=dp.urows; j>=dp.lrows+1; j--) dp[j] = dp[j]*x + dp[j-1];
-    dp[dp.lrows] = dp[dp.lrows]*x + p[i];
-  }
-
-  int factor = 1;
-  for (int i=dp.lrows+1; i<dp.urows; i++){
-    factor *= i;
-    dp[i+1] *= factor;
-  }
-}
-
-/// Evaluates the value and the derivatives of the polynomial with coefficients p at
-/// the value x and returns the result as an array.
-///
-/// The result is stored in ascending order starting from the zero's derivative.
-/// @param n is the highest order of the derivative to be calculated.
-xvector<double> eval_polynomial_deriv(double x, const xvector<double> &p, uint n)
-{
-  xvector<double> dp(n+1);
-  eval_polynomial_deriv(x, p, dp);
-  return dp;
-}
-
-/// Constructs the Vandermonde matrix with columns up to a given order n.
-/// Vandermonde matrix:
-/// 1 x1^2 x1^3 .. x1^n
-/// 1 x2^2 x2^3 .. x2^n
-/// ...
-/// 1 xm^2 xm^3 .. xm^n
-/// where m is the size of x array
-xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
-{
-  xmatrix<double> VM(x.rows, n);
-
-  for (int i=1; i<=x.rows; i++){
-    VM[i][1] = 1.0;
-    for (int j=2; j<=n; j++) VM[i][j] = std::pow(x[i], j-1);
-  }
-
-  return VM;
-}
-
-/// Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
-/// for the value x where the derviative of polynomial equals to zero using the
-/// bisection method.
-///
-/// The function returns a negative number if an error has occurred.
-///
-/// It is assumed that only one extremum exists between xmin and xmax.
-/// The specific use of this function is to search for the equilibrium volume of a given
-/// polynomial E(V) dependency.
-///
-/// The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
-/// then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
-/// The root searching algorithm is iterative: one bisects the interval [a,b] into two 
-/// subintervals and for the next iteration picks a subinterval where f(x) has 
-/// opposite sign on its ends.
-/// This process continues until the length of the interval is less than some negligibly
-/// small number and one picks the middle of the interval as x0.
-/// In this situation, f(x0)~0 and this condition is used as a criterion to stop the
-/// iteration procedure.
-///
-double polynomial_find_extremum(const xvector<double> &p, double xmin, double xmax,
-    double tol=_mm_epsilon) {
-  bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
-  string function = XPID + "polynomial_find_extremum(): ";
-  if (LDEBUG) cerr << function << "begin" << std::endl;
-
-  double left_end = xmin; double right_end = xmax;
-  double middle = 0.5*(left_end + right_end);
-
-  xvector<double> dp(2); // index 1 - value, index 2 - first derivative
-  eval_polynomial_deriv(left_end, p, dp);
-  double f_at_left_end  = dp[2];
-  eval_polynomial_deriv(right_end, p, dp);
-  double f_at_right_end = dp[2];
-  eval_polynomial_deriv(middle, p, dp);
-  double f_at_middle    = dp[2];
-
-  // no root within a given interval
-  if (sign(f_at_left_end) == sign(f_at_right_end)) return -1;
-
-  if (LDEBUG){
-    cerr << function << "left_end= "  << left_end  << "middle= ";
-    cerr << middle  << "right_end= "  << right_end  << std::endl;
-    cerr << function << "f_left= " << f_at_left_end;
-    cerr << "f_middle= " << f_at_middle << "f_right= ";
-    cerr << f_at_right_end << std::endl;
-  }
-
-  // Iterate until the convergence criterion is reached:
-  // f(middle) is sufficiently close to zero.
-  // Meanwhile, do a sanity check that the function has opposite signs at the interval ends.
-  while ((sign(f_at_left_end) != sign(f_at_right_end)) && (std::abs(f_at_middle)>tol)){
-    if (sign(f_at_left_end) == sign(f_at_middle)){
-      std::swap(left_end, middle);
-      std::swap(f_at_left_end, f_at_middle);
-    }
-
-    if (sign(f_at_right_end) == sign(f_at_middle)){
-      std::swap(right_end, middle);
-      std::swap(f_at_right_end, f_at_middle);
-    }
-
-    middle = 0.5*(left_end + right_end);
-    eval_polynomial_deriv(middle, p, dp);
-    f_at_middle = dp[2];
-
-    if (LDEBUG){
-      cerr << function << "left_end= "  << left_end  << "middle= ";
-      cerr << middle  << "right_end= "  << right_end  << std::endl;
-      cerr << function << "f_left= " << f_at_left_end;
-      cerr << "f_middle= " << f_at_middle << "f_right= ";
-      cerr << f_at_right_end << std::endl;
-    }
-  }
-
-  // double-check that the convergence criterion was reached
-  if (std::abs(f_at_middle) > tol) return -1;
-
-  if (LDEBUG) cerr << function << "end" << std::endl;
-  return middle;
 }
 
 /// Calculates the bulk modulus for the Birch-Murnaghan EOS model.
@@ -1425,7 +1097,7 @@ namespace apl
           dummy_dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
-//      dosc.writePHDOSCAR(subdirectories[i]);
+//      dosc.writePHDOSCAR(subdirectories[i]);//AS20200824
 
       if (dosc.hasNegativeFrequencies()){
         stringstream msg;
@@ -1475,7 +1147,7 @@ namespace apl
       apl::PhononDispersionCalculator pdisc(phcalc);
       pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
-//      pdisc.writePHEIGENVAL(subdirectories[i]);
+//      pdisc.writePHEIGENVAL(subdirectories[i]);//20200824
 
       // save all the data that is necessary for QHA calculations
       if (i==0){// qmesh data is the same for all volumes: need to store only once
@@ -1776,7 +1448,7 @@ namespace apl
       case(EOS_SJ):
         {
           double x = std::pow(V, -1.0/3.0);
-          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 2);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 2);
           B = BulkModulus_SJ(x, dEdp);
         }
         break;
@@ -1784,7 +1456,7 @@ namespace apl
       case(EOS_BIRCH_MURNAGHAN4):
         {
           double x = std::pow(V, -2.0/3.0);
-          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 2);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 2);
           B = BulkModulus_BM(x, dEdp);
         }
         break;
@@ -1805,7 +1477,7 @@ namespace apl
       case(EOS_SJ):
         {
           double x = std::pow(V, -1.0/3.0);
-          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 3);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 3);
           Bp = Bprime_SJ(x, dEdp);
         }
         break;
@@ -1813,7 +1485,7 @@ namespace apl
       case(EOS_BIRCH_MURNAGHAN4):
         {
           double x = std::pow(V, -2.0/3.0);
-          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 3);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 3);
           Bp = Bprime_BM(x, dEdp);
         }
         break;
@@ -1833,7 +1505,7 @@ namespace apl
       case(EOS_SJ):
         {
           double x = std::pow(V, -1.0/3.0);
-          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 1);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 1);
           P = -std::pow(x,4)/3.0*dEdp[2];
         }
         break;
@@ -1841,7 +1513,7 @@ namespace apl
       case(EOS_BIRCH_MURNAGHAN4):
         {
           double x = std::pow(V, -2.0/3.0);
-          xvector<double> dEdp = eval_polynomial_deriv(x, parameters, 1);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 1);
           P = -2.0/3.0*std::pow(x,5.0/2.0)*dEdp[2];
         }
         break;
@@ -1861,7 +1533,7 @@ namespace apl
         {
           double xmin = std::pow(max(EOSvolumes), -1.0/3.0);
           double xmax = std::pow(min(EOSvolumes), -1.0/3.0);
-          Veq = std::pow(polynomial_find_extremum(parameters, xmin, xmax), -3);
+          Veq = std::pow(aurostd::polynomialFindExtremum(parameters, xmin, xmax), -3);
         }
         break;
       case(EOS_BIRCH_MURNAGHAN3):
@@ -1869,7 +1541,7 @@ namespace apl
         {
           double xmin = std::pow(max(EOSvolumes), -2.0/3.0);
           double xmax = std::pow(min(EOSvolumes), -2.0/3.0);
-          Veq = std::pow(polynomial_find_extremum(parameters, xmin, xmax), -3.0/2.0);
+          Veq = std::pow(aurostd::polynomialFindExtremum(parameters, xmin, xmax), -3.0/2.0);
         }
         break;
       case(EOS_MURNAGHAN):
@@ -1924,14 +1596,14 @@ namespace apl
         {
           xvector<double> x(V.rows);
           for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-1.0/3.0);
-          aurostd::cematrix M(Vandermonde_matrix(x, 4));
+          aurostd::cematrix M(aurostd::Vandermonde_matrix(x, 4));
           M.LeastSquare(E);
           fit_params = M.GetFitVector();
 
-          double x_eq = polynomial_find_extremum(fit_params, min(x), max(x));
+          double x_eq = aurostd::polynomialFindExtremum(fit_params, min(x), max(x));
           EOS_volume_at_equilibrium = std::pow(x_eq, -3);
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
-          xvector<double> dEdp = eval_polynomial_deriv(x_eq, fit_params, 3);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
           EOS_bulk_modulus_at_equilibrium = BulkModulus_SJ(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_SJ(x_eq, dEdp);
@@ -1941,14 +1613,14 @@ namespace apl
         {
           xvector<double> x(V.rows);
           for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-2.0/3.0);
-          aurostd::cematrix M(Vandermonde_matrix(x, 4));
+          aurostd::cematrix M(aurostd::Vandermonde_matrix(x, 4));
           M.LeastSquare(E);
           fit_params = M.GetFitVector();
 
-          double x_eq = polynomial_find_extremum(fit_params, min(x), max(x));
+          double x_eq = aurostd::polynomialFindExtremum(fit_params, min(x), max(x));
           EOS_volume_at_equilibrium = std::pow(x_eq, -3.0/2.0);
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
-          xvector<double> dEdp = eval_polynomial_deriv(x_eq, fit_params, 3);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
           EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
@@ -1958,14 +1630,14 @@ namespace apl
         {
           xvector<double> x(V.rows);
           for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-2.0/3.0);
-          aurostd::cematrix M(Vandermonde_matrix(x, 5));
+          aurostd::cematrix M(aurostd::Vandermonde_matrix(x, 5));
           M.LeastSquare(E);
           fit_params = M.GetFitVector();
 
-          double x_eq = polynomial_find_extremum(fit_params, min(x), max(x));
+          double x_eq = aurostd::polynomialFindExtremum(fit_params, min(x), max(x));
           EOS_volume_at_equilibrium = std::pow(x_eq, -3.0/2.0);
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
-          xvector<double> dEdp = eval_polynomial_deriv(x_eq, fit_params, 3);
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
           EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
@@ -1978,7 +1650,7 @@ namespace apl
           guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
           guess[4] = 3.5; // a reasonable initial value for most materials
 
-          NonlinearFit nlfit(V,E,guess,Murnaghan);
+          aurostd::NonlinearFit nlfit(V,E,guess,Murnaghan);
           nlfit.fitLevenbergMarquardt();
 
           fit_params = nlfit.p;
@@ -2006,11 +1678,11 @@ namespace apl
     static xvector<double> dydp(4);
     switch(method){
       case(EOS_SJ):
-        energy = eval_polynomial(std::pow(V, -1.0/3.0), p);
+        energy = aurostd::evalPolynomial(std::pow(V, -1.0/3.0), p);
         break;
       case(EOS_BIRCH_MURNAGHAN3):
       case(EOS_BIRCH_MURNAGHAN4):
-        energy = eval_polynomial(std::pow(V, -2.0/3.0), p);
+        energy = aurostd::evalPolynomial(std::pow(V, -2.0/3.0), p);
         break;
       case(EOS_MURNAGHAN):
         energy = Murnaghan(V, p, dydp);
@@ -2690,7 +2362,7 @@ namespace apl
   {
     xvector<double> E = aurostd::vector2xvector<double>(E0_V);
     xvector<double> fit_params = fitToEOSmodel(E, method);
-    double Vguess = 1.1*EquilibriumVolume(fit_params, method);
+    double Vguess = SCQHA_INITIAL_VOLUME_FACTOR * EquilibriumVolume(fit_params, method);
 
     return SCQHAgetEquilibriumVolume(T, Vguess, fit_params, method);
   }
@@ -2724,7 +2396,8 @@ namespace apl
     // self-consistent loop to determine equilibrium volume at T=0K
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V0K = SCQHAgetEquilibriumVolume(0,1.1*EOS_volume_at_equilibrium,fit_params, method);
+    double V0K = SCQHAgetEquilibriumVolume(0,SCQHA_INITIAL_VOLUME_FACTOR *
+        EOS_volume_at_equilibrium, fit_params, method);
 
     // the name of the output file depends on the EOS fit method
     stringstream file;
@@ -2770,7 +2443,8 @@ namespace apl
 
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V = SCQHAgetEquilibriumVolume(T, 1.1*EOS_volume_at_equilibrium, fit_params, method);
+    double V = SCQHAgetEquilibriumVolume(T, SCQHA_INITIAL_VOLUME_FACTOR * 
+        EOS_volume_at_equilibrium, fit_params, method);
 
     double dT = (Temperatures[Ntemperatures-1]-Temperatures[0])/(Ntemperatures-1);
 
@@ -3378,7 +3052,7 @@ namespace apl
       lattice[2] = struc.b * 1E-10;
       lattice[3] = struc.c * 1E-10;
       eig.lattice = lattice;
-      eig.carstring = "TPHON";
+      eig.carstring = "PHON";
       eig.title = system_title;
 
       //venergy.at(kpoint number).at(band number).at(spin number)
