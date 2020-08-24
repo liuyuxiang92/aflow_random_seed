@@ -303,7 +303,7 @@ double eval_polynomial(double x, const xvector<double> &p)
 /// the value x.
 ///
 /// The highest derivative is determined by the size of the dp array and the result
-/// is stored in the accending order starting from the zero's derivative.
+/// is stored in ascending order starting from the zero's derivative.
 void eval_polynomial_deriv(double x, const xvector<double> &p, xvector<double> &dp)
 {
   for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
@@ -323,8 +323,8 @@ void eval_polynomial_deriv(double x, const xvector<double> &p, xvector<double> &
 /// Evaluates the value and the derivatives of the polynomial with coefficients p at
 /// the value x and returns the result as an array.
 ///
-/// The result is stored in the accending order starting from the zero's derivative.
-/// @param n is the highsted order of derivative to be calculated.
+/// The result is stored in ascending order starting from the zero's derivative.
+/// @param n is the highest order of the derivative to be calculated.
 xvector<double> eval_polynomial_deriv(double x, const xvector<double> &p, uint n)
 {
   xvector<double> dp(n+1);
@@ -332,7 +332,7 @@ xvector<double> eval_polynomial_deriv(double x, const xvector<double> &p, uint n
   return dp;
 }
 
-/// Constructs Vandermonde matrix with columns up to a given order n.
+/// Constructs the Vandermonde matrix with columns up to a given order n.
 /// Vandermonde matrix:
 /// 1 x1^2 x1^3 .. x1^n
 /// 1 x2^2 x2^3 .. x2^n
@@ -351,7 +351,7 @@ xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
   return VM;
 }
 
-/// Calculates the extremum of polynomial bounded by the region [xmin,xmax] by searching
+/// Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
 /// for the value x where the derviative of polynomial equals to zero using the
 /// bisection method.
 ///
@@ -1195,7 +1195,7 @@ namespace apl
 
       if (aurostd::FileExist(subdirectories[i]+'/'+_AFLOWIN_)) continue;
 
-      msg = "Generate aflow.in file in " + subdirectories[i] + " directory.";
+      msg = "Generating aflow.in file in " + subdirectories[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
         *p_oss, _LOGGER_MESSAGE_);
 
@@ -1231,7 +1231,7 @@ namespace apl
     string function = XPID + "QHA::checkAPLCalculations():", msg = "";
 
     if (!isInitialized){
-      msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
+      msg = "QHA was not initialized properly.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return 0;
