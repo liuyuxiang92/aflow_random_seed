@@ -42,6 +42,7 @@ enum ST_DATA_FILE {ST_DF_DIRECTORY, ST_DF_OUTCAR, ST_DF_EIGENVAL, ST_DF_IBZKPT};
 enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 
 #define EOS_METHOD_FILE_SJ "stabilized-jellium."
+#define EOS_METHOD_FILE_BIRCH_MURNAGHAN2 "birch-murnaghan2."
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN3 "birch-murnaghan3."
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
@@ -578,6 +579,11 @@ namespace apl
             writeTphononDispersions(EOS_SJ, QHA_CALC);
           }
 
+          if (qha_options.flag("EOS_MODEL:BM2")){
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA_CALC);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA_CALC);
+          }
+
           if (qha_options.flag("EOS_MODEL:BM3")){
             writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
             writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
@@ -601,6 +607,10 @@ namespace apl
         if (qhanp_data_available){
           if (qha_options.flag("EOS_MODEL:SJ")){
             writeThermalProperties(EOS_SJ, QHANP_CALC);
+          }
+
+          if (qha_options.flag("EOS_MODEL:BM2")){
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHANP_CALC);
           }
 
           if (qha_options.flag("EOS_MODEL:BM3")){
@@ -636,6 +646,11 @@ namespace apl
                 writeTphononDispersions(EOS_SJ, QHA3P_CALC);
               }
 
+              if (qha_options.flag("EOS_MODEL:BM2")){
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC);
+              }
+
               if (qha_options.flag("EOS_MODEL:BM3")){
                 writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
                 writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
@@ -657,6 +672,10 @@ namespace apl
             if (qha_options.flag("EOS_MODEL:SJ")){
               RunSCQHA(EOS_SJ, true);
               writeTphononDispersions(EOS_SJ, SCQHA_CALC);
+            }
+            if (qha_options.flag("EOS_MODEL:BM2")){
+              RunSCQHA(EOS_BIRCH_MURNAGHAN2, true);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC);
             }
             if (qha_options.flag("EOS_MODEL:BM3")){
               RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
@@ -1452,6 +1471,7 @@ namespace apl
           B = BulkModulus_SJ(x, dEdp);
         }
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
       case(EOS_BIRCH_MURNAGHAN3):
       case(EOS_BIRCH_MURNAGHAN4):
         {
@@ -1481,6 +1501,7 @@ namespace apl
           Bp = Bprime_SJ(x, dEdp);
         }
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
       case(EOS_BIRCH_MURNAGHAN3):
       case(EOS_BIRCH_MURNAGHAN4):
         {
@@ -1509,6 +1530,7 @@ namespace apl
           P = -std::pow(x,4)/3.0*dEdp[2];
         }
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
       case(EOS_BIRCH_MURNAGHAN3):
       case(EOS_BIRCH_MURNAGHAN4):
         {
@@ -1536,6 +1558,7 @@ namespace apl
           Veq = std::pow(aurostd::polynomialFindExtremum(parameters, xmin, xmax), -3);
         }
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
       case(EOS_BIRCH_MURNAGHAN3):
       case(EOS_BIRCH_MURNAGHAN4):
         {
@@ -1609,6 +1632,23 @@ namespace apl
           EOS_Bprime_at_equilibrium  = Bprime_SJ(x_eq, dEdp);
         }
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
+        {
+          xvector<double> x(V.rows);
+          for (int i=V.lrows; i<=V.urows; i++) x[i] = std::pow(V[i],-2.0/3.0);
+          aurostd::cematrix M(aurostd::Vandermonde_matrix(x, 3));
+          M.LeastSquare(E);
+          fit_params = M.GetFitVector();
+
+          double x_eq = aurostd::polynomialFindExtremum(fit_params, min(x), max(x));
+          EOS_volume_at_equilibrium = std::pow(x_eq, -3.0/2.0);
+          // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
+          xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
+          EOS_energy_at_equilibrium = dEdp[1];
+          EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
+          EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
+        }
+        break;
       case(EOS_BIRCH_MURNAGHAN3):
         {
           xvector<double> x(V.rows);
@@ -1680,6 +1720,7 @@ namespace apl
       case(EOS_SJ):
         energy = aurostd::evalPolynomial(std::pow(V, -1.0/3.0), p);
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
       case(EOS_BIRCH_MURNAGHAN3):
       case(EOS_BIRCH_MURNAGHAN4):
         energy = aurostd::evalPolynomial(std::pow(V, -2.0/3.0), p);
@@ -2407,6 +2448,9 @@ namespace apl
       case(EOS_SJ):
         filename += sc+EOS_METHOD_FILE_SJ;
         break;
+      case(EOS_BIRCH_MURNAGHAN2):
+        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN2;
+        break;
       case(EOS_BIRCH_MURNAGHAN3):
         filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
         break;
@@ -2614,6 +2658,9 @@ namespace apl
     switch(eos_method){
       case(EOS_SJ):
         filename += EOS_METHOD_FILE_SJ;
+        break;
+      case(EOS_BIRCH_MURNAGHAN2):
+        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN2;
         break;
       case(EOS_BIRCH_MURNAGHAN3):
         filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
