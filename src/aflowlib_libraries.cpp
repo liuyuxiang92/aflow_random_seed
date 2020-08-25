@@ -6296,6 +6296,10 @@ namespace aflowlib {
     deque<string> vdirsOUT,vzips,vcleans;
     XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans); //CO20200501
 
+    uint aflow_max_argv=100;  //CO20200731 - deep directories like AEL/AGL require more room  //AFLOW_MAX_ARGV
+    //CO20200731 - really, aflow_max_argv should count the length of vzips as a total string and make sure it's not longer than 1024
+    //CO20200731 - 100 is a fine heuristic
+
     if(vzips.size()>0) {
       stringstream command;
       if(aurostd::substring2bool(XHOST.hostname,"m7int0") || aurostd::substring2bool(XHOST.hostname,"m6int0")) XHOST.hostname="marylou";
@@ -6303,14 +6307,14 @@ namespace aflowlib {
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".mems.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".pratt.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".duke.edu");
-      for(uint i=0;i<vzips.size();i+=AFLOW_MAX_ARGV) {
+      for(uint i=0;i<vzips.size();i+=aflow_max_argv) {
         command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
         command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
         //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
         command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
-        command << "_" << i/AFLOW_MAX_ARGV+1 << "_" << XHOST.hostname;
+        command << "_" << i/aflow_max_argv+1 << "_" << XHOST.hostname;
         command << " --size=" << NUM_SIZE << " --DIRECTORY ";
-        for(uint j=i;j<i+AFLOW_MAX_ARGV && j<vzips.size();j++) command << " " << vzips.at(j);
+        for(uint j=i;j<i+aflow_max_argv && j<vzips.size();j++) command << " " << vzips.at(j);
         command << " " << endl << endl;
       }
       cerr << command.str() << endl;
