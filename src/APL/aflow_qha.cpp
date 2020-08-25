@@ -1116,6 +1116,12 @@ namespace apl
           dummy_dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
+// AS20200824 we do not want to overwrite the PHDOSCAR created by the independent APL
+// calculation.
+// A.S. was not sure if it is necessary to write the file at QHA level at all (maybe for
+// debug purposes).
+// In the case if it would be necessary to output the file, for convenience the
+// following line is left commented instead of being deleted.
 //      dosc.writePHDOSCAR(subdirectories[i]);//AS20200824
 
       if (dosc.hasNegativeFrequencies()){
@@ -1166,7 +1172,13 @@ namespace apl
       apl::PhononDispersionCalculator pdisc(phcalc);
       pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
-//      pdisc.writePHEIGENVAL(subdirectories[i]);//20200824
+// AS20200824 we do not want to overwrite the PHEIGENVAL created by the independent APL
+// calculation.
+// A.S. was not sure if it is necessary to write the file at QHA level at all (maybe for
+// debug purposes).
+// In the case if it would be necessary to output the file, for convenience the
+// following line is left commented instead of being deleted.
+//      pdisc.writePHEIGENVAL(subdirectories[i]);//AS20200824
 
       // save all the data that is necessary for QHA calculations
       if (i==0){// qmesh data is the same for all volumes: need to store only once
