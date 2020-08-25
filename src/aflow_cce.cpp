@@ -58,8 +58,8 @@ namespace cce {
 
   void print_corrections(xstructure& structure, aurostd::xoption& flags) {
     aurostd::xoption cce_flags = init_flags();
-    if(!(aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") && !aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))){ // additional output like oxidation numbers should not be provided for tests and json; the oxidation numbers are included in the json and don't need to be printed twice
-      cce_flags.flag("SCREEN_ONLY",TRUE);
+    if(aurostd::toupper(flags.flag("CCE_CORRECTION::TEST_COMMAND_LINE"))){ // some output should be written in specific way to test command line functionality
+      cce_flags.flag("TEST_COMMAND_LINE",TRUE);
     } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
       cce_flags.flag("TEST",TRUE);
     }
@@ -139,7 +139,7 @@ namespace cce {
   // For determining the number of anion neighbors for each cation
   void print_num_anion_neighbors(aurostd::xoption& flags, std::istream& ist, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::determine_num_anion_neighbors():";
+    string soliloquy=XPID+"cce::determine_num_anion_neighbors():";
     // read structure
     xstructure structure=read_structure(ist);
 
@@ -218,7 +218,7 @@ namespace cce {
   // for setting parameters, analyzing structure, determining oxidation numbers, assigning corrections,
   // calculating total corrections, converting correction vector, and returning corrections
   vector<double> calculate_corrections(const string& directory_path) {
-    string soliloquy="cce::calculate_corrections():";
+    string soliloquy=XPID+"cce::calculate_corrections():";
     stringstream message;
     // get structure
     string poscar="";
@@ -246,13 +246,15 @@ namespace cce {
   // for setting parameters, analyzing structure, determining oxidation numbers, assigning corrections,
   // calculating total corrections, converting correction vector, and returning corrections
   //vector<double> CCE(xstructure& structure) // OLD: functional will be automatically determined during Bader charge analysis for the current implementation, later when using e.g. electronegativities, it might be needed as input
-  vector<double> calculate_corrections(xstructure& structure, string functional, ostream& oss) { // functional needed as input when determining oxidation numbers from electronegativities
-    string soliloquy="cce::calculate_corrections():";
+  vector<double> calculate_corrections(const xstructure& structure, string functional, ostream& oss) { // functional needed as input when determining oxidation numbers from electronegativities
+    string soliloquy=XPID+"cce::calculate_corrections():";
     stringstream message;
+    // copy structure to structure_to_use since check_structure includes rescaling to 1
+    xstructure structure_to_use=structure;
     // check structure
-    structure=check_structure(structure); //includes rescaling the structure to 1
+    structure_to_use=check_structure(structure_to_use); //includes rescaling the structure to 1
     // init variables and flags
-    CCE_Variables cce_vars = init_variables(structure);
+    CCE_Variables cce_vars = init_variables(structure_to_use);
     aurostd::xoption cce_flags = init_flags();
     // determine functional
     vector<string> CCE_vallowed_functionals;
@@ -267,9 +269,9 @@ namespace cce {
     cce_vars.vfunctionals.push_back(functional);
     cce_vars.offset.push_back(get_offset(functional));
     // run main CCE function to determine correction
-    CCE_core(structure, cce_flags, cce_vars);
+    CCE_core(structure_to_use, cce_flags, cce_vars);
     // print oxidation_numbers
-    oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
+    oss << print_output_oxidation_numbers(structure_to_use, cce_flags, cce_vars);
     // cce_vars.cce_corrections can be returned directly since there is always only one functional for this CCE function
     return cce_vars.cce_correction;
   } // main CCE function for calling inside AFLOW
@@ -282,7 +284,9 @@ namespace cce {
   // and calculating total corrections
   void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::CCE_core():";
+    string soliloquy=XPID+"cce::CCE_core():";
+    // set flag that full correction scheme is run and not just determination of ox. nums. or num. anion neighbors
+    cce_flags.flag("RUN_FULL_CCE",TRUE);
     // determine temperatures
     aurostd::string2tokens(CCE_temperatures, cce_vars.vtemperatures, ",");
     uint num_temps=cce_vars.vtemperatures.size();
@@ -380,7 +384,7 @@ namespace cce {
       // calculate total correction per cell only using cations although 
       // corrections for anions should be set to zero
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){
-        if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+        if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
           if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
             uint num_funcs=cce_vars.vfunctionals.size();
             for (uint k = 0; k < num_funcs; k++) {
@@ -403,7 +407,7 @@ namespace cce {
             cerr << soliloquy << "adding corrections for multi anion species " << k << " (" << cce_vars.multi_anion_species[k] << ")" << endl;
           }
           for(uint i=0,isize=structure.atoms.size();i<isize;i++){
-            if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+            if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
               if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the anion species under consideration
                 uint num_funcs=cce_vars.vfunctionals.size();
                 for (uint l = 0; l < num_funcs; l++) {
@@ -440,7 +444,7 @@ namespace cce {
   //read_structure////////////////////////////////////////////////////////
   // read structural data from structure file provided on command line
   xstructure read_structure(const string& structure_file, int mode){ // first argument can be directly structure_file and not structure_file_path
-    string soliloquy="cce::read_structure():";
+    string soliloquy=XPID+"cce::read_structure():";
     stringstream message;
     //string structure_file = aurostd::file2string(structure_file_path); // first argument of read_structure_function does not need to be converted to string since it contains already the file content and not only the file name
     xstructure structure(structure_file, mode);
@@ -450,7 +454,7 @@ namespace cce {
   //read_structure////////////////////////////////////////////////////////
   // read structural data from istream
   xstructure read_structure(std::istream& ist){
-    string soliloquy="cce::read_structure():";
+    string soliloquy=XPID+"cce::read_structure():";
     xstructure structure(ist);
     return check_structure(structure);
   }
@@ -458,7 +462,7 @@ namespace cce {
   //check_structure////////////////////////////////////////////////////////
   xstructure check_structure(xstructure& structure){
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::check_structure():";
+    string soliloquy=XPID+"cce::check_structure():";
     stringstream message;
     structure.ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
     //let the program spit out what it thinks (input structure)
@@ -495,7 +499,7 @@ namespace cce {
   // set the DFT formation enthalpies and functionals according to the input and check consistency of functionals and formation enthalpies
   void get_dft_form_enthalpies_functionals(const string& dft_enthalpies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_dft_form_enthalpies_functionals():";
+    string soliloquy=XPID+"cce::get_dft_form_enthalpies_functionals():";
     stringstream message;
     // vectorize precalculated DFT formation enthalpies if provided
     if(!dft_enthalpies_input_str.empty()){ //if the DFT enthalpies input string is not empty, convert it to vector of doubles
@@ -508,7 +512,7 @@ namespace cce {
     //use PBE as default if only 1 DFT formation enthalpy is provided
     ostream& oss = cout;
     ofstream FileMESSAGE;
-    _aflags aflags;aflags.Directory=".";
+    _aflags aflags;aflags.Directory=aurostd::getPWD();
     if(functionals_input_str.empty() && cce_vars.dft_enthalpies.size() == 1){
       message << " Setting functionals=PBE since only 1 DFT formation enthalpy is provided and PBE is the default functional!";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
@@ -581,7 +585,7 @@ namespace cce {
   //get_oxidation_states////////////////////////////////////////////////////////
   // Retrieves the oxidation states of the material.
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
-    string soliloquy="cce::get_oxidation_states():";
+    string soliloquy=XPID+"cce::get_oxidation_states():";
     stringstream message;
     if(!oxidation_numbers_input_str.empty()){
       aurostd::string2tokens<double>(oxidation_numbers_input_str,cce_vars.oxidation_states,","); //if the oxidation numbers input string is not empty, convert it to vector of doubles
@@ -610,7 +614,7 @@ namespace cce {
   //get_functional_from_aflow_in_outcar////////////////////////////////////////////////////////
   // determine the functional from the aflow.in or the outcar file if the PP information cannot be determined from the aflow.in
   string get_functional_from_aflow_in_outcar(const xstructure& structure, string& aflowin_file, string& outcar_file) {
-    string soliloquy="cce::get_functional_from_aflow_in_outcar():";
+    string soliloquy=XPID+"cce::get_functional_from_aflow_in_outcar():";
     stringstream message;
     string functional = "";
     string aflowIn = aurostd::RemoveComments(aurostd::file2string(aflowin_file));
@@ -706,7 +710,7 @@ namespace cce {
         if (vLDAUtype[k] != 2 && vLDAUU[k] !=0){
           ostream& oss = cout;
           ofstream FileMESSAGE;
-          _aflags aflags;aflags.Directory=".";
+          _aflags aflags;aflags.Directory=aurostd::getPWD();
           message << " BAD NEWS: It seems the standard DFT+U method for " << species_vector[k] << " was changed from Dudarev's approach (LDAU2=ON, vLDAUtype[" << k << "]=2)" << std::endl;
           message << "as used for the AFLOW ICSD database when obtaining the corrections to vLDAUtype[" << k << "]=" << vLDAUtype[k] << " now." << std::endl;
           message << "If the standard U values have also been changed, then the corrections might have been constructed for other U values than used in this calculation" << std::endl;
@@ -768,8 +772,9 @@ namespace cce {
   // Initializes the CCE flags to their default values.
   aurostd::xoption init_flags() {
     aurostd::xoption flags;
-    flags.flag("SCREEN_ONLY", false);
+    flags.flag("TEST_COMMAND_LINE", false);
     flags.flag("TEST", false);
+    flags.flag("RUN_FULL_CCE", false);
     flags.flag("CORRECTABLE", true); // first assuming that formation enthalpy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     flags.flag("OX_NUMS_PROVIDED", false);
     flags.flag("MULTI_ANION_SYSTEM", false);
@@ -833,7 +838,7 @@ namespace cce {
   // determine anion species
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::determine_anion_species():";
+    string soliloquy=XPID+"cce::determine_anion_species():";
     stringstream message;
     if(LDEBUG){
       cerr << soliloquy << "ANION SPECIES FROM ALLEN ELECTRONEGATIVITIES:" << endl;
@@ -880,7 +885,7 @@ namespace cce {
   // check whether it is a multi-anion system, i. e. whether atoms of another species than the the anion_species are only bound to atoms of lower electronegativity or of the same type
   vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::check_for_multi_anion_system():";
+    string soliloquy=XPID+"cce::check_for_multi_anion_system():";
     stringstream message;
     if(LDEBUG){
       cerr << soliloquy << "CHECKING FOR MULTI-ANION SYSTEM:" << endl;
@@ -898,10 +903,10 @@ namespace cce {
       uint multi_anion_count=0;
       for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
         const _atom& atom=neigh_mat[i][j]; // the atom object stands for the neighbors of each atom of the structure
-        if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
+        if ((_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type]) ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
           if (atom.cleanname == cce_vars.anion_species){
             neighbors_count+=1;
-          } else if (atom.cleanname != cce_vars.anion_species && structure.atoms[i].cleanname != cce_vars.anion_species){ // second condition set since the anion_species cannot be set as a multi-anion species again
+          } else if ((atom.cleanname != cce_vars.anion_species) && (structure.atoms[i].cleanname != cce_vars.anion_species)){ // second condition set since the anion_species cannot be set as a multi-anion species again
             neighbors_count+=1;
             z = GetAtomNumber(structure.atoms[i].cleanname);
             xelement::xelement atom_element(z);
@@ -913,7 +918,7 @@ namespace cce {
               cerr << soliloquy << "electronegativity of atom " << i << ": " << electronegativity_atom << endl;
               cerr << soliloquy << "electronegativity of neighbor " << j << ": " << electronegativity_neighbor << endl;
             }
-            if(electronegativity_neighbor < electronegativity_atom || structure.atoms[i].cleanname == atom.cleanname){ // could be multi-anion atom if bound to only atoms of lower electroneg. or of same species
+            if((electronegativity_neighbor < electronegativity_atom) || (structure.atoms[i].cleanname == atom.cleanname)){ // could be multi-anion atom if bound to only atoms of lower electroneg. or of same species
               multi_anion_count+=1;
             }
           }
@@ -923,18 +928,18 @@ namespace cce {
         cerr << soliloquy << "multi_anion_count for atom " << i << " (" << structure.atoms[i].cleanname << "): " << multi_anion_count << endl;
         cerr << soliloquy << "neighbors_count for atom " << i << " (" << structure.atoms[i].cleanname << "): " << neighbors_count << endl;
       }
-      if (multi_anion_count == neighbors_count && structure.atoms[i].cleanname != cce_vars.anion_species){ // anion_species should not be detected again as multi_anion_species
+      if ((multi_anion_count == neighbors_count) && (structure.atoms[i].cleanname != cce_vars.anion_species)){ // anion_species should not be detected again as multi_anion_species
         if (!cce_flags.flag("MULTI_ANION_SYSTEM")){
           cce_flags.flag("MULTI_ANION_SYSTEM",TRUE);
           stringstream message;
           message << " This system has been detected to be a multi-anion compound!" << endl;
-          if(cce_flags.flag("SCREEN_ONLY")){
+          if(cce_flags.flag("TEST_COMMAND_LINE")){
             oss << endl;
             oss << "WARNING:" << message.str();
           } else if (!cce_flags.flag("TEST")){
             ostream& oss = cout;
             ofstream FileMESSAGE;
-            _aflags aflags;aflags.Directory=".";
+            _aflags aflags;aflags.Directory=aurostd::getPWD();
             pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
@@ -1007,7 +1012,7 @@ namespace cce {
   // trying to get the number of neighbors for each atom within respective species selective cutoff
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) { // anion_species here cannot be taken from cce_vars since function is also used to determine multi anion num_neighbors for which anion_species is the respective multi_anion_species
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_num_neighbors():";
+    string soliloquy=XPID+"cce::get_num_neighbors():";
     if(LDEBUG){
       cerr << soliloquy << "STRUCTURAL ANALYSIS:" << endl;
     }
@@ -1022,12 +1027,12 @@ namespace cce {
       stringstream other_neighbors;
       for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
         const _atom& atom=neigh_mat[i][j];
-        if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
+        if ((_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type]) ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
           if (!anion_species.empty()){ // variable called anion type since function was developed for CCE for polar materials but it can be used to check for any atom type and only include those as neighbors
             // implement check whether each nearest neighbor is of the anion_species, otherwise throw warning; 
             if (atom.cleanname == anion_species){
               neighbors_count+=1;
-            } else if (atom.cleanname != anion_species && structure.atoms[i].cleanname != anion_species){ // second condition set since it is expected that the anion has predominantly other neighbors than its own type 
+            } else if ((atom.cleanname != anion_species) && (structure.atoms[i].cleanname != anion_species)){ // second condition set since it is expected that the anion has predominantly other neighbors than its own type 
               if (!cce_flags.flag("MULTI_ANION_SYSTEM")){
                 if (!warning) { warning = true; }
                 other_neighbors << "Not all nearest neighbors of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]) within the distance tolerance of " << tolerance << " Ang. are " << anion_species << ", there is also " << atom.cleanname << endl;
@@ -1042,13 +1047,13 @@ namespace cce {
         stringstream message;
         message << " Not all nearest neighbors of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]) within the distance tolerance are " << anion_species << "!" << endl;
         message << other_neighbors.str();
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("TEST_COMMAND_LINE")){
           oss << endl;
           oss << "WARNING:" << message.str();
         } else if (!cce_flags.flag("TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
-          _aflags aflags;aflags.Directory=".";
+          _aflags aflags;aflags.Directory=aurostd::getPWD();
           pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
       }
@@ -1065,7 +1070,7 @@ namespace cce {
   // determine species selective nearest neighbor distances and then cutoffs accordingly
   vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_dist_cutoffs():";
+    string soliloquy=XPID+"cce::get_dist_cutoffs():";
     vector<double> cutoffs(structure.species.size());
     xmatrix<double> distsij=GetDistMatrix(structure); // gives matrix with nearest neighbor distances between all species pairs with species running over rows and columns
     vector<double> near_neigh_dist(structure.species.size());
@@ -1091,7 +1096,7 @@ namespace cce {
   // check whether the system contains per- or superoxide ions based on the O-O bond length and set variables accordingly
   void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::check_per_super_oxides():";
+    string soliloquy=XPID+"cce::check_per_super_oxides():";
     stringstream message;
     if(LDEBUG){
       cerr << soliloquy << "CHECKING FOR (SU-)PEROXIDES:" << endl;
@@ -1111,19 +1116,19 @@ namespace cce {
         for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by the cutoffs_max
           const _atom& atom=neigh_mat[i][j];
           if (atom.cleanname == "O"){
-            if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= _CCE_O2_molecule_lower_cutoff_ ){ // distance must be larger than _CCE_SELF_DIST_TOL_ to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong
+            if ((_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= _CCE_O2_molecule_lower_cutoff_) ){ // distance must be larger than _CCE_SELF_DIST_TOL_ to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong
               message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS SHORTER THAN IN THE O2 MOLECULE; CHECK YOUR STRUCTURE! THE O-O BOND LENGTH IS: " << AtomDist(structure.atoms[i],atom) << " Ang.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-            } else if (_CCE_O2_molecule_lower_cutoff_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) < _CCE_O2_molecule_upper_cutoff_ ){
+            } else if ((_CCE_O2_molecule_lower_cutoff_ < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) < _CCE_O2_molecule_upper_cutoff_) ){
               message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS ABOUT THE SAME AS IN THE O2 MOLECULE, I.E. THE STRUCTURE SEEMS TO INCLUDE MOLECULAR OXYGEN FOR WHICH NO CCE CORRECTION IS AVAILABLE! THE O-O BOND LENGTH IS: " << AtomDist(structure.atoms[i],atom) << " Ang.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-            } else if (_CCE_O2_molecule_upper_cutoff_ <= AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= _CCE_superox_cutoff_ ){
+            } else if ((_CCE_O2_molecule_upper_cutoff_ <= AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= _CCE_superox_cutoff_) ){
               if(LDEBUG){
                 cerr << soliloquy << "WARNING: This should be a superoxide; the O-O bond length is: " << AtomDist(structure.atoms[i],atom) << " Ang." << endl;
               }
               superox_count+=1;
               cce_vars.superox_indices[i]=1;
-            } else if (_CCE_superox_cutoff_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= _CCE_perox_cutoff_ ){
+            } else if ((_CCE_superox_cutoff_ < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= _CCE_perox_cutoff_) ){
               if(LDEBUG){
                 cerr << soliloquy << "WARNING: This should be a peroxide; the O-O bond length is: " << AtomDist(structure.atoms[i],atom) << " Ang." << endl;
               }
@@ -1141,26 +1146,26 @@ namespace cce {
       stringstream message;
       message << " This should be a peroxide!" << endl;
       message << "Number of peroxide O-O bonds in cell: " << cce_vars.num_perox_bonds << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     } else if (cce_vars.num_superox_bonds > 0) {
       stringstream message_so;
       message_so << " This should be a superoxide!" << endl;
       message_so << "Number of superoxide O-O bonds in cell: " << cce_vars.num_superox_bonds << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message_so.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message_so, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     }
@@ -1196,7 +1201,7 @@ namespace cce {
   // determine the oxidation numbers of the ions using preferred/all known oxidation numbers, electronegativities and structural information
   vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_oxidation_states_from_electronegativities():";
+    string soliloquy=XPID+"cce::get_oxidation_states_from_electronegativities():";
     stringstream message;
     if(LDEBUG){
       cerr << soliloquy << "DETERMINATION OF OXIDATION NUMBERS FROM PREFERRED/ALL KNOWN OXIDATION STATES, ALLEN ELECTRONEGATIVITIES, AND STRUCTURE:" << endl;
@@ -1218,7 +1223,7 @@ namespace cce {
     cce_flags.flag("NO_OX_STATES",FALSE);
     cce_flags.flag("OX_STATES_DETERMINED",FALSE);
     load_ox_states_templates_each_species(structure, cce_flags, cce_vars);
-    //ME201911, exact date is not known, only that it was Nov.; for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
+    //ME20191101 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
     uint natoms = structure.atoms.size();
     cce_vars.cations_map.resize(num_cation_species);
     uint i = 0;
@@ -1261,7 +1266,7 @@ namespace cce {
           cce_flags.flag("CORRECTABLE",FALSE);
           oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
           message << "BAD NEWS: The determined oxidation numbers do not add up to zero!"  << endl;
-          if(cce_flags.flag("SCREEN_ONLY")){
+          if(cce_flags.flag("RUN_FULL_CCE")){
             message << "The formation enthalpy of this system is hence not correctable!"  << endl;
             message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           }
@@ -1269,12 +1274,11 @@ namespace cce {
         }
       } else{ // error message that oxidation numbers cannot be determined since for at least one species there are no known oxidation numbers is already included in load_ox_states_templates_each_species function
         cce_flags.flag("CORRECTABLE",FALSE);
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("RUN_FULL_CCE")){
           message << "The formation enthalpy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
         }
-        //oss << endl;
       }
     }
     return cce_vars.oxidation_states;
@@ -1284,13 +1288,13 @@ namespace cce {
   // determine the oxidation numbers of the anions
   void set_anion_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::set_anion_oxidation_states():";
+    string soliloquy=XPID+"cce::set_anion_oxidation_states():";
     if(LDEBUG){
       cerr << soliloquy << soliloquy << "ANION PART:" << endl;
     }
     double total_anion_charge=0;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == cce_vars.anion_species || cce_vars.multi_anion_atoms[i] == 1){
+      if ((structure.atoms[i].cleanname == cce_vars.anion_species) || (cce_vars.multi_anion_atoms[i] == 1)){
         if (structure.atoms[i].cleanname == cce_vars.anion_species){ // for multi-anion atoms oxidation states have been assigned previously
           cce_vars.oxidation_states[i] = cce_vars.standard_anion_charge; // oxidation numbers for O are assumed to be -2 (other anions accordingly) and are corrected below if it is a per- or superoxide O atom as identified from the structural analysis in other functions
         }
@@ -1323,7 +1327,7 @@ namespace cce {
   // sort species ascending by electronegativity
   void sort_species_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::sort_species_by_electronegativity():";
+    string soliloquy=XPID+"cce::sort_species_by_electronegativity():";
     // using aurostd sort functions
     vector<double> electronegativities_sorted = cce_vars.electronegativities;
     for(uint j=0,jsize=structure.species.size();j<jsize;j++){ //loop over all species
@@ -1345,7 +1349,7 @@ namespace cce {
   // load templates for preferred and other oxidation states
   void load_ox_states_templates_each_species(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::load_ox_states_templates_each_species():";
+    string soliloquy=XPID+"cce::load_ox_states_templates_each_species():";
     stringstream message;
     _atom atom;
     uint z = 0;
@@ -1391,7 +1395,7 @@ namespace cce {
         cce_flags.flag("NO_OX_STATES",TRUE);
         message << "BAD NEWS: There are no known oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << ")."  << endl;
         message << "Therefore the oxidation states cannot be determined on this basis." << endl;
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("RUN_FULL_CCE")){
           message << "The formation enthalpy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
         }
@@ -1404,7 +1408,7 @@ namespace cce {
   // try to determine the oxidation numbers using the preferred oxidation states for all cation species
   void try_preferred_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::try_preferred_oxidation_states():";
+    string soliloquy=XPID+"cce::try_preferred_oxidation_states():";
     if(LDEBUG){
       cerr << soliloquy << "Trying preferred oxidation numbers:" << endl;
     }
@@ -1423,7 +1427,7 @@ namespace cce {
   // with the actual formula Sb2O4 it is a mixed valence oxide with one Sb+3 with 4 Sb-O bonds and one Sb+5 with 6 Sb-O bonds
   void treat_SbO2_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_SbO2_special_case():";
+    string soliloquy=XPID+"cce::treat_SbO2_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Sb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
     uint num_O_before_Sb = 0;
@@ -1458,19 +1462,19 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Sb2O4 with ratio of Sb/O= " << Sb_O_ratio << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 6) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/6; // 6 for Sb2O4
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        if(LDEBUG){
+          cerr << "number of formula units in cell: " << num_formula_units_in_cell << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Sb"){
@@ -1479,21 +1483,21 @@ namespace cce {
             // number of Sb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
             if ( i < (1+num_O_before_Sb)*num_formula_units_in_cell ){  // (1 Sb3+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
               cce_vars.oxidation_states[i]=3;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+3 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+3 " << endl;
               }
               cce_vars.num_neighbors[i]=4; // for Sb2O4 the Sb3+ ions are 4-fold coordinated by oxygen
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
               }
             } else {
               cce_vars.oxidation_states[i]=5;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+5 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+5 " << endl;
               }
               cce_vars.num_neighbors[i]=6; // for Sb2O4 the Sb5+ ions are 6-fold coordinated by oxygen
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+5: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+5: " << cce_vars.num_neighbors[i] << endl;
               }
             }
           }
@@ -1510,7 +1514,7 @@ namespace cce {
   // for Pb3O4 the oxidation states are not identified properly
   // https://en.wikipedia.org/wiki/Lead(II,IV)_oxide
   void treat_Pb3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
-    string soliloquy="cce::treat_Pb3O4_special_case():";
+    string soliloquy=XPID+"cce::treat_Pb3O4_special_case():";
     stringstream message;
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Pb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Pb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
@@ -1546,19 +1550,19 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Pb3O4 with ratio of Pb/O= " << Pb_O_ratio << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 7) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Pb3O4
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        if(LDEBUG){
+          cerr << "number of formula units in cell: " << num_formula_units_in_cell << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Pb"){
@@ -1567,21 +1571,21 @@ namespace cce {
             // number of Pb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
             if ( i < (1+num_O_before_Pb)*num_formula_units_in_cell ){  // (1 Pb4+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
               cce_vars.oxidation_states[i]=4;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+4 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+4 " << endl;
               }
               cce_vars.num_neighbors[i]=6; // for Pb3O4 the Pb4+ ions are 6-fold coordinated by oxygen
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+4: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+4: " << cce_vars.num_neighbors[i] << endl;
               }
             } else {
               cce_vars.oxidation_states[i]=2;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+2 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+2 " << endl;
               }
               cce_vars.num_neighbors[i]=3; // for Pb3O4 the Pb2+ ions are 3-fold coordinated by oxygen
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+2: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+2: " << cce_vars.num_neighbors[i] << endl;
               }
             }
           }
@@ -1600,7 +1604,7 @@ namespace cce {
   // of the respective oxidation state there are, not which one is which
   void treat_Ti_O_Magneli_phase_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_Ti_O_Magneli_phase_special_case():";
+    string soliloquy=XPID+"cce::treat_Ti_O_Magneli_phase_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ti" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
     uint num_O_before_Ti = 0;
@@ -1649,19 +1653,19 @@ namespace cce {
         message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
         message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         message << "n= " << n << " Magneli composition Ti_nO_(2n-1)" << endl;
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("TEST_COMMAND_LINE")){
           oss << endl;
           oss << "WARNING:" << message.str();
         } else if (!cce_flags.flag("TEST")) {
           ostream& oss = cout;
           ofstream FileMESSAGE;
-          _aflags aflags;aflags.Directory=".";
+          _aflags aflags;aflags.Directory=aurostd::getPWD();
           pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         magneli = true;
         num_formula_units_in_cell=amount_Ti/n;
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        if(LDEBUG){
+          cerr << "number of formula units in cell: " << num_formula_units_in_cell << endl;
         }
       }
     }
@@ -1677,13 +1681,13 @@ namespace cce {
           // for the Magneli phases both Ti+3 and Ti+4 have both always 6 Ti-O bonds
           if ( i < (2+num_O_before_Ti)*num_formula_units_in_cell ){
             cce_vars.oxidation_states[i]=3;
-            if(cce_flags.flag("SCREEN_ONLY")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+3 " << endl;
+            if(LDEBUG){
+              cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+3 " << endl;
             }
           } else {
             cce_vars.oxidation_states[i]=4;
-            if(cce_flags.flag("SCREEN_ONLY")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
+            if(LDEBUG){
+              cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
             }
           }
         }
@@ -1705,7 +1709,7 @@ namespace cce {
   // https://en.wikipedia.org/wiki/Manganese(II,III)_oxide
   void treat_Fe3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_Fe3O4_special_case():";
+    string soliloquy=XPID+"cce::treat_Fe3O4_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
     uint num_O_before_Fe = 0;
@@ -1740,19 +1744,19 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Fe3O4 with ratio of Fe/O= " << Fe_O_ratio << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 7) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Fe3O4
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        if(LDEBUG){
+          cerr << "number of formula units in cell: " << num_formula_units_in_cell << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
@@ -1761,21 +1765,21 @@ namespace cce {
             // number of Fe-O bonds (this is a hack since I know how many bonds there should be for each ion type)
             if ( i < (1+num_O_before_Fe)*num_formula_units_in_cell ){  // 1 Fe2+ ions per formula unit * number of formula units
               cce_vars.oxidation_states[i]=2;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
               }
               cce_vars.num_neighbors[i]=6; // for Fe3O4 the Fe2+ ions are 6-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+2: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+2: " << cce_vars.num_neighbors[i] << endl;
               }
             } else {
               cce_vars.oxidation_states[i]=3;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
               }
               cce_vars.num_neighbors[i]=5; // for Fe3O4 the Fe3+ ions are evenly 6- and 4-fold, so on average 5-fold (set here as a hack) coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+3 (average between even 6- and 4-fold coordination): " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+3 (average between even 6- and 4-fold coordination): " << cce_vars.num_neighbors[i] << endl;
               }
             }
           }
@@ -1796,7 +1800,7 @@ namespace cce {
   // https://en.wikipedia.org/wiki/Manganese(II,III)_oxide
   void treat_Mn3O4_Co3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& cation_species, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_Mn3O4_Co3O4_special_case():";
+    string soliloquy=XPID+"cce::treat_Mn3O4_Co3O4_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == cation_species) || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == cation_species && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
     uint num_O_before_cation_species = 0;
@@ -1831,19 +1835,19 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << cation_species << "3O4 with ratio of " << cation_species << "/O= " << cation_species_O_ratio << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 7) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Mn3O4 and Co3O4
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        if(LDEBUG){
+          cerr << "number of formula units in cell: " << num_formula_units_in_cell << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == cation_species){
@@ -1852,21 +1856,21 @@ namespace cce {
             // number of Mn/Co-O bonds (this is a hack since I know how many bonds there should be for each ion type)
             if ( i < (1+num_O_before_cation_species)*num_formula_units_in_cell ){  // 1 Mn/Co2+ ions per formula unit * number of formula units
               cce_vars.oxidation_states[i]=2;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to " << cation_species << "+2 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to " << cation_species << "+2 " << endl;
               }
               cce_vars.num_neighbors[i]=4; // for Mn3O4/Co3O4 the Mn/Co2+ ions are 4-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of " << cation_species << " (atom[" << i << "]) taken as " << cation_species << "+2: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of " << cation_species << " (atom[" << i << "]) taken as " << cation_species << "+2: " << cce_vars.num_neighbors[i] << endl;
               }
             } else {
               cce_vars.oxidation_states[i]=3;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to " << cation_species << "+3 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to " << cation_species << "+3 " << endl;
               }
               cce_vars.num_neighbors[i]=6; // for Mn3O4/Co3O4 the Mn/Co3+ ions are 6-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "Modified number of neighbors of " << cation_species << " (atom[" << i << "]) taken as " << cation_species << "+3: " << cce_vars.num_neighbors[i] << endl;
+              if(LDEBUG){
+                cerr << "Modified number of neighbors of " << cation_species << " (atom[" << i << "]) taken as " << cation_species << "+3: " << cce_vars.num_neighbors[i] << endl;
               }
             }
           }
@@ -1889,7 +1893,7 @@ namespace cce {
   // the oxidation numbers and per- as well as superoxide corrections will be adjusted accordingly
   void treat_alkali_sesquioxide_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_alkali_sesquioxide_special_case():";
+    string soliloquy=XPID+"cce::treat_alkali_sesquioxide_special_case():";
     stringstream message;
     string alkali_metals = "Li,Na,K,Rb,Cs,Fr";
     vector<string> valkali_metals;
@@ -1937,19 +1941,19 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << alkali_metal << "2O3 with ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 5) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/5; // 5 for alkali_metal2O3
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        if(LDEBUG){
+          cerr << "number of formula units in cell: " << num_formula_units_in_cell << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "O"){
@@ -1960,26 +1964,26 @@ namespace cce {
             // (this is a hack since I know how many bonds there should be for each ion type)
             if ( i < (2+num_alkali_before_O)*num_formula_units_in_cell ){  // 2 superoxide O-atoms per formula unit * number of formula units
               cce_vars.oxidation_states[i]=-0.5;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-0.5 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to -0.5 " << endl;
               }
               cce_vars.superox_indices[i]=1;
             } else {
               cce_vars.oxidation_states[i]=-1;
-              if(cce_flags.flag("SCREEN_ONLY")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-1 " << endl;
+              if(LDEBUG){
+                cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to -1 " << endl;
               }
               cce_vars.perox_indices[i]=1;
             }
           }
         }
         cce_vars.num_superox_bonds=1*num_formula_units_in_cell; // 1 superox. bonds per formula unit * num. formula units
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "Number of superoxide bonds set to: " << cce_vars.num_superox_bonds << endl;
+        if(LDEBUG){
+          cerr << "Number of superoxide bonds set to: " << cce_vars.num_superox_bonds << endl;
         }
         cce_vars.num_perox_bonds=0.5*num_formula_units_in_cell; // 0.5 perox. bonds per formula unit * num. formula units; this should neve yield a non-integer since there should be at least one complete peroxide ion per cell
-        if(cce_flags.flag("SCREEN_ONLY")){
-          oss << "Number of peroxide bonds set to: " << cce_vars.num_perox_bonds << endl;
+        if(LDEBUG){
+          cerr << "Number of peroxide bonds set to: " << cce_vars.num_perox_bonds << endl;
         }
       } else {
         message << " The total number of atoms is not divisible by 5 as needed for alkali metal sesquioxide. Please check your structure.";
@@ -1997,7 +2001,7 @@ namespace cce {
   // is accidentally 0 it needs to be corrected individually
   void treat_MnMoO4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_MnMoO4_special_case():";
+    string soliloquy=XPID+"cce::treat_MnMoO4_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Mn" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mo" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "O" )) {return;}
     double amount_Mn=0;
@@ -2021,26 +2025,26 @@ namespace cce {
       if (aurostd::isequal(amount_Mn/amount_Mo,1.0) && aurostd::isequal(amount_Mn/amount_O,0.25) && aurostd::isequal(amount_Mo/amount_O,0.25)) {
         stringstream message;
         message << " MnMoO4 special treatment since sum over oxidation states is zero but individual oxidation numbers are wrong!!!" << endl;
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("TEST_COMMAND_LINE")){
           oss << endl;
           oss << "WARNING:" << message.str();
         } else if (!cce_flags.flag("TEST")) {
           ostream& oss = cout;
           ofstream FileMESSAGE;
-          _aflags aflags;aflags.Directory=".";
+          _aflags aflags;aflags.Directory=aurostd::getPWD();
           pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Mn"){
             cce_vars.oxidation_states[i]=2;
-            if(cce_flags.flag("SCREEN_ONLY")){
-             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
+            if(LDEBUG){
+             cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
             }
           }
           if (structure.atoms[i].cleanname == "Mo"){
             cce_vars.oxidation_states[i]=6;
-            if(cce_flags.flag("SCREEN_ONLY")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mo+6 " << endl;
+            if(LDEBUG){
+              cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mo+6 " << endl;
             }
           }
         }
@@ -2057,7 +2061,7 @@ namespace cce {
   // to be Fe+3 but are partly Fe+2 which will be corrected here
   void treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_Ca2Fe2O5_CaFe2O4_LDA_special_case():";
+    string soliloquy=XPID+"cce::treat_Ca2Fe2O5_CaFe2O4_LDA_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ca" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "O" )) {return;}
     double amount_Ca=0;
@@ -2082,15 +2086,15 @@ namespace cce {
       if (aurostd::isequal(amount_Ca/amount_Fe,1.0) && aurostd::isequal(amount_Ca/amount_O,0.4) && aurostd::isequal(amount_Fe/amount_O,0.4)) {
         stringstream message;
         message << " Ca2Fe2O5 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("TEST_COMMAND_LINE")){
           oss << endl;
           oss << "WARNING:" << message.str();
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
             cce_vars.oxidation_states[i]=3;
-            if(cce_flags.flag("SCREEN_ONLY")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
+            if(LDEBUG){
+              cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
             }
           }
         }
@@ -2099,15 +2103,15 @@ namespace cce {
       } else if (amount_Ca/amount_Fe == 0.5 && amount_Ca/amount_O == 0.25 && amount_Fe/amount_O == 0.5) {
         stringstream message;
         message << " CaFe2O4 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("TEST_COMMAND_LINE")){
           oss << endl;
           oss << "WARNING:" << message.str();
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
             cce_vars.oxidation_states[i]=3;
-            if(cce_flags.flag("SCREEN_ONLY")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
+            if(LDEBUG){
+              cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
             }
           }
         }
@@ -2125,7 +2129,7 @@ namespace cce {
   // in non-zero oxidation number sum, which is fixed here
   void treat_FeTiO3_LDA_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::treat_FeTiO3_LDA_special_case():";
+    string soliloquy=XPID+"cce::treat_FeTiO3_LDA_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "Ti" )) {return;}
     double amount_Fe=0;
@@ -2150,15 +2154,15 @@ namespace cce {
       if (aurostd::isequal(amount_Fe/amount_Ti,1.0) && aurostd::isequal(amount_Fe/amount_O,1.0/3) && aurostd::isequal(amount_Ti/amount_O,1.0/3)) {
         stringstream message;
         message << " FeTiO3 special treatment for LDA since oxidation numbers for Ti, which should be Ti+4, are not correctly determined from Bader charges and using other fixing would also change Fe oxidation numbers!!!" << endl;
-        if(cce_flags.flag("SCREEN_ONLY")){
+        if(cce_flags.flag("TEST_COMMAND_LINE")){
           oss << endl;
           oss << "WARNING:" << message.str();
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Ti"){
             cce_vars.oxidation_states[i]=4;
-            if(cce_flags.flag("SCREEN_ONLY")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
+            if(LDEBUG){
+              cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
             }
           }
         }
@@ -2173,7 +2177,7 @@ namespace cce {
   //check_ox_nums_special_case////////////////////////////////////////////////////////
   // part checking oxidation numbers for special case treatment
   void check_ox_nums_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
-    string soliloquy="cce::check_ox_nums_special_case():";
+    string soliloquy=XPID+"cce::check_ox_nums_special_case():";
     stringstream message;
     // calculate sum of oxidation numbers
     cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars);
@@ -2193,7 +2197,7 @@ namespace cce {
   // try to determine the oxidation numbers using all known oxidation states for all cation species
   void try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::try_all_oxidation_states():";
+    string soliloquy=XPID+"cce::try_all_oxidation_states():";
     if(LDEBUG){
       cerr << soliloquy << "Trying all known oxidation numbers:" << endl;
     }
@@ -2202,13 +2206,13 @@ namespace cce {
   }
 
   //determine_cation_oxidation_states////////////////////////////////////////////////////////
-  //ME201911, exact date is not knonw only that it was Nov.
+  //ME20191101
   // for avoiding recursion algorithm to determine cation oxidation_numbers
   // determine the cation oxidation numbers by using possible oxidation states for each species 
   // which can be either the preferred or all known oxidation numbers
   void determine_cation_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars, const vector<vector<double> >& possible_ox_states) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::determine_cation_oxidation_states():";
+    string soliloquy=XPID+"cce::determine_cation_oxidation_states():";
     uint num_cation_species = cce_vars.cations_map.size(); // the number of cation species
     uint natoms = cce_vars.oxidation_states.size();
 
@@ -2313,7 +2317,7 @@ namespace cce {
   // determine the oxidation numbers of the ions by an analysis of the Bader charges of the system and handle known exceptional cases explicitly
   vector<double> get_oxidation_states_from_Bader(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_oxidation_states_from_Bader():";
+    string soliloquy=XPID+"cce::get_oxidation_states_from_Bader():";
     stringstream message;
     if(LDEBUG){
       cerr << soliloquy << "DETERMINATION OF OXIDATION NUMBERS FROM BADER CHARGES:" << endl;
@@ -2398,7 +2402,7 @@ namespace cce {
   // determine the system name and functional from the aflow_in
   void get_system_name_functional_from_aflow_in(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& system_name, string& functional, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_system_name_functional_from_aflow_in():";
+    string soliloquy=XPID+"cce::get_system_name_functional_from_aflow_in():";
     stringstream message;
     string outcar="OUTCAR.relax1";
     functional=get_functional_from_aflow_in_outcar(structure, _AFLOWIN_,outcar);
@@ -2407,7 +2411,7 @@ namespace cce {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     // Bader implementation works currently only with Bader file and aflow.in in directory where AFLOW is run
-    system_name=KBIN::ExtractSystemNameFromAFLOWIN(".");
+    system_name=KBIN::ExtractSystemNameFromAFLOWIN(aurostd::getPWD());
     if(LDEBUG){
       cerr << soliloquy << "functional determined from aflow.in: " << functional << endl;
       cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
@@ -2423,13 +2427,13 @@ namespace cce {
     if(!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == functional)){
       stringstream message;
       message << " The oxidation numbers are only determined on the basis of a" << (functional == "LDA"?"n ":" ") << functional << " calculation." << endl;
-      if(cce_flags.flag("SCREEN_ONLY")){
+      if(cce_flags.flag("TEST_COMMAND_LINE")){
         oss << endl;
         oss << "WARNING:" << message.str();
       } else if (!cce_flags.flag("TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
-        _aflags aflags;aflags.Directory=".";
+        _aflags aflags;aflags.Directory=aurostd::getPWD();
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     }
@@ -2439,7 +2443,7 @@ namespace cce {
   // determine the Bader charges from the AFLOW Bader file (_abader.out)
   vector<double> get_Bader_charges_from_Bader_file(const xstructure& structure, CCE_Variables& cce_vars, const string& Bader_file) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_Bader_charges_from_Bader_file():";
+    string soliloquy=XPID+"cce::get_Bader_charges_from_Bader_file():";
     vector<string> vlines; 
     aurostd::efile2vectorstring(Bader_file,vlines);
     vector<string> tokens;
@@ -2459,7 +2463,7 @@ namespace cce {
   // compare Bader charges to template values from fitting set and set oxidation numbers accordingly
   vector<double> Bader_charges_to_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& functional, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::Bader_charges_to_oxidation_states():";
+    string soliloquy=XPID+"cce::Bader_charges_to_oxidation_states():";
     stringstream message;
     bool print_empty_line=TRUE;
     bool error1=FALSE;
@@ -2575,9 +2579,9 @@ namespace cce {
         }
       }
     }
-    if(!cce_flags.flag("SCREEN_ONLY")){ // throw following errors only when CCE is not called from the command line; otherwise automated checks break
+    if(!cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
       if (error1) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
-        message << " VERY BAD NEWS: The formation enthalpy of this system is not correctlable since some of the species were not included in the set for deducing corrections!"  << endl;
+        message << " VERY BAD NEWS: The formation enthalpy of this system is not correctable since some of the species were not included in the set for deducing corrections!"  << endl;
         message << " See the output for details.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       } else if (error2) {
@@ -2594,16 +2598,17 @@ namespace cce {
   // a brute force ansatz can be implemented to just change their oxidation state and later check 
   // whether it fixes the oxidation number sum rule
   void general_attempt_fixing_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
-    string soliloquy="cce::general_attempt_fixing_oxidation_states():";
+    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy=XPID+"cce::general_attempt_fixing_oxidation_states():";
     stringstream message;
     message << " The sum over all oxidation numbers (as determined from the Bader charges) is NOT zero, trying to repair that based on known problematic cases (Ti, V, Fe). This may or may not work." << endl;
-    if(cce_flags.flag("SCREEN_ONLY")){
+    if(cce_flags.flag("TEST_COMMAND_LINE")){
       oss << endl;
       oss << "WARNING:" << message.str();
     } else if (!cce_flags.flag("TEST")) {
       ostream& oss = cout;
       ofstream FileMESSAGE;
-      _aflags aflags;aflags.Directory=".";
+      _aflags aflags;aflags.Directory=aurostd::getPWD();
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
     }
     // repairing only by considering non mixed valence oxides
@@ -2611,29 +2616,29 @@ namespace cce {
       if (structure.atoms[i].cleanname == "Ti"){
         if ( cce_vars.oxidation_states[i] == 3){
           cce_vars.oxidation_states[i]=4;
-          if(cce_flags.flag("SCREEN_ONLY")){
-            oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
+          if(LDEBUG){
+            cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
           }
         }
       }
       if (structure.atoms[i].cleanname == "Fe"){
         if ( cce_vars.oxidation_states[i] == 2){
           cce_vars.oxidation_states[i]=3;
-          if(cce_flags.flag("SCREEN_ONLY")){
-            oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
+          if(LDEBUG){
+            cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
           }
         } else if ( cce_vars.oxidation_states[i] == 3){
           cce_vars.oxidation_states[i]=2;
-          if(cce_flags.flag("SCREEN_ONLY")){
-            oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
+          if(LDEBUG){
+            cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
           }
         }
       }
       if (structure.atoms[i].cleanname == "V"){
         if ( cce_vars.oxidation_states[i] == 4){
           cce_vars.oxidation_states[i]=5;
-          if(cce_flags.flag("SCREEN_ONLY")){
-            oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to V+5 " << endl;
+          if(LDEBUG){
+            cerr << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to V+5 " << endl;
           }
         }
       }
@@ -2651,7 +2656,7 @@ namespace cce {
   // determine the corrections after oxidation numbers are known (from input, EN, or Bader)
   void get_corrections(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& considered_anion_species, const vector<uint>& num_neighbors, vector<vector<double> >& corrections_atom, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::get_corrections():";
+    string soliloquy=XPID+"cce::get_corrections():";
     stringstream message;
     bool error=FALSE;
     if(LDEBUG){
@@ -2659,7 +2664,7 @@ namespace cce {
     }
     bool print_previous_output=TRUE;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+      if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         string corrections_line = "";
         string cor_identifier = structure.atoms[i].cleanname + "_+" + aurostd::utype2string<double>(cce_vars.oxidation_states[i]) + "_" + considered_anion_species;
         if (num_neighbors[i] > 0){ // are there actually bonds between the cation and the anion species under consideration (to load only needed corrections in multi-anion systems)
@@ -2701,12 +2706,12 @@ namespace cce {
             load_cation_corrections(structure, cce_vars, corrections_line, corrections_atom, i);
           }
         }
-      } else if (structure.atoms[i].cleanname == cce_vars.anion_species || cce_vars.multi_anion_atoms[i] == 1) {
+      } else if ((structure.atoms[i].cleanname == cce_vars.anion_species) || (cce_vars.multi_anion_atoms[i] == 1)) {
         // set anion corrections (to zero)
         set_anion_corrections(structure, cce_vars, corrections_atom, i);
       }
     }
-    if(!cce_flags.flag("SCREEN_ONLY")){ // throw following error only when CCE is not called from the command line; otherwise automated checks break
+    if(!cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
       if (error) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
         message << " BAD NEWS: No correction available for some species in the system." << endl;
         message << " See the output for details.";
@@ -2721,7 +2726,7 @@ namespace cce {
   // are provided as input, one might want to get the corrections for more than one functional
   void load_cation_corrections(const xstructure& structure, CCE_Variables& cce_vars, const string& corrections_line, vector<vector<double> >& corrections_atom, uint i) { // also provide increment for loop of get_corrections function
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::load_cation_corrections():";
+    string soliloquy=XPID+"cce::load_cation_corrections():";
     vector<string> corrections_tokens;
     aurostd::string2tokens(corrections_line, corrections_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one so that e.g. corrections_tokens[1] is not a space but the oxidation number
     uint num_funcs=cce_vars.vfunctionals.size();
@@ -2748,7 +2753,7 @@ namespace cce {
   // per- & superoxides will be dealt with in other function
   void set_anion_corrections(const xstructure& structure, CCE_Variables& cce_vars, vector<vector<double> >& corrections_atom, uint i) { // also provide increment for loop of get_corrections function
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::set_anion_corrections():";
+    string soliloquy=XPID+"cce::set_anion_corrections():";
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
@@ -2772,7 +2777,7 @@ namespace cce {
   // check whether corrections for per- or superoxide ions are needed and assign accordingly
   void check_get_per_super_ox_corrections(CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::check_get_per_super_ox_corrections():";
+    string soliloquy=XPID+"cce::check_get_per_super_ox_corrections():";
     // check for per- and superoxides should always be kept separate since a compound could have both per- and superoxide ions (alkali-metal sesquioxides)
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
@@ -2839,7 +2844,7 @@ namespace cce {
   // check whether corrections for per- or superoxide ions are needed and apply accordingly
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::check_apply_per_super_ox_corrections():";
+    string soliloquy=XPID+"cce::check_apply_per_super_ox_corrections():";
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     if (cce_vars.num_perox_bonds > 0){
@@ -2885,7 +2890,7 @@ namespace cce {
   // apply the shifts for the ref. enthalpies for PBE+U_ICSD if needed
   void apply_pbe_u_icsd_shifts(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy="cce::apply_pbe_u_icsd_shifts():";
+    string soliloquy=XPID+"cce::apply_pbe_u_icsd_shifts():";
     stringstream message;
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
@@ -2896,8 +2901,8 @@ namespace cce {
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){
           for (uint l = 0; l < num_temps; l++) {
-            if (get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname) != -1) {
-              if (get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname) == -123456) {
+            if (get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname) != -1) { // consider only species that need a ref. enthalpy shift, i.e. for which a U is used
+              if (get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname) == AUROSTD_NAN) { // for some species needing shifts, there is no reference (ground state) energy yet
                 oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
                 message << " No ref. enthalpy shift for " << structure.atoms[i].cleanname << " for PBE+U_ICSD yet.";
                 throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
@@ -2929,7 +2934,7 @@ namespace cce {
     json << "\"anion=" << cce_vars.anion_species << "\":{";
     // first populate vectors with names, atom indices of the cations, and num anion neighbors for each cation
     for (uint i=0,isize=structure.atoms.size();i<isize;i++){
-      if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+      if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
           cations_names_vector.push_back("\"" + structure.atoms[i].cleanname + "(ATOM[" + aurostd::utype2string<uint>(i) + "])\":");
           cations_num_neighbors_vector.push_back(cce_vars.num_neighbors[i]);
@@ -2953,7 +2958,7 @@ namespace cce {
         cations_names_vector.clear();
         cations_num_neighbors_vector.clear();
         for (uint i=0,isize=structure.atoms.size();i<isize;i++){
-          if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+          if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
             if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the (main) anion species
               cations_names_vector.push_back("\"" + structure.atoms[i].cleanname + "(ATOM[" + aurostd::utype2string<uint>(i) + "])\":");
               cations_num_neighbors_vector.push_back(multi_anion_num_neighbors[k][i]);
@@ -3050,7 +3055,7 @@ namespace cce {
     output << endl;
     output << "ANION=" << cce_vars.anion_species << ":" << endl;
     for (uint i=0,isize=structure.atoms.size();i<isize;i++){
-      if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+      if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
           output << "Number of " << cce_vars.anion_species << " nearest neighbors within " << tolerance << " Ang. tolerance of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]): " << cce_vars.num_neighbors[i] << endl;
         }
@@ -3061,7 +3066,7 @@ namespace cce {
         output << endl;
         output << "ANION=" << cce_vars.multi_anion_species[k] << ":" << endl;
         for (uint i=0,isize=structure.atoms.size();i<isize;i++){
-          if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
+          if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
             if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the anion species under consideration
               output << "Number of " << cce_vars.multi_anion_species[k] << " nearest neighbors within " << tolerance << " Ang. tolerance of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]): " << multi_anion_num_neighbors[k][i] << endl;
             }
@@ -3083,9 +3088,9 @@ namespace cce {
     for (uint k=0,ksize=cce_vars.oxidation_states.size();k<ksize;k++){
       output << "Oxidation state of " << structure.atoms[k].cleanname << " (atom[" << k << "]): " << cce_vars.oxidation_states[k] << endl;
     }
-    if(!cce_flags.flag("OX_NUMS_PROVIDED")){
-      output << "CHECK whether this is what you are expecting!" << endl;
-    }
+    //if(!cce_flags.flag("OX_NUMS_PROVIDED")){
+    //  output << "CHECK whether this is what you are expecting!" << endl;
+    //}
     // get sum of oxidation numbers
     cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars); // double because for superoxides O ox. number is -0.5
     output << "Sum over all oxidation numbers is (should be ZERO): " << cce_vars.oxidation_sum << endl;
@@ -3219,7 +3224,7 @@ namespace cce {
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
     oss << "--cce                            Prints these user instructions." << endl;
     oss << "--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure" << endl;
-    oss << "                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF." << endl;
+    oss << "                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF." << endl;
     oss << "                                 For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species" << endl;
     oss << "                                 must be written on the right side next to the coordinates for each atom" << endl;
     oss << "                                 just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
@@ -3239,18 +3244,18 @@ namespace cce {
     oss << "                                 provided structure file." << endl;
     oss << "--poscar2cce < STRUC_FILE        Determines the CCE corrections for the structure in file STRUC_FILE." << endl;
     oss << "                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
-    oss << "                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR" << endl;
+    oss << "                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR" << endl;
     oss << "                                 is used, the species must be written on the right side next to the coordinates for" << endl;
     oss << "                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
     oss << "--get_ox_nums < STRUC_FILE       Determines the oxidation numbers for the structure in file STRUC_FILE." << endl;
     oss << "                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
-    oss << "                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
-    oss << "                                 is used the species must be written on the right side next to the coordinates for" << endl;
+    oss << "                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
+    oss << "                                 is used, the species must be written on the right side next to the coordinates for" << endl;
     oss << "                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
     oss << "--num_anion_neigh < STRUC_FILE   Determines the number of anion neighbors for each cation for the structure in STRUC_FILE." << endl;
     oss << "                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
-    oss << "                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
-    oss << "                                 is used the species must be written on the right side next to the coordinates for" << endl;
+    oss << "                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR" << endl;
+    oss << "                                 is used, the species must be written on the right side next to the coordinates for" << endl;
     oss << "                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
     oss << "--print=                         Obtain output in standard format (--print=out) or as json (--print=json)." << endl;
     oss << "                                 Default: out." << endl;
@@ -3529,18 +3534,18 @@ namespace cce {
     if (element=="Ir")          {return 2.8837526;} // AUID="9c41e654d31db16a"
     if (element=="Pt")          {return 2.4902537;} // AUID="59081d68fabd053c"
     if (element=="La")          {return 0.139627;} // AUID="8353806ee117d7fd"
-    if (element=="Ce")          {return -123456;} // AUID="6e846dc10a52b11b"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Pr")          {return -123456;} // AUID="82dbd5ee06192a4c"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Nd")          {return -123456;} // AUID="81811d7c33a85a8b"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Sm")          {return -123456;} // AUID="e892f33edd3901b8"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Ce")          {return AUROSTD_NAN;} // AUID="6e846dc10a52b11b"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Pr")          {return AUROSTD_NAN;} // AUID="82dbd5ee06192a4c"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Nd")          {return AUROSTD_NAN;} // AUID="81811d7c33a85a8b"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Sm")          {return AUROSTD_NAN;} // AUID="e892f33edd3901b8"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     if (element=="Eu")          {return 0.3926978;} // AUID="9b801fd8fd52e116"
-    if (element=="Gd")          {return -123456;} // AUID="c0f01c59eb971d30"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Gd")          {return AUROSTD_NAN;} // AUID="c0f01c59eb971d30"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     if (element=="Dy")          {return 0.00023385;} // AUID="0373199190a8abb7"; calc. with and without U gives basically same energy
-    if (element=="Tm")          {return -123456;} // AUID="766b44cce10b0315"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Tm")          {return AUROSTD_NAN;} // AUID="766b44cce10b0315"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     if (element=="Yb")          {return 0.5301314;} // AUID="de1c22a384a8d945"
-    if (element=="Lu")          {return -123456;} // AUID="98b3a5d589b252b5"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="Th")          {return -123456;} // AUID="78f7995fc479457d"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
-    if (element=="U")           {return -123456;} // AUID="2f0fba94372190f4"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Lu")          {return AUROSTD_NAN;} // AUID="98b3a5d589b252b5"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="Th")          {return AUROSTD_NAN;} // AUID="78f7995fc479457d"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
+    if (element=="U")           {return AUROSTD_NAN;} // AUID="2f0fba94372190f4"; no groundstate_energy in aflow_xpseudopotentials_data.cpp yet
     else {return -1;}
   }
 } // namespace cce

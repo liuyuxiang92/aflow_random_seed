@@ -1200,8 +1200,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce")); //ME
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::PRINT","--print=","OUT"); //ME
   vpflow.flag("CCE_CORRECTION::TEST",aurostd::args2flag(argv,cmds,"--cce_test")); //RF20200409
+  vpflow.flag("CCE_CORRECTION::TEST_COMMAND_LINE",aurostd::args2flag(argv,cmds,"--cce_test_command_line")); //RF20200825
   vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_oxidation_numbers|--get_ox_nums|--poscar2ox_nums")); //RF20200725
-  vpflow.flag("CCE_CORRECTION::GET_NUM_ANION_NEIGHBORS", aurostd::args2flag(argv,cmds,"--get_num_anion_neighbors|--num_anion_neigh|--poscar2num_anion_neighbors")); //RF20200814
+  vpflow.flag("CCE_CORRECTION::GET_NUM_ANION_NEIGHBORS", aurostd::args2flag(argv,cmds,"--get_num_anion_neighbors|--get_num_anion_neighbours|--num_anion_neigh|--poscar2num_anion_neighbors|--poscar2num_anion_neighbours")); //RF20200814
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DIST_TOL","--tolerance=|dist_tol=|distance_tolerance=|dist_tolerance=|distance_tol=",""); //RF20200819
 
   vpflow.flag("RMATOM",aurostd::args2flag(argv,cmds,"--rm_atom") && argv.at(1)=="--rm_atom");

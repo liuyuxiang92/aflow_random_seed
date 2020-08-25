@@ -34,7 +34,7 @@ Details for the options available are explained in the following.
 (ii) AVAILABLE OPTIONS:
 --cce                            Prints user instructions.
 --cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure
-                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF.
+                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
                                  For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
                                  must be written on the right side next to the coordinates for each atom
                                  just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
@@ -54,18 +54,18 @@ Details for the options available are explained in the following.
                                  provided structure file.
 --poscar2cce < STRUC_FILE        Determines the CCE corrections for the structure in file STRUC_FILE.
                                  It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                                 is used the species must be written on the right side next to the coordinates for
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                                 is used, the species must be written on the right side next to the coordinates for
                                  each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 --get_ox_nums < STRUC_FILE       Determines the oxidation numbers for the structure in file STRUC_FILE.
                                  It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                                 is used the species must be written on the right side next to the coordinates for
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                                 is used, the species must be written on the right side next to the coordinates for
                                  each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 --num_anion_neigh < STRUC_FILE   Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE.
                                  It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                                 QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                                 is used the species must be written on the right side next to the coordinates for
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
+                                 is used, the species must be written on the right side next to the coordinates for
                                  each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 --print=                         Obtain output in standard format (--print=out) or as json (--print=json).
                                  Default: out.

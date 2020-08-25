@@ -68,7 +68,7 @@ namespace cce {
   void print_num_anion_neighbors(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   void print_oxidation_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   vector<double> calculate_corrections(const string& directory_path);
-  vector<double> calculate_corrections(xstructure& structure, string functional, ostream& oss=std::cout);
+  vector<double> calculate_corrections(const xstructure& structure, string functional, ostream& oss=std::cout);
   void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
@@ -108,7 +108,7 @@ namespace cce {
   void treat_FeTiO3_LDA_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void check_ox_nums_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
-  void determine_cation_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars, const vector<vector<double> >& possible_ox_states); // ME201911, exact date is not known, only Nov.
+  void determine_cation_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars, const vector<vector<double> >& possible_ox_states); // ME20191101
   double get_oxidation_states_sum(CCE_Variables& cce_vars);
   // determine oxidation numbers from Bader charges (outdated)
   vector<double> get_oxidation_states_from_Bader(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);

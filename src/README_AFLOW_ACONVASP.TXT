@@ -737,10 +737,10 @@ LATTICES = (the ones with "")
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
-        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR
-        is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
-        the coordinates for each atom.
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
+        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
+        next to the coordinates for each atom.
         Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
         --dft_formation_enthalpies= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
@@ -1366,7 +1366,7 @@ LATTICES = (the ones with "")
 
   aflow --get_ox_nums < STRUC_FILE
         Determines the oxidation numbers for the structure in file STRUC_FILE. It can be in any structure
-        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR
         is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
         the coordinates for each atom.
 
@@ -1971,9 +1971,9 @@ LATTICES = (the ones with "")
         easy movement between POSCAR files with and without selective
         dynamics formatting.
   aflow --num_anion_neigh < STRUC_FILE
-        Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE. 
-        It can be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. 
-        For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written 
+        Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE.
+        It can be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
+        For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written
         on the right side next to the coordinates for each atom. (RF20200820)
   aflow --numnames A1 A2 ... < POSCAR
         Same as names except appends an increasing integer to
@@ -2662,10 +2662,10 @@ LATTICES = (the ones with "")
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
-        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ELK, and CIF. For VASP, a VASP5 POSCAR
-        is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
-        the coordinates for each atom.
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
+        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
+        next to the coordinates for each atom.
         Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
         --dft_formation_enthalpies= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
