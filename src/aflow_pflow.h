@@ -228,6 +228,8 @@ namespace pflow {
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, vector<string>& combination, string LIB, string server, vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss=cout);
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, vector<string>& combination, string LIB, string server, vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss=cout);
   ////////////////////////////////////////////////////////////////////////////////
+  uint SubLayersRestAPILS(const string& url,vector<string>& vsuburl); //CO20200731
+  ////////////////////////////////////////////////////////////////////////////////
   // loadLIBX string elements
   bool loadLIBX(string LIB, string elements, vector<aflowlib::_aflowlib_entry>& entries, ostream& oss=cout);
   bool loadLIBX(string LIB, string elements, vector<aflowlib::_aflowlib_entry>& entries, ofstream& FileMESSAGE, ostream& oss=cout);

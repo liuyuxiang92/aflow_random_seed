@@ -8967,6 +8967,21 @@ namespace pflow {
 }  // namespace pflow
 
 namespace pflow {
+  uint SubLayersRestAPILS(const string& url,vector<string>& vsuburl){  //CO20200731 - mimicking SubDirectoryLS() in aurostd for REST-API
+    vector<string> vtokens,_vtokens;
+    aurostd::url2tokens(url+"/?aflowlib_entries",vtokens,",");
+    for(uint i=0;i<vtokens.size();i++){
+      aurostd::url2tokens(url+"/"+vtokens[i]+"/?aflowlib_entries",_vtokens,",");
+      if(_vtokens.size()>0){
+        vsuburl.push_back(url+"/"+vtokens[i]);
+        SubLayersRestAPILS(url+"/"+vtokens[i],vsuburl);
+      }
+    }
+    return vsuburl.size();
+  }
+}
+
+namespace pflow {
   // ***************************************************************************
   // pflow::loadLIBX(aurostd::xoption& vpflow,string elements,string server,
   // ofstream& FileMESSAGE, ostream& oss)
@@ -9276,7 +9291,7 @@ namespace pflow {
       aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server,
       vector<vector<aflowlib::_aflowlib_entry> >& entries,
       ofstream& FileMESSAGE, ostream& oss) {  // main function
-
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::loadLIBX():";
     stringstream message;
 
@@ -9331,13 +9346,13 @@ namespace pflow {
     bool load_from_common = pflow::loadFromCommon(vpflow);
     bool override_load_from_common = false;
 
-    string LIB_path;  //will be actual directory path or URL, depending on machine
+    string LIB_path="";  //will be actual directory path or URL, depending on machine
     if(load_from_common) {
       if(!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX")) {
         message << "Loading entries from COMMON";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
-      LIB_path = "/common/" + lib_name + "/RAW/";
+      LIB_path = "/common/" + lib_name + "/RAW";
       if(!aurostd::IsDirectory(LIB_path)) {
         load_from_common = false;
         message << LIB_path << " does not exist! Cannot load from COMMON, switching to API";
@@ -9356,9 +9371,9 @@ namespace pflow {
         return false;  //entries;
       }
       if(isICSD) {
-        LIB_path = server + "/AFLOWDATA/ICSD_WEB/";
+        LIB_path = server + "/AFLOWDATA/ICSD_WEB";
       } else {
-        LIB_path = server + "/AFLOWDATA/" + lib_name + "_RAW/";
+        LIB_path = server + "/AFLOWDATA/" + lib_name + "_RAW";
       }
     }
 
@@ -9366,17 +9381,18 @@ namespace pflow {
     // START Finding matches
     //////////////////////////////////////////////////////////////////////////
     aflowlib::_aflowlib_entry _aflowlib_tmp;
-    uint nary;
+    uint nary=0;
     uint total_count = 0;
-    string::size_type loc;
+    string::size_type loc=0;
     vector<string> input_velements;
     vector<double> input_vcomposition;
+    vector<string> vloadpaths;
     if(isICSD) {
       bool double_check_icsd = false;  //NOT NECESSARY for ICSD since we load from the calculation layer
       string symmetry_path, clean_icsd;
       vector<string> icsds, tokens, elements;
       for (uint i = 0; i < symmetries.size(); i++) {
-        symmetry_path = LIB_path + symmetries[i];
+        symmetry_path = LIB_path + "/" + symmetries[i];
         if(load_from_common && !aurostd::IsDirectory(symmetry_path)) { continue; }
         //not many symmetries, so this boolean placement won't impact much
         if(load_from_common) {aurostd::DirectoryLS(symmetry_path, icsds);}
@@ -9392,40 +9408,50 @@ namespace pflow {
             clean_icsd = icsds[j].substr(0,loc);  //get just compound
             if(compoundsBelong(velements, clean_icsd, input_velements, input_vcomposition, FileMESSAGE, oss, false, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL"), composition_string)) {  // NOT recommended, these are BS entries // no need to clean, ICSD compound format is already clean of pps
               // url2aflowlib has bad printing to screen options, so we mimic here
-
-              //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
-              message << "Loading " << (load_from_common ? "path" : "url") << "=" << symmetry_path << "/" << icsds[j];
-              pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
-              //}
-              //complicated ternary operator, returns bool, but necessary to avoid double code
-              if(
-                  (load_from_common)
-                  ?
-                  //if load_from_common, check this bool
-                  (
-                   //(aurostd::FileExist(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                   (aurostd::FileNotEmpty(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                   (_aflowlib_tmp.file2aflowlib(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
-                  )
-                  :
-                  //if load_from_api, check this bool
-                  (
-                   (_aflowlib_tmp.url2aflowlib(symmetry_path + "/" + icsds[j], message, false) > 0) &&
-                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
-                  )) {
-                nary = _aflowlib_tmp.vspecies.size();
-                if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
-                entries[nary - 1].push_back(_aflowlib_tmp);
-                total_count++;
-                if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
-                  if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
-                    entries[nary - 1].pop_back();
-                    total_count--;
+              vloadpaths.clear();
+              vloadpaths.push_back(symmetry_path+"/"+icsds[j]);
+              if(load_from_common) {aurostd::SubDirectoryLS(symmetry_path+"/"+icsds[j],vloadpaths);}
+              else {pflow::SubLayersRestAPILS(symmetry_path+"/"+icsds[j],vloadpaths);}
+              if(1||LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+              if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
+                message << "REST-API appears to be down";
+                pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+                return false;
+              }
+              for(uint k=0;k<vloadpaths.size();k++){
+                const string& load_path=vloadpaths[k];
+                message << "Loading " << (load_from_common ? "path" : "url") << "=" << load_path;
+                pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+                //complicated ternary operator, returns bool, but necessary to avoid double code
+                if(
+                    (load_from_common)
+                    ?
+                    //if load_from_common, check this bool
+                    (
+                     //(aurostd::FileExist(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                     (aurostd::FileNotEmpty(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                     (_aflowlib_tmp.file2aflowlib(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
+                     (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                    )
+                    :
+                    //if load_from_api, check this bool
+                    (
+                     (_aflowlib_tmp.url2aflowlib(load_path, message, false) > 0) &&
+                     (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                    )) {
+                  nary = _aflowlib_tmp.vspecies.size();
+                  if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
+                  entries[nary - 1].push_back(_aflowlib_tmp);
+                  total_count++;
+                  if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
+                    if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
+                      entries[nary - 1].pop_back();
+                      total_count--;
+                    }
                   }
                 }
+                message.str("");
               }
-              message.str("");
             }
           }
         }
@@ -9442,7 +9468,7 @@ namespace pflow {
         return false;
       }
       for (uint i = 0; i < systems.size(); i++) {
-        calculation_path = LIB_path + systems[i];
+        calculation_path = LIB_path + "/" + systems[i];
         if(load_from_common && !aurostd::IsDirectory(calculation_path)) { continue; }
         loc=systems[i].find(":");
         clean_system=systems[i].substr(0,loc);  //even if we don't find it, simply copy string
@@ -9456,39 +9482,51 @@ namespace pflow {
           }
           for (uint j = 0; j < calculations.size(); j++) {
             if(load_from_common && !aurostd::IsDirectory(calculation_path + "/" + calculations[j])) { continue; }
-            //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
-            message << "Loading " << (load_from_common ? "path" : "url") << "=" << calculation_path << "/" << calculations[j];
-            pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
-            //}
-            //complicated ternary operator, returns bool, but necessary to avoid double code
-            if(
-                (load_from_common)
-                ?
-                //if load_from_common, check this bool
-                (
-                 //(aurostd::FileExist(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                 (aurostd::FileNotEmpty(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                 (_aflowlib_tmp.file2aflowlib(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
-                )
-                :
-                //if load_from_api, check this bool
-                (
-                 (_aflowlib_tmp.url2aflowlib(calculation_path + "/" + calculations[j], message, false) > 0) &&
-                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
-                )) {
-              nary = _aflowlib_tmp.vspecies.size();
-              if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
-              entries[nary - 1].push_back(_aflowlib_tmp);
-              total_count++;
-              if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
-                if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
-                  entries[nary - 1].pop_back();
-                  total_count--;
+            //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT"))
+            vloadpaths.clear();
+            vloadpaths.push_back(calculation_path+"/"+calculations[j]);
+            if(load_from_common) {aurostd::SubDirectoryLS(calculation_path+"/"+calculations[j],vloadpaths);}
+            else {pflow::SubLayersRestAPILS(calculation_path+"/"+calculations[j],vloadpaths);}
+            if(1||LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+            if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
+              message << "REST-API appears to be down";
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              return false;
+            }
+            for(uint k=0;k<vloadpaths.size();k++){
+              const string& load_path=vloadpaths[k];
+              message << "Loading " << (load_from_common ? "path" : "url") << "=" << load_path;
+              pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+              //complicated ternary operator, returns bool, but necessary to avoid double code
+              if(
+                  (load_from_common)
+                  ?
+                  //if load_from_common, check this bool
+                  (
+                   //(aurostd::FileExist(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                   (aurostd::FileNotEmpty(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                   (_aflowlib_tmp.file2aflowlib(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
+                   (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                  )
+                  :
+                  //if load_from_api, check this bool
+                  (
+                   (_aflowlib_tmp.url2aflowlib(load_path, message, false) > 0) &&
+                   (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                  )) {
+                nary = _aflowlib_tmp.vspecies.size();
+                if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
+                entries[nary - 1].push_back(_aflowlib_tmp);
+                total_count++;
+                if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
+                  if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
+                    entries[nary - 1].pop_back();
+                    total_count--;
+                  }
                 }
               }
+              message.str("");
             }
-            message.str("");
           }
         }
       }

@@ -4050,6 +4050,7 @@ namespace chull {
 
     bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
     bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
+    bool remove_submodular=true;  //remove AEL-AGL, APL, etc.
     bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN"); //SK20200327
     bool remove_invalid=true;
     bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
@@ -4103,8 +4104,8 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " organizing into coordgroups" << endl;}
     vector<uint> unique_entries;
     string invalid_reason,canonical_auid;
-    char LOGGER_TYPE;
-    bool silent;
+    char LOGGER_TYPE=_LOGGER_OPTION_;
+    bool silent=false;
     uint i_coord_group_sort;  //so it doesn't conflict with i_coord_group in for-loops
     CoordGroup cg;
     xvector<double> r_coords;
@@ -4113,14 +4114,26 @@ namespace chull {
       const aflowlib::_aflowlib_entry& entry=m_points[i].m_entry;
       if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
       // start remove points
-      if(remove_invalid && m_points[i].m_has_entry){
-        if(!entryValid(entry,invalid_reason,LOGGER_TYPE,ignore_bad_database)){
+      if(m_points[i].m_has_entry){
+        if(remove_invalid && !entryValid(entry,invalid_reason,LOGGER_TYPE,ignore_bad_database)){
           if(!invalid_reason.empty()){
             silent=(!see_neglect && LOGGER_TYPE==_LOGGER_OPTION_);
             message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: " << invalid_reason;
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
           }
           continue;
+        }
+        if(remove_submodular){
+          if(entry.aurl.find("ARUN.AEL_")!=string::npos ||
+             entry.aurl.find("ARUN.AGL_")!=string::npos ||
+             entry.aurl.find("ARUN.APL_")!=string::npos ||
+             entry.aurl.find("ARUN.QHA_")!=string::npos ||
+             FALSE){
+            silent=true;  //no need to see
+            message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: sub-module load";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
+            continue;
+          }
         }
         if(remove_duplicate_entries && !entryUnique(unique_entries,entry,canonical_auid)){
           silent=(!see_neglect);
@@ -4139,6 +4152,8 @@ namespace chull {
           // point.getDim() is dimension of hull
           //SK20200330
           if (point.getDim() == point.m_i_nary + 1) {
+            message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "] to calculate N+1 enthalpy gain";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
             continue;
           }
         }

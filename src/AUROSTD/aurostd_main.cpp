@@ -1626,11 +1626,28 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function SubDirectoryLS
+  // ***************************************************************************
+  // Stefano Curtarolo
+  // Returns all the subdirectories of a path
+  bool SubDirectoryLS(const string& _Directory,vector<string>& vsubd){
+    vector<string> vfiles;
+    bool run=DirectoryLS(_Directory,vfiles);
+    for(uint i=0;i<vfiles.size();i++){
+      if(aurostd::IsDirectory(_Directory+"/"+vfiles[i])){
+        vsubd.push_back(_Directory+"/"+vfiles[i]);
+        run=(run&&SubDirectoryLS(_Directory+"/"+vfiles[i],vsubd));
+      }
+    }
+    return run;
+  }
+
+  // ***************************************************************************
   // Function DirectoryLS
   // ***************************************************************************
   // Stefano Curtarolo
   // Returns the content of a directory without "." and ".."
-  bool DirectoryLS(string _Directory,vector<string> &vfiles) {
+  bool DirectoryLS(const string& _Directory,vector<string> &vfiles) {
     vfiles.clear();
     string Directory(CleanFileName(_Directory));
     DIR *dp;
@@ -1650,25 +1667,11 @@ namespace aurostd {
     }
     return TRUE;
   }
-  bool DirectoryLS(string _Directory,deque<string> &vfiles) {
-    vfiles.clear();
-    string Directory(CleanFileName(_Directory));
-    DIR *dp;
-    struct dirent *ep;
-    string file;
-    dp=opendir(Directory.c_str());
-    if(dp!=NULL) {
-      while((ep=readdir(dp))) {
-        file=(ep->d_name);
-        if(file!="." && file!="..")
-          vfiles.push_back(file);
-      }
-      (void) closedir (dp);
-    } else {
-      cerr << "ERROR: aurostd::DirectoryLS Couldn't open the directory: " << Directory << endl;
-      return FALSE;
-    }
-    return TRUE;
+  bool DirectoryLS(const string& _Directory,deque<string> &vfiles) {
+    vector<string> _vfiles;
+    bool run=DirectoryLS(_Directory,_vfiles);
+    vfiles=aurostd::vector2deque(_vfiles);
+    return run;
   }
 
   // ***************************************************************************
@@ -3944,7 +3947,7 @@ namespace aurostd {
       aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url); // _MACOSX_
 #endif    
       if(aurostd::FileEmpty(fileIN)) {
-        cerr << "ERROR - aurostd::url2file(): URL not found http://" << _url << endl;
+        if(LDEBUG){cerr << "ERROR - aurostd::url2file(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
       }
     }
@@ -4017,7 +4020,7 @@ namespace aurostd {
       stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
 #endif    
       if(stringIN=="") {
-        cerr << "ERROR - aurostd::url2string(): URL not found http://" << _url << endl;
+        if(LDEBUG){cerr << "ERROR - aurostd::url2string(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
       }
     }
@@ -4132,7 +4135,10 @@ namespace aurostd {
       cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+    if(content.empty()) {
+      if(LDEBUG){cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;} //CO20200731 - silence this, it's not an error
+      return 0;
+    }
 
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
@@ -4161,7 +4167,10 @@ namespace aurostd {
       cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+    if(content.empty()) {
+      if(LDEBUG){cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;} //CO20200731 - silence this, it's not an error
+      return 0;
+    }
 
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
@@ -4322,7 +4331,7 @@ namespace aurostd {
   // ***************************************************************************
   // true if path is directory
   // http://stackoverflow.com/questions/146924/how-can-i-tell-if-a-given-path-is-a-directory-or-a-file-c-c
-  bool IsDirectory(string _path){
+  bool IsDirectory(const string& _path){
     string path=CleanFileName(_path);
     struct stat s;
     if( stat(path.c_str(),&s) != 0 ){return FALSE;} //error
@@ -4341,7 +4350,7 @@ namespace aurostd {
   // ***************************************************************************
   // true if path is file
   // http://stackoverflow.com/questions/146924/how-can-i-tell-if-a-given-path-is-a-directory-or-a-file-c-c
-  bool IsFile(string _path){
+  bool IsFile(const string& _path){
     string path=CleanFileName(_path);
     struct stat s;
     if( stat(path.c_str(),&s) != 0 ){return FALSE;} //error

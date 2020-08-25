@@ -414,8 +414,9 @@ namespace aurostd {
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
-  bool DirectoryLS(string Directory,vector<string> &vfiles);
-  bool DirectoryLS(string Directory,deque<string> &vfiles);
+  bool SubDirectoryLS(const string& _Directory,vector<string>& vsubd);  //CO20200731
+  bool DirectoryLS(const string& Directory,vector<string> &vfiles);
+  bool DirectoryLS(const string& Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -675,8 +676,8 @@ namespace aurostd {
   bool file2file(const string& _file,const string& destination); //CO20171025
   string file2md5sum(const string& _file); //SC20200326
   string file2auid(const string& _file); //SC20200326  
-  bool IsDirectory(string path);
-  bool IsFile(string path);
+  bool IsDirectory(const string& path);
+  bool IsFile(const string& path);
   //CO END
   bool RemoveFile(string FileNameOUTPUT);
   bool RemoveFile(const vector<string>& files); //CO
