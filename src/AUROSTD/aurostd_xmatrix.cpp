@@ -1825,7 +1825,7 @@ namespace aurostd { // namespace aurostd
   template<class utype> utype
     CMdet(const xmatrix<utype>& B){ //Cayley-Menger Determinant for simplex content
       bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="aurostd::CMdet():";
+      string soliloquy=XPID+"aurostd::CMdet():";
       if(!B.issquare){
         string message = "Only defined for square xmatrices";
         throw xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
@@ -2942,7 +2942,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare) {
         string function = XPID + "aurostd::sin():";
-        string message = "exp only defined for square matrices.";
+        string message = "sin only defined for square matrices.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols), an(a.urows,a.ucols,a.lrows,a.lcols);
@@ -2970,7 +2970,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare) {
         string function = XPID + "aurostd::cos():";
-        string message = "exp only defined for square matrices.";
+        string message = "cos only defined for square matrices.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
@@ -2998,7 +2998,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare) {
         string function = XPID + "aurostd::sinh():";
-        string message = "exp only defined for square matrices.";
+        string message = "sinh only defined for square matrices.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
@@ -3027,7 +3027,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare) {
         string function = XPID + "aurostd::cosh():";
-        string message = "exp only defined for square matrices.";
+        string message = "cosh only defined for square matrices.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
@@ -3072,7 +3072,7 @@ namespace aurostd {  // namespace aurostd
         throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
       }
       if(A.ucols!=B.urows) {
-        message = "[6] A.ucols!=B.urows <<  A.ucols=" + aurostd::utype2string<int>(A.ucols) + " B.urows=" + aurostd::utype2string<int>( B.urows);
+        message = "[6] A.ucols!=B.urows <<  A.ucols=" + aurostd::utype2string<int>(A.ucols) + " B.urows=" + aurostd::utype2string<int>(B.urows);
         throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
       }
       int n=A.urows;
@@ -3154,7 +3154,7 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
       throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
     }
     if(m>b.cols) {
-      message = "n>b.cols";
+      message = "m>b.cols";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
     }
 

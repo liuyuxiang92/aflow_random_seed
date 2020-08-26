@@ -454,7 +454,7 @@ namespace aurostd {  // namespace aurostd
       if(b.rows!=3) {
         string function = XPID + "aurostd::xvector::vector_product():";
         stringstream message;
-        message << "xvector product (a%b) b.rows=" << a.rows << " !=3";
+        message << "xvector product (a%b) b.rows=" << b.rows << " !=3";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
       }
 
@@ -2564,7 +2564,7 @@ namespace aurostd {  // namespace aurostd
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
             string function = XPID + "aurostd::xvector::quicksort3():";
-            string message = " _XQSORT_NSTACK too small in sort2.";
+            string message = " _XQSORT_NSTACK too small in sort3.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
@@ -2666,7 +2666,7 @@ namespace aurostd {  // namespace aurostd
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
             string function = XPID + "aurostd::xvector::quicksort4():";
-            string message = " _XQSORT_NSTACK too small in sort2.";
+            string message = " _XQSORT_NSTACK too small in sort4.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
