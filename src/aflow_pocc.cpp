@@ -4107,7 +4107,7 @@ namespace pocc {
 
   void POccSiteConfiguration::preparePOccConfig() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"preparePOccConfig():";
+    string soliloquy=XPID+"POccSiteConfiguration::preparePOccConfig():";
     //////////////////////////////////////////////////////////////////////////////
     //clear all fields, but save that which is declared in constructor
     int _site=site, _i_hnf=i_hnf;
