@@ -3730,10 +3730,10 @@ namespace aflowlib {
 // auid2present
 // **************************************************************************
 namespace aflowlib {
-  string _aflowlib_entry::directory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
+  string _aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
     //CO20200624 - THIS IS HOW WE CREATE AUID FOR POCC STRUCTURES
     bool LDEBUG=(TRUE || XHOST.DEBUG);
-    string soliloquy=XPID+"_aflowlib_entry::directory2MetadataAUIDjsonfile():";
+    string soliloquy=XPID+"_aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile():";
     stringstream message;
     
     if(aurl.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AURL has not been calculated",_INPUT_MISSING_);}
@@ -3786,7 +3786,7 @@ namespace aflowlib {
       message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
       if(aurl_found!=aurl) { // avoid conflict with yourself
         salt++;
-        metadata_auid_json=directory2MetadataAUIDjsonfile(directory,salt);
+        metadata_auid_json=POCCdirectory2MetadataAUIDjsonfile(directory,salt);
         if(LDEBUG){cerr << soliloquy << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
         //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
         crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS

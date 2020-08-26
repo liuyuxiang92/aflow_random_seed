@@ -49,7 +49,7 @@
         -- return early for --pocc_count_total command to avoid giving user too much verbosity (CO)
         -- added MessageOption() (vs. ErrorOption()) that does NOT throw error (CO)
         -- patching flow of POccCalculator() to read/load from aflow.in ALWAYS and overwrite with inputs (CO)
-        -- created scheme for POCC auids, see directory2MetadataAUIDjsonfile (CO)
+        -- created scheme for POCC auids, see POCCdirectory2MetadataAUIDjsonfile (CO)
         -- prepared LIB2RAW for POCC, including adding perform_POCC and aflowlib::LIB2RAW_Loop_POCC() (CO)
         -- added aurostd::FileExist() to all linking in LIB2RAW (CO)
         -- lots of cleaning of LIB2RAW, including adding CleanDirectoryLIB(), removing obsolete VOLDISTPARAMS and VOLDISTEVOLUTION functionality, and cleaning vspecies (CO)

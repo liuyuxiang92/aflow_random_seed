@@ -1333,7 +1333,7 @@ namespace aflowlib {
       
       if(LDEBUG) cerr << soliloquy << " [AUID=0] directory_LIB=" << directory_LIB << endl;
       if(perform_POCC){ //CO20200624
-        string metadata_auid_json=aflowlib_data.directory2MetadataAUIDjsonfile(directory_LIB);
+        string metadata_auid_json=aflowlib_data.POCCdirectory2MetadataAUIDjsonfile(directory_LIB);
         aurostd::string2file(metadata_auid_json,aurostd::CleanFileName(directory_RAW+"/"+"metadata_auid.json"));
       }else{
         // aflowlib::directory2auid(directory_LIB,aflowlib_data.aurl,aflowlib_data.auid,aflowlib_data.vauid); // OLD STYLE

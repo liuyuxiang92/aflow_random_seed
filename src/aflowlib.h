@@ -259,7 +259,7 @@ namespace aflowlib {
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
-      string directory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
+      string POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
       bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
       double enthalpyFormationCell(int T=300) const;                                        //CO20200624 - CCE correction added
       double enthalpyFormationAtom(int T=300) const;                                        //CO20200624 - CCE correction added
