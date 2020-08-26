@@ -1028,7 +1028,7 @@ namespace apl
     vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
         (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
 
-    vector<vector<bool> > file_is_present(subdirectories_apl_eos.size(),vector<bool>(2));
+    vector<vector<bool> > file_is_present(subdirectories.size(),vector<bool>(2));
 
     bool apl_data_available = false;
     uint n_apl_calcs = checkAPLCalculations(file_is_present, qhatype);
