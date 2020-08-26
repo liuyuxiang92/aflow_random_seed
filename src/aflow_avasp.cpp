@@ -444,7 +444,7 @@ string AVASP_Get_PseudoPotential_PAW_LDA_KIN(string species) {
 
 // ***************************************************************************
 string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
-  string function = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_PBE()";
+  string function = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_PBE():";
   string error = "";
   bool ALLOW_ACTINIDIES=TRUE; //FALSE;
   if(ALLOW_ACTINIDIES==FALSE) {
@@ -7118,4 +7118,3 @@ string AVASP_Shortcuts_for_Ternaries(string &label) {
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
-
