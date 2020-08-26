@@ -1696,8 +1696,8 @@ namespace aflowlib {
           aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
         }
         //H15Th4_ICSD_638495_abader.out
-        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_abader.out") << endl; cout.flush(); }  //CO20200624  //CO20200624 - adding FileExist() check
-        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_abader.out")) aurostd::LinkFile(directory_RAW+"/"+system_name+"_abader.out",directory_WEB); // LINK //CO20200624
+        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_abader.out") << endl; cout.flush(); }  //CO20200624
+        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_abader.out")) aurostd::LinkFile(directory_RAW+"/"+system_name+"_abader.out",directory_WEB); // LINK //CO20200624  //CO20200624 - adding FileExist() check
       }
     } // flag_WEB
     
@@ -1780,20 +1780,20 @@ namespace aflowlib {
         // directory_AUID_LIB
         if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_LIB=" << directory_AUID_LIB << " -> " << directory_LIB << endl;
         cout << soliloquy << " (AUID_NEW) linking file AUID_LIB->LIB: " << directory_AUID_LIB << " -> " << directory_LIB << endl; cout.flush();
-        if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_AUID_LIB);         // LINK  //CO20200624 - adding IsDirectory() check
         // directory_AUID_RAW
         if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_RAW=" << directory_AUID_RAW << " -> " << directory_RAW << endl;
         cout << soliloquy << " (AUID_NEW) linking file AUID_RAW->LIB: " << directory_AUID_RAW << " -> " << directory_RAW << endl; cout.flush();
-        if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK  //CO20200624 - adding FileExist() check
+        if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_RAW);         // LINK  //CO20200624 - adding IsDirectory() check
 
         if(flag_WEB) {
           if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_WEB << endl;
           cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_WEB << endl; cout.flush();
-          if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK  //CO20200624 - adding FileExist() check
+          if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_AUID_WEB);         // LINK  //CO20200624 - adding IsDirectory() check
         } else {
           if(LDEBUG) cout << soliloquy << " (AUID_NEW) directory_AUID_WEB=" << directory_AUID_WEB << " -> " << directory_RAW << endl;
           cout << soliloquy << " (AUID_NEW) linking file AUID_WEB->LIB: " << directory_AUID_WEB << " -> " << directory_RAW << endl; cout.flush();
-          if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK  //CO20200624 - adding FileExist() check
+          if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_AUID_WEB);         // LINK  //CO20200624 - adding IsDirectory() check
         }
 
         // ICSD2LINK
@@ -1806,15 +1806,15 @@ namespace aflowlib {
               cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
               // LIB
               aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
-              if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK  //CO20200624 - adding FileExist() check
+              if(aurostd::IsDirectory(directory_LIB)) aurostd::LinkFile(directory_LIB,directory_ICSD2LINK+"/LIB"); // LINK  //CO20200624 - adding IsDirectory() check
               cout << soliloquy << " (ICSD2LINK) linking file LIB->ICSD2LINK/LIB: " << directory_LIB << " -> " << directory_ICSD2LINK << "/LIB" << endl; cout.flush();
               // RAW
               aurostd::RemoveFile(directory_ICSD2LINK+"/RAW");  // to avoid auto-linking SC20190830
-              if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK  //CO20200624 - adding FileExist() check
+              if(aurostd::IsDirectory(directory_RAW)) aurostd::LinkFile(directory_RAW,directory_ICSD2LINK+"/RAW"); // LINK  //CO20200624 - adding IsDirectory() check
               cout << soliloquy << " (ICSD2LINK) linking file RAW->ICSD2LINK/RAW: " << directory_RAW << " -> " << directory_ICSD2LINK << "/RAW" << endl; cout.flush();
               // WEB
               aurostd::RemoveFile(directory_ICSD2LINK+"/WEB");  // to avoid auto-linking SC20190830
-              if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK  //CO20200624 - adding FileExist() check
+              if(aurostd::IsDirectory(directory_WEB)) aurostd::LinkFile(directory_WEB,directory_ICSD2LINK+"/WEB"); // LINK  //CO20200624 - adding IsDirectory() check
               cout << soliloquy << " (ICSD2LINK) linking file WEB->ICSD2LINK/WEB: " << directory_WEB << " -> " << directory_ICSD2LINK << "/WEB" << endl; cout.flush();
             }
           }
