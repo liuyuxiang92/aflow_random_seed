@@ -781,6 +781,20 @@
 // DEFAULT CCE
 #define AFLOWRC_DEFAULT_CCE_OX_METHOD                         1
 #define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedutype<int>("DEFAULT_CCE_OX_METHOD")
+#define AFLOWRC_DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION           0.4
+#define         DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION           XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION")
+#define AFLOWRC_DEFAULT_CCE_OX_TOL                            0.001
+#define         DEFAULT_CCE_OX_TOL                            XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_OX_TOL")
+#define AFLOWRC_DEFAULT_CCE_SELF_DIST_TOL                     0.001
+#define         DEFAULT_CCE_SELF_DIST_TOL                     XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_SELF_DIST_TOL")
+#define AFLOWRC_DEFAULT_CCE_PEROX_CUTOFF                      1.6
+#define         DEFAULT_CCE_PEROX_CUTOFF                      XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_PEROX_CUTOFF")
+#define AFLOWRC_DEFAULT_CCE_SUPEROX_CUTOFF                    1.4
+#define         DEFAULT_CCE_SUPEROX_CUTOFF                    XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_SUPEROX_CUTOFF")
+#define AFLOWRC_DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF          1.3
+#define         DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF          XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF")
+#define AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF          1.2
+#define         DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF          XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF")
 //RF20200413 END
 
 //DX20200709 - START
@@ -1493,6 +1507,13 @@ namespace aflowrc {
     //RF20200413 START
     // DEFAULT CCE
     aflowrc::load_default("DEFAULT_CCE_OX_METHOD",AFLOWRC_DEFAULT_CCE_OX_METHOD);
+    aflowrc::load_default("DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION",AFLOWRC_DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION);
+    aflowrc::load_default("DEFAULT_CCE_OX_TOL",AFLOWRC_DEFAULT_CCE_OX_TOL);
+    aflowrc::load_default("DEFAULT_CCE_SELF_DIST_TOL",AFLOWRC_DEFAULT_CCE_SELF_DIST_TOL);
+    aflowrc::load_default("DEFAULT_CCE_PEROX_CUTOFF",AFLOWRC_DEFAULT_CCE_PEROX_CUTOFF);
+    aflowrc::load_default("DEFAULT_CCE_SUPEROX_CUTOFF",AFLOWRC_DEFAULT_CCE_SUPEROX_CUTOFF);
+    aflowrc::load_default("DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF",AFLOWRC_DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF);
+    aflowrc::load_default("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF",AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF);
     //RF20200413 END
 
     //DX20200709 - START
@@ -2043,6 +2064,13 @@ namespace aflowrc {
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CCE" << endl;
     aflowrc << "DEFAULT_CCE_OX_METHOD=" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "" << "  // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER" << endl;
+    aflowrc << "DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION=" << AFLOWRC_DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION << "" << "  // 0.4 Ang tolerance between shortest and longest bonds when testing for multi-anion compound" << endl;
+    aflowrc << "DEFAULT_CCE_OX_TOL=" << AFLOWRC_DEFAULT_CCE_OX_TOL << "" << "  // sum of oxidation states might not be exactly zero due to numerics" << endl;
+    aflowrc << "DEFAULT_CCE_SELF_DIST_TOL=" << AFLOWRC_DEFAULT_CCE_SELF_DIST_TOL << "" << "  // distance tolerance in Ang for neighbor screening to savely exclude the cation itself" << endl;
+    aflowrc << "DEFAULT_CCE_PEROX_CUTOFF=" << AFLOWRC_DEFAULT_CCE_PEROX_CUTOFF << "" << "  // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang" << endl;
+    aflowrc << "DEFAULT_CCE_SUPEROX_CUTOFF=" << AFLOWRC_DEFAULT_CCE_SUPEROX_CUTOFF << "" << "  // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang" << endl;
+    aflowrc << "DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF=" << AFLOWRC_DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF << "" << "  // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
+    aflowrc << "DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF=" << AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF << "" << "  // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
     //RF20200413 END
 
     //DX20200708 - START
@@ -2564,6 +2592,13 @@ namespace aflowrc {
     //RF20200413 START
     if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION\")=\"" << DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION << "\"" << "               // 0.4 Ang tolerance between shortest and longest bonds when testing for multi-anion compound" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_TOL\")=\"" << DEFAULT_CCE_OX_TOL << "\"" << "               // sum of oxidation states might not be exactly zero due to numerics" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_SELF_DIST_TOL\")=\"" << DEFAULT_CCE_SELF_DIST_TOL << "\"" << "               // distance tolerance in Ang for neighbor screening to savely exclude the cation itself" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_PEROX_CUTOFF\")=\"" << DEFAULT_CCE_PEROX_CUTOFF << "\"" << "               // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_SUPEROX_CUTOFF\")=\"" << DEFAULT_CCE_SUPEROX_CUTOFF << "\"" << "               // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF\")=\"" << DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF << "\"" << "               // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF\")=\"" << DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF << "\"" << "               // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
     //RF20200413 END
 
     //DX20200708 - START

@@ -14,18 +14,11 @@ static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // 
 static const string CCE_default_output_functionals= "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
 static const string CCE_temperatures = "298.15,0"; // needs to be extended when adding new corrections for other temperatures
 static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
-static const double _CCE_NN_DIST_TOL_MULTI_ANION_ = 0.4; // 0.4 Ang tolerance between shortest and longest bonds for each bond when testing for multi-anion compound; it was found that the standard 0.5 Ang tol. is too large such that different anions appear to be bonded, which would prevent anions to be detected as such
-static const double _CCE_OX_TOL_ = 0.001; // choose small finite value since sum of oxidation states might not be exactly zero due to numerics
-static const double _CCE_SELF_DIST_TOL_ = 0.001; // distance tolerance in Ang for neighbor screening to savely exclude the cation itself having distance zero to itself
-static const double _CCE_perox_cutoff_=1.6; // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang
-static const double _CCE_superox_cutoff_=1.4; // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang
-static const double _CCE_O2_molecule_upper_cutoff_=1.3; // O-O bonds in the O2 molecule is about 1.21 Ang.
-static const double _CCE_O2_molecule_lower_cutoff_=1.2; // O-O bonds in the O2 molecule is about 1.21 Ang.
 static const uint CCE_num_functionals_Bader=4; // Currently, Bader charges used to determine oxidation states are available for 4 functionals: PBE, LDA, SCAN, and PBE+U_ICSD and ONLY for oxides, see get_Bader_templates function
 
 namespace cce {
   struct CCE_Variables {
-    vector<double> dft_enthalpies;
+    vector<double> enthalpies_dft;
     vector<string> vfunctionals; // should be needed as long as output for corrected dft formation enthalpies is based on vfunctionals
     vector<int> offset; // needed for reading corrections from lookup table for different functionals
     vector<string> vtemperatures;
@@ -54,7 +47,7 @@ namespace cce {
     vector<double> perox_correction; // peroxide correction per cell for functionals and temperatures as above
     vector<double> superox_correction; // superoxide correction per cell for functionals and temperatures as above
     vector<double> cce_correction; // total correction per cell for functionals and temperatures as above
-    vector<double> cce_form_enthalpy_cell; // CCE formation enthalpy per cell for functionals and temperatures as above
+    vector<double> enthalpy_formation_cell_cce; // CCE formation enthalpy per cell for functionals and temperatures as above
   };
 
   // main CCE functions
@@ -65,7 +58,7 @@ namespace cce {
   void print_corrections(xstructure& structure, aurostd::xoption& flags);
   void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void print_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
-  void print_num_anion_neighbors(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
+  void print_cation_coordination_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   void print_oxidation_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(const xstructure& structure, string functional, ostream& oss=std::cout);
@@ -74,7 +67,7 @@ namespace cce {
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);
   xstructure check_structure(xstructure& structure);
-  void get_dft_form_enthalpies_functionals(const string& dft_enthalpies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
+  void get_dft_form_enthalpies_functionals(const string& enthalpies_dft_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
   int get_offset(const string& functional);
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   string get_functional_from_aflow_in_outcar(const xstructure& structure, string& aflowin_file, string& outcar_file);
@@ -83,7 +76,7 @@ namespace cce {
   CCE_Variables init_variables(const xstructure&); //ME20200213
   // structural analysis
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
-  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_, ostream& oss=std::cout);
+  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION, ostream& oss=std::cout);
   vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);
@@ -125,13 +118,13 @@ namespace cce {
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
   void apply_pbe_u_icsd_shifts(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // print output and citation
-  string print_JSON_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
+  string print_JSON_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
   string print_JSON_ox_nums(const CCE_Variables& cce_vars);
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
-  string print_output_num_anion_neighbors(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance);
+  string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance);
   string print_output_oxidation_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_enthalpy_cell);
-  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_enthalpy_cell);
+  string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce);
+  string print_test_output(CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce);
   string print_citation();
   // print user instructions
   string print_usage();

@@ -33,40 +33,57 @@ Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
 --cce                            Prints user instructions.
+
 --cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure
                                  format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
                                  For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
                                  must be written on the right side next to the coordinates for each atom
                                  just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
---dft_formation_enthalpies=      Provide a comma separated list of precalculated DFT formation enthalpies,
+
+--dft_formation_enthalpies=|--dfte=
+                                 Provide a comma separated list of precalculated DFT formation enthalpies,
                                  they are assumed to be: (i) negative for compounds lower in enthalpy
                                  than the elements, (ii) in eV/cell. Currently, corrections are available
                                  for PBE, LDA and SCAN.
---functionals=                   Provide a comma separated list of functionals for which corrections
+
+--functionals=|--func=|--functional=
+                                 Provide a comma separated list of functionals for which corrections
                                  should be returned. If used together with --dft_formation_enthalpies,
                                  the functionals must be in the same sequence as the DFT formation
                                  enthalpies they correspond to. Available functionals are:
                                  (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation
                                  enthalpy is provided).
---oxidation_numbers=             Provide as a comma separated list the oxidation numbers. It is
+
+--oxidation_numbers=|--ox_nums=|--oxidation_number=
+                                 Provide as a comma separated list the oxidation numbers. It is
                                  assumed that: (i) one is provided for each atom of the structure and
                                  (ii) they are in the same sequence as the corresponding atoms in the
                                  provided structure file.
---poscar2cce < STRUC_FILE        Determines the CCE corrections for the structure in file STRUC_FILE.
+
+--get_cce_correction|--get_cce_cor|--poscar2cce < STRUCTURE_FILE_PATH
+                                 Determines the CCE corrections for the structure in STRUCTURE_FILE_PATH.
                                  It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                                 is used, the species must be written on the right side next to the coordinates for
-                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
---get_ox_nums < STRUC_FILE       Determines the oxidation numbers for the structure in file STRUC_FILE.
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a
+                                 VASP4 POSCAR is used, the species must be written on the right side next to
+                                 the coordinates for each atom just as for the EXAMPLE INPUT STRUCTURE FOR
+                                 ROCKSALT MgO below.
+
+--get_oxidation_numbers|--get_ox_nums|--poscar2ox_nums < STRUCTURE_FILE_PATH
+                                 Determines the oxidation numbers for the structure in STRUCTURE_FILE_PATH.
                                  It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                                 is used, the species must be written on the right side next to the coordinates for
-                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
---num_anion_neigh < STRUC_FILE   Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE.
-                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR
-                                 is used, the species must be written on the right side next to the coordinates for
-                                 each atom just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a
+                                 VASP4 POSCAR is used, the species must be written on the right side next to
+                                 the coordinates for each atom just as for the EXAMPLE INPUT STRUCTURE FOR
+                                 ROCKSALT MgO below.
+
+--get_cation_coordination_numbers|--get_cation_coord_nums|--poscar2cation_coord_nums < STRUCTURE_FILE_PATH
+                                 Determines the number of anion neighbors for each cation for the structure
+                                 in STRUCTURE_FILE_PATH. It can be in any structure format that AFLOW
+                                 supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a
+                                 VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species must
+                                 be written on the right side next to the coordinates for each atom just
+                                 as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+
 --print=                         Obtain output in standard format (--print=out) or as json (--print=json).
                                  Default: out.
 
