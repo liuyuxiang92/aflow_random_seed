@@ -1043,7 +1043,6 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0 || tokens.size()>2) {
       init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --lib2raw=directory","aflow --lib2raw=all[,dir]"));
-      return false;  //CO20200624
     }
 
     if(tokens.size()>=1) {
