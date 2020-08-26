@@ -12647,7 +12647,7 @@ namespace pflow {
             "                --list",
             "                --params=....  { check aflow --readme=anrl }",
             "                --hex          { check aflow --readme=anrl }"));
-        return true;  //CO20200624 - the option was expressed successfully
+      return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PROTO_AFLOW::USAGE\")=" << vpflow.flag("PROTO_AFLOW::USAGE") << endl;
 
