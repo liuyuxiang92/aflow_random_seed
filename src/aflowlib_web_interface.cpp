@@ -4392,8 +4392,10 @@ namespace aflowlib {
     stringstream num_prec;
     vector<string> voptions;
     aurostd::string2tokens(options,voptions,",");
+    string errormsg = "";
     if(voptions.size()==0) {
-      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
+      errormsg = "--aflowlib= has no arguments.";
+      //init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web // OBSOLETE - use errormsg instead
       //[CO+ME20200731 - ErrorOption throws an error, so no need to return]return 0; //CO20200624 - 0 is error here
     } 
 
@@ -4463,7 +4465,7 @@ namespace aflowlib {
       // START SEARCH
 
       vflags.flag("FLAG::FOUND",FALSE);
-      string catalog="",auid="",strtmp,errormsg="";
+      string catalog="",auid="",strtmp="";
 
       // **********************************************************************************************************
       // TRY AUID
