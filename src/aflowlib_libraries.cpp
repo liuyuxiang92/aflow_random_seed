@@ -1340,7 +1340,7 @@ namespace aflowlib {
         aurostd::string2file(metadata_auid_json,aurostd::CleanFileName(directory_RAW+"/"+"metadata_auid.json"));
       }else{
         // aflowlib::directory2auid(directory_LIB,aflowlib_data.aurl,aflowlib_data.auid,aflowlib_data.vauid); // OLD STYLE
-        aflowlib_data.directory2auid(directory_LIB); // NEW STLYE
+        aflowlib_data.directory2auid(directory_LIB); // NEW STYLE
       }
       //  if(AFLOWLIB_VERBOSE)
       if(LDEBUG) cerr << soliloquy << " [AUID=0b] directory_LIB=" << directory_LIB << endl;
@@ -1374,7 +1374,7 @@ namespace aflowlib {
       if(LDEBUG) cerr << soliloquy << " [AUID=3]" << endl;
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // do the THERMNODYNAMYCS
+    // do the THERMODYNAMICS
     if(perform_THERMODYNAMICS) {
       cout << soliloquy << " THERMODYNAMIC LOOP ---------------------------------------------------------------------------------" << endl;//perform_BANDS=FALSE;
       aflowlib::LIB2RAW_Loop_Thermodynamics(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (thermodynamics):",LOCAL); // identifier inside
