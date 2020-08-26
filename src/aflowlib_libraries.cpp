@@ -6300,9 +6300,8 @@ namespace aflowlib {
     deque<string> vdirsOUT,vzips,vcleans;
     XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans); //CO20200501
 
-    uint aflow_max_argv=100;  //CO20200731 - deep directories like AEL/AGL require more room  //AFLOW_MAX_ARGV
+    uint aflow_max_argv=20;  //CO20200731 - deep directories like AEL/AGL require more room  //AFLOW_MAX_ARGV
     //CO20200731 - really, aflow_max_argv should count the length of vzips as a total string and make sure it's not longer than 1024
-    //CO20200731 - 100 is a fine heuristic
 
     if(vzips.size()>0) {
       stringstream command;

@@ -449,6 +449,7 @@ namespace AFLOW_PTHREADS {
 namespace aurostd {
   bool multithread_execute(deque<string> dcmds,int _NUM_THREADS,bool VERBOSE) {
     bool LDEBUG=TRUE;
+    string soliloquy=XPID+"aurostd::multithread_execute():";
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
     if((int) dcmds.size()<=NUM_THREADS) NUM_THREADS=(uint) dcmds.size();   // SAFETY
 
@@ -460,10 +461,10 @@ namespace aurostd {
       AFLOW_PTHREADS::FLAG=TRUE;AFLOW_PTHREADS::MAX_PTHREADS=NUM_THREADS;  // prepare
       if(AFLOW_PTHREADS::MAX_PTHREADS>MAX_ALLOCATABLE_PTHREADS) AFLOW_PTHREADS::MAX_PTHREADS=MAX_ALLOCATABLE_PTHREADS; // check max
 
-      if(LDEBUG) cerr << "aurostd::multithread_execute: _NUM_THREADS=" << _NUM_THREADS << endl;
-      if(LDEBUG) cerr << "aurostd::multithread_execute: NUM_THREADS=" << NUM_THREADS << endl;
-      if(LDEBUG) cerr << "aurostd::multithread_execute: MAX_ALLOCATABLE_PTHREADS=" << MAX_ALLOCATABLE_PTHREADS << endl;
-      if(LDEBUG) cerr << "aurostd::multithread_execute: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " _NUM_THREADS=" << _NUM_THREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " NUM_THREADS=" << NUM_THREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " MAX_ALLOCATABLE_PTHREADS=" << MAX_ALLOCATABLE_PTHREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
 
       _aflags aflags;
       AFLOW_PTHREADS::Clean_Threads();                                     // clean threads
@@ -615,8 +616,14 @@ namespace AFLOW_PTHREADS {
       vcommands.push_back(command);
     }
 
+    int np=1;
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")){
+      np=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
+    }
+    if(np<1){np=1;}
+
     //  for(uint i=0;i<vcommands.size();i++) aurostd::execute(vcommands.at(i));
-    aurostd::multithread_execute(vcommands,PTHREADS_DEFAULT);
+    aurostd::multithread_execute(vcommands,np,true); //CO20200731 - PTHREADS_DEFAULT doesn't always work
 
     return TRUE;
   }

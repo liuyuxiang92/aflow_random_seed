@@ -82,6 +82,7 @@
         -- converted CCE functions to take structure as read-in only parameter (CO)
         -- added enthalpy_formation to POCC structures (CO)
         -- adjusting aflow_max_argv for xplug (CO)
+        -- adding --np functionality to --multi=zip (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
