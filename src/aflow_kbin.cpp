@@ -1196,7 +1196,7 @@ namespace KBIN {
           }
           // ************************************************************************************************************************************
           // ALIEN MODE
-          if(kflags.AFLOW_MODE_ALIEN) {
+          if(Krun && kflags.AFLOW_MODE_ALIEN) {
             // ***************************************************************************
             // ALIEN MODE  // must contain EMAIL perform
             if(Krun) {
@@ -1210,7 +1210,7 @@ namespace KBIN {
           }
           // ************************************************************************************************************************************
           // MATLAB MODE
-          if(kflags.AFLOW_MODE_MATLAB) {
+          if(Krun && kflags.AFLOW_MODE_MATLAB) {
             if(Krun) {
               aurostd::CommandRequired(DEFAULT_KBIN_MATLAB_BIN); // MATLAB MUST BE AVAILABLE
               Krun=(Krun && KBIN_MATLAB_Directory(FileLOCK,aflags,kflags));
@@ -1223,7 +1223,7 @@ namespace KBIN {
           }
           // ************************************************************************************************************************************
           // AIMS MODE
-          if(kflags.AFLOW_MODE_AIMS) {
+          if(Krun && kflags.AFLOW_MODE_AIMS) {
             // ***************************************************************************
             // AIMS MODE  // must contain EMAIL perform
             if(Krun) {
@@ -1237,7 +1237,7 @@ namespace KBIN {
           // ************************************************************************************************************************************
           // ************************************************************************************************************************************
           // VASP MODE
-          if(kflags.AFLOW_MODE_VASP) {
+          if(Krun && kflags.AFLOW_MODE_VASP) {
             // ***************************************************************************
             // VASP MODE  // must contain EMAIL perform
             if(Krun) {
@@ -1253,12 +1253,12 @@ namespace KBIN {
           }
           // ************************************************************************************************************************************
           // MATLAB MODE
-          if(kflags.KBIN_PHONONS_CALCULATION_FROZSL && !kflags.AFLOW_MODE_VASP) {
+          if(Krun && kflags.KBIN_PHONONS_CALCULATION_FROZSL && !kflags.AFLOW_MODE_VASP) {
             // PRESCRIPT
-            if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
+            if(Krun && kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
               KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
             // POSTSCRIPT
-            if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
+            if(Krun && kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
               KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
           }
           // ***************************************************************************
