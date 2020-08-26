@@ -2535,7 +2535,6 @@ namespace aflowlib {
         string aus_gs_structure;
         double aus_gs_atom,aus_volume_atom,aus_spin_atom;
         // NEW STYLE
-        // bool found=
         xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA,aus_gs_structure,aus_gs_atom,aus_volume_atom,aus_spin_atom);
         enthalpy_atom_ref=aus_gs_atom;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE species=" << xstr.species.at(i) << " species_pp_AUID=" << data.vspecies_pp_AUID.at(i) << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=" << enthalpy_atom_ref << endl;
