@@ -1306,11 +1306,11 @@ namespace aflowlib {
     } else {
       // build aflowlib_data.aurl
       aflowlib_data.aurl="aflowlib.duke.edu:"+directory_LIB;
-      
-      //CO REMOVE ME - DEBUGGING ONLY!!!!!!
-      aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO REMOVE ME - DEBUGGING ONLY!!!!!!
-      aurostd::StringSubst(aflowlib_data.aurl,"/home/corey/common","common"); //CO REMOVE ME - DEBUGGING ONLY!!!!!!
-      //CO REMOVE ME - DEBUGGING ONLY!!!!!!
+ 
+      if(false){
+        aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,"/home/corey/common","common"); //CO20200731 DEBUGGING ONLY
+      }
 
       if(LDEBUG){cerr << soliloquy << " aurl(PRE )=" << aflowlib_data.aurl << endl;}
 
