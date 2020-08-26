@@ -309,7 +309,7 @@ namespace apl
       ofstream &FileMESSAGE, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
-    static const int precision_format = 3;
+    static const int precision_format = 4;
 
     isInitialized = false;
 
