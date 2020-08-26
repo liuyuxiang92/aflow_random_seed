@@ -66,11 +66,11 @@ namespace aflowlib {
     vector<string> tokens,tk;aurostd::string2tokens(line,tokens,"|");
     string qquery=query;aurostd::StringSubst(qquery,"=","");aurostd::StringSubst(qquery," ","");
     for(uint i=0;i<tokens.size();i++) {
-      aurostd::StringSubst(tokens.at(i)," ","");
-      aurostd::string2tokens(tokens.at(i),tk,"=");
+      aurostd::StringSubst(tokens[i]," ","");
+      aurostd::string2tokens(tokens[i],tk,"=");
       if(tk.size()==2) { //   cerr << XPID << tk.at(0) << endl;
         if(tk.at(0)==qquery) { return tk.at(1); }
-        // return aurostd::substring2string(tokens.at(i),query,TRUE);
+        // return aurostd::substring2string(tokens[i],query,TRUE);
       }
     }
     return "";
@@ -539,7 +539,7 @@ namespace aflowlib {
       vspecies.push_back("Nb");vspecies.push_back("Pt");vspecies.push_back("Rh");  // DO IN ALPHABETIC ORDER OTHERWISE COMPLAIN
     } else {
       for(uint i=0;i<tokens.size();i++)
-        vspecies.push_back(tokens.at(i));
+        vspecies.push_back(tokens[i]);
     }
 
     //  uint nentries=GREP_Species_ALL(vspecies,vspecies_pp,vList,vList_tokens);
@@ -874,14 +874,16 @@ namespace aflowlib {
       string directory_list=aurostd::execute2string(command);
       vector<string> tokens;
       aurostd::string2tokens(directory_list,tokens,"\n");
+      uint tokens_i_size=0;
       for(uint i=0;i<tokens.size();i++) {
-        aurostd::StringSubst(tokens.at(i),"/"+_AFLOWIN_,"");
-        aurostd::StringSubst(tokens.at(i),"/"+_AFLOWLOCK_,"");
-        if(tokens.at(i).size()>=5 && tokens.at(i)[tokens.at(i).size()-5]=='/' && tokens.at(i)[tokens.at(i).size()-4]=='c' && tokens.at(i)[tokens.at(i).size()-3]=='o' && tokens.at(i)[tokens.at(i).size()-2]=='r' && tokens.at(i)[tokens.at(i).size()-1]=='e'){tokens.at(i)=tokens.at(i).substr(0,tokens.at(i).size()-5);} //aurostd::StringSubst(tokens.at(i),"/core",""); //CO20200624 - prevent /home/corey -> /homey
+        aurostd::StringSubst(tokens[i],"/"+_AFLOWIN_,"");
+        aurostd::StringSubst(tokens[i],"/"+_AFLOWLOCK_,"");
+        tokens_i_size=tokens[i].size();
+        if(tokens_i_size>=5 && tokens[i][tokens_i_size-5]=='/' && tokens[i][tokens_i_size-4]=='c' && tokens[i][tokens_i_size-3]=='o' && tokens[i][tokens_i_size-2]=='r' && tokens[i][tokens_i_size-1]=='e'){tokens[i]=tokens[i].substr(0,tokens_i_size-5);} //aurostd::StringSubst(tokens[i],"/core",""); //CO20200624 - prevent /home/corey -> /homey
         string cmd="aflow";
         if(XHOST.vflag_control.flag("BEEP")) cmd+=" --beep";
         if(flag_FORCE) cmd+=" --force";
-        cmd+=" --lib2raw="+ tokens.at(i);
+        cmd+=" --lib2raw="+ tokens[i];
         dcmds.push_back(cmd);
       };
       if(multi_sh_value==0 || multi_sh_value==1) {
@@ -889,7 +891,7 @@ namespace aflowlib {
         vector<long double> vdelta_seconds;
         for(uint i=0;i<dcmds.size();i++) {
           //  cout << delta_seconds << " " << dcmds.at(i) << endl;
-          aflowlib::LIB2RAW(tokens.at(i),flag_FORCE);
+          aflowlib::LIB2RAW(tokens[i],flag_FORCE);
           delta_seconds=aurostd::get_delta_seconds(reference_seconds);
           if(delta_seconds>1.0) {
             vdelta_seconds.push_back(delta_seconds);
@@ -1121,9 +1123,9 @@ namespace aflowlib {
       directory_LIB.clear();directory_RAW.clear();
       if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("ICSD")) {
         for(uint i=tokens.size()-1;i>0;i--)
-          if(aurostd::substring2bool(tokens.at(i),"_ICSD_")) {
+          if(aurostd::substring2bool(tokens[i],"_ICSD_")) {
             if(i>=1) {
-              directory_LIB=tokens.at(i-1)+"/"+tokens.at(i);
+              directory_LIB=tokens.at(i-1)+"/"+tokens[i];
               //    directory_WEB=tokens.at(i-1);  removed to make things consistent
               directory_WEB=directory;
             }
