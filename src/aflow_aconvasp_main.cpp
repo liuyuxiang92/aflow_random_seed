@@ -16023,7 +16023,7 @@ void helpIndividualOption(vector<string> & argv) {
 namespace pflow {
   double GetAtomicPlaneDist(const string& options,istream & cin) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::GetAtom():";  //CO20200624
+    string soliloquy=XPID+"pflow::GetAtomicPlaneDist():";  //CO20200624
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
