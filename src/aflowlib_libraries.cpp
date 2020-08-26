@@ -1395,7 +1395,7 @@ namespace aflowlib {
       // MOVE/LINK PICS data
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // do the MAGNETIC
+    // do the STATIC
     if((perform_STATIC || perform_BANDS)) { //CO20200731 - MAGNETIC->STATIC //JX
       cout << soliloquy << " MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
       aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (magnetic):"); 
