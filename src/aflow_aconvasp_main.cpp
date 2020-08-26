@@ -9427,6 +9427,9 @@ namespace pflow {
                     (load_from_common)
                     ?
                     //if load_from_common, check this bool
+                    //this part of the ternary operator will first look for a non-empty aflowlib.out, 
+                    //then try to load it
+                    //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
                     (
                      //(aurostd::FileExist(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
                      (aurostd::FileNotEmpty(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
@@ -9435,6 +9438,8 @@ namespace pflow {
                     )
                     :
                     //if load_from_api, check this bool
+                    //this part of the ternary operator loads in the url
+                    //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
                     (
                      (_aflowlib_tmp.url2aflowlib(load_path, message, false) > 0) &&
                      (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
@@ -9502,6 +9507,9 @@ namespace pflow {
                   (load_from_common)
                   ?
                   //if load_from_common, check this bool
+                  //this part of the ternary operator will first look for a non-empty aflowlib.out, 
+                  //then try to load it
+                  //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
                   (
                    //(aurostd::FileExist(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
                    (aurostd::FileNotEmpty(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
@@ -9510,6 +9518,8 @@ namespace pflow {
                   )
                   :
                   //if load_from_api, check this bool
+                  //this part of the ternary operator loads in the url
+                  //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
                   (
                    (_aflowlib_tmp.url2aflowlib(load_path, message, false) > 0) &&
                    (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
