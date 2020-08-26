@@ -4064,7 +4064,7 @@ namespace aflowlib {
   }
 
   void _aflowlib_entry::GetSGROUP(string aflowlibentry) {
-    string function = XPID + "aflowlib::_aflowlib_entry::getSGROUP():";
+    string function = XPID + "aflowlib::_aflowlib_entry::GetSGROUP():";
     string message = "";
     vector<string> vaflowlib_entry;
     aurostd::string2tokens(aflowlibentry,vaflowlib_entry,"|");
