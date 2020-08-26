@@ -46,7 +46,7 @@ namespace pocc {
     //  cerr << v_temperatures.at(i) << endl;
     //}
     setAELOptions(ael_run_postprocess, ael_write_full_results);
-    if (ael_run_postprocess) { 
+    if (ael_run_postprocess) {
       generateElasticProperties(Bvoigt, Breuss, Bvrh, Gvoigt, Greuss, Gvrh, Poisson_ratio, elastic_tensor_list, compliance_tensor_list);
     } else {
       getElasticProperties(Bvoigt, Breuss, Bvrh, Gvoigt, Greuss, Gvrh, Poisson_ratio, elastic_tensor_list, compliance_tensor_list);

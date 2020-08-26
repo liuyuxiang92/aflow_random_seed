@@ -391,7 +391,7 @@ namespace KBIN {
     kflags.KBIN_FROZSL_FILE  = aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]FILE",TRUE); // load of file somewhere else
     if(kflags.KBIN_PHONONS_CALCULATION_FROZSL || kflags.KBIN_FROZSL_DOWNLOAD|| kflags.KBIN_FROZSL_FILE) kflags.KBIN_FROZSL=TRUE;
     // ---------------------------------------------------------
-    // the rest of symmetry stuff is seeked inside ivasp or
+    // the rest of symmetry stuff is sought inside ivasp or
     if(kflags.AFLOW_MODE_ALIEN) {
       kflags.AFLOW_MODE_MATLAB=FALSE;                  // fix PRIORITY
       kflags.AFLOW_MODE_VASP=FALSE;                    // fix PRIORITY

@@ -7,7 +7,7 @@
         -- Updated README_PROTO.TXT with new nitrides and oxides (DX+RF)
         -- Bug fixes in XtalFinder: precondition structures with BringInCell() for local geometry comparisons (DX)
         -- Bug fixes in XtalFinder: use more robust matching protocol; accounts for undecorated prototypes (i.e., small volumes) (DX)
-        -- Added calculation of electronic contribution to the free energy. (AS)
+        -- Added calculation of electronic contributions to the free energy. (AS)
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
         -- Removed old QHA code, related infrastructure and dependencies. (AS)
