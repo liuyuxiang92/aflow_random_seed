@@ -2287,7 +2287,8 @@ namespace aurostd {
       ifstream& file_to_check) {
     string FileName(CleanFileName(_FileName));
     if(!file_to_check) {
-      string function = XPID + "aurostd::InFileExistCheck()";
+      string function = XPID + "aurostd::InFileExistCheck():";
+
       string message = "In routine " + routine + ". Cannot open file " + FileName + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -5017,7 +5018,8 @@ namespace aurostd {
 
   bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN) {
     // be careful, this does not filter-out # comments
-    string function = XPID + "aurostd::substring_present_file_FAST()";
+    string function = XPID + "aurostd::substring_present_file_FAST():";
+
     string message = "";
     string temp_file=aurostd::TmpFileCreate("substring");
     ostringstream aus;
@@ -6023,7 +6025,8 @@ namespace aurostd  {
   vector<vector<double> > NormalizeAndSum3DVector(const vector<vector<vector<double> > >& vvva, const vector<double>& vFi) {
     //normalize DOS and sum
     if(vvva.size()!=vFi.size()) {
-      string function = XPID + "aurostd::NormalizeAndSum3DVector()";
+      string function = XPID + "aurostd::NormalizeAndSum3DVector():";
+
       string message = "Vector sizes are not equal.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
     }
