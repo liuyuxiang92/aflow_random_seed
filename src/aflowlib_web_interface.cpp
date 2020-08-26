@@ -506,7 +506,7 @@ namespace aflowlib {
   _aflowlib_entry::_aflowlib_entry(const string& file) { // constructur from file
     stringstream oss;
     if(!aurostd::FileExist(file)) { //SC20190813
-      string function = XPID + "aflowlib::_aflowlib_entry::aflowlib_entr():";
+      string function = XPID + "aflowlib::_aflowlib_entry::_aflowlib_entry():";
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " not found =" + file;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
