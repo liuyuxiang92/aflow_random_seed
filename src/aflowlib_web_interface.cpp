@@ -4394,7 +4394,7 @@ namespace aflowlib {
     aurostd::string2tokens(options,voptions,",");
     if(voptions.size()==0) {
       init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
-      return 0; //CO20200624 - 0 is error here
+      //[CO+ME20200731 - ErrorOption throws an error, so no need to return]return 0; //CO20200624 - 0 is error here
     } 
 
     // move on
