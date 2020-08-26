@@ -950,7 +950,7 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function CleanStringASCIIInPlace
+  // Function CleanStringASCII_InPlace
   // ***************************************************************************
   // Similar to CleanStringASCII, but does NOT create a new string (costly if done MANY times)
   // Corey Oses 20190712
@@ -968,6 +968,26 @@ namespace aurostd {
             FALSE)
         ){RemoveCharacterInPlace(s,s[i]);}
     }
+  }
+  
+  // ***************************************************************************
+  // Function RemoveTrailingCharacter
+  // ***************************************************************************
+  // Removes trailing character
+  // CO+ME20200825
+  string RemoveTrailingCharacter(const string& s,char c){
+    string ss=s;
+    RemoveTrailingCharacter_InPlace(ss,c);
+    return ss;
+  }
+
+  // ***************************************************************************
+  // Function RemoveTrailingCharacter_InPlace
+  // ***************************************************************************
+  // Similar to RemoveTrailingCharacter, but does NOT create a new string (costly if done MANY times)
+  // CO+ME20200825
+  void RemoveTrailingCharacter_InPlace(string& s,char c){
+    while(s.size()>0 && s.at(s.size()-1)==c){s=s.substr(0,s.size()-1);}
   }
 
   //DX20190516 - remove control code characters - START

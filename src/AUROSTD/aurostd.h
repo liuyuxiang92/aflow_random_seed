@@ -380,6 +380,8 @@ namespace aurostd {
   string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
   string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
   void CleanStringASCII_InPlace(string& s) __xprototype;  //CO20190712
+  string RemoveTrailingCharacter(const string& s,char c); //CO+ME20200825
+  void RemoveTrailingCharacter_InPlace(string& s,char c); //CO+ME20200825
   string CGI_StringClean(const string& stringIN) __xprototype;
   string RemoveWhiteSpaces(const string& s) __xprototype;
   string RemoveWhiteSpaces(const string& s, const char toogle) __xprototype;

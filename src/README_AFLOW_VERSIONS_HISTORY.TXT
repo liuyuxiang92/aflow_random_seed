@@ -24,6 +24,8 @@
         -- incorporating CCE into CHULL (CO)
         -- changed XHOST.vschema for aflowlib_date (CO+ME)
         -- changing NOTICE color blue to cyan (CO+ME)
+        -- making /www/AFLOWDATA an .aflow.rc parameter (CO+ME)
+        -- adding aurostd::RemoveTrailingCharacter() (CO+ME)
         -- patching lib2raw index issues: LIB7/LIB did not exist (CO)
         -- patching lib2raw index issues: string substitution of /core (CO)
         -- patching --run vs --run=1 bug in AEL/AGL (CO)

@@ -1008,7 +1008,8 @@ namespace aflowlib {
     aurostd::StringSubst(directory,"LIBRARYX/RAW","LIBRARYX/LIB");      // [HISTORIC]
     aurostd::StringSubst(directory,"LIB2/RAW","LIB2/LIB");              // [HISTORIC]
     aurostd::StringSubst(directory,"/RAW/","/LIB/");                    // to help 
-    while(directory.size()>0 && directory.at(directory.size()-1)=='/'){directory=directory.substr(0,directory.size()-1);} //CO20200624 - MOVED FROM BELOW
+    //[CO+ME20200825 OBSOLETE]while(directory.size()>0 && directory.at(directory.size()-1)=='/'){directory=directory.substr(0,directory.size()-1);} //CO20200624 - MOVED FROM BELOW
+    aurostd::RemoveTrailingCharacter_InPlace(directory,'/');
     if(directory=="." || directory.empty()) {directory=aurostd::getPWD();} //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
   }
 }
