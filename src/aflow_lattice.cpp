@@ -157,14 +157,14 @@ namespace LATTICE {
 
 // ***************************************************************************
 namespace LATTICE {
-  uint Lattice2SpaceGroup(string lattice,vector<uint>& vsgn) {
+  uint Lattice2SpaceGroup(const string& lattice,vector<uint>& vsgn) {
     vsgn.clear();
     string lattice_type,lattice_system;
     for(uint sg=1;sg<=230;sg++) {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
       if(lattice_type=="error") {
         string function = XPID + "LATTICE::Lattice2SpaceGroup():";
-        string message = "Could not find the lattice type for space group=" + sg + ". Check the space group input or the LATTICE::Lattice2SpaceGroup() function.";
+        string message = "Could not find the lattice type for space group=" + aurostd::utype2string(sg) + ". Check the space group input or the LATTICE::Lattice2SpaceGroup() function.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       if(lattice_type==lattice) vsgn.push_back(sg);
