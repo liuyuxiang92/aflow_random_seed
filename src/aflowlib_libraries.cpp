@@ -1606,8 +1606,8 @@ namespace aflowlib {
       }
       if(aurostd::FileExist(directory_RAW+"/"+system_name+".cif")) aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK //CO20200624 - adding FileExist() check
 
-      if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_RAW+"/index.php");                      // LINK //CO20200624 - adding FileExist() check
-      if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_WEB+"/index.php");                      // LINK //CO20200624 - adding FileExist() check
+      if(aurostd::FileExist(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php")) aurostd::LinkFile(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php",directory_RAW+"/index.php");                      // LINK //CO20200624 - adding FileExist() check
+      if(aurostd::FileExist(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php")) aurostd::LinkFile(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php",directory_WEB+"/index.php");                      // LINK //CO20200624 - adding FileExist() check
       //CO20200624 - these are PRE-LINKS: these files have NOT been written yet
       //if we check if they exist first, then the links will not be created
       //we want to do this NOW so that it can be captured by vfiles
@@ -1730,7 +1730,7 @@ namespace aflowlib {
     //     cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
     //      aurostd::LinkFile("../../"+_XENTRY_","directory_RAW+"/"+_XENTRY_);
     if(!LOCAL) { //CO20171025
-      if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_RAW+"/"+_XENTRY_);  //CO20200624 - adding FileExist() check
+      if(aurostd::FileExist(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php")) aurostd::LinkFile(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php",directory_RAW+"/"+_XENTRY_);  //CO20200624 - adding FileExist() check
     }
 
     // write aflowlib.out
@@ -1749,7 +1749,7 @@ namespace aflowlib {
 
     if(flag_WEB) {
       if(!LOCAL) { //CO20171025
-        if(aurostd::FileExist("/www/AFLOWDATA/api_index.php")) aurostd::LinkFile("/www/AFLOWDATA/api_index.php",directory_WEB+"/"+_XENTRY_);  //CO20200624 - adding FileExist() check
+        if(aurostd::FileExist(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php")) aurostd::LinkFile(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php",directory_WEB+"/"+_XENTRY_);  //CO20200624 - adding FileExist() check
       }
     }
 
