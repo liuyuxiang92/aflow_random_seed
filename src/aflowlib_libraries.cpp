@@ -998,7 +998,8 @@ namespace aflowlib {
     //[CO20200624 - do below]if(directory.at(directory.size()-1)=='/')  directory=directory.substr(0,directory.size()-1);
     aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");
     aurostd::StringSubst(directory,"/"+_AFLOWLOCK_,"");
-    if(directory.size()>=5 && directory[directory.size()-5]=='/' && directory[directory.size()-4]=='c' && directory[directory.size()-3]=='o' && directory[directory.size()-2]=='r' && directory[directory.size()-1]=='e'){directory=directory.substr(0,directory.size()-5);} //aurostd::StringSubst(directory,"/core",""); //CO20200624 - prevent /home/corey -> /homey
+    uint directory_size=directory.size();
+    if(directory_size>=5 && directory[directory_size-5]=='/' && directory[directory_size-4]=='c' && directory[directory_size-3]=='o' && directory[directory_size-2]=='r' && directory[directory_size-1]=='e'){directory=directory.substr(0,directory_size-5);} //aurostd::StringSubst(directory,"/core",""); //CO20200624 - prevent /home/corey -> /homey
     aurostd::StringSubst(directory,"/common/GNDSTATE","/common/LIB2");  // [HISTORIC]
     aurostd::StringSubst(directory,"common/SCINT","common/ICSD");       // [HISTORIC]
     aurostd::StringSubst(directory,"SCINT","ICSD");                     // [HISTORIC]
