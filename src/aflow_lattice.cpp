@@ -163,8 +163,8 @@ namespace LATTICE {
     for(uint sg=1;sg<=230;sg++) {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
       if(lattice_type=="error") {
-        string function = XPID + "LATTICE::Lattice2SpaceGroup";
-        string message = "error";
+        string function = XPID + "LATTICE::Lattice2SpaceGroup():";
+        string message = "Could not find the lattice type for space group=" + sg + ". Check the space group input or the LATTICE::Lattice2SpaceGroup() function.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       if(lattice_type==lattice) vsgn.push_back(sg);
@@ -350,7 +350,7 @@ namespace LATTICE {
       //However, this function needs lattice vectors to determine alpha,kgamma,testphi
       //and to return the proper variation, for now it will return "MCLC".
       return "MCLC";
-      message = XPID + "error in MCLC: ";
+      message = "error in MCLC: ";
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
@@ -361,7 +361,7 @@ namespace LATTICE {
     // 5. ORCC
     if(sg==20 || sg==21 || (sg>=35 && sg<=41) || (sg>=63 && sg<=68)) {
       return "ORCC";
-      message = XPID + "error in ORCC: ";
+      message = "error in ORCC: ";
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
@@ -374,7 +374,7 @@ namespace LATTICE {
       if(mismatch>1+eps/5.0) return "ORCF1";
       if(mismatch<1-eps/5.0) return "ORCF2";
       if(aurostd::isequal(mismatch,1.0,eps/5.0)) return "ORCF3";
-      message = XPID + "error in ORCF: ";
+      message = "error in ORCF: ";
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
@@ -390,7 +390,7 @@ namespace LATTICE {
       if(a<c)  return "BCT2";
       // test if a=b=c
       if(aurostd::isequal(a,b,eps) && aurostd::isequal(a,c,eps)) return "BCT2";
-      message = XPID + "error in BCT: ";
+      message = "error in BCT: ";
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);

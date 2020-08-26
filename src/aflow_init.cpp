@@ -1019,7 +1019,7 @@ namespace init {
   long _GetRAM(void) {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
-      string function = XPID + "init::_GetRAM()";
+      string function = XPID + "init::_GetRAM():";
       string message = "sysinfo error";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1034,7 +1034,7 @@ namespace init {
     uint64_t size;
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
-      string function = XPID + "init::GetRAM()";
+      string function = XPID + "init::GetRAM():";
       string message = "sysctl returned an error";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
