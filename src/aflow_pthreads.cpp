@@ -306,7 +306,7 @@ namespace KBIN {
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv) {
 
-    string function_name = "AFLOW_PTHREADS::MULTI_sh()";
+    string function_name=XPID+"AFLOW_PTHREADS::MULTI_sh()";
     stringstream message;
     ostringstream aus;
     _aflags aflags;
