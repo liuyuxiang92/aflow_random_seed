@@ -1210,7 +1210,7 @@ namespace aflowlib {
       cout << soliloquy << " directory does not exist: " << directory_LIB << endl;
       return FALSE;
     }
-    if(flag_FORCE==FALSE) {
+    if(flag_FORCE==FALSE) { //only goes in this loop if no --force, this happens BEFORE directory_RAW is deleted
       //CO20200624 - checking files in RAW from previous lib2raw run
       if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {  // directory_RAW+"/"+_AFLOWIN_)
         _aflags aflags;
@@ -1221,7 +1221,7 @@ namespace aflowlib {
         return FALSE;
       }
       if(perform_BANDS) {
-        if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands") || aurostd::EFileExist(directory_RAW+"/EIGENVAL.bands")) { //CO20200624 - this check does not make sense, we don't rely on EIGENVAL.bands, we need OUTCAR.bands!
+        if(aurostd::EFileExist(directory_RAW+"/OUTCAR.bands")) { //CO20200624 - EIGENVAL.bands->OUTCAR.bands
           // return FALSE;
           cout << soliloquy << " directory is skipped because of BANDS: " << directory_RAW << endl;
           return FALSE;
