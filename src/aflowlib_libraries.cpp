@@ -5372,14 +5372,14 @@ namespace aflowlib {
           aurostd::LinkFile(directory_LIB+"/"+vfiles[i],directory_RAW);  //link the file, no need to de-compress
           //aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // DOSCAR.pocc_
         }
-        if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){
-          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_orbitals_
+        if(vfiles[i].find("_dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // _dos_orbitals_
         }
-        if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){
-          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_species_
+        if(vfiles[i].find("_dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // _dos_species_
         }
-        if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){
-          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // dos_atoms_
+        if(vfiles[i].find("_dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // _dos_atoms_
         }
       }
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE) << endl;
