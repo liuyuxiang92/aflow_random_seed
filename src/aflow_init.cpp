@@ -1709,7 +1709,7 @@ string aflow_get_time_string(void) {
 string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   //refer to aflow_get_time_string()
   //convert Www Mmm dd hh:mm:ss yyyy style to aurostd::get_datetime() one
-  string soliloquy=XPID+"aflow_convert_time_LOCK2aflowlib():";
+  string soliloquy=XPID+"aflow_convert_time_ctime2aurostd():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}

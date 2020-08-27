@@ -912,7 +912,7 @@ namespace pflow {
     RAWlist.clear();
     iftmp.open("wRAWlist.tmp");
     if(!iftmp) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"can not open wLIBlist.tmp, aborted",_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"can not open wRAWlist.tmp, aborted",_FILE_CORRUPT_); //CO20200624
     }
     while(!iftmp.eof()) {
       iftmp >> stmp;
