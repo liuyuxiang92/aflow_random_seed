@@ -2490,8 +2490,8 @@ namespace apl
       setw(TW) << "F(Veq)[eV/atom]"      << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
       setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
-      setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
-      setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
+      setw(TW) << "Cv[kB/atom]"         << setw(SW) << ' ' <<
+      setw(TW) << "Cp[kB/atom]"         << setw(SW) << ' ' <<
       setw(TW) << "gamma"                << setw(SW) << ' ' <<
       std::endl;
 
@@ -2705,16 +2705,16 @@ namespace apl
       setw(TW) << "F(V0)[eV/atom]"       << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
       setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
-      setw(TW) << "Cv[kB/atoms]"         << setw(SW) << ' ' <<
-      setw(TW) << "Cp[kB/atoms]"         << setw(SW) << ' ' <<
+      setw(TW) << "Cv[kB/atom]"         << setw(SW) << ' ' <<
+      setw(TW) << "Cp[kB/atom]"         << setw(SW) << ' ' <<
       setw(TW) << "gamma(beta,B,Cv)"     << setw(SW) << ' ' <<
       setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
     if (qha_method==QHA_CALC){
       file  << setw(SW) << ' ' <<
         setw(TW) << "beta_mesh[10^-6/K]"   << setw(SW) << ' ' <<
-        setw(TW) << "Cv_mesh[kB/atoms]"    << setw(SW) << ' ' <<
-        setw(TW) << "Cp_mesh[kB/atoms]"    << setw(SW) << ' ' <<
+        setw(TW) << "Cv_mesh[kB/atom]"    << setw(SW) << ' ' <<
+        setw(TW) << "Cp_mesh[kB/atom]"    << setw(SW) << ' ' <<
         setw(TW) << "gamma_mesh";
     }
     file << std::endl;
