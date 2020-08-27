@@ -2397,7 +2397,8 @@ namespace apl
     while (iter++ < max_scqha_iteration){
       Pe   = EOS2Pressure(V, fit_params, method);
       VPg  = VPgamma(T, V);
-      Vnew = -VPg/Pe;
+      Vnew = -VPg/Pe; // be careful: note that sign in this expression depends on 
+      // whether the pressure or the volume derivative of energy is used (dE/dV = -Pe)
       if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
     }
 
