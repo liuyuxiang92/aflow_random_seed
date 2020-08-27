@@ -9413,7 +9413,7 @@ namespace pflow {
               vloadpaths.push_back(symmetry_path+"/"+icsds[j]);
               if(load_from_common) {aurostd::SubDirectoryLS(symmetry_path+"/"+icsds[j],vloadpaths);}
               else {pflow::SubLayersRestAPILS(symmetry_path+"/"+icsds[j],vloadpaths);}
-              if(1||LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+              if(LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
               if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
                 message << "REST-API appears to be down";
                 pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -9493,7 +9493,7 @@ namespace pflow {
             vloadpaths.push_back(calculation_path+"/"+calculations[j]);
             if(load_from_common) {aurostd::SubDirectoryLS(calculation_path+"/"+calculations[j],vloadpaths);}
             else {pflow::SubLayersRestAPILS(calculation_path+"/"+calculations[j],vloadpaths);}
-            if(1||LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+            if(LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
             if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
               message << "REST-API appears to be down";
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
