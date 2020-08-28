@@ -3050,7 +3050,7 @@ namespace cce {
     for (uint i=0,isize=structure.atoms.size();i<isize;i++){
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         if (num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
-          output << "Number of " << considered_anion_species << " nearest neighbors within " << tolerance << " Ang. tolerance of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]): " << num_neighbors[i] << endl;
+          output << num_neighbors[i] << " //number of " << considered_anion_species << " nearest neighbors within " << tolerance << " Ang. tolerance of " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << endl; // i+1: convert to 1-based counting
         }
       }
     }
@@ -3064,14 +3064,16 @@ namespace cce {
     output << endl;
     output << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
     for (uint k=0,ksize=cce_vars.oxidation_states.size();k<ksize;k++){
-      output << "Oxidation state of " << structure.atoms[k].cleanname << " (atom[" << k << "]): " << cce_vars.oxidation_states[k] << endl;
+      output << (cce_vars.oxidation_states[k]>0?"+":"") << cce_vars.oxidation_states[k] << " //" << structure.atoms[k].cleanname << " (atom " << k+1 << ")"  << endl; // k+1: convert to 1-based counting
     }
     //if(!cce_flags.flag("OX_NUMS_PROVIDED")){
     //  output << "CHECK whether this is what you are expecting!" << endl;
     //}
     // get sum of oxidation numbers
     cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars); // double because for superoxides O ox. number is -0.5
-    output << "Sum over all oxidation numbers is (should be ZERO): " << cce_vars.oxidation_sum << endl;
+    if (std::abs(cce_vars.oxidation_sum) > DEFAULT_CCE_OX_TOL) {
+      output << "Sum over all oxidation numbers is (should be ZERO): " << cce_vars.oxidation_sum << endl;
+    }
     output << endl;
     return output.str();
   }
