@@ -6301,8 +6301,9 @@ namespace aflowlib {
     XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans); //CO20200501
 
     uint aflow_max_argv=AFLOW_MAX_ARGV;  //CO20200731 - deep directories like AEL/AGL require more room
+    uint vzips_size=vzips.size();
 
-    if(vzips.size()>0) {
+    if(vzips_size>0) {
       if(aurostd::substring2bool(XHOST.hostname,"m7int0") || aurostd::substring2bool(XHOST.hostname,"m6int0")) XHOST.hostname="marylou";
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".egr.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".mems.duke.edu");
@@ -6311,30 +6312,34 @@ namespace aflowlib {
       vector<string> vcommands;
       stringstream command;
       uint i=0;
-      while(i<vzips.size()){  //new loop for zip command, limit not the number of inputs, but the size of the overall command
+      uint iwhile=0;  //SAFETY, maximum number of while loop iteration is vzips_size (1 zip command per vzips entry)
+      //CO20200825 - modifying the loop to check command LENGTH vs. number of arguments
+      while(i<vzips_size && iwhile<vzips_size){  //new loop for zip command, limit not the number of inputs, but the size of the overall command
         command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
         command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
         //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
         command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
         command << "_" << i/aflow_max_argv+1 << "_" << XHOST.hostname;
         command << " --size=" << NUM_SIZE << " --DIRECTORY ";
-        for(;i<vzips.size();i++){
-          command << " " << vzips[i];
-          if(command.str().size()>=AFLOW_MAX_ARGV || i==vzips.size()-1){
+        while(i<vzips_size){
+          command << " " << vzips[i++];
+          if(command.str().size()>=AFLOW_MAX_ARGV || i>=vzips_size){
             cerr << command.str() << endl;
             vcommands.push_back(command.str());aurostd::StringstreamClean(command);
             break;
           }
         }
+        iwhile++;
       }
-      //[CO20200825 - OBSOLETE]for(uint i=0;i<vzips.size();i+=aflow_max_argv) {
+      cerr << soliloquy << " last command=\"" << command.str() << "\"" << endl;
+      //[CO20200825 - OBSOLETE]for(uint i=0;i<vzips_size;i+=aflow_max_argv) {
       //[CO20200825 - OBSOLETE]  command << "aflow-dev --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
       //[CO20200825 - OBSOLETE]  command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
       //[CO20200825 - OBSOLETE]  //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
       //[CO20200825 - OBSOLETE]  command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
       //[CO20200825 - OBSOLETE]  command << "_" << i/aflow_max_argv+1 << "_" << XHOST.hostname;
       //[CO20200825 - OBSOLETE]  command << " --size=" << NUM_SIZE << " --DIRECTORY ";
-      //[CO20200825 - OBSOLETE]  for(uint j=i;j<i+aflow_max_argv && j<vzips.size();j++) command << " " << vzips.at(j);
+      //[CO20200825 - OBSOLETE]  for(uint j=i;j<i+aflow_max_argv && j<vzips_size;j++) command << " " << vzips.at(j);
       //[CO20200825 - OBSOLETE]  command << " " << endl << endl;
       //[CO20200825 - OBSOLETE]}
       //[CO20200825 - OBSOLETE]cerr << command.str() << endl;
@@ -6342,7 +6347,7 @@ namespace aflowlib {
       aurostd::execute(vcommands);
     }
 
-    //if(vzips.size()>0) {
+    //if(vzips_size>0) {
     //stringstream command;
     //if(aurostd::substring2bool(XHOST.hostname,"m7int0") || aurostd::substring2bool(XHOST.hostname,"m6int0")) XHOST.hostname="marylou";
     //XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".egr.duke.edu");
@@ -6353,7 +6358,7 @@ namespace aflowlib {
     // << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string("")) << aurostd::get_date()
     // << "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec() << "_" << XHOST.hostname
     // << " --size=" << NUM_SIZE << " --DIRECTORY ";
-    //for(uint j=0;j<vzips.size()&&j<AFLOW_MAX_ARGV;j++)
+    //for(uint j=0;j<vzips_size&&j<AFLOW_MAX_ARGV;j++)
     //command << " " << vzips.at(j);
     //cerr << command.str() << endl;
     //aurostd::execute(command);
