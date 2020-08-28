@@ -599,9 +599,10 @@ namespace cce {
       if (std::abs(cce_vars.oxidation_sum) > DEFAULT_CCE_OX_TOL) {
         oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
         string function = "cce::get_oxidation_states()";
-        message << " BAD NEWS: The formation enthalpy of this system is not correctable!"
-          << " The oxidation numbers that you provided do not add up to zero!"
-          << " Please correct and rerun.";
+        message << " BAD NEWS: The formation enthalpy of this system is not correctable!" << endl;
+        message << " The oxidation numbers that you provided do not add up to zero!" << endl;
+        message << " Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
+        message << " Please correct and rerun." << endl;
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);	
       }
     } else {
@@ -1266,6 +1267,7 @@ namespace cce {
           cce_flags.flag("CORRECTABLE",FALSE);
           oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
           message << "BAD NEWS: The determined oxidation numbers do not add up to zero!"  << endl;
+          message << "Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
           if(cce_flags.flag("RUN_FULL_CCE")){
             message << "The formation enthalpy of this system is hence not correctable!"  << endl;
             message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
@@ -2186,6 +2188,7 @@ namespace cce {
       cce_flags.flag("CORRECTABLE",FALSE);
       oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
       message << "BAD NEWS: The formation enthalpy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+      message << "Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
       message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     } else {
@@ -2373,6 +2376,7 @@ namespace cce {
                   cce_flags.flag("CORRECTABLE",FALSE);
                   oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars); // print previously gathered output e.g. from determination of oxidation numbers
                   message << "BAD NEWS: The formation enthalpy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+                  message << "Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
                   message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
                   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
                 }
@@ -2664,6 +2668,7 @@ namespace cce {
       cerr << soliloquy << " ASSIGNMENT OF CORRECTIONS:" << endl;
     }
     bool print_previous_output=TRUE;
+    //string missing_corrections = "";
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         string corrections_line = "";
@@ -3065,14 +3070,6 @@ namespace cce {
     output << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
     for (uint k=0,ksize=cce_vars.oxidation_states.size();k<ksize;k++){
       output << (cce_vars.oxidation_states[k]>0?"+":"") << cce_vars.oxidation_states[k] << " //" << structure.atoms[k].cleanname << " (atom " << k+1 << ")"  << endl; // k+1: convert to 1-based counting
-    }
-    //if(!cce_flags.flag("OX_NUMS_PROVIDED")){
-    //  output << "CHECK whether this is what you are expecting!" << endl;
-    //}
-    // get sum of oxidation numbers
-    cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars); // double because for superoxides O ox. number is -0.5
-    if (std::abs(cce_vars.oxidation_sum) > DEFAULT_CCE_OX_TOL) {
-      output << "Sum over all oxidation numbers is (should be ZERO): " << cce_vars.oxidation_sum << endl;
     }
     output << endl;
     return output.str();
