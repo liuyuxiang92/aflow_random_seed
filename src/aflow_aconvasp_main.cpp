@@ -4980,6 +4980,7 @@ namespace pflow {
     if(LDEBUG) oss << soliloquy << "CHECK USAGE" << endl; 
     if(vpflow.flag("CHGSUM::USAGE")) {
       init::MessageOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
+      return oss.str();
     }
 
     // no input
@@ -9412,7 +9413,7 @@ namespace pflow {
               vloadpaths.push_back(symmetry_path+"/"+icsds[j]);
               if(load_from_common) {aurostd::SubDirectoryLS(symmetry_path+"/"+icsds[j],vloadpaths);}
               else {pflow::SubLayersRestAPILS(symmetry_path+"/"+icsds[j],vloadpaths);}
-              if(1||LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+              if(LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
               if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
                 message << "REST-API appears to be down";
                 pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -9492,7 +9493,7 @@ namespace pflow {
             vloadpaths.push_back(calculation_path+"/"+calculations[j]);
             if(load_from_common) {aurostd::SubDirectoryLS(calculation_path+"/"+calculations[j],vloadpaths);}
             else {pflow::SubLayersRestAPILS(calculation_path+"/"+calculations[j],vloadpaths);}
-            if(1||LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+            if(LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
             if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
               message << "REST-API appears to be down";
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -12646,7 +12647,7 @@ namespace pflow {
             "                --list",
             "                --params=....  { check aflow --readme=anrl }",
             "                --hex          { check aflow --readme=anrl }"));
-        return true;  //CO20200624 - the option was expressed successfully
+      return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PROTO_AFLOW::USAGE\")=" << vpflow.flag("PROTO_AFLOW::USAGE") << endl;
 
@@ -16022,7 +16023,7 @@ void helpIndividualOption(vector<string> & argv) {
 namespace pflow {
   double GetAtomicPlaneDist(const string& options,istream & cin) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::GetAtom():";  //CO20200624
+    string soliloquy=XPID+"pflow::GetAtomicPlaneDist():";  //CO20200624
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");

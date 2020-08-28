@@ -1172,56 +1172,10 @@ namespace apl {
 
 //AS20200513 BEGIN
 #define QHA_ARUN_MODE "QHA" // used in filename
-
 namespace apl
 {
-  /// Fit to a nonlinear model using the Levenberg-Marquardt algorithm.
-  ///
-  /// The implementation here is based on the ideas from Numerical Recipes and
-  /// K. Madsen et al. Methods For Non-linear Least Squares Problems
-  /// http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
-  ///
-  /// Caution: the default value for the parameter tau (a scaling factor for the initial step size)
-  /// was picked to yield a correct fit to the Murnaghan equation of state. 
-  /// If you observe that this is not a good choice for your function,
-  /// try 1e-6 if the initial guess is believed to be a good approximation to the true
-  /// parameters. Otherwise 1e-3 or even 1 might be a better choice.
-  class NonlinearFit{
-    public:
-      NonlinearFit();
-      NonlinearFit(const NonlinearFit &nlf);
-      NonlinearFit(xvector<double> &x, xvector<double> &y, xvector<double> &guess,
-          double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
-          double tol=1e-6, double tau=1e-12, int max_iter=1000);
-      ~NonlinearFit();
-      const NonlinearFit& operator=(const NonlinearFit &qha);
-      int Npoints, Nparams;
-      double tol; /// convergence tolerance criterion
-      double tau; /// scaling parameter for initial step size
-      int max_iter; /// maximum number of allowed iterations
-      xvector<double> x,y;   // data points
-      xvector<double> residuals; // residuals of a given model function
-      xvector<double> guess; // initial guess for fit parameters
-      xvector<double> p;     // parameters obtained by fit
-      xvector<double> dydp;  // derivative of a given function w.r.t parameters
-      xmatrix<double> A;     // J^T.J matrix
-      xmatrix<double> J;     // Jacobian of a model function w.r.t parameters
-      double (*f)(const double x, const xvector<double> &p, xvector<double> &dydp);
-      bool fitLevenbergMarquardt();
-      void Jacobian(const xvector<double> &guess);
-      void calculateResiduals(const xvector<double> &params);
-      double calculateResidualSquareSum(const xvector<double> &params);
-      void clear();
-
-    private:
-      void free();
-      void copy(const NonlinearFit &nlf);
-  };
-}
-
-namespace apl
-{
-  enum EOSmethod {EOS_MURNAGHAN, EOS_POLYNOMIAL, EOS_BIRCH_MURNAGHAN};
+  enum EOSmethod {EOS_MURNAGHAN, EOS_SJ, EOS_BIRCH_MURNAGHAN2, EOS_BIRCH_MURNAGHAN3,
+    EOS_BIRCH_MURNAGHAN4};
   enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC, QHANP_CALC};
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
@@ -1240,7 +1194,7 @@ namespace apl
           ofstream &FileMESSAGE, ostream &oss);
       ~QHA();
       const QHA& operator=(const QHA &qha);
-      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags, string &aflowin);
+      void run(_xflags &xflags, _aflags &aflags, _kflags &kflags);
       void clear();
       double calcFrequencyFit(double V, xvector<double> &xomega);
       double calcGrueneisen(double V, xvector<double> &xomega, double &w);
@@ -1254,9 +1208,13 @@ namespace apl
       double IDOS(double e, double T, xEIGENVAL &eig);
       xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
-      double InternalEnergyFit(double T, double V);
+      double InternalEnergyFit(double T, double V, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
       double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
+      double BulkModulus(double V, const xvector<double> &parameters, EOSmethod method);
+      double Bprime(double V, const xvector<double> &parameters, EOSmethod method);
+      double EOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
+      double EquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
       double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
       double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
       double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
@@ -1270,7 +1228,8 @@ namespace apl
       double InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
       double VPgamma(double T, double V);
-      double SCQHAgetEquilibriumVolume(double T);
+      double SCQHAgetEquilibriumVolume(double T, EOSmethod method);
+      double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
       void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
       // output
       void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
@@ -1279,9 +1238,10 @@ namespace apl
       void   writeAverageGPfiniteDifferences();
       void   writeGPmeshFD();
       void   writeFrequencies();
-      void   writeTphononDispersions(QHAmethod qha_method);
+      void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method);
       // members
       xoption apl_options;
+      xoption qha_options;
       string system_title;
       double EOS_volume_at_equilibrium;
       double EOS_energy_at_equilibrium;
@@ -1336,21 +1296,29 @@ namespace apl
       vector<string> subdirectories_apl_gp;
       vector<string> subdirectories_apl_qhanp;
       vector<string> subdirectories_static;
+      vector<string> arun_runnames_apl_eos;
+      vector<string> arun_runnames_apl_gp;
+      vector<string> arun_runnames_apl_qhanp;
       vector<string> arun_runnames_static;
       _xinput xinput;
       string currentDirectory;
       // methods
-      int  checkStaticCalculations(vector<vector<bool> > &file_is_present);
-      void read();
-      bool runAPLcalculations(const vector<string> &subdirectories,
-          const vector<double> &coefVolumes, _xflags &xflags, _aflags &aflags,
-          _kflags &kflags, string &aflowin, QHAtype type);
-      bool readStaticCalculationsData();
-      void calculate();
+      // related to static DFT calculations
       void createSubdirectoriesStaticRun(const _xflags &xflags, const _aflags &aflags,
           const _kflags &kflags, const vector<vector<bool> > &list);
+      int  checkStaticCalculations(vector<vector<bool> > &file_is_present);
       void printMissingStaticFiles(const vector<vector<bool> > & list,
           const vector<string> &subdirectories);
+      bool readStaticCalculationsData();
+      // related to APL calculations
+      void createSubdirectoriesAPLRun(const _xflags &xflags, const _aflags &aflags,
+          const _kflags &kflags, const vector<vector<bool> > &list, QHAtype qhatype);
+      int  checkAPLCalculations(vector<vector<bool> > &file_is_present, QHAtype qhatype);
+      void printMissingAPLFiles(const vector<vector<bool> > & list, QHAtype qhatype);
+      bool readAPLCalculationData(const vector<string> &subdirectories, _kflags &kflags,
+          QHAtype type);
+      bool runAPL(_xflags &xflags, _aflags &aflags, _kflags &kflags, QHAtype qhatype);
+      // mandatory
       void free();
       void copy(const QHA &qha);
   };

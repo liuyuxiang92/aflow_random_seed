@@ -1584,7 +1584,7 @@ namespace aurostd {
   // Stefano Curtarolo
   // Make a directory by splitting each part.. returns false if something wrong
   // happens.
-  bool DirectoryMake(string _Directory) {  // "" compliant 20190401 SC
+  bool DirectoryMake(string _Directory) {  // "" compliant SC20190401
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string Directory(CleanFileName(_Directory));
     std::deque<string> tokens;
@@ -1614,7 +1614,7 @@ namespace aurostd {
   // Make a directory by splitting each part.. cant check much remotely
   // it starts from the assumption that you DO HAVE access to the remove account
   // which does not pretend a password
-  bool SSH_DirectoryMake(string user, string machine,string _Directory) {  // "" compliant 20190401 SC
+  bool SSH_DirectoryMake(string user, string machine,string _Directory) {  // "" compliant SC20190401
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string Directory(CleanFileName(_Directory));
     std::deque<string> tokens;
@@ -1636,7 +1636,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo
   // return FALSE if something got messed up
-  bool DirectoryChmod(string chmod_string,string _Directory) {  // "" compliant 20190401 SC
+  bool DirectoryChmod(string chmod_string,string _Directory) {  // "" compliant SC20190401
     string Directory(CleanFileName(_Directory));
     ostringstream aus;
     aurostd::StringstreamClean(aus);
@@ -1719,7 +1719,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function DirectoryWritable and DirectoryUnwritable
   // ***************************************************************************
-  bool DirectoryWritable(string _Directory) {  // "" compliant 20190401 SC
+  bool DirectoryWritable(string _Directory) {  // "" compliant SC20190401
     string Directory(CleanFileName(_Directory));
     string filename=string(Directory+"/aflow.writable."+aurostd::utype2string(uint((double) std::floor(100000*aurostd::ran0())))+".test");
     string2file("DirectoryWritable",filename);
@@ -1771,7 +1771,7 @@ namespace aurostd {
   // Stefano Curtarolo
   // copy the file but does not check if the directory can be made or not...
   // CO20200624 - it cannot check because we might pass in *
-  bool CopyFile(string from,string to) { // "" compliant 20190401 SC
+  bool CopyFile(string from,string to) { // "" compliant SC20190401
     stringstream command;
     command << "cp -f \"" << CleanFileName(from) << "\" \"" << CleanFileName(to) << "\" " << endl;
     aurostd::execute(command);
@@ -1785,7 +1785,7 @@ namespace aurostd {
   // Stefano Curtarolo
   // copy the file but does not check if the directory can be made or not...
   // CO20200624 - it cannot check because we might pass in *
-  bool LinkFile(string from,string to) { // "" compliant 20190401 SC
+  bool LinkFile(string from,string to) { // "" compliant SC20190401
     stringstream command;
     command << "ln -sf \"" << CleanFileName(from) << "\" \"" << CleanFileName(to) << "\" " << endl;
     aurostd::execute(command);
@@ -1897,7 +1897,7 @@ namespace aurostd {
   // Function aurostd::UncompressFile aurostd::Compress
   // ***************************************************************************
   // Bzip the file (does not check)
-  bool UncompressFile(const string& _file,const string& command) {  // "" compliant 20190401 SC
+  bool UncompressFile(const string& _file,const string& command) {  // "" compliant SC20190401
     string file(CleanFileName(_file));
     if(command=="bunzip2" || command=="bzip2" || command=="bz2"  || command==".bz2") {
       if(!aurostd::IsCommandAvailable("bzip2")) {
@@ -1926,7 +1926,7 @@ namespace aurostd {
     }
     return TRUE;
   }
-  bool UncompressFile(const string& _file) {  // "" compliant 20190401 SC
+  bool UncompressFile(const string& _file) {  // "" compliant SC20190401
     string file(CleanFileName(_file));
     if(substring2bool(file,".xz"))  {return UncompressFile(file,"xz");}
     if(substring2bool(file,".bz2")) {return UncompressFile(file,"bzip2");}
@@ -1935,7 +1935,7 @@ namespace aurostd {
     return FALSE;
   }
 
-  bool CompressFile(const string& _file,const string& command) {  // "" compliant 20190401 SC
+  bool CompressFile(const string& _file,const string& command) {  // "" compliant SC20190401
     string file(CleanFileName(_file));
     //  cerr << "aurostd::CompressFile FileName=[" << FileName << "]  command=[" << command << "]" << endl;
     if(aurostd::substring2bool(command,"bzip2") || aurostd::substring2bool(command,"bz2")  || aurostd::substring2bool(command,".bz2")) {
@@ -1982,7 +1982,7 @@ namespace aurostd {
   // ***************************************************************************
   // aurostd::ZIP2ZIP aurostd::BZ2XZ aurostd::GZ2XZ
   // ***************************************************************************
-  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE,const string& message) {  // "" compliant 20190401 SC
+  bool ZIP2ZIP(string _dir,string from,string to,bool VERBOSE,const string& message) {  // "" compliant SC20190401
     string from_cmd="bzip2",from_ext="bz2";
     string to_cmd="xz",to_ext="xz";
     string dir=aurostd::CleanFileName(_dir);
@@ -2287,7 +2287,8 @@ namespace aurostd {
       ifstream& file_to_check) {
     string FileName(CleanFileName(_FileName));
     if(!file_to_check) {
-      string function = XPID + "aurostd::InFileExistCheck()";
+      string function = XPID + "aurostd::InFileExistCheck():";
+
       string message = "In routine " + routine + ". Cannot open file " + FileName + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -3482,7 +3483,7 @@ namespace aurostd {
   }
 
   bool string2compressfile(const string& command,const string& StringOUTPUT,const string& _file,string mode) {
-    // "" compliant 20190401 SC
+    // "" compliant SC20190401
     string file=aurostd::CleanFileName(_file);
     bool out=string2file(StringOUTPUT,file,mode);
     aurostd::execute(command+" -9fq \""+file+"\"");
@@ -4247,7 +4248,7 @@ namespace aurostd {
   // Function ChmodFile
   // ***************************************************************************
   // change mod of a file - Stefano Curtarolo
-  bool ChmodFile(string chmod_string,string _file) { // "" compliant 20190401 SC
+  bool ChmodFile(string chmod_string,string _file) { // "" compliant SC20190401
     string file=aurostd::CleanFileName(_file);
     if(chmod_string.empty()){return false;} //CO20190321
     if(file.empty()){return false;} //CO20190321
@@ -4264,7 +4265,7 @@ namespace aurostd {
   //***************************************************************************//
   // Corey Oses
   // Move file to destination
-  bool file2directory(const string& _file,const string& _destination) { // "" compliant 20190401 SC
+  bool file2directory(const string& _file,const string& _destination) { // "" compliant SC20190401
     string file=CleanFileName(_file);
     string destination=CleanFileName(_destination);
     if(!aurostd::IsCommandAvailable("mv")) {
@@ -5017,7 +5018,8 @@ namespace aurostd {
 
   bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN) {
     // be careful, this does not filter-out # comments
-    string function = XPID + "aurostd::substring_present_file_FAST()";
+    string function = XPID + "aurostd::substring_present_file_FAST():";
+
     string message = "";
     string temp_file=aurostd::TmpFileCreate("substring");
     ostringstream aus;
@@ -6023,7 +6025,8 @@ namespace aurostd  {
   vector<vector<double> > NormalizeAndSum3DVector(const vector<vector<vector<double> > >& vvva, const vector<double>& vFi) {
     //normalize DOS and sum
     if(vvva.size()!=vFi.size()) {
-      string function = XPID + "aurostd::NormalizeAndSum3DVector()";
+      string function = XPID + "aurostd::NormalizeAndSum3DVector():";
+
       string message = "Vector sizes are not equal.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
     }

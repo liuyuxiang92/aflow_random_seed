@@ -506,7 +506,7 @@ namespace aflowlib {
   _aflowlib_entry::_aflowlib_entry(const string& file) { // constructur from file
     stringstream oss;
     if(!aurostd::FileExist(file)) { //SC20190813
-      string function = XPID + "aflowlib::_aflowlib_entry::aflowlib_entr():";
+      string function = XPID + "aflowlib::_aflowlib_entry::_aflowlib_entry():";
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " not found =" + file;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
@@ -4064,7 +4064,7 @@ namespace aflowlib {
   }
 
   void _aflowlib_entry::GetSGROUP(string aflowlibentry) {
-    string function = XPID + "aflowlib::_aflowlib_entry::getSGROUP():";
+    string function = XPID + "aflowlib::_aflowlib_entry::GetSGROUP():";
     string message = "";
     vector<string> vaflowlib_entry;
     aurostd::string2tokens(aflowlibentry,vaflowlib_entry,"|");
@@ -4392,8 +4392,10 @@ namespace aflowlib {
     stringstream num_prec;
     vector<string> voptions;
     aurostd::string2tokens(options,voptions,",");
+    string errormsg = "";
     if(voptions.size()==0) {
-      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
+      errormsg = "--aflowlib= has no arguments.";
+      //init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web // OBSOLETE - use errormsg instead
       //[CO+ME20200731 - ErrorOption throws an error, so no need to return]return 0; //CO20200624 - 0 is error here
     } 
 
@@ -4463,7 +4465,7 @@ namespace aflowlib {
       // START SEARCH
 
       vflags.flag("FLAG::FOUND",FALSE);
-      string catalog="",auid="",strtmp,errormsg="";
+      string catalog="",auid="",strtmp="";
 
       // **********************************************************************************************************
       // TRY AUID

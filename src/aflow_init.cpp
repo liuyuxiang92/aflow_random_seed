@@ -1019,7 +1019,7 @@ namespace init {
   long _GetRAM(void) {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
-      string function = XPID + "init::_GetRAM()";
+      string function = XPID + "init::_GetRAM():";
       string message = "sysinfo error";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1034,7 +1034,7 @@ namespace init {
     uint64_t size;
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
-      string function = XPID + "init::GetRAM()";
+      string function = XPID + "init::GetRAM():";
       string message = "sysctl returned an error";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1709,7 +1709,7 @@ string aflow_get_time_string(void) {
 string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   //refer to aflow_get_time_string()
   //convert Www Mmm dd hh:mm:ss yyyy style to aurostd::get_datetime() one
-  string soliloquy=XPID+"aflow_convert_time_LOCK2aflowlib():";
+  string soliloquy=XPID+"aflow_convert_time_ctime2aurostd():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1807,21 +1807,16 @@ string Message(const string& list2print) {
   pthread_mutex_lock(&mutex_INIT_Message);
   // pthread_mutex_unlock(&mutex_INIT_Message);
   stringstream strout;
-  if(aurostd::substring2bool(list2print,"user") || aurostd::substring2bool(list2print,"USER")) strout << " - [user=" << XHOST.user << "]";
-  if(aurostd::substring2bool(list2print,"group") || aurostd::substring2bool(list2print,"GROUP")) strout << " - [group=" << XHOST.group << "]";
-  if(aurostd::substring2bool(list2print,"host") || aurostd::substring2bool(list2print,"HOST") || 
-      aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME") ||
-      FALSE) strout << " - [host=" << XHOST.hostname << "]";
-  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME")) strout << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
-  if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) strout << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"pid") || aurostd::substring2bool(list2print,"PID")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
-  if(aurostd::substring2bool(list2print,"tid") || aurostd::substring2bool(list2print,"TID")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
-  if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME") || 
-      aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
-  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";
-  //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
-  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) strout << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
+  string LIST2PRINT=aurostd::toupper(list2print); //CO+DX20200825
+  if(aurostd::substring2bool(LIST2PRINT,"user")) strout << " - [user=" << XHOST.user << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"group")) strout << " - [group=" << XHOST.group << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"host") || aurostd::substring2bool(LIST2PRINT,"hostname")) strout << " - [host=" << XHOST.hostname << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"temperature")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
+  if(aurostd::substring2bool(LIST2PRINT,"machine")) strout << " - [host=" << XHOST.hostname << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"pid")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
+  if(aurostd::substring2bool(LIST2PRINT,"tid")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
+  if(LIST2PRINT.empty() || aurostd::substring2bool(LIST2PRINT,"time") || aurostd::substring2bool(LIST2PRINT,"date")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
+  if(aurostd::substring2bool(LIST2PRINT,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) strout << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
   if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) strout << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
   // strout << endl;
   pthread_mutex_unlock(&mutex_INIT_Message);

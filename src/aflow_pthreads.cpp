@@ -306,7 +306,7 @@ namespace KBIN {
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv) {
 
-    string function_name = "AFLOW_PTHREADS::MULTI_sh()";
+    string function_name=XPID+"AFLOW_PTHREADS::MULTI_sh()";
     stringstream message;
     ostringstream aus;
     _aflags aflags;
@@ -367,7 +367,7 @@ namespace AFLOW_PTHREADS {
 namespace AFLOW_PTHREADS {
   void *_threaded_COMMANDS(void *ptr) {
 
-    string function_name = "AFLOW_PTHREADS::_threaded_COMMANDS():";
+    string function_name=XPID+"AFLOW_PTHREADS::_threaded_COMMANDS():";
     stringstream message;
     if(AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_) {
       //cerr << XPID << "AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_ AFLOW_PTHREADS::_threaded_COMMANDS" << endl;
@@ -616,6 +616,7 @@ namespace AFLOW_PTHREADS {
       vcommands.push_back(command);
     }
 
+    //CO20200825 - adding --np=XX functionality
     int np=1;
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")){
       np=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));

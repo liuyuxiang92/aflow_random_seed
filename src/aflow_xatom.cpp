@@ -6362,11 +6362,11 @@ void xstructure::SetCoordinates(const int& mode)  {
   string function_name = XPID + "xstructure::SetCoordinates():";
   switch(mode) {
     case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[1] mode="+mode,_INPUT_ERROR_);
+                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[1] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[2] mode="+mode,_INPUT_ERROR_);
+                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[2] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _COORDS_CARTESIAN_ : {

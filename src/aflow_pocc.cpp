@@ -2559,7 +2559,7 @@ namespace pocc {
 
   bool POccCalculator::iterateHNFMatrix(){
     bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::iterateHNFMatrix()";
+    string soliloquy=XPID+"POccCalculator::iterateHNFMatrix():";
 
     xmatrix<double> _hnf_mat(3,3),duplicate_mat(3,3);
     xmatrix<double> superlattice(3,3), rotated_superlattice(3,3);
@@ -4107,7 +4107,7 @@ namespace pocc {
 
   void POccSiteConfiguration::preparePOccConfig() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"preparePOccConfig():";
+    string soliloquy=XPID+"POccSiteConfiguration::preparePOccConfig():";
     //////////////////////////////////////////////////////////////////////////////
     //clear all fields, but save that which is declared in constructor
     int _site=site, _i_hnf=i_hnf;
@@ -4301,7 +4301,7 @@ namespace pocc {
       const vector<vector<int> >& v_types_config,
       xstructure& supercell){
 #if _DEBUG_POCC_CLUSTER_ANALYSIS_
-    string soliloquy=XPID+"replaceRandomSitesSuperCell():";
+    string soliloquy=XPID+"pocc::replaceRandomSitesSuperCell():";
     stringstream message;
 #endif
     uint starting_supercell_atom_index,pocc_atom_index,supercell_atom_index;
@@ -4902,7 +4902,7 @@ namespace pocc {
 
     void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
       bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-      string soliloquy=XPID+"pocc::generateStructures():";
+      string soliloquy=XPID+"POccCalculator::generateStructures():";
       stringstream message;
       //[NO NEED, AVASP_populateXVASP() is now const]_aflags aflags=m_aflags; //make copies
       _xvasp xvasp=in_xvasp; //[NO NEED, AVASP_populateXVASP() is now const]_kflags kflags=in_kflags;_vflags vflags=in_vflags; //make copies

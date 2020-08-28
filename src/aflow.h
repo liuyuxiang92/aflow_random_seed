@@ -4164,7 +4164,7 @@ namespace LATTICE {
   string Lattice2TypeAndCentering(const string& lattice_type); //DX20191031
   string SpaceGroup2Lattice(uint sg);
   string SpaceGroup2LatticeTypeAndCentering(uint sg); //DX20191031
-  uint Lattice2SpaceGroup(string lattice,vector<uint>& vsg);
+  uint Lattice2SpaceGroup(const string& lattice,vector<uint>& vsg);
   string SpaceGroup2LatticeVariation(uint sg,const xstructure& str);
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);
   string ConventionalLattice_SpaceGroup(uint sg,const xstructure& str);

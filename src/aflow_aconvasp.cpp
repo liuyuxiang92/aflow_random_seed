@@ -813,7 +813,7 @@ namespace pflow {
       return b;
     }
     stringstream message;
-    message << "Must specity as many names as types/numbers: in.size()=" << (int) in.size();
+    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
     message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
     message << "   =a.atoms.size()=" << (int) a.atoms.size();
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
@@ -840,7 +840,7 @@ namespace pflow {
       return b;
     }
     stringstream message;
-    message << "Must specity as many names as types/numbers: in.size()=" << (int) in.size();
+    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
     message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
     message << "   =a.atoms.size()=" << (int) a.atoms.size();
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);

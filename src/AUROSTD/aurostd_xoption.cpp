@@ -83,7 +83,7 @@ namespace aurostd {
   // **************************************************************************
   void xoption::options2entry(string options_FILE,string input_keyword,int _option_DEFAULT,string xscheme_DEFAULT) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::xoption::options2entry()";
+    string soliloquy=XPID+"aurostd::xoption::options2entry():";
     clear();
     bool option_DEFAULT=FALSE; 
     if(_option_DEFAULT==0) option_DEFAULT=FALSE; // it is a int.. it might be -1

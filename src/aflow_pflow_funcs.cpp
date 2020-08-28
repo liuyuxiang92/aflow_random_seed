@@ -3792,7 +3792,7 @@ namespace pflow {
                break;
              }
       default:{
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"invalid CALCTYPE = "+rtp.calc_type,_INPUT_ILLEGAL_); //CO20200624
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"invalid CALCTYPE = "+aurostd::utype2string(rtp.calc_type),_INPUT_ILLEGAL_); //CO20200624
               }
     }//switch
   }

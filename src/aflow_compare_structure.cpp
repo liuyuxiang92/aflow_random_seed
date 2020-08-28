@@ -115,7 +115,6 @@ namespace compare {
       //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
       //[CO20200624 - OBSOLETE]return ss_usage.str();
       init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
-      return "";
     }
 
     // ---------------------------------------------------------------------------
