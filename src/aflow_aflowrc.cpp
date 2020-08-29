@@ -580,6 +580,10 @@
 #define         DEFAULT_QHA_EOS                               XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_EOS")
 #define AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE              string("-12:16:3")
 #define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
+//AS20200818 BEGIN
+#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ,BM4")
+#define         DEFAULT_QHA_EOS_MODEL                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_MODEL")
+//AS20200818 END
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 //AS20200602 BEGIN
@@ -1383,6 +1387,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_MODE", AFLOWRC_DEFAULT_QHA_MODE);
     aflowrc::load_default("DEFAULT_QHA_EOS", AFLOWRC_DEFAULT_QHA_EOS);
     aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
+    aflowrc::load_default("DEFAULT_QHA_EOS_MODEL", AFLOWRC_DEFAULT_QHA_EOS_MODEL);//AS20200818
     aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
     aflowrc::load_default("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER", AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);//AS20200602
     aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
@@ -1943,6 +1948,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_MODE=\"" << AFLOWRC_DEFAULT_QHA_MODE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_EOS=" << AFLOWRC_DEFAULT_QHA_EOS  << endl;
     aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    aflowrc << "DEFAULT_QHA_EOS_MODEL=\"" << AFLOWRC_DEFAULT_QHA_EOS_MODEL << "\"" << endl;//AS20200818
     aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
     aflowrc << "DEFAULT_QHA_TAYLOR_EXPANSION_ORDER=" << AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER  << endl;//AS20200602
     aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
@@ -2469,6 +2475,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_MODE\")=\"" << DEFAULT_QHA_MODE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS\")=" << DEFAULT_QHA_EOS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_MODEL\")=\"" << DEFAULT_QHA_EOS_MODEL << "\"" << endl;//AS20200818
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_TAYLOR_EXPANSION_ORDER\")=" << DEFAULT_QHA_TAYLOR_EXPANSION_ORDER << endl;//AS20200602
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
