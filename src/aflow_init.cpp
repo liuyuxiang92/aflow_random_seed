@@ -2195,6 +2195,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:CATALOG","string");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:COEFFICIENT_ENTROPY_STABILIZATION","coefficient_entropy_stabilization");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:COEFFICIENT_ENTROPY_STABILIZATION","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:COEFFICIENT_ENTROPY_STABILIZATION","number");
+    nschema++;
+    //CO20200829 START
+    
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:CODE","code");
     XHOST.vschema.push_attached("SCHEMA::UNIT:CODE","");
@@ -2285,6 +2293,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:DFT_TYPE","string");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DISTANCE_HULL","distance_hull");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DISTANCE_HULL","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DISTANCE_HULL","number");
+    nschema++;
+    //CO20200829 START
+    
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_ATOM","eentropy_atom");
     XHOST.vschema.push_attached("SCHEMA::UNIT:EENTROPY_ATOM","eV/atom");
@@ -2357,6 +2373,38 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CELL","number");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_300K_CELL","enthalpy_formation_cce_300K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_300K_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_300K_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_300K_ATOM","enthalpy_formation_cce_300K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_300K_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_300K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_0K_CELL","enthalpy_formation_cce_0K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_0K_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_0K_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_0K_ATOM","enthalpy_formation_cce_0K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_0K_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_0K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPY_FORMING_ABILITY","entropy_forming_ability");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPY_FORMING_ABILITY","(ev/atom)^{-1}");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPY_FORMING_ABILITY","number");
+    nschema++;
+    //CO20200829 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPIC_TEMPERATURE","entropic_temperature");
     XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPIC_TEMPERATURE","K");
@@ -2386,6 +2434,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:GEOMETRY_ORIG","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:GEOMETRY_ORIG","numbers");
     nschema++;
+
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GROUND_STATE","ground_state");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GROUND_STATE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GROUND_STATE","bool");
+    nschema++;
+    //CO20200829 START
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
@@ -2542,6 +2598,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:PEARSON_SYMBOL_SUPERLATTICE_ORIG","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:PEARSON_SYMBOL_SUPERLATTICE_ORIG","string");
     nschema++;
+
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POCC_PARAMETERS","pocc_parameters");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POCC_PARAMETERS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POCC_PARAMETERS","string");
+    nschema++;
+    //CO20200829 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_HERMANN_MAUGUIN","point_group_Hermann_Mauguin");
