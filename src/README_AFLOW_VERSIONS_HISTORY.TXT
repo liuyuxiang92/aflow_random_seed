@@ -3,6 +3,7 @@
         -- Added patch functionality to the AflowDB database. (ME)
         -- Added xStream to AflowDB. (ME)
         -- Improved database analysis speed. (ME)
+        -- Added UPDATE command interface to AflowDB. (ME)
         -- Made title property obsolete. (ME)
         -- Made search --aflowlib more inclusive. (ME)
         -- Fixed out of bounds error in init::AFLOW_Projects_Directories for missing LIB directories. (ME)
