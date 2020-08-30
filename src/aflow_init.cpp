@@ -2201,7 +2201,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:COEFFICIENT_ENTROPY_STABILIZATION","eV/atom");
     XHOST.vschema.push_attached("SCHEMA::TYPE:COEFFICIENT_ENTROPY_STABILIZATION","number");
     nschema++;
-    //CO20200829 START
+    //CO20200829 END
     
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:CODE","code");
@@ -2299,7 +2299,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:DISTANCE_HULL","eV/atom");
     XHOST.vschema.push_attached("SCHEMA::TYPE:DISTANCE_HULL","number");
     nschema++;
-    //CO20200829 START
+    //CO20200829 END
     
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_ATOM","eentropy_atom");
@@ -2441,7 +2441,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:GROUND_STATE","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:GROUND_STATE","bool");
     nschema++;
-    //CO20200829 START
+    //CO20200829 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
