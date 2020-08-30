@@ -1364,7 +1364,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("PATCHDB", aurostd::args2flag(argv,cmds,"--patch_database"));  //ME20200829
   vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database"));  //ME20191001
   vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database"));  //ME20191001
-  vpflow.args2addattachedscheme(argv,cmds,"DBPATCHFILES","--patch_files=","");
+  vpflow.args2addattachedscheme(argv,cmds,"DBPATCHFILES","--patchfiles=","");
 
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
@@ -1640,31 +1640,6 @@ namespace pflow {
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
       if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),XHOST.vflag_control.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically  //CO20200404 - new web flag
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
-      //ME20191001 START
-      //ME20200829 - Added patch functionality
-      if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
-        string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
-        // Hierarchy: rebuild > update > patch
-        if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
-          if (db.rebuildDatabase(patchfiles, vpflow.flag("REBUILDDB"))) {
-            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-          }
-        } else if (vpflow.flag("PATCHDB")) {
-          // false: do not check timestamps (always patch)
-          if (db.patchDatabase(patchfiles, false) > 0) {
-            // Only analyze when patches were applied
-            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-          }
-        }
-        _PROGRAMRUN = true;
-      }
-      if (vpflow.flag("ANALYZEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);
-        db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-        _PROGRAMRUN = true;
-      }
-      //ME20191001 END
       // [OBSOLETE CO20180703]if(vpflow.flag("QMVASP")) {pflow::QMVASP(argv); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}
@@ -1947,6 +1922,32 @@ namespace pflow {
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508
+      //ME20191001 START
+      //ME20200829 - Added patch functionality
+      if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
+        string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
+        // Hierarchy: rebuild > update > patch
+        if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
+          if (db.rebuildDatabase(patchfiles, vpflow.flag("REBUILDDB"))) {
+            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+          }
+        } else if (vpflow.flag("PATCHDB")) {
+          // false: do not check timestamps (always patch)
+          if (db.patchDatabase(patchfiles, false) > 0) {
+            // Only analyze when patches were applied
+            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+          }
+        }
+        _PROGRAMRUN = true;
+      }
+      if (vpflow.flag("ANALYZEDB")) {
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);
+        db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+        _PROGRAMRUN = true;
+      }
+      //ME20191001 END
+
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}
