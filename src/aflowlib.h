@@ -514,10 +514,10 @@ namespace aflowlib {
     string catalog;
   };
 
-  class AflowDB {
+  class AflowDB : public xStream {
     public:
-      AflowDB(const string&);
-      AflowDB(const string&, const string&, const string&);
+      AflowDB(const string&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
       AflowDB& operator=(const AflowDB&);
       ~AflowDB();
