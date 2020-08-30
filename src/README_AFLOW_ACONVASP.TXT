@@ -1977,6 +1977,10 @@ LATTICES = (the ones with "")
         by the lattice vectors. So, for three orthogonal vectors, this ratio 
         would be unity. (R. Taylor).
 
+  aflow --patch_database --patchfiles=file1,file2,...
+        Patches entries of the database file. The patch files have to be in
+        jsonl format.
+
   aflow --pdb < POSCAR
         Outputs to standard out a protein database (PDB) format file
         based on the POSCAR input file.  This can be used as input
@@ -2999,8 +3003,9 @@ LATTICES = (the ones with "")
         each type you can create supercell (see --supercell) to make this
         function usable.
 
-  aflow --rebuild_database
+  aflow --rebuild_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file.
+        --patchfiles can be used to path the AFLOW database using jsonl files.
 
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
@@ -3373,8 +3378,9 @@ LATTICES = (the ones with "")
   aflow --uffenergy | --ue <  POSCAR
         Output the energy of the structure using the simplified Universal Force Filed (UFF) method [JACS, 114, 10024 (1992)].
 
-  aflow --update_database
+  aflow --update_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file if new entries are available.
+        --patchfiles can be used to path the AFLOW database using jsonl files.
 
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
