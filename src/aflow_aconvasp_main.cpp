@@ -1188,7 +1188,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
-  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database"));  //ME20191001
 
   vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
@@ -1360,7 +1359,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("TERDATA_EXIST",aurostd::args2flag(argv,cmds,"--terdata_exist"));
 
   vpflow.flag("UFFENERGY",aurostd::args2flag(argv,cmds,"--uffenergy|--ue"));
+
+  //DATABASE
+  vpflow.flag("PATCHDB", aurostd::args2flag(argv,cmds,"--patch_database"));  //ME20200829
   vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database"));  //ME20191001
+  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database"));  //ME20191001
+  vpflow.args2addattachedscheme(argv,cmds,"DBPATCHFILES","--patch_files=","");
 
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
@@ -1637,10 +1641,21 @@ namespace pflow {
       if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),XHOST.vflag_control.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically  //CO20200404 - new web flag
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
       //ME20191001 START
-      if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
+      //ME20200829 - Added patch functionality
+      if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
         aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
-        if (db.rebuildDatabase(vpflow.flag("REBUILDDB"))) {
-          db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+        string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
+        // Hierarchy: rebuild > update > patch
+        if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
+          if (db.rebuildDatabase(patchfiles, vpflow.flag("REBUILDDB"))) {
+            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+          }
+        } else if (vpflow.flag("PATCHDB")) {
+          // false: do not check timestamps (always patch)
+          if (db.patchDatabase(patchfiles, false) > 0) {
+            // Only analyze when patches were applied
+            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+          }
         }
         _PROGRAMRUN = true;
       }

@@ -51,7 +51,7 @@ namespace aflowlib {
       string auid;                                              // AFLOW UNIQUE IDENTIFIER
       deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
-      string title;                                             //ME20190125 - title of the calculation
+      //string title;                                           //ME20190125 - title of the calculation  // OBSOLETE ME20200829 - not used anymore
       string keywords;deque<string> vkeywords;                  // keywords inside
       string aflowlib_date,aflowlib_version;                    // version/creation
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
@@ -529,7 +529,11 @@ namespace aflowlib {
 
       bool isTMP();
 
-      bool rebuildDatabase(bool=false);
+      bool rebuildDatabase(bool force_rebuild=false);
+      bool rebuildDatabase(const string&, bool force_rebuild=false);
+      bool rebuildDatabase(const vector<string>&, bool force_rebuild=false);
+      uint patchDatabase(const string&, bool check_timestamps=false);
+      uint patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
       vector<string> getTables(string="");
@@ -540,16 +544,16 @@ namespace aflowlib {
       vector<string> getColumnTypes(const string&);
       vector<string> getColumnTypes(sqlite3*, const string&);
 
-      string getValue(const string&, const string&, string="");
-      string getValue(sqlite3*, const string&, const string&, string="");
-      string getProperty(const string&, const string&, const string&, string="");
-      string getProperty(sqlite3*, const string&, const string&, const string&, string="");
-      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
-      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
-      vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
-      vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
+      string getValue(const string&, const string&, const string& where="");
+      string getValue(sqlite3*, const string&, const string&, const string& where="");
+      string getProperty(const string&, const string&, const string&, const string& where="");
+      string getProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
+      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
+      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, const string& where="");
+      vector<string> getSet(const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
+      vector<string> getSet(sqlite3*, const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
+      vector<string> getSetMultiTables(const vector<string>&, const string&, bool distinct=false, const string& where="", int limit=0);
+      vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool distinct=false, const string& where="", int limit=0);
 
       void transaction(bool);
 
@@ -562,24 +566,30 @@ namespace aflowlib {
       sqlite3* db;
       bool is_tmp;
 
-      void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
-      bool closeTmpFile(bool=false, bool=false);
+      void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
+      bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
       void buildTables(int, int, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
+      uint applyPatchFromJsonl(const vector<string>&);
+      bool auidInDatabase(const string&);
+      void updateEntry(const string&, const vector<string>&, const vector<string>&);
+
       vector<string> getSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+      vector<string> extractJsonKeysAflow(const string&);
       string extractJsonValueAflow(const string&, string);
 
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
       void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
+          const vector<string>&, const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
           vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       void writeStatsToJson(std::stringstream&, const DBStats&);
+
 
       void createIndex(const string&, const string&, const string&);
       void dropIndex(const string&);
@@ -588,8 +598,9 @@ namespace aflowlib {
       void createTable(const string&, const vector<string>&, const vector<string>&);
       void insertValues(const string&, const vector<string>&);
       void insertValues(const string&, const vector<string>&, const vector<string>&);
-      string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
-      string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
+      void updateRow(const string&, const vector<string>&, const vector<string>&, const string&);
+      string prepareSELECT(const string&, const string&, const string&, const string& where="", int limit=0, const string& order_by="");
+      string prepareSELECT(const string&, const string&, const vector<string>&, const string& where="", int limit=0, const string& order_by="");
   };
 }  // namespace aflowlib
 
