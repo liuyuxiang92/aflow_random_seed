@@ -4,16 +4,16 @@ import json
 import subprocess
 import os
 
-VERBOSE=True   #CO20200520
+VERBOSE=False
 
 class CCE:
-    def __init__(self, aflow_executable = './aflow'):
+    def __init__(self, aflow_executable = 'aflow'):
         self.aflow_executable = aflow_executable
 
     def aflow_command(self, cmd):
         try:
             if VERBOSE: print('aflow_command(): cmd = ' + self.aflow_executable + cmd)
-            output = subprocess.check_output(   #MB20200409
+            output = subprocess.check_output(
                     self.aflow_executable + cmd,
                     shell=True
                     )
