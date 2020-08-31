@@ -26,8 +26,7 @@ namespace sql {
   // types should be handled outside these functions.
 
   void SQLexecuteCommand(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommand(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << "sql::SQLexecuteCommand(): command = " << command << std::endl;
     char* sqlErrMsg = 0;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback, 0, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
@@ -38,8 +37,7 @@ namespace sql {
   }
 
   string SQLexecuteCommandSCALAR(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << "sql::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
     char* sqlErrMsg = 0;
     string returnstring = "";
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackSCALAR, &returnstring, &sqlErrMsg);
@@ -54,8 +52,7 @@ namespace sql {
   }
 
   vector<string> SQLexecuteCommandVECTOR(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommandVECTOR(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << "sql::SQLexecuteCommandVECTOR(): command = " << command << std::endl;
     char *sqlErrMsg = 0;
     vector<string> returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackVECTOR, &returnvector, &sqlErrMsg);
@@ -70,8 +67,7 @@ namespace sql {
   }
 
   vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommand2DVECTOR(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << "sql::SQLexecuteCommand2DVECTOR(): command = " << command << std::endl;
     char *sqlErrMsg = 0;
     vector<vector<string> > returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback2DVECTOR, &returnvector, &sqlErrMsg);
@@ -91,9 +87,8 @@ namespace sql {
   // function.
 
   int SQLcallback(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
     (void) data;  // To suppress compiler warnings
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
         std::cerr << "sql::SQLcallback()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
@@ -103,8 +98,7 @@ namespace sql {
   }
 
   int SQLcallbackSCALAR(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
         std::cerr << "sql::SQLcallbackSCALAR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
@@ -124,8 +118,7 @@ namespace sql {
   }
 
   int SQLcallbackVECTOR(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
         std::cerr << "sql::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
@@ -142,8 +135,7 @@ namespace sql {
   }
 
   int SQLcallback2DVECTOR(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
         std::cerr << "sql::SQLcallback2DVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }

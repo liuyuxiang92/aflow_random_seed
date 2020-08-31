@@ -323,7 +323,7 @@ namespace aflowlib {
     if (sql_code != SQLITE_OK) {
       message_error << "Could not close tmp database file " + tmp_file
         << " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message_error, _FILE_ERROR_);
     }
     is_tmp = false;
 
@@ -338,18 +338,31 @@ namespace aflowlib {
       if (!aurostd::FileEmpty(database_file)) {
         message << "Old database file found. Determining number of entries and properties to prevent data loss.";
         pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
-        open();
+
+        sqlite3* main_db;
+        sql_code = sqlite3_open_v2(database_file.c_str(), &main_db, SQLITE_OPEN_READONLY, NULL);
+        if (sql_code != SQLITE_OK) {
+          message_error << "Could not close main database file " + database_file
+            << " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message_error, _FILE_ERROR_);
+        }
         vector<string> props, tables;
-        tables = getTables();
+        tables = getTables(main_db);
 
         // Get number of properties
-        props = getColumnNames(tables[0]);
+        props = getColumnNames(main_db, tables[0]);
         ncols_old = props.size();
 
         // Get number of entries
-        props = getPropertyMultiTables("COUNT", tables, "*");
+        props = getPropertyMultiTables(main_db, "COUNT", tables, "*");
         for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
-        close();
+
+        sql_code = sqlite3_close(main_db);
+        if (sql_code != SQLITE_OK) {
+          message_error << "Could not close main database file " + database_file
+            << " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message_error, _FILE_ERROR_);
+        }
       } else {
         if (LDEBUG) std::cerr << function << "No old datbase found." << std::endl;
         ncols_old = 0;
@@ -362,7 +375,7 @@ namespace aflowlib {
       }
 
       if (nentries_tmp < nentries_old) {
-        message << "The rebuild process resulted in less entries"
+        message_error << "The rebuild process resulted in less entries"
           << " than in the current database. To prevent accidental"
           << " data loss, the temporary database will not be copied."
           << " Rerun as aflow --rebuild_database if the database should"
@@ -372,7 +385,7 @@ namespace aflowlib {
         copied = false;
         found_error = true;
       } else if (ncols_tmp < ncols_old) {
-        message << "The rebuild process resulted in less properties"
+        message_error << "The rebuild process resulted in less properties"
           << " than in the current database. To prevent accidental"
           << " data loss, the temporary database will not be copied."
           << " Rerun as aflow --rebuild_database if the database should"
@@ -539,9 +552,9 @@ namespace aflowlib {
     if (rebuild_db || (npatch_input > 0)) {
       // Do not check timestamps after a rebuild because patches must be applied
       uint patches_applied = patchDatabase(patch_files_input, !rebuild_db);
-      message << ((patches_applied > 0)?aurostd::utype2string<uint>(patches_applied):"No") << " patche" << ((patches_applied == 1)?"":"s") << " applied.";
+      message << ((patches_applied > 0)?aurostd::utype2string<uint>(patches_applied):"No") << " patch" << ((patches_applied == 1)?"":"es") << " applied.";
       pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
-      return (patches_applied > 0);
+      return (rebuild_db || (patches_applied > 0));
     }
 
     return false;
@@ -1366,11 +1379,11 @@ namespace aflowlib {
   //getTables/////////////////////////////////////////////////////////////////
   // Retrieves a set of tables. If where is empty, all tables in the database
   // will be returned.
-  vector<string> AflowDB::getTables(string where) {
+  vector<string> AflowDB::getTables(const string& where) {
     return getTables(db, where);
   }
 
-  vector<string> AflowDB::getTables(sqlite3* cursor, string where) {
+  vector<string> AflowDB::getTables(sqlite3* cursor, const string& where) {
     string command = "SELECT name FROM sqlite_master WHERE type='table'";
     if (!where.empty()) command += " AND (" + where + ")";
     return sql::SQLexecuteCommandVECTOR(cursor, command);

@@ -1979,7 +1979,9 @@ LATTICES = (the ones with "")
 
   aflow --patch_database --patchfiles=file1,file2,...
         Patches entries of the database file. The patch files have to be in
-        jsonl format.
+        jsonl format. Each json in the jsonl must contain an AUID. If an AUID
+        is not found in the database, it will be skipped. Properties not in
+        the schema will be ignored.
 
   aflow --pdb < POSCAR
         Outputs to standard out a protein database (PDB) format file
@@ -3005,7 +3007,7 @@ LATTICES = (the ones with "")
 
   aflow --rebuild_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file.
-        --patchfiles can be used to path the AFLOW database using jsonl files.
+        --patchfiles can be used to path the AFLOW database using jsonl files (see --patch_database).
 
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
@@ -3380,7 +3382,7 @@ LATTICES = (the ones with "")
 
   aflow --update_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file if new entries are available.
-        --patchfiles can be used to path the AFLOW database using jsonl files.
+        --patchfiles can be used to path the AFLOW database using jsonl files (see --patch_database).
 
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        

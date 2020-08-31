@@ -536,8 +536,8 @@ namespace aflowlib {
       uint patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
-      vector<string> getTables(string="");
-      vector<string> getTables(sqlite3*, string="");
+      vector<string> getTables(const string& where="");
+      vector<string> getTables(sqlite3*, const string& where="");
 
       vector<string> getColumnNames(const string&);
       vector<string> getColumnNames(sqlite3*, const string&);
@@ -566,7 +566,7 @@ namespace aflowlib {
       sqlite3* db;
       bool is_tmp;
 
-      void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
+      void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
