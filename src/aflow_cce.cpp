@@ -2912,7 +2912,6 @@ namespace cce {
               message << " No ref. enthalpy shift for " << structure.atoms[i].cleanname << " for PBE+U_ICSD yet.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
             } else if (ref_enthalpy_shift > 0) { // consider only species that need a ref. enthalpy shift, i.e. for which a U is used
-              //double shift=get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname);
               cce_vars.cce_correction[num_temps*k+l] += ref_enthalpy_shift;
             }
           }
