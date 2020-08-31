@@ -2668,7 +2668,6 @@ namespace cce {
       cerr << soliloquy << " ASSIGNMENT OF CORRECTIONS:" << endl;
     }
     bool print_previous_output=TRUE;
-    //string missing_corrections = "";
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         string corrections_line = "";
