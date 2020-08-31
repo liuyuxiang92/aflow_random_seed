@@ -1053,7 +1053,7 @@ namespace aflowlib {
       stats.loop_counts[l].second = 0;
     }
 
-    // Get types post-processing
+    // Get types for post-processing
     vector<string> types(ncols);
     for (uint i = 0; i < ncols; i++) {
       types[i] = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
