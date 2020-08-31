@@ -2534,7 +2534,7 @@ namespace cce {
             // from the Bader charge template, here W+6 is set and later the sum over the oxidation states will still be checked
             if (structure.atoms[i].cleanname == "W") {
               cce_vars.oxidation_states[i]=6;
-            // since it can happen that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
+            // since it is possible that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
             // from the Bader charge template, here Pb+2 is set and later the sum over the oxidation states will still be checked
             } else if (structure.atoms[i].cleanname == "Pb") {
               cce_vars.oxidation_states[i]=2;
@@ -2668,7 +2668,6 @@ namespace cce {
       cerr << soliloquy << " ASSIGNMENT OF CORRECTIONS:" << endl;
     }
     bool print_previous_output=TRUE;
-    //string missing_corrections = "";
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         string corrections_line = "";
