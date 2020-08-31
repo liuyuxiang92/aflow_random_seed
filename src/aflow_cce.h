@@ -120,7 +120,7 @@ namespace cce {
   // print output and citation
   string print_JSON_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
   void append_coordination_info_JSON(const xstructure& structure, const CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& json);
-  string print_JSON_ox_nums(const CCE_Variables& cce_vars);
+  string print_JSON_ox_nums(const xstructure& structure, const CCE_Variables& cce_vars);
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
   string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance);
   void append_coordination_info_output(const xstructure& structure, const CCE_Variables& cce_vars, double tolerance, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& output);

@@ -204,7 +204,7 @@ namespace cce {
     cce_vars.oxidation_states=get_oxidation_states_from_electronegativities(structure);
 
     if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-      oss << print_JSON_ox_nums(cce_vars) << std::endl;
+      oss << print_JSON_ox_nums(structure, cce_vars) << std::endl;
     } else {
       // print oxidation numbers
       oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
@@ -2954,12 +2954,12 @@ namespace cce {
   void append_coordination_info_JSON(const xstructure& structure, const CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& json) {
     vector<string> cations_names_and_neighbors_vector;
 
-    json << "\"anion=" << considered_anion_species << "\":{";
+    json << "\"anion_" << considered_anion_species << "\":{";
     // first populate vectors with names, atom indices of the cations, and num anion neighbors for each cation
     for (uint i=0,isize=structure.atoms.size();i<isize;i++){
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         if (num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
-          cations_names_and_neighbors_vector.push_back("\"" + structure.atoms[i].cleanname + "(ATOM[" + aurostd::utype2string<uint>(i) + "])\":" + aurostd::utype2string<uint>(num_neighbors[i]));
+          cations_names_and_neighbors_vector.push_back("\"" + structure.atoms[i].cleanname + "(atom " + aurostd::utype2string<uint>(i) + ")\":" + aurostd::utype2string<uint>(num_neighbors[i]));
         }
       }
     }
@@ -2970,12 +2970,19 @@ namespace cce {
 
   //print_JSON_ox_nums/////////////////////////////////////////////////////////////
   // Returns oxidation numbers in JSON format
-  string print_JSON_ox_nums(const CCE_Variables& cce_vars) {
+  string print_JSON_ox_nums(const xstructure& structure, const CCE_Variables& cce_vars) {
     stringstream json;
+    uint natoms = cce_vars.oxidation_states.size();
 
     json << "{";
     json << "\"oxidation_states\":";
-    json << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.oxidation_states),",") << "]";
+    json << "{";
+    for (uint i = 0; i < natoms; i++) {
+      json << "\"" << structure.atoms[i].cleanname << "(atom " << aurostd::utype2string<uint>(i) << ")\":" << cce_vars.oxidation_states[i]; // << "," << structure.atoms[i].fpos 
+      if (i < natoms - 1) json << ",";
+    }
+    json << "}";
+    //json << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.oxidation_states),",") << "]";
     json << "}";
     return json.str();
   }
