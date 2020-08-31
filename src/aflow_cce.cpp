@@ -252,7 +252,7 @@ namespace cce {
     // copy structure to structure_to_use since check_structure includes rescaling to 1
     xstructure structure_to_use=structure;
     // check structure
-    structure_to_use=check_structure(structure_to_use); //includes rescaling the structure to 1
+    structure_to_use=structure_to_use.check_structure(structure_to_use); //includes rescaling the structure to 1
     // init variables and flags
     CCE_Variables cce_vars = init_variables(structure_to_use);
     aurostd::xoption cce_flags = init_flags();
@@ -285,6 +285,12 @@ namespace cce {
   void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& directory_path) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::CCE_core():";
+    stringstream message;
+    // if there is only one species, it must be an elemental phase and is hence not correctable
+    if (structure.species.size() == 1){
+      message << " BAD NEWS: Only one species found. Enthalpies of elemental systems cannot be corrected with the CCE methodology.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    }
     // set flag that full correction scheme is run and not just determination of ox. nums. or num. anion neighbors
     cce_flags.flag("RUN_FULL_CCE",TRUE);
     // determine temperatures
@@ -448,7 +454,7 @@ namespace cce {
     stringstream message;
     //string structure_file = aurostd::file2string(structure_file_path); // first argument of read_structure_function does not need to be converted to string since it contains already the file content and not only the file name
     xstructure structure(structure_file, mode);
-    return check_structure(structure);
+    return structure.check_structure(structure);
   }
 
   //read_structure////////////////////////////////////////////////////////
@@ -456,44 +462,39 @@ namespace cce {
   xstructure read_structure(std::istream& ist){
     string soliloquy=XPID+"cce::read_structure():";
     xstructure structure(ist);
-    return check_structure(structure);
+    return structure.check_structure(structure);
   }
 
-  //check_structure////////////////////////////////////////////////////////
-  xstructure check_structure(xstructure& structure){
-    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy=XPID+"cce::check_structure():";
-    stringstream message;
-    structure.ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
-    //let the program spit out what it thinks (input structure)
-    if(LDEBUG){
-      cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
-      cerr << soliloquy << structure << endl;
-    }
-    // check whether the species vector is populated, otherwise throw error
-    if (structure.species.size() == 0){
-      message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-    }
-    // check whether there are any atoms in the structure
-    if (structure.atoms.size() == 0){
-      message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-    }
-    // if species of atoms are not known like in VASP4 format, throw error
-    for(uint k=0,ksize=structure.atoms.size();k<ksize;k++){
-      if (structure.atoms[k].cleanname == ""){
-        message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-      }
-    }
-    // if there is only one species, it must be an elemental phase and is hence not correctable
-    if (structure.species.size() == 1){
-      message << " BAD NEWS: Only one species found. Enthalpies of elemental systems cannot be corrected with the CCE methodology.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-    }
-    return structure;
-  }
+  ////check_structure////////////////////////////////////////////////////////
+  //xstructure check_structure(xstructure& structure){
+  //  bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+  //  string soliloquy=XPID+"cce::check_structure():";
+  //  stringstream message;
+  //  structure.ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
+  //  //throw some general information such as input structure
+  //  if(LDEBUG){
+  //    cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
+  //    cerr << soliloquy << structure << endl;
+  //  }
+  //  // check whether the species vector is populated, otherwise throw error
+  //  if (structure.species.size() == 0){
+  //    message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
+  //    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  //  }
+  //  // check whether there are any atoms in the structure
+  //  if (structure.atoms.size() == 0){
+  //    message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
+  //    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  //  }
+  //  // if species of atoms are not known like in VASP4 format, throw error
+  //  for(uint k=0,ksize=structure.atoms.size();k<ksize;k++){
+  //    if (structure.atoms[k].cleanname == ""){
+  //      message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
+  //      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  //    }
+  //  }
+  //  return structure;
+  //}
 
   //get_dft_form_enthalpies_functionals////////////////////////////////////////////////////////
   // set the DFT formation enthalpies and functionals according to the input and check consistency of functionals and formation enthalpies
@@ -1183,7 +1184,7 @@ namespace cce {
   // function overloading for below function to be able to use oxidation number determination independently of CCE
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure) {
     // check structure
-    structure=check_structure(structure); //includes rescaling the structure to 1
+    structure=structure.check_structure(structure); //includes rescaling the structure to 1
     CCE_Variables cce_vars = init_variables(structure);
     cce_vars.anion_species=determine_anion_species(structure, cce_vars);
     aurostd::xoption cce_flags = init_flags();

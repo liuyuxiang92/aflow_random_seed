@@ -15667,6 +15667,42 @@ class compare_GetNeighData {
     }
 };
 
+//RF20200831 - check_structure - START
+// **************************************************************************
+// check_structure
+// **************************************************************************
+// rescale structure to 1 and check whether e.g. species and atoms are present
+xstructure xstructure::check_structure(xstructure& structure){
+  bool LDEBUG = (FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::check_structure():";
+  stringstream message;
+  structure.ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
+  //throw some general information such as input structure
+  if(LDEBUG){
+    cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
+    cerr << soliloquy << structure << endl;
+  }
+  // check whether the species vector is populated, otherwise throw error
+  if (structure.species.size() == 0){
+    message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  // check whether there are any atoms in the structure
+  if (structure.atoms.size() == 0){
+    message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  // if species of atoms are not known like in VASP4 format, throw error
+  for(uint k=0,ksize=structure.atoms.size();k<ksize;k++){
+    if (structure.atoms[k].cleanname == ""){
+      message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    }
+  }
+  return structure;
+}
+//RF20200831 - check_structure - END
+
 // **************************************************************************
 // Function GetNeighData
 // **************************************************************************
