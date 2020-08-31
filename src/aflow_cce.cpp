@@ -2534,7 +2534,7 @@ namespace cce {
             // from the Bader charge template, here W+6 is set and later the sum over the oxidation states will still be checked
             if (structure.atoms[i].cleanname == "W") {
               cce_vars.oxidation_states[i]=6;
-            // since it can happen that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
+            // since it is possible that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
             // from the Bader charge template, here Pb+2 is set and later the sum over the oxidation states will still be checked
             } else if (structure.atoms[i].cleanname == "Pb") {
               cce_vars.oxidation_states[i]=2;
