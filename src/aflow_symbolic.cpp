@@ -168,13 +168,15 @@ namespace symbolic {
     
     // ---------------------------------------------------------------------------
     // check that the inputs' types are SymbolicMatrix (vector)
-    if(typeid(*a_vec).name() != typeid(SymbolicMatrix).name() ||
-        typeid(*b_vec).name() != typeid(SymbolicMatrix).name()){
+    const std::type_info& a_vec_info = typeid(a_vec);
+    const std::type_info& b_vec_info = typeid(b_vec);
+    if(a_vec_info.name() != typeid(SymbolicMatrix).name() ||
+        b_vec_info.name() != typeid(SymbolicMatrix).name()){
       string function_name = XPID + "symbolic::isEqualVector():"; // definition in loop for efficiency
       stringstream message;
       message << "One or both of the inputs are not a SymbolicMatrix (i.e., typeids are different):"
-        << " a_vec (input) id: " << typeid(*a_vec).name()
-        << " b_vec (input) id: " << typeid(*b_vec).name()
+        << " a_vec (input) id: " << a_vec_info.name()
+        << " b_vec (input) id: " << b_vec_info.name()
         << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
@@ -205,11 +207,12 @@ namespace symbolic {
 
     // ---------------------------------------------------------------------------
     // check that input type is a SymbolicMatrix 
-    if(typeid(*lattice).name() != typeid(SymbolicMatrix).name()){
+    const std::type_info& lattice_info = typeid(*lattice);
+    if(lattice_info.name() != typeid(SymbolicMatrix).name()){
       string function_name = XPID + "symbolic::matrix2VectorVectorString():";
       stringstream message;
       message << "The input is not a SymbolicMatrix (i.e., typeids are different): lattice (input) id: "
-        << typeid(*lattice).name() << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
+        << lattice_info.name() << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
 

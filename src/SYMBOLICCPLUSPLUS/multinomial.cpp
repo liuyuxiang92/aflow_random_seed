@@ -208,7 +208,13 @@ Multinomial<T> &Multinomial<T>::operator*=(const T &c)
 
 template <class T>
 T Diff(const T &t,const string &x)
-{return zero(T());}
+//DX20200901 [OBSOLETE] - {return zero(T());}
+//DX20200901 - need to use arguments somehow, simple fix - START
+{
+  if(t.type() == T().type() && typeid(x) == typeid(std::string) ) {return zero(T());}
+  return zero(T());
+}
+//DX20200901 - need to use arguments somehow, simple fix - END
 
 // partial template specialization for polynomials
 template <class T>
