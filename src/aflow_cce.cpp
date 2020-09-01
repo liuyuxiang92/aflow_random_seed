@@ -252,7 +252,7 @@ namespace cce {
     // copy structure to structure_to_use since check_structure includes rescaling to 1
     xstructure structure_to_use=structure;
     // check structure
-    structure_to_use=structure_to_use.check_structure(structure_to_use); //includes rescaling the structure to 1
+    structure_to_use.check_structure(); //includes rescaling the structure to 1
     // init variables and flags
     CCE_Variables cce_vars = init_variables(structure_to_use);
     aurostd::xoption cce_flags = init_flags();
@@ -454,7 +454,8 @@ namespace cce {
     stringstream message;
     //string structure_file = aurostd::file2string(structure_file_path); // first argument of read_structure_function does not need to be converted to string since it contains already the file content and not only the file name
     xstructure structure(structure_file, mode);
-    return structure.check_structure(structure);
+    structure.check_structure();
+    return structure;
   }
 
   //read_structure////////////////////////////////////////////////////////
@@ -462,7 +463,8 @@ namespace cce {
   xstructure read_structure(std::istream& ist){
     string soliloquy=XPID+"cce::read_structure():";
     xstructure structure(ist);
-    return structure.check_structure(structure);
+    structure.check_structure();
+    return structure;
   }
 
   ////check_structure////////////////////////////////////////////////////////
@@ -1184,7 +1186,7 @@ namespace cce {
   // function overloading for below function to be able to use oxidation number determination independently of CCE
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure) {
     // check structure
-    structure=structure.check_structure(structure); //includes rescaling the structure to 1
+    structure.check_structure(); //includes rescaling the structure to 1
     CCE_Variables cce_vars = init_variables(structure);
     cce_vars.anion_species=determine_anion_species(structure, cce_vars);
     aurostd::xoption cce_flags = init_flags();
@@ -2474,6 +2476,8 @@ namespace cce {
     bool print_empty_line=TRUE;
     bool error1=FALSE;
     bool error2=FALSE;
+    vector<string> species_missing_corrections;
+    vector<string> undetermined_ox_states;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if (structure.atoms[i].cleanname != cce_vars.anion_species){
         string Bader_templ_line = "";
@@ -2484,8 +2488,13 @@ namespace cce {
             oss << endl;
             print_empty_line=FALSE; // previously gathered output should only be printed once
           }
-          oss << "VERY BAD NEWS: There is no correction for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " since this species was not included in the set for deducing corrections!"  << endl;
+          oss << "VERY BAD NEWS: There is no correction for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " coordinated by " << cce_vars.anion_species << " since this species was not included in the set for deducing corrections!"  << endl;
           oss << endl;
+         if (species_missing_corrections.size() == 0) {
+            species_missing_corrections.push_back(structure.atoms[i].cleanname);
+          } else if (species_missing_corrections[species_missing_corrections.size()-1] != structure.atoms[i].cleanname) {
+            species_missing_corrections.push_back(structure.atoms[i].cleanname);
+          }
         } else {
           Bader_templ_line=get_Bader_templates(structure.atoms[i].cleanname);
           if(LDEBUG){
@@ -2550,6 +2559,7 @@ namespace cce {
                 oss << endl;
                 print_empty_line=FALSE; // previously gathered output should only be printed once
               }
+              undetermined_ox_states.push_back(structure.atoms[i].cleanname + " (ATOM[" + aurostd::utype2string<uint>(i) + "])");
               oss << "BAD NEWS: The oxidation number (and hence the correction) for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " cannot be identified from the Bader charges!"  << endl;
               oss << "The deviation of the Bader charge from the closest tested template value is: " << Bader_deviation_min << " electrons. This is larger than the tolerance: " << Bader_tolerance  << " electrons." << endl;
               // list all oxidation states of the element for which corrections are available
@@ -2587,11 +2597,11 @@ namespace cce {
     }
     if(!cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
       if (error1) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
-        message << " VERY BAD NEWS: The formation enthalpy of this system is not correctable since some of the species were not included in the set for deducing corrections!"  << endl;
-        message << " See the output for details.";
+        message << " VERY BAD NEWS: The formation enthalpy of this system is not correctable since there are no corrections for " << aurostd::joinWDelimiter(species_missing_corrections, ", ") << " coordinated by " << cce_vars.anion_species << "!" << endl;
+        message << " See also the output for details.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       } else if (error2) {
-        message << " BAD NEWS: Some of the oxidation numbers (and hence the corrections) cannot be identified from the Bader charges!"  << endl;
+        message << " BAD NEWS: The oxidation numbers (and hence the corrections) of " << aurostd::joinWDelimiter(undetermined_ox_states, ", ") << " cannot be identified from the Bader charges!"  << endl;
         message << " See the output for details.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
@@ -2669,6 +2679,7 @@ namespace cce {
       cerr << soliloquy << " ASSIGNMENT OF CORRECTIONS:" << endl;
     }
     bool print_previous_output=TRUE;
+    vector<string> missing_corrections;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         string corrections_line = "";
@@ -2681,7 +2692,13 @@ namespace cce {
               oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
               print_previous_output=FALSE; // previously gathered output should only be printed once
             }
+	    string info_missing_corrections=structure.atoms[i].cleanname + " in oxidation state " + aurostd::utype2string<double>(cce_vars.oxidation_states[i]) + " coordinated by " + considered_anion_species;
             oss << "BAD NEWS: No correction available for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " in oxidation state " << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << "." << endl;
+            if (missing_corrections.size() == 0) {
+              missing_corrections.push_back(info_missing_corrections);
+            } else if (missing_corrections[missing_corrections.size()-1] != info_missing_corrections) {
+              missing_corrections.push_back(info_missing_corrections);
+            }
             //checking for which oxidation states corrections are available and throw out errors accordingly
             uint ox_nums_count=0;
             vector<uint> ox_nums_avail_vec;
@@ -2719,8 +2736,8 @@ namespace cce {
     }
     if(error && !cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
       // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
-      message << " BAD NEWS: No correction available for some species in the system." << endl;
-      message << " See the output for details.";
+      message << " BAD NEWS: No correction available for " << aurostd::joinWDelimiter(missing_corrections, ", ") << "." << endl;
+      message << " See also the output for details.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
   }
@@ -2927,7 +2944,7 @@ namespace cce {
   /////////////////////////////////////////////////////////////////////////////
 
   //print_JSON_cation_coordination_numbers/////////////////////////////////////////////////////////////
-  // Returns cation coordination numbers, i.e. number of anion neighbors for each cation in JSON format
+  // Returns cation coordination numbers, i.e. number of anions coordinating each cation in JSON format
   string print_JSON_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream json;
     vector<string> cations_names_and_neighbors_vector;
@@ -3038,7 +3055,7 @@ namespace cce {
   }
 
   //print_output_cation_coordination_numbers////////////////////////////////////////////////////////
-  // print cation coordination numbers, i.e. number of anion neighbors for each cation
+  // print cation coordination numbers, i.e. number of anions coordinating each cation
   string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance) {
     stringstream output;
     output << endl;
@@ -3075,7 +3092,7 @@ namespace cce {
     output << endl;
     output << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
     for (uint k=0,ksize=cce_vars.oxidation_states.size();k<ksize;k++){
-      output << (cce_vars.oxidation_states[k]>0?"+":"") << cce_vars.oxidation_states[k] << " //" << structure.atoms[k].cleanname << " (atom " << k+1 << ")"  << endl; // k+1: convert to 1-based counting
+      output << std::showpos << cce_vars.oxidation_states[k] << " //" << structure.atoms[k].cleanname << " (atom " << k+1 << ")"  << endl; // k+1: convert to 1-based counting
     }
     output << endl;
     return output.str();
