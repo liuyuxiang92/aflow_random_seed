@@ -9,24 +9,24 @@
 #ifndef _AFLOW_SYMBOLIC_H_
 #define _AFLOW_SYMBOLIC_H_
 
+#if USE_SYMBOLIC_SOURCE //DX20200831 - defined in aflow.h
+
 #include "aflow.h"
 #include "aflow_symmetry_spacegroup.h"
 #include "aflow_compare_structure.h"
 #include "SYMBOLICCPLUSPLUS/symbolic_main.h"
 
-// toggle symbolic math
-#define COMPILE_SYMBOLIC
+//// toggle symbolic math
+//#define COMPILE_SYMBOLIC
+
 
 // Symbolic math variables
-#ifdef COMPILE_SYMBOLIC
 #define _SYMBOLIC_ZERO_ symbolic::Symbolic(0)
 #define _SYMBOLIC_TOL_ 1e-3 
 #define _ANRL_LATTICE_VARIABLES_  "a,b,c,alpha,beta,gamma,cx,cy,cz"
 #define _ANRL_TRIG_VARIABLES_  "sin,cos,tan,sec,csc,cot"
 #define _ANRL_WYCKOFF_VARIABLES_  "x,y,z"
-#endif
 
-#ifdef COMPILE_SYMBOLIC
 //SYMBOLIC
 
 // ---------------------------------------------------------------------------

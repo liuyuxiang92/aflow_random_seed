@@ -15,7 +15,9 @@
 #define _DEBUG_MAKEFILE_ true
 #define EXCLUDE_DATA true
 
-#define COMPILE_ANRL_SUBDIRECTORY false //DX20200623 
+//DX20200831 - revert back to hard-coded prototypes and do not compile symbolic math
+#define COMPILE_HARDCODED_PROTOTYPES false
+#define COMPILE_SYMBOLIC !(COMPILE_HARDCODED_PROTOTYPES)
 
 namespace makefile {
   void trimPath(string& filename){
@@ -349,7 +351,7 @@ namespace makefile {
     vector<string> vsubdirectories;
     vsubdirectories.push_back(directory);
     vsubdirectories.push_back(directory+"/APL");
-    if(COMPILE_ANRL_SUBDIRECTORY){vsubdirectories.push_back(directory+"/ANRL");} //DX20200623 - add if-statement
+    if(COMPILE_HARDCODED_PROTOTYPES){vsubdirectories.push_back(directory+"/ANRL");} //DX20200623 - add if-statement
     vsubdirectories.push_back(directory+"/SQLITE");
     std::sort(vsubdirectories.begin(),vsubdirectories.end()); //sort before adding AUROSTD, which must come first
 
@@ -402,6 +404,7 @@ namespace makefile {
     if(LDEBUG){cerr << soliloquy << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
    
     //DX20200801 - SYMBOLIC MATH - START
+#if COMPILE_SYMBOLIC
     //do SYMBOLICCPLUSPLUS second - it gets compiled separately
     file=directory+"/SYMBOLICCPLUSPLUS/symbolic_main.cpp";
     trimPath(file);
@@ -425,11 +428,12 @@ namespace makefile {
     if(vcpp_symbolic.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_symbolic.size()==0",_RUNTIME_ERROR_);}
     if(vcpp_symbolic[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << soliloquy << " vcpp_symbolic=" << aurostd::joinWDelimiter(vcpp_symbolic,",") << endl;}
-    //DX20200801 - SYMBOLIC MATH - END
-    
+#endif
+      //DX20200801 - SYMBOLIC MATH - END
+
     //ANRL
     vector<string> vcpp_anrl;
-    if(COMPILE_ANRL_SUBDIRECTORY){
+    if(COMPILE_HARDCODED_PROTOTYPES){
       dir=directory+"/ANRL";
       trimPath(dir);
       aurostd::DirectoryLS(dir,vfs);
@@ -545,6 +549,7 @@ namespace makefile {
         updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vvdependencies[i]);
       }
       //DX20200801 - SYMBOLIC MATH - START
+#if COMPILE_SYMBOLIC
       if(obj_file.find("symbolic_main.o")!=string::npos){ //exception for symbolic_main.o
         updateDependenciesVariable(vcpp_symbolic,var_vcpp_symbolic,vvdependencies[i]);
         updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vvdependencies[i]);
@@ -553,6 +558,7 @@ namespace makefile {
       if(obj_file.find("aflow_symbolic.o")!=string::npos || obj_file.find("aflow_anrl.o")!=string::npos){ //exception for aflow_symbolic.o and aflow_anrl.o
         updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vvdependencies[i]);
       }
+#endif
       //DX20200801 - SYMBOLIC MATH - END
       //makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << obj_file << ": " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
@@ -593,14 +599,16 @@ namespace makefile {
     //MAIN DEPENDENCIES START
     if(vcpp_aurostd.size()){makefile_definitions_ss << var_vcpp_aurostd << "=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
     if(vhpp_aurostd.size()){makefile_definitions_ss << var_vhpp_aurostd << "=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
+#if COMPILE_SYMBOLIC
     if(vcpp_symbolic.size()){makefile_definitions_ss << var_vcpp_symbolic << "=" << aurostd::joinWDelimiter(vcpp_symbolic," ") << endl;} //DX20200831 - symbolic math
     if(vhpp_symbolic.size()){makefile_definitions_ss << var_vhpp_symbolic << "=" << aurostd::joinWDelimiter(vhpp_symbolic," ") << endl;} //DX20200831 - symbolic math
+#endif
     if(vdep_aflowh.size()){makefile_definitions_ss << var_vdep_aflowh << "=" << aurostd::joinWDelimiter(vdep_aflowh," ") << endl;} //SC variables - hack
     //MAIN DEPENDENCIES END
     if(vdep_aflow.size()){makefile_definitions_ss << "AFLOW_DEPS=" << aurostd::joinWDelimiter(vdep_aflow," ") << endl;}  //SC variables - hack
     if(vfile_obj.size()){makefile_definitions_ss << "AFLOW_OBJS=" << aurostd::joinWDelimiter(vfile_obj," ") << endl;}  //SC variables - hack
     if(vhpp_aflow.size()){makefile_definitions_ss << "AFLOW_HPPS=" << aurostd::joinWDelimiter(vhpp_aflow," ") << endl;} //SC variables - hack
-    if(COMPILE_ANRL_SUBDIRECTORY&&vcpp_anrl.size()){makefile_definitions_ss << "ANRL_CPPS=" << aurostd::joinWDelimiter(vcpp_anrl," ") << endl;} //SC variables - hack //DX20200623 - added COMPILE_ANRL_SUBDIRECTORY
+    if(COMPILE_HARDCODED_PROTOTYPES&&vcpp_anrl.size()){makefile_definitions_ss << "ANRL_CPPS=" << aurostd::joinWDelimiter(vcpp_anrl," ") << endl;} //SC variables - hack //DX20200623 - added USE_HARDCODED_PROTOTYPES
 
     //join together
     stringstream makefile_aflow;

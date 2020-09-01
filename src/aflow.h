@@ -18,12 +18,17 @@
 //[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 // hard-coded prototype generator (ANRL/ subdirectory required) //DX20200623
-// if you want to uncomment below, do the following sequence:
-// 1) set COMPILE_ANRL_SUBDIRECTORY to true in aflow_makefile.cpp
+// to revert to the hard-coded prototypes, do the following sequence:
+// 1) set USE_HARDCODED_PROTOTYPES to true in aflow_makefile.cpp
 // 2) compile
 // 3) run aflow --makefile
-// 4) then uncomment the line below
-//#define USE_HARDCODED_PROTOTYPES
+// 4) set USE_HARDCODED_PROTOTYPES (below) to true
+// 5) recompile
+#define USE_HARDCODED_PROTOTYPES false
+
+// toggle symbolic math
+// (for now it is coupled with USE_HARDCODED_PROTOTYPES, although it does not have to be)
+#define USE_SYMBOLIC_SOURCE !(USE_HARDCODED_PROTOTYPES) // true
 
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 //DX

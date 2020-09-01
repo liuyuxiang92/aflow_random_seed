@@ -2132,7 +2132,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // symbolic representation of prototypes
     if(print_mode == _PROTO_GENERATOR_EQUATIONS_ONLY_ || print_mode == _PROTO_GENERATOR_GEOMETRY_FILE_AND_EQUATIONS_){ 
-#ifdef COMPILE_SYMBOLIC
+#if USE_SYMBOLIC_SOURCE //DX20200831 - defined in aflow.h
       // ---------------------------------------------------------------------------
       // get symbolic lattice
       symbolic::Symbolic lattice_symbolic = SymbolicANRLPrimitiveLattices(lattice_and_centering_from_Pearson, space_group_letter);
@@ -2247,15 +2247,16 @@ namespace anrl {
   }
 }
 
-#ifdef USE_HARDCODED_PROTOTYPES
+#if USE_HARDCODED_PROTOTYPES //DX20200831 - defined in aflow.h
 // ***************************************************************************
 // !!! OLD PROTOTOYPE GENERATOR (HARD-CODED ANRL FILES) !!!
 // Below are the functions for hard-coded ANRL CPP files
 // To toggle back to this generator, do the following:
-// 1) set COMPILE_ANRL_SUBDIRECTORY to true in aflow_makefile.cpp
+// 1) set USE_HARDCODED_PROTOTYPES to true in aflow_makefile.cpp
 // 2) compile
 // 3) run aflow --makefile
-// 4) then uncomment the line "#define USE_HARDCODED_PROTOTYPES" in aflow.h
+// 4) set USE_HARDCODED_PROTOTYPES (in aflow.h) to true
+// 5) recompile
 
 // ***************************************************************************
 namespace anrl { // put them in order

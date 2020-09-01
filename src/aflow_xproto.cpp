@@ -632,7 +632,7 @@ namespace aflowlib {
         if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << label << endl;
       }
       //DX20190708 END
-#ifdef USE_HARDCODED_PROTOTYPES
+#if USE_HARDCODED_PROTOTYPES //DX20200831 - defined in aflow.h
       // hard-coded prototype generator (requires ANRL/ subdirectory)
       return anrl::PrototypeANRL(oss,label,parameters,vatomX,vvolumeX,volume_in,mode,flip_option);
 #else

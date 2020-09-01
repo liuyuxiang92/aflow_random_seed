@@ -17,7 +17,7 @@
 #define _DEBUG_SYMBOLIC_ false //DX20200625
 
 
-#ifdef COMPILE_SYMBOLIC
+#if USE_SYMBOLIC_SOURCE //DX20200831 - defined in aflow.h
 // *************************************************************************** 
 // *************************************************************************** 
 // Symbolic math functions leveraging the SymbolicC++ source code
@@ -725,6 +725,6 @@ namespace anrl {
     }
 	}
 }
-#endif // COMPILE_SYMBOLIC
+#endif // USE_SYMBOLIC_SOURCE
 
 #endif // _AFLOW_SYMBOLIC_CPP

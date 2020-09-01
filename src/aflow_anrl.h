@@ -18,18 +18,6 @@
 #define _PROTO_GENERATOR_EQUATIONS_ONLY_ 1
 #define _PROTO_GENERATOR_GEOMETRY_FILE_AND_EQUATIONS_ 2
 
-// toggle symbolic math
-#define COMPILE_SYMBOLIC
-
-// Symbolic math variables
-#ifdef COMPILE_SYMBOLIC
-#define _SYMBOLIC_ZERO_ symbolic::Symbolic(0)
-#define _SYMBOLIC_TOL_ 1e-3 
-#define _ANRL_LATTICE_VARIABLES_  "a,b,c,alpha,beta,gamma,cx,cy,cz"
-#define _ANRL_TRIG_VARIABLES_  "sin,cos,tan,sec,csc,cot"
-#define _ANRL_WYCKOFF_VARIABLES_  "x,y,z"
-#endif
-  
 // ---------------------------------------------------------------------------
 // below are functions limited to the aflow_anrl.cpp file, if you want to
 // include functions into other parts of aflow, put the functions in aflow.h
