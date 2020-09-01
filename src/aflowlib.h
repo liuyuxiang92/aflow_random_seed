@@ -503,7 +503,7 @@ namespace aflowlib {
 
   struct DBStats {
     vector<string> columns;
-    vector<int> count;
+    vector<vector<int> > count;  // 2D to accommodate bool
     vector<std::pair<string, int> > loop_counts;
     vector<string> max;
     vector<string> min;
@@ -511,6 +511,7 @@ namespace aflowlib {
     int nsystems;
     vector<vector<string> > set;
     vector<string> species;
+    vector<string> types;
     string catalog;
   };
 
@@ -585,7 +586,7 @@ namespace aflowlib {
 
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
       void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
+          const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
           vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       void writeStatsToJson(std::stringstream&, const DBStats&);

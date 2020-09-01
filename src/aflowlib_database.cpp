@@ -188,10 +188,11 @@ namespace aflowlib {
       message << "Could not create symbolic link to lock file " + lock_file + ": ";
       if (errno == EEXIST) {
         message << "Another process has created it already.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_BUSY_);
       } else {
         message << "Process exited with errno " << errno << ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     // If there is a temporary database file, a rebuild process is either in
@@ -237,7 +238,7 @@ namespace aflowlib {
         aurostd::RemoveFile(tmp_file + "-journal");
       } else {
         message << "Could not create temporary database file. File already exists and rebuild process is active.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_BUSY_);
       }
     }
 
@@ -1041,7 +1042,7 @@ namespace aflowlib {
     DBStats stats;
     stats.catalog = catalog;
     stats.columns = cols;
-    stats.count.assign(ncols, 0);
+    stats.count.assign(ncols, vector<int>(2, 0));
     stats.max.assign(ncols, "");
     stats.min.assign(ncols, "");
     stats.nentries = 0;
@@ -1059,6 +1060,8 @@ namespace aflowlib {
       types[i] = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
     }
 
+    stats.types = types;
+
     string where = "catalog='" + catalog + "'";
     vector<string> entries = getPropertyMultiTables("COUNT", tables, "*", where);
     for (int t = 0; t < _N_AUID_TABLES_; t++) stats.nentries += aurostd::string2utype<int>(entries[t]);
@@ -1067,7 +1070,7 @@ namespace aflowlib {
 
     if (stats.nentries > 0) {
       vector<vector<vector<string> >  > maxmin(_N_AUID_TABLES_, vector<vector<string> >(ncols, vector<string>(2))), sets(_N_AUID_TABLES_, vector<vector<string> >(ncols));
-      vector<vector<int> > counts(_N_AUID_TABLES_, vector<int>(ncols));
+      vector<vector<vector<int> > > counts(_N_AUID_TABLES_, vector<vector<int> >(ncols, vector<int>(2, 0)));
       vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
       int ncpus = init::GetCPUCores();
@@ -1103,14 +1106,17 @@ namespace aflowlib {
       string max = "", min = "";
       uint nset = 0, n = 0;
       for (uint c = 0; c < ncols; c++) {
-        for (int t = 0; t < _N_AUID_TABLES_; t++) stats.count[c] += counts[t][c];
-        if (stats.count[c] > 0) {
+        for (int t = 0; t < _N_AUID_TABLES_; t++) {
+          stats.count[c][0] += counts[t][c][0];
+          stats.count[c][1] += counts[t][c][1];
+        }
+        if (stats.count[c][0] + stats.count[c][1] > 0) {
           set.clear();
           max = ""; min = "";
           nset = 0; n = 0;
           if (types[c] != "bool") {  // No max, min, or set for bool
             for (int t = 0; t < _N_AUID_TABLES_; t++) {
-              if (counts[t][c] > 0) {
+              if (counts[t][c][0] > 0) {
                 if (types[c] == "number") {
                   if (max.empty()) max = maxmin[t][c][0];
                   else if (aurostd::string2utype<double>(maxmin[t][c][0]) > aurostd::string2utype<double>(max)) max = maxmin[t][c][0];
@@ -1173,7 +1179,7 @@ namespace aflowlib {
   // Retrieves the statistics for each database property and the loops.
   void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
       const vector<string>& tables, const vector<string>& cols, const vector<string>& types,
-      const vector<string>& loops, vector<vector<int> >& counts, vector<vector<int> >& loop_counts,
+      const vector<string>& loops, vector<vector<vector<int> > >& counts, vector<vector<int> >& loop_counts,
       vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
     sqlite3* cursor;
     string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
@@ -1188,18 +1194,22 @@ namespace aflowlib {
     string where = "", where_loop = "";
     for (int i = startIndex; i < endIndex; i++) {
       for (uint c = 0; c < ncols; c++) {
-        where = "catalog='" + catalog + "' AND ";
-        if (types[c] == "bool") where += cols[c] + "='true'";
-        else where += cols[c] + " NOT NULL";
-        counts[i][c] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
-        if (counts[i][c] > 0) {
+        if (types[c] == "bool") {
+          where = "catalog='" + catalog + "' AND " + cols[c] + "=";
+          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
+          counts[i][c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
+        } else {
+          where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
+          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
+        }
+        // No need to determine max, min, or set for bool
+        if ((types[c] != "bool") && (counts[i][c][0] > 0)) {
           // Max and  min only make sense for numbers
           if (types[c] == "number") {
             maxmin[i][c][0] = getProperty(cursor, "MAX", tables[i], cols[c], where);
             maxmin[i][c][1] = getProperty(cursor, "MIN", tables[i], cols[c], where);
           }
-          // No need to determine set for bool
-          if (types[c] != "bool") sets[i][c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
+          sets[i][c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
         }
       }
       for (uint l = 0, nloops = loops.size(); l < nloops; l++) {
@@ -1264,7 +1274,14 @@ namespace aflowlib {
     for (uint c = 0; c < ncols; c++) {
       json << indent << tab << tab << "\"" << db_stats.columns[c] << "\": {" << std::endl;
       json << indent << tab << tab << tab << "\"count\": ";
-      json << aurostd::utype2string<int>(db_stats.count[c]) << "," << std::endl;
+      if (db_stats.types[c] == "bool") {
+        json << "{" << std::endl;
+        json << indent << tab << tab << tab << tab << "\"true\": " << db_stats.count[c][0] << "," << std::endl;
+        json << indent << tab << tab << tab << tab << "\"false\": " << db_stats.count[c][1] << std::endl;
+        json << indent << tab << tab << tab << "}," << std::endl;
+      } else {
+        json << aurostd::utype2string<int>(db_stats.count[c][0]) << "," << std::endl;
+      }
       str_formatted = db_stats.min[c];
       if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
