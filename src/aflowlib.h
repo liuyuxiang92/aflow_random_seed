@@ -530,11 +530,11 @@ namespace aflowlib {
 
       bool isTMP();
 
-      bool rebuildDatabase(bool force_rebuild=false);
-      bool rebuildDatabase(const string&, bool force_rebuild=false);
-      bool rebuildDatabase(const vector<string>&, bool force_rebuild=false);
-      uint patchDatabase(const string&, bool check_timestamps=false);
-      uint patchDatabase(const vector<string>&, bool check_timestamps=false);
+      int rebuildDatabase(bool force_rebuild=false);
+      int rebuildDatabase(const string&, bool force_rebuild=false);
+      int rebuildDatabase(const vector<string>&, bool force_rebuild=false);
+      int patchDatabase(const string&, bool check_timestamps=false);
+      int patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
       vector<string> getTables(const string& where="");

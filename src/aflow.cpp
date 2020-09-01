@@ -304,6 +304,7 @@ int main(int _argc,char **_argv) {
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
+    int return_code = 0;  //ME20200901
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
     std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
     if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
@@ -836,11 +837,12 @@ int main(int _argc,char **_argv) {
     // **************************************************************
     // LAST RESOURCE PFLOW
     if(!Arun) { 
-      Arun=TRUE;pflow::main(argv,cmds);
+      Arun=TRUE;
+      return_code = pflow::main(argv,cmds);   //ME20200901 - use pflow::main return code database handling
     }
     // **************************************************************
     // END
-    return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0
+    return (Arun?return_code:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0//ME20200901 - use return_code
   }
   //CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){

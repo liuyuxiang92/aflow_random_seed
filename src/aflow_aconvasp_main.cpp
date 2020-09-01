@@ -1925,21 +1925,21 @@ namespace pflow {
       //ME20191001 START
       //ME20200829 - Added patch functionality
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
+        int return_code = 199;  // Placeholder: return code in the 100s do not run the analysis
         aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
         string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
         // Hierarchy: rebuild > update > patch
         if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
-          if (db.rebuildDatabase(patchfiles, vpflow.flag("REBUILDDB"))) {
-            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-          }
+          return_code = db.rebuildDatabase(patchfiles, vpflow.flag("REBUILDDB"));
         } else if (vpflow.flag("PATCHDB")) {
           // false: do not check timestamps (always patch)
-          if (db.patchDatabase(patchfiles, false) > 0) {
-            // Only analyze when patches were applied
+          return_code = db.patchDatabase(patchfiles, false);
+        }
+        if ((return_code < 100) && (return_code >= 200)) {
             db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-          }
         }
         _PROGRAMRUN = true;
+        return return_code;
       }
       if (vpflow.flag("ANALYZEDB")) {
         aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);

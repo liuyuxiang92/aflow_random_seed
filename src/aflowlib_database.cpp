@@ -43,6 +43,25 @@
 //     entries and properties of the new database file is greater than or equal
 //     to that of the old file.
 //   * Analyze the database and output the database statistics.
+//
+// ------------------------------ RETURN CODES -------------------------------
+//
+// The database rebuild uses return codes to convey to outside processes why
+// it terminated. The codes are listed below.
+
+// Return code definitions
+
+// Success
+#define _AFLOW_DB_SUCCESS_            0  // Database successfully updated
+
+// Codes that do not trigger a database analysis
+#define _AFLOW_DB_NOT_UPDATED_       100  // Nothing to update or patch
+#define _AFLOW_DB_NOT_COPIED_        101  // Temp database file was not copied
+#define _AFLOW_DB_NOT_PATCHED_       102  // No patches applied even though files were given
+
+// Codes that trigger a database analysis
+#define _AFLOW_DB_PATCH_SKIPPED_     200  // Returned when rebuild was successful but no patch was applied
+#define _AFLOW_DB_PATCH_INCOMPLETE_  201  // At least one patch was incomplete
 
 #include "aflowlib.h"
 #include "SQLITE/aflow_sqlite.h"
@@ -438,18 +457,18 @@ namespace aflowlib {
   // This function first checks if a rebuild is necessary and then initiates
   // the rebuilding functions. Returns true if the database has been
   // successfully rebuilt.
-  bool AflowDB::rebuildDatabase(bool force_rebuild) {
+  int AflowDB::rebuildDatabase(bool force_rebuild) {
     vector<string> patch_placeholder;
     return rebuildDatabase(patch_placeholder, force_rebuild);
   }
 
-  bool AflowDB::rebuildDatabase(const string& patch_files, bool force_rebuild) {
+  int AflowDB::rebuildDatabase(const string& patch_files, bool force_rebuild) {
     vector<string> patch_files_input;
     if (!patch_files.empty()) aurostd::string2tokens(patch_files, patch_files_input, ",");
     return rebuildDatabase(patch_files_input, force_rebuild);
   }
 
-  bool AflowDB::rebuildDatabase(const vector<string>& patch_files_input, bool force_rebuild) {
+  int AflowDB::rebuildDatabase(const vector<string>& patch_files_input, bool force_rebuild) {
     string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "rebuildDatabase():";
     stringstream message;
     bool rebuild_db = false;
@@ -543,43 +562,51 @@ namespace aflowlib {
       openTmpFile();
       rebuildDB();
       bool close_tmp = closeTmpFile(force_rebuild);
-      // If the tmp database was not copied, something went wrong - return
-      if (!close_tmp) return false;
+      // If the tmp database was not copied, something went wrong - return 1
+      if (!close_tmp) return _AFLOW_DB_NOT_COPIED_;
 
       // No patches needed, so return
-      if (npatch_input == 0) return close_tmp;
+      if (npatch_input == 0) return (close_tmp?_AFLOW_DB_SUCCESS_:_AFLOW_DB_NOT_COPIED_);
     }
 
-    if (rebuild_db || (npatch_input > 0)) {
+    if (npatch_input > 0) {
       // Do not check timestamps after a rebuild because patches must be applied
-      uint patches_applied = patchDatabase(patch_files_input, !rebuild_db);
-      message << ((patches_applied > 0)?aurostd::utype2string<uint>(patches_applied):"No") << " patch" << ((patches_applied == 1)?"":"es") << " applied.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
-      return (rebuild_db || (patches_applied > 0));
+      int patch_code = patchDatabase(patch_files_input, !rebuild_db);
+      if (rebuild_db) {
+        if (patch_code == _AFLOW_DB_NOT_PATCHED_) return _AFLOW_DB_NOT_PATCHED_; // Database was rebuilt but not patched
+        else return patch_code;
+      } else if (patch_code == _AFLOW_DB_NOT_PATCHED_) {
+        return _AFLOW_DB_NOT_UPDATED_;  // Database not rebuilt and not patched
+      } else {
+        return patch_code;
+      }
     }
 
-    return false;
+    return _AFLOW_DB_NOT_UPDATED_;
   }
 
   //patchDatabase/////////////////////////////////////////////////////////////
   // Patches the database using jsonl files. This can be used for emergency
   // patches before a lib2raw run or to add data that lib2raw does not cover.
-  uint AflowDB::patchDatabase(const string& patch_files, bool check_timestamps) {
+  int AflowDB::patchDatabase(const string& patch_files, bool check_timestamps) {
     vector<string> patch_files_input;
     if (!patch_files.empty()) aurostd::string2tokens(patch_files, patch_files_input, ",");
     return patchDatabase(patch_files_input, check_timestamps);
   }
 
-  uint AflowDB::patchDatabase(const vector<string>& patch_files_input, bool check_timestamps) {
+  int AflowDB::patchDatabase(const vector<string>& patch_files_input, bool check_timestamps) {
     string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "patchDatabase():";
     stringstream message;
+    int patch_code = 0;
+
+    vector<string> patch_files;
+    uint npatch_input = patch_files_input.size();
+    if (npatch_input == 0) return 0;  // No files, so nothing to patch
 
     long int tm_db = 0;
     if (check_timestamps) tm_db = aurostd::FileModificationTime(database_file);
 
     // Check files that need to be patched
-    vector<string> patch_files;
-    uint npatch_input = patch_files_input.size();
     for (uint i = 0; i < npatch_input; i++) {
         string filename = patch_files_input[i];
         if (!aurostd::EFileExist(filename)) {
@@ -589,6 +616,9 @@ namespace aflowlib {
           } else {
             message << "File " << filename << " not found. Skipping.";
             pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+
+            // If a file is missing, then the patch is incomplete
+            patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
             continue;
           }
         }
@@ -603,7 +633,10 @@ namespace aflowlib {
     }
 
     uint npatch = patch_files.size();
-    if (npatch == 0) return 0;  // Nothing to patch
+    if (npatch == 0) {  // Nothing to patch
+      if (check_timestamps) return _AFLOW_DB_NOT_PATCHED_;  // No new files
+      else return _AFLOW_DB_PATCH_INCOMPLETE_;  // All (new) files missing
+    }
 
     // Start patching
     uint patches_applied = 0;
@@ -624,6 +657,8 @@ namespace aflowlib {
         if (closeTmpFile(false)) {  // Do not force copy or a bad patch may break the database
           message << "Patched " << entries_patched << "/" << data.size() << " entries.";
           pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+          // Patch incomplete, so adjust code (unless an error was found before)
+          if ((patch_code < 200) && (entries_patched < data.size())) patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
           patches_applied++;
         } else {
           message << "Could not close temporary database file.";
@@ -632,11 +667,15 @@ namespace aflowlib {
       } else {
         closeTmpFile(false, false, true);  // Do not copy tmp file
         message << "No patches applied.";
+        // Patch incomplete, so adjust code (unless an error was found before)
+        if ((patch_code < 200) && (entries_patched < data.size())) patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
         pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
 
-    return patches_applied;
+    if (patches_applied == 0) patch_code = _AFLOW_DB_NOT_PATCHED_;
+
+    return patch_code;
   }
 
   // Rebuild -----------------------------------------------------------------
@@ -814,6 +853,7 @@ namespace aflowlib {
         pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         continue;
       }
+
       if ((npatches + 1) % chunk_size == 0) {
         transaction(false);
         transaction(true);
