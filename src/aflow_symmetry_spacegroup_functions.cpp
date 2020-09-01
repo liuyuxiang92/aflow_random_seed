@@ -2891,9 +2891,10 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
   }
 
 }
+//DX20191029 - END
 
 // ******************************************************************************
-// numberOccupiedSitesInConventionalCell()
+// numberOccupiedSitesInConventionalCell() //DX20200601
 // ******************************************************************************
 namespace SYM {
   uint numberOccupiedSitesInConventionalCell(const vector<wyckoffsite_ITC>& Wyckoff_sites){
@@ -2909,7 +2910,7 @@ namespace SYM {
 }
 
 // ******************************************************************************
-// numberEachTypeFromWyckoff()
+// numberEachTypeFromWyckoff() //DX20200601
 // ******************************************************************************
 namespace SYM {
   vector<uint> numberEachTypeFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_sites){
