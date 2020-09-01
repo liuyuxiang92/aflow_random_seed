@@ -3007,7 +3007,7 @@ LATTICES = (the ones with "")
 
   aflow --rebuild_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file.
-        --patchfiles can be used to path the AFLOW database using jsonl files (see --patch_database).
+        --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
 
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
@@ -3382,7 +3382,7 @@ LATTICES = (the ones with "")
 
   aflow --update_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file if new entries are available.
-        --patchfiles can be used to path the AFLOW database using jsonl files (see --patch_database).
+        --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
 
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
