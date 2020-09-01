@@ -12,7 +12,7 @@
 #include "aflow.h"
 #include "aflow_symmetry_spacegroup.h"
 #include "aflow_compare_structure.h"
-#include "SYMBOLICCPLUSPLUS/symboliccplusplus.h"
+#include "SYMBOLICCPLUSPLUS/symbolic_main.h"
 
 // toggle symbolic math
 #define COMPILE_SYMBOLIC

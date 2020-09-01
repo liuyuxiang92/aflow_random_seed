@@ -17,7 +17,7 @@ Modifications from original source code:
   This prevents inclusion of the code into more than one CPP file (i.e., violates the "One Definition Rule").
 
 - The original source code had a class hierarchy (i.e., symbolic/ subdirectory) and a "redirect" header file.
-  For clarity (and to ensure no circular/infinite dependency issues), the redirect was removed and all functions 
+  For clarity (and to ensure no circular/infinite dependency issues), the redirect was removed and all functions
   were moved to a single directory hierarchy.
 
 - Wrapped all functions in this directory in namespace "symbolic". Otherwise, this can cause namespace conflicts.

@@ -27,7 +27,7 @@
 // Please preserve the order of including the CPP files 
 // (the order mirrors the header/forward declaration dependencies)
 
-#include "symboliccplusplus.h"
+#include "symbolic_main.h"
 
 #ifndef _SYMBOLIC_CLONING_CPP_
 #include "cloning.cpp"
