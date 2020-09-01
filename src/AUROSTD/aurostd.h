@@ -171,6 +171,7 @@ using std::vector;
 #include "aurostd_xparser.h" //CO20200624
 #include "aurostd_xcombos.h"
 #include "aurostd_xerror.h" //ME20180627
+#include "aurostd_xfit.h" //AS20200824
 
 using aurostd::min;
 using aurostd::max;

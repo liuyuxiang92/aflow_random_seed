@@ -795,7 +795,7 @@ namespace KBIN {
       apl::QHA qha(xinput, qhaopts, aplopts, FileMESSAGE, oss);
 
       qha.system_title = phcalc._system;
-      qha.run(xflags, aflags, kflags, AflowIn);
+      qha.run(xflags, aflags, kflags);
       return;
     }
     //AS20200513 END
@@ -1423,6 +1423,28 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
     }
 
+    // EOS_MODEL
+    option = "EOS_MODEL";
+    string MODEL = aurostd::toupper(qhaopts.getattachedscheme(option));
+    aurostd::string2tokens(MODEL, tokens, ",");
+    if ((tokens.size()<1) || (tokens.size() > 5)){
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
+      msg += " Either no model was given or the number of given models is too big.";
+      msg += " Specify as "+option+"=SJ,BM2,BM3,BM4,M using each method once.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    string token = "";
+    // note: different models could be used "simultaneously"
+    for (uint i=0; i<tokens.size(); i++){
+      token = aurostd::toupper(tokens[i]);
+      if (token == "SJ")  qhaopts.flag("EOS_MODEL:SJ",  true);
+      if (token == "BM2") qhaopts.flag("EOS_MODEL:BM2", true);
+      if (token == "BM3") qhaopts.flag("EOS_MODEL:BM3", true);
+      if (token == "BM4") qhaopts.flag("EOS_MODEL:BM4", true);
+      if (token == "M")   qhaopts.flag("EOS_MODEL:M",   true);
+    }
+
     // GP_DISTORTION
     double gp_distortion = aurostd::string2utype<double>(qhaopts.getattachedscheme("GP_DISTORTION"));
     if (gp_distortion < _ZERO_TOL_){
@@ -1442,7 +1464,6 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
     }
 
-    string token = "";
     // note: QHA, QHA3P and SCQHA could run "simultaneously"
     for (uint i=0; i<tokens.size(); i++){
       token = aurostd::toupper(tokens[i]);
