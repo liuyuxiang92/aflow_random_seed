@@ -401,8 +401,8 @@ namespace makefile {
     if(vcpp_aurostd[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_aurostd",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << soliloquy << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
     
-    //do SYMBOLICC++ second - it gets compiled separately
-    file=directory+"/SYMBOLICC++/symbolicc++_master.h";
+    //do SYMBOLICCPLUSPLUS second - it gets compiled separately
+    file=directory+"/SYMBOLICCPLUSPLUS/symboliccplusplus.cpp";
     trimPath(file);
     if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
     vfiles.push_back(file);
@@ -412,18 +412,19 @@ namespace makefile {
     vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
     vmt_required.push_back(mt_required);
 
-    //SC variables - hack
+    //SYMBOLIC - hack
     //SYMBOLIC
-    string var_vhpp_symbolic="SYMBOLIC_HPPS";
-    vector<string> vhpp_symbolic;
+    string var_vcpp_symbolic="SYMBOLIC_CPPS",var_vhpp_symbolic="SYMBOLIC_HPPS";
+    //string var_vhpp_symbolic="SYMBOLIC_HPPS";
+    vector<string> vcpp_symbolic,vhpp_symbolic;
     for(i=0;i<vvdependencies.back().size();i++){
       const string& dep=vvdependencies.back()[i];
-      //if(dep.find("SYMBOLICC++")!=string::npos && dep.size()>4 && dep.find(".cpp")==dep.size()-4){vcpp_symbolic.push_back(dep);}
-      if(dep.find("SYMBOLICC++")!=string::npos && dep.size()>2 && dep.find(".h")==dep.size()-2){vhpp_symbolic.push_back(dep);}
+      if(dep.find("SYMBOLICCPLUSPLUS")!=string::npos && dep.size()>4 && dep.find(".cpp")==dep.size()-4){vcpp_symbolic.push_back(dep);}
+      else if(dep.find("SYMBOLICCPLUSPLUS")!=string::npos && dep.size()>2 && dep.find(".h")==dep.size()-2){vhpp_symbolic.push_back(dep);}
     }
-    //if(vcpp_symbolic.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_symbolic.size()==0",_RUNTIME_ERROR_);}
-    //if(vcpp_symbolic[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
-    //if(LDEBUG){cerr << soliloquy << " vcpp_symbolic=" << aurostd::joinWDelimiter(vcpp_symbolic,",") << endl;}
+    if(vcpp_symbolic.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_symbolic.size()==0",_RUNTIME_ERROR_);}
+    if(vcpp_symbolic[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
+    if(LDEBUG){cerr << soliloquy << " vcpp_symbolic=" << aurostd::joinWDelimiter(vcpp_symbolic,",") << endl;}
     //ANRL
     vector<string> vcpp_anrl;
     if(COMPILE_ANRL_SUBDIRECTORY){
@@ -541,8 +542,12 @@ namespace makefile {
         updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vvdependencies[i]);
         updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vvdependencies[i]);
       }
-      if(obj_file.find("symbolicc++.o")!=string::npos){ //exception for symbolicc++.o
-        //updateDependenciesVariable(vcpp_symbolic,var_vcpp_symbolic,vvdependencies[i]);
+      if(obj_file.find("symboliccplusplus.o")!=string::npos){ //exception for symboliccplusplus.o
+        updateDependenciesVariable(vcpp_symbolic,var_vcpp_symbolic,vvdependencies[i]);
+        updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vvdependencies[i]);
+        updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vvdependencies[i]);
+      }
+      if(obj_file.find("aflow_symbolic.o")!=string::npos || obj_file.find("aflow_anrl.o")!=string::npos){ //exception for symboliccplusplus.o
         updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vvdependencies[i]);
       }
       //makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
@@ -558,7 +563,7 @@ namespace makefile {
     updateDependenciesVariable(vcpp_aurostd,var_vcpp_aurostd,vdep_aflowh);
     updateDependenciesVariable(vhpp_aurostd,var_vhpp_aurostd,vdep_aflowh);
     //updateDependenciesVariable(vcpp_symbolic,var_vcpp_symbolic,vdep_aflowh);
-    updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vdep_aflowh);
+    //updateDependenciesVariable(vhpp_symbolic,var_vhpp_symbolic,vdep_aflowh);
 
     //this approach is not sustainable - do you think SC won't demand more hacks?
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//unfortunate hacks that are needed
@@ -586,7 +591,7 @@ namespace makefile {
     //MAIN DEPENDENCIES START
     if(vcpp_aurostd.size()){makefile_definitions_ss << var_vcpp_aurostd << "=" << aurostd::joinWDelimiter(vcpp_aurostd," ") << endl;} //SC variables - hack
     if(vhpp_aurostd.size()){makefile_definitions_ss << var_vhpp_aurostd << "=" << aurostd::joinWDelimiter(vhpp_aurostd," ") << endl;} //SC variables - hack
-    //if(vcpp_symbolic.size()){makefile_definitions_ss << var_vcpp_symbolic << "=" << aurostd::joinWDelimiter(vcpp_symbolic," ") << endl;} //SC variables - hack
+    if(vcpp_symbolic.size()){makefile_definitions_ss << var_vcpp_symbolic << "=" << aurostd::joinWDelimiter(vcpp_symbolic," ") << endl;} //SC variables - hack
     if(vhpp_symbolic.size()){makefile_definitions_ss << var_vhpp_symbolic << "=" << aurostd::joinWDelimiter(vhpp_symbolic," ") << endl;} //SC variables - hack
     if(vdep_aflowh.size()){makefile_definitions_ss << var_vdep_aflowh << "=" << aurostd::joinWDelimiter(vdep_aflowh," ") << endl;} //SC variables - hack
     //MAIN DEPENDENCIES END

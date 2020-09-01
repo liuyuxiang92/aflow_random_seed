@@ -11,7 +11,7 @@
 #include "aflow.h"
 #include "aflow_symmetry_spacegroup.h"
 #include "aflow_compare_structure.h"
-#include "SYMBOLICC++/symbolicc++.h"
+#include "aflow_symbolic.h"
 
 // printing modes
 #define _PROTO_GENERATOR_GEOMETRY_FILE_ 0
@@ -60,7 +60,7 @@ namespace anrl{
   bool structureAndLabelConsistent(const xstructure& _xstr, const string& label_input, string& label_and_params_calculated);
 }
 //SYMBOLIC
-
+/*
 #ifdef COMPILE_SYMBOLIC
 //SYMBOLIC
 
@@ -111,5 +111,5 @@ namespace anrl {
   void addSymbolicEquation2Atoms(const vector<symbolic::Symbolic>& equations, deque<_atom>& atoms, bool isfpos=true);
 }
 #endif 
-
+*/
 #endif 

@@ -7610,7 +7610,7 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::latticeAndOriginSearch():";
 
-    bool supercell_method = false; //DX20200330 - original method, but slow
+    bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
     bool test_one_lfa_only = false; //DX20190318
     bool test_one_origin_only = false; //DX20200715
     //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
@@ -8185,7 +8185,7 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
-    bool supercell_method = false; //DX20200330
+    bool supercell_method = true; //DX20200330 //DX20200827 - false method is not robust enough yet
     double mis=AUROSTD_MAX_DOUBLE;
     double mag_dis=AUROSTD_MAX_DOUBLE; double mag_fail=AUROSTD_MAX_DOUBLE;
 
