@@ -31,7 +31,7 @@
 
 // phased include headers
 // according to class hierarchy
-// DX20200612 - removed class hierarchy (one-level, i.e., removed symbolic directory and moved everything to the same level)
+// DX20200612 - removed class hierarchy (one-level, i.e., removed symbolic directory and moved everything to the same level; see README_AFLOW_SYMBOLIC.TXT)
 
 // DX: Note, the order of includes is important (dependencies and forward declarations), do not change the order
 
