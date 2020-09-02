@@ -11755,6 +11755,16 @@ namespace chull {
             distances_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
             num_ss.str("");
             //WSCHMITT20190620 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+
+            //SK20200825 start
+            //adding decompositionAuids for webapp
+            distances_data_JSON_ss << ",";
+            num_ss.str("");
+
+            num_ss << ConvexHull::grabCHPointProperty(point,"phases_decomposition_auid",json_ft);
+            distances_data_JSON_ss << "\"decompositionAuids\":" << num_ss.str();
+            num_ss.str("");
+            //SK20200825 end
           }
           distances_data_JSON_ss << "}";
           distances_data_JSON_vs.push_back(distances_data_JSON_ss.str());
