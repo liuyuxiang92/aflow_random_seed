@@ -1047,10 +1047,6 @@ namespace aflowlib {
     vector<string> tables = getTables();
     vector<string> columns = getColumnNames(tables[0]);
 
-    string tab = "    ";
-    std::stringstream json;
-    json << "{" << std::endl << tab << "\"Aflow_DBs\": {" << std::endl;
-
     vector<string> catalogs = getSetMultiTables(tables, "catalog", true);
     uint ncatalogs = catalogs.size();
 
@@ -1058,24 +1054,97 @@ namespace aflowlib {
     loop_entries = getSetMultiTables(tables, "loop", true);
     loops = getUniqueFromJsonArrays(loop_entries);
 
+    vector<DBStats> db_stats(ncatalogs + 1);
+    DBStats& total_stats = db_stats[0];  // Declare to make code more legible
+    total_stats = initDBStats("\"total\"", columns, loops);;
+
     for (uint c = 0; c < ncatalogs; c++) {
-      DBStats db_stats = getCatalogStats(catalogs[c], tables, columns, loops);
-      writeStatsToJson(json, db_stats);
+      DBStats& catalog_stats = db_stats[c+1];  // Declare to make code more legible
+      catalog_stats = getCatalogStats(catalogs[c], tables, columns, loops);
+
+      // Add to totals
+      total_stats.nentries += catalog_stats.nentries;
+      // Since we cannot determine which systems are in the ICSD but not
+      // in other catalogs, skip it for the system count. The error should
+      // be small though.
+      if (catalog_stats.catalog != "ICSD") total_stats.nsystems += catalog_stats.nsystems;
+
+      // Columns
+      for (uint i = 0; i < total_stats.columns.size(); i++) {
+        total_stats.count[i][0] += catalog_stats.count[i][0];
+        total_stats.count[i][1] += catalog_stats.count[i][1];
+        //std::cout << total_stats.columns[i] << " " << total_stats.types[i] << std::endl;
+        if ((catalog_stats.types[i] != "bool") && (catalog_stats.count[i][0] + catalog_stats.count[i][1] > 0)) {
+          if (total_stats.types[i] == "number") {
+            //std::cout << total_stats.max[i] << " | " << total_stats.min[i] << std::endl;
+            if (total_stats.max[i].empty()) total_stats.max[i] = catalog_stats.max[i];
+            else if (aurostd::string2utype<double>(catalog_stats.max[i]) > aurostd::string2utype<double>(total_stats.max[i])) total_stats.max[i] = catalog_stats.max[i];
+
+            if (total_stats.min[i].empty()) total_stats.min[i] = catalog_stats.min[i];
+            else if (aurostd::string2utype<double>(total_stats.min[i]) > aurostd::string2utype<double>(catalog_stats.min[i])) total_stats.min[i] = catalog_stats.min[i];
+          }
+
+          // Just append to the sets for now and sort later
+          uint nset = total_stats.set[i].size();
+          for (uint s = 0; s < catalog_stats.set[i].size(); s++) {
+            if ((nset <= _DEFAULT_SET_LIMIT_) && !aurostd::WithinList(total_stats.set[i], catalog_stats.set[i][s])) {
+              total_stats.set[s].push_back(catalog_stats.set[i][s]);
+              nset++;
+            }
+          }
+        }
+      }
+
+      // Loops
+      for (uint i = 0; i < total_stats.loop_counts.size(); i++){
+        total_stats.loop_counts[i].second += catalog_stats.loop_counts[i].second;
+      }
+
+
+      // Species
+      for (uint s = 0; s < catalog_stats.species.size(); s++) {
+        if (!aurostd::WithinList(total_stats.species, catalog_stats.species[s])) {
+          total_stats.species.push_back(catalog_stats.species[s]);
+        }
+      }
+    }
+
+    // Get the sets for the totals
+    for (uint i = 0; i < total_stats.columns.size(); i++) {
+      uint nset = total_stats.set[i].size();
+      if (nset <= _DEFAULT_SET_LIMIT_) {
+        if (total_stats.types[i] == "bool") {
+          total_stats.set[i].clear();
+          total_stats.set[i].push_back("true");
+          total_stats.set[i].push_back("false");
+        } else if (total_stats.types[i] == "number") {
+          vector<double> set_dbl(nset);
+          for (uint s = 0; s < nset; s++) set_dbl[s] = aurostd::string2utype<double>(total_stats.set[i][s]);
+          aurostd::sort(set_dbl, total_stats.set[i]);
+        } else {
+          std::sort(total_stats.set[i].begin(), total_stats.set[i].end());
+        }
+      }
+    }
+    std::sort(total_stats.species.begin(), total_stats.species.end());
+
+    // Write everything now
+    ncatalogs = ncatalogs + 1; // Include totals now
+
+    string tab = "    ";
+    std::stringstream json;
+    json << "{" << std::endl << tab << "\"Aflow_DBs\": {" << std::endl;
+
+    for (uint c = 0; c < ncatalogs; c++) {
+      writeStatsToJson(json, db_stats[c]);
       if (c < ncatalogs - 1) json << ",";
       json << std::endl;
     }
-
     json << tab << "}" << std::endl << "}" << std::endl;
     aurostd::stringstream2file(json, outfile);
   }
 
-  //getCatalogStats///////////////////////////////////////////////////////////
-  // Gets the statistics for all properties in the catalog.
-  DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& tables,
-      const vector<string>& cols, const vector<string>& loops) {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "getCatalogStats():";
-    stringstream message;
-
+  DBStats AflowDB::initDBStats(const string& catalog, const vector<string>& cols, const vector<string>& loops) {
     uint ncols = cols.size();
     uint nloops = loops.size();
 
@@ -1099,8 +1168,23 @@ namespace aflowlib {
     for (uint i = 0; i < ncols; i++) {
       types[i] = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
     }
-
     stats.types = types;
+
+    return stats;
+  }
+
+  //getCatalogStats///////////////////////////////////////////////////////////
+  // Gets the statistics for all properties in the catalog.
+  DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& tables,
+      const vector<string>& cols, const vector<string>& loops) {
+    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "getCatalogStats():";
+    stringstream message;
+
+    uint ncols = cols.size();
+    uint nloops = loops.size();
+
+    DBStats stats = initDBStats(catalog, cols, loops);
+    const vector<string>& types = stats.types;
 
     string where = "catalog='" + catalog + "'";
     vector<string> entries = getPropertyMultiTables("COUNT", tables, "*", where);

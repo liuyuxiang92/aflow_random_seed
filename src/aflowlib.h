@@ -584,6 +584,7 @@ namespace aflowlib {
       vector<string> extractJsonKeysAflow(const string&);
       string extractJsonValueAflow(const string&, string);
 
+      DBStats initDBStats(const string&, const vector<string>&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
       void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
           const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
