@@ -29,6 +29,8 @@
 
 //SYMBOLIC
 
+template <typename T> char const* get_type(T const& object);
+
 // ---------------------------------------------------------------------------
 // mirrors wyckoffsite_ITC, requires SymbolicC++ 
 // instead of adding Symbolic equations to wyckoffsite_ITC (don't want to put 

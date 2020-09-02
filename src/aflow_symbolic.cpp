@@ -46,6 +46,16 @@
 // ---------------------------------------------------------------------------
 // GENERIC SYMBOLIC MATH FUNCTIONS
 
+// ***************************************************************************
+// template <typename T> char const* get_type()
+// ***************************************************************************
+template <typename T> char const* get_type(T const& object) {
+
+  // get the type of the object
+
+  return typeid(*object).name();
+}
+
 // *************************************************************************** 
 // SymbolicWyckoffSite initializeSymbolicWyckoffSite() 
 // *************************************************************************** 
@@ -168,15 +178,17 @@ namespace symbolic {
     
     // ---------------------------------------------------------------------------
     // check that the inputs' types are SymbolicMatrix (vector)
-    const std::type_info& a_vec_info = typeid(a_vec);
-    const std::type_info& b_vec_info = typeid(b_vec);
-    if(a_vec_info.name() != typeid(SymbolicMatrix).name() ||
-        b_vec_info.name() != typeid(SymbolicMatrix).name()){
+    //const std::type_info& a_vec_info = typeid(a_vec);
+    //const std::type_info& b_vec_info = typeid(b_vec);
+    const char* a_vec_info = get_type(a_vec);
+    const char* b_vec_info = get_type(b_vec);
+    if(a_vec_info != typeid(SymbolicMatrix).name() ||
+        b_vec_info != typeid(SymbolicMatrix).name()){
       string function_name = XPID + "symbolic::isEqualVector():"; // definition in loop for efficiency
       stringstream message;
       message << "One or both of the inputs are not a SymbolicMatrix (i.e., typeids are different):"
-        << " a_vec (input) id: " << a_vec_info.name()
-        << " b_vec (input) id: " << b_vec_info.name()
+        << " a_vec (input) id: " << a_vec_info
+        << " b_vec (input) id: " << b_vec_info
         << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
@@ -207,12 +219,13 @@ namespace symbolic {
 
     // ---------------------------------------------------------------------------
     // check that input type is a SymbolicMatrix 
-    const std::type_info& lattice_info = typeid(*lattice);
-    if(lattice_info.name() != typeid(SymbolicMatrix).name()){
+    //const std::type_info& lattice_info = typeid(*lattice);
+    const char* lattice_info = get_type(lattice);
+    if(lattice_info != typeid(SymbolicMatrix).name()){
       string function_name = XPID + "symbolic::matrix2VectorVectorString():";
       stringstream message;
       message << "The input is not a SymbolicMatrix (i.e., typeids are different): lattice (input) id: "
-        << lattice_info.name() << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
+        << lattice_info << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
 
