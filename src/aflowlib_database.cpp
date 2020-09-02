@@ -969,7 +969,7 @@ namespace aflowlib {
           // Most non-keys are filtered out by now. There could still be array
           // elements left. In that case, however, the colon is between the quotes,
           // so make sure that the first two quotes appear before the colon and
-          // take everyting in-between as the key. This breaks if quotes, colons,
+          // take everything in-between as the key. This breaks if quotes, colons,
           // and commas are inside a string in the right sequence, but should not
           // be the case in AFLOW's JSON files.
           if ((quote2 != string::npos) && (quote1 < colon) && (quote2 < colon)) {
@@ -978,7 +978,7 @@ namespace aflowlib {
           }
         }
       }
-      // Move on the the next comma
+      // Move on to the next comma
       lastPos = json.find_first_not_of(",", pos);
       pos = json.find(",", lastPos);
       dpos = pos - lastPos;
@@ -1594,12 +1594,12 @@ namespace aflowlib {
     uint nvals = vals.size();
     if (ncols == 0) {
       string function = XPID +  _AFLOW_DB_ERR_PREFIX_ + "updateRow():";
-      string message = "Could update row. ";
+      string message = "Could not update row. ";
       message += "No columns selected.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     } else if (ncols != nvals) {
       string function = XPID +  _AFLOW_DB_ERR_PREFIX_ + "updateRow():";
-      string message = "Could update row. ";
+      string message = "Could not update row. ";
       message += "Number of columns and number of values do not match.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     } else {
