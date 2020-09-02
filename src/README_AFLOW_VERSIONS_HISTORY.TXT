@@ -36,6 +36,7 @@
         -- Added xstructure::getElements() and xstructure::GetReducedComposition() (DX)
         -- Added getCentroidOfStructure() and getCentroidOfStructurePBC() for periodic systems (DX)
         -- Added sorting functionality for Wyckoff positions (DX)
+        -- Added ANRL prototype keywords (6) to schema (DX)
         -- cleaning up all getElements() variants (CO+DX)
         -- adding aurostd_xparser.cpp .h (CO)
 3.2.4 - 2020/06/25
