@@ -1860,11 +1860,11 @@ namespace aurostd {
     //Given a File, it will return name of decompressed variant
     //NB: Does not actually decompress
     //FileNameOUT="";
-    if(substring2bool(FileNameIN,".xz")) {FileNameOUT=StringSubst(FileNameIN,".xz","");return TRUE;}
-    if(substring2bool(FileNameIN,".bz2")) {FileNameOUT=StringSubst(FileNameIN,".bz2","");return TRUE;}
-    if(substring2bool(FileNameIN,".tar.gz")) {FileNameOUT=StringSubst(FileNameIN,".tar.gz","");return TRUE;}
-    if(substring2bool(FileNameIN,".gz")) {FileNameOUT=StringSubst(FileNameIN,".gz","");return TRUE;}
-    if(substring2bool(FileNameIN,".zip")) {FileNameOUT=StringSubst(FileNameIN,".zip","");return TRUE;}
+    if(FileNameIN.find(".xz")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".xz","");return TRUE;}
+    if(FileNameIN.find(".bz2")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".bz2","");return TRUE;}
+    if(FileNameIN.find(".tar.gz")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".tar.gz","");return TRUE;}
+    if(FileNameIN.find(".gz")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".gz","");return TRUE;}
+    if(FileNameIN.find(".zip")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".zip","");return TRUE;}
     // FileNameOUT=FileNameIN; // dont touch it if not found
     return FALSE;
   }

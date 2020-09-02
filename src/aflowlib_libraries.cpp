@@ -6558,6 +6558,7 @@ namespace aflowlib {
   bool LIB2LIB(const string& options,bool flag_FORCE,bool LOCAL) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20200624
     string soliloquy=XPID+"aflowlib::LIB2LIB():";
+    stringstream message;
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     if(LDEBUG) cerr << soliloquy << " options=" << options << endl;
     vector<string> tokens;
@@ -6643,58 +6644,58 @@ namespace aflowlib {
       // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
       AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name
       if (agl_aflowin_found) {
-	run_directory=true;
-	for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	  aurostd::RemoveFile(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.json"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_energies_temperature.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_energy.json"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_energy_structures.json"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_energy_volume.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_gibbs_energy_pT.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_Hugoniot.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_thermal_properties_temperature.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AGL_THERMO"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
-	}
-	// CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
-	if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-	  // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-	  // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-	  // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
-	  FileLockName = "agl.LOCK";
-	}
-	// [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
-	// [OBSOLETE]  AflowInName="agl_aflow.in";
-	// [OBSOLETE] }
+        run_directory=true;
+        for(uint iext=0;iext<XHOST.vext.size();iext++) {
+          aurostd::RemoveFile(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_edos_gap_pressure.json"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_energies_temperature.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_energy.json"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_energy_structures.json"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_energy_volume.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_gibbs_energy_pT.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_Hugoniot.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_thermal_properties_temperature.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AGL_THERMO"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
+          aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
+        }
+        // CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
+        if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+          // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+          // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+          // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
+          FileLockName = "agl.LOCK";
+        }
+        // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
+        // [OBSOLETE]  AflowInName="agl_aflow.in";
+        // [OBSOLETE] }
       } else {
-	// Check for AEL input file
-	AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found); //CT20200715 Call function to find correct aflow.in file name
-	if (ael_aflowin_found) {
-	  run_directory=true;
-	  for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	    aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
-	    aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
-	    aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
-	    aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
-	    aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
-	  }
-	  // if(_AFLOWIN_=="aflow.in")
-	  if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
-	    //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
-	    //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
-	    FileLockName = "ael.LOCK";
-	  }
-	  // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
-	  // [OBSOLETE]  AflowInName="ael_aflow.in";
-	  // [OBSOLETE] }
-	}
+        // Check for AEL input file
+        AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found); //CT20200715 Call function to find correct aflow.in file name
+        if (ael_aflowin_found) {
+          run_directory=true;
+          for(uint iext=0;iext<XHOST.vext.size();iext++) {
+            aurostd::RemoveFile(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext));
+            aurostd::RemoveFile(directory_LIB+"/AEL_Compliance_tensor.out"+XHOST.vext.at(iext));
+            aurostd::RemoveFile(directory_LIB+"/AEL_Elastic_constants.out"+XHOST.vext.at(iext));
+            aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
+            aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
+          }
+          // if(_AFLOWIN_=="aflow.in")
+          if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
+            //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
+            //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
+            FileLockName = "ael.LOCK";
+          }
+          // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
+          // [OBSOLETE]  AflowInName="ael_aflow.in";
+          // [OBSOLETE] }
+        }
       }
     }	
     //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
@@ -6720,7 +6721,21 @@ namespace aflowlib {
       //set env for RUN_Directory()
       _AFLOWIN_=AflowInName;
       _AFLOWLOCK_=FileLockName;
-      if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".run");} //keep original LOCK
+      
+      //CO20200829 - because of LOCK and agl.LOCK in the same directory, sometimes we see LOCK.xz, we need to decompress
+      //otherwise aflow can't run in the directory
+      if(XHOST.vext.size()!=XHOST.vzip.size()) {  //CO20200829 - check for LOCK.xz and decompress first
+        message << "XHOST.vext.size()!=XHOST.vzip.size()";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
+      }
+      for(uint iext=1;iext<XHOST.vext.size();iext++) {  //CO20200829 - check for LOCK.xz and decompress first // SKIP uncompressed
+        if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext])){
+          aurostd::execute(XHOST.vzip[iext]+" -dqf \""+directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext]+"\"");
+        }
+      }
+      if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){
+        aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".run"); //keep original LOCK
+      }
       KBIN::RUN_Directory(aflags);
 
       //return to original
