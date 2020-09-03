@@ -1935,7 +1935,7 @@ namespace pflow {
           // false: do not check timestamps (always patch)
           return_code = db.patchDatabase(patchfiles, false);
         }
-        if ((return_code < 100) && (return_code >= 200)) {
+        if ((return_code < 100) || (return_code >= 200)) {
             db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         }
         _PROGRAMRUN = true;
