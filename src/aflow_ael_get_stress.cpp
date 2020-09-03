@@ -306,6 +306,7 @@ namespace AEL_functions {
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     string aflowinname = "";
+    uint aelerror = 0, filelength = 0;
     vector<string> vAflowInCheck;
     ael_aflowin_found = false;
     aurostd::xoption USER_AEL_POISSON_RATIO;
@@ -319,17 +320,23 @@ namespace AEL_functions {
       aflowinname = vaflowins.at(iaf);
       if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
+        // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
+        // [OBSOLETE] FileAFLOWINcheck.clear();
+        // [OBSOLETE] FileAFLOWINcheck.seekg(0);
         AflowInCheck="";
-        char c;
+        // [OBSOLETE] char c;
         // READ aflowinname and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
+        // [OBSOLETE] while (FileAFLOWINcheck.get(c)) {
+        // [OBSOLETE]   AflowInCheck+=c;
+        // [OBSOLETE] }
+        // [OBSOLETE] FileAFLOWINcheck.clear();
+        // [OBSOLETE] FileAFLOWINcheck.seekg(0);
+	filelength=aurostd::file2string(FileNameAFLOWINcheck, AflowInCheck);
+	if (filelength > 0) {
+	  aelerror = 0;
+	} else {
+	  aelerror = 1;
+	}	
         AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
         vAflowInCheck.clear();
         aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
@@ -359,7 +366,7 @@ namespace AEL_functions {
 	FileAFLOWINcheck.close();
       }
     }
-    return 0;
+    return aelerror;
   }
 }
 
