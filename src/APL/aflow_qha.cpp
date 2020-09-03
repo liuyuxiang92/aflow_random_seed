@@ -575,28 +575,29 @@ namespace apl
           writeFVT();
 
           if (qha_options.flag("EOS_MODEL:SJ")){
-            writeThermalProperties(EOS_SJ, QHA_CALC);
-            writeTphononDispersions(EOS_SJ, QHA_CALC);
+            writeQHAresults(currentDirectory);
+            writeThermalProperties(EOS_SJ, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_SJ, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM2")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA_CALC);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM3")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM4")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:M")){
-            writeThermalProperties(EOS_MURNAGHAN, QHA_CALC);
-            writeTphononDispersions(EOS_MURNAGHAN, QHA_CALC);
+            writeThermalProperties(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
           }
         }
       }
@@ -606,23 +607,23 @@ namespace apl
         qhanp_data_available = runAPL(xflags, aflags, kflags, QHA_TE);
         if (qhanp_data_available){
           if (qha_options.flag("EOS_MODEL:SJ")){
-            writeThermalProperties(EOS_SJ, QHANP_CALC);
+            writeThermalProperties(EOS_SJ, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM2")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHANP_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM3")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM4")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:M")){
-            writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
+            writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC, currentDirectory);
           }
         }
       }
@@ -642,28 +643,34 @@ namespace apl
 
             if (runQHA3P && eos_static_data_available){
               if (qha_options.flag("EOS_MODEL:SJ")){
-                writeThermalProperties(EOS_SJ, QHA3P_CALC);
-                writeTphononDispersions(EOS_SJ, QHA3P_CALC);
+                writeThermalProperties(EOS_SJ, QHA3P_CALC, currentDirectory);
+                writeTphononDispersions(EOS_SJ, QHA3P_CALC, currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:BM2")){
-                writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC);
-                writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC);
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC,
+                    currentDirectory);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC,
+                    currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:BM3")){
-                writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
-                writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC,
+                    currentDirectory);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC,
+                    currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:BM4")){
-                writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
-                writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC,
+                    currentDirectory);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC,
+                    currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:M")){
-                writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
-                writeTphononDispersions(EOS_MURNAGHAN, QHA3P_CALC);
+                writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC, currentDirectory);
+                writeTphononDispersions(EOS_MURNAGHAN, QHA3P_CALC, currentDirectory);
               }
             }
           }
@@ -671,23 +678,27 @@ namespace apl
           if (runSCQHA && eos_static_data_available){
             if (qha_options.flag("EOS_MODEL:SJ")){
               RunSCQHA(EOS_SJ, true);
-              writeTphononDispersions(EOS_SJ, SCQHA_CALC);
+              writeTphononDispersions(EOS_SJ, SCQHA_CALC, currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM2")){
               RunSCQHA(EOS_BIRCH_MURNAGHAN2, true);
-              writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC,
+                    currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM3")){
               RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
-              writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, SCQHA_CALC);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, SCQHA_CALC,
+                    currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM4")){
               RunSCQHA(EOS_BIRCH_MURNAGHAN4, true);
-              writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, SCQHA_CALC);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, SCQHA_CALC,
+                    currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:M")){
               RunSCQHA(EOS_MURNAGHAN, true);
-              writeTphononDispersions(EOS_MURNAGHAN, SCQHA_CALC);
+              writeTphononDispersions(EOS_MURNAGHAN, SCQHA_CALC,
+                    currentDirectory);
             }
           }
         }
@@ -729,7 +740,8 @@ namespace apl
       }
       else if (file_is_present[i][ST_DF_OUTCAR]) continue;
 
-      if (aurostd::FileExist(subdirectories_static[i]+'/'+_AFLOWIN_)) continue;
+      if (aurostd::FileExist(currentDirectory+'/'+subdirectories_static[i]+'/'
+            +_AFLOWIN_)) continue;
 
       msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -774,25 +786,26 @@ namespace apl
     }
 
     int count = 0;
-    string outcarfile = "", eigenvfile = "", ibzkptfile = "";
+    string outcarfile = "", eigenvfile = "", ibzkptfile = "", directory = "";
     bool all_files_are_present = true;
     for (uint i=0; i<subdirectories_static.size(); i++){
       all_files_are_present = true;
 
-      if (aurostd::IsDirectory(subdirectories_static[i]))
+      directory = currentDirectory + '/' + subdirectories_static[i];
+      if (aurostd::IsDirectory(directory))
         file_is_present[i][ST_DF_DIRECTORY] = true;
       else
         all_files_are_present = false;
 
-      outcarfile = subdirectories_static[i]+"/OUTCAR.static";
+      outcarfile = directory+"/OUTCAR.static";
       if (aurostd::EFileExist(outcarfile))
         file_is_present[i][ST_DF_OUTCAR] = true;
       else
         all_files_are_present = false;
 
       if (includeElectronicContribution){
-        eigenvfile = subdirectories_static[i]+"/EIGENVAL.static";
-        ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
+        eigenvfile = directory+"/EIGENVAL.static";
+        ibzkptfile = directory+"/IBZKPT.static";
 
         if (aurostd::EFileExist(eigenvfile))
           file_is_present[i][ST_DF_EIGENVAL] = true;
@@ -884,7 +897,8 @@ namespace apl
     for (uint i=0; i<subdirectories.size(); i++){
       if (file_is_present[i][PH_DF_HARMIFC]) continue;
 
-      if (aurostd::FileExist(subdirectories[i]+'/'+_AFLOWIN_)) continue;
+      if (aurostd::FileExist(currentDirectory+'/'+subdirectories[i]+'/'+_AFLOWIN_)) 
+        continue;
 
       msg = "Generating aflow.in file in " + subdirectories[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -932,23 +946,24 @@ namespace apl
       (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
 
     int count = 0;
-    string harmifcfile = "", phposcarfile = "";
+    string harmifcfile = "", phposcarfile = "", directory = "";
     bool all_files_are_present = true;
     for (uint i=0; i<subdirectories.size(); i++){
       all_files_are_present = true;
 
-      if (aurostd::IsDirectory(subdirectories[i]))
+      directory = currentDirectory + '/' + subdirectories[i];
+      if (aurostd::IsDirectory(directory))
         file_is_present[i][PH_DF_DIRECTORY] = true;
       else
         all_files_are_present = false;
 
-      harmifcfile=subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
+      harmifcfile=directory+'/'+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
       if (aurostd::EFileExist(harmifcfile))
         file_is_present[i][PH_DF_HARMIFC] = true;
       else
         all_files_are_present = false;
 
-      phposcarfile=subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      phposcarfile=directory+'/'+DEFAULT_APL_PHPOSCAR_FILE;
       if (aurostd::EFileExist(phposcarfile))
         file_is_present[i][PH_DF_PHPOSCAR] = true;
       else
@@ -1066,18 +1081,19 @@ namespace apl
     int Nqpoints = 0;
     bool apl_data_read_successfully = true;
 
-    string phposcarfile = "";
+    string phposcarfile = "", directory = "";
     for (uint i=0; i<subdirectories.size(); i++){
-      phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      directory = currentDirectory + '/' + subdirectories[i];
+      phposcarfile = directory + '/' + DEFAULT_APL_PHPOSCAR_FILE;
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xstructure(phposcarfile, IOVASP_POSCAR));
       phcalc.getSupercell().build(apl_options);  // ME20200518
-      phcalc.setDirectory(subdirectories[i]);
+      phcalc.setDirectory(directory);
       phcalc.setNCPUs(kflags);
       phcalc._system = system_title;
 
-      string hibernation_file = subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX + 
+      string hibernation_file = directory+'/'+DEFAULT_APL_FILE_PREFIX + 
         DEFAULT_APL_HARMIFC_FILE;
       if (aurostd::EFileExist(hibernation_file)){
         msg = "Reading hibernation file...";
@@ -1277,14 +1293,15 @@ namespace apl
     bool data_read_success = true;
 
     xOUTCAR outcar;
-    string outcarfile = "";
+    string outcarfile = "", directory = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
       msg = "Reading data from the static DFT calculation in the ";
       msg += subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
           *p_oss, _LOGGER_MESSAGE_);
 
-      outcarfile = subdirectories_static[i]+'/'+"OUTCAR.static";
+      directory = currentDirectory + '/' + subdirectories_static[i];
+      outcarfile = directory+'/'+"OUTCAR.static";
       if (!outcar.GetPropertiesFile(outcarfile)){
         msg = "Could not read the " + outcarfile + " file";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
@@ -1297,8 +1314,8 @@ namespace apl
 
       Nelectrons = outcar.nelectrons;
 
-      static_eigvals.push_back(xEIGENVAL(subdirectories_static[i]+"/EIGENVAL.static"));
-      static_ibzkpts.push_back(xIBZKPT(subdirectories_static[i]+"/IBZKPT.static"));
+      static_eigvals.push_back(xEIGENVAL(directory+"/EIGENVAL.static"));
+      static_ibzkpts.push_back(xIBZKPT(directory+"/IBZKPT.static"));
 
       if (!static_eigvals.back().m_initialized){
         msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
@@ -2643,22 +2660,23 @@ namespace apl
   /// Grueneisen parameters and average Grueneisen calculated from the thermal
   /// expansion coefficient.
   ///
-  void QHA::writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method)
+  void QHA::writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method,
+      const string &directory)
   {
     string function = XPID + "QHA::writeThermalProperties():";
     string msg = "";
 
     // type of qha calculation
-    string filename = "";
+    string filename = directory + '/';
     switch(qha_method){
       case (QHANP_CALC):
-        filename = DEFAULT_QHANP_FILE_PREFIX;
+        filename += DEFAULT_QHANP_FILE_PREFIX;
         break;
       case (QHA3P_CALC):
-        filename = DEFAULT_QHA3P_FILE_PREFIX;
+        filename += DEFAULT_QHA3P_FILE_PREFIX;
         break;
       case(QHA_CALC):
-        filename = DEFAULT_QHA_FILE_PREFIX;
+        filename += DEFAULT_QHA_FILE_PREFIX;
         break;
       default:
         msg = "Nonexistent QHA method was passed to " + function;
@@ -2831,7 +2849,7 @@ namespace apl
 
   /// Writes the F(V,T) data to aflow.qha.FVT.out file
   ///
-  void QHA::writeFVT()
+  void QHA::writeFVT(const string &directory)
   {
     string function = XPID + "QHA::writeFVT():";
     string msg = "Writing F(V,T) relations to file.";
@@ -2839,7 +2857,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FVT_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE;
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -2928,7 +2946,7 @@ namespace apl
   /// difference method and isochoric specific heat.
   /// Output file: "aflow.qha.gp.avg.out"
   ///
-  void QHA::writeAverageGPfiniteDifferences()
+  void QHA::writeAverageGPfiniteDifferences(const string &directory)
   {
     string function = XPID + "QHA::writeAverageGPfiniteDifferences(): ";
     string msg = "Writing T-dependence of the average Grueneisen parameter.";
@@ -2936,7 +2954,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_GP_AVG_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_GP_AVG_FILE;
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -2970,7 +2988,7 @@ namespace apl
 
   /// Writes the mode-dependent Grueneisen parameters calculated at each q-point in the IBZ.
   ///
-  void QHA::writeGPmeshFD()
+  void QHA::writeGPmeshFD(const string &directory)
   {
     string function = XPID + "QHA::writeGPmeshFD():";
     string msg = "Writing Grueneisen parameters calculated on the mesh of q-points.";
@@ -2978,7 +2996,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_GP_MESH_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_GP_MESH_FILE;
     file.precision(6);
 
     xvector<double> xomega;
@@ -3027,11 +3045,11 @@ namespace apl
   /// Writes the volume-dependent phonon frequencies obtained from the series of EOS APL
   /// calculations.
   ///
-  void QHA::writeFrequencies()
+  void QHA::writeFrequencies(const string &directory)
   {
     string function = XPID + "QHA::writeFrequencies():", msg = "";
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FREQS_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FREQS_FILE;
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << "[QHA_FREQUENCIES]START" << std::endl;
@@ -3052,7 +3070,8 @@ namespace apl
     }
   }
 
-  void QHA::writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method)
+  void QHA::writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
+      const string &directory)
   {
     string function = XPID + "QHA::writeTphononDispersions():", msg = "";
     double V = 0.0; int T = 0;
@@ -3143,16 +3162,16 @@ namespace apl
       stringstream eig_stream;
       eig_stream << eig;
 
-      string filename = "";
+      string filename = directory + '/';
       switch (qha_method){
         case (QHA_CALC):
-          filename = DEFAULT_QHA_FILE_PREFIX;
+          filename += DEFAULT_QHA_FILE_PREFIX;
           break;
         case (QHA3P_CALC):
-          filename = DEFAULT_QHA3P_FILE_PREFIX;
+          filename += DEFAULT_QHA3P_FILE_PREFIX;
           break;
         case (SCQHA_CALC):
-          filename = DEFAULT_SCQHA_FILE_PREFIX;
+          filename += DEFAULT_SCQHA_FILE_PREFIX;
           break;
         case (QHANP_CALC):
           // not supported, this case is handled in an earlier switch statement
@@ -3165,5 +3184,42 @@ namespace apl
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }
+  }
+
+  void QHA::writeQHAresults(const string &directory)
+  {
+    string function = XPID + "QHA::writeQHAresults:";
+    string msg = "Writing properties calculated by QHA into aflow.qha.out file.";
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+        *p_oss, _LOGGER_MESSAGE_);
+
+    xvector<double> F(N_EOSvolumes); // free energy
+    xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
+    for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(0, Vid);
+
+    fitToEOSmodel(F, EOS_SJ);
+    double V0K = EOS_volume_at_equilibrium; // equilibrium volume at 0K
+
+    double T = 300.0;
+    for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(T, Vid);
+    fitToEOSmodel(F, EOS_SJ);
+
+    double bulk_modulus = EOS_bulk_modulus_at_equilibrium;
+    double thermal_expansion = ThermalExpansion(T, EOS_SJ, QHA_CALC);
+
+    double CV = 0.0, grueneisen = 0.0;
+    calcCVandGPfit(T, V0K, CV, grueneisen);
+
+    stringstream aflow_qha_out;
+    aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
+    aflow_qha_out << "[QHA_RESULTS]START" << endl;
+    aflow_qha_out << "grueneisen_qha = " << grueneisen << endl;
+    aflow_qha_out << "thermal_expansion_300K_qha = " << thermal_expansion * 1e5;
+    aflow_qha_out << " (10^-5/K)" << endl;
+    aflow_qha_out << "modulus_bulk_static_300K_qha = " << bulk_modulus;
+    aflow_qha_out << " (GPa)" << endl;
+    aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
+    aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
+    aurostd::stringstream2file(aflow_qha_out, directory + "/aflow.qha.out");
   }
 }

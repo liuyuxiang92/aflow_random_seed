@@ -1232,13 +1232,16 @@ namespace apl
       double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
       void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
       // output
-      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
-      void   writeFVT();
+      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method, 
+          const string &directory=".");
+      void   writeFVT(const string &directory=".");
       void   writeGPpath(double V, const string &directory=".");
-      void   writeAverageGPfiniteDifferences();
-      void   writeGPmeshFD();
-      void   writeFrequencies();
-      void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method);
+      void   writeAverageGPfiniteDifferences(const string &directory=".");
+      void   writeGPmeshFD(const string &directory=".");
+      void   writeFrequencies(const string &directory=".");
+      void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
+          const string &directory=".");
+      void   writeQHAresults(const string &directory=".");
       // members
       xoption apl_options;
       xoption qha_options;
