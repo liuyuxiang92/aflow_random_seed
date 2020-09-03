@@ -1683,9 +1683,9 @@ namespace compare {
           str_proto_tmp.structure_representative_source="aurl";
           str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
           str_proto_tmp.stoichiometry=tmp_reduced_stoich;
+          str_proto_tmp.elements=species; //DX20200903 - needs to be before prettyPrintCompound()
           str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
           //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
-          str_proto_tmp.elements=species;
           str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
           str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
           // store any properties 

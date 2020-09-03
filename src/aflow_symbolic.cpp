@@ -52,6 +52,8 @@
 template <typename T> char const* get_type(T const& object) {
 
   // get the type of the object
+  // this function is needed to avoid compiler warning so that
+  // the template type can be recognized at compile time
 
   return typeid(*object).name();
 }
@@ -178,10 +180,8 @@ namespace symbolic {
     
     // ---------------------------------------------------------------------------
     // check that the inputs' types are SymbolicMatrix (vector)
-    //const std::type_info& a_vec_info = typeid(a_vec);
-    //const std::type_info& b_vec_info = typeid(b_vec);
-    const char* a_vec_info = get_type(a_vec);
-    const char* b_vec_info = get_type(b_vec);
+    const char* a_vec_info = get_type(a_vec); //DX20200901
+    const char* b_vec_info = get_type(b_vec); //DX20200901
     if(a_vec_info != typeid(SymbolicMatrix).name() ||
         b_vec_info != typeid(SymbolicMatrix).name()){
       string function_name = XPID + "symbolic::isEqualVector():"; // definition in loop for efficiency
@@ -219,8 +219,7 @@ namespace symbolic {
 
     // ---------------------------------------------------------------------------
     // check that input type is a SymbolicMatrix 
-    //const std::type_info& lattice_info = typeid(*lattice);
-    const char* lattice_info = get_type(lattice);
+    const char* lattice_info = get_type(lattice); //DX20200901
     if(lattice_info != typeid(SymbolicMatrix).name()){
       string function_name = XPID + "symbolic::matrix2VectorVectorString():";
       stringstream message;
