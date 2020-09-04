@@ -129,7 +129,7 @@ namespace pocc {
       // [OBSOLETE] }
       aelerror = AEL_functions::AEL_Get_AflowInName(AflowInName, pocc_directory_abs, ael_aflowin_found);
       if (aelerror != 0) {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AEL aflow.in filename [dir="+pocc_directory_abs+"]",_GENERIC_ERROR_);
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AEL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
       }
       if (ael_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/ael.LOCK")) {
@@ -886,7 +886,7 @@ namespace pocc {
       //CT20200722 Run AGL postprocessing through KBIN
       aglerror = AGL_functions::AGL_Get_AflowInName(AflowInName, pocc_directory_abs, agl_aflowin_found);
       if (aglerror != 0) {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AGL aflow.in filename [dir="+pocc_directory_abs+"]",_GENERIC_ERROR_);
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AGL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
       }
       if (agl_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/agl.LOCK")) {
