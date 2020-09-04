@@ -122,7 +122,7 @@ namespace cce {
   void append_coordination_info_JSON(const xstructure& structure, const CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& json);
   string print_JSON_ox_nums(const xstructure& structure, const CCE_Variables& cce_vars);
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
-  string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, double tolerance);
+  string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
   void append_coordination_info_output(const xstructure& structure, const CCE_Variables& cce_vars, double tolerance, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& output);
   string print_output_oxidation_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce);
