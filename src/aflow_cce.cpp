@@ -111,8 +111,10 @@ namespace cce {
       } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
         oss << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
       } else {
-        // print oxidation_numbers
-        oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
+        //// print oxidation_numbers
+        //oss << endl;
+        //oss << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
+        //oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
         // print CCE corrections & corrected formation enthalpies per cell and atom
         oss << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
         // print CCE citation
@@ -2665,8 +2667,8 @@ namespace cce {
               oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
               print_previous_output=FALSE; // previously gathered output should only be printed once
             }
-	    string info_missing_corrections=structure.atoms[i].cleanname + " in oxidation state " + aurostd::utype2string<double>(cce_vars.oxidation_states[i]) + " coordinated by " + considered_anion_species;
-            oss << "BAD NEWS: No correction available for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " in oxidation state " << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << "." << endl;
+	    string info_missing_corrections=structure.atoms[i].cleanname + " in oxidation state " + "+" + aurostd::utype2string<double>(cce_vars.oxidation_states[i]) + " coordinated by " + considered_anion_species;
+            oss << "BAD NEWS: No correction available for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << "." << endl; // i+1 to convert to human based counting from 1
             if (missing_corrections.size() == 0) {
               missing_corrections.push_back(info_missing_corrections);
             } else if (missing_corrections[missing_corrections.size()-1] != info_missing_corrections) {
@@ -2686,9 +2688,9 @@ namespace cce {
             } else {
               // list all oxidation states of the element for which corrections are available
               string ox_nums_avail="";
-              string separator=", ";
+              string separator=", +";
               ox_nums_avail = aurostd::joinWDelimiter(ox_nums_avail_vec, separator);
-              oss << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << considered_anion_species << " are available for oxidation states: " << ox_nums_avail << endl;
+              oss << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << considered_anion_species << " are available for oxidation states: " << "+" << ox_nums_avail << endl;
               oss << "If the desired oxidation state is listed but it is just not correctly determined," << endl;
               oss << "you might want to consider supplying the oxidation numbers manually by using the option --oxidation_numbers=." << endl;
             }
@@ -2709,7 +2711,7 @@ namespace cce {
     }
     if(error && !cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
       // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
-      message << " BAD NEWS: No correction available for " << aurostd::joinWDelimiter(missing_corrections, ", ") << "." << endl;
+      message << " BAD NEWS: No correction available for " << std::showpos << aurostd::joinWDelimiter(missing_corrections, ", ") << "." << endl;
       message << " See also the output for details.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
@@ -3048,17 +3050,17 @@ namespace cce {
   string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream output;
     output << endl;
-    output << "CATION COORDINATION NUMBERS:" << endl;
-    output << "atom" << setw(10) << "species" << setw(8) << "anion" << setw(22) << "coordination number" << endl;
+    //output << "CATION COORDINATION NUMBERS:" << endl;
+    output << std::setw(4) << "atom" << std::setw(10) << "species" << std::setw(8) << "anion" << std::setw(16) << "coord. number" << endl;
     for (uint i=0,isize=structure.atoms.size();i<isize;i++){
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
         if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
-          output << setw(4) << i+1 << setw(10) << structure.atoms[i].cleanname << setw(8) << cce_vars.anion_species << setw(22) << cce_vars.num_neighbors[i] << endl; // i+1: convert to 1-based counting
+          output << std::setw(4) << i+1 << std::setw(10) << structure.atoms[i].cleanname << std::setw(8) << cce_vars.anion_species << std::setw(16) << cce_vars.num_neighbors[i] << endl; // i+1: convert to 1-based counting
         }
         if (cce_flags.flag("MULTI_ANION_SYSTEM")){
           for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
             if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the multi anion species
-              output << setw(4) << i+1 << setw(10) << structure.atoms[i].cleanname << setw(8) << cce_vars.multi_anion_species[k] << setw(22) << multi_anion_num_neighbors[k][i] << endl; // i+1: convert to 1-based counting
+              output << std::setw(4) << i+1 << std::setw(10) << structure.atoms[i].cleanname << std::setw(8) << cce_vars.multi_anion_species[k] << std::setw(16) << multi_anion_num_neighbors[k][i] << endl; // i+1: convert to 1-based counting
             }
           }
         }
@@ -3102,10 +3104,10 @@ namespace cce {
     stringstream output;
     // print oxidation numbers
     output << endl;
-    output << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
-    output << "atom" << setw(10) << "species" << setw(18) << "oxidation state" << endl;
+    //output << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
+    output << std::setw(4) << "atom" << std::setw(10) << "species" << std::setw(18) << "oxidation state" << endl;
     for (uint k=0,ksize=cce_vars.oxidation_states.size();k<ksize;k++){
-      output << std::showpos << setw(4) << k+1 << setw(10) << structure.atoms[k].cleanname << setw(18) << cce_vars.oxidation_states[k] << endl; // k+1: convert to 1-based counting
+      output << std::showpos << std::setw(4) << k+1 << std::setw(10) << structure.atoms[k].cleanname << std::setw(18) << cce_vars.oxidation_states[k] << endl; // k+1: convert to 1-based counting
     }
     output << endl;
     return output.str();
@@ -3116,52 +3118,52 @@ namespace cce {
   string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce) {
     stringstream output;
     // print out CCE corrections per cell and atom for functionals selected
+    output << endl;
     if (!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == "exp")){ // if only exp is set as functional CCE CORRECTIONS: should not be written
       output << "CCE CORRECTIONS (to be subtracted from precalculated DFT formation enthalpies):" << endl;
-      output << "functional" << setw(14) << "temperature" << setw(13) << "correction" << setw(13) << "correction" << endl;
-      output << setw(24) << "(K)" << setw(13) << "(eV/cell)" << setw(13) << "(eV/atom)" << endl;
+      output << std::setw(10) << "functional" << std::setw(14) << "temperature" << std::setw(13) << "correction" << std::setw(13) << "correction" << endl;
+      output << std::setw(24) << "(K)" << std::setw(13) << "(eV/cell)" << std::setw(13) << "(eV/atom)" << endl;
     }
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] != "exp") {
         for (uint l = 0; l < num_temps; l++) {
-          output << std::showpos << std::setprecision(3) << std::fixed << setw(10) << cce_vars.vfunctionals[k] << setw(14) << cce_vars.vtemperatures[l] << setw(13) << cce_vars.cce_correction[num_temps*k+l] << setw(13) << cce_vars.cce_correction[num_temps*k+l]/structure.atoms.size() << endl;
+          output << std::showpos << std::setprecision(3) << std::fixed << std::setw(10) << cce_vars.vfunctionals[k] << std::setw(14) << cce_vars.vtemperatures[l] << std::setw(13) << cce_vars.cce_correction[num_temps*k+l] << std::setw(13) << cce_vars.cce_correction[num_temps*k+l]/structure.atoms.size() << endl;
         }
-        output << endl;
       }
     }
+    output << endl;
     // exp result should always be written at the end, hence print only after writing output for other functionals
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] == "exp" && cce_vars.enthalpies_dft.size()==0) { // second condition for that if precalc. form. enthalpies are given and asking for exp., exp. result is not written twice
         output << "CCE FORMATION ENTHALPIES:" << endl;
-        output << "CCE@func." << setw(14) << "temperature" << setw(17) << "form. enthalpy" << setw(17) << "form. enthalpy" << endl;
-        output << setw(23) << "(K)" << setw(17) << "(eV/cell)" << setw(17) << "(eV/atom)" << endl;
-        output << std::showpos << std::setprecision(3) << std::fixed << setw(9) << "CCE@exp" << setw(14) << "298.15" << setw(17) << enthalpy_formation_cell_cce[num_temps*k] << setw(17) << enthalpy_formation_cell_cce[num_temps*k]/structure.atoms.size() << endl;
+        output << std::setw(9) << "CCE@func." << std::setw(14) << "temperature" << std::setw(17) << "form. enthalpy" << std::setw(17) << "form. enthalpy" << endl;
+        output << std::setw(23) << "(K)" << std::setw(17) << "(eV/cell)" << std::setw(17) << "(eV/atom)" << endl;
+        output << std::showpos << std::setprecision(3) << std::fixed << std::setw(9) << "CCE@exp" << std::setw(14) << "298.15" << std::setw(17) << enthalpy_formation_cell_cce[num_temps*k] << std::setw(17) << enthalpy_formation_cell_cce[num_temps*k]/structure.atoms.size() << endl;
         output << "Note that CCE@exp provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
-        output << endl;
       }
     }
     // print CCE formation enthalpies per cell and atom for functionals selected 
     // if precalculated DFT values are provided
     if(cce_vars.enthalpies_dft.size()!=0){ 
       output << "CCE FORMATION ENTHALPIES:" << endl;
-      output << "CCE@func." << setw(14) << "temperature" << setw(17) << "form. enthalpy" << setw(17) << "form. enthalpy" << endl;
-      output << setw(23) << "(K)" << setw(17) << "(eV/cell)" << setw(17) << "(eV/atom)" << endl;
+      output << std::setw(9) <<  "CCE@func." << std::setw(14) << "temperature" << std::setw(17) << "form. enthalpy" << std::setw(17) << "form. enthalpy" << endl;
+      output << std::setw(23) << "(K)" << std::setw(17) << "(eV/cell)" << std::setw(17) << "(eV/atom)" << endl;
       uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
         if (cce_vars.vfunctionals[k] != "exp") {
           for (uint l = 0; l < num_temps; l++) {
-            output << std::showpos << std::setprecision(3) << std::fixed << setw(9) << "CCE@" + cce_vars.vfunctionals[k] << setw(14) << cce_vars.vtemperatures[l] << setw(17) << enthalpy_formation_cell_cce[num_temps*k+l] << setw(17) << enthalpy_formation_cell_cce[num_temps*k+l]/structure.atoms.size() << endl;
+            output << std::showpos << std::setprecision(3) << std::fixed << std::setw(9) << "CCE@" + cce_vars.vfunctionals[k] << std::setw(14) << cce_vars.vtemperatures[l] << std::setw(17) << enthalpy_formation_cell_cce[num_temps*k+l] << std::setw(17) << enthalpy_formation_cell_cce[num_temps*k+l]/structure.atoms.size() << endl;
           }
-          output << endl;
         } else if (cce_vars.vfunctionals[k] == "exp") {
-          output << std::showpos << std::setprecision(3) << std::fixed << setw(9) << "CCE@exp" << setw(14) << "298.15" << setw(17) << enthalpy_formation_cell_cce[num_temps*k] << setw(17) << enthalpy_formation_cell_cce[num_temps*k]/structure.atoms.size() << endl;
-          output << "Note that CCE@exp provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
           output << endl;
+          output << std::showpos << std::setprecision(3) << std::fixed << std::setw(9) << "CCE@exp" << std::setw(14) << "298.15" << std::setw(17) << enthalpy_formation_cell_cce[num_temps*k] << std::setw(17) << enthalpy_formation_cell_cce[num_temps*k]/structure.atoms.size() << endl;
+          output << "Note that CCE@exp provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
         }
       }
     }
+    output << endl;
     return output.str();
   }
 
