@@ -1348,7 +1348,7 @@ namespace aflowlib {
       cout << soliloquy << " AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
       cout << soliloquy << " VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
       //ME20200207 - the system name is the canonical title
-      aflowlib_data.title = system_name;  //ME20200207  //CO20200624
+      //aflowlib_data.title = KBIN::ExtractSystemName(directory_LIB);  //ME20200207  //OBSOLETE ME20200829 - not used anymore
 
       //[OBSOLETE] //ME20190125 BEGIN - Build the title of the calculation
       //[OBSOLETE] vector<string> tokens;

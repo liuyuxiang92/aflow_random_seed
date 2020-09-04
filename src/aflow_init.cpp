@@ -2872,10 +2872,11 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
-    nschema++;
+    // OBSOLETE ME20200829
+    //XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
+    //XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
+    //XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
+    //nschema++;
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:VALENCE_CELL_IUPAC","valence_cell_iupac");
