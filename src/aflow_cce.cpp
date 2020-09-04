@@ -3261,12 +3261,10 @@ namespace cce {
   // print citation information at end of output
   string print_citation() {
     stringstream oss;
-    oss << "#########################################################################################################" << endl;
-    oss << "When you obtain results using the CCE methodology and/or this implementation," << endl; 
-    oss << "please cite the following article:" << endl;
-    oss << "Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);" << endl; 
-    oss << "https://doi.org/10.1038/s41524-019-0192-1" << endl;
-    oss << "#########################################################################################################" << endl;
+    oss << "############################################################################################" << endl;
+    oss << "When you use results from CCE and/or this implementation, please cite the following article:" << endl;
+    oss << "Friedrich et al., npj Comput. Mater. 5, 59 (2019); https://doi.org/10.1038/s41524-019-0192-1" << endl;
+    oss << "############################################################################################" << endl;
     oss << endl;
     return oss.str();
   }
