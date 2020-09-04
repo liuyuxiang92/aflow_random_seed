@@ -185,6 +185,8 @@ namespace cce {
     } else {
       // print cation coordination numbers
       oss << print_output_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
+      // print CCE citation
+      oss << print_citation();
     }
   }
 
@@ -208,6 +210,8 @@ namespace cce {
     } else {
       // print oxidation numbers
       oss << print_output_oxidation_numbers(structure, cce_flags, cce_vars);
+      // print CCE citation
+      oss << print_citation();
     }
   }
 
