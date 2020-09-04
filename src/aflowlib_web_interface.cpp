@@ -558,7 +558,7 @@ namespace aflowlib {
         }
         //CO20180409 - added the else if's for speed, no need to go through more checks than necessary
         else if(keyword=="aurl") {aurl=content;aurostd::string2tokens(content,stokens,":");for(uint j=0;j<stokens.size();j++) vaurl.push_back(stokens.at(j));}
-        else if(keyword=="title") {title=content;}  //ME20190129
+        //else if(keyword=="title") {title=content;}  //ME20190129 // OBSOLETE ME20200829 - not used anymore
         else if(keyword=="keywords") {keywords=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vkeywords.push_back(stokens.at(j));}
         else if(keyword=="aflowlib_date") {aflowlib_date=content;}
         else if(keyword=="aflowlib_version") {aflowlib_version=content;}
@@ -884,7 +884,7 @@ namespace aflowlib {
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
       oss << "aurl=" << aurl << (html?"<br>":"") << endl;
-      oss << "title=" << title << (html?"<br>":"") << endl;  //ME20190129
+      //oss << "title=" << title << (html?"<br>":"") << endl;  //ME20190129  // OBSOLETE ME20200829 - not used anymore
       oss << "keywords=" << keywords << (html?"<br>":"") << "  vkeywords= ";for(uint j=0;j<vkeywords.size();j++) oss << vkeywords.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "Optional controls keywords (alphabetic order)" << endl;
       oss << "aflowlib_date=" << aflowlib_date << (html?"<br>":"") << endl; 
@@ -1112,7 +1112,7 @@ namespace aflowlib {
       if(auid.size()) sss << "" << "aurl=" << aurl << eendl;
       if(auid.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "auid=" << auid << eendl;
       if(data_api.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_api=" << data_api << eendl;
-      if(!title.empty()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "title=" << title << eendl;  //ME20190125
+      //if(!title.empty()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "title=" << title << eendl;  //ME20190125 // OBSOLETE ME20200829 - not used anymore
       if(data_source.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_source=" << data_source << eendl;
       if(data_language.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_language=" << data_language << eendl;
       if(error_status.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "error_status=" << error_status << eendl;
@@ -1382,12 +1382,13 @@ namespace aflowlib {
 
       //ME20190125 BEGIN
       //////////////////////////////////////////////////////////////////////////
-      if(!title.empty()) {
-        sscontent_json << "\"title\":\"" << title << "\"" << eendl;
-      } else {
-        if(PRINT_NULL) sscontent_json << "\"title\":null" << eendl;
-      }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      // OBSOLETE ME20200829 - not used anymore
+      //if(!title.empty()) {
+      //  sscontent_json << "\"title\":\"" << title << "\"" << eendl;
+      //} else {
+      //  if(PRINT_NULL) sscontent_json << "\"title\":null" << eendl;
+      //}
+      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
       //ME20190125 END
 

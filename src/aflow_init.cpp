@@ -2174,6 +2174,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:CATALOG","string");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:COEFFICIENT_ENTROPY_STABILIZATION","coefficient_entropy_stabilization");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:COEFFICIENT_ENTROPY_STABILIZATION","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:COEFFICIENT_ENTROPY_STABILIZATION","number");
+    nschema++;
+    //CO20200829 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:CODE","code");
     XHOST.vschema.push_attached("SCHEMA::UNIT:CODE","");
@@ -2263,6 +2271,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:DFT_TYPE","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:DFT_TYPE","string");
     nschema++;
+
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DISTANCE_HULL","distance_hull");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DISTANCE_HULL","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DISTANCE_HULL","number");
+    nschema++;
+    //CO20200829 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_ATOM","eentropy_atom");
@@ -2365,6 +2381,15 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:GEOMETRY_ORIG","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:GEOMETRY_ORIG","numbers");
     nschema++;
+
+
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GROUND_STATE","ground_state");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GROUND_STATE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GROUND_STATE","bool");
+    nschema++;
+    //CO20200829 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
@@ -2787,10 +2812,11 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
-    nschema++;
+    // OBSOLETE ME20200829
+    //XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
+    //XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
+    //XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
+    //nschema++;
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:VALENCE_CELL_IUPAC","valence_cell_iupac");
