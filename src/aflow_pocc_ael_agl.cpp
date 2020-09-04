@@ -85,7 +85,7 @@ namespace pocc {
   void POccCalculator::generateElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::generateElasticProperties():";
-    // [OBSOLETE] uint aelerror = 0;
+    uint aelerror = 0;
     if(LDEBUG) {
       cerr << soliloquy << " BEGIN" << endl;
     }
@@ -127,7 +127,10 @@ namespace pocc {
       // [OBSOLETE] if (aelerror > 0) {
       // [OBSOLETE]   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       // [OBSOLETE] }
-      AEL_functions::AEL_Get_AflowInName(AflowInName, pocc_directory_abs, ael_aflowin_found);
+      aelerror = AEL_functions::AEL_Get_AflowInName(AflowInName, pocc_directory_abs, ael_aflowin_found);
+      if (aelerror != 0) {
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AEL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
+      }
       if (ael_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/ael.LOCK")) {
           FileLockName = "ael.LOCK";
@@ -222,7 +225,8 @@ namespace pocc {
         elastic_tensor.clear();
         compliance_tensor.clear();
       } else {
-        cerr << soliloquy << pocc_directory_abs << "/aflow.ael.out: File not found" << endl;
+        // [OBSOLETE] cerr << soliloquy << pocc_directory_abs << "/aflow.ael.out: File not found" << endl;
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
     }
   }
@@ -836,7 +840,7 @@ namespace pocc {
   // [OBSOLETE] void POccCalculator::generateDebyeThermalProperties(uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom)
   void POccCalculator::generateDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
-    // [OBSOLETE] uint aglerror = 0;
+    uint aglerror = 0;
     string soliloquy="POccCalculator::generateDebyeThermalProperties():";
     if(LDEBUG) {
       cerr << soliloquy << " BEGIN" << endl;
@@ -880,7 +884,10 @@ namespace pocc {
       // [OBSOLETE]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       // [OBSOLETE] }
       //CT20200722 Run AGL postprocessing through KBIN
-      AGL_functions::AGL_Get_AflowInName(AflowInName, pocc_directory_abs, agl_aflowin_found);
+      aglerror = AGL_functions::AGL_Get_AflowInName(AflowInName, pocc_directory_abs, agl_aflowin_found);
+      if (aglerror != 0) {
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AGL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
+      }
       if (agl_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/agl.LOCK")) {
           FileLockName = "agl.LOCK";
@@ -962,7 +969,8 @@ namespace pocc {
         agl_gibbs_energies_atom.push_back(agl_gibbs_energy_atom);
         agl_vibrational_energies_atom.push_back(agl_vibrational_energy_atom);
       } else {
-        cerr << soliloquy << pocc_directory_abs << "/aflow.agl.out: File not found" << endl;
+        // [OBSOLETE] cerr << soliloquy << pocc_directory_abs << "/aflow.agl.out: File not found" << endl;
+	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
     }
   }
