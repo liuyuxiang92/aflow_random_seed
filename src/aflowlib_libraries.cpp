@@ -1306,7 +1306,7 @@ namespace aflowlib {
       // build aflowlib_data.aurl
       aflowlib_data.aurl="aflowlib.duke.edu:"+directory_LIB;
  
-      if(false){
+      if(true){
         aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
         aurostd::StringSubst(aflowlib_data.aurl,"/home/corey/common","common"); //CO20200731 DEBUGGING ONLY
       }
