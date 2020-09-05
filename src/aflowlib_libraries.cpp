@@ -1289,7 +1289,7 @@ namespace aflowlib {
     //[CO20200624 - OBSOLETE]  if(i<vspecies.size()-1)  aflowlib_data.species+=",";
     //[CO20200624 - OBSOLETE]}    // plug vspecies into aflowlib_data
     
-    string system_name=KBIN::ExtractSystemName(directory_LIB);
+    aflowlib_data.system_name=KBIN::ExtractSystemName(directory_LIB); //ME20200207 - the system name is the canonical title
 
     if(perform_THERMODYNAMICS||perform_POCC) {
       aurostd::string2tokens(directory_LIB,tokens,"/");
@@ -1347,8 +1347,6 @@ namespace aflowlib {
       cout << soliloquy << " AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl; 
       cout << soliloquy << " AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
       cout << soliloquy << " VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
-      //ME20200207 - the system name is the canonical title
-      //aflowlib_data.title = KBIN::ExtractSystemName(directory_LIB);  //ME20200207  //OBSOLETE ME20200829 - not used anymore
 
       //[OBSOLETE] //ME20190125 BEGIN - Build the title of the calculation
       //[OBSOLETE] vector<string> tokens;
@@ -1472,14 +1470,14 @@ namespace aflowlib {
       aurostd::xoption vpflow;  //dummy
       if(estructure::DOSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
         json_file << _json_file.str() << endl; _json_file.str("");
-        cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_dosdata.json") << endl; cout.flush();
-        aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_dosdata.json");
+        cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata.json") << endl; cout.flush();
+        aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+aflowlib_data.system_name+"_dosdata.json");
         json_file.str("");
         if(aurostd::EFileExist(directory_LIB+"/EIGENVAL.bands") && aurostd::EFileExist(directory_LIB+"/KPOINTS.bands")) {
           if(estructure::BANDSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
             json_file << _json_file.str() << endl; _json_file.str("");
-            cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+system_name+"_bandsdata.json") << endl; cout.flush();
-            aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+system_name+"_bandsdata.json");
+            cout << soliloquy << " compressing file: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata.json") << endl; cout.flush();
+            aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,json_file,directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata.json");
             json_file.str("");
           }
         }
@@ -1598,13 +1596,13 @@ namespace aflowlib {
     // MOVE/LINK PICS data
 
     if(flag_WEB) {
-      cout << soliloquy << " linking SYSTEM=" << system_name << endl;
-      if(aurostd::FileExist(directory_RAW+"/"+system_name+".png") ||
-          aurostd::FileExist(directory_RAW+"/"+system_name+"_banddos.png") ||  //ME20190621 - new file name convention
+      cout << soliloquy << " linking SYSTEM=" << aflowlib_data.system_name << endl;
+      if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+".png") ||
+          aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_banddos.png") ||  //ME20190621 - new file name convention
           FALSE){
         aurostd::LinkFile(directory_RAW+"/*png",directory_WEB);            // LINK
       }
-      if(aurostd::FileExist(directory_RAW+"/"+system_name+".cif")) aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK //CO20200624 - adding FileExist() check
+      if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+".cif")) aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK //CO20200624 - adding FileExist() check
 
       if(aurostd::FileExist(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php")) aurostd::LinkFile(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php",directory_RAW+"/index.php");                      // LINK //CO20200624 - adding FileExist() check
       if(aurostd::FileExist(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php")) aurostd::LinkFile(DEFAULT_AFLOWDATA_WEB_DIRECTORY+"/api_index.php",directory_WEB+"/index.php");                      // LINK //CO20200624 - adding FileExist() check
@@ -1639,38 +1637,38 @@ namespace aflowlib {
       } // ilink
       // PREVIOUSLY IN NETFLIX // cheat for void string
       for(uint iout=0;iout<vout.size();iout++) {
-        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout))) {
-          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
-          aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax"+vout.at(iout),directory_WEB);  //CO20171024
+        if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_structure_relax"+vout.at(iout))) {
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_structure_relax"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_structure_relax"+vout.at(iout),directory_WEB);  //CO20171024
         }  // FileExist
       } // iout
       for(uint iout=0;iout<vout.size();iout++) {
-        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout))) {
-          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
-          aurostd::LinkFile(directory_RAW+"/"+system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  //CO20171024
+        if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_structure_relax1"+vout.at(iout))) {
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_structure_relax1"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_structure_relax1"+vout.at(iout),directory_WEB);  //CO20171024
         } // FileExist
       } // iout
       for(uint iout=0;iout<vout.size();iout++) {
-        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)))  {  // NO EXTENSION
-          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
-          aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout),directory_WEB);       //CO20171024
+        if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata"+vout.at(iout)))  {  // NO EXTENSION
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata"+vout.at(iout),directory_WEB);       //CO20171024
         }
         for(uint iext=0;iext<XHOST.vext.size();iext++) {
-          if(aurostd::FileExist(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)))  {
-            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-            aurostd::LinkFile(directory_RAW+"/"+system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       //CO20171024
+          if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)))  {
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+            aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_dosdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);       //CO20171024
           } // FileExist
         } // iext
       } // iout
       for(uint iout=0;iout<vout.size();iout++) {
-        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout))) { // NO EXTENSION
-          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
-          aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout),directory_WEB);     //CO20171024
+        if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata"+vout.at(iout))) { // NO EXTENSION
+          if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata"+vout.at(iout)) << endl; cout.flush(); }
+          aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata"+vout.at(iout),directory_WEB);     //CO20171024
         } // FileExist
         for(uint iext=0;iext<XHOST.vext.size();iext++) {
-          if(aurostd::FileExist(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext))) {
-            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
-            aurostd::LinkFile(directory_RAW+"/"+system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     //CO20171024
+          if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext))) {
+            if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext)) << endl; cout.flush(); }
+            aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_bandsdata"+vout.at(iout)+XHOST.vext.at(iext),directory_WEB);     //CO20171024
           } // FileExist
         } // iext
       } // iout
@@ -1692,12 +1690,12 @@ namespace aflowlib {
         //CO20200624 - we don't need to worry about zipped variants, this analysis is done in RAW only (no LIB compression)
         //H15Th4_ICSD_638495_Bader_50_H.jvxl - 50 will always exist
         if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+"*jvxl") << endl; cout.flush(); }
-        if(aflowlib_data.vspecies.size()>0 && aurostd::FileExist(directory_RAW+"/"+system_name+"_Bader_50_"+aflowlib_data.vspecies[0]+".jvxl")){  //CO20200624 - adding FileExist() check
+        if(aflowlib_data.vspecies.size()>0 && aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_Bader_50_"+aflowlib_data.vspecies[0]+".jvxl")){  //CO20200624 - adding FileExist() check
           aurostd::LinkFile(directory_RAW+"/"+"*jvxl*",directory_WEB);         // LINK
         }
         //H15Th4_ICSD_638495_abader.out
-        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+system_name+"_abader.out") << endl; cout.flush(); }  //CO20200624
-        if(aurostd::FileExist(directory_RAW+"/"+system_name+"_abader.out")) aurostd::LinkFile(directory_RAW+"/"+system_name+"_abader.out",directory_WEB); // LINK //CO20200624  //CO20200624 - adding FileExist() check
+        if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+aflowlib_data.system_name+"_abader.out") << endl; cout.flush(); }  //CO20200624
+        if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.system_name+"_abader.out")) aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.system_name+"_abader.out",directory_WEB); // LINK //CO20200624  //CO20200624 - adding FileExist() check
       }
     } // flag_WEB
     
@@ -2616,7 +2614,7 @@ namespace aflowlib {
     aflags.Directory=directory_RAW;
     ofstream FileMESSAGE; //dummy ofstream, not really used
     if(LDEBUG) cerr << soliloquy << " [-2]" << endl;
-    string system_name=KBIN::ExtractSystemName(directory_LIB);
+    //[CO20200829 - inside data]string system_name=KBIN::ExtractSystemName(directory_LIB);
     if(LDEBUG) cerr << soliloquy << " [-3]" << endl;
     //CO+DX STOP 20170713 - adding symmetry output to RAW
     //    if(LDEBUG) cerr << soliloquy << " data.aurl=" << data.aurl << endl;
@@ -3017,7 +3015,7 @@ namespace aflowlib {
       str_orig=_str_orig;
       str_orig.SetSpecies(deq_species); //DX20190620 - add species to xstructure
       str_orig.ReScale(1.0);
-      //xstr_js.str("");xstr_js << xstructure2json(str_orig);aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_orig.json");
+      //xstr_js.str("");xstr_js << xstructure2json(str_orig);aurostd::stringstream2file(xstr_js,directory_RAW+"/"+data.system_name+"_structure_orig.json");
     } //CO20171025
 
     if(LDEBUG) cerr << soliloquy << " [7.1]" << endl;
@@ -3029,7 +3027,7 @@ namespace aflowlib {
       str_relax.ReScale(1.0);
       xstr_js.str("");
       xstr_js << xstructure2json(str_relax); //DX20190620 - bug fix; orig->relax
-      aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax.json");
+      aurostd::stringstream2file(xstr_js,directory_RAW+"/"+data.system_name+"_structure_relax.json");
     } //CO20171025
 
     if(LDEBUG) cerr << soliloquy << " [7.2]" << endl;
@@ -3041,7 +3039,7 @@ namespace aflowlib {
       str_relax.ReScale(1.0);
       xstr_js.str("");
       xstr_js << xstructure2json(str_relax); //DX20190620 - bug fix; orig->relax
-      aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax.json");
+      aurostd::stringstream2file(xstr_js,directory_RAW+"/"+data.system_name+"_structure_relax.json");
     } //CO20171025
 
     if(LDEBUG) cerr << soliloquy << " [7.3]" << endl;
@@ -3053,7 +3051,7 @@ namespace aflowlib {
       str_relax1.ReScale(1.0);
       xstr_js.str("");
       xstr_js << xstructure2json(str_relax1); //DX20190620 - bug fix; orig->relax1
-      aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax1.json");
+      aurostd::stringstream2file(xstr_js,directory_RAW+"/"+data.system_name+"_structure_relax1.json");
     } //CO20171025
     // do the extractions
 
@@ -5056,7 +5054,7 @@ namespace aflowlib {
 
     vector<string> vline,tokens;
     stringstream abader_ss;
-    string abader_out=data.title+"_abader.out"; //CO20200731 - not prototype, title
+    string abader_out=data.system_name+"_abader.out"; //CO20200731 - not prototype, title
 
     abader_ss.clear();
     if(aurostd::FileExist(directory_RAW+"/"+abader_out)) {
@@ -5345,7 +5343,7 @@ namespace aflowlib {
     data.vloop.push_back("pocc");
     
     //CMo_pvNb_svTa_pvV_svW_pv:PAW_PBE.AB_cF8_225_a_b.AB:POCC_P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF
-    data.pocc_parameters=data.title;
+    data.pocc_parameters=data.system_name;
     string::size_type loc;
     loc=data.pocc_parameters.find(POCC_TITLE_TAG);
     data.pocc_parameters=data.pocc_parameters.substr(loc+POCC_TITLE_TAG.size(),string::npos);

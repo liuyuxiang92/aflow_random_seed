@@ -51,7 +51,7 @@ namespace aflowlib {
       string auid;                                              // AFLOW UNIQUE IDENTIFIER
       deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
-      //string title;                                           //ME20190125 - title of the calculation  // OBSOLETE ME20200829 - not used anymore
+      string system_name;                                       //ME20190125 - system_name of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
       string aflowlib_date;vector<string> vaflowlib_date;       // CONTAINS 2 DATES: [0]=lock_date, [1]=lib2raw_date
       string aflowlib_version;                                  // version
