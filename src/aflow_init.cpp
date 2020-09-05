@@ -2399,7 +2399,7 @@ namespace init {
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPY_FORMING_ABILITY","entropy_forming_ability");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPY_FORMING_ABILITY","(ev/atom)^{-1}");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPY_FORMING_ABILITY","(eV/atom)^{-1}");
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPY_FORMING_ABILITY","number");
     nschema++;
     //CO20200829 END
