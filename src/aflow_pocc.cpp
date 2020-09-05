@@ -257,8 +257,12 @@ namespace pocc {
 
 namespace pocc {
   bool structuresGenerated(const string& directory){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pocc::structuresGenerated():";
     string file="";
+    if(LDEBUG){cerr << soliloquy << " aurostd::EFileExist(" << directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE << ")=" << aurostd::EFileExist(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,file) << endl;}
     if(!aurostd::EFileExist(directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,file)){return false;} //CO20200606 - necessary because efile2tempfile is verbose
+    if(LDEBUG){cerr << soliloquy << " aurostd::EFileNotEmpty(" << file << ")=" << aurostd::EFileNotEmpty(file) << endl;}
     if(aurostd::EFileNotEmpty(file)){return true;}
     return false;
   }

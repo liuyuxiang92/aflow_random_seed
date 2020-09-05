@@ -6633,6 +6633,7 @@ namespace aflowlib {
     //[CO20200624 - OBSOLETE]else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
     if(pocc::structuresGenerated(directory_LIB)){ //CO20200624
       run_directory=true;
+      if(LDEBUG){cerr << soliloquy << " FOUND POCC" << endl;}
       if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing")){
         if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".old")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".old",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".OLD")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".OLD",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
