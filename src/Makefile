@@ -1139,7 +1139,7 @@ check_full:
 	$(MAKE) check_smith
 	$(MAKE) check_proto
 	$(MAKE) check_slab
-	$(MAKE) check_chull
+	#[TO BE ADDED BACK WITH THE NEXT VERSION]$(MAKE) check_chull
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
