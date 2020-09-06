@@ -16,14 +16,13 @@
 
 //using namespace std;
 
-//*************************************
-// Output the error message to cerr
-//*************************************
-void ErrorMessage(const string & errmsg, int errnr) {
-  cerr << errmsg << endl;
-  cerr << "Abort the program ... \n";
-  exit(errnr);
-}
+//[CO20200624 - OBSOLETE]//*************************************
+//[CO20200624 - OBSOLETE]// Output the error message to cerr
+//[CO20200624 - OBSOLETE]//*************************************
+//[CO20200624 - OBSOLETE]void ErrorMessage(const string & errmsg, int errnr) {
+//[CO20200624 - OBSOLETE]  cerr << errmsg << endl;
+//[CO20200624 - OBSOLETE]  cerr << "Abort the program ... \n";
+//[CO20200624 - OBSOLETE]}
 
 //*************************************
 // Wrapper for generate new training item
@@ -41,6 +40,7 @@ void GenerateNewTrainingItem(string & SL_name) {
 // Generate new training item
 //*************************************
 void CalculateNewStateAFLOW(string & SL_name) {
+  string soliloquy=XPID+"CalculateNewStateAFLOW():";
 
   pid_t pID;
   int child_exit_status;
@@ -74,8 +74,7 @@ void CalculateNewStateAFLOW(string & SL_name) {
   pID= fork();
   if( pID < 0 ) {
     // fail to fork
-    cerr << "Fail to fork !\n";
-    exit(_EXIT_FAIL_FORK);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"fail to fork",_RUNTIME_ERROR_); //CO20200624
   } else if( pID == 0 ) {
     // child process
 
@@ -148,8 +147,7 @@ void CalculateNewStateAFLOW(string & SL_name) {
 //    pID= fork();
 //    if( pID < 0 ) {
 //        // fail to fork
-//        cerr << "Fail to fork !\n";
-//        exit(_EXIT_FAIL_FORK);
+//        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"fail to fork",_RUNTIME_ERROR_); //CO20200624
 //    } else if( pID == 0 ) {
 //        // child process
 //

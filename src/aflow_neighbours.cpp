@@ -229,7 +229,6 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   //    }
   //    }
   //
-  //    exit(0);
   //
   //    //    for(ii=0;ii<str.ashell.size();ii++) cout << str.ashell.at(ii) << " " << str.ashell.at(ii).reference << endl;
   //
@@ -256,7 +255,6 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   //    str.write_DEBUG_flag=TRUE;
   //    cout << a << endl;
   //
-  //    exit(0);
   //    str.neighbours_calculated=TRUE;
   //    // Krun=(Krun && SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,kflags.KBIN_NEIGHBOURS_WRITE));
   //    //  a=str;

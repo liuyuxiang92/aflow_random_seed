@@ -116,6 +116,8 @@ namespace chull {
   bool nonZeroWithinTol(double val,double tol=ZERO_TOL);
   bool subspaceBelongs(const xvector<int>& space,const xvector<int>& subspace);
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive);
+  xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present); //truncated arbitrary coords
+  vector<uint> getRelevantIndices(const xvector<int>& elements_present);
 } // namespace chull
 
 //CO20180420 - moved to xStream (aflow.h)
@@ -201,7 +203,7 @@ namespace chull {
       double m_dist_2_hull; //warning, this is not TRUE dist to hull (facet), this is vertical distance
       //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]xvector<double> m_decomp_coefs; //un-reduced coefficients here, reduced exist at the m_coord_groups level
       double m_stability_criterion;
-      double m_n_plus_1_energy_gain;
+      double m_n_plus_1_enthalpy_gain;
 
       //flags - MOVED TO xStream
       //aurostd::xoption m_cflags;
@@ -223,7 +225,6 @@ namespace chull {
       bool isGState() const;
       xvector<double> getStoichiometricCoords() const; //get stoichiometric coordinates (sans energetic coordinate)
       xvector<double> getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred=frac_vrt) const;
-      xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) const; //truncated arbitrary coords
       xvector<double> getTruncatedSCoords(const xvector<int>& elements_present) const; //truncate stoichiometry
       xvector<double> getTruncatedCCoords(const xvector<int>& elements_present,bool reduce=true) const; //similar to truncated stoichiometry, but in integer form (if not POCC)
       xvector<double> getReducedCCoords() const;  //reduce by gcd()
@@ -239,12 +240,13 @@ namespace chull {
       double getDist2Hull(char units=_std_) const;
       double getStabilityCriterion(char units=_std_) const;
       double getRelativeStabilityCriterion() const;
-      double getNPlus1EnergyGain(char units=_std_) const;
+      double getNPlus1EnthalpyGain(char units=_std_) const;
 
       //setters
       void setHullCoords();
       void setHullCoords(const xvector<double>& coords);
       void setHullCoords(const xvector<int>& elements_present);
+      void reduceCoords(const xvector<int>& elements_present);
 
       //general methods
       bool entryIdentical(const aflowlib::_aflowlib_entry& other) const;
@@ -490,7 +492,7 @@ namespace chull {
       vector<uint> m_equivalent_g_states; //structure comparison
       vector<uint> m_sym_equivalent_g_states; //structure comparison
       double m_stability_criterion; //g-states only
-      double m_n_plus_1_energy_gain;     //g-states only
+      double m_n_plus_1_enthalpy_gain;     //g-states only
       bool m_icsd_g_state;          //whether icsd exists among equivalent states
       uint m_i_canonical_icsd;      //canonical icsd entry (lowest number)
 
@@ -523,7 +525,7 @@ namespace chull {
 
       //initializer
       void initialize(const xvector<int>& elements_present);
-      bool belongs2Hull(const xvector<int>& hull_elements_present) const;  //checks if alloy is a member of the hull (via hull_elements_present)
+      bool belongs2Hull(const xvector<int>& elements_present_hull) const;  //checks if alloy is a member of the hull (via elements_present_hull)
 
       //attributes
       bool m_initialized;
@@ -733,10 +735,18 @@ namespace chull {
       double getStabilityCriterion(const string& cauid) const;
       double getStabilityCriterion(uint cpoint) const;
       vector<double> getStabilityCriterion(const vector<string>& vcauid) const;
-      vector<double> getStabilityCriterion(const vector<uint>& vcpoint) const;
-      void getFakeHull(const vector<uint>& vcpoint,ConvexHull& fake_hull) const;
-      double getNPlus1EnergyGain(const string& cauid) const;
-      double getNPlus1EnergyGain(uint cpoint) const;
+      vector<double> getStabilityCriterion(const vector<uint>& vcpoints) const;
+      void getFakeHull(const vector<uint>& vcpoints,ConvexHull& fake_hull) const;
+      void getFakeHull(const vector<uint>& vcpoints,const xvector<int>& elements_present,ConvexHull& fake_hull) const;
+      void getFakeHull(const vector<uint>& vcpoints,const xvector<int>& elements_present_hull,const xvector<int>& elements_present_points,ConvexHull& fake_hull) const;
+      double getNPlus1EnthalpyGain(const string& cauid) const;
+      double getNPlus1EnthalpyGain(const string& cauid,ConvexHull& fake_hull,bool hull_set) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<string>& vcauid) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<string>& vcauid,ConvexHull& fake_hull,bool hull_set) const;
+      double getNPlus1EnthalpyGain(uint cpoint) const;
+      double getNPlus1EnthalpyGain(uint cpoint,ConvexHull& fake_hull,bool hull_set) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoints) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoint,ConvexHull& fake_hull,bool hull_set) const;
 
       //writer
       bool write(filetype ftype=latex_ft) const;
@@ -827,6 +837,8 @@ namespace chull {
       void removeDuplicateHullPoints();
       void calculateFacets();
       const xvector<int>& getElementsPresent(uint i_nary,uint i_alloy) const;
+      const xvector<int>& getElementsPresent(uint ipoint) const;
+      xvector<int> getElementsPresent(const vector<uint>& vcpoints) const;
       void setElementsPresent(uint i_nary,uint i_alloy);
       void addRelevantUnariesToHullCalculation(uint i_nary,uint i_alloy);
       void addRelevantUnariesToHullCalculation(xvector<int>& elements_present);
@@ -862,7 +874,9 @@ namespace chull {
       void thermodynamicsPostProcessing();
       void calculate();
       void setStabilityCriterion();
-      void setNPlus1EnergyGain();
+      void setNPlus1EnthalpyGain(uint i_point);
+      void setNPlus1EnthalpyGain(uint i_point,ConvexHull& fake_hull,bool hull_set);
+      void setNPlus1EnthalpyGain();
       void cleanHull(); //clean state of hull
 
       //writer functions

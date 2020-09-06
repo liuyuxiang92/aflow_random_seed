@@ -424,13 +424,13 @@ namespace KBIN {
 
     // First check if relaxation has already been performed
     for (uint i = 1; i <= num_relax; i++) {
-      string filename = aurostd::CleanFileName(xvasp.Directory) + "CONTCAR.relax" + aurostd::utype2string<int>(num_relax);
+      string filename = aurostd::CleanFileName(xvasp.Directory + "/CONTCAR.relax" + aurostd::utype2string<int>(i));  //CO20200624 - patching --run vs --run=1 bug
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Relaxation CONTCAR filename = " << filename << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if (aurostd::FileExist(filename) || aurostd::FileExist(filename + ".xz")) {
         aurostd::StringstreamClean(aus);
-        aus << _AGLSTR_MESSAGE_ + "Relaxation " << i << " has aleady completed"  << endl;  
+        aus << _AGLSTR_MESSAGE_ + "Relaxation " << i << " has already completed"  << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       } else {
         aurostd::StringstreamClean(aus);
@@ -441,7 +441,7 @@ namespace KBIN {
     }
     if (relax_complete) {
       aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ + "Relaxation has aleady completed"  << endl;  
+      aus << _AGLSTR_MESSAGE_ + "Relaxation has already completed"  << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 0;
     } else {
@@ -471,7 +471,7 @@ namespace KBIN {
   // Run AGL postprocessing: calls AGL from other parts of AFLOW, to run AGL postprocessing on previously run calculations
   // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
   //  void VASP_RunPhonons_AGL_postprocess(  _xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE)
-  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, const string& AflowInName, const string& FileLockName) {  
+  void VASP_RunPhonons_AGL_postprocess(const string& directory_LIB, string& AflowInName, string& FileLockName) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
     // [OBSOLETE] uint aglerror = 0;
@@ -485,11 +485,17 @@ namespace KBIN {
 
     // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
     uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
-    if (aglerror != 0) {
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_ERROR_ + "AGL set xvasp flags failed" << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      return;
+    if (aglerror != 0) { //CT20200624: Check for error, aglerror=2 implies not an AGL main directory
+      if (aglerror == 2) {
+	cerr << _AGLSTR_MESSAGE_ << "Not AGL main directory" << endl;
+	cerr << _AGLSTR_MESSAGE_ << AflowInName << endl;
+	return;
+      } else {
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_ERROR_ + "AGL set xvasp flags failed" << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	return;
+      }
     }
 
     // Set AGL postprocess flag to true
@@ -554,8 +560,7 @@ namespace AGL_functions {
     } else {
       AflowInName = _AFLOWIN_;
     }
-
-
+    
     // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
     uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
 
@@ -2407,7 +2412,7 @@ namespace AGL_functions {
             aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
             aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
             aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
-            ((XHOST.POSTPROCESS || AGL_data.postprocess) &&
+            ((XHOST.ARUN_POSTPROCESS || AGL_data.postprocess) &&
              ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
               (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
               (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
@@ -2431,7 +2436,7 @@ namespace AGL_functions {
         }
 
         // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-        if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {
+        if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
           // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
           // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
           // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
@@ -2485,7 +2490,7 @@ namespace AGL_functions {
       // If the data does not have a minimum, then this section of the code will add additional strained structures until a minimum is found
       // If the structure has been properly relaxed prior to running AFLOW AGL, then this problem should not occur
       // If this part of the code produces warnings, you should check the relaxation of the initial structure
-      if(USER_CHECK_EV_MIN.option && !(XHOST.POSTPROCESS || AGL_data.postprocess)) {
+      if(USER_CHECK_EV_MIN.option && !(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Checking location of energy minimum" << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2623,7 +2628,7 @@ namespace AGL_functions {
             continue;
           }
           // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-          if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {
+          if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
             // [OBSOLETE] if(aglerror != 0) {
@@ -2764,7 +2769,7 @@ namespace AGL_functions {
             continue;
           } 	  	  
           // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-          if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {	  
+          if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {	  
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
             // [OBSOLETE] if(aglerror != 0) {
@@ -2818,7 +2823,7 @@ namespace AGL_functions {
       // Problems with the concavity of the (E, V) data are usually caused by an insufficient basis set or k-point mesh
       // If the data is not concave, then this section of the code will increase the density of the k-point mesh and rerun the VASP calculations
       // If this part of the code produces warnings, you should check the k-point mesh and the basis set
-      if(USER_CHECK_EV_CONCAVITY.option && !(XHOST.POSTPROCESS || AGL_data.postprocess)) {	  
+      if(USER_CHECK_EV_CONCAVITY.option && !(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {	  
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Checking concavity of (E, V) data" << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

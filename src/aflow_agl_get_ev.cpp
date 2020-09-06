@@ -27,7 +27,7 @@
 // The following functions are for setting up AGL inputs for postprocessing runs called from other parts of AFLOW
 // *****************************************************************************************************************
 namespace AGL_functions {
-  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, const string& AflowInName, const string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
+  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string& AflowInName, string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
     ifstream FileAFLOWIN, FileAFLOWINcheck;
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
@@ -44,57 +44,81 @@ namespace AGL_functions {
     aflags.KBIN_GEN_AFLOWIN_FROM_VASP=FALSE;
     aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN=FALSE;
     aflags.KBIN_DELETE_AFLOWIN=FALSE;
+    //CT20200721 The following code has been moved to the function AGL_Get_AflowInName
     // Set FileMESSAGE name
-    if(FileLockName.length() > 0) {
-      if (aurostd::FileExist(directory_LIB+"/"+FileLockName)) {
-        aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+" ")+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+".run"));   
-      }
-      string FileNameMessage=directory_LIB+"/"+FileLockName;
-      FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
-    } else {
-      if (aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-        aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/agl.LOCK ")+aurostd::CleanFileName(directory_LIB+"/agl.LOCK.run"));
-      }
-      string FileNameMessage=directory_LIB+"/agl.LOCK";
-      FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
-    }
+    // [OBSOLETE] if(FileLockName.length() > 0) { //CT20200624 Moved down: only rename LOCK files if it is confirmed that this is an AGL main directory and not an ARUN.AGL directory
+    // [OBSOLETE]   if (aurostd::FileExist(directory_LIB+"/"+FileLockName)) {
+    // [OBSOLETE]     aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+" ")+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+".run"));   
+    // [OBSOLETE]   }
+    // [OBSOLETE]   string FileNameMessage=directory_LIB+"/"+FileLockName;
+    // [OBSOLETE]   FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+    // [OBSOLETE] } else {
+    // [OBSOLETE]   if (aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+    // [OBSOLETE]     aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/agl.LOCK ")+aurostd::CleanFileName(directory_LIB+"/agl.LOCK.run"));
+    // [OBSOLETE]   }
+    // [OBSOLETE]   string FileNameMessage=directory_LIB+"/agl.LOCK";
+    // [OBSOLETE]   FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+    // [OBSOLETE] }
     //CO20200502 START - CT, I am consolidating the following code with an outer loop, it should make it easier to patch in the future
-    vector<string> vaflowins;
-    if(AflowInName.length()>0){vaflowins.push_back(AflowInName);} // Check if AflowInName exists
-    if(_AFLOWIN_.length()>0){vaflowins.push_back(_AFLOWIN_);} // Otherwise, check if _AFLOWIN_ file is AGL input file
-    vaflowins.push_back("agl_aflow.in");  // Otherwise, check for other commonly used names for AGL aflow.in file:
-    for(uint iaf=0;iaf<vaflowins.size()&&!agl_aflowin_found;iaf++){
-      const string& aflowinname = vaflowins.at(iaf);
-      if((!agl_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
-        FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck="";
-        char c;
-        // READ aflowinname and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
-        AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
-        vAflowInCheck.clear();
-        aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
-        // Check if aflowinname contains command to run AGL
-        for(uint i=0;i<vAflowInCheck.size()&&!agl_aflowin_found;i++){
-          if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
-              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
-                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
-            FileNameAFLOWIN = FileNameAFLOWINcheck;
-            agl_aflowin_found = true;
-          }
-        }
-      }
-    }
+    // [OBSOLETE] vector<string> vaflowins;
+    // [OBSOLETE] if(AflowInName.length()>0){vaflowins.push_back(AflowInName);} // Check if AflowInName exists
+    // [OBSOLETE] if(_AFLOWIN_.length()>0){vaflowins.push_back(_AFLOWIN_);} // Otherwise, check if _AFLOWIN_ file is AGL input file
+    // [OBSOLETE] vaflowins.push_back("agl_aflow.in");  // Otherwise, check for other commonly used names for AGL aflow.in file:
+    // [OBSOLETE] for(uint iaf=0;iaf<vaflowins.size()&&!agl_aflowin_found;iaf++){
+    // [OBSOLETE]   const string& aflowinname = vaflowins.at(iaf);
+    // [OBSOLETE]   if((!agl_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
+    // [OBSOLETE]     FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
+    // [OBSOLETE]     cerr << "FileNameAFLOWINcheck = " << FileNameAFLOWINcheck << endl;
+    // [OBSOLETE]     FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
+    // [OBSOLETE]     FileAFLOWINcheck.clear();
+    // [OBSOLETE]     FileAFLOWINcheck.seekg(0);
+    // [OBSOLETE]     AflowInCheck="";
+    // [OBSOLETE]     char c;
+    // [OBSOLETE]     // READ aflowinname and put into AflowInCheck
+    // [OBSOLETE]     while (FileAFLOWINcheck.get(c)) {
+    // [OBSOLETE]       AflowInCheck+=c;
+    // [OBSOLETE]     }
+    // [OBSOLETE]     FileAFLOWINcheck.clear();
+    // [OBSOLETE]     FileAFLOWINcheck.seekg(0);
+    // [OBSOLETE]     AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
+    // [OBSOLETE]     vAflowInCheck.clear();
+    // [OBSOLETE]     aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
+    // [OBSOLETE]     // Check if aflowinname contains command to run AGL
+    // [OBSOLETE]     for(uint i=0;i<vAflowInCheck.size()&&!agl_aflowin_found;i++){
+    // [OBSOLETE]       if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
+    // [OBSOLETE]           !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
+    // [OBSOLETE]             aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
+    // [OBSOLETE]         FileNameAFLOWIN = FileNameAFLOWINcheck;
+    // [OBSOLETE]         agl_aflowin_found = true;
+    // [OBSOLETE]       }
+    // [OBSOLETE]     }
+    // [OBSOLETE]     FileAFLOWINcheck.close();
+    // [OBSOLETE]   }
+    // [OBSOLETE] }
+
+    //CT20200721 Calls function AGL_Get_AflowInName to find correct aflow.in filename
+    AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found);
+    FileNameAFLOWIN = directory_LIB+"/"+AflowInName;
 
     //CO20200502 STOP - CT, I am consolidating the following code with an outer loop, it should make it easier to patch in the future
     if (agl_aflowin_found) {
+      // Set FileMESSAGE name
+      //CT20200624 Moved down so LOCK file is only renamed if this is actually an AGL main directory and not an ARUN.AGL directory
+      // [OBSOLETE] cerr << _AGLSTR_MESSAGE_ << "FileLockName = " << FileLockName << endl;
+      if(FileLockName.length() > 0) {
+	if (aurostd::FileExist(directory_LIB+"/"+FileLockName)) {
+	  aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+" ")+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+".run"));   
+	}
+	string FileNameMessage=directory_LIB+"/"+FileLockName;
+	FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+      } else {
+	if (aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+	  aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/agl.LOCK ")+aurostd::CleanFileName(directory_LIB+"/agl.LOCK.run"));
+	}
+	string FileNameMessage=directory_LIB+"/agl.LOCK";
+	FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+      }
+      // Search for AGL aflow.in filename
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "AFLOW Input file name = " << FileNameAFLOWIN << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
@@ -215,11 +239,70 @@ namespace AGL_functions {
         return 1;
       }
     } else {
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "AGL input file not found!" << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      return 1;
+      // [OBSOLETE] aurostd::StringstreamClean(aus); 
+      cerr << _AGLSTR_MESSAGE_ << "AGL input file not found!" << endl; //CT20200624 If no AGL file present, then this is not an AGL main directory: write to cerr and return 2 to inform calling function
+      cerr << _AGLSTR_MESSAGE_ << "Not an AGL main directory" << endl;
+      // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return 2;
     }     
+  }
+}
+
+
+// *****************************************************************************************************************
+// Finds aflow.in file for AGL calculation (if it exists) //CT20200713
+// *****************************************************************************************************************
+namespace AGL_functions {
+  uint AGL_Get_AflowInName(string& AflowInName, const string& directory_LIB, bool& agl_aflowin_found) {
+    ifstream FileAFLOWIN, FileAFLOWINcheck;
+    string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
+    string FileNameMessage = "";
+    string aflowinname = "";
+    uint aglerror = 0, filelength = 0;
+    vector<string> vAflowInCheck;
+    agl_aflowin_found = false;
+    vector<string> vaflowins;
+    if(AflowInName.length()>0){vaflowins.push_back(AflowInName);} // Check if AflowInName exists
+    if(_AFLOWIN_.length()>0){vaflowins.push_back(_AFLOWIN_);} // Otherwise, check if _AFLOWIN_ file is AGL input file
+    vaflowins.push_back("agl_aflow.in");  // Otherwise, check for other commonly used names for AGL aflow.in file
+    for(uint iaf=0;iaf<vaflowins.size()&&!agl_aflowin_found;iaf++){
+      aflowinname = vaflowins.at(iaf);
+      if((!agl_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
+        FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
+        // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
+        // [OBSOLETE] FileAFLOWINcheck.clear();
+        // [OBSOLETE] FileAFLOWINcheck.seekg(0);
+        AflowInCheck="";
+        // [OBSOLETE] char c;
+        // READ aflowinname and put into AflowInCheck
+        // [OBSOLETE] while (FileAFLOWINcheck.get(c)) {
+	// [OBSOLETE]  AflowInCheck+=c;
+        // [OBSOLETE] }
+        // [OBSOLETE] FileAFLOWINcheck.clear();
+        // [OBSOLETE] FileAFLOWINcheck.seekg(0);
+	filelength=aurostd::file2string(FileNameAFLOWINcheck, AflowInCheck);
+	if (filelength > 0) {
+	  aglerror = 0;
+	} else {
+	  aglerror = 1;
+	}
+        AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
+        vAflowInCheck.clear();
+        aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
+        // Check if aflowinname contains command to run AGL
+        for(uint i=0;i<vAflowInCheck.size()&&!agl_aflowin_found;i++){
+          if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
+              !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
+                aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
+            FileNameAFLOWIN = FileNameAFLOWINcheck;
+            agl_aflowin_found = true;
+	    AflowInName = aflowinname;
+          }
+        }
+	FileAFLOWINcheck.close();
+      }
+    }
+    return aglerror;
   }
 }
 
@@ -265,7 +348,7 @@ namespace AGL_functions {
     // SOME WARNINGS: check existence of LOCK and OUTCAR.static files
     // [OBSOLETE] if( !aurostd::FileExist( vaspRun.Directory + "/"+_AFLOWLOCK_ ) && aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.static") ) )
     if( !(aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) ||
-          ((XHOST.POSTPROCESS || AGL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) &&
+          ((XHOST.ARUN_POSTPROCESS || AGL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) &&
         ( vfileexist ) ) {
       aurostd::StringstreamClean(aus);
       // [OBOLSETE] aus << _AGLSTR_WARNING_ + "found OUTCAR.static but no LOCK in " <<  vaspRun.Directory << endl;
@@ -300,7 +383,7 @@ namespace AGL_functions {
 
     // [OBSOLETE] if( aurostd::FileExist( vaspRun.Directory + "/"+_AFLOWLOCK_ ) && !aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.static") ) )
     if( (aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) ||
-          ((XHOST.POSTPROCESS || AGL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) &&
+          ((XHOST.ARUN_POSTPROCESS || AGL_data.postprocess) && (aurostd::FileExist(dirrunname + "/agl.LOCK") || aurostd::FileExist(dirrunname + "/LOCK")))) &&
         !(vfileexist) ) {
       aurostd::StringstreamClean(aus);
       // [OBSOLETE] aus << _AGLSTR_WARNING_ + "found LOCK but no OUTCAR.static in " <<  vaspRun.Directory << endl;
@@ -715,7 +798,7 @@ namespace AGL_functions {
 
       // If the LOCK file is missing, then it is probably a corrupted run
       // Do not accept it and wait for the new run
-      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ )) {
+      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) && !((XHOST.ARUN_POSTPROCESS || AGL_data.postprocess) && ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) || (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) || (aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK"))))) { //CT20200625 Modify to check for other LOCK file names if postprocessing run
         aurostd::StringstreamClean(aus);
         aus <<  _AGLSTR_WARNING_ + "The " << _AFLOWLOCK_ << " file in " << vaspRuns.at(idVaspRun).Directory << " directory is missing." << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

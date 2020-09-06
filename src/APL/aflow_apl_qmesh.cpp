@@ -205,7 +205,7 @@ namespace apl {
       min_distances[i] = aurostd::modulus(_recCell.lattice(i))/((double) _qptGrid[i]);
     }
     double min_dist = aurostd::min(min_distances);
-    double tol = _ZERO_TOL_LOOSE_;
+    double tol = _FLOAT_TOL_;
     _recCell.skewed = SYM::isLatticeSkewed(_recCell.lattice, min_dist, tol);
 
     // Calculate the crystallographic point group of the reciprocal cell.
