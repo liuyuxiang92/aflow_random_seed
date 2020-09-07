@@ -3675,12 +3675,11 @@ namespace anrl {
           vparameters.clear();
           vparameters=tmp;
         }
-        // -------------------------------------------------------------------------
-        // if only one parameter is needed, then an enumeration is not given,
-        // signaling that the symmetry fixes the degrees of freedom (i.e., there is
-        // only ONE possible structure with this label (aside from volume scaling)
         else{
-          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choice(s).";
+          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choice(s):";
+          for(uint i=0;i<vparameters.size();i++){
+            message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
+          }
           throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
@@ -3693,7 +3692,7 @@ namespace anrl {
         message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
         for(uint i=0;i<vparameters.size();i++){
           message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
-        }   
+        }
         message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }

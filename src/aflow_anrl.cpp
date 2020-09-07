@@ -3149,6 +3149,10 @@ namespace anrl {
         // only one degree of freedom
         choice = 0; //only one possiblity
         if(number_id.size()!=0){ 
+          // -------------------------------------------------------------------------
+          // if only one parameter is needed, then an enumeration is not given,
+          // signaling that the symmetry fixes the degrees of freedom (i.e., there is
+          // only ONE possible structure with this label (aside from volume scaling)
           stringstream message;
           message << vlabel.at(ifound) << " only has one degree of freedom (lattice parameter), i.e., no enumerated suffix necessary." << endl; 
           throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
