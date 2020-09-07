@@ -3675,12 +3675,21 @@ namespace anrl {
           vparameters.clear();
           vparameters=tmp;
         }
+        // -------------------------------------------------------------------------
+        // if only one parameter is needed, then an enumeration is not given,
+        // signaling that the symmetry fixes the degrees of freedom (i.e., there is
+        // only ONE possible structure with this label (aside from volume scaling)
         else{
           message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choice(s).";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
+        // -------------------------------------------------------------------------
+        // we do not automatically assign the enumeration suffix to the label
+        // (even if there there is currently only one prototype with a label)
+        // otherwise, the command without the suffix may break in the future
+        // (cannot auto-assign when more than one choice, e.g., -001 or -002)
         message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
         for(uint i=0;i<vparameters.size();i++){
           message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
