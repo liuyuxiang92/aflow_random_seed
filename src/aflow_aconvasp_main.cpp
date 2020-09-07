@@ -11537,7 +11537,7 @@ namespace pflow {
     uint site;
     POCCSiteSpecification pss;
     uint iatom;
-    vector<string> poce_str_typenations; //quick way to check if there are duplicate specifications
+    vector<string> pocc_designations; //quick way to check if there are duplicate specifications
     for(uint i=0;i<pocc_sites.size();i++){
       const string& ps=pocc_sites[i];
       if(ps.empty()){
@@ -11554,11 +11554,11 @@ namespace pflow {
         message << "No mode specified [designation=" << ps << "]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      if(aurostd::WithinList(poce_str_typenations,designation)){
+      if(aurostd::WithinList(pocc_designations,designation)){
         message << "Duplicate POCC designation: " << designation;
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      poce_str_typenations.push_back(designation);
+      pocc_designations.push_back(designation);
       mode=designation[0];
       _site=designation;_site.erase(_site.begin());
       if(!aurostd::isfloat(_site)){
