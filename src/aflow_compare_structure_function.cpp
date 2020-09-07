@@ -6228,13 +6228,13 @@ namespace compare{
     if(USE_CENTROID_METHOD){
       for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].mass = GetAtomMass(xstr1_atoms[i].name)/AMU2KILOGRAM; cerr << xstr1_atoms[i].name << " -> " << xstr1_atoms[i].mass << endl;}
       xstr1_centroid = getCentroidOfStructure(xstr1_atoms,true,false);
-      //xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
+      xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
     }
     deque<_atom> PROTO_atoms = _PROTO_atoms;
     if(USE_CENTROID_METHOD){
       for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].mass = GetAtomMass(PROTO_atoms[i].name)/AMU2KILOGRAM;}
       PROTO_centroid = getCentroidOfStructure(PROTO_atoms,true,false);
-      //PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
+      PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
     }
 
     if(USE_CENTROID_METHOD){

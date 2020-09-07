@@ -1985,12 +1985,19 @@ namespace anrl {
     if(LDEBUG){ cerr << function_name << " parameters=" << aurostd::joinWDelimiter(parameter_list,",") << endl; }
 
     // -------------------------------------------------------------------------
-    // if no parameters provided and more than one is needed
+    // if no parameters are provided and more than one parameter is needed,
+    // we throw an error
+    // we do not automatically assign the enumeration suffix to the label
+    // (even if there there is currently only one prototype with a label)
+    // otherwise, the command without the suffix may break in the future
+    // (cannot auto-assign when more than one choice, e.g., -001 or -002)
     if(parameters.size()==0 && parameter_list.size()!=1){
       message << "No parameters provided. Since this is a new prototype label with more than one degree of freedom,";
       message << "you must add parameter values with --params=..." << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
+    // if only one parameter is needed, then an enumeration is not given,
+    // signaling that the symmetry fixes the degrees of freedom
     else if(parameters.size()==0 && parameter_list.size()==1){
       parameters = "1.0";
     }
