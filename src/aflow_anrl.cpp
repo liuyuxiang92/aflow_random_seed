@@ -146,24 +146,25 @@ namespace anrl {
     xvector<double> c1(3); c1(1)=(2.0/3.0); c1(2)=(1.0/3.0); c1(3)=(1.0/3.0); //centering translation
     xvector<double> c2(3); c2(1)=(1.0/3.0); c2(2)=(2.0/3.0); c2(3)=(2.0/3.0); //centering translation
 
+    _atom atom_tmp; //DX20200907
     for(uint a=0;a<str.atoms.size();a++) {
-      _atom tmp;
-      tmp.name=str.atoms[a].name;
-      tmp.type=str.atoms[a].type;
-      tmp.basis=str.atoms[a].basis;
+      atom_tmp.clear(); //DX20200907
+      atom_tmp.name=str.atoms[a].name;
+      atom_tmp.type=str.atoms[a].type;
+      atom_tmp.basis=str.atoms[a].basis;
       xvector<double> center_pos;
       center_pos=trasp(inverse(htransf))*(trasp(rtransf)*str.atoms[a].fpos); // Method for transforming RHL to HEX
-      tmp.fpos=center_pos;
-      hex_str.comp_each_type.at(tmp.type)+=1.0;                        
-      hex_str.atoms.push_back(tmp);
+      atom_tmp.fpos=center_pos;
+      hex_str.comp_each_type.at(atom_tmp.type)+=1.0;
+      hex_str.atoms.push_back(atom_tmp);
       //add centering c1
-      tmp.fpos=center_pos+c1; 
-      hex_str.comp_each_type.at(tmp.type)+=1.0;                        
-      hex_str.atoms.push_back(tmp);
+      atom_tmp.fpos=center_pos+c1;
+      hex_str.comp_each_type.at(atom_tmp.type)+=1.0;
+      hex_str.atoms.push_back(atom_tmp);
       //add centering c2
-      tmp.fpos=center_pos+c2; 
-      hex_str.comp_each_type.at(tmp.type)+=1.0;                        
-      hex_str.atoms.push_back(tmp);
+      atom_tmp.fpos=center_pos+c2;
+      hex_str.comp_each_type.at(atom_tmp.type)+=1.0;
+      hex_str.atoms.push_back(atom_tmp);
     }
     return hex_str;
   }

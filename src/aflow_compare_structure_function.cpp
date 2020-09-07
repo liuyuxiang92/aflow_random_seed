@@ -7797,7 +7797,6 @@ namespace compare{
             if(xstr1_tmp.atoms[i].name==lfa_str1){
               xstr1_tmp.ShiftOriginToAtom(i);
               xstr1_tmp.BringInCell(1e-10);
-              xstr1_tmp.UpdateCartesianCoordinates(); //DX
 
               // ---------------------------------------------------------------------------
               // create vector of variables for each thread 
@@ -8330,7 +8329,6 @@ namespace compare{
           if(proto.atoms[iat].name==lfa){
             proto.ShiftOriginToAtom(iat);
             proto.BringInCell(1e-10);
-            proto.UpdateCartesianCoordinates(); //DX
             if(VERBOSE){
               cerr << "compare::structureSearch: orig structure " << xstr1 << endl;
               cerr << "compare::structureSearch: structure " << proto << endl;
