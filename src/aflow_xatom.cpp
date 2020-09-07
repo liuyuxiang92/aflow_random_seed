@@ -226,7 +226,7 @@ void _atom::CleanName(void) {
   //CO20200624 - cleaning up function
   //the old function had a sign problem and was inefficient
   cleanname=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(name);
-  KBIN::VASP_PseudoPotential_CleanName_InPlace(cleanname);
+  aurostd::VASP_PseudoPotential_CleanName_InPlace(cleanname); //DX20200907 - changed from KBIN to aurostd (since this is now in xparser)
   if(cleanname.size()>3){cleanname=cleanname.substr(0,3);}  //cannot be longer than 3 characters
   for(uint i=cleanname.size()-1;i<cleanname.size();i--){  //go backwards and clean anything that isn't between A-Z and a-z 
     //65-90 is A-Z

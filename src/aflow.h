@@ -2922,7 +2922,6 @@ namespace KBIN {
   string VASP_PseudoPotential_CleanName(const string& specieIN);
   string VASP_PseudoPotential_CleanName_20190712(const string& specieIN); //CO20190712
   string VASP_PseudoPotential_CleanName_20190101(const string& specieIN); //CO20190712
-  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO20190712
   bool VASP_PseudoPotential_CleanName_TEST(void); //CO20190712
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
