@@ -7364,15 +7364,13 @@ namespace pflow{
 
     string function_name = XPID + "pflow::fakeElements():";
 
-    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    if(nspecies>letters.size()){
+    if(nspecies>26){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
     }
 
     vector<string> elements;
     for(uint i=0;i<nspecies;i++){
-      stringstream ss_letter; ss_letter << letters[i]; // cannot type cast char to string directly
+      stringstream ss_letter; ss_letter << char('A'+i); // cannot type cast char to string directly //DX20200907 - use ASCII
       elements.push_back(ss_letter.str());
     }
 
