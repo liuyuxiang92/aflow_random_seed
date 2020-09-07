@@ -5,7 +5,7 @@
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2016
-// Written by David Hicks (DX) - 2016/2020 (generic prototype generator)
+// Written by David Hicks (DX) - 2016-2020 (generic prototype generator)
 
 #ifndef _AFLOW_ANRL_CPP
 #define _AFLOW_ANRL_CPP
