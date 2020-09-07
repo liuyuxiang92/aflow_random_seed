@@ -246,7 +246,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 
-  afloa --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--tolerance_spectrum=start:stop:step] < POSCAR
+  aflow --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--tolerance_spectrum=start:stop:step] < POSCAR
         Calculates the space group of the crystal in the ITC convention.
         No assumptions are made on the input POSCAR-- may be supercell, primitive, etc.
         Gives the Bravais lattice, crystal system, point group, space group number and wyckoff set.
