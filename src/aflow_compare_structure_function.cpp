@@ -6196,6 +6196,7 @@ namespace compare{
 namespace compare{
   bool findMatch(const deque<_atom>& _xstr1_atoms,
       const deque<_atom>& _PROTO_atoms,
+      const xmatrix<double>& xstr1_lattice,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1,
@@ -6216,23 +6217,39 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
+    bool USE_CENTROID_METHOD=false;
 
     string function_name = XPID + "compare::findMatch():";
    
     // ---------------------------------------------------------------------------
     // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
     deque<_atom> xstr1_atoms = _xstr1_atoms;
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> xstr1_centroid = getCentroidOfStructure(xstr1_atoms);
+    xvector<double> xstr1_centroid,xstr1_centroid_PBC,PROTO_centroid,PROTO_centroid_PBC;
+    if(USE_CENTROID_METHOD){
+      xstr1_centroid = getCentroidOfStructure(xstr1_atoms);
+      xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice); //DX20200904 - use PBC to account for switching sides of cell
+    }
     deque<_atom> PROTO_atoms = _PROTO_atoms;
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] xvector<double> PROTO_centroid = getCentroidOfStructure(PROTO_atoms);
+    if(USE_CENTROID_METHOD){
+      PROTO_centroid = getCentroidOfStructure(PROTO_atoms);
+      PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice); //DX20200904 - use PBC to account for switching sides of cell
+    }
 
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] if(LDEBUG){
-    //DX20200716 [BETA- NEEDS FUTHER TESTING]   cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
-    //DX20200716 [BETA- NEEDS FUTHER TESTING]   cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] }
+    if(USE_CENTROID_METHOD && LDEBUG){
+      cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
+      cerr << function_name << " xstr1_centroid_PBC: " << xstr1_centroid_PBC << endl;
+      cerr << function_name << " FRAC:xstr1_centroid: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid << endl;
+      cerr << function_name << " FRAC:xstr1_centroid_PBC: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid_PBC << endl;
+      cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
+      cerr << function_name << " PROTO_centroid_PBC: " << PROTO_centroid_PBC << endl;
+      cerr << function_name << " FRAC:PROTO_centroid: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid << endl;
+      cerr << function_name << " FRAC:PROTO_centroid_PBC: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid_PBC << endl;
+    }
 
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid; }
-    //DX20200716 [BETA- NEEDS FUTHER TESTING] for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid; }
+    if(USE_CENTROID_METHOD){
+      for(uint i=0;i<xstr1_atoms.size();i++){xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid_PBC; }
+      for(uint i=0;i<PROTO_atoms.size();i++){PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-xstr1_centroid_PBC; }
+    }
 
     // ---------------------------------------------------------------------------
     // Determines cutoff distance in which atoms map onto one another and are
@@ -8321,7 +8338,7 @@ namespace compare{
             }
             vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
+            if(findMatch(xstr1_atoms,proto_atoms,xstr1.lattice,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
               if(VERBOSE){
                 for(uint m=0;m<map_index_str1.size();m++){
                   cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;
