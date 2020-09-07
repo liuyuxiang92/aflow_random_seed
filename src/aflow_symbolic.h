@@ -22,7 +22,6 @@
 
 // Symbolic math variables
 #define _SYMBOLIC_ZERO_ symbolic::Symbolic(0)
-#define _SYMBOLIC_TOL_ 1e-3 
 #define _ANRL_LATTICE_VARIABLES_  "a,b,c,alpha,beta,gamma,cx,cy,cz"
 #define _ANRL_TRIG_VARIABLES_  "sin,cos,tan,sec,csc,cot"
 #define _ANRL_WYCKOFF_VARIABLES_  "x,y,z"
