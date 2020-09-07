@@ -9,6 +9,8 @@
 #define _AUROSTD_ARGV_CPP_
 //#include "aurostd.h"
 
+#define VERBOSE_ARGV false //DX20200907
+
 namespace aurostd {  // namespace aurostd
   string attach(const string& s1) { return s1;}
   string attach(const string& s1,const string& s2) { return s1+"|"+s2;}
@@ -23,7 +25,7 @@ namespace aurostd {  // namespace aurostd
 // this function creates the argv vector as vector<string> easier to handle than the char **argv
 namespace aurostd {  // namespace aurostd
   vector<string> get_arguments_from_input(int _argc,char **_argv) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     vector<string> out_argv;
     // [OBSOLETE]    for(int i=0;i<_argc;i++) out_argv.push_back(_argv[i]);
     for(int i=0;i<_argc;i++) {
@@ -44,7 +46,7 @@ namespace aurostd {  // namespace aurostd
       if(argi.at(argi.size()-1)=='=' && i<_argc-1) {argi+=string(_argv[i+1]);i++;}  // fixing space after "= "
       out_argv.push_back(argi);
     }
-    if(LDEBUG) for(uint i=0;i<out_argv.size();i++) cerr << "out_argv.at(" << i << ")=" << out_argv.at(i) << endl;
+    if(VERBOSE) for(uint i=0;i<out_argv.size();i++) cerr << "out_argv.at(" << i << ")=" << out_argv.at(i) << endl;
     return out_argv;
   }
 }
@@ -54,11 +56,11 @@ namespace aurostd {  // namespace aurostd
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
   bool args2flag(const vector<string>& argv,const string& s0) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint j=0;j<tokens.size();j++)
       for(uint i=0;i<argv.size();i++)
  	if(argv.at(i)==tokens.at(j)) return TRUE;
@@ -66,11 +68,11 @@ namespace aurostd {  // namespace aurostd
   }
   
   bool args2flag(const vector<string>& argv,std::vector<string>& cmds,const string& s0) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint j=0;j<tokens.size();j++)
       cmds.push_back(tokens.at(j));
     for(uint i=0;i<argv.size();i++)
@@ -86,11 +88,11 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {
   // namespace aurostd
   template<class utype> utype args2utype(const vector<string>& argv,const string& s0,utype def_out) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     utype out=def_out;
     for(uint i=1;i<argv.size()-1;i++)
       for(uint j=0;j<tokens.size();j++)     
@@ -104,11 +106,11 @@ namespace aurostd {
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype> args2xvectorutype(const vector<string>& argv,const string& s0, const xvector<utype>& def_out) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     xvector<utype> out(def_out.lrows,def_out.urows);
     out=def_out;
     for(uint i=0;i<argv.size();i++) {
@@ -129,11 +131,11 @@ namespace aurostd {  // namespace aurostd
     return out;
   }
   template<class utype> xvector<utype> args2xvectorutype(const vector<string>& argv,const string& s0,int dim) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     xvector<utype> out(1,dim);
     for(uint i=0;i<argv.size();i++) {
       if(i+out.rows<argv.size()) {
@@ -160,11 +162,11 @@ namespace aurostd {
   // namespace aurostd
   template<class utype> vector<utype>
   args2vectorutype(const vector<string>& argv,const string& s0) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     vector<utype> out;
     for(uint i=0;i<argv.size();i++) {
       for(uint j=0;j<tokens.size();j++) {
@@ -184,11 +186,11 @@ namespace aurostd {
   
   template<class utype> deque<utype>
   args2dequeutype(const deque<string>& argv,const string& s0) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     deque<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     deque<utype> out;
     for(uint i=0;i<argv.size();i++) {
       for(uint j=0;j<tokens.size();j++) {
@@ -212,11 +214,11 @@ namespace aurostd {
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
   string args2string(const vector<string>& argv,const string& s0,const string& s_def) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint i=0;i<argv.size()-1;i++)
       for(uint j=0;j<tokens.size();j++) 
 	if(argv.at(i)==tokens.at(j)) return argv.at(i+1);
@@ -224,11 +226,11 @@ namespace aurostd {  // namespace aurostd
   }
   
   string args2string(const vector<string>& argv,vector<string>& cmds,const string& s0,const string& s_def) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint j=0;j<tokens.size();j++) 
       cmds.push_back(tokens.at(j));
     for(uint i=0;i<argv.size()-1;i++)
@@ -249,11 +251,11 @@ namespace aurostd {
   }
 
   vector<string> args2vectorstring(const vector<string>& argv,const string& s0,const string& s_def) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint i=0;i<argv.size()-1;i++)
       for(uint j=0;j<tokens.size();j++) 
 	if(argv.at(i)==tokens.at(j))
@@ -455,11 +457,11 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
 
   bool args2attachedflag(const vector<string>& argv,const string& s0) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint i=0;i<argv.size();i++)
       for(uint j=0;j<tokens.size();j++)
 	if(aurostd::substring2bool(argv.at(i),tokens.at(j))) return TRUE;
@@ -467,11 +469,11 @@ namespace aurostd {  // namespace aurostd
   }
   
   bool args2attachedflag(const vector<string>& argv,std::vector<string>& cmds,const string& s0) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveSpaces(s0);
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
+    if(VERBOSE) for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;
     for(uint j=0;j<tokens.size();j++)
       cmds.push_back(tokens.at(j));
     for(uint i=0;i<argv.size();i++)
@@ -486,12 +488,12 @@ namespace aurostd {  // namespace aurostd
 // ***************************************************************************
 namespace aurostd {  // namespace aurostd
   string args2attachedstring(const vector<string>& argv,const string& s0,string s_def) { // string=""
-    bool LDEBUG=(FALSE || XHOST.DEBUG); 
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0),output="";
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) {cerr << "argv.size()=" << argv.size() << endl;for(uint j=0;j<argv.size();j++) cerr << "[" << argv.at(j) << "]" << endl;}
-    if(LDEBUG) {cerr << "tokens.size()=" << tokens.size() << endl;for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;}
+    if(VERBOSE) {cerr << "argv.size()=" << argv.size() << endl;for(uint j=0;j<argv.size();j++) cerr << "[" << argv.at(j) << "]" << endl;}
+    if(VERBOSE) {cerr << "tokens.size()=" << tokens.size() << endl;for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;}
     for(uint i=1;i<argv.size();i++)
       for(uint j=0;j<tokens.size();j++)
 	if(argv.at(i).find(tokens.at(j))!=string::npos) {
@@ -547,12 +549,12 @@ namespace aurostd {  // namespace aurostd
   
   template<typename string>
   string args2attachedutype(const vector<string>& argv,const string& s0,const string& s_def) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); 
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     string s=aurostd::RemoveWhiteSpaces(s0),output="";
     vector<string> tokens;
     aurostd::string2tokens(s,tokens,"|"); 
-    if(LDEBUG) {cerr << "argv.size()=" << argv.size() << endl;for(uint j=0;j<argv.size();j++) cerr << "[" << argv.at(j) << "]" << endl;}
-    if(LDEBUG) {cerr << "tokens.size()=" << tokens.size() << endl;for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;}
+    if(VERBOSE) {cerr << "argv.size()=" << argv.size() << endl;for(uint j=0;j<argv.size();j++) cerr << "[" << argv.at(j) << "]" << endl;}
+    if(VERBOSE) {cerr << "tokens.size()=" << tokens.size() << endl;for(uint j=0;j<tokens.size();j++) cerr << "[" << tokens.at(j) << "]" << endl;}
     for(uint i=1;i<argv.size();i++)
       for(uint j=0;j<tokens.size();j++)
       if(argv.at(i).find(tokens.at(j))!=string::npos) return argv.at(i).substr(argv.at(i).find(tokens.at(j))+tokens.at(j).length());
@@ -601,11 +603,11 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<typename utype>
   utype args2attachedutype(const vector<string>& argv,const string& str1,const utype& utype_default) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); 
+    bool VERBOSE=(FALSE || VERBOSE_ARGV); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG
     vector<string> tokens1;
     aurostd::string2tokens(aurostd::RemoveWhiteSpaces(str1),tokens1,"|"); 
-    if(LDEBUG) {cerr << "argv.size()=" << argv.size() << endl;for(uint j=0;j<argv.size();j++) cerr << "[" << argv.at(j) << "]" << endl;}
-    if(LDEBUG) {cerr << "tokens1.size()=" << tokens1.size() << endl;for(uint j=0;j<tokens1.size();j++) cerr << "[" << tokens1.at(j) << "]" << endl;}
+    if(VERBOSE) {cerr << "argv.size()=" << argv.size() << endl;for(uint j=0;j<argv.size();j++) cerr << "[" << argv.at(j) << "]" << endl;}
+    if(VERBOSE) {cerr << "tokens1.size()=" << tokens1.size() << endl;for(uint j=0;j<tokens1.size();j++) cerr << "[" << tokens1.at(j) << "]" << endl;}
     utype out=utype_default;
     for(uint j=0;j<tokens1.size();j++) {
       string s1=tokens1.at(j),s1eq,s1neq;     //   s1=aurostd::RemoveSubString(s1,"-");s1=aurostd::RemoveSubString(s1,"-");
