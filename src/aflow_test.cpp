@@ -94,7 +94,6 @@ void PERFORM_TEST_ALLOYS(ostream& oss) {
   //     for(uint j=i+1;j<velement.size();j++) 
   //       for(uint k=j+1;k<velement.size();k++) 
   // 	cout << "/home/auro/work/AFLOW3/aflow --terdata " << velement.at(i) << " " << velement.at(j) << " " << velement.at(k) << endl;
-  //   exit(0);
 
   vector<string> tokens,vspecies;
   bool found=FALSE;
@@ -170,7 +169,6 @@ void PERFORM_TEST_ALLOYS(ostream& oss) {
     }
   }
   oss << "vicsd3.size()=" << vicsd3.size() << endl;
-  exit(0);
 
   if(0) {
     vector<string> vicsd4;
@@ -276,7 +274,6 @@ void _PERFORM_TEST(ostream& oss) {
           }
       }
   oss << vicsd.size() << endl;
-  exit(0);
 }
 
 void PERFORM_TEST3(ostream& oss) {
@@ -445,7 +442,6 @@ void PERFORM_TEST3(ostream& oss) {
     //  oss << "mkdir  ./LIB3/" << " && " << "mkdir  ./LIB3/LIB/" << " && " << "mkdir  ./LIB3/LIB/" << tokens.at(0) << " && " "mkdir  ./LIB3/LIB/" << tokens.at(0) << " && " << "mkdir  ./LIB3/LIB/" << tokens.at(0) << "/" << tokens.at(1) << "_" << tokens.at(2) << ".ABC" << endl;
   }
   // oss << vprotos3.size() << endl;
-  exit(0);
 }
 
 // vector<string> vAUID_new,vAURL_new;

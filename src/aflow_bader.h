@@ -20,13 +20,13 @@ using std::string;
 // perform Bader analysis using the program from Henkelman Group at UT, Austin
 namespace bader_functions {
 string BaderCalc(aurostd::xoption vpflow);
-bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, string& directory, ostream& oss);
+bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, const string& directory, ostream& oss);
 bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, const string& prototype,
                const vector<string>& vspecies, const deque<int>& num_each_species, const vector<double>& vZVAL,
-               const vector<double>& cutoffs, const vector<int>& downsample_ratios, string& directory, ostream& oss);
+               const vector<double>& cutoffs, const vector<int>& downsample_ratios, const string& directory, ostream& oss);
 bool BaderCalc(const string& bader_options, const string& prototype, const vector<string>& vspecies,
                const deque<int>& num_each_species, const vector<double>& vZVAL, const vector<double>& cutoffs,
-               const vector<int>& downsample_ratios, string& directory, ostream& oss);
+               const vector<int>& downsample_ratios, const string& directory, ostream& oss);
 void FixDirectory(string& directory);
 bool Flags2BaderCommands(aurostd::xoption& vpflow, string& bader_options, ostream& oss);
 bool getPushCommand(const string& misc_option, string& push_command, ostream& oss);

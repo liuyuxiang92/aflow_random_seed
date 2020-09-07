@@ -53,19 +53,19 @@ namespace pflow {
   void AGROUP2(istream& input);
   void AGROUP2m(istream& input);
   xstructure ALPHABETIC(istream& input);
-  string ALPHACompound(string options);
-  string ALPHASpecies(string options);
+  string ALPHACompound(const string& options);
+  string ALPHASpecies(const string& options);
   string AFLOWIN(istream& input);
-  void ANGLES(string options,istream& input);
-  string ATOMSMAX(string options,istream& input);
-  void BANDS(string options,istream& input);
+  void ANGLES(const string& options,istream& input);
+  string ATOMSMAX(const string& options,istream& input);
+  void BANDS(const string& options,istream& input);
   void BANDGAP(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  //CO20171006
   void BANDGAP_DOS(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  //CO20171006  //CO20191110
   void BANDSTRUCTURE(_aflags &aflags);
-  string BZDirectionsLATTICE(string options);
+  string BZDirectionsLATTICE(const string& options);
   //DX20181102 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input);
   string BZDirectionsSTRUCTURE(istream& input, aurostd::xoption& vpflow); //DX20181102 - add options
-  void CAGES(_aflags &aflags,string options,istream& input);
+  void CAGES(_aflags &aflags,const string& options,istream& input);
   //DX+CO START
   bool PerformFullSymmetry(xstructure& a);
   bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");  //ME20200224
@@ -80,7 +80,7 @@ namespace pflow {
   //DX+CO END
   xstructure CART(istream& input);
   xstructure CORNERS(istream& input);
-  void ChangeSuffix(string options);
+  void ChangeSuffix(const string& options);
   string CHGDIFF(aurostd::xoption vpflow);
   bool CHGDIFF(const string& chgcar1_file,const string& chgcar2_file, const string& output_File,ostream& oss=cout);
   //DX+CO START
@@ -96,11 +96,11 @@ namespace pflow {
   bool CHGSUM(string& species_header,const vector<string>& chgcar_files,const string& output_file,ostream& oss=cout);
   //DX20180806 [OBSOLETE] void CIF(istream& input);
   void CIF(istream& input,aurostd::xoption& vpflow);
-  void CLAT(string options);
+  void CLAT(const string& options);
   void CLEAN(vector<string>);
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
-  void COMPARE(string options);
+  void COMPARE(const string& options);
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20191125
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20191125
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
@@ -114,25 +114,25 @@ namespace pflow {
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190314 - overloaded 
-  //DX20170901 [OBSOLETE] void DATA(string smode,istream& input);
-  bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170901 - SGDATA + JSON
-  void DATA1(string options,istream& input);
+  //DX20170901 [OBSOLETE] void DATA(const string& smode="DATA",istream& input);
+  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode="DATA",ostream& oss=cout); //DX20170901 - SGDATA + JSON
+  void DATA1(const string& options,istream& input);
   void DATA2(istream& input);
-  void DEBYE(string options);
-  void DISP(string options,istream& input);
-  void DIST(string options,istream& input);
+  void DEBYE(const string& options);
+  void DISP(const string& options,istream& input);
+  void DIST(const string& options,istream& input);
   void DYNADIEL(vector<string>& argv); // CAMILO
   void EDOS(vector<string>);
   void EFFMASS(vector<string>& argv, ostream& oss=cout); // CAMILO
-  void EIGCURV(string options, ostream& oss=cout); // CAMILO
+  void EIGCURV(const string& options, ostream& oss=cout); // CAMILO
   //DX20170818 [OBSOLETE] xstructure EQUIVALENT(_aflags &aflags,istream& input);
   string EQUIVALENT(_aflags &aflags,istream& input, aurostd::xoption& vpflow);
-  void EWALD(string options,istream& input);
+  void EWALD(const string& options,istream& input);
   string EXTRACT_xcar(_aflags &aflags,vector<string>,string,string);
   string EXTRACT_Symmetry(_aflags &aflags,vector<string>);
   void FGROUP(_aflags &aflags,istream& input);
   bool FIXBANDS(_aflags &aflags,string opts);
-  //DX20170926 [OBSOLETE] void FINDSYM(string options,uint mode,istream& input);
+  //DX20170926 [OBSOLETE] void FINDSYM(const string& options,uint mode,istream& input);
   void FINDSYM(aurostd::xoption& vpflow,uint mode,istream& input);
   xstructure FRAC(istream& input);
   string FROZSL_VASPSETUP(vector<string> argv,int mode);
@@ -145,8 +145,8 @@ namespace pflow {
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF20190329
   void GULP(istream& input);
-  void HKL(string options,_aflags &aflags,istream& input);
-  void HKLSearch(string options,_aflags &aflags,istream& input,const string& smode);
+  void HKL(const string& options,_aflags &aflags,istream& input);
+  void HKLSearch(const string& options,_aflags &aflags,istream& input,const string& smode);
   bool setPOCCTOL(xstructure& xstr,const string& pocc_tol_string); //CO20181226
   //[CO20181226 OBSOLETE]string HNF(vector<string> argv,istream& input,ostream& oss=cout);
   //[CO20190208 - OBSOLETE]bool HNF(aurostd::xoption& vpflow,istream& input,ostream& oss=cout); //CO20181226
@@ -158,15 +158,15 @@ namespace pflow {
   xstructure IDENTICAL(istream& input);
   xstructure INCELL(istream& input);
   xstructure INCOMPACT(istream& input);
-  void INTPOL(string options);
+  void INTPOL(const string& options);
   xstructure INWS(istream& input);
-  void JMOL(string options,istream& input);
+  void JMOL(const string& options,istream& input);
   void KBAND(vector<string>);
-  xstructure INFLATE_LATTICE(string options,istream& input);
-  xstructure INFLATE_VOLUME(string options,istream& input);
+  xstructure INFLATE_LATTICE(const string& options,istream& input);
+  xstructure INFLATE_VOLUME(const string& options,istream& input);
   void KPATH(istream& input,bool WWW); 
   void KPATH(istream& input,double grid,bool WWW); 
-  xstructure KPOINTS(string options,istream& input,ostream& oss=cout);
+  xstructure KPOINTS(const string& options,istream& input,ostream& oss=cout);
   xstructure KPOINTS_DELTA(aurostd::xoption& vpflow, istream& input, ostream& oss=cout);
   void JOINSTRLIST(vector<string>);
   void MAKESTRLIST(vector<string>);
@@ -229,6 +229,8 @@ namespace pflow {
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, string _combination, string LIB, string server, vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss=cout);
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, vector<string>& combination, string LIB, string server, vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss=cout);
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, vector<string>& combination, string LIB, string server, vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss=cout);
+  ////////////////////////////////////////////////////////////////////////////////
+  uint SubLayersRestAPILS(const string& url,vector<string>& vsuburl); //CO20200731
   ////////////////////////////////////////////////////////////////////////////////
   // loadLIBX string elements
   bool loadLIBX(string LIB, string elements, vector<aflowlib::_aflowlib_entry>& entries, ostream& oss=cout);
@@ -325,12 +327,14 @@ namespace pflow {
   // START - added by Corey Oses - May 2017
   // effectively logs EVERYTHING, deals with cout and logger
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=std::cout);
+  void logger(const string& filename, const string& function_name, stringstream& message, const char& type, ostream& oss=cout, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const char& type=_LOGGER_MESSAGE_, ostream& oss=cout, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
   void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // overload
@@ -338,10 +342,10 @@ namespace pflow {
   void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // main function
   void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata=_AFLOW_MESSAGE_DEFAULTS_);  // main function
   // END - added by Corey Oses - May 2017
-  xstructure LTCELL(string options,istream& input);
-  // [OBSOLETE]  xstructure LTCELLFV(string options,istream& input);
+  xstructure LTCELL(const string& options,istream& input);
+  // [OBSOLETE]  xstructure LTCELLFV(const string& options,istream& input);
   void MagneticParameters(string _directory, ostream& oss=cout);
-  // [OBSOLETE]  xstructure MILLER(string options,istream& input);
+  // [OBSOLETE]  xstructure MILLER(const string& options,istream& input);
   xstructure MINKOWSKIBASISREDUCTION(istream& input);
   string MISCIBILITY(vector<string> argv);
   void MOM(istream& input);
@@ -372,8 +376,8 @@ namespace pflow {
   void PGROUPK(_aflags &aflags,istream& input);
   void PLANEDENS(vector<string>);
   // [OBSOLETE] string PLATON(vector<string>,istream& input);
-  string PLATON(string options,istream& input);
-  //DX20170926 [OBSOLETE] string SG(string options,istream& input,string mode,string print);
+  string PLATON(const string& options,istream& input);
+  //DX20170926 [OBSOLETE] string SG(const string& options,istream& input,string mode,string print);
   string SG(aurostd::xoption& vpflow,istream& input,string mode,string print);
   // [OBSOLETE]  string SG(string mode,string print,vector<string>,istream& input);
   void STATDIEL(vector<string>& argv); // CAMILO
@@ -383,7 +387,10 @@ namespace pflow {
   void POSCAR2WYCKOFF(istream& input);
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX20190314
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314
-  bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss=cout); //SC20200330
+  vector<string> GENERATE_CERAMICS(const vector<string>& nonmetals,const vector<string>& metals,uint metal_arity); //CO20200731
+  vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow); //CO20200731
+  string GENERATE_CERAMICS_PRINT(const aurostd::xoption& vpflow); //CO20200731
+  bool PSEUDOPOTENTIALS_CHECK(const aurostd::xoption& vpflow,const string& file,ostream& oss=cout); //SC20200330
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO20180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); //DX20180123 - added more robust QE reader
@@ -409,15 +416,15 @@ namespace pflow {
   // [OBSOLETE] bool PROTO_GUS_CPP(vector<string>);
   bool PROTO_ICSD_AFLOWIN(vector<string> &argv);
   xstructure PRIM(istream& input,uint mode);
-  void RASMOL(string options,istream& input);
+  void RASMOL(const string& options,istream& input);
   void RBANAL(vector<string>);
   void RBDIST(vector<string>);
   xstructure RMATOM(istream& input,const int& iatom);
   xstructure RMCOPIES(istream& input);
   void RAYTRACE(vector<string>);
-  xstructure SCALE(string options,istream& input);
-  void RDF(string options,istream& input);
-  void RDFCMP(string options);
+  xstructure SCALE(const string& options,istream& input);
+  void RDF(const string& options,istream& input);
+  void RDFCMP(const string& options);
   void RSM(vector<string>, istream& input);
   xstructure SD(vector<string>,istream& input);
   xstructure SETCM(istream& input,const xvector<double>& cm);
@@ -427,18 +434,18 @@ namespace pflow {
   void SG(istream& input);
   bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170831 - SGDATA
   void SGROUP(_aflags &aflags,istream& input,double radius);
-  void SHELL(string options,istream& input);
+  void SHELL(const string& options,istream& input);
   string SPECIES(istream& input);
-  xstructure SHIFT(string options,istream& input);
+  xstructure SHIFT(const string& options,istream& input);
   void SPLINE(vector<string>);
   void SUMPDOS(vector<string>);
-  xstructure SUPERCELL(string options,istream& input);
-  void SUPERCELLSTRLIST(string options);
+  xstructure SUPERCELL(const string& options,istream& input);
+  void SUPERCELLSTRLIST(const string& options);
   xstructure xstrSWAP(vector<string>, istream& input);
-  xstructure VOLUME(string options, istream& input);
+  xstructure VOLUME(const string& options, istream& input);
   string WYCCAR(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow
   xstructure WYCKOFF(vector<string>,istream& input);
-  void XRAY(string options,istream& input);
+  void XRAY(const string& options,istream& input);
   void XRAY_PEAKS(const aurostd::xoption& vpflow,istream& input); //CO20190409
   void READ_XRAY_DATA(const string& filename,vector<double>& v_twotheta,vector<double>& intensity); //CO20190620
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,istream& input); //CO20190409
@@ -455,11 +462,11 @@ namespace pflow {
   void PLOT_XRAY(const aurostd::xoption& vpflow,const string& title="",const string& directory="",bool keep_gp=false);  //CO20190620
   void PLOT_XRAY(const string& filename,const string& title="",const string& directory="",bool keep_gp=false); //CO20190620
   void PLOT_XRAY(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& title="",const string& directory="",bool keep_gp=false);  //CO20190620
-  void XYZ(string options,istream& input);
+  void XYZ(const string& options,istream& input);
   void XYZINSPHERE(istream& input,double radius);
   void XYZWS(istream& input);
-  void XelementPrint(string options,ostream& oss=cout);
-  void ZVAL(string options);
+  void XelementPrint(const string& options,ostream& oss=cout);
+  void ZVAL(const string& options);
 }
 
 // aflow_pflow_print.cpp
@@ -473,13 +480,14 @@ namespace pflow {
   void PrintCIF(ostream& oss,const xstructure&,int=1,int=1); //DX20180806 - added setting default
   void PrintClat(const xvector<double>& data,ostream& oss=cout);
   void PrintCmpStr(const xstructure& str1,const xstructure& str2,const double& rcut,ostream& oss=cout);
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,string mode, const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format="txt",bool already_calculated=false); //DX20180823
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt",bool already_calculated=false); //DX20180822
-  //DX20170901 [OBSOLETE] void PrintData(const xstructure&,ostream& oss,string mode,const string& format="txt",bool already_calculated=false);
-  void PrintData(const xstructure& str,ostream& oss,string smode,double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt");
-  void PrintData(const xstructure& str,ostream& oss,string smode,const string& format="txt");
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //CO20171027
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //CO20171027
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //DX20180823
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //DX20180822
+  void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
+  void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
+  void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);
@@ -487,9 +495,9 @@ namespace pflow {
   void PrintDistances(xstructure str,const double cutoff,ostream& oss=cout);
   void PrintEwald(const xstructure& in_str,double& epoint,double& ereal,double& erecip,double& eewald,double& eta,const double& SUMTOL,ostream& oss=cout);
   void PrintGulp(const xstructure&,ostream& oss=cout);
-  bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone=true, const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss, bool no_scan, const int& setting=1, bool standalone=true, const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& sg_setting=1, bool standalone=true, const string& format="txt",bool already_calculated=false); //DX20180822
+  bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
+  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
 }
 void PrintKmesh(const xmatrix<double>& kmesh,ostream& oss=cout);    // HERE
 void PrintImages(xstructure strA,xstructure strB,const int& ni,const string& path_flag);
@@ -567,6 +575,12 @@ namespace pflow {
 int SignNoZero(const double& x);
 int Nint(const double& x);
 int Sign(const double& x);
+
+//CO20200731 START include from aflow_aconvasp.cpp
+namespace pflow {
+  void GetStrNeighData(const xstructure& str,const double cutoff,deque<deque<_atom> >& neigh_mat);   //CO20200731
+}
+//CO20200731 END include from aflow_aconvasp.cpp
 
 // ---------------------------------------------------------------------------
 // PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDOSDATA PDO
@@ -881,7 +895,7 @@ xvector<double> cross(const xvector<double> a, const xvector<double> b);
 // ---------------------------------------------------------------------------
 // FORMER RICHARD.H
 namespace pflow {
-  double GetAtomicPlaneDist(string options,istream& input);
+  double GetAtomicPlaneDist(const string& options,istream& input);
   double frac2dbl(string str);
   bool havechar(string str_in, char c);
   int whereischar(string str, char c);

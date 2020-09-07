@@ -192,7 +192,6 @@ namespace aflow {
     }
     cerr << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
-    //  std::exit(0);
     return oss.str();
   }
 } // namespace aflow
@@ -523,7 +522,7 @@ int main(int _argc,char **_argv) {
 		if(LDEBUG) {cerr.flush();}
 	      }
 	    } // cycle through possible directories
-	    if((*pstr).empty()) { if(LDEBUG) {cerr << "WARNING - init::InitGlobalObject: " << argvi << " not found! " << endl;}// exit(0);
+	    if((*pstr).empty()) { if(LDEBUG) {cerr << "WARNING - init::InitGlobalObject: " << argvi << " not found! " << endl;}
 	      found=FALSE;
 	    }
 	    cout << (*pstr) << endl;

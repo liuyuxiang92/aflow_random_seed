@@ -595,8 +595,7 @@ namespace anrl {
         }
       }
       else {
-        cerr << function_name << "::ERROR: The equations for site " << i << "are not provided. Check symmetry." << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"The equations for site "+aurostd::utype2string(i)+"are not provided. Check symmetry",_INPUT_MISSING_); //CO20200624
       }
     }
 
@@ -3070,9 +3069,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // not found
     if(!found) {
-
-      cerr << "ERROR - anrl::PrototypeANRL: prototype not found [label=" << label << "]" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"prototype not found [label="+label+"]",_INPUT_ILLEGAL_); //CO20200624
     }
 
     if(LDEBUG) { cerr << function_name << ": FOUND" << endl;}
@@ -3091,7 +3088,7 @@ namespace anrl {
       message << "vproto_nspecies.at(ifound)=" << vproto_nspecies.at(ifound) << endl;
       message << "vpermutation.size()=" << vpermutation.size() << endl;
       message << "vpermutation ="; for(uint i=0;i<vpermutation.size();i++) {message << " " << vpermutation.at(i);} message << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
     // ---------------------------------------------------------------------------
     // check for vatomX size and errors
@@ -3101,7 +3098,7 @@ namespace anrl {
       message << "vproto_nspecies.at(ifound)=" << vproto_nspecies.at(ifound) << endl;
       message << "vatomX.size()=" << vatomX.size() << endl;
       message << "vatomX ="; for(uint i=0;i<vatomX.size();i++) {message << " " << vatomX.at(i);} message << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_);
     }
 
     for(uint i=0;i<vproto_nspecies.at(ifound);i++) { // number of species
@@ -3149,7 +3146,7 @@ namespace anrl {
         if(number_id.size()!=0){ 
           stringstream message;
           message << vlabel.at(ifound) << " only has one degree of freedom (lattice parameter), i.e., no enumerated suffix necessary." << endl; 
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
         }
       }
       // if number ID is given, i.e., 001, 002, etc.
@@ -3163,7 +3160,7 @@ namespace anrl {
     if(vparameters.size()==0){  //CO20181226 DX fix
       stringstream message;
       message << "no parameters provided; add parameter values with --params=... or use tabulated enumeration suffix (see aflow --protos)" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
     if(aurostd::string2utype<double>(vparameters[0])<=0.0){ //CO20181226 forget signbit, also include 0
       scale_volume_by_species=true;
@@ -6815,11 +6812,6 @@ namespace anrl {
       }
       str.SpeciesPutAlphabetic();
     }
-
-    //DX20200207 [OBSOLETE] if(XHOST.vflag_control.flag("WWW")) {
-    //DX20200207 [OBSOLETE]   cout << web.str() << endl;
-    //DX20200207 [OBSOLETE]   exit(0);
-    //DX20200207 [OBSOLETE] }
 
     aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO20181216
     if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO20181216

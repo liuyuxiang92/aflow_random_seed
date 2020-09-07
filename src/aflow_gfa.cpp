@@ -20,7 +20,7 @@
 /********DEFINITIONS**********/
 
 //atomic environments
-#define _DOUBLE_TOL_ 0.001 //Tolerance for double comparison
+//[CO20200731 - OBSOLETE]#define _DOUBLE_TOL_ 0.001 //Tolerance for double comparison
 #define _MIN_NUM_ATM_ 500.0 //Number of atoms used to define the supercell
 #define _MIN_SAMPLING_ 40 //Minimum number of neighbors for acceptable sampling
 #define _CON_TOL_ 1.3 //Tolerance when calculating connectivity (multiplying constant < sqrt(2))
@@ -109,7 +109,7 @@ void FindGap(xvector<double>& maxGaps, xvector<double>& gapPositions, xmatrix<do
       if((maxGaps(i)-new_tol) <= (individualDistances(j)-individualDistances(j-1))){
         if((individualDistances(j-1)<gapPositions(i) ||
               maxGaps(i)<(individualDistances(j)-individualDistances(j-1)-new_tol)) && 
-            individualDistances(j-1)>_DOUBLE_TOL_) { //Excludes first gap and negative distances (atoms outside cutoff)
+            individualDistances(j-1)>_ZERO_TOL_LOOSE_) { //Excludes first gap and negative distances (atoms outside cutoff)
           gapPositions(i)=individualDistances(j-1);
           maxGaps(i)=individualDistances(j)-individualDistances(j-1);
         } 
@@ -117,7 +117,7 @@ void FindGap(xvector<double>& maxGaps, xvector<double>& gapPositions, xmatrix<do
 
     }
 
-    if(maxGaps(i)<_DOUBLE_TOL_) //Just a check
+    if(maxGaps(i)<_ZERO_TOL_LOOSE_) //Just a check
       cout << "WARNING!!! Failed to find gap!" << endl << endl;
   } 
 }
@@ -144,7 +144,7 @@ void FindNewGap(uint i, xvector<double>& maxGaps, xvector<double>& gapPositions,
       if((maxGaps(i)-new_tol) <= (individualDistances(j)-individualDistances(j-1))){
         if((individualDistances(j-1)<gapPositions(i) || 
               maxGaps(i)<(individualDistances(j)-individualDistances(j-1)-new_tol)) && 
-            individualDistances(j-1)>_DOUBLE_TOL_) { //Excludes first gap and negative distances (atoms outside cutoff)
+            individualDistances(j-1)>_ZERO_TOL_LOOSE_) { //Excludes first gap and negative distances (atoms outside cutoff)
           gapPositions(i)=individualDistances(j-1);
           maxGaps(i)=individualDistances(j)-individualDistances(j-1);
         } 
@@ -152,7 +152,7 @@ void FindNewGap(uint i, xvector<double>& maxGaps, xvector<double>& gapPositions,
 
   }
 
-  if(maxGaps(i)<_DOUBLE_TOL_){ //Gap rule failure
+  if(maxGaps(i)<_ZERO_TOL_LOOSE_){ //Gap rule failure
     for(uint j=2;j<=superStr.atoms.size();j++){ 
       if(individualDistances(j-1)<cutoff){
         maxGaps(i)=individualDistances(j)-individualDistances(j-1);
@@ -175,7 +175,7 @@ void BuildAE(deque<deque<int> > &environment, xvector<double> gapPositions, xstr
   for(uint i=1;i<=str.atoms.size();i++){
     for(uint j=1;j<=superStr.atoms.size();j++){
       d = superStr.atoms[p*(k*k+k+1)+(i-1)*k*k*k].cpos - superStr.atoms[j-1].cpos;
-      if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_DOUBLE_TOL_){
+      if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_ZERO_TOL_LOOSE_){
         environment[i-1].push_back(j);
       }
     }
@@ -194,7 +194,7 @@ void BuildNewAE(int i, deque<deque<int> > &environment, xvector<double> gapPosit
 
   for(uint j=1;j<=superStr.atoms.size();j++){
     d = superStr.atoms[p*(k*k+k+1)+(i-1)*k*k*k].cpos - superStr.atoms[j-1].cpos;
-    if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_DOUBLE_TOL_){
+    if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_ZERO_TOL_LOOSE_){
       environment[i-1].push_back(j);
     }
   }
@@ -289,7 +289,7 @@ namespace pflow {
 
     //Determines the size of the supercell
     int cellNumber = (int) pow((_MIN_NUM_ATM_/str.atoms.size()),1.0/3.0);
-    if((pow((_MIN_NUM_ATM_/str.atoms.size()),1.0/3.0)-(double)cellNumber)>_DOUBLE_TOL_)
+    if((pow((_MIN_NUM_ATM_/str.atoms.size()),1.0/3.0)-(double)cellNumber)>_ZERO_TOL_LOOSE_)
       cellNumber++;
     if(cellNumber<3)
       cellNumber=3;
@@ -414,7 +414,7 @@ namespace pflow {
                 else {//third connection
                   v3 = superStr.atoms[environment[i-1][j-1]-1].cpos - superStr.atoms[environment[i-1][l-1]-1].cpos;
                   vp = vector_product(vector_product(v1,v2),vector_product(v2,v3));
-                  if(modulus(vp)<_DOUBLE_TOL_) //v1,v2 and v2,v3 define the same plane
+                  if(modulus(vp)<_ZERO_TOL_LOOSE_) //v1,v2 and v2,v3 define the same plane
                     recalcAE[i]=1; //Flag for recalculating AE
                 }
               }

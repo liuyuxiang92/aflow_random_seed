@@ -151,12 +151,14 @@ template<class utype> bool initialize_xcomplex(utype d) {
   //xvector<xcomplex<utype> > va,vb=va,vc(va); //DX20180115 - equal operator was missing
   sin(vx);sinh(vx);cos(vx);cosh(vx);exp(vx);log(vx);//sqrt(vx);
   vx.clear(); //DX20180115 - clear was missing
+  vx.null(); //CO20200731
   cout << vx << endl; //DX20180115 - ostream was missing
   conj(vx);  //ME20180904
 
   aurostd::xmatrix<utype > mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO20190329 - clang doesn't like x=x, changing to x=y
   mx=mx+mx;mx+=my;mx=mx-mx;mx-=my;mx=mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20200106 - set the result or clang complains
   mx=sin(mx);mx=sinh(mx);mx=cos(mx);mx=cosh(mx);mx=exp(mx); //CO20200106 - set the result or clang complains
+  aurostd::null_xv<utype>();  //CO20200731
   aurostd::ones_xv<utype>();aurostd::ones_xv<utype>(3);aurostd::ones_xv<utype>(3,3); //CO20190520
   aurostd::ones_xm<utype>();aurostd::ones_xm<utype>(3);aurostd::ones_xm<utype>(3,3);aurostd::ones_xm<utype>(1,2,3,4); //CO20190520
   aurostd::eye<utype>();aurostd::eye<utype>(3);aurostd::eye<utype>(3,3);aurostd::eye<utype>(1,2,3,4); //CO20190520
@@ -502,6 +504,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=initialize_xscalar_xvector_xmatrix_xtensor(int(1));
     //[CO20191201 - better not - these algorithms are NOT meant for ints]o+=initialize_eigenproblems(int(1));  //CO20191201
     aurostd::xvector<int> xv; //CO20190520
+    aurostd::null_xv<int>();  //CO20200731
     aurostd::ones_xv<int>();aurostd::ones_xv<int>(3);aurostd::ones_xv<int>(3,3); //CO20180515 //CO20190520
     aurostd::xmatrix<int> mxint; //CO20190520
     aurostd::ones_xm<int>();aurostd::ones_xm<int>(3);aurostd::ones_xm<int>(3,3);aurostd::ones_xm<int>(1,2,3,4); //CO20180515 //CO20190520

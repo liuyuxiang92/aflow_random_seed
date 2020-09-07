@@ -310,6 +310,8 @@
 #define         DEFAULT_AFLOW_LIBRARY_DIRECTORIES             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_LIBRARY_DIRECTORIES")
 #define AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES            string("/common/AUID,/common/ICSD,/common/LIB0,/common/LIB1,/common/LIB2,/common/LIB3,/common/LIB4,/common/LIB5,/common/LIB6,/common/LIB7,/common/LIB8,/common/LIB9")  // first is default, tokenized with ","
 #define         DEFAULT_AFLOW_PROJECTS_DIRECTORIES            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PROJECTS_DIRECTORIES")
+#define AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY               string("/www/AFLOWDATA")  //CO+ME20200731
+#define         DEFAULT_AFLOWDATA_WEB_DIRECTORY               XHOST.adefault.getattachedscheme("DEFAULT_AFLOWDATA_WEB_DIRECTORY") //CO+ME20200731
 
 // PLATON/FINDSYM // DONE
 #define AFLOWRC_DEFAULT_PLATON_P_EQUAL                        FALSE
@@ -1244,6 +1246,7 @@ namespace aflowrc {
     // AFLOW_LIBRARY AFLOW_PROJECT
     aflowrc::load_default("DEFAULT_AFLOW_LIBRARY_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES);
     aflowrc::load_default("DEFAULT_AFLOW_PROJECTS_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES);
+    aflowrc::load_default("DEFAULT_AFLOWDATA_WEB_DIRECTORY",AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY); //CO+ME20200731
 
     // DEFAULT PLATON/FINDSYM
     aflowrc::load_default("DEFAULT_PLATON_P_EQUAL",AFLOWRC_DEFAULT_PLATON_P_EQUAL);
@@ -1807,6 +1810,7 @@ namespace aflowrc {
     aflowrc << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     aflowrc << "DEFAULT_AFLOW_LIBRARY_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PROJECTS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOWDATA_WEB_DIRECTORY=\"" << AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY << "\"" << endl; //CO+ME20200731
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULT PLATON/FINDSYM" << endl;
@@ -2176,7 +2180,6 @@ namespace aflowrc {
       }
     }
     if(LDEBUG) oss << soliloquy << " END" << endl;
-    //    exit(0);
     return TRUE;
   }
 } // namespace aflowrc
@@ -2348,6 +2351,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_LIBRARY_DIRECTORIES\")=\"" << DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PROJECTS_DIRECTORIES\")=\"" << DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOWDATA_WEB_DIRECTORY\")=\"" << DEFAULT_AFLOWDATA_WEB_DIRECTORY << "\"" << endl;  //CO+ME20200731
 
     if(LDEBUG) oss << "// DEFAULT PLATON/FINDSYM" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_PLATON_P_EQUAL\")=" << DEFAULT_PLATON_P_EQUAL << endl;
@@ -2693,7 +2697,6 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: END" << endl;
 
     oss.flush();
-    //    exit(0);
     return FALSE;
   }
 } // namespace aflowrc

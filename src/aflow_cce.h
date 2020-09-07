@@ -10,7 +10,7 @@
 #ifndef _AFLOW_CCE_H_
 #define _AFLOW_CCE_H_
 
-static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in get_offset function needed for reading corrections from lookup table
+static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U:ICSD,exp"; // when adding a new functional also introduce new 'offset' in get_offset function needed for reading corrections from lookup table
 static const string CCE_default_output_functionals= "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
 static const string CCE_temperatures = "298.15,0"; // needs to be extended when adding new corrections for other temperatures
 static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
@@ -20,7 +20,7 @@ static const double _CCE_SELF_DIST_TOL_ = 0.001; // distance tolerance in Ang fo
 static const double _CCE_perox_cutoff_=1.6; // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang
 static const double _CCE_superox_cutoff_=1.4; // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang
 static const double _CCE_O2_molecule_cutoff_=1.2; // O-O bonds in the O2 molecule is about 1.21 Ang.
-static const uint CCE_num_functionals_Bader=4; // Currently, Bader charges used to determine oxidation states are available for 4 functionals: PBE, LDA, SCAN, and PBE+U_ICSD and ONLY for oxides, see get_Bader_templates function
+static const uint CCE_num_functionals_Bader=4; // Currently, Bader charges used to determine oxidation states are available for 4 functionals: PBE, LDA, SCAN, and PBE+U:ICSD and ONLY for oxides, see get_Bader_templates function
 
 namespace cce {
   struct CCE_Variables {
@@ -65,8 +65,8 @@ namespace cce {
   void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void print_corrections(aurostd::xoption& flags, std::istream& ist); //ME20200213
   vector<double> calculate_corrections(const string& directory_path);
-  vector<double> calculate_corrections(xstructure& structure, string& functional);
-  void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
+  vector<double> calculate_corrections(const xstructure& structure, string& functional);  //CO20200731 - const xstructure
+  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);  //CO20200731 - const xstructure
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);
@@ -80,12 +80,12 @@ namespace cce {
   CCE_Variables init_variables(const xstructure&); //ME20200213
   // structural analysis
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
-  vector<uint> check_for_multi_anion_system(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_, ostream& oss=std::cout);
-  vector<uint> get_num_neighbors(xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);
+  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_, ostream& oss=std::cout);  //CO20200731 - const xstructure
+  vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);  //CO20200731 - const xstructure
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_); //CO20200731 - const xstructure
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);  //CO20200731 - const xstructure
   vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
-  void check_per_super_oxides(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);  //CO20200731 - const xstructure
   // determine oxidation numbers from electronegativities
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);
   vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
