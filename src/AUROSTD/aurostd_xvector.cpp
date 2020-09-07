@@ -2066,8 +2066,8 @@ namespace aurostd {
 namespace aurostd {
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points, const vector<utype>& weights) { //DX20200728 - added weights
-      xvector<utype> centroid;
-      if(points.size()==0){return centroid;}
+      if(points.size()==0){ xvector<utype> centroid; return centroid; }
+      xvector<utype> centroid(points[0].lrows,points[0].urows); //DX+CO20200907 - ensure dimensions are commensurate
       centroid=points[0]*weights[0]; //DX20200728
       for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[0];} //DX20200728
       centroid/=(aurostd::sum(weights));
@@ -2095,8 +2095,8 @@ namespace aurostd {
       // This is based on the algorithm proposed in:
       // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
 
-      xvector<double> centroid;
-      if(points.size()==0){return centroid;}
+      if(points.size()==0){ xvector<double> centroid; return centroid; }
+      xvector<double> centroid(points[0].lrows,points[0].urows); //DX+CO20200907 - ensure dimensions are commensurate
 
       for(uint i=1;i<4;i++){
         double zi_avg = 0.0;
