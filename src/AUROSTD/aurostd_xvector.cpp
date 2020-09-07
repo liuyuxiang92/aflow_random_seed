@@ -2070,7 +2070,7 @@ namespace aurostd {
       if(points.size()==0){return centroid;}
       centroid=points[0]*weights[0]; //DX20200728
       for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[0];} //DX20200728
-      centroid/=points.size();
+      centroid/=(aurostd::sum(weights));
       return centroid;
     }
 }
@@ -2108,8 +2108,8 @@ namespace aurostd {
           zi_avg += zi;
           zeta_avg += zeta;
         }
-        zi_avg/=points.size();
-        zeta_avg/=points.size();
+        zi_avg/=(aurostd::sum(weights));
+        zeta_avg/=(aurostd::sum(weights));
         double theta_avg = std::atan2(-zeta_avg,-zi_avg);
         centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*pi));
       }

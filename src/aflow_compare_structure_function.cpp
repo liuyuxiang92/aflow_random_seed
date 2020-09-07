@@ -6226,16 +6226,18 @@ namespace compare{
     deque<_atom> xstr1_atoms = _xstr1_atoms;
     xvector<double> xstr1_centroid,xstr1_centroid_PBC,PROTO_centroid,PROTO_centroid_PBC;
     if(USE_CENTROID_METHOD){
-      xstr1_centroid = getCentroidOfStructure(xstr1_atoms);
-      xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice); //DX20200904 - use PBC to account for switching sides of cell
+      for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].mass = GetAtomMass(xstr1_atoms[i].name)/AMU2KILOGRAM; cerr << xstr1_atoms[i].name << " -> " << xstr1_atoms[i].mass << endl;}
+      xstr1_centroid = getCentroidOfStructure(xstr1_atoms,true,false);
+      //xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
     }
     deque<_atom> PROTO_atoms = _PROTO_atoms;
     if(USE_CENTROID_METHOD){
-      PROTO_centroid = getCentroidOfStructure(PROTO_atoms);
-      PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice); //DX20200904 - use PBC to account for switching sides of cell
+      for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].mass = GetAtomMass(PROTO_atoms[i].name)/AMU2KILOGRAM;}
+      PROTO_centroid = getCentroidOfStructure(PROTO_atoms,true,false);
+      //PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
     }
 
-    if(USE_CENTROID_METHOD && LDEBUG){
+    if(USE_CENTROID_METHOD){
       cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
       cerr << function_name << " xstr1_centroid_PBC: " << xstr1_centroid_PBC << endl;
       cerr << function_name << " FRAC:xstr1_centroid: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid << endl;
@@ -6244,11 +6246,15 @@ namespace compare{
       cerr << function_name << " PROTO_centroid_PBC: " << PROTO_centroid_PBC << endl;
       cerr << function_name << " FRAC:PROTO_centroid: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid << endl;
       cerr << function_name << " FRAC:PROTO_centroid_PBC: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid_PBC << endl;
+      xvector<double> xstr1_centroid_PBC_cart = aurostd::trasp(xstr1_lattice)*BringInCell(xstr1_centroid_PBC);
+      xvector<double> PROTO_centroid_PBC_cart = aurostd::trasp(PROTO_lattice)*BringInCell(PROTO_centroid_PBC);
+      cerr << function_name << " CART:xstr1_centroid_PBC: " << xstr1_centroid_PBC_cart << endl; 
+      cerr << function_name << " CART:PROTO_centroid_PBC: " << PROTO_centroid_PBC_cart << endl;
     }
 
     if(USE_CENTROID_METHOD){
       for(uint i=0;i<xstr1_atoms.size();i++){xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid_PBC; }
-      for(uint i=0;i<PROTO_atoms.size();i++){PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-xstr1_centroid_PBC; }
+      for(uint i=0;i<PROTO_atoms.size();i++){PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid_PBC; }
     }
 
     // ---------------------------------------------------------------------------
@@ -7791,6 +7797,7 @@ namespace compare{
             if(xstr1_tmp.atoms[i].name==lfa_str1){
               xstr1_tmp.ShiftOriginToAtom(i);
               xstr1_tmp.BringInCell(1e-10);
+              xstr1_tmp.UpdateCartesianCoordinates(); //DX
 
               // ---------------------------------------------------------------------------
               // create vector of variables for each thread 
@@ -8323,6 +8330,7 @@ namespace compare{
           if(proto.atoms[iat].name==lfa){
             proto.ShiftOriginToAtom(iat);
             proto.BringInCell(1e-10);
+            proto.UpdateCartesianCoordinates(); //DX
             if(VERBOSE){
               cerr << "compare::structureSearch: orig structure " << xstr1 << endl;
               cerr << "compare::structureSearch: structure " << proto << endl;
