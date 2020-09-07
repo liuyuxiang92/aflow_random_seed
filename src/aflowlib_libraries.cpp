@@ -6296,7 +6296,6 @@ namespace aflowlib {
     deque<string> vdirsOUT,vzips,vcleans;
     XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans); //CO20200501
 
-    uint aflow_max_argv=AFLOW_MAX_ARGV;  //CO20200731 - deep directories like AEL/AGL require more room
     uint vzips_size=vzips.size();
 
     if(vzips_size>0) {
@@ -6315,7 +6314,7 @@ namespace aflowlib {
         command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
         //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
         command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
-        command << "_" << i/aflow_max_argv+1 << "_" << XHOST.hostname;
+        command << "_" << (iwhile++)+1 << "_" << XHOST.hostname;
         command << " --size=" << NUM_SIZE << " --DIRECTORY ";
         while(i<vzips_size){
           command << " " << vzips[i++];
@@ -6325,11 +6324,10 @@ namespace aflowlib {
             break;
           }
         }
-        iwhile++;
       }
-      cerr << soliloquy << " last command=\"" << command.str() << "\"" << endl;
+      cerr << soliloquy << " last command=\"" << command.str() << "\"" << endl; //sanity check that we didn't leave anything out
       //[CO20200825 - OBSOLETE]for(uint i=0;i<vzips_size;i+=aflow_max_argv) {
-      //[CO20200825 - OBSOLETE]  command << "aflow-dev --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
+      //[CO20200825 - OBSOLETE]  command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
       //[CO20200825 - OBSOLETE]  command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
       //[CO20200825 - OBSOLETE]  //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
       //[CO20200825 - OBSOLETE]  command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
