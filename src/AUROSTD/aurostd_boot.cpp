@@ -86,6 +86,7 @@ using aurostd::gaussj;
 using aurostd::xoption;
 using aurostd::floor;
 using aurostd::ceil;
+using aurostd::getElements; //CO20200624
 
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
@@ -259,7 +260,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o=+(v==v);o=+(v!=v);o+=identical(v,v);o+=identical(v,v,x);o+=identical(v,v,(utype&) x);o+=identical(v,v,(const utype&) x);o+=isdifferent(v,v);
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX20191125 - changed input format for reduceByGCD()
   o+=getcos(v,v);v.clear();v.set(x);v.reset();clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
-  o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);o+=distance(v,v);
+  o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);v=getCentroid(vxv,vutype);o+=distance(v,v); //DX20200729 - added getCentroid() with weights
+  aurostd::xmatrix<utype> xmatpbc;dxv=getCentroidPBC(vxv,xmatpbc);dxv=getCentroidPBC(vxv,vutype,xmatpbc); //DX20200728 - added getCentroidPBC()
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
   vv=pointLineIntersection(v,v,v); //CO20190520
   double dist;vv=linePlaneIntersect(v,v,v,v,dist,w); //CO20190520
@@ -401,6 +403,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 
   double o=0;
   o=aurostd::sqrt((double) 0.0)+aurostd::sqrt((int) 0.0)+aurostd::sqrt((float) 0.0);
+  ofstream FileMESSAGE;
   // return TRUE;
   // NEVER CALL THIS FUNCTION ... JUST TO INITIALIZE TEMPLATES
   // this function is called with aflow.cpp and it is used to create the various templates used in the whole code.
@@ -512,6 +515,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     getSmithNormalForm(mxint,mxint,mxint,mxint); //CO20191201
     mxdouble=xmatrixutype2double(mxint);  //CO20191201
     mxint=xmatrixdouble2utype<int>(mxdouble);   //CO20191201
+    vector<int> vi;getElements("MnPd",vi);getElements("MnPd",vi,pp_string);getElements("MnPd",vi,pp_string,FileMESSAGE); //CO20200624
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
@@ -523,6 +527,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     getSmithNormalForm(mxuint,mxuint,mxuint,mxuint); //CO20191201
     mxdouble=xmatrixutype2double(mxuint);  //CO20191201
     mxuint=xmatrixdouble2utype<uint>(mxdouble);   //CO20191201
+    vector<uint> vui;getElements("MnPd",vui);getElements("MnPd",vui,pp_string);getElements("MnPd",vui,pp_string,FileMESSAGE); //CO20200624
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
@@ -538,6 +543,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       o+=aurostd::isequal<float>(float(d),float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d),float(d));
+      vector<float> vf;getElements("MnPd",vf);getElements("MnPd",vf,pp_string);getElements("MnPd",vf,pp_string,FileMESSAGE); //CO20200624
     }
 #endif
 #ifdef AUROSTD_INITIALIZE_DOUBLE
@@ -570,6 +576,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       xc.reset(bits,'E'); //CO20181226
       while(xc.increment()){xc.applyCombo(vvxd);} //CO20181226
       //[CO20191201 - should NOT be needed here, the output should be an int type]getSmithNormalForm(z,z,z,z); //CO20191201
+      vector<double> vd;getElements("MnPd",vd);getElements("MnPd",vd,pp_string);getElements("MnPd",vd,pp_string,FileMESSAGE); //CO20200624
     }
 #endif   
 #ifdef AUROSTD_INITIALIZE_LONG_DOUBLE
@@ -582,6 +589,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       aurostd::lfit(x,x,x,x,ia,z,chi,utype_funcs);
       // o+=initialize_xcomplex((long double)(1));
       // xmatrix<(long double)> mm(1,1);GaussJordan(m,m);
+      vector<long double> vld;getElements("MnPd",vld);getElements("MnPd",vld,pp_string);getElements("MnPd",vld,pp_string,FileMESSAGE); //CO20200624
     }
 #endif
 #ifdef AUROSTD_INITIALIZE_LONG_INT
@@ -595,6 +603,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     getSmithNormalForm(mxlint,mxlint,mxlint,mxlint); //CO20191201
     mxdouble=xmatrixutype2double(mxlint);  //CO20191201
     mxlint=xmatrixdouble2utype<long int>(mxdouble);   //CO20191201
+    vector<long int> vli;getElements("MnPd",vli);getElements("MnPd",vli,pp_string,FileMESSAGE); //CO20200624
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
@@ -608,6 +617,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     getSmithNormalForm(mxulint,mxulint,mxulint,mxulint); //CO20191201
     mxdouble=xmatrixutype2double(mxulint);  //CO20191201
     mxulint=xmatrixdouble2utype<unsigned long int>(mxdouble);   //CO20191201
+    vector<unsigned long int> vuli;getElements("MnPd",vuli);getElements("MnPd",vuli,pp_string,FileMESSAGE); //CO20200624
 #endif
 #ifdef AUROSTD_INITIALIZE_LONG_LONG_INT
     o+=initialize_scalar((long long int)(1));
@@ -620,6 +630,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     getSmithNormalForm(mxllint,mxllint,mxllint,mxllint); //CO20191201
     mxdouble=xmatrixutype2double(mxllint);  //CO20191201
     mxllint=xmatrixdouble2utype<long long int>(mxdouble);   //CO20191201
+    vector<long long int> vlli;getElements("MnPd",vlli);getElements("MnPd",vlli,pp_string,FileMESSAGE); //CO20200624
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
@@ -633,6 +644,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     getSmithNormalForm(mxullint,mxullint,mxullint,mxullint); //CO20191201
     mxdouble=xmatrixutype2double(mxullint);  //CO20191201
     mxullint=xmatrixdouble2utype<unsigned long long int>(mxdouble);   //CO20191201
+    vector<unsigned long long int> vulli;getElements("MnPd",vulli);getElements("MnPd",vulli,pp_string,FileMESSAGE); //CO20200624
 #endif
   }
   return TRUE;

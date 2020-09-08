@@ -17,6 +17,18 @@
 #define NNN   -123456
 //[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
+// hard-coded prototype generator (ANRL/ subdirectory required) //DX20200623
+// to revert to the hard-coded prototypes, do the following sequence:
+// 1) set USE_HARDCODED_PROTOTYPES to true in aflow_makefile.cpp
+// 2) compile
+// 3) run aflow --makefile
+// 4) set USE_HARDCODED_PROTOTYPES (below) to true
+// 5) recompile
+#define USE_HARDCODED_PROTOTYPES false
+
+// toggle symbolic math
+// (for now it is coupled with USE_HARDCODED_PROTOTYPES, although it does not have to be)
+#define USE_SYMBOLIC_SOURCE !(USE_HARDCODED_PROTOTYPES) // true
 
 //ZERO PRECISION DEFINITIONS - TIGHT (DEFAULT) AND LOOSE
 #define _ZERO_PRECISION_ 10
@@ -73,24 +85,6 @@ enum vector_reduction_type {   //CO20190629
 //[CO20190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
 //[CO20190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 //ME20190628 END
-
-//compound specification is how a compound is specified
-//composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
-//for instance, H1.25 can be a pseudopotential and NOT a composition
-enum compound_designation {
-  composition_string,
-  pp_string,
-};
-
-//CO20190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
-const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
-",_GW"    //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
-",_ZORA"  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
-",_LDApU" //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
-",_AE"    //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
-",_NC2"   //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
-",_200eV"
-"";
 
 //MESSAGE defaults - CO20200502
 #define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
@@ -1252,19 +1246,19 @@ double GetCompoundAttenuationLength(const deque<string>& _species,const deque<in
 //DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  //RHT
 //DX+CO END
 // routines of general use
-string XATOM_AlphabetizationSpecies(string speciesA,string speciesB);
-string XATOM_AlphabetizationSpecies(vector<string> vspecies);
-string XATOM_AlphabetizationSpecies(vector<string> vspecies,vector<double> vnumbers);
+string XATOM_AlphabetizationSpecies(const string& speciesA,const string& speciesB);
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies);
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies,const vector<double>& vnumbers);
 void XATOM_AlphabetizationSpecies(string& system, vector<string>& vspecies,vector<double>& vnumbers);
 void XATOM_AlphabetizationCompound(string& system, vector<string>& vspecies,vector<double>& vnumbers);
 void XATOM_AlphabetizationSpecies(string& system, vector<string>& vspecies);
 void XATOM_AlphabetizationSpecies(string& system);
 void XATOM_AlphabetizationCompound(string& system);
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX);
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
-vector<uint> composition2stoichiometry(string& composition); //DX20181009
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX);
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, vector<double> &natomsX);
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX);
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
+//DX20200724 [OBSOLETE] vector<uint> composition2stoichiometry(string& composition); //DX20181009
 // neighbour things
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 
@@ -1363,19 +1357,27 @@ class wyckoffsite_ITC { //Also for wyckoff sites
     wyckoffsite_ITC(const wyckoffsite_ITC& b);
     ~wyckoffsite_ITC(void);
     // OPERATORS                                                  // --------------------------------------
-    const wyckoffsite_ITC& operator=(const wyckoffsite_ITC& b);             // some operators
-    bool operator<(const wyckoffsite_ITC& b) const;                          // < operator //DX20190130 - so we can sort by Wyckoff letter, then by species
-    friend ostream& operator<<(ostream&,const wyckoffsite_ITC&);       // ostream
+    const wyckoffsite_ITC& operator=(const wyckoffsite_ITC& b);   // some operators
+    bool operator<(const wyckoffsite_ITC& b) const;               // < operator //DX20190130 - so we can sort by Wyckoff letter, then by species
+    friend ostream& operator<<(ostream&,const wyckoffsite_ITC&);  // ostream
     // CONTENT
     xvector<double> coord;
-    string type; //chemical label etc
+    uint index; //index //DX20200427
+    string type; //chemical label etc //DX20200427
     string wyckoffSymbol;
     string letter;                                                //DX20190128 - add Wyckoff letter
     string site_symmetry;                                         //DX20190128 - add Wyckoff site symmetry
     uint multiplicity;                                            //DX20190128 - add Wyckoff multiplicity
     double site_occupation;                                       //DX20190128 - add Wyckoff site occupation
     vector<vector<string> > equations;                            //DX20190128 - add Wyckoff equations
-  private:                                                       // ---------------------------------------
+    uint parameter_index;                                         //DX20200513 - for ANRL parameter
+    // initializers
+    void getWyckoffFromLetter(uint space_group_number,            //DX20200501
+        const string& Wyckoff_letter,
+        int setting=SG_SETTING_1);
+    void getWyckoffFromLetter(const string& space_group_string,   //DX20200501
+        const string& Wyckoff_letter);
+  private:                                                        // ---------------------------------------
     void free();                                                  // to free everything
 };
 
@@ -1454,6 +1456,9 @@ bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
 bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
 bool sortAtomsDist(const _atom& a1,const _atom& a2);		// sort atoms by dist  //CO20180420
 bool sortAtomsEquiv(const _atom& a1,const _atom& a2); // cluster by equivalent atoms //CO20190116
+// sort Wyckoff positions //DX20200515
+bool sortWyckoffByLetter(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // sort Wyckoff positions by Wyckoff letter
+bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // sort Wyckoff positions by atom type
 
 class xstructure {
   public:
@@ -1523,7 +1528,12 @@ class xstructure {
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
     string platon2print(bool,bool,double,double,double,double);   // Create Platon input file >=51108
-    void FakeNames(void);                                         // Fix names as fakes - useful for platon
+    void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
+    void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
+    vector<string> GetElements(bool clean_name=false,
+        bool fake_names=false);                                   //DX20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name);     //Dx20200724
+    vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
         double P_ang=DEFAULT_PLATON_P_ANG,
@@ -2449,6 +2459,13 @@ xstructure input2VASPxstr(istream& input);
 xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------
+// centroid functions for structures //DX20200728
+xvector<double> getCentroidOfStructure(const xstructure& xstr, bool use_cpos=true, bool use_atom_mass=false);
+xvector<double> getCentroidOfStructure(const deque<_atom>& atoms, bool use_cpos=true, bool use_atom_mass=false);
+xvector<double> getCentroidOfStructurePBC(const xstructure& xstr, bool use_cpos=true, bool use_atom_mass=false);
+xvector<double> getCentroidOfStructurePBC(const deque<_atom>& atoms,xmatrix<double> lattice,bool use_cpos=true,bool use_atom_mass=false);
+
+// ----------------------------------------------------------------------------
 // functions related to AtomEnvironment - DX20191122
 vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode=ATOM_ENVIRONMENT_MODE_1);
 vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode=ATOM_ENVIRONMENT_MODE_1);
@@ -2585,7 +2602,8 @@ extern string PrototypeBinaryGUS_Cache_Library[];
 #define DOI_POCC " [POCC doi: 10.1021/acs.chemmater.6b01449]"
 
 namespace anrl {
-  xstructure PrototypeANRL(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option);
+  // ---------------------------------------------------------------------------
+  // get existing prototype information
   uint PrototypeANRL_LoadList(vector<string>& vproto,
       vector<string>& vproto_label,
       vector<uint>& vproto_nspecies,
@@ -2598,7 +2616,10 @@ namespace anrl {
       vector<string>& vproto_Strukturbericht,
       vector<string>& vproto_prototype,
       vector<string>& vproto_dialect);
-  vector<string> getANRLParameters(string anrl_label, string library="", int choice=-1, bool keep_original_lattice_parameter=false); //DX20181009 //DX20190227 - added keep_original_lattice_parameter
+  vector<string> getANRLParameters(string anrl_label,
+      string library="",
+      int choice=-1,
+      bool keep_original_lattice_parameter=false); //DX20181009 //DX20190227 - added keep_original_lattice_parameter
   bool vproto2tokens(string proto,
       string& label,
       uint& nspecies,
@@ -2611,22 +2632,43 @@ namespace anrl {
       string& Strukturbericht,
       string& prototype,
       string& dialect);
+  // ---------------------------------------------------------------------------
+  // functions to determine atomic positions from Wyckoff and parameters
   vector<uint> extractStoichiometry(string& anrl_label);
+  // ---------------------------------------------------------------------------
+  // checking functions
   bool PrototypeANRL_Consistency(uint vparameters_size,uint proto_nparameters,string proto_prototype,
       string proto_label,string proto_Strukturbericht,string proto_Pearson_symbol,
       uint proto_spacegroup, string proto_params, uint print_mode); //DX20180710 - added print_mode //DX20200207 - oss no longer needed
+  // ---------------------------------------------------------------------------
+  // helper functions to determine label and internal degrees of freedom 
   string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize);
   vector<string> getANRLLatticeParameterString(char& lattice_type);
   vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting); //DX20191031
   vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting); //DX20191031
   vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting); //DX20191031
   uint getANRLSettingChoice(int spacegroup); //DX20191031 - removed reference
+  // ---------------------------------------------------------------------------
+  // map structure to label and internal degrees of freedom 
   string structure2anrl(istream& input, aurostd::xoption& vpflow);           // xoption
   string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX20191031 - added recalculate_symmetry
   string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO20190520 - removed pointers for bools and doubles, added const where possible
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
   string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
-  xstructure rhl2hex(xstructure& str, double& a, double& c); 
+  // ---------------------------------------------------------------------------
+  // generic prototype generator (main function)
+  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout, bool silence_logger=true); //DX20200528 - command line = no logger
+  xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ofstream& FileMESSAGE, ostream& logstream=cout, bool silence_logger=false); //DX20200528 - internal = logger
+  // ---------------------------------------------------------------------------
+  // [OLD] hard-coded generator (requires ANRL/ subdirectory)
+  xstructure PrototypeANRL(ostream &oss,
+      string label,
+      string parameters,
+      deque<string> &vatomX,
+      deque<double> &vvolumeX,
+      double volume_in,
+      int mode,
+      bool flip_option);
 }
 
 // ----------------------------------------------------------------------------
@@ -2881,7 +2923,6 @@ namespace KBIN {
   string VASP_PseudoPotential_CleanName(const string& specieIN);
   string VASP_PseudoPotential_CleanName_20190712(const string& specieIN); //CO20190712
   string VASP_PseudoPotential_CleanName_20190101(const string& specieIN); //CO20190712
-  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO20190712
   bool VASP_PseudoPotential_CleanName_TEST(void); //CO20190712
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
@@ -4165,6 +4206,7 @@ namespace LATTICE {
   string Lattice2TypeAndCentering(const string& lattice_type); //DX20191031
   string SpaceGroup2Lattice(uint sg);
   string SpaceGroup2LatticeTypeAndCentering(uint sg); //DX20191031
+  uint Conventional2PrimitiveRatio(char& lattice_centering); //DX20200427
   uint Lattice2SpaceGroup(const string& lattice,vector<uint>& vsg);
   string SpaceGroup2LatticeVariation(uint sg,const xstructure& str);
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);

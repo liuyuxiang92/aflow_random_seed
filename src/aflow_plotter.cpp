@@ -443,7 +443,7 @@ namespace plotter {
         if (aurostd::WithinList(protos, proto)) {
           if(LDEBUG){cerr << soliloquy << " found proto in ANRL" << endl;}
           if (tokens.size() == 3) proto += "." + tokens[2];
-          vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
+          vector<string> elements = aurostd::getElements(tokens[0]);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
           if(LDEBUG){
             cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
@@ -459,7 +459,7 @@ namespace plotter {
           int index;
           if (aurostd::WithinList(protos, proto, index)) {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-            vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
+            vector<string> elements = aurostd::getElements(tokens[0]);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
             if(LDEBUG){
               cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
@@ -526,7 +526,7 @@ namespace plotter {
 
     // Now determine the composition
     vector<double> comp;
-    pflow::stringElements2VectorElements(compound, comp);
+    aurostd::getElements(compound, comp);
 
     // Finally, sort to match sequence
     vector<double> composition(comp.size());
@@ -585,7 +585,7 @@ namespace plotter {
         cerr << soliloquy << " proto=" << proto << endl;
       }
 
-      velements=pflow::stringElements2VectorElements(pps,true,false,pp_string,true);  //clean, no sort_elements, pseudopotential string, keep_pp
+      velements=aurostd::getElements(pps,pp_string,true,false,true);  //clean, no sort_elements, pseudopotential string, keep_pp
       if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
       pocc_params=pocc_params_arun_str;
@@ -734,7 +734,7 @@ namespace plotter {
     el = proto.substr(0, t);
     proto = proto.substr(t + 1, string::npos);
     if (!generic) {
-      vector<string> elements = pflow::stringElements2VectorElements(el);
+      vector<string> elements = aurostd::getElements(el);
       if (elements.size() != composition.size()) {
         generic = true;
         broken = true;
