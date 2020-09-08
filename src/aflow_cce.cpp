@@ -1086,7 +1086,7 @@ namespace cce {
       cce_vars.perox_indices[i] = 0; 
       cce_vars.superox_indices[i] = 0; 
     }
-    cce_vars.cutoffs=get_dist_cutoffs(structure);
+    //cce_vars.cutoffs=get_dist_cutoffs(structure);
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
     structure.GetStrNeighData(cutoffs_max,neigh_mat);
@@ -2922,43 +2922,56 @@ namespace cce {
   // Returns cation coordination numbers, i.e. number of anions coordinating each cation in JSON format
   string print_JSON_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream json;
-    vector<string> cations_names_and_neighbors_vector;
+    vector<string> cations_neighbors_vector;
+    vector<string> anion_neighbors_vector;
 
     json << "{";
-    json << "\"cation_coordination_numbers\":{";
-    append_coordination_info_JSON(structure, cce_vars, cce_vars.num_neighbors, cce_vars.anion_species, json);
-    if (cce_flags.flag("MULTI_ANION_SYSTEM")){
-      json << ",";
-      for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
-        append_coordination_info_JSON(structure, cce_vars, multi_anion_num_neighbors[k], cce_vars.multi_anion_species[k], json);
-        if (k<ksize-1){
-          json << ",";
+    //json << "\"cation_coordination_numbers\":{";
+    for (uint i=0,isize=structure.atoms.size();i<isize;i++){
+      if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
+        anion_neighbors_vector.clear();
+        string cation_info="";
+        if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
+          cation_info="\"" + aurostd::utype2string<uint>(i+1) + "_" + structure.atoms[i].cleanname + "\":{";
+          anion_neighbors_vector.push_back("\"" + cce_vars.anion_species + "\":" + aurostd::utype2string<uint>(cce_vars.num_neighbors[i]));
         }
+        if (cce_flags.flag("MULTI_ANION_SYSTEM")){
+          for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
+            if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the multi anion species
+              if (cation_info == ""){ // if no neighbors from main anion species, append basic cation info first
+                cation_info="\"" + aurostd::utype2string<uint>(i+1) + "_" + structure.atoms[i].cleanname + "\":{";
+              }
+              anion_neighbors_vector.push_back("\"" + cce_vars.multi_anion_species[k] + "\":" + aurostd::utype2string<uint>(multi_anion_num_neighbors[k][i])); // i+1: convert to 1-based counting
+            }
+          }
+        }
+        cations_neighbors_vector.push_back(cation_info + aurostd::joinWDelimiter(anion_neighbors_vector,",") + "}");
       }
     }
+    json << aurostd::joinWDelimiter(cations_neighbors_vector,",");
     json << "}";
-    json << "}";
+    //json << "}";
     return json.str();
   }
 
-  //append_coordination_info_JSON/////////////////////////////////////////////////////////////
-  // append the cation names and coordination numbers to the JSON
-  void append_coordination_info_JSON(const xstructure& structure, const CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& json) {
-    vector<string> cations_names_and_neighbors_vector;
+  ////append_coordination_info_JSON/////////////////////////////////////////////////////////////
+  //// append the cation names and coordination numbers to the JSON
+  //void append_coordination_info_JSON(const xstructure& structure, const CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& json) {
+  //  vector<string> cations_names_and_neighbors_vector;
 
-    json << "\"anion_" << considered_anion_species << "\":{";
-    // first populate vectors with names, atom indices of the cations, and num anion neighbors for each cation
-    for (uint i=0,isize=structure.atoms.size();i<isize;i++){
-      if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
-        if (num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
-          cations_names_and_neighbors_vector.push_back("\"" + structure.atoms[i].cleanname + "(atom " + aurostd::utype2string<uint>(i) + ")\":" + aurostd::utype2string<uint>(num_neighbors[i]));
-        }
-      }
-    }
-    // then append anion neighbors info for cations to json
-    json << aurostd::joinWDelimiter(cations_names_and_neighbors_vector,",");
-    json << "}";
-  }
+  //  json << "\"anion_" << considered_anion_species << "\":{";
+  //  // first populate vectors with names, atom indices of the cations, and num anion neighbors for each cation
+  //  for (uint i=0,isize=structure.atoms.size();i<isize;i++){
+  //    if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
+  //      if (num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
+  //        cations_names_and_neighbors_vector.push_back("\"" + structure.atoms[i].cleanname + "(atom " + aurostd::utype2string<uint>(i) + ")\":" + aurostd::utype2string<uint>(num_neighbors[i]));
+  //      }
+  //    }
+  //  }
+  //  // then append anion neighbors info for cations to json
+  //  json << aurostd::joinWDelimiter(cations_names_and_neighbors_vector,",");
+  //  json << "}";
+  //}
 
   //print_JSON_ox_nums/////////////////////////////////////////////////////////////
   // Returns oxidation numbers in JSON format
@@ -2966,16 +2979,15 @@ namespace cce {
     stringstream json;
     uint natoms = cce_vars.oxidation_states.size();
 
-    json << "{";
-    json << "\"oxidation_states\":";
+    //json << "{";
+    //json << "\"oxidation_states\":";
     json << "{";
     for (uint i = 0; i < natoms; i++) {
-      json << "\"" << structure.atoms[i].cleanname << "(atom " << aurostd::utype2string<uint>(i) << ")\":" << cce_vars.oxidation_states[i]; // << "," << structure.atoms[i].fpos 
+      json << "\"" << aurostd::utype2string<uint>(i+1) << "_" << structure.atoms[i].cleanname << "\":" << cce_vars.oxidation_states[i]; // << "," << structure.atoms[i].fpos 
       if (i < natoms - 1) json << ",";
     }
     json << "}";
-    //json << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.oxidation_states),",") << "]";
-    json << "}";
+    //json << "}";
     return json.str();
   }
 
@@ -3297,7 +3309,7 @@ namespace cce {
     oss << "                                 must be written on the right side next to the coordinates for each atom" << endl;
     oss << "                                 just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below." << endl;
     oss << endl;
-    oss << "--dft_formation_enthalpies=|--dfte=" << endl;
+    oss << "--enthalpies_formation_dft=|--dfte=" << endl;
     oss << "                                 Provide a comma separated list of precalculated DFT formation enthalpies," << endl; 
     oss << "                                 they are assumed to be: (i) negative for compounds lower in enthalpy" << endl; 
     oss << "                                 than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
@@ -3360,13 +3372,13 @@ namespace cce {
     oss << "Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO" << endl; 
     oss << "in the current directory as POSCAR, the following commands can be executed:" << endl;
     oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_enthalpies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN" << endl;
+    oss << "aflow --cce=POSCAR --enthalpies_formation_dft=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN" << endl;
     oss << "This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO." << endl;
     oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_enthalpies=-6.220 --functionals=LDA" << endl;
+    oss << "aflow --cce=POSCAR --enthalpies_formation_dft=-6.220 --functionals=LDA" << endl;
     oss << "This gives you only the CCE corrections and CCE formation enthalpies for LDA." << endl;
     oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_enthalpies=-5.434" << endl;
+    oss << "aflow --cce=POSCAR --enthalpies_formation_dft=-5.434" << endl;
     oss << "This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that" << endl; 
     oss << "PBE is assumed as functional." << endl;
     oss << endl;

@@ -40,7 +40,7 @@ Details for the options available are explained in the following.
                                  must be written on the right side next to the coordinates for each atom
                                  just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 
---dft_formation_enthalpies=|--dfte=
+--enthalpies_formation_dft=|--dfte=
                                  Provide a comma separated list of precalculated DFT formation enthalpies,
                                  they are assumed to be: (i) negative for compounds lower in enthalpy
                                  than the elements, (ii) in eV/cell. Currently, corrections are available
@@ -48,7 +48,7 @@ Details for the options available are explained in the following.
 
 --functionals=|--func=|--functional=
                                  Provide a comma separated list of functionals for which corrections
-                                 should be returned. If used together with --dft_formation_enthalpies,
+                                 should be returned. If used together with --enthalpies_formation_dft,
                                  the functionals must be in the same sequence as the DFT formation
                                  enthalpies they correspond to. Available functionals are:
                                  (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation
@@ -103,13 +103,13 @@ Direct(2) [A1B1]
 Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO 
 in the current directory as POSCAR, the following commands can be executed:
 
-aflow --cce=POSCAR --dft_formation_enthalpies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN
+aflow --cce=POSCAR --enthalpies_formation_dft=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN
 This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO.
 
-aflow --cce=POSCAR --dft_formation_enthalpies=-6.220 --functionals=LDA
+aflow --cce=POSCAR --enthalpies_formation_dft=-6.220 --functionals=LDA
 This gives you only the CCE corrections and CCE formation enthalpies for LDA.
 
-aflow --cce=POSCAR --dft_formation_enthalpies=-5.434
+aflow --cce=POSCAR --enthalpies_formation_dft=-5.434
 This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that 
 PBE is assumed as functional.
 
