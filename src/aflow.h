@@ -1558,6 +1558,7 @@ class xstructure {
     int  GenerateGridAtoms(int);                                  // generate grid of atoms
     int  GenerateLIJK(double);                                    // generate lijk look up table
     // QUANTUM ESPRESSO AND ABINIT AND AIMS                       // --------------------------------------
+    void fixEmptyAtomNames(bool force_fix=false);                 //CO20200829
     void buildGenericTitle(bool vasp_input=false,bool force_fix=false); // build a nice title with atoms
     void xstructure2qe(void);                                     // some wrap up IOs to convert format to QE
     void xstructure2vasp(void);                                   // some wrap up IOs to convert format to VASP

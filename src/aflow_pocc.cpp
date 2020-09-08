@@ -225,16 +225,16 @@ namespace pocc {
       if(aurostd::IsDirectory(ls_contents[i]) && aurostd::substring2bool(ls_contents[i],"ARUN.POCC")){
         if(!(aurostd::EFileExist(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+" does not contain "+DEFAULT_AFLOW_QMVASP_OUT,_FILE_NOT_FOUND_);}
         v_qmvasp.push_back(xQMVASP(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT));
-        if(v_qmvasp.back().H_atom_static==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
+        if(v_qmvasp.back().H_atom_relax==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
       }
     }
     uint v_qmvasp_size=v_qmvasp.size(); //NO MORE PUSH_BACK BELOW! Will save time for AAPL calculations
     if(v_qmvasp_size<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
-    //sort by H_atom_static
+    //sort by H_atom_relax
     xQMVASP qmvasp_tmp;
     for(uint i=0;i<v_qmvasp_size-1;i++){
       for(uint j=i;j<v_qmvasp_size;j++){
-        if(v_qmvasp[i].H_atom_static>v_qmvasp[j].H_atom_static){
+        if(v_qmvasp[i].H_atom_relax>v_qmvasp[j].H_atom_relax){
           qmvasp_tmp=v_qmvasp[i];
           v_qmvasp[i]=v_qmvasp[j];
           v_qmvasp[j]=qmvasp_tmp;
@@ -246,7 +246,7 @@ namespace pocc {
       for(uint i=0;i<v_qmvasp_size-1;i++){
         qmvasp_filename=v_qmvasp[i].filename;
         aurostd::StringSubst(qmvasp_filename,"/"+DEFAULT_AFLOW_QMVASP_OUT,"");
-        cerr << soliloquy << " H_atom_static(" << qmvasp_filename << ")=" << v_qmvasp[i].H_atom_static << endl;
+        cerr << soliloquy << " H_atom_relax(" << qmvasp_filename << ")=" << v_qmvasp[i].H_atom_relax << endl;
       }
     }
     qmvasp_filename=v_qmvasp[0].filename;
@@ -641,23 +641,15 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies){double dg_total;return getHmix(v_dg,v_energies,dg_total);}
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total){
-    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"pocc::getHmix():";
-    dg_total=aurostd::sum(v_dg);
-    if(LDEBUG){cerr << soliloquy << " dg_total=" << dg_total << endl;}
-    double Hmix=aurostd::scalar_product(v_dg,v_energies)/dg_total;
-    if(LDEBUG){cerr << soliloquy << " Hmix=" << Hmix << endl;}
-    return Hmix;
-  }
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies){
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs){double dg_total;return getHmix(xv_energies,xv_dgs,dg_total);}
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs,double& dg_total){return aurostd::meanWeighted(xv_energies,xv_dgs,dg_total);}
+  double getEFA(const xvector<double>& xv_energies,const xvector<double>& xv_dgs){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::getEFA():";
     double dg_total=0.0;
-    double Hmix=getHmix(v_dg,v_energies,dg_total);
+    double Hmix=getHmix(xv_energies,xv_dgs,dg_total);
     double sigma=0.0;
-    for(int i=v_dg.lrows;i<=v_dg.urows;i++){sigma+=v_dg[i]*pow(v_energies[i]-Hmix,2.0);}
+    for(int i=xv_dgs.lrows;i<=xv_dgs.urows;i++){sigma+=xv_dgs[i]*pow(xv_energies[i]-Hmix,2.0);}
     sigma/=(dg_total-1);
     sigma=sqrt(sigma);
     if(LDEBUG){cerr << soliloquy << " sigma=" << sigma << endl;}
@@ -844,7 +836,7 @@ namespace pocc {
       qmvasp_filename=pocc_directory_abs+"/"+DEFAULT_AFLOW_QMVASP_OUT;
       if(!aurostd::EFileExist(qmvasp_filename,qmvasp_filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No qmvasp file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
       qmvasp.GetPropertiesFile(qmvasp_filename);
-      (*it).m_energy_dft=qmvasp.H_atom_static;
+      (*it).m_energy_dft=qmvasp.H_atom_relax; //this will be the LAST relax, relax matches with aflowlib_libraries (NOT static)
       if((*it).m_energy_dft==AUROSTD_NAN){(*it).m_energy_dft=qmvasp.H_atom_relax;}
       if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_FILE_CORRUPT_);}
       //energy_dft_ground
@@ -894,22 +886,22 @@ namespace pocc {
 
   void POccCalculator::setEFA(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::getEFA():";
+    string soliloquy=XPID+"POccCalculator::setEFA():";
 
     if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
-    xvector<double> v_dg(l_supercell_sets.size()),v_energies(l_supercell_sets.size());
+    xvector<double> xv_dgs(l_supercell_sets.size()),xv_energies(l_supercell_sets.size());
     unsigned long long int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
-      v_dg[isupercell+v_dg.lrows]=(*it).getDegeneracy();
-      v_energies[isupercell+v_energies.lrows]=(*it).m_energy_dft;
+      xv_dgs[isupercell+xv_dgs.lrows]=(*it).getDegeneracy();
+      xv_energies[isupercell+xv_energies.lrows]=(*it).m_energy_dft;
       if(LDEBUG){
-        cerr << soliloquy << " v_dg[i=" << isupercell+v_dg.lrows << "]=" << v_dg[isupercell+v_dg.lrows];
-        cerr << " v_energies[" << isupercell+v_energies.lrows << "]=" << v_energies[isupercell+v_energies.lrows] << endl;
+        cerr << soliloquy << " xv_dgs[i=" << isupercell+xv_dgs.lrows << "]=" << xv_dgs[isupercell+xv_dgs.lrows];
+        cerr << " xv_energies[" << isupercell+xv_energies.lrows << "]=" << xv_energies[isupercell+xv_energies.lrows] << endl;
       }
     }
-    m_Hmix=pocc::getHmix(v_dg,v_energies);
-    m_efa=pocc::getEFA(v_dg,v_energies);
+    m_Hmix=pocc::getHmix(xv_energies,xv_dgs);
+    m_efa=pocc::getEFA(xv_energies,xv_dgs);
   }
 
   string POccCalculator::getTemperatureString(double temperature) const {

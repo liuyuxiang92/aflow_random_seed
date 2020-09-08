@@ -14450,6 +14450,36 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
 }
 
 // ***************************************************************************
+// Function fixEmptyAtomNames()
+// ***************************************************************************
+void xstructure::fixEmptyAtomNames(bool force_fix){
+ bool LDEBUG=(FALSE || XHOST.DEBUG);
+ string soliloquy=XPID+"xstructure::fixEmptyAtomNames():";
+ if(species.size()==species_pp.size()) { //CO20190218
+   for(uint itype=0;itype<species.size();itype++) {
+     if((force_fix || species.at(itype)=="") && species_pp.at(itype)!=""){
+       if(LDEBUG) {cerr << soliloquy << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
+       species.at(itype)=species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
+     }
+   }
+ }  // cormac I`ll write a short pflow for this stuff
+ if(species.size()==num_each_type.size()){
+   int iatom=0;
+   for(uint itype=0;itype<num_each_type.size();itype++) {
+     string s=string(species.at(itype));
+     species.at(itype)=s;
+     for(int j=0;j<num_each_type.at(itype);j++) {
+       atoms.at(iatom).name=s;    // CONVASP_MODE
+       atoms.at(iatom).CleanName();
+       atoms.at(iatom).CleanSpin();
+       atoms.at(iatom).name_is_given=TRUE;
+       iatom++;
+     }
+   }
+ }
+}
+
+// ***************************************************************************
 // Function buildGenericTitle()
 // ***************************************************************************
 void xstructure::buildGenericTitle(bool vasp_input,bool force_fix){

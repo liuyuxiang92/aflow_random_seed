@@ -2732,6 +2732,16 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {
   template<class utype> utype mean(const xvector<utype>& a){return sum(a)/a.rows;} //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights){utype sum_weights;return meanWeighted(a,weights,sum_weights);} //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights){ //CO20190520
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::meanWeighted():";
+    sum_weights=aurostd::sum(weights);
+    if(LDEBUG){cerr << soliloquy << " sum_weights=" << sum_weights << endl;}
+    double avg=aurostd::scalar_product(a,weights)/sum_weights;
+    if(LDEBUG){cerr << soliloquy << " avg=" << avg << endl;}
+    return avg;
+  }
   template<class utype> utype stddev(const xvector<utype>& a){ //CO20190520
     utype avg=mean(a);
     utype sd=(utype)0,diff=(utype)0;

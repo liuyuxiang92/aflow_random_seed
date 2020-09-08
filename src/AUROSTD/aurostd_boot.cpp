@@ -271,7 +271,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
   o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
   getQuartiles(v,x,x,x);
-  o+=aurostd::mean(v);o+=aurostd::stddev(v); //CO20190520
+  o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::stddev(v); //CO20190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO20190520
   v=aurostd::gaussian_filter_xv<utype>(x);v=aurostd::gaussian_filter_xv<utype>(x,1);v=aurostd::gaussian_filter_xv<utype>(x,1,1); //CO20190520
   vector<uint> vii; //CO20190622

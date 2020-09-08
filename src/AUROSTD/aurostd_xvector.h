@@ -587,6 +587,8 @@ namespace aurostd { //CO20190419
 namespace aurostd { //CO20190419
   //SOME STATS STUFF
   template<class utype> utype mean(const xvector<utype>& a); //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights); //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights); //CO20190520
   template<class utype> utype stddev(const xvector<utype>& a); //CO20190520
   template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO20171202
   template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO20171202, absolute deviation around the median (MAD)

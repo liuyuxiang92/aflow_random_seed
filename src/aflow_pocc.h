@@ -88,9 +88,9 @@ namespace pocc {
   string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
   string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
 
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs);
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs,double& dg_total);
+  double getEFA(const xvector<double>& xv_energies,const xvector<double>& xv_dgs);
 
   void poccOld2New(ostream& oss=cout);
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);

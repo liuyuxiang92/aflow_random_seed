@@ -6764,30 +6764,7 @@ namespace pflow {
 //force_fix: override if a column is present, this may be crucial to fix issues with write_inequivalent_flag
 namespace pflow {
   bool fixEmptyAtomNames(xstructure& xstr,bool force_fix) { //CO20190219
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::fixEmptyAtomNames():";
-    if(xstr.species.size()==xstr.species_pp.size()) { //CO20190218
-      for(uint itype=0;itype<xstr.species.size();itype++) {
-        if((force_fix || xstr.species.at(itype)=="") && xstr.species_pp.at(itype)!=""){
-          if(LDEBUG) {cerr << soliloquy << " xstr.species_pp.at(" << itype << ")=" << xstr.species_pp.at(itype) << endl;}
-          xstr.species.at(itype)=xstr.species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(xstr.species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
-        }
-      }
-    }  // cormac I`ll write a short pflow for this stuff
-    if(xstr.species.size()==xstr.num_each_type.size()){
-      int iatom=0;
-      for(uint itype=0;itype<xstr.num_each_type.size();itype++) {
-        string species=string(xstr.species.at(itype));
-        xstr.species.at(itype)=species;
-        for(int j=0;j<xstr.num_each_type.at(itype);j++) {
-          xstr.atoms.at(iatom).name=species;    // CONVASP_MODE
-          xstr.atoms.at(iatom).CleanName();
-          xstr.atoms.at(iatom).CleanSpin();
-          xstr.atoms.at(iatom).name_is_given=TRUE;
-          iatom++;
-        }
-      }
-    }
+    xstr.fixEmptyAtomNames(force_fix);
     return TRUE;
   }
 } // namespace pflow

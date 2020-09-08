@@ -389,7 +389,6 @@ namespace aflowlib {
   bool XPLUG(const vector<string>& argv);  //CO20200501
   bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
   bool LIB2RAW_Calculate_FormationEnthalpy(aflowlib::_aflowlib_entry& data,const xstructure& xstr,const string& MESSAGE); //CO20200731
-  bool LIB2RAW_Calculate_FormationEnthalpy(aflowlib::_aflowlib_entry& data,const xstructure& xstr,const xstructure& xstr_cce,const string& MESSAGE); //CO20200731
   bool LIB2RAW_Loop_Thermodynamics(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE,bool LOCAL=false);
   // [OBSOLETE]  bool LIB2RAW_Loop_DATA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
   bool LIB2RAW_Loop_Static(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);  //CO20200731

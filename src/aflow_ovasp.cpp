@@ -9037,7 +9037,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   if(filename=="") filename="stringstream";
 
   // crunching to eat the info
-  H_atom_relax=AUROSTD_NAN;
+  H_atom_relax=AUROSTD_NAN; //this will be the LAST relax
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------
