@@ -230,6 +230,11 @@ namespace aflowlib {
       double ael_average_external_pressure; // (GPa) //CT20181212
       xmatrix<double> ael_stiffness_tensor;  //ME20191105
       xmatrix<double> ael_compliance_tensor;  //ME20191105
+      // QHA  //AS20200831
+      double grueneisen_qha; //AS20200831
+      double grueneisen_300K_qha; //AS20200903
+      double thermal_expansion_300K_qha; //AS20200831
+      double modulus_bulk_static_300K_qha; //AS20200831
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -397,6 +402,7 @@ namespace aflowlib {
   bool LIB2RAW_Loop_Bader(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
   bool LIB2RAW_Loop_AGL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
   bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_QHA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //AS20200831
   bool LIB2RAW_Loop_LOCK(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
   bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //CO20200624
   bool LIB2RAW_Loop_PATCH(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);

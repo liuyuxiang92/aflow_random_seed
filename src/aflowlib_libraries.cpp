@@ -18,6 +18,7 @@
 #include "aflow_gnuplot_funcs.cpp" //CO20200508
 #include "aflow_agl_debye.h" //CT20200713
 #include "aflow_ael_elasticity.h" //CT20200713
+#include "APL/aflow_apl.h" //AS20200904
 
 using std::vector;
 using std::deque;
@@ -1183,6 +1184,7 @@ namespace aflowlib {
     bool perform_STATIC=FALSE;
     bool perform_BANDS=FALSE,perform_BADER=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
+    bool perform_QHA=FALSE; //AS20200831
     bool perform_POCC=FALSE;  //CO20200624
     bool perform_PATCH=FALSE; // to inject updates while LIB2RAW  //CO20200624 - turning off in general, check below
 
@@ -1199,6 +1201,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/AECCAR0.static"+XHOST.vext.at(iext)) && aurostd::FileExist(directory_LIB+"/AECCAR2.static"+XHOST.vext.at(iext))) perform_BADER=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext))) perform_AGL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext))) perform_AEL=TRUE;
+      if(aurostd::FileExist(directory_LIB+"/aflow.qha.out"+XHOST.vext.at(iext))) perform_QHA=TRUE;//AS20200831
       if(aurostd::FileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+XHOST.vext.at(iext))) perform_POCC=TRUE; //CO20200624
     }
     if((perform_THERMODYNAMICS || perform_BANDS || perform_STATIC)){perform_PATCH=true;} //CO20200624
@@ -1445,6 +1448,17 @@ namespace aflowlib {
         if(aurostd::FileExist(directory_RAW+"/AEL_energy_structures.json")) aurostd::LinkFile(directory_RAW+"/AEL_energy_structures.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
       }
     }
+    // BEGIN AS20200831
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // do the QHA
+    if(perform_QHA){
+      cout << soliloquy << " QHA LOOP ---------------------------------------------------------------------------------" << endl;
+      aflowlib::LIB2RAW_Loop_QHA(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (qha):");
+      if(flag_WEB) {
+        if(aurostd::FileExist(directory_RAW+"/aflow.qha.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.out",directory_WEB);
+      }
+    }
+    // END AS20200831
     // ---------------------------------------------------------------------------------------------------------------------------------
     // do the POCC
     if(perform_POCC) {
@@ -5344,6 +5358,49 @@ namespace aflowlib {
   }
 }
 
+// BEGIN AS20200831
+// ***************************************************************************
+// aflowlib::LIB2RAW_Loop_QHA  // SMOLYANYUK
+// ***************************************************************************
+namespace aflowlib {
+  bool LIB2RAW_Loop_QHA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << XPID << "aflowlib::LIB2RAW_Loop_QHA [1]" << endl;
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_QHA - begin " << directory_LIB << endl;
+    data.vloop.push_back("qha");
+
+    vector<string> vline,tokens;
+    stringstream aflow_qha_out;
+
+    aflow_qha_out.clear();
+    if(aurostd::FileExist(directory_LIB+"/"+"aflow.qha.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.out")) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
+      // TODO: list other files that are needed
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.qha.out") << endl;
+      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.qha.out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
+      aurostd::stream2vectorstring(aflow_qha_out,vline);
+      for (uint i=0;i<vline.size();i++) {
+        aurostd::StringSubst(vline.at(i),"="," ");
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        if(tokens.size()>=2) {
+          if(tokens[0]=="grueneisen_qha") data.grueneisen_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="grueneisen_300K_qha") data.grueneisen_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="thermal_expansion_300K_qha") data.thermal_expansion_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="modulus_bulk_static_300K_qha") data.modulus_bulk_static_300K_qha=aurostd::string2utype<double>(tokens[1]);
+        }
+      }
+    } else {
+      return FALSE;
+    }
+
+//    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " agl_vibrational_entropy_300K_cell (meV/cell*K) = " << ((data.agl_vibrational_entropy_300K_cell!=AUROSTD_NAN)?aurostd::utype2string(data.agl_vibrational_entropy_300K_cell,10):"unavailable") << endl; //CT20181212
+    // done
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_QHA - end " << directory_LIB << endl;
+    return TRUE;
+  }
+}
+//END AS20200831
+
 // ***************************************************************************
 // aflowlib::LIB2RAW_Loop_POCC - CO20200624
 // ***************************************************************************
@@ -6736,8 +6793,10 @@ namespace aflowlib {
     bool run_directory=false;
     bool agl_aflowin_found = false;
     bool ael_aflowin_found = false;        
+    bool qha_aflowin_found = false; //AS20200901
     string AflowInName = _AFLOWIN_;
     string FileLockName = _AFLOWLOCK_;
+    vector<string> vAflowInName, vFileLockName;
 
     //[CO20200624 - OBSOLETE]if(pocc::structuresGenerated(directory_LIB)){KBIN::VASP_RunPOCC(directory_LIB);}  //CO20200624
     //[CO20200624 - OBSOLETE]else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
@@ -6783,6 +6842,12 @@ namespace aflowlib {
         // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
         // [OBSOLETE]  AflowInName="agl_aflow.in";
         // [OBSOLETE] }
+
+        // AS20200904
+        // save for later since we will need to loop among all possible submodules, i.e.
+        // AGL, QHA,...
+        vAflowInName.push_back(AflowInName); //AS20200904
+        vFileLockName.push_back(FileLockName); //AS20200904
       } else {
         // Check for AEL input file
         AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found); //CT20200715 Call function to find correct aflow.in file name
@@ -6804,9 +6869,37 @@ namespace aflowlib {
           // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
           // [OBSOLETE]  AflowInName="ael_aflow.in";
           // [OBSOLETE] }
+
+          // AS20200904
+          // save for later since we will need to loop among all possible submodules, 
+          // i.e. AGL, QHA,...
+          vAflowInName.push_back(AflowInName); //AS20200904
+          vFileLockName.push_back(FileLockName); //AS20200904
         }
       }
-    }	
+
+      // AS20200902 BEGIN
+      // Check for QHA input file
+      qha_aflowin_found = apl::QHA_Get_AflowInName(AflowInName, directory_LIB);
+      if (qha_aflowin_found){
+        run_directory = true;
+
+	for(uint iext=0;iext<XHOST.vext.size();iext++) {
+	  aurostd::RemoveFile(directory_LIB+"/aflow.qha.out"+XHOST.vext.at(iext));
+        }
+
+        if(aurostd::FileExist(directory_LIB+"/qha.LOCK")) {
+          FileLockName = "qha.LOCK";
+        }
+
+        // AS20200904
+        // save for later since we will need to loop among all possible submodules, 
+        // i.e. AGL, QHA,...
+        vAflowInName.push_back(AflowInName); //AS20200904
+        vFileLockName.push_back(FileLockName); //AS20200904
+      }
+      // AS20200902 END
+    }
     //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
     //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
     //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
@@ -6827,25 +6920,35 @@ namespace aflowlib {
       string _AFLOWIN_orig=_AFLOWIN_;
       string _AFLOWLOCK_orig=_AFLOWLOCK_;
 
-      //set env for RUN_Directory()
-      _AFLOWIN_=AflowInName;
-      _AFLOWLOCK_=FileLockName;
+      //AS20200904 loop over all detected earlier submodules
+      for (uint i=0; i<vAflowInName.size(); i++){
+        //set env for RUN_Directory()
+        //AS20200904 BEGIN
+        //_AFLOWIN_=AflowInName; 
+        //_AFLOWLOCK_=FileLockName;
 
-      //CO20200829 - because of LOCK and agl.LOCK in the same directory, sometimes we see LOCK.xz, we need to decompress
-      //otherwise aflow can't run in the directory
-      if(XHOST.vext.size()!=XHOST.vzip.size()) {  //CO20200829 - check for LOCK.xz and decompress first
-        message << "XHOST.vext.size()!=XHOST.vzip.size()";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
-      }
-      for(uint iext=1;iext<XHOST.vext.size();iext++) {  //CO20200829 - check for LOCK.xz and decompress first // SKIP uncompressed
-        if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext])){
-          aurostd::execute(XHOST.vzip[iext]+" -dqf \""+directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext]+"\"");
+        _AFLOWIN_   = vAflowInName[i];
+        _AFLOWLOCK_ = vFileLockName[i];
+        cout << soliloquy << " Running KBIN::RUN_Directory() with aflow.in=";
+        cout << vAflowInName[i] << " and LOCK=" << vFileLockName[i] << endl;
+        //AS20200904 END
+
+        //CO20200829 - because of LOCK and agl.LOCK in the same directory, sometimes we see LOCK.xz, we need to decompress
+        //otherwise aflow can't run in the directory
+        if(XHOST.vext.size()!=XHOST.vzip.size()) {  //CO20200829 - check for LOCK.xz and decompress first
+          message << "XHOST.vext.size()!=XHOST.vzip.size()";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
         }
+        for(uint iext=1;iext<XHOST.vext.size();iext++) {  //CO20200829 - check for LOCK.xz and decompress first // SKIP uncompressed
+          if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext])){
+            aurostd::execute(XHOST.vzip[iext]+" -dqf \""+directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext]+"\"");
+          }
+        }
+        if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){
+          aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".run"); //keep original LOCK
+        }
+        KBIN::RUN_Directory(aflags);
       }
-      if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){
-        aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".run"); //keep original LOCK
-      }
-      KBIN::RUN_Directory(aflags);
 
       //return to original
       _AFLOWIN_=_AFLOWIN_orig;

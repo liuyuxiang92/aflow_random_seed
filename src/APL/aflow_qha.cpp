@@ -47,6 +47,7 @@ enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
 
+#define QHA_AFLOWIN_DEFAULT string("qha_aflow.in")
 
 //================================================================================
 //                    EOS related
@@ -572,7 +573,7 @@ namespace apl
         if (eos_apl_data_available && eos_static_data_available){
           if (includeElectronicContribution && doSommerfeldExpansion) DOSatEf();
           if (LDEBUG) writeFrequencies();
-          writeFVT();
+          writeFVT(currentDirectory);
 
           if (qha_options.flag("EOS_MODEL:SJ")){
             writeQHAresults(currentDirectory);
@@ -637,9 +638,9 @@ namespace apl
         if (gp_data_available){
           if (runQHA || runQHA3P){
             double V0 = origStructure.GetVolume()/NatomsOrigCell;
-            writeGPpath(V0);
-            writeGPmeshFD();
-            writeAverageGPfiniteDifferences();
+            writeGPpath(V0, currentDirectory);
+            writeGPmeshFD(currentDirectory);
+            writeAverageGPfiniteDifferences(currentDirectory);
 
             if (runQHA3P && eos_static_data_available){
               if (qha_options.flag("EOS_MODEL:SJ")){
@@ -677,26 +678,26 @@ namespace apl
 
           if (runSCQHA && eos_static_data_available){
             if (qha_options.flag("EOS_MODEL:SJ")){
-              RunSCQHA(EOS_SJ, true);
+              RunSCQHA(EOS_SJ, true, currentDirectory);
               writeTphononDispersions(EOS_SJ, SCQHA_CALC, currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM2")){
-              RunSCQHA(EOS_BIRCH_MURNAGHAN2, true);
+              RunSCQHA(EOS_BIRCH_MURNAGHAN2, true, currentDirectory);
               writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC,
                     currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM3")){
-              RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
+              RunSCQHA(EOS_BIRCH_MURNAGHAN3, true, currentDirectory);
               writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, SCQHA_CALC,
                     currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM4")){
-              RunSCQHA(EOS_BIRCH_MURNAGHAN4, true);
+              RunSCQHA(EOS_BIRCH_MURNAGHAN4, true, currentDirectory);
               writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, SCQHA_CALC,
                     currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:M")){
-              RunSCQHA(EOS_MURNAGHAN, true);
+              RunSCQHA(EOS_MURNAGHAN, true, currentDirectory);
               writeTphononDispersions(EOS_MURNAGHAN, SCQHA_CALC,
                     currentDirectory);
             }
@@ -1087,7 +1088,7 @@ namespace apl
       phposcarfile = directory + '/' + DEFAULT_APL_PHPOSCAR_FILE;
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
-      phcalc.initialize_supercell(xstructure(phposcarfile, IOVASP_POSCAR));
+      phcalc.initialize_supercell(xstructure(phposcarfile, IOVASP_POSCAR), false);// verbose=false: do not write files related to symmetry-analysis
       phcalc.getSupercell().build(apl_options);  // ME20200518
       phcalc.setDirectory(directory);
       phcalc.setNCPUs(kflags);
@@ -1420,6 +1421,12 @@ namespace apl
     }
 
     return gamma;
+  }
+
+  double QHA::calcGrueneisen(double V, xvector<double> &xomega)
+  {
+    double w = 0.0;
+    return calcGrueneisen(V, xomega, w);
   }
 
   /// Calculates the Grueneisen parameter of an individual vibrational mode using
@@ -1890,6 +1897,33 @@ namespace apl
     GP /= CV;
     CV /= NQpoints; CV /= NatomsOrigCell;
     CV *= pow(beta,2);
+  }
+
+  /// Calculates average Grueneisen parameter at infinite temperature.
+  /// It corresponds to an unweighted average over mode-dependent Grueneisen parameters.
+  double QHA::calcGPinfFit(double V)
+  {
+    xvector<double> xomega;
+
+    uint NIrQpoints = omegaV_mesh_EOS.size();
+    int NQpoints = 0; // the total number of q-points
+    double w    = 0;  // frequency for a given volume
+    double gamma = 0;
+    double GP = 0;
+
+    for (uint q=0; q<NIrQpoints; q++){
+      for (int branch=0; branch<Nbranches; branch++){
+        xomega = aurostd::vector2xvector(omegaV_mesh_EOS[q][branch]);
+
+        gamma = calcGrueneisen(V, xomega, w);
+        w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
+        if (w > AUROSTD_ROUNDOFF_TOL) GP += gamma * qpWeights[q];
+      }
+      NQpoints += qpWeights[q];
+    }
+
+    GP /= NQpoints; GP/= Nbranches;
+    return GP;
   }
 
   /// Calculates the volumetric thermal expansion coefficient (beta).
@@ -2448,7 +2482,8 @@ namespace apl
   /// 1) corresponds to the original implementation as described by the following papers:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
-  void QHA::RunSCQHA(EOSmethod method, bool all_iterations_self_consistent)
+  void QHA::RunSCQHA(EOSmethod method, bool all_iterations_self_consistent,
+      const string &directory)
   {
     string function = XPID + "QHA::RunSCQHA():", msg = "Running SCQHA ";
     if (all_iterations_self_consistent)
@@ -2472,7 +2507,7 @@ namespace apl
 
     // the name of the output file depends on the EOS fit method
     stringstream file;
-    string filename = DEFAULT_SCQHA_FILE_PREFIX;
+    string filename = directory + '/' + DEFAULT_SCQHA_FILE_PREFIX;
     string sc = all_iterations_self_consistent ? "sc." : "";
     switch(method){
       case(EOS_SJ):
@@ -3207,13 +3242,15 @@ namespace apl
     double bulk_modulus = EOS_bulk_modulus_at_equilibrium;
     double thermal_expansion = ThermalExpansion(T, EOS_SJ, QHA_CALC);
 
-    double CV = 0.0, grueneisen = 0.0;
-    calcCVandGPfit(T, V0K, CV, grueneisen);
+    double CV = 0.0, grueneisen_300K = 0.0;
+    calcCVandGPfit(T, V0K, CV, grueneisen_300K);
+    double grueneisen = calcGPinfFit(V0K);
 
     stringstream aflow_qha_out;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
     aflow_qha_out << "[QHA_RESULTS]START" << endl;
     aflow_qha_out << "grueneisen_qha = " << grueneisen << endl;
+    aflow_qha_out << "grueneisen_300K_qha = " << grueneisen_300K << endl;
     aflow_qha_out << "thermal_expansion_300K_qha = " << thermal_expansion * 1e5;
     aflow_qha_out << " (10^-5/K)" << endl;
     aflow_qha_out << "modulus_bulk_static_300K_qha = " << bulk_modulus;
@@ -3221,5 +3258,43 @@ namespace apl
     aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
     aurostd::stringstream2file(aflow_qha_out, directory + "/aflow.qha.out");
+  }
+}
+
+//=============================================================================
+//                         Auxiliary functions
+namespace apl{
+  /// Checks if there is an aflow.in-type file in directory_LIB with a directive to
+  /// run QHA and returns its name in AflowInName parameter.
+  /// The following variables/filenames are used for the check: AflowInName, _AFLOWIN_
+  /// and qha_aflow.in.
+  /// If there are a few suitable files, the topmost in the list is returned.
+  bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB)
+  {
+    bool qha_aflowin_is_found = false;
+    vector<string> vaflowins;
+    if (!AflowInName.empty()) vaflowins.push_back(AflowInName);
+    if (!_AFLOWIN_.empty()) vaflowins.push_back(_AFLOWIN_);
+    vaflowins.push_back(QHA_AFLOWIN_DEFAULT);
+
+    string aflowin_name, aflowin, fullpath_aflowin_name;
+    for (uint i=0; i<vaflowins.size(); i++){
+      aflowin_name = vaflowins[i];
+      fullpath_aflowin_name = directory_LIB + '/' + aflowin_name;
+      if (aurostd::FileExist(fullpath_aflowin_name)){
+        aflowin = aurostd::file2string(fullpath_aflowin_name);
+        if (aflowin.empty()) continue;
+      }
+
+      aflowin = aurostd::RemoveComments(aflowin);
+      if (aurostd::substring2bool(aflowin,"[AFLOW_QHA]CALC",TRUE) ||
+          aurostd::substring2bool(aflowin,"[VASP_QHA]CALC",TRUE)){
+        AflowInName = aflowin_name;
+        qha_aflowin_is_found = true;
+        break;
+      }
+    }
+
+    return qha_aflowin_is_found;
   }
 }

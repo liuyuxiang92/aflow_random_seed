@@ -219,6 +219,11 @@ namespace aflowlib {
     ael_average_external_pressure=b.ael_average_external_pressure; //CT20181212
     ael_stiffness_tensor = b.ael_stiffness_tensor;  //ME20191105
     ael_compliance_tensor = b.ael_compliance_tensor;  //ME20191105
+    // QHA
+    grueneisen_qha = b.grueneisen_qha; //AS20200901
+    grueneisen_300K_qha = b.grueneisen_300K_qha; //AS20200903
+    thermal_expansion_300K_qha = b.thermal_expansion_300K_qha; //AS20200901
+    modulus_bulk_static_300K_qha = b.modulus_bulk_static_300K_qha; //AS20200901
     // BADER
     bader_net_charges=b.bader_net_charges;vbader_net_charges.clear();for(uint i=0;i<b.vbader_net_charges.size();i++) vbader_net_charges.push_back(b.vbader_net_charges.at(i));
     bader_atomic_volumes=b.bader_atomic_volumes;vbader_atomic_volumes.clear();for(uint i=0;i<b.vbader_atomic_volumes.size();i++) vbader_atomic_volumes.push_back(b.vbader_atomic_volumes.at(i));
@@ -481,6 +486,11 @@ namespace aflowlib {
     ael_average_external_pressure=AUROSTD_NAN; //CT20181212
     ael_stiffness_tensor.clear();  //ME20191105
     ael_compliance_tensor.clear();  //ME20191105
+    // QHA
+    grueneisen_qha = AUROSTD_NAN;//AS20200901
+    grueneisen_300K_qha = AUROSTD_NAN;//AS20200903
+    thermal_expansion_300K_qha = AUROSTD_NAN;//AS20200901
+    modulus_bulk_static_300K_qha = AUROSTD_NAN;//AS20200901
     // BADER
     bader_net_charges.clear();vbader_net_charges.clear();
     bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
@@ -868,6 +878,13 @@ namespace aflowlib {
           ael_compliance_tensor = tensor;
         }
         //ME20191105 END
+        //AS20200901 BEGIN
+        // QHA
+        else if(keyword=="grueneisen_qha") {grueneisen_qha=aurostd::string2utype<double>(content);}
+        else if(keyword=="grueneisen_300K_qha") {grueneisen_300K_qha=aurostd::string2utype<double>(content);}
+        else if(keyword=="thermal_expansion_300K_qha") {thermal_expansion_300K_qha=aurostd::string2utype<double>(content);}
+        else if(keyword=="modulus_bulk_static_300K_qha") {modulus_bulk_static_300K_qha=aurostd::string2utype<double>(content);}
+        //AS20200901 END
         // BADER
         else if(keyword=="bader_net_charges") {bader_net_charges=content;aurostd::string2tokens<double>(content,vbader_net_charges,",");}
         else if(keyword=="bader_atomic_volumes") {bader_atomic_volumes=content;aurostd::string2tokens<double>(content,vbader_atomic_volumes,",");}
@@ -1118,6 +1135,13 @@ namespace aflowlib {
       oss << "ael_stiffness_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
       oss << "ael_compliance_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
       //ME20191105 END
+      //AS20200901 BEGIN
+      //QHA
+      oss << "grueneisen_qha" << grueneisen_qha << (html?"<br>":"") << endl;
+      oss << "grueneisen_300K_qha" << grueneisen_300K_qha << (html?"<br>":"") << endl;
+      oss << "thermal_expansion_300K_qha" << thermal_expansion_300K_qha << (html?"<br>":"") << endl;
+      oss << "modulus_bulk_static_300K_qha" << modulus_bulk_static_300K_qha << (html?"<br>":"") << endl;
+      //AS20200901 END
       // BADER
       oss << "bader_net_charges" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
       oss << "bader_atomic_volumes" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
@@ -1362,6 +1386,13 @@ namespace aflowlib {
         }
       }
       //ME20191105 END
+      //AS20200901 BEGIN
+      //QHA
+      if(grueneisen_qha!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "grueneisen_qha=" << grueneisen_qha << eendl; //AS20200901
+      if(grueneisen_300K_qha!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "grueneisen_300K_qha=" << grueneisen_300K_qha << eendl; //AS20200901
+      if(thermal_expansion_300K_qha!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "thermal_expansion_300K_qha=" << thermal_expansion_300K_qha << eendl; //AS20200901
+      if(modulus_bulk_static_300K_qha!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "modulus_bulk_static_300K_qha=" << modulus_bulk_static_300K_qha << eendl; //AS20200901
+      //AS20200901 END
       // BADER
       if(bader_net_charges.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_net_charges=" << bader_net_charges << eendl;
       if(bader_atomic_volumes.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_atomic_volumes=" << bader_atomic_volumes << eendl;
@@ -3200,6 +3231,46 @@ namespace aflowlib {
         if (PRINT_NULL) sscontent_json << "\"ael_compliance_tensor\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+
+      //AS20200901 BEGIN
+      // QHA
+      //////////////////////////////////////////////////////////////////////////
+      if(grueneisen_qha!=AUROSTD_NAN) {
+        sscontent_json << "\"grueneisen_qha\":" << grueneisen_qha;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"grueneisen_qha\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(grueneisen_300K_qha!=AUROSTD_NAN) {
+        sscontent_json << "\"grueneisen_300K_qha\":" << grueneisen_qha;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"grueneisen_300K_qha\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(thermal_expansion_300K_qha!=AUROSTD_NAN) {
+        sscontent_json << "\"thermal_expansion_300K_qha\":" << thermal_expansion_300K_qha;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"thermal_expansion_300K_qha\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(modulus_bulk_static_300K_qha!=AUROSTD_NAN) {
+        sscontent_json << "\"modulus_bulk_static_300K_qha\":" << modulus_bulk_static_300K_qha;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"modulus_bulk_static_300K_qha\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //AS20200901 END
 
       // BADER
       //////////////////////////////////////////////////////////////////////////

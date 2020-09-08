@@ -521,8 +521,8 @@ namespace apl {
       // Initializers
       void initialize_qmesh(const vector<int>&, bool=true, bool=true);
       void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
-      void initialize_supercell(const xstructure&);
-      void initialize_supercell(const string&);
+      void initialize_supercell(const xstructure&, bool verbose=true);//AS20200908
+      void initialize_supercell(const string&, bool verbose=true);//AS20200908
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
@@ -1179,6 +1179,8 @@ namespace apl
   enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC, QHANP_CALC};
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
+  bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
+
   /// Calculates QHA-related properties
   ///
   /// This class will substitute old QHA class.
@@ -1197,10 +1199,12 @@ namespace apl
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags);
       void clear();
       double calcFrequencyFit(double V, xvector<double> &xomega);
+      double calcGrueneisen(double V, xvector<double> &xomega);
       double calcGrueneisen(double V, xvector<double> &xomega, double &w);
       double calcGrueneisenFD(const xvector<double> &xomega);
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
+      double calcGPinfFit(double V);
       double FreeEnergy(double T, int id);
       double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
       double electronicFreeEnergy(double T, int id);
@@ -1230,7 +1234,8 @@ namespace apl
       double VPgamma(double T, double V);
       double SCQHAgetEquilibriumVolume(double T, EOSmethod method);
       double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
-      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
+      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true,
+          const string &directory=".");
       // output
       void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method, 
           const string &directory=".");
