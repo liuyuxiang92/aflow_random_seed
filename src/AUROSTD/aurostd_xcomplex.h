@@ -14,8 +14,8 @@
 // -------------------------------------------------------------- class xcomplex
 namespace aurostd {
 
-  class istream;
-  class ostream;
+  //[CO20200624 - OBSOLETE]class istream;
+  //[CO20200624 - OBSOLETE]class ostream;
 
   template <class utype> class xcomplex;
 
